@@ -1,0 +1,13 @@
+/**
+ * 페이지의 경로를 관리합니다.
+ */
+export const enum Paths {
+  HOME = "HOME", // 메인 페이지
+  SETTING = "SETTING", // 설정 페이지 
+  EXAMPLE = "EXAMPLE",
+  MAIN_REFRENCE = "MAIN_REFRENCE",
+  FN_NOTIFICATION = "FN_NOTIFICATION",
+  FN_ADVERTISEMENT = "FN_ADVERTISEMENT",
+  FN_PERMISSION = "FN_PERMISSION",
+  FN_LANGUAGE = "FN_LANGUAGE"
+}

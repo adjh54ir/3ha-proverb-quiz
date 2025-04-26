@@ -1,0 +1,19 @@
+{
+    "main": {
+        "common_appName": {
+            "full": "React Native 보일러플레이트",
+            "initials": "RNB"
+        },
+        "common_error": "죄송합니다! 문제가 발생했습니다.",
+        "screen_example": {
+            "hello_user": "안녕하세요, 제 이름은 {{name}}입니다",
+            "title": "$t(common_appName.full)에 오신 것을 환영합니다",
+            "description": "기능들을 살펴보시겠습니까? 화면 하단의 세 버튼 중 하나를 클릭해보세요. 첫 번째 버튼은 REST API를 호출하고, 두 번째 버튼은 테마 색상을 변경하며, 세 번째 버튼은 언어를 변경할 수 있습니다."
+        },
+        "error_boundary": {
+            "title": "죄송합니다! 문제가 발생했습니다.",
+            "description": "불편을 끼쳐 죄송합니다. 나중에 다시 시도해주세요.",
+            "cta": "화면 새로고침"
+        }
+    }
+}

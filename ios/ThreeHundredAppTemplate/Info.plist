@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>korea</string>
+	<key>CFBundleDisplayName</key>
+	<string>앱 개발 템플릿</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3238080563416979~5124343909</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<!-- ===================================================== 권한들을 관리합니다 ======================================================== -->
+	<!-- 음악 라이브러리 접근 권한 설정 -->
+	<key>NSAppleMusicUsageDescription</key>
+	<string>음악 재생 기능을 위해 음악 라이브러리 접근 권한이 필요합니다.</string>
+
+	<!-- 블루투스 관련 권한 설정 -->
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>블루투스 기기 연결을 위해 권한이 필요합니다.</string>
+
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>주변 블루투스 기기 검색을 위해 권한이 필요합니다.</string>
+
+	<!-- 캘린더 관련 권한 설정 -->
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>일정 관리를 위해 캘린더 접근 권한이 필요합니다.</string>
+
+	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<string>일정 추가를 위해 캘린더 쓰기 권한이 필요합니다.</string>
+
+	<!-- 카메라 접근 권한 설정 -->
+	<key>NSCameraUsageDescription</key>
+	<string>사진 촬영을 위해 카메라 접근 권한이 필요합니다.</string>
+
+	<!-- 연락처 접근 권한 설정 -->
+	<key>NSContactsUsageDescription</key>
+	<string>연락처 정보 동기화를 위해 주소록 접근 권한이 필요합니다.</string>
+
+	<!-- Face ID 사용 권한 설정 -->
+	<key>NSFaceIDUsageDescription</key>
+	<string>안전한 인증을 위해 Face ID 사용 권한이 필요합니다.</string>
+
+	<!-- 위치 정보 관련 권한 설정 -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>위치 기반 서비스 제공을 위해 위치 정보 접근 권한이 필요합니다.</string>
+
+	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
+	<dict>
+	<key>YOUR-PURPOSE-KEY</key>
+	<string>일시적인 위치 정보 확인을 위해 권한이 필요합니다.</string>
+	</dict>
+
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>앱 사용 중 위치 기반 서비스 제공을 위해 위치 정보 접근 권한이 필요합니다.</string>
+
+	<!-- 마이크 접근 권한 설정 -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>음성 녹음을 위해 마이크 접근 권한이 필요합니다.</string>
+
+	<!-- 모션 센서 접근 권한 설정 -->
+	<key>NSMotionUsageDescription</key>
+	<string>동작 감지 기능을 위해 모션 센서 접근 권한이 필요합니다.</string>
+
+	<!-- 사진 라이브러리 관련 권한 설정 -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>사진 저장 및 불러오기를 위해 사진 라이브러리 접근 권한이 필요합니다.</string>
+
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>사진 저장을 위해 사진 라이브러리 접근 권한이 필요합니다.</string>
+
+	<!-- 미리 알림 접근 권한 설정 -->
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>알림 설정을 위해 미리 알림 접근 권한이 필요합니다.</string>
+
+	<!-- 음성 인식 관련 권한 설정 -->
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>음성 인식 기능을 위해 음성 인식 권한이 필요합니다.</string>
+
+	<!-- Siri 사용 권한 설정 -->
+	<key>NSSiriUsageDescription</key>
+	<string>Siri를 통한 기능 사용을 위해 Siri 접근 권한이 필요합니다.</string>
+
+	<!-- 사용자 추적 권한 설정 -->
+	<key>NSUserTrackingUsageDescription</key>
+	<string>맞춤형 광고 제공을 위해 사용자 추적 권한이 필요합니다.</string>
+
+	<!-- 광고 네트워크 설정 -->
+	<key>SKAdNetworkItems</key>
+	<!-- ===================================================== 권한들을 관리합니다 ======================================================== -->
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>4fzdc2evr5.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>2fnua5tdw4.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>ydx93a7ass.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>p78axxw29g.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>v72qych5uu.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>ludvb6z3bs.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cp8zw746q7.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>3sh42y64q3.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>c6k4g5qg8m.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>s39g8k73mm.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>3qy4746246.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>hs6bdukanm.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>mlmmfzh3r3.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>v4nxqhlyqp.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>wzmmz9fp6w.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>su67r6k2v3.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>yclnxrl5pm.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>7ug5zh24hu.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>gta9lk7p23.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>vutu7akeur.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>y5ghdn5j9k.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>v9wttpbfk9.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>n38lu8286q.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>47vhws6wlr.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>kbd757ywx3.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>9t245vhmpl.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>a2p9lx4jpn.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>22mmun2rn5.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>4468km3ulz.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>2u9pt9hc89.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>8s468mfl3y.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>ppxm28t8ap.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>uw77j35x4d.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>pwa73g5rt2.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>578prtvx9j.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>4dzt52r2t5.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>tl55sbb4fm.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>e5fvkxwrpn.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>8c4e2ghe7u.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>3rd42ekr43.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>3qcr597p9d.skadnetwork</string>
+		</dict>
+	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>AntDesign.ttf</string>
+		<string>Entypo.ttf</string>
+		<string>EvilIcons.ttf</string>
+		<string>Feather.ttf</string>
+		<string>FontAwesome.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
+		<string>FontAwesome6_Brands.ttf</string>
+		<string>FontAwesome6_Regular.ttf</string>
+		<string>FontAwesome6_Solid.ttf</string>
+		<string>Foundation.ttf</string>
+		<string>Ionicons.ttf</string>
+		<string>MaterialIcons.ttf</string>
+		<string>MaterialCommunityIcons.ttf</string>
+		<string>SimpleLineIcons.ttf</string>
+		<string>Octicons.ttf</string>
+		<string>Zocial.ttf</string>
+		<string>Fontisto.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+</dict>
+</plist>

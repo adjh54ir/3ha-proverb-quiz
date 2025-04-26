@@ -1,0 +1,154 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 인터넷 권한: API 통신, 원격 이미지 로딩, 웹소켓 연결 등에 필요 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- 다른 기기로 통화 전환 권한 -->
+    <uses-permission android:name="android.permission.ACCEPT_HANDOVER" />
+
+    <!-- 백그라운드에서 위치 정보 접근 권한 -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!-- 대략적인 위치 정보 접근 권한 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- 정확한 위치 정보 접근 권한 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- 미디어 위치 정보 접근 권한 -->
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+
+    <!-- 활동 인식 권한 -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+
+    <!-- 음성메일 추가 권한 -->
+    <uses-permission android:name="com.android.voicemail.permission.ADD_VOICEMAIL" />
+
+    <!-- 전화 응답 권한 -->
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+
+    <!-- 블루투스 광고 권한 -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+
+    <!-- 블루투스 연결 권한 -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <!-- 블루투스 스캔 권한 -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+
+    <!-- 신체 센서 접근 권한 -->
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
+
+    <!-- 백그라운드 신체 센서 접근 권한 -->
+    <uses-permission android:name="android.permission.BODY_SENSORS_BACKGROUND" />
+
+    <!-- 전화 걸기 권한 -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <!-- 카메라 사용 권한 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- 계정 정보 접근 권한 -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+
+    <!-- 근처 WiFi 기기 검색 권한 -->
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" />
+
+    <!-- 알림 발송 권한 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- 발신 전화 처리 권한 -->
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+
+    <!-- 캘린더 읽기 권한 -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+
+    <!-- 통화 기록 읽기 권한 -->
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+
+    <!-- 연락처 읽기 권한 -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!-- 외부 저장소 읽기 권한 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- 오디오 미디어 읽기 권한 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+    <!-- 이미지 미디어 읽기 권한 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!-- 비디오 미디어 읽기 권한 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+
+    <!-- 사용자 선택 시각 미디어 읽기 권한 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+
+    <!-- 전화번호 읽기 권한 -->
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+
+    <!-- 전화 상태 읽기 권한 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!-- SMS 읽기 권한 -->
+    <uses-permission android:name="android.permission.READ_SMS" />
+
+    <!-- MMS 수신 권한 -->
+    <uses-permission android:name="android.permission.RECEIVE_MMS" />
+
+    <!-- SMS 수신 권한 -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+
+    <!-- WAP PUSH 수신 권한 -->
+    <uses-permission android:name="android.permission.RECEIVE_WAP_PUSH" />
+
+    <!-- 오디오 녹음 권한 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- 정확한 알람 예약 권한 -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <!-- SMS 전송 권한 -->
+    <uses-permission android:name="android.permission.SEND_SMS" />
+
+    <!-- SIP 사용 권한 -->
+    <uses-permission android:name="android.permission.USE_SIP" />
+
+    <!-- UWB 범위 측정 권한 -->
+    <uses-permission android:name="android.permission.UWB_RANGING" />
+
+    <!-- 캘린더 쓰기 권한 -->
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+
+    <!-- 통화 기록 쓰기 권한 -->
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
+
+    <!-- 연락처 쓰기 권한 -->
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+    <!-- 외부 저장소 쓰기 권한 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+
+    <application
+      android:name=".MainApplication"
+      android:label="@string/app_name"
+      android:icon="@mipmap/ic_launcher"
+      android:roundIcon="@mipmap/ic_launcher"
+      android:allowBackup="false"
+      android:theme="@style/AppTheme"
+      android:supportsRtl="true">
+      <activity
+        android:name=".MainActivity"
+        android:label="@string/app_name"
+        android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+        android:launchMode="singleTask"
+        android:windowSoftInputMode="adjustResize"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+      </activity>
+    </application>
+</manifest>

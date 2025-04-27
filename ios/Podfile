@@ -24,7 +24,7 @@ if linkage != nil
 end
 
 
-target 'ThreeHundredAppTemplate' do
+target 'ProverbQuiz' do
   config = use_native_modules!
   use_react_native!(
     :path => config[:reactNativePath],

@@ -1,5 +1,5 @@
 {
-  "name": "threehundredapptemplate",
+  "name": "proverbquiz",
   "version": "0.0.1",
   "private": true,
   "description": "300개의 앱을 만들기 위한 기본 템플릿",
@@ -54,6 +54,7 @@
     "react-native-date-picker": "^5.0.10",
     "react-native-device-info": "^14.0.4",
     "react-native-dotenv": "^3.4.11",
+    "react-native-dropdown-picker": "^5.4.6",
     "react-native-fast-image": "^8.6.3",
     "react-native-flip-card": "^3.5.7",
     "react-native-gesture-handler": "^2.24.0",

@@ -18,6 +18,17 @@ const BottomTabNavigator = (appStateType: any) => {
 	return (
 		<Tab.Navigator initialRouteName={Paths.HOME}>
 			{/* 홈 화면 */}
+
+			<Tab.Screen
+				name={Paths.PROVERB_LIST}
+				component={ProverbListScreen}
+				options={({ navigation }) => ({
+					unmountOnBlur: true,
+					title: '속담 리스트',
+					tabBarLabel: '속담 리스트',
+					tabBarIcon: ({ color, size }) => <IconComponent type='materialIcons' name='public' size={size} color={color} />,
+				})}
+			/>
 			<Tab.Screen
 				name={Paths.HOME}
 				component={Home}
@@ -26,17 +37,6 @@ const BottomTabNavigator = (appStateType: any) => {
 					title: '홈',
 					tabBarLabel: '홈',
 					tabBarIcon: ({ color, size }) => <IconComponent type='materialIcons' name='home' size={size} color={color} />,
-				})}
-			/>
-
-			<Tab.Screen
-				name={Paths.PROVERB_LIST}
-				component={ProverbListScreen}
-				options={({ navigation }) => ({
-					unmountOnBlur: true,
-					title: '설정',
-					tabBarLabel: '설정',
-					tabBarIcon: ({ color, size }) => <IconComponent type='materialIcons' name='settings' size={size} color={color} />,
 				})}
 			/>
 

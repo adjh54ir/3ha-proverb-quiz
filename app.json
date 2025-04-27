@@ -1,6 +1,6 @@
 {
-  "name": "ThreeHundredAppTemplate",
-  "displayName": "ThreeHundredAppTemplate",
+  "name": "ProverbQuiz",
+  "displayName": "ProverbQuiz",
   "react-native-google-mobile-ads": {
     "android_app_id": "ca-app-pub-3238080563416979~6437425576",
     "ios_app_id": "ca-app-pub-3238080563416979~5124343909"

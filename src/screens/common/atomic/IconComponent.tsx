@@ -18,24 +18,24 @@ import Zocial from 'react-native-vector-icons/Zocial';
 import { StyleProp, TextStyle } from 'react-native/types';
 
 export type IconType =
-	| 'antDesign'
+	| 'antdesign'
 	| 'entypo'
-	| 'evilIcons'
+	| 'evilicons'
 	| 'feather'
-	| 'fontAwesome'
-	| 'fontAwesome5'
-	| 'fontAwesome6'
+	| 'fontawesome'
+	| 'fontawesome5'
+	| 'fontawesome6'
 	| 'fontisto'
 	| 'foundation'
 	| 'ionicons'
-	| 'materialCommunityIcons'
-	| 'materialIcons'
+	| 'materialcommunityicons'
+	| 'materialicons'
 	| 'octicons'
-	| 'simpleLineIcons'
+	| 'simplelineicons'
 	| 'zocial';
 
 interface IconProps {
-	type: IconType;
+	type: string;
 	name: string;
 	size?: number;
 	color?: string;
@@ -48,56 +48,46 @@ interface IconProps {
  *  호출 예시 
  const MyComponent = () => {
   return (
-    <IconComponent
-      type="materialIcons"
-      name="home"
-      size={24}
-      color="#000000"
-    />
+	<IconComponent
+	  type="materialIcons"
+	  name="home"
+	  size={24}
+	  color="#000000"
+	/>
   );
 };
  * @param param0 
  * @returns 
  */
 const IconComponent: React.FC<IconProps> = ({ type, name, size = 24, color = 'black', style }) => {
-	const getIcon = () => {
-		switch (type) {
-			case 'antDesign':
-				return <AntDesign name={name} size={size} color={color} style={style} />;
-			case 'entypo':
-				return <Entypo name={name} size={size} color={color} style={style} />;
-			case 'evilIcons':
-				return <EvilIcons name={name} size={size} color={color} style={style} />;
-			case 'feather':
-				return <Feather name={name} size={size} color={color} style={style} />;
-			case 'fontAwesome':
-				return <FontAwesome name={name} size={size} color={color} style={style} />;
-			case 'fontAwesome5':
-				return <FontAwesome5 name={name} size={size} color={color} style={style} />;
-			case 'fontAwesome6':
-				return <FontAwesome6 name={name} size={size} color={color} style={style} />;
-			case 'fontisto':
-				return <Fontisto name={name} size={size} color={color} style={style} />;
-			case 'foundation':
-				return <Foundation name={name} size={size} color={color} style={style} />;
-			case 'ionicons':
-				return <Ionicons name={name} size={size} color={color} style={style} />;
-			case 'materialCommunityIcons':
-				return <MaterialCommunityIcons name={name} size={size} color={color} style={style} />;
-			case 'materialIcons':
-				return <MaterialIcons name={name} size={size} color={color} style={style} />;
-			case 'octicons':
-				return <Octicons name={name} size={size} color={color} style={style} />;
-			case 'simpleLineIcons':
-				return <SimpleLineIcons name={name} size={size} color={color} style={style} />;
-			case 'zocial':
-				return <Zocial name={name} size={size} color={color} style={style} />;
-			default:
-				return null;
-		}
+	const normalizedType = type.toLowerCase(); // 소문자 변환
+
+	const iconMap: Record<IconType, any> = {
+		antdesign: AntDesign,
+		entypo: Entypo,
+		evilicons: EvilIcons,
+		feather: Feather,
+		fontawesome: FontAwesome,
+		fontawesome5: FontAwesome5,
+		fontawesome6: FontAwesome6,
+		fontisto: Fontisto,
+		foundation: Foundation,
+		ionicons: Ionicons,
+		materialcommunityicons: MaterialCommunityIcons,
+		materialicons: MaterialIcons,
+		octicons: Octicons,
+		simplelineicons: SimpleLineIcons,
+		zocial: Zocial,
 	};
 
-	return getIcon();
+	const Icon = iconMap[normalizedType as IconType];
+
+	if (!Icon) {
+		console.warn(`[IconComponent] '${type}'는 지원되지 않는 아이콘 타입입니다.`);
+		return null;
+	}
+
+	return <Icon name={name} size={size} color={color} style={style} />;
 };
 
 export default IconComponent;

@@ -78,9 +78,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.tha"             // TODO 변경필요
+    namespace "com.tha.proverbquiz"             // TODO 변경필요
     defaultConfig {
-        applicationId "com.tha"     // TODO 변경 필요
+        applicationId "com.tha.proverbquiz"     // TODO 변경 필요
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

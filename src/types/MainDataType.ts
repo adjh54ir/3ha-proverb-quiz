@@ -40,4 +40,16 @@ export declare module MainDataType {
 		iconType: string; // 아이콘 타입(FontAwesome6)
 		icon: string; // 아이콘 이름(earth-asia)
 	}
+	/**
+	 * 사용자 퀴즈 데이터 정의 
+	 */
+	export interface UserQuizHistory {
+		correctProverbId: number[];     		// 사용자가 정답을 맞춘 속담의 아이디 목록 (예: [1, 2])
+		wrongProverbId: number[];       		// 사용자가 오답을 선택한 속담의 아이디 목록
+		lastAnsweredAt: Date;           		// 마지막으로 퀴즈를 푼 시간 (Date 객체 또는 ISO 문자열)
+		quizCounts: { [id: number]: number }; 	// 각 속담별 퀴즈 시도 횟수 (key는 사용자 아이디)
+		badges: string[];               		// 사용자가 획득한 뱃지의 ID 목록 (ex: ['asia_master', 'level1_perfect'])
+		totalScore: number;             		// 사용자의 퀴즈 총 누적 점수
+		bestCombo?: number;             		// 사용자가 기록한 가장 높은 연속 정답 수 (선택 값)
+	}
 }

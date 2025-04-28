@@ -11,6 +11,8 @@ import {
 	Platform,
 	TouchableWithoutFeedback,
 	FlatList,
+	Modal,
+	ScrollView,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -34,6 +36,8 @@ const ProverbListScreen = () => {
 	const [levelOpen, setLevelOpen] = useState(false);
 	const [fieldValue, setFieldValue] = useState('전체');
 	const [levelValue, setLevelValue] = useState('전체');
+	const [selectedProverb, setSelectedProverb] = useState<MainDataType.Proverb | null>(null);
+	const [showDetailModal, setShowDetailModal] = useState(false);
 
 	const [fieldItems, setFieldItems] = useState([
 		{ label: '전체', value: '전체' },
@@ -139,6 +143,12 @@ const ProverbListScreen = () => {
 				return '#b2bec3'; // 기본 회색 (분류가 안된 경우)
 		}
 	};
+	const handleReset = () => {
+		setKeyword('');
+		setFieldValue('전체');
+		setLevelValue('전체');
+		Keyboard.dismiss(); // 키보드도 닫아줌
+	};
 
 	return (
 		<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -166,6 +176,7 @@ const ProverbListScreen = () => {
 								onChangeText={setKeyword}
 								value={keyword}
 							/>
+
 							<View style={styles.filterDropdownRow}>
 								<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
 									<DropDownPicker
@@ -175,7 +186,7 @@ const ProverbListScreen = () => {
 										setOpen={setFieldOpen}
 										setValue={setFieldValue}
 										setItems={setFieldItems}
-										placeholder='분야 선택'
+										placeholder="분야 선택"
 										placeholderStyle={styles.dropdownPlaceholder}
 										style={[styles.dropdown, { justifyContent: 'center' }]}
 										iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
@@ -184,6 +195,7 @@ const ProverbListScreen = () => {
 										zIndexInverse={fieldOpen ? 1000 : 2000}
 									/>
 								</View>
+
 								<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000 }]}>
 									<DropDownPicker
 										open={levelOpen}
@@ -192,7 +204,7 @@ const ProverbListScreen = () => {
 										setOpen={setLevelOpen}
 										setValue={setLevelValue}
 										setItems={setLevelItems}
-										placeholder='수준 선택'
+										placeholder="수준 선택"
 										placeholderStyle={styles.dropdownPlaceholder}
 										style={styles.dropdown}
 										iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
@@ -201,11 +213,28 @@ const ProverbListScreen = () => {
 										zIndexInverse={levelOpen ? 1000 : 2000}
 									/>
 								</View>
+
+								{/* ✅ 초기화 버튼 추가 */}
+								<TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+									<Icon name="rotate-right" size={20} color="#555" />
+								</TouchableOpacity>
+							</View>
+							{/* ✅ 리스트 시작부분에 갯수 표시 */}
+							<View style={styles.listCountWrapper}>
+								<Text style={styles.listCountText}>
+									총 {proverbList.length}개의 속담이 있어요
+								</Text>
 							</View>
 						</View>
 					}
 					renderItem={({ item }) => (
-						<View style={styles.itemBox}>
+						<TouchableOpacity
+							style={styles.itemBox}
+							onPress={() => {
+								setSelectedProverb(item);
+								setShowDetailModal(true);
+							}}
+						>
 							<Text style={styles.proverbText}>{item.proverb}</Text>
 							<Text style={styles.meaningText}>{item.meaning}</Text>
 							<View style={styles.badgeRow}>
@@ -216,7 +245,7 @@ const ProverbListScreen = () => {
 									<Text style={styles.badgeText}>{item.levelName}</Text>
 								</View>
 							</View>
-						</View>
+						</TouchableOpacity>
 					)}
 					contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
 				/>
@@ -226,6 +255,68 @@ const ProverbListScreen = () => {
 					<Icon name='arrow-up' size={20} color='#fff' />
 				</TouchableOpacity>
 			)}
+
+			<Modal
+				visible={showDetailModal}
+				animationType="slide"
+				transparent={true}
+				onRequestClose={() => setShowDetailModal(false)}
+			>
+				<View style={styles.modalOverlay}>
+					<View style={styles.modalContainer}>
+						<View style={styles.modalHeader}>
+							<Text style={styles.modalTitle}>{selectedProverb?.proverb}</Text>
+						</View>
+
+						{/* ✅ 스크롤 가능한 영역 */}
+						<ScrollView contentContainerStyle={styles.modalBody}>
+							<View style={styles.modalSection}>
+								<Text style={styles.modalLabel}>의미</Text>
+								<Text style={styles.modalText}>{selectedProverb?.meaning}</Text>
+							</View>
+
+							<View style={styles.modalSection}>
+								<Text style={styles.modalLabel}>예시</Text>
+								<Text style={styles.modalText}>{selectedProverb?.example}</Text>
+							</View>
+
+							<View style={styles.modalSection}>
+								<Text style={styles.modalLabel}>유래</Text>
+								<Text style={styles.modalText}>{selectedProverb?.origin}</Text>
+							</View>
+
+							<View style={styles.modalSection}>
+								<Text style={styles.modalLabel}>사용 팁</Text>
+								<Text style={styles.modalText}>{selectedProverb?.usageTip}</Text>
+							</View>
+
+							{selectedProverb?.synonym && (
+								<View style={styles.modalHighlightBox}>
+									<Text style={styles.modalHighlightTitle}>비슷한 속담</Text>
+									<Text style={styles.modalHighlightText}>{selectedProverb.synonym}</Text>
+								</View>
+							)}
+
+							{selectedProverb?.antonym && (
+								<View style={styles.modalHighlightBox}>
+									<Text style={styles.modalHighlightTitle}>반대 속담</Text>
+									<Text style={styles.modalHighlightText}>{selectedProverb.antonym}</Text>
+								</View>
+							)}
+
+							<View style={styles.modalSection}>
+								<Text style={styles.modalLabel}>난이도 점수</Text>
+								<Text style={styles.modalText}>{selectedProverb?.difficultyScore} / 100</Text>
+							</View>
+						</ScrollView>
+
+						{/* ✅ 닫기 버튼을 모달 맨 하단에 고정 */}
+						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowDetailModal(false)}>
+							<Text style={styles.modalCloseButtonText}>닫기</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</Modal>
 		</KeyboardAvoidingView>
 	);
 };
@@ -246,12 +337,15 @@ const styles = StyleSheet.create({
 		elevation: 3,
 	},
 	input: {
+		height: 44, // 드롭다운과 똑같이!
 		borderWidth: 1,
 		borderColor: '#ccc',
-		padding: 12,
 		borderRadius: 8,
 		fontSize: 16,
+		paddingHorizontal: 12, // 좌우 패딩만
+		paddingVertical: 0, // 위아래 패딩 없애야 높이 딱 맞아
 		marginBottom: 12,
+		textAlignVertical: 'center', // 텍스트 수직 중앙 정렬
 	},
 	filterRow: {
 		flexDirection: 'row',
@@ -336,5 +430,104 @@ const styles = StyleSheet.create({
 	dropdownWrapperLast: {
 		flex: 1,
 		marginBottom: 6,
+		marginRight: 6, // ✅ 초기화 버튼과 여백 추가!
 	},
+	listCountWrapper: {
+		marginTop: 10,
+		alignItems: 'flex-end', // ✅ 오른쪽 정렬
+		paddingHorizontal: 16, // ✅ 양쪽 여백 추가 (리스트랑 맞추기)
+		marginBottom: 8,
+	},
+	listCountText: {
+		fontSize: 14,
+		color: '#666',
+	},
+	resetButton: {
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#eee',
+		height: 44,
+		width: 44, // ✅ 정사각형으로 통일
+		borderRadius: 8,
+	},
+	resetButtonText: {
+		color: '#555',
+		fontSize: 14,
+		fontWeight: 'bold',
+	},
+	modalOverlay: {
+		flex: 1,
+		backgroundColor: 'rgba(0,0,0,0.5)',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	modalContainer: {
+		width: '90%',
+		backgroundColor: '#fff',
+		borderRadius: 20,
+		overflow: 'hidden',
+		maxHeight: '85%',
+		justifyContent: 'space-between', // ✅ 상단-스크롤-하단 분리
+	},
+	modalBody: {
+		paddingHorizontal: 20,
+		paddingVertical: 16,
+	},
+	modalHeader: {
+		backgroundColor: '#4a90e2',
+		paddingVertical: 16,
+		paddingHorizontal: 20,
+		alignItems: 'center',
+	},
+	modalTitle: {
+		fontSize: 20,
+		fontWeight: 'bold',
+		color: '#fff',
+	},
+	modalScrollContent: {
+		paddingVertical: 20,
+	},
+	modalSection: {
+		marginBottom: 16,
+		borderBottomWidth: 1,
+		borderBottomColor: '#e0e0e0',
+		paddingBottom: 12,
+	},
+	modalLabel: {
+		fontSize: 14,
+		fontWeight: 'bold',
+		color: '#555',
+		marginBottom: 4,
+	},
+	modalText: {
+		fontSize: 14,
+		color: '#333',
+	},
+	modalHighlightBox: {
+		backgroundColor: '#dfe6e9',
+		borderRadius: 12,
+		padding: 12,
+		marginBottom: 16,
+	},
+	modalHighlightTitle: {
+		fontSize: 14,
+		fontWeight: 'bold',
+		marginBottom: 4,
+		color: '#2d3436',
+	},
+	modalHighlightText: {
+		fontSize: 14,
+		color: '#2d3436',
+	},
+	modalCloseButton: {
+		backgroundColor: '#4a90e2',
+		paddingVertical: 14,
+		alignItems: 'center',
+	},
+	modalCloseButtonText: {
+		color: '#fff',
+		fontSize: 16,
+		fontWeight: 'bold',
+	},
+
 });

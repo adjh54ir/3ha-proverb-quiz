@@ -7,10 +7,10 @@ import BottomTabNavigator from './BottomTabNavigator';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
-import ProverbQuizModeSelectScreen from '@/screens/ProverbQuizModeScreen';
-import ProverbMeaningQuizScreen from '@/screens/ProverbMeaningQuizScreen';
-import ProverbFindQuizScreen from '@/screens/ProverbFindQuizScreen';
-import ProverbFillBlankQuizScreen from '@/screens/ProverbFillBlankQuizScreen';
+import ProverbQuizModeSelectScreen from '@/screens/quizMode/ProverbQuizModeScreen';
+import ProverbMeaningQuizScreen from '@/screens/quiz/ProverbMeaningQuizScreen';
+import ProverbFindQuizScreen from '@/screens/quiz/ProverbFindQuizScreen';
+import ProverbFillBlankQuizScreen from '@/screens/quiz/ProverbFillBlankQuizScreen';
 import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
 
 /**

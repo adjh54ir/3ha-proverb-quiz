@@ -167,7 +167,7 @@ const Home = () => {
 							iconName='play-arrow'
 							iconType='materialIcons'
 							label='시작하기'
-							description='전체, 대륙, 난이도별 퀴즈 모드를 선택해 퀴즈를 풀어봐요'
+							description='속담 뜻, 속담 찾기, 빈칸 채우기 퀴즈를 선택해서 퀴즈를 풀어봐요'
 							color='#3498db'
 							onPress={moveToHandler.quiz}
 						/>
@@ -175,7 +175,7 @@ const Home = () => {
 							iconName='school'
 							iconType='materialIcons'
 							label='학습 모드'
-							description='카드 형식으로 국가별 수도 정보를 재미있게 익혀봐요'
+							description='카드 형식으로 속담과 속담의 의미를 재미있게 익혀봐요'
 							color='#2ecc71'
 							onPress={moveToHandler.study}
 						/>

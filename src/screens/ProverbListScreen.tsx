@@ -19,18 +19,22 @@ import Icon from 'react-native-vector-icons/FontAwesome6';
 import DropDownPicker from 'react-native-dropdown-picker';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
+import FastImage from 'react-native-fast-image';
 
 const PAGE_SIZE = 30;
 
 const ProverbListScreen = () => {
 	const scrollRef = useRef<FlatList>(null);
 	const searchInputRef = useRef<TextInput>(null);
+
+	const emptyImage = require('@/assets/images/emptyList.png')
 	const [refreshing, setRefreshing] = useState(false);
 	const [keyword, setKeyword] = useState('');
 	const [proverbList, setProverbList] = useState(ProverbServices.selectProverbList());
 	const [visibleList, setVisibleList] = useState<MainDataType.Proverb[]>([]);
 	const [page, setPage] = useState(1);
 	const [showScrollTop, setShowScrollTop] = useState(false);
+
 
 	const [fieldOpen, setFieldOpen] = useState(false);
 	const [levelOpen, setLevelOpen] = useState(false);
@@ -59,7 +63,11 @@ const ProverbListScreen = () => {
 		let filtered = allData;
 
 		if (keyword.trim()) {
-			filtered = filtered.filter((item) => item.proverb.includes(keyword) || item.meaning.includes(keyword));
+			const lowerKeyword = keyword.trim().toLowerCase();
+			filtered = filtered.filter((item) =>
+				(item.proverb && item.proverb.toLowerCase().includes(lowerKeyword)) ||
+				(item.meaning && item.meaning.toLowerCase().includes(lowerKeyword))
+			);
 		}
 		if (fieldValue !== '전체') {
 			filtered = filtered.filter((item) => item.category && item.category.trim() === fieldValue);
@@ -153,30 +161,18 @@ const ProverbListScreen = () => {
 	return (
 		<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-				<FlatList
-					ref={scrollRef}
-					data={visibleList}
-					keyExtractor={(item) => item.id.toString()}
-					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-					onEndReached={loadMoreData}
-					onEndReachedThreshold={0.5}
-					onScroll={(event) => {
-						const offsetY = event.nativeEvent.contentOffset.y;
-						setShowScrollTop(offsetY > 100);
-					}}
-					scrollEventThrottle={16}
-					keyboardShouldPersistTaps='handled'
-					ListHeaderComponent={
+				<View style={{ flex: 1 }}>
+					{/* 필터 + 드롭다운 영역 */}
+					<View style={{ zIndex: 10, paddingHorizontal: 16, paddingTop: 16 }}>
 						<View style={styles.filterCard}>
 							<TextInput
 								ref={searchInputRef}
 								style={styles.input}
-								placeholder='속담을 입력해주세요'
+								placeholder='속담이나 의미를 입력해주세요'
 								placeholderTextColor='#666'
 								onChangeText={setKeyword}
 								value={keyword}
 							/>
-
 							<View style={styles.filterDropdownRow}>
 								<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
 									<DropDownPicker
@@ -188,7 +184,7 @@ const ProverbListScreen = () => {
 										setItems={setFieldItems}
 										placeholder="분야 선택"
 										placeholderStyle={styles.dropdownPlaceholder}
-										style={[styles.dropdown, { justifyContent: 'center' }]}
+										style={styles.dropdown}
 										iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
 										dropDownContainerStyle={styles.dropdownList}
 										zIndex={fieldOpen ? 2000 : 1000}
@@ -214,109 +210,138 @@ const ProverbListScreen = () => {
 									/>
 								</View>
 
-								{/* ✅ 초기화 버튼 추가 */}
+								{/* 초기화 버튼 */}
 								<TouchableOpacity style={styles.resetButton} onPress={handleReset}>
 									<Icon name="rotate-right" size={20} color="#555" />
 								</TouchableOpacity>
 							</View>
-							{/* ✅ 리스트 시작부분에 갯수 표시 */}
+							{/* 리스트 개수 표시 */}
 							<View style={styles.listCountWrapper}>
 								<Text style={styles.listCountText}>
 									총 {proverbList.length}개의 속담이 있어요
 								</Text>
 							</View>
 						</View>
-					}
-					renderItem={({ item }) => (
-						<TouchableOpacity
-							style={styles.itemBox}
-							onPress={() => {
-								setSelectedProverb(item);
-								setShowDetailModal(true);
+
+
+					</View>
+
+					{/* 리스트 영역 */}
+					<View style={{ flex: 1, zIndex: 0 }}>
+						<FlatList
+							ref={scrollRef}
+							data={visibleList}
+							keyExtractor={(item) => item.id.toString()}
+							refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+							onEndReached={loadMoreData}
+							onEndReachedThreshold={0.5}
+							onScroll={(event) => {
+								const offsetY = event.nativeEvent.contentOffset.y;
+								setShowScrollTop(offsetY > 100);
 							}}
-						>
-							<Text style={styles.proverbText}>{item.proverb}</Text>
-							<Text style={styles.meaningText}>{item.meaning}</Text>
-							<View style={styles.badgeRow}>
-								<View style={[styles.badge, { backgroundColor: getFieldColor(item.category) }]}>
-									<Text style={styles.badgeText}>{item.category}</Text>
+							scrollEventThrottle={16}
+							keyboardShouldPersistTaps='handled'
+							ListEmptyComponent={() => (
+								<View style={styles.emptyWrapper}>
+									<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
+									<Text style={styles.emptyText}>앗! 조건에 맞는 속담이 없어요.{"\n"}다른 검색어나 필터를 사용해보세요!</Text>
 								</View>
-								<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
-									<Text style={styles.badgeText}>{item.levelName}</Text>
-								</View>
-							</View>
+							)}
+							renderItem={({ item }) => (
+								<TouchableOpacity
+									style={styles.itemBox}
+									onPress={() => {
+										setSelectedProverb(item);
+										setShowDetailModal(true);
+									}}
+								>
+									<Text style={styles.proverbText}>{item.proverb}</Text>
+									<Text style={styles.meaningText}>{item.meaning}</Text>
+									<View style={styles.badgeRow}>
+										<View style={[styles.badge, { backgroundColor: getFieldColor(item.category) }]}>
+											<Text style={styles.badgeText}>{item.category}</Text>
+										</View>
+										<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
+											<Text style={styles.badgeText}>{item.levelName}</Text>
+										</View>
+									</View>
+								</TouchableOpacity>
+							)}
+							contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+						/>
+					</View>
+
+					{/* 스크롤 최상단 이동 버튼 */}
+					{showScrollTop && (
+						<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
+							<Icon name='arrow-up' size={20} color='#fff' />
 						</TouchableOpacity>
 					)}
-					contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-				/>
-			</TouchableWithoutFeedback>
-			{showScrollTop && (
-				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
-					<Icon name='arrow-up' size={20} color='#fff' />
-				</TouchableOpacity>
-			)}
 
-			<Modal
-				visible={showDetailModal}
-				animationType="slide"
-				transparent={true}
-				onRequestClose={() => setShowDetailModal(false)}
-			>
-				<View style={styles.modalOverlay}>
-					<View style={styles.modalContainer}>
-						<View style={styles.modalHeader}>
-							<Text style={styles.modalTitle}>{selectedProverb?.proverb}</Text>
+					{/* 상세 모달 */}
+					<Modal
+						visible={showDetailModal}
+						animationType="slide"
+						transparent={true}
+						onRequestClose={() => setShowDetailModal(false)}
+					>
+						<View style={styles.modalOverlay}>
+							<View style={styles.modalContainer}>
+								<View style={styles.modalHeader}>
+									<Text style={styles.modalTitle}>{selectedProverb?.proverb}</Text>
+								</View>
+
+								{/* ✅ 스크롤 가능한 영역 */}
+								<ScrollView contentContainerStyle={styles.modalBody}>
+									<View style={styles.modalSection}>
+										<Text style={styles.modalLabel}>의미</Text>
+										<Text style={styles.modalText}>{selectedProverb?.meaning}</Text>
+									</View>
+
+									<View style={styles.modalSection}>
+										<Text style={styles.modalLabel}>예시</Text>
+										<Text style={styles.modalText}>{selectedProverb?.example}</Text>
+									</View>
+
+									<View style={styles.modalSection}>
+										<Text style={styles.modalLabel}>유래</Text>
+										<Text style={styles.modalText}>{selectedProverb?.origin}</Text>
+									</View>
+
+									<View style={styles.modalSection}>
+										<Text style={styles.modalLabel}>사용 팁</Text>
+										<Text style={styles.modalText}>{selectedProverb?.usageTip}</Text>
+									</View>
+
+									{selectedProverb?.synonym && (
+										<View style={styles.modalHighlightBox}>
+											<Text style={styles.modalHighlightTitle}>비슷한 속담</Text>
+											<Text style={styles.modalHighlightText}>{selectedProverb.synonym}</Text>
+										</View>
+									)}
+
+									{selectedProverb?.antonym && (
+										<View style={styles.modalHighlightBox}>
+											<Text style={styles.modalHighlightTitle}>반대 속담</Text>
+											<Text style={styles.modalHighlightText}>{selectedProverb.antonym}</Text>
+										</View>
+									)}
+
+									<View style={styles.modalSection}>
+										<Text style={styles.modalLabel}>난이도 점수</Text>
+										<Text style={styles.modalText}>{selectedProverb?.difficultyScore} / 100</Text>
+									</View>
+								</ScrollView>
+
+								{/* ✅ 닫기 버튼을 모달 맨 하단에 고정 */}
+								<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowDetailModal(false)}>
+									<Text style={styles.modalCloseButtonText}>닫기</Text>
+								</TouchableOpacity>
+							</View>
 						</View>
-
-						{/* ✅ 스크롤 가능한 영역 */}
-						<ScrollView contentContainerStyle={styles.modalBody}>
-							<View style={styles.modalSection}>
-								<Text style={styles.modalLabel}>의미</Text>
-								<Text style={styles.modalText}>{selectedProverb?.meaning}</Text>
-							</View>
-
-							<View style={styles.modalSection}>
-								<Text style={styles.modalLabel}>예시</Text>
-								<Text style={styles.modalText}>{selectedProverb?.example}</Text>
-							</View>
-
-							<View style={styles.modalSection}>
-								<Text style={styles.modalLabel}>유래</Text>
-								<Text style={styles.modalText}>{selectedProverb?.origin}</Text>
-							</View>
-
-							<View style={styles.modalSection}>
-								<Text style={styles.modalLabel}>사용 팁</Text>
-								<Text style={styles.modalText}>{selectedProverb?.usageTip}</Text>
-							</View>
-
-							{selectedProverb?.synonym && (
-								<View style={styles.modalHighlightBox}>
-									<Text style={styles.modalHighlightTitle}>비슷한 속담</Text>
-									<Text style={styles.modalHighlightText}>{selectedProverb.synonym}</Text>
-								</View>
-							)}
-
-							{selectedProverb?.antonym && (
-								<View style={styles.modalHighlightBox}>
-									<Text style={styles.modalHighlightTitle}>반대 속담</Text>
-									<Text style={styles.modalHighlightText}>{selectedProverb.antonym}</Text>
-								</View>
-							)}
-
-							<View style={styles.modalSection}>
-								<Text style={styles.modalLabel}>난이도 점수</Text>
-								<Text style={styles.modalText}>{selectedProverb?.difficultyScore} / 100</Text>
-							</View>
-						</ScrollView>
-
-						{/* ✅ 닫기 버튼을 모달 맨 하단에 고정 */}
-						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowDetailModal(false)}>
-							<Text style={styles.modalCloseButtonText}>닫기</Text>
-						</TouchableOpacity>
-					</View>
+					</Modal>
 				</View>
-			</Modal>
+			</TouchableWithoutFeedback>
 		</KeyboardAvoidingView>
 	);
 };
@@ -325,7 +350,6 @@ export default ProverbListScreen;
 
 const styles = StyleSheet.create({
 	filterCard: {
-		flex: 1,
 		backgroundColor: '#fff',
 		padding: 16,
 		borderRadius: 16,
@@ -355,8 +379,6 @@ const styles = StyleSheet.create({
 		borderColor: '#ccc',
 		height: 44,
 	},
-	emptyWrapper: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 100 },
-	emptyText: { fontSize: 16, color: '#777' },
 	scrollTopButton: {
 		position: 'absolute',
 		right: 20,
@@ -528,6 +550,24 @@ const styles = StyleSheet.create({
 		color: '#fff',
 		fontSize: 16,
 		fontWeight: 'bold',
+	},
+	emptyWrapper: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginTop: 100,
+		paddingHorizontal: 20,
+	},
+	emptyImage: {
+		width: 200,
+		height: 200,
+		marginBottom: 20,
+	},
+	emptyText: {
+		fontSize: 16,
+		color: '#636e72',
+		textAlign: 'center',
+		lineHeight: 22,
 	},
 
 });

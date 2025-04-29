@@ -10,21 +10,21 @@ const ProverbQuizModeSelectScreen = () => {
 	const MODES = [
 		{
 			key: 'meaning',
-			label: '뜻 맞추기',
+			label: '속담 뜻 퀴즈',
 			icon: 'lightbulb',
 			type: 'fontAwesome6',
 			color: '#5DADE2',
 		},
 		{
 			key: 'proverb',
-			label: '속담 찾기',
+			label: '속담 찾기 퀴즈',
 			icon: 'quote-left',
 			type: 'fontAwesome6',
 			color: '#58D68D',
 		},
 		{
 			key: 'blank',
-			label: '빈칸 채우기',
+			label: '빈칸 채우기 퀴즈',
 			icon: 'pen',
 			type: 'fontAwesome6',
 			color: '#F5B041',
@@ -63,6 +63,7 @@ const ProverbQuizModeSelectScreen = () => {
 				<View style={styles.container}>
 					<View style={styles.centerWrapper}>
 						<Text style={styles.title}>🧠 오늘은 어떤 속담 퀴즈로 도전할까요?</Text>
+						<Text style={styles.subTitle}>퀴즈를 선택하면 난이도, 카테고리별로 퀴즈를 선택할 수 있습니다</Text>
 						<View style={styles.gridWrap}>
 							{MODES.map((mode) => {
 								const isDisabled = mode.key === 'comingsoon';
@@ -103,14 +104,14 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: 20,
+		paddingHorizontal: 40,
 	},
 	title: {
 		fontSize: 20,
 		fontWeight: '700',
 		color: '#2c3e50',
 		textAlign: 'center',
-		marginBottom: 40,
+		marginBottom: 10,
 	},
 	gridWrap: {
 		width: '100%',
@@ -157,5 +158,12 @@ const styles = StyleSheet.create({
 		color: '#95a5a6',
 		fontSize: 16,
 		textAlign: 'center',
+	},
+	subTitle: {
+		fontSize: 14,
+		color: '#7f8c8d',
+		textAlign: 'center',
+		marginBottom: 40,
+		lineHeight: 20,
 	},
 });

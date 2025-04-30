@@ -336,6 +336,7 @@ const ProverbStudyScreen = () => {
 						<View style={styles.cardContent}>
 							{mascot && (
 								<FastImage
+									//@ts-ignore
 									source={mascot}
 									style={[styles.subMascotImage, { marginBottom: 16 }]}
 									resizeMode="contain"

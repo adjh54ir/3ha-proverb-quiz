@@ -12,6 +12,7 @@ import ProverbMeaningQuizScreen from '@/screens/quiz/ProverbMeaningQuizScreen';
 import ProverbFindQuizScreen from '@/screens/quiz/ProverbFindQuizScreen';
 import ProverbFillBlankQuizScreen from '@/screens/quiz/ProverbFillBlankQuizScreen';
 import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
+import IconComponent from '@/screens/common/atomic/IconComponent';
 
 /**
  * Stack Navigator : 일반적인 화면만 출력을 하는 경우
@@ -46,7 +47,7 @@ const StackNavigator = () => {
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '뜻 맞추기',
-					headerLeft: () => <></>
+					headerLeft: () => <></>,
 				})}
 			/>
 
@@ -56,7 +57,7 @@ const StackNavigator = () => {
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '속담 찾기',
-					headerLeft: () => <></>
+					headerLeft: () => <></>,
 				})}
 			/>
 
@@ -66,7 +67,7 @@ const StackNavigator = () => {
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '빈칸 채우기',
-					headerLeft: () => <></>
+					headerLeft: () => <></>,
 				})}
 			/>
 
@@ -81,6 +82,14 @@ const StackNavigator = () => {
 							<Icon name='arrow-back' size={24} color='#2c3e50' />
 						</TouchableOpacity>
 					),
+					headerRight: () => (
+						//@ts-ignore
+						<TouchableOpacity
+							onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })}
+							style={{ marginRight: 16 }}>
+							<IconComponent type='materialIcons' name='info-outline' size={24} color='#3498db' />
+						</TouchableOpacity>
+					),
 				})}
 			/>
 			<Stack.Screen
@@ -90,9 +99,10 @@ const StackNavigator = () => {
 					headerShown: true,
 					title: '속담 학습',
 					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
-							<Icon name='arrow-back' size={24} color='#2c3e50' />
-						</TouchableOpacity>
+						<></>
+						// <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
+						// 	<Icon name='arrow-back' size={24} color='#2c3e50' />
+						// </TouchableOpacity>
 					),
 				})}
 			/>

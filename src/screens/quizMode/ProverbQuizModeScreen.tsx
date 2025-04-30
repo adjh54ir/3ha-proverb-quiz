@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import IconComponent from '../common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 
 const ProverbQuizModeSelectScreen = () => {
+	const [showGuideModal, setShowGuideModal] = useState(false);
 	const navigation = useNavigation();
 
 	const MODES = [
@@ -57,6 +58,19 @@ const ProverbQuizModeSelectScreen = () => {
 		}
 	};
 
+	/**
+	 * showGuide 파라미터를 통해 모달 자동 오픈
+	 */
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<TouchableOpacity onPress={() => setShowGuideModal(true)} style={{ marginRight: 16 }}>
+					<IconComponent type='materialIcons' name='info-outline' size={24} color='#3498db' />
+				</TouchableOpacity>
+			),
+		});
+	}, [navigation]);
+
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
 			<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -89,6 +103,36 @@ const ProverbQuizModeSelectScreen = () => {
 					</View>
 				</View>
 			</KeyboardAvoidingView>
+
+			{showGuideModal && (
+				<View style={styles.modalOverlay}>
+					<View style={styles.modalContent}>
+						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowGuideModal(false)}>
+							<IconComponent type='materialIcons' name='close' size={24} color='#555' />
+						</TouchableOpacity>
+						<Text style={styles.modalTitle}>
+							<IconComponent type='materialCommunityIcons' name='head-question-outline' size={20} /> 퀴즈 모드 안내
+						</Text>
+						<Text style={styles.modalText}>
+							<Text style={styles.boldText}>
+								<IconComponent type='materialCommunityIcons' name='head-question-outline' size={20} /> 퀴즈 모드 안내{'\n\n'}
+							</Text>
+							<Text style={styles.boldText}>1️⃣ 속담 뜻 퀴즈{'\n'}</Text>- 제시된 속담에 대한 올바른 의미를 고르는 4지선다형
+							퀴즈입니다.{'\n'}- 속담의 뜻을 이해하는 능력을 키울 수 있어요.{'\n\n'}
+							<Text style={styles.boldText}>2️⃣ 속담 찾기 퀴즈{'\n'}</Text>- 제시된 의미에 해당하는 속담을 고르는 퀴즈입니다.
+							{'\n'}- 유사한 의미의 속담 중 정확한 속담을 찾아내는 연습이 돼요.{'\n\n'}
+							<Text style={styles.boldText}>3️⃣ 빈칸 채우기 퀴즈{'\n'}</Text>- 속담의 일부분이 빈칸으로 제시되고, 알맞은 단어를
+							고르는 퀴즈입니다.{'\n'}- 속담의 문장 구조와 정확한 어휘력을 함께 익힐 수 있어요.{'\n\n'}
+							<Text style={styles.boldText}>📌 공통 안내{'\n'}</Text>- 각 퀴즈는 난이도별, 카테고리별로 문제를 선택해 풀 수
+							있습니다.{'\n'}- 이미 푼 문제는 자동으로 제외되어, 복습 또는 도전이 편리해요.
+						</Text>
+
+						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowGuideModal(false)}>
+							<Text style={styles.modalCloseText}>닫기</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			)}
 		</SafeAreaView>
 	);
 };
@@ -145,19 +189,10 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		lineHeight: 22,
 	},
-	disabledButton: {
-		backgroundColor: '#ecf0f1',
-		opacity: 0.7,
-	},
 	disabledInner: {
 		alignItems: 'center',
 		justifyContent: 'center',
 		opacity: 0.6,
-	},
-	disabledText: {
-		color: '#95a5a6',
-		fontSize: 16,
-		textAlign: 'center',
 	},
 	subTitle: {
 		fontSize: 14,
@@ -165,5 +200,133 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		marginBottom: 40,
 		lineHeight: 20,
+	},
+	modalOverlay: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		justifyContent: 'center',
+		alignItems: 'center',
+		zIndex: 99,
+	},
+	modalContent: {
+		width: '85%',
+		backgroundColor: '#fff',
+		padding: 20,
+		borderRadius: 12,
+		elevation: 6,
+	},
+	modalCloseButton: {
+		marginTop: 20,
+		alignSelf: 'center',
+		backgroundColor: '#3498db',
+		paddingVertical: 10,
+		paddingHorizontal: 30,
+		borderRadius: 8,
+	},
+	modalCloseText: {
+		color: '#fff',
+		fontWeight: '600',
+		fontSize: 15,
+	},
+	modalTitle: {
+		fontSize: 18,
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		marginBottom: 14,
+		textAlign: 'center',
+	},
+	modalText: {
+		fontSize: 14,
+		color: '#34495e',
+		lineHeight: 22,
+		textAlign: 'left',
+		marginTop: 10,
+		marginBottom: 20,
+	},
+	boldText: {
+		fontWeight: 'bold',
+	},
+
+	modalCloseIcon: {
+		position: 'absolute',
+		top: 10,
+		right: 10,
+		zIndex: 2,
+		padding: 5,
+	},
+	homeButtonWrap: {
+		width: '100%',
+		alignItems: 'center',
+		marginTop: 24,
+	},
+
+	headerSection: {
+		marginBottom: 36,
+		alignItems: 'center',
+	},
+
+	subtitle: {
+		fontSize: 15,
+		color: '#7f8c8d',
+		textAlign: 'center',
+		lineHeight: 20,
+		marginTop: 4,
+		paddingHorizontal: 12,
+	},
+	bottomExitWrapper: {
+		width: '100%',
+		paddingVertical: 24,
+		alignItems: 'center',
+		backgroundColor: '#fff',
+		borderTopWidth: 1,
+		borderTopColor: '#eee',
+	},
+	homeButton: {
+		flexDirection: 'row',
+		alignItems: 'center', // ✅ 수직 중앙 정렬
+		justifyContent: 'center',
+		backgroundColor: '#28a745',
+		paddingVertical: 14,
+		paddingHorizontal: 28,
+		borderRadius: 30,
+	},
+	buttonText: {
+		color: '#fff',
+		fontSize: 15,
+		fontWeight: '600',
+		textAlign: 'center',
+		lineHeight: 22, // ✅ 텍스트가 수직 기준에서 올라오는 현상 완화
+	},
+
+	row: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		width: '100%',
+		marginBottom: 12,
+	},
+	disabledButton: {
+		backgroundColor: '#ecf0f1',
+		borderRadius: 16,
+		justifyContent: 'center',
+		alignItems: 'center',
+		width: '48%',
+		height: 120,
+		opacity: 0.6,
+	},
+	disabledText: {
+		color: '#95a5a6',
+		fontSize: 16,
+		fontWeight: '600',
+		textAlign: 'center',
+	},
+	comingSoon: {
+		fontSize: 12,
+		color: '#bdc3c7',
+		fontWeight: '500',
+		marginTop: 4,
 	},
 });

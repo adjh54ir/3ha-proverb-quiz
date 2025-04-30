@@ -177,12 +177,12 @@ const CapitalResultScreen = () => {
     // getTitleByScore 함수 추가
     const getTitleByScore = (score: number) => {
         if (score >= 1800)
-            return { label: '속담 마스터', icon: 'trophy', mascot: require('@/assets/images/level4_mascote_back.png') };
+            return { label: '속담 마스터', icon: 'trophy', mascot: require('@/assets/images/level4_mascote.png') };
         if (score >= 1200)
-            return { label: '속담 능력자', icon: 'tree', mascot: require('@/assets/images/level3_mascote_back.png') };
+            return { label: '속담 능력자', icon: 'tree', mascot: require('@/assets/images/level3_mascote.png') };
         if (score >= 600)
-            return { label: '속담 입문자', icon: 'leaf', mascot: require('@/assets/images/level2_mascote_back.png') };
-        return { label: '속담 초보자', icon: 'seedling', mascot: require('@/assets/images/level1_mascote_back.png') };
+            return { label: '속담 입문자', icon: 'leaf', mascot: require('@/assets/images/level2_mascote.png') };
+        return { label: '속담 초보자', icon: 'seedling', mascot: require('@/assets/images/level1_mascote.png') };
     };
     const { label, icon, mascot } = getTitleByScore(totalScore);
 

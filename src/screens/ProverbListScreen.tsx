@@ -27,14 +27,13 @@ const ProverbListScreen = () => {
 	const scrollRef = useRef<FlatList>(null);
 	const searchInputRef = useRef<TextInput>(null);
 
-	const emptyImage = require('@/assets/images/emptyList.png')
+	const emptyImage = require('@/assets/images/emptyList.png');
 	const [refreshing, setRefreshing] = useState(false);
 	const [keyword, setKeyword] = useState('');
 	const [proverbList, setProverbList] = useState(ProverbServices.selectProverbList());
 	const [visibleList, setVisibleList] = useState<MainDataType.Proverb[]>([]);
 	const [page, setPage] = useState(1);
 	const [showScrollTop, setShowScrollTop] = useState(false);
-
 
 	const [fieldOpen, setFieldOpen] = useState(false);
 	const [levelOpen, setLevelOpen] = useState(false);
@@ -43,8 +42,8 @@ const ProverbListScreen = () => {
 	const [selectedProverb, setSelectedProverb] = useState<MainDataType.Proverb | null>(null);
 	const [showDetailModal, setShowDetailModal] = useState(false);
 
-	const [fieldItems, setFieldItems] = useState([{ label: "", value: "" }]);
-	const [levelItems, setLevelItems] = useState([{ label: "", value: "" }]);
+	const [fieldItems, setFieldItems] = useState([{ label: '', value: '' }]);
+	const [levelItems, setLevelItems] = useState([{ label: '', value: '' }]);
 
 	const fetchData = () => {
 		const allData = ProverbServices.selectProverbList();
@@ -52,9 +51,10 @@ const ProverbListScreen = () => {
 
 		if (keyword.trim()) {
 			const lowerKeyword = keyword.trim().toLowerCase();
-			filtered = filtered.filter((item) =>
-				(item.proverb && item.proverb.toLowerCase().includes(lowerKeyword)) ||
-				(item.meaning && item.meaning.toLowerCase().includes(lowerKeyword))
+			filtered = filtered.filter(
+				(item) =>
+					(item.proverb && item.proverb.toLowerCase().includes(lowerKeyword)) ||
+					(item.meaning && item.meaning.toLowerCase().includes(lowerKeyword)),
 			);
 		}
 		if (fieldValue !== '전체') {
@@ -99,7 +99,7 @@ const ProverbListScreen = () => {
 			setLevelItems([{ label: '전체', value: '전체' }, ...levelList.map((level) => ({ label: level, value: level }))]);
 			// ✅ 데이터 새로 불러오기
 			fetchData();
-		}, [])
+		}, []),
 	);
 
 	const onRefresh = () => {
@@ -126,14 +126,14 @@ const ProverbListScreen = () => {
 
 	const getFieldColor = (field: string) => {
 		const categoryColorMap: Record<string, string> = {
-			'운/우연': '#00cec9',       // 청록
-			'인간관계': '#6c5ce7',     // 보라
-			'세상 이치': '#fdcb6e',    // 연노랑
-			'근면/검소': '#e17055',    // 주황
-			'노력/성공': '#00b894',    // 짙은 청록
-			'경계/조심': '#d63031',    // 빨강
-			'욕심/탐욕': '#e84393',    // 핫핑크
-			'배신/불신': '#2d3436',    // 짙은 회색
+			'운/우연': '#00cec9', // 청록
+			인간관계: '#6c5ce7', // 보라
+			'세상 이치': '#fdcb6e', // 연노랑
+			'근면/검소': '#e17055', // 주황
+			'노력/성공': '#00b894', // 짙은 청록
+			'경계/조심': '#d63031', // 빨강
+			'욕심/탐욕': '#e84393', // 핫핑크
+			'배신/불신': '#2d3436', // 짙은 회색
 		};
 
 		return categoryColorMap[field] || '#b2bec3'; // 기본 회색
@@ -141,9 +141,9 @@ const ProverbListScreen = () => {
 	const getLevelColor = (levelName: string) => {
 		const levelColorMap: Record<string, string> = {
 			'아주 쉬움': '#dfe6e9',
-			'쉬움': '#74b9ff',
-			'보통': '#0984e3',
-			'어려움': '#2d3436',
+			쉬움: '#74b9ff',
+			보통: '#0984e3',
+			어려움: '#2d3436',
 		};
 
 		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
@@ -184,7 +184,7 @@ const ProverbListScreen = () => {
 									setOpen={setFieldOpen}
 									setValue={setFieldValue}
 									setItems={setFieldItems}
-									placeholder="분야 선택"
+									placeholder='분야 선택'
 									placeholderStyle={styles.dropdownPlaceholder}
 									style={styles.dropdown}
 									iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
@@ -202,7 +202,7 @@ const ProverbListScreen = () => {
 									setOpen={setLevelOpen}
 									setValue={setLevelValue}
 									setItems={setLevelItems}
-									placeholder="수준 선택"
+									placeholder='수준 선택'
 									placeholderStyle={styles.dropdownPlaceholder}
 									style={styles.dropdown}
 									iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
@@ -214,18 +214,14 @@ const ProverbListScreen = () => {
 
 							{/* 초기화 버튼 */}
 							<TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-								<Icon name="rotate-right" size={20} color="#555" />
+								<Icon name='rotate-right' size={20} color='#555' />
 							</TouchableOpacity>
 						</View>
 						{/* 리스트 개수 표시 */}
 						<View style={styles.listCountWrapper}>
-							<Text style={styles.listCountText}>
-								총 {proverbList.length}개의 속담이 있어요
-							</Text>
+							<Text style={styles.listCountText}>총 {proverbList.length}개의 속담이 있어요</Text>
 						</View>
 					</View>
-
-
 				</View>
 
 				{/* 리스트 영역 */}
@@ -245,8 +241,8 @@ const ProverbListScreen = () => {
 						keyboardShouldPersistTaps='handled'
 						ListEmptyComponent={() => (
 							<View style={[styles.emptyWrapper, { height: '100%', marginTop: 40 }]}>
-								<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
-								<Text style={styles.emptyText}>앗! 조건에 맞는 속담이 없어요.{"\n"}다른 검색어나 필터를 사용해보세요!</Text>
+								<FastImage source={emptyImage} style={styles.emptyImage} resizeMode='contain' />
+								<Text style={styles.emptyText}>앗! 조건에 맞는 속담이 없어요.{'\n'}다른 검색어나 필터를 사용해보세요!</Text>
 							</View>
 						)}
 						renderItem={({ item }) => (
@@ -255,10 +251,9 @@ const ProverbListScreen = () => {
 								onPress={() => {
 									setSelectedProverb(item);
 									setShowDetailModal(true);
-								}}
-							>
+								}}>
 								<Text style={styles.proverbText}>{item.proverb}</Text>
-								<Text style={styles.meaningText}>{item.meaning}</Text>
+								<Text style={styles.meaningText}>- {item.meaning}</Text>
 								<View style={styles.badgeRow}>
 									<View style={[styles.badge, { backgroundColor: getFieldColor(item.category) }]}>
 										<Text style={styles.badgeText}>{item.category}</Text>
@@ -283,16 +278,15 @@ const ProverbListScreen = () => {
 				{/* 상세 모달 */}
 				<Modal
 					visible={showDetailModal}
-					animationType="slide"
+					animationType='slide'
 					transparent={true}
-					onRequestClose={() => setShowDetailModal(false)}
-				>
+					onRequestClose={() => setShowDetailModal(false)}>
 					<View style={styles.modalOverlay}>
 						<View style={styles.modalContainer}>
 							<View style={styles.modalHeader}>
 								<Text style={styles.modalHeaderTitle}>속담 상세</Text>
 								<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowDetailModal(false)}>
-									<Icon name="xmark" size={20} color="#0984e3" />
+									<Icon name='xmark' size={20} color='#0984e3' />
 								</TouchableOpacity>
 							</View>
 
@@ -306,29 +300,27 @@ const ProverbListScreen = () => {
 								)}
 								<View style={styles.modalSection}>
 									<Text style={styles.modalLabel}>의미</Text>
-									<Text style={styles.modalText}>{selectedProverb?.meaning}</Text>
+									<Text style={styles.modalText}>- {selectedProverb?.meaning}</Text>
 								</View>
 
 								<View style={styles.modalSection}>
 									<Text style={styles.modalLabel}>예시</Text>
-									<Text style={styles.modalText}>{selectedProverb?.example}</Text>
+									<Text style={styles.modalText}>- {selectedProverb?.example}</Text>
 								</View>
-
 
 								{selectedProverb?.synonym && (
 									<View style={styles.modalHighlightBox}>
 										<Text style={styles.modalHighlightTitle}>비슷한 속담</Text>
-										<Text style={styles.modalHighlightText}>{selectedProverb.synonym}</Text>
+										<Text style={styles.modalHighlightText}>- {selectedProverb.synonym}</Text>
 									</View>
 								)}
 
 								{selectedProverb?.antonym && (
 									<View style={styles.modalHighlightBox}>
 										<Text style={styles.modalHighlightTitle}>반대 속담</Text>
-										<Text style={styles.modalHighlightText}>{selectedProverb.antonym}</Text>
+										<Text style={styles.modalHighlightText}>- {selectedProverb.antonym}</Text>
 									</View>
 								)}
-
 							</ScrollView>
 
 							{/* ✅ 닫기 버튼을 모달 맨 하단에 고정 */}
@@ -541,7 +533,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: '#eee',
-		height: 44,
+		height: 50,
 		width: 44, // ✅ 정사각형으로 통일
 		borderRadius: 8,
 	},
@@ -611,14 +603,10 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	bannerContainer: {
-		position: 'absolute',
-		bottom: 0,
-		left: 0,
-		right: 0,
 		backgroundColor: '#fff',
 		alignItems: 'center',
 		paddingVertical: 6,
-		borderTopWidth: 1,
+		borderBottomWidth: 1, // ← 상단 배치 시 하단 구분선
 		borderColor: '#ccc',
 		zIndex: 999,
 	},

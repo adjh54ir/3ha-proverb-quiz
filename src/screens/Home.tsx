@@ -77,8 +77,6 @@ const Home = () => {
 		},
 	];
 
-
-
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
@@ -96,8 +94,6 @@ const Home = () => {
 	const levelData = useMemo(() => getLevelData(totalScore), [totalScore]);
 
 	const { label, icon, mascot } = levelData;
-
-
 
 	useFocusEffect(
 		useCallback(() => {
@@ -178,20 +174,22 @@ const Home = () => {
 								</View>
 
 								<TouchableOpacity onPress={handleMascotPress}>
-									<FastImage
-										key={totalScore} // totalScore가 바뀌면 이미지 강제 갱신
-										source={
-											totalScore >= 1800
-												? require('@/assets/images/level4_mascote_back.png')
-												: totalScore >= 1200
-													? require('@/assets/images/level3_mascote_back.png')
-													: totalScore >= 600
-														? require('@/assets/images/level2_mascote_back.png')
-														: require('@/assets/images/level1_mascote_back.png')
-										}
-										style={styles.image}
-										resizeMode='contain'
-									/>
+									<View style={{ width: 180, height: 180, alignItems: 'center', justifyContent: 'center' }}>
+										<FastImage
+											key={totalScore} // totalScore가 바뀌면 이미지 강제 갱신
+											source={
+												totalScore >= 1800
+													? require('@/assets/images/level4_mascote.png')
+													: totalScore >= 1200
+														? require('@/assets/images/level3_mascote.png')
+														: totalScore >= 600
+															? require('@/assets/images/level2_mascote.png')
+															: require('@/assets/images/level1_mascote.png')
+											}
+											style={{ width: '100%', height: '100%' }}
+											resizeMode='contain'
+										/>
+									</View>
 								</TouchableOpacity>
 							</View>
 							<View style={{ alignItems: 'center', marginBottom: 8 }}>
@@ -257,11 +255,9 @@ const Home = () => {
 							<IconComponent type='materialIcons' name='emoji-events' size={18} color='#2ecc71' />
 							<Text style={styles.curiousButtonText}>숨겨진 뱃지들을 찾아보세요!</Text>
 						</TouchableOpacity>
-
-
 					</ScrollView>
-				</KeyboardAvoidingView >
-			</TouchableWithoutFeedback >
+				</KeyboardAvoidingView>
+			</TouchableWithoutFeedback>
 
 			{/* 설명 모달 */}
 			<Modal transparent visible={showGuideModal} animationType='fade'>
@@ -271,21 +267,19 @@ const Home = () => {
 							<IconComponent type='materialIcons' name='close' size={24} color='#555' />
 						</TouchableOpacity>
 						<Text style={styles.modalText}>
-							<Text style={styles.boldText}>🏠 홈 화면{'\n'}</Text>
-							- 주요 기능으로 빠르게 이동할 수 있는 메뉴를 제공합니다.
+							<Text style={styles.boldText}>🏠 홈 화면{'\n'}</Text>- 주요 기능으로 빠르게 이동할 수 있는 메뉴를 제공합니다.
 							{'\n\n'}
-							<Text style={styles.boldText}>➡️ 시작하기{'\n'}</Text>
-							- 속담 뜻 맞히기, 속담 찾기, 빈칸 채우기 퀴즈를 통해 재미있게 속담을 학습할 수 있어요.
+							<Text style={styles.boldText}>➡️ 시작하기{'\n'}</Text>- 속담 뜻 맞히기, 속담 찾기, 빈칸 채우기 퀴즈를 통해
+							재미있게 속담을 학습할 수 있어요.
 							{'\n\n'}
-							<Text style={styles.boldText}>➡️ 학습 모드{'\n'}</Text>
-							- 카드 형식으로 속담과 그 의미, 예문 등을 쉽게 학습할 수 있어요.
+							<Text style={styles.boldText}>➡️ 학습 모드{'\n'}</Text>- 카드 형식으로 속담과 그 의미, 예문 등을 쉽게 학습할 수
+							있어요.
 							{'\n\n'}
-							<Text style={styles.boldText}>➡️ 오답 복습{'\n'}</Text>
-							- 이전에 틀렸던 문제들을 다시 풀어보며 확실하게 기억할 수 있어요.
+							<Text style={styles.boldText}>➡️ 오답 복습{'\n'}</Text>- 이전에 틀렸던 문제들을 다시 풀어보며 확실하게 기억할 수
+							있어요.
 							{'\n\n'}
-							<Text style={styles.boldText}>🏅 숨겨진 뱃지들을 찾아보세요!{'\n'}</Text>
-							- 학습이나 퀴즈 도중 특정 조건을 만족하면 다양한 뱃지를 획득할 수 있어요.{'\n'}
-							- 모은 뱃지는 홈 화면에서 확인할 수 있어요!
+							<Text style={styles.boldText}>🏅 숨겨진 뱃지들을 찾아보세요!{'\n'}</Text>- 학습이나 퀴즈 도중 특정 조건을
+							만족하면 다양한 뱃지를 획득할 수 있어요.{'\n'}- 모은 뱃지는 홈 화면에서 확인할 수 있어요!
 						</Text>
 						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowGuideModal(false)}>
 							<Text style={styles.modalCloseText}>닫기</Text>
@@ -316,7 +310,7 @@ const Home = () => {
 						)}
 					</View>
 				</View>
-			</Modal >
+			</Modal>
 		</>
 	);
 };

@@ -14,7 +14,7 @@ import MyScoreScreen from '@/screens/MyScoreScreen';
 const BottomTabNavigator = (appStateType: any) => {
 	const Tab = createBottomTabNavigator();
 
-	useEffect(() => { }, []);
+	useEffect(() => {}, []);
 
 	return (
 		<Tab.Navigator initialRouteName={Paths.HOME}>
@@ -25,8 +25,8 @@ const BottomTabNavigator = (appStateType: any) => {
 				component={ProverbListScreen}
 				options={({ navigation }) => ({
 					unmountOnBlur: true,
-					title: '속담 리스트',
-					tabBarLabel: '속담 리스트',
+					title: '속담 정보',
+					tabBarLabel: '속담 정보',
 					tabBarIcon: ({ color, size }) => <IconComponent type='materialIcons' name='public' size={size} color={color} />,
 				})}
 			/>
@@ -47,7 +47,7 @@ const BottomTabNavigator = (appStateType: any) => {
 					unmountOnBlur: true,
 					title: '나의 활동',
 					tabBarLabel: '나의 활동',
-					tabBarIcon: ({ color, size }) => <IconComponent type="materialIcons" name="insights" size={size} color={color} />,
+					tabBarIcon: ({ color, size }) => <IconComponent type='materialIcons' name='insights' size={size} color={color} />,
 				})}
 			/>
 

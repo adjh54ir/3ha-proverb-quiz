@@ -36,7 +36,6 @@ const ProverbStudyScreen = () => {
 	const flipAnim = useRef(new Animated.Value(0)).current;
 	const toastAnim = useRef(new Animated.Value(0)).current;
 
-
 	const [proverbs, setProverbs] = useState<MainDataType.Proverb[]>([]);
 	const [filteredProverbs, setFilteredProverbs] = useState<MainDataType.Proverb[]>([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
@@ -47,7 +46,9 @@ const ProverbStudyScreen = () => {
 
 	const [showExitModal, setShowExitModal] = useState(false);
 	const [isDetailFilterOpen, setIsDetailFilterOpen] = useState(false);
-	const [levelFilter, setLevelFilter] = useState<'all' | 'Level 1' | 'Level 2' | 'Level 3' | 'Level 4' | 'Level 5'>('all');
+	const [levelFilter, setLevelFilter] = useState<'all' | 'Level 1' | 'Level 2' | 'Level 3' | 'Level 4' | 'Level 5'>(
+		'all',
+	);
 	const [themeFilter, setThemeFilter] = useState<'all' | '속담' | '격언' | '명언'>('all');
 
 	const [levelOpen, setLevelOpen] = useState(false);
@@ -67,8 +68,6 @@ const ProverbStudyScreen = () => {
 	const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([
 		{ label: '전체', value: 'all' }, // 기본값
 	]);
-
-
 
 	const levelOptions = [
 		{ label: '전체', value: 'all' },
@@ -95,20 +94,17 @@ const ProverbStudyScreen = () => {
 		'속담 공부 완료! 다음 단계로 고고~ 🚀',
 	];
 
-
 	const mascotImages = [
-		require('@/assets/images/level1_back.png'),
-		require('@/assets/images/level2_back.png'),
-		require('@/assets/images/level1_mascote_back.png'),
-		require('@/assets/images/level2_mascote_back.png'),
-		require('@/assets/images/level3_mascote.png'),
-		require('@/assets/images/level4_mascote.png'),
-		require('@/assets/images/level1_back.png'),
-		require('@/assets/images/level2_back.png'),
+		require('@/assets/images/random/random_mascote1.png'),
+		require('@/assets/images/random/random_mascote2.png'),
+		require('@/assets/images/random/random_mascote3.png'),
+		require('@/assets/images/random/random_mascote4.png'),
+		require('@/assets/images/random/random_mascote5.png'),
+		require('@/assets/images/random/random_mascote6.png'),
+		require('@/assets/images/random/random_mascote7.png'),
 	];
 	const [mascotImage, setMascotImage] = useState(mascotImages[Math.floor(Math.random() * mascotImages.length)]);
 	const [mascotImagesQueue, setMascotImagesQueue] = useState<string[]>([]);
-
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -162,7 +158,6 @@ const ProverbStudyScreen = () => {
 		}).start();
 	}, [isDetailFilterOpen]);
 
-
 	useEffect(() => {
 		filterData();
 		flipAnim.setValue(0); // 카드만 초기화
@@ -196,7 +191,6 @@ const ProverbStudyScreen = () => {
 		}).start(() => setIsFlipped(!isFlipped));
 	};
 
-
 	const showEncourageToast = () => {
 		setShowToast(true);
 		Animated.timing(toastAnim, {
@@ -219,7 +213,7 @@ const ProverbStudyScreen = () => {
 		if (!currentProverb) return;
 
 		// 1. studyProverbs에서 현재 항목 제거
-		const updatedProverbs = studyHistory.studyProverbs.filter(id => id !== currentProverb.id);
+		const updatedProverbs = studyHistory.studyProverbs.filter((id) => id !== currentProverb.id);
 
 		// 2. 업데이트된 History 만들기
 		const updatedHistory: UserProverbStudyHistory = {
@@ -247,7 +241,7 @@ const ProverbStudyScreen = () => {
 		setTimeout(() => {
 			carouselRef.current?.scrollTo({ index: currentIndex, animated: true });
 		}, 300);
-	}
+	};
 
 	const handleComplete = async () => {
 		const currentProverb = filteredProverbs[currentIndex];
@@ -315,7 +309,6 @@ const ProverbStudyScreen = () => {
 		outputRange: ['180deg', '360deg'],
 	});
 
-
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
 		const mascot = mascotImagesQueue[index % mascotImagesQueue.length];
 		const isLearned = studyHistory.studyProverbs.includes(item.id);
@@ -339,7 +332,7 @@ const ProverbStudyScreen = () => {
 									//@ts-ignore
 									source={mascot}
 									style={[styles.subMascotImage, { marginBottom: 16 }]}
-									resizeMode="contain"
+									resizeMode='contain'
 								/>
 							)}
 							<Text style={styles.cardLabel}>속담</Text>
@@ -365,9 +358,7 @@ const ProverbStudyScreen = () => {
 						<TouchableOpacity activeOpacity={0.9} style={styles.cardContent} onPress={flipCard}>
 							<Text style={styles.cardLabel}>🧠 속담 의미</Text>
 							<Text style={styles.meaningHighlight}>{item.meaning}</Text>
-							<Text style={styles.exampleText}>
-								{item.example ? `✏️ 예시: ${item.example}` : '✏️ 예시가 없는 속담입니다'}
-							</Text>
+							<Text style={styles.exampleText}>{item.example ? `✏️ 예시: ${item.example}` : '✏️ 예시가 없는 속담입니다'}</Text>
 						</TouchableOpacity>
 
 						<TouchableOpacity
@@ -446,7 +437,9 @@ const ProverbStudyScreen = () => {
 					{isDetailFilterOpen && (
 						<Animated.View style={[styles.detailFilterWrapper, { height: detailFilterHeightAnim }]}>
 							<View style={styles.subFilterRow}>
-								<View style={{ flex: 1, zIndex: themeOpen ? 1000 : 2000 }}> {/* zIndex 역전 방지 */}
+								<View style={{ flex: 1, zIndex: themeOpen ? 1000 : 2000 }}>
+									{' '}
+									{/* zIndex 역전 방지 */}
 									<DropDownPicker
 										open={levelOpen}
 										setOpen={setLevelOpen}
@@ -461,7 +454,7 @@ const ProverbStudyScreen = () => {
 											zIndex: 10000, // ✅ 매우 높게 설정
 											elevation: 10,
 										}}
-										zIndex={10000}        // ✅ 최상단 유지
+										zIndex={10000} // ✅ 최상단 유지
 										zIndexInverse={1000}
 										listMode='SCROLLVIEW' /* 스크롤뷰 모드로 변경 */
 									/>
@@ -479,8 +472,8 @@ const ProverbStudyScreen = () => {
 										placeholderStyle={{ color: '#95a5a6', fontSize: 14 }}
 										dropDownContainerStyle={styles.dropdownList}
 										containerStyle={{ zIndex: 3000, elevation: 10 }}
-										zIndex={9999}           // 높게 설정
-										zIndexInverse={1000}    // 반대 드롭다운일 경우 대비
+										zIndex={9999} // 높게 설정
+										zIndexInverse={1000} // 반대 드롭다운일 경우 대비
 										listMode='SCROLLVIEW' /* 스크롤뷰 모드로 변경 */
 									/>
 								</View>
@@ -591,10 +584,8 @@ const ProverbStudyScreen = () => {
 						</View>
 					</View>
 				</Modal>
-
-
 			</View>
-		</SafeAreaView >
+		</SafeAreaView>
 	);
 };
 
@@ -622,7 +613,7 @@ const styles = StyleSheet.create({
 		backfaceVisibility: 'hidden',
 		position: 'absolute',
 		elevation: 1, // ✅ 낮게 조정
-		zIndex: 1,     // ✅ 낮게 조정
+		zIndex: 1, // ✅ 낮게 조정
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.2,
@@ -667,8 +658,7 @@ const styles = StyleSheet.create({
 		color: '#fff',
 		fontSize: 16,
 		fontWeight: '600',
-		textAlign: "center",
-
+		textAlign: 'center',
 	},
 	loadingContainer: {
 		flex: 1,

@@ -113,6 +113,7 @@ const SettingScreen = () => {
 
     const handleCompleteAllQuiz = async () => {
         const allProverbs = ProverbServices.selectProverbList();
+        console.log(allProverbs.map((p) => p.id))
         const parsed = {
             badges: CONST_BADGES.filter(b => b.type === 'quiz').map(b => b.id),
             correctProverbId: allProverbs.map((p) => p.id),

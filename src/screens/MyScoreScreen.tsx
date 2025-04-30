@@ -26,8 +26,8 @@ import { CONST_BADGES } from '@/const/ConstBadges';
 
 moment.locale('ko'); // 로케일 설정
 
-const STORAGE_KEY_STUDY = 'UserStudyHistory';
 const STORAGE_KEY_QUIZ = 'UserQuizHistory';
+const STORAGE_KEY_STUDY = 'UserStudyHistory';
 
 const CapitalResultScreen = () => {
     const isFocused = useIsFocused();
@@ -111,7 +111,7 @@ const CapitalResultScreen = () => {
             const quizBadges = quizJson?.badges ?? [];
             const studyJson = studyData ? JSON.parse(studyData) : null;
             // const studiedIds: number[] = studyJson?.studyCountries ?? [];
-            const studiedIds: number[] = studyJson?.studyCountries ?? [];
+            const studiedIds: number[] = studyJson?.studyProverbes ?? [];
             const studyCounts = studyJson?.studyCounts ?? {};
             const lastDate = studyJson?.lastStudyAt ?? '';
 
@@ -123,8 +123,8 @@ const CapitalResultScreen = () => {
             setTotalStudyCount(totalCount);
 
             setTotalScore(quizJson?.totalScore ?? 0);
-            setCorrectCount(quizJson?.correctCountries?.length ?? 0);
-            setWrongCount(quizJson?.wrongCountries?.length ?? 0);
+            setCorrectCount(quizJson?.correctProverbId?.length ?? 0);
+            setWrongCount(quizJson?.wrongProverbId?.length ?? 0);
             setLastAnsweredAt(quizJson?.lastAnsweredAt ?? '');
             setBestCombo(quizJson?.bestCombo ?? 0);
 
@@ -161,11 +161,12 @@ const CapitalResultScreen = () => {
     const totalSolved = correctCount + wrongCount;
     const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
     const levelGuide = [
-        { score: 0, next: 600, label: '여행 초보자', icon: 'seedling' },
-        { score: 600, next: 1200, label: '여행 입문자', icon: 'leaf' },
-        { score: 1200, next: 1800, label: '여행 전문가', icon: 'tree' },
-        { score: 1800, next: 2461, label: '월드마스터', icon: 'trophy' },
+        { score: 0, next: 600, label: '속담 초보자', icon: 'seedling' },
+        { score: 600, next: 1200, label: '속담 입문자', icon: 'leaf' },
+        { score: 1200, next: 1800, label: '여행 능력자', icon: 'tree' },
+        { score: 1800, next: 2461, label: '속담 마스터', icon: 'trophy' },
     ];
+
 
     const getEncourageMessage = (score: number) => {
         if (score >= 1800) return '🌎 당신은 월드 마스터! 모두가 당신을 주목해요!';
@@ -176,12 +177,12 @@ const CapitalResultScreen = () => {
     // getTitleByScore 함수 추가
     const getTitleByScore = (score: number) => {
         if (score >= 1800)
-            return { label: '월드마스터', icon: 'trophy', mascot: require('@/assets/images/level4_mascote_back.png') };
+            return { label: '속담 마스터', icon: 'trophy', mascot: require('@/assets/images/level4_mascote_back.png') };
         if (score >= 1200)
-            return { label: '여행 전문가', icon: 'tree', mascot: require('@/assets/images/level3_mascote_back.png') };
+            return { label: '속담 능력자', icon: 'tree', mascot: require('@/assets/images/level3_mascote_back.png') };
         if (score >= 600)
-            return { label: '여행 입문자', icon: 'leaf', mascot: require('@/assets/images/level2_mascote_back.png') };
-        return { label: '여행 초보자', icon: 'seedling', mascot: require('@/assets/images/level1_mascote_back.png') };
+            return { label: '속담 입문자', icon: 'leaf', mascot: require('@/assets/images/level2_mascote_back.png') };
+        return { label: '속담 초보자', icon: 'seedling', mascot: require('@/assets/images/level1_mascote_back.png') };
     };
     const { label, icon, mascot } = getTitleByScore(totalScore);
 
@@ -217,7 +218,7 @@ const CapitalResultScreen = () => {
 
                     {/* 👇 간단한 설명으로 변경 */}
                     <Text style={styles.levelDescription}>
-                        모든 퀴즈를 풀면 < Text style={{ fontWeight: 'bold' }}> 월드마스터 </Text> 등급을 획득할 수 있습니다.
+                        모든 퀴즈를 풀면 < Text style={{ fontWeight: 'bold' }}> 속담 마스터</Text> 등급을 획득할 수 있습니다.
                     </Text>
                     < Text style={styles.levelDescription} >
                         틀린 퀴즈는 < Text style={{ fontWeight: 'bold' }}> 오답 복습 </Text>으로 다시 점수를 얻을 수 있습니다.
@@ -233,7 +234,7 @@ const CapitalResultScreen = () => {
                                 {studyCountries.length} / {totalCountryCount}
                             </Text>
                             < Text style={styles.statLabel} >
-                                학습 완료 국가({Math.round((studyCountries.length / totalCountryCount) * 100)} %)
+                                학습 완료 속담({Math.round((studyCountries.length / totalCountryCount) * 100)} %)
                             </Text>
                         </View>
                         < View style={styles.summaryStatCard} >
@@ -280,11 +281,25 @@ const CapitalResultScreen = () => {
                         <Text style={styles.sectionSubtitle}>🧠 정복한 카테고리</Text>
                         <Text style={styles.regionHelperText}>- 다양한 분야의 속담을 학습해보세요!</Text>
                         <View style={styles.gridRowNoBottomGap}>
-                            {categoryMaster.map((category) => (
-                                <View key={category} style={styles.regionCard}>
-                                    <Text style={styles.regionText}>{category}</Text>
-                                </View>
-                            ))}
+                            {categoryMaster.map((category) => {
+                                const isEarned = true; // 이미 earned된 상태니까 true
+                                return (
+                                    <View
+                                        key={category}
+                                        style={[
+                                            styles.regionCard,
+                                            isEarned && {
+                                                backgroundColor: '#eafaf1',
+                                                borderColor: '#27ae60',
+                                            },
+                                        ]}
+                                    >
+                                        <Text style={[styles.regionText, isEarned && { color: '#27ae60', fontWeight: 'bold' }]}>
+                                            {category}
+                                        </Text>
+                                    </View>
+                                );
+                            })}
                         </View>
                     </View>
                     < View style={styles.subSectionBox2} >
@@ -700,15 +715,15 @@ const styles = StyleSheet.create({
     },
     regionCard: {
         width: '30%',
-        aspectRatio: 1,
+        height: 100, // 적당한 고정값으로
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#fff',
-        marginBottom: 12, // ✅ 카드 간 하단 여백 추가
-        marginHorizontal: 5, // ✅ 좌우 간격 추가
+        marginBottom: 12,
+        marginHorizontal: 5,
     },
     levelCard: {
         width: 120, // ✅ 픽셀 고정이 안정적 (또는 Dimensions로 계산해도 OK)
@@ -869,5 +884,13 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
         borderTopWidth: 1,
         borderTopColor: '#eee',
+    },
+    regionCardActive: {
+        backgroundColor: '#eafaf1',
+        borderColor: '#27ae60',
+    },
+    regionTextActive: {
+        color: '#27ae60',
+        fontWeight: 'bold',
     },
 });

@@ -272,19 +272,29 @@ const ProverbStudyScreen = () => {
 			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
 			setStudyHistory(updatedHistory);
 
+			// handleComplete 내부
 			const newFiltered = getFilteredProverbs(updatedProverbs);
 			setFilteredProverbs(newFiltered);
 
-			setCurrentIndex((prev) => Math.min(prev, newFiltered.length - 1));
-			setIsFlipped(false);
+			// 카드가 줄었을 경우 인덱스 조정
+			const nextIndex = Math.min(currentIndex, newFiltered.length - 1);
+			setCurrentIndex(nextIndex); // 👈 인덱스 보정
+
+			// 카드 앞면으로 돌리기
+			if (isFlipped) {
+				setIsFlipped(false);
+				flipAnim.setValue(0);
+			}
 
 			// ✅ 추가: 완료하면 전체보기 모드로 전환
-
 			setPraiseText(praiseMessages[Math.floor(Math.random() * praiseMessages.length)]);
 			showEncourageToast();
 
+			// 일정 시간 후에 포커스 이동 (유효한 인덱스일 경우에만)
 			setTimeout(() => {
-				carouselRef.current?.scrollTo({ index: currentIndex, animated: true });
+				if (carouselRef.current && newFiltered.length > 0) {
+					carouselRef.current.scrollTo({ index: nextIndex, animated: true });
+				}
 			}, 300);
 		}
 	};
@@ -308,7 +318,7 @@ const ProverbStudyScreen = () => {
 
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
 		const mascot = mascotImagesQueue[index % mascotImagesQueue.length];
-		const isLearned = studyHistory.studyProverbs.includes(item.id); // ✅ 완료 여부 체크
+		const isLearned = studyHistory.studyProverbs.includes(item.id);
 
 		const frontAnimatedStyle = {
 			transform: [{ rotateY: frontInterpolate }],
@@ -322,34 +332,49 @@ const ProverbStudyScreen = () => {
 		return (
 			<View style={styles.cardWrapper}>
 				<Animated.View style={[styles.card, frontAnimatedStyle]}>
-					<TouchableOpacity activeOpacity={0.9} style={styles.cardInner} onPress={flipCard}>
-						{mascot && (
-							<View style={{ marginBottom: 20 }}>
-								{/* @ts-ignore */}
-								<FastImage source={mascot} style={{ width: 240, height: 240 }} resizeMode="contain" />
-							</View>
-						)}
-						<Text style={styles.cardLabel}>📜 속담</Text>
-						<Text style={styles.proverbText}>{item.proverb}</Text>
-						{isLearned && ( // ✅ 학습 완료한 경우
-							<View style={styles.completedBadge}>
-								<Text style={styles.completedBadgeText}>완료됨 ✅</Text>
-							</View>
-						)}
-						<Text style={styles.hintText}>카드를 탭하면 뜻풀이를 볼 수 있어요 👆</Text>
-					</TouchableOpacity>
+					<View style={styles.cardInner}>
+						<View style={styles.cardContent}>
+							{mascot && (
+								<FastImage
+									source={mascot}
+									style={[styles.subMascotImage, { marginBottom: 16 }]}
+									resizeMode="contain"
+								/>
+							)}
+							<Text style={styles.cardLabel}>속담</Text>
+							<Text style={styles.proverbText}>{item.proverb}</Text>
+							{isLearned && (
+								<View style={styles.completedBadge}>
+									<Text style={styles.completedBadgeText}>완료됨 ✅</Text>
+								</View>
+							)}
+							<Text style={styles.hintText}>카드를 탭하면 속담 의미를 볼 수 있어요 👆</Text>
+						</View>
+
+						<TouchableOpacity
+							style={isLearned ? styles.retryButton : styles.cardCompleteButton}
+							onPress={isLearned ? handleAgain : handleComplete}>
+							<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
+						</TouchableOpacity>
+					</View>
 				</Animated.View>
 
 				<Animated.View style={[styles.card, styles.cardBack, backAnimatedStyle]}>
-					<TouchableOpacity activeOpacity={0.9} style={styles.cardInner} onPress={flipCard}>
-						<Text style={styles.cardLabel}>🧠 뜻풀이</Text>
-						<Text style={styles.meaningHighlight}>{item.meaning}</Text>
-						{item.example ? (
-							<Text style={styles.exampleText}>✏️ 예시: {item.example}</Text>
-						) : (
-							<Text style={styles.exampleText}>✏️ 예시가 없는 속담입니다</Text>
-						)}
-					</TouchableOpacity>
+					<View style={styles.cardInner}>
+						<TouchableOpacity activeOpacity={0.9} style={styles.cardContent} onPress={flipCard}>
+							<Text style={styles.cardLabel}>🧠 속담 의미</Text>
+							<Text style={styles.meaningHighlight}>{item.meaning}</Text>
+							<Text style={styles.exampleText}>
+								{item.example ? `✏️ 예시: ${item.example}` : '✏️ 예시가 없는 속담입니다'}
+							</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							style={isLearned ? styles.retryButton : styles.cardCompleteButton}
+							onPress={isLearned ? handleAgain : handleComplete}>
+							<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
+						</TouchableOpacity>
+					</View>
 				</Animated.View>
 			</View>
 		);
@@ -431,9 +456,12 @@ const ProverbStudyScreen = () => {
 										textStyle={{ fontSize: 15, color: '#2c3e50', fontWeight: '500' }}
 										placeholderStyle={{ color: '#95a5a6', fontSize: 14 }}
 										dropDownContainerStyle={styles.dropdownList}
-										containerStyle={{ zIndex: 3000, elevation: 10 }}
-										zIndex={9999}           // 높게 설정
-										zIndexInverse={1000}    // 반대 드롭다운일 경우 대비
+										containerStyle={{
+											zIndex: 10000, // ✅ 매우 높게 설정
+											elevation: 10,
+										}}
+										zIndex={10000}        // ✅ 최상단 유지
+										zIndexInverse={1000}
 										listMode='SCROLLVIEW' /* 스크롤뷰 모드로 변경 */
 									/>
 								</View>
@@ -465,34 +493,63 @@ const ProverbStudyScreen = () => {
 						<Text>해당 조건에 맞는 속담이 없어요</Text>
 					</View>
 				) : (
-					<Animated.View style={[styles.carouselContainer]}>
-						<Carousel
-							ref={carouselRef}
-							width={screenWidth * 0.85}
-							height={screenHeight * 0.5}
-							data={filteredProverbs}
-							renderItem={renderItem}
-							mode='parallax'
-							loop={false}
-							windowSize={3}
-							pagingEnabled={true}
-							scrollAnimationDuration={600}
-							modeConfig={{
-								parallaxScrollingScale: 0.9,
-								parallaxScrollingOffset: 40,
-								parallaxAdjacentItemScale: 0.9,
-							}}
-							onSnapToItem={(index) => {
-								setCurrentIndex(index);
-								setIsFlipped(false);
-								flipAnim.setValue(0);
-								setMascotImage(mascotImages[Math.floor(Math.random() * mascotImages.length)]); // ✅ 추가
-							}}
-						/>
-					</Animated.View>
+					<>
+						<Animated.View style={[styles.carouselContainer]}>
+							<Carousel
+								ref={carouselRef}
+								width={screenWidth * 0.85}
+								height={screenHeight * 0.5}
+								data={filteredProverbs}
+								renderItem={renderItem}
+								mode='parallax'
+								loop={false}
+								windowSize={3}
+								pagingEnabled={true}
+								scrollAnimationDuration={600}
+								modeConfig={{
+									parallaxScrollingScale: 0.9,
+									parallaxScrollingOffset: 40,
+									parallaxAdjacentItemScale: 0.9,
+								}}
+								onSnapToItem={(index) => {
+									setCurrentIndex(index);
+									setIsFlipped(false);
+									flipAnim.setValue(0);
+									setMascotImage(mascotImages[Math.floor(Math.random() * mascotImages.length)]); // ✅ 추가
+								}}
+							/>
+						</Animated.View>
+						{showToast && (
+							<View style={styles.toastWrapper}>
+								<Animated.View
+									style={[
+										styles.toastContainer,
+										{
+											opacity: toastAnim,
+											transform: [
+												{
+													translateY: toastAnim.interpolate({
+														inputRange: [0, 1],
+														outputRange: [-50, 0],
+													}),
+												},
+											],
+										},
+									]}>
+									<View style={styles.toastInner}>
+										<FastImage source={completionImages} style={styles.toastImage} />
+										<View style={styles.toastTextBox}>
+											<Text style={styles.toastTitle}>🎉 학습 완료!</Text>
+											<Text style={styles.toastText}>{praiseText}</Text>
+										</View>
+									</View>
+								</Animated.View>
+							</View>
+						)}
+					</>
 				)}
 
-				<View style={styles.buttonWrapper}>
+				{/* <View style={styles.buttonWrapper}>
 					{studyHistory.studyProverbs.includes(filteredProverbs[currentIndex]?.id) ? (
 						<TouchableOpacity style={styles.retryButton} onPress={handleAgain}>
 							<Text style={styles.buttonText}>다시 학습하기</Text>
@@ -502,7 +559,7 @@ const ProverbStudyScreen = () => {
 							<Text style={styles.buttonText}>학습 완료</Text>
 						</TouchableOpacity>
 					)}
-				</View>
+				</View> */}
 
 				<View style={styles.studyEndWrapper}>
 					<TouchableOpacity style={styles.studyEndButton} onPress={() => setShowExitModal(true)}>
@@ -534,33 +591,7 @@ const ProverbStudyScreen = () => {
 					</View>
 				</Modal>
 
-				{showToast && (
-					<View style={styles.toastWrapper}>
-						<Animated.View
-							style={[
-								styles.toastContainer,
-								{
-									opacity: toastAnim,
-									transform: [
-										{
-											translateY: toastAnim.interpolate({
-												inputRange: [0, 1],
-												outputRange: [-50, 0],
-											}),
-										},
-									],
-								},
-							]}>
-							<View style={styles.toastInner}>
-								<FastImage source={completionImages} style={styles.toastImage} />
-								<View style={styles.toastTextBox}>
-									<Text style={styles.toastTitle}>🎉 학습 완료!</Text>
-									<Text style={styles.toastText}>{praiseText}</Text>
-								</View>
-							</View>
-						</Animated.View>
-					</View>
-				)}
+
 			</View>
 		</SafeAreaView >
 	);
@@ -574,9 +605,11 @@ const styles = StyleSheet.create({
 		backgroundColor: '#f9fafb', // 기존보다 덜 눈부심
 	},
 	cardWrapper: {
-		flex: 1,
-		justifyContent: 'center',
+		position: 'absolute',
+		left: 0,
+		right: 0,
 		alignItems: 'center',
+		zIndex: 1,
 	},
 	card: {
 		width: screenWidth * 0.85,
@@ -587,7 +620,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backfaceVisibility: 'hidden',
 		position: 'absolute',
-		elevation: 6,
+		elevation: 1, // ✅ 낮게 조정
+		zIndex: 1,     // ✅ 낮게 조정
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.2,
@@ -597,42 +631,15 @@ const styles = StyleSheet.create({
 		backgroundColor: '#4a90e2',
 	},
 	cardInner: {
+		flex: 1,
 		width: '100%',
-		height: '100%',
 		padding: 20,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	proverbText: {
-		fontSize: 24,
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		textAlign: 'center',
+		justifyContent: 'space-between',
 	},
 	hintText: {
-		marginTop: 20,
+		marginTop: 15,
 		fontSize: 14,
 		color: '#7f8c8d',
-		textAlign: 'center',
-	},
-	cardLabel: {
-		fontSize: 16,
-		color: '#7f8c8d',
-		marginBottom: 10,
-		textAlign: 'center',
-		fontWeight: '500',
-	},
-	meaningHighlight: {
-		fontSize: 20,
-		color: '#fff',
-		fontWeight: 'bold',
-		textAlign: 'center',
-		marginVertical: 10,
-	},
-	exampleText: {
-		fontSize: 14,
-		color: '#dfe6e9',
-		fontStyle: 'italic',
 		textAlign: 'center',
 	},
 	progressWrapper: {
@@ -659,6 +666,8 @@ const styles = StyleSheet.create({
 		color: '#fff',
 		fontSize: 16,
 		fontWeight: '600',
+		textAlign: "center",
+
 	},
 	loadingContainer: {
 		flex: 1,
@@ -802,6 +811,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 30,
 		borderRadius: 30,
 		elevation: 4,
+		marginBottom: 10,
 	},
 	modalOverlay: {
 		flex: 1,
@@ -904,5 +914,55 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		color: '#fff',
 		fontWeight: '600',
+	},
+	subMascotImage: {
+		width: 150,
+		height: 150,
+		marginTop: 16,
+		opacity: 0.9, // 조금 더 뚜렷하게
+	},
+	proverbText: {
+		fontSize: 28,
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		textAlign: 'center',
+		lineHeight: 34,
+		marginVertical: 10,
+	},
+	meaningHighlight: {
+		fontSize: 22,
+		color: '#ffffff',
+		fontWeight: 'bold',
+		textAlign: 'center',
+		lineHeight: 30,
+		marginVertical: 10,
+	},
+	exampleText: {
+		fontSize: 15,
+		color: '#dfe6e9',
+		fontStyle: 'italic',
+		textAlign: 'center',
+		lineHeight: 22,
+		marginTop: 30, // ✅ 예시 위 간격 추가
+	},
+	cardLabel: {
+		fontSize: 17,
+		color: '#ffffff',
+		marginBottom: 8,
+		fontWeight: '600',
+		textAlign: 'center',
+	},
+	cardCompleteButton: {
+		backgroundColor: '#27ae60',
+		paddingVertical: 10,
+		paddingHorizontal: 24,
+		borderRadius: 20,
+		marginTop: 20,
+		marginBottom: 10,
+	},
+	cardContent: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center', // 중앙 정렬 추가
 	},
 });

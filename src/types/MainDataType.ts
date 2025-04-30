@@ -39,6 +39,7 @@ export declare module MainDataType {
 		description: string; // '아시아 국가 정답률 90% 이상'
 		iconType: string; // 아이콘 타입(FontAwesome6)
 		icon: string; // 아이콘 이름(earth-asia)
+		type: "quiz" | "study"
 	}
 	/**
 	 * 사용자 퀴즈 데이터 정의 

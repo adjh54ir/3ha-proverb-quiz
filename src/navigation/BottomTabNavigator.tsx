@@ -5,6 +5,7 @@ import { Paths } from './conf/Paths';
 import SettingScreen from '@/screens/SettingScreen';
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import ProverbListScreen from '@/screens/ProverbListScreen';
+import MyScoreScreen from '@/screens/MyScoreScreen';
 
 /**
  * BottomTab Navigator : 하단의 메뉴를 구성하는 경우
@@ -13,7 +14,7 @@ import ProverbListScreen from '@/screens/ProverbListScreen';
 const BottomTabNavigator = (appStateType: any) => {
 	const Tab = createBottomTabNavigator();
 
-	useEffect(() => {}, []);
+	useEffect(() => { }, []);
 
 	return (
 		<Tab.Navigator initialRouteName={Paths.HOME}>
@@ -37,6 +38,16 @@ const BottomTabNavigator = (appStateType: any) => {
 					title: '홈',
 					tabBarLabel: '홈',
 					tabBarIcon: ({ color, size }) => <IconComponent type='materialIcons' name='home' size={size} color={color} />,
+				})}
+			/>
+			<Tab.Screen
+				name={Paths.MY_SCORE}
+				component={MyScoreScreen}
+				options={({ navigation }) => ({
+					unmountOnBlur: true,
+					title: '나의 활동',
+					tabBarLabel: '나의 활동',
+					tabBarIcon: ({ color, size }) => <IconComponent type="materialIcons" name="insights" size={size} color={color} />,
 				})}
 			/>
 

@@ -35,11 +35,21 @@ const Home = () => {
 	const [showBadgeModal, setShowBadgeModal] = useState(false);
 	const [selectedBadge, setSelectedBadge] = useState<(typeof CONST_BADGES)[number] | null>(null);
 
+	const earnedBadges = CONST_BADGES.filter((b) => earnedBadgeIds.includes(b.id));
+	const visibleBadges = earnedBadges; // 제한 없이 모두 보여줌
+	const [tooltipBadgeId, setTooltipBadgeId] = useState<string | null>(null);
+
 	const greetingMessages = [
-		'🎯 반가워! 오늘도 똑똑해질 시간이야!',
-		'🧠 오늘도 새로운 수도를 알아보자!',
-		'📚 기억력 자신 있지? 퀴즈 시작해볼까?',
-		'✨ 하루 한 퀴즈! 똑똑해지는 비결이야!',
+		'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
+		'🧠 오늘의 속담으로 지혜를 키워봐요!',
+		'📚 기억력 자신 있죠? 속담 퀴즈에 도전!',
+		'📝 속담 하나, 교훈 하나! 함께 배워봐요!',
+		'✨ 속담으로 생각을 키워보는 시간이에요!',
+		'💡 옛말 속 지혜, 오늘도 한마디 배워볼까요?',
+		'👀 퀴즈로 속담을 익히면 재미가 두 배!',
+		'🔍 뜻을 알면 더 재밌는 속담! 지금 풀어보세요!',
+		'🧩 맞히는 재미, 배우는 즐거움! 속담 퀴즈 GO!',
+		'🐣 하루 한 속담! 작지만 큰 지혜가 자라나요!',
 	];
 
 	const LEVEL_DATA = [
@@ -67,6 +77,8 @@ const Home = () => {
 		},
 	];
 
+
+
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
@@ -76,6 +88,16 @@ const Home = () => {
 			),
 		});
 	}, [navigation]);
+
+	const getLevelData = (score: number) => {
+		return LEVEL_DATA.find((l) => score >= l.score && score < l.next) || LEVEL_DATA[0];
+	};
+	// 이걸 기존 getLevelData 아래에 추가해
+	const levelData = useMemo(() => getLevelData(totalScore), [totalScore]);
+
+	const { label, icon, mascot } = levelData;
+
+
 
 	useFocusEffect(
 		useCallback(() => {
@@ -95,11 +117,6 @@ const Home = () => {
 		const studyBadges = studyData ? JSON.parse(studyData).badges || [] : [];
 		setEarnedBadgeIds([...new Set([...quizBadges, ...studyBadges])]);
 	};
-
-	const levelData = useMemo(
-		() => LEVEL_DATA.find((l) => totalScore >= l.score && totalScore < l.next) || LEVEL_DATA[0],
-		[totalScore],
-	);
 
 	const handleMascotPress = () => {
 		const random = greetingMessages[Math.floor(Math.random() * greetingMessages.length)];
@@ -147,20 +164,68 @@ const Home = () => {
 	);
 
 	return (
-		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-			<KeyboardAvoidingView style={styles.wrapper} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-				<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-					<View style={styles.container}>
-						<View style={styles.imageContainer}>
-							<View style={styles.speechWrapper}>
-								<View style={styles.speechBubble}>
-									<Text style={styles.speechText}>{greeting}</Text>
+		<>
+			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+				<KeyboardAvoidingView style={styles.wrapper} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+					<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+						<View style={styles.container}>
+							<View style={styles.imageContainer}>
+								<View style={styles.speechWrapper}>
+									<View style={styles.speechBubble}>
+										<Text style={styles.speechText}>{greeting}</Text>
+									</View>
+									<View style={styles.speechTail} />
 								</View>
-								<View style={styles.speechTail} />
+
+								<TouchableOpacity onPress={handleMascotPress}>
+									<FastImage
+										key={totalScore} // totalScore가 바뀌면 이미지 강제 갱신
+										source={
+											totalScore >= 1800
+												? require('@/assets/images/level4_mascote_back.png')
+												: totalScore >= 1200
+													? require('@/assets/images/level3_mascote_back.png')
+													: totalScore >= 600
+														? require('@/assets/images/level2_mascote_back.png')
+														: require('@/assets/images/level1_mascote_back.png')
+										}
+										style={styles.image}
+										resizeMode='contain'
+									/>
+								</TouchableOpacity>
 							</View>
-							<TouchableOpacity onPress={handleMascotPress}>
-								<FastImage source={require('../assets/images/main_mascote.png')} style={styles.image} resizeMode='contain' />
-							</TouchableOpacity>
+							<View style={{ alignItems: 'center', marginBottom: 8 }}>
+								<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+									<IconComponent type='fontAwesome6' name={icon} size={18} color='#27ae60' />
+									<Text style={{ fontSize: 14, color: '#27ae60', fontWeight: '600', marginLeft: 6 }}>{label}</Text>
+								</View>
+
+								{earnedBadges.length > 0 && (
+									<View style={{ width: '100%', marginTop: 10 }}>
+										<ScrollView
+											horizontal
+											showsHorizontalScrollIndicator={false}
+											contentContainerStyle={{ paddingHorizontal: 10 }}>
+											{visibleBadges.map((item) => (
+												<View key={item.id} style={{ marginRight: 12, alignItems: 'center' }}>
+													<TouchableOpacity
+														style={styles.iconBoxActive}
+														onPress={() => setSelectedBadge(item)} // ✅ 툴팁 관리 필요없음
+													>
+														<IconComponent name={item.icon} type={item.iconType} size={20} color='#27ae60' />
+													</TouchableOpacity>
+
+													{tooltipBadgeId === item.id && (
+														<View style={styles.tooltipBox}>
+															<Text style={styles.tooltipText}>{item.description}</Text>
+														</View>
+													)}
+												</View>
+											))}
+										</ScrollView>
+									</View>
+								)}
+							</View>
 						</View>
 
 						<ActionCard
@@ -192,10 +257,67 @@ const Home = () => {
 							<IconComponent type='materialIcons' name='emoji-events' size={18} color='#2ecc71' />
 							<Text style={styles.curiousButtonText}>숨겨진 뱃지들을 찾아보세요!</Text>
 						</TouchableOpacity>
+
+
+					</ScrollView>
+				</KeyboardAvoidingView >
+			</TouchableWithoutFeedback >
+
+			{/* 설명 모달 */}
+			<Modal transparent visible={showGuideModal} animationType='fade'>
+				<View style={styles.modalOverlay}>
+					<View style={styles.modalContent}>
+						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowGuideModal(false)}>
+							<IconComponent type='materialIcons' name='close' size={24} color='#555' />
+						</TouchableOpacity>
+						<Text style={styles.modalText}>
+							<Text style={styles.boldText}>🏠 홈 화면{'\n'}</Text>
+							- 주요 기능으로 빠르게 이동할 수 있는 메뉴를 제공합니다.
+							{'\n\n'}
+							<Text style={styles.boldText}>➡️ 시작하기{'\n'}</Text>
+							- 속담 뜻 맞히기, 속담 찾기, 빈칸 채우기 퀴즈를 통해 재미있게 속담을 학습할 수 있어요.
+							{'\n\n'}
+							<Text style={styles.boldText}>➡️ 학습 모드{'\n'}</Text>
+							- 카드 형식으로 속담과 그 의미, 예문 등을 쉽게 학습할 수 있어요.
+							{'\n\n'}
+							<Text style={styles.boldText}>➡️ 오답 복습{'\n'}</Text>
+							- 이전에 틀렸던 문제들을 다시 풀어보며 확실하게 기억할 수 있어요.
+							{'\n\n'}
+							<Text style={styles.boldText}>🏅 숨겨진 뱃지들을 찾아보세요!{'\n'}</Text>
+							- 학습이나 퀴즈 도중 특정 조건을 만족하면 다양한 뱃지를 획득할 수 있어요.{'\n'}
+							- 모은 뱃지는 홈 화면에서 확인할 수 있어요!
+						</Text>
+						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowGuideModal(false)}>
+							<Text style={styles.modalCloseText}>닫기</Text>
+						</TouchableOpacity>
 					</View>
-				</ScrollView>
-			</KeyboardAvoidingView>
-		</TouchableWithoutFeedback>
+				</View>
+			</Modal>
+			<Modal visible={!!selectedBadge} transparent animationType='fade'>
+				<View style={styles.modalOverlay}>
+					<View style={styles.badgeDetailModal}>
+						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setSelectedBadge(null)}>
+							<IconComponent type='materialIcons' name='close' size={24} color='#555' />
+						</TouchableOpacity>
+
+						{selectedBadge && (
+							<>
+								<View style={styles.badgeIconWrapper}>
+									<IconComponent name={selectedBadge.icon} type={selectedBadge.iconType} size={48} color='#27ae60' />
+								</View>
+
+								<Text style={styles.badgeDetailTitle}>{selectedBadge.name}</Text>
+								<Text style={styles.badgeDetailDescription}>{selectedBadge.description}</Text>
+
+								<TouchableOpacity onPress={() => setSelectedBadge(null)} style={styles.modalConfirmButton}>
+									<Text style={styles.modalConfirmText}>닫기</Text>
+								</TouchableOpacity>
+							</>
+						)}
+					</View>
+				</View>
+			</Modal >
+		</>
 	);
 };
 
@@ -215,7 +337,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 12,
 		paddingHorizontal: 20,
 		borderRadius: 20,
-		maxWidth: '85%', // ✅ 기존 90% → 85%, 더 자연스럽게 말풍선 위치됨
+		maxWidth: '95%', // ✅ 기존 90% → 85%, 더 자연스럽게 말풍선 위치됨
 		shadowColor: '#000',
 		shadowOpacity: 0.07,
 		shadowOffset: { width: 0, height: 2 },

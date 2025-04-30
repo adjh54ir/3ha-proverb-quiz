@@ -46,11 +46,7 @@ const StackNavigator = () => {
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '뜻 맞추기',
-					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
-							<Icon name='arrow-back' size={24} color='#2c3e50' />
-						</TouchableOpacity>
-					),
+					headerLeft: () => <></>
 				})}
 			/>
 
@@ -60,11 +56,7 @@ const StackNavigator = () => {
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '속담 찾기',
-					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
-							<Icon name='arrow-back' size={24} color='#2c3e50' />
-						</TouchableOpacity>
-					),
+					headerLeft: () => <></>
 				})}
 			/>
 
@@ -74,11 +66,7 @@ const StackNavigator = () => {
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '빈칸 채우기',
-					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
-							<Icon name='arrow-back' size={24} color='#2c3e50' />
-						</TouchableOpacity>
-					),
+					headerLeft: () => <></>
 				})}
 			/>
 

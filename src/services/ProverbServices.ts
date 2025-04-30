@@ -86,8 +86,8 @@ class ProverbServices {
 	};
 
 	/**
- * 카테고리 목록 조회 (중복 제거)
- */
+	 * 카테고리 목록 조회 (중복 제거)
+	 */
 	selectCategoryList = (): string[] => {
 		try {
 			const categories = filterData.map((item) => item.category);
@@ -97,6 +97,40 @@ class ProverbServices {
 			console.error('카테고리 목록 조회 실패:', error);
 			return [];
 		}
+	};
+	/**
+	 * 난이도(levelName) 목록 조회 (중복 제거)
+	 */
+	selectLevelNameList = (): string[] => {
+		try {
+			const levels = filterData.map((item) => item.levelName).filter(Boolean);
+			const uniqueLevels = Array.from(new Set(levels));
+			const LEVEL_ORDER = ['아주 쉬움', '쉬움', '보통', '어려움'];
+
+			// 정해진 순서대로 정렬, 없으면 기본 순서 유지
+			const sorted = uniqueLevels.sort((a, b) => {
+				const indexA = LEVEL_ORDER.indexOf(a);
+				const indexB = LEVEL_ORDER.indexOf(b);
+				if (indexA === -1) return 1;
+				if (indexB === -1) return -1;
+				return indexA - indexB;
+			});
+			return sorted;
+		} catch (error) {
+			console.error('난이도 목록 조회 실패:', error);
+			return [];
+		}
+	};
+	/**
+ * 주어진 속담 ID 배열로부터 정복한 레벨 목록 추출
+ */
+	selectMasterLevelsByStudyIds = (studiedIds: number[]): string[] => {
+		const allProverbs = this.selectProverbList();
+		const levels = allProverbs
+			.filter((item) => studiedIds.includes(item.id))
+			.map((item) => item.levelName)
+			.filter(Boolean);
+		return Array.from(new Set(levels));
 	};
 }
 

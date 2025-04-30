@@ -63,7 +63,7 @@ const ProverbStudyScreen = () => {
 	});
 
 	const [filter, setFilter] = useState<'all' | 'learning' | 'learned'>('learning');
-	const progress = filteredProverbs.length > 0 ? (currentIndex + 1) / filteredProverbs.length : 0;
+	const progress = proverbs.length > 0 ? studyHistory.studyProverbs.length / proverbs.length : 0;
 	const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([
 		{ label: '전체', value: 'all' }, // 기본값
 	]);
@@ -99,8 +99,6 @@ const ProverbStudyScreen = () => {
 	const mascotImages = [
 		require('@/assets/images/level1_back.png'),
 		require('@/assets/images/level2_back.png'),
-		require('@/assets/images/level3_back.png'),
-		require('@/assets/images/level4_back.png'),
 		require('@/assets/images/level1_mascote_back.png'),
 		require('@/assets/images/level2_mascote_back.png'),
 		require('@/assets/images/level3_mascote.png'),
@@ -151,6 +149,12 @@ const ProverbStudyScreen = () => {
 	}, []);
 
 	useEffect(() => {
+		if (currentIndex >= filteredProverbs.length) {
+			setCurrentIndex(Math.max(0, filteredProverbs.length - 1));
+		}
+	}, [filteredProverbs]);
+
+	useEffect(() => {
 		Animated.timing(detailFilterHeightAnim, {
 			toValue: isDetailFilterOpen ? DETAIL_FILTER_HEIGHT : 0,
 			duration: 300,
@@ -161,6 +165,7 @@ const ProverbStudyScreen = () => {
 
 	useEffect(() => {
 		filterData();
+		flipAnim.setValue(0); // 카드만 초기화
 	}, [proverbs, studyHistory, filter]);
 
 	const filterData = () => {
@@ -320,6 +325,7 @@ const ProverbStudyScreen = () => {
 					<TouchableOpacity activeOpacity={0.9} style={styles.cardInner} onPress={flipCard}>
 						{mascot && (
 							<View style={{ marginBottom: 20 }}>
+								{/* @ts-ignore */}
 								<FastImage source={mascot} style={{ width: 240, height: 240 }} resizeMode="contain" />
 							</View>
 						)}

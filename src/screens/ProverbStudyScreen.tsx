@@ -9,6 +9,8 @@ import {
 	SafeAreaView,
 	ActivityIndicator,
 	Modal,
+	InteractionManager,
+	ScrollView,
 } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,23 +20,20 @@ import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import IconComponent from './common/atomic/IconComponent';
 import { useNavigation } from '@react-navigation/native';
+import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
+import { CONST_BADGES } from '@/const/ConstBadges';
+import ConfettiCannon from 'react-native-confetti-cannon';
 
-const STORAGE_KEY = 'UserProverbStudyHistory';
+const STORAGE_KEY = 'UserStudyHistory';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-
-export interface UserProverbStudyHistory {
-	studyProverbs: number[];
-	studyCounts?: { [id: string]: number };
-	badges?: string[];
-	lastStudyAt: Date;
-}
 
 const ProverbStudyScreen = () => {
 	const navigation = useNavigation();
 	const carouselRef = useRef<any>(null);
 	const flipAnim = useRef(new Animated.Value(0)).current;
 	const toastAnim = useRef(new Animated.Value(0)).current;
+	const scaleAnim = useRef(new Animated.Value(0)).current;
 
 	const [proverbs, setProverbs] = useState<MainDataType.Proverb[]>([]);
 	const [filteredProverbs, setFilteredProverbs] = useState<MainDataType.Proverb[]>([]);
@@ -45,11 +44,16 @@ const ProverbStudyScreen = () => {
 	const [praiseText, setPraiseText] = useState('');
 
 	const [showExitModal, setShowExitModal] = useState(false);
+	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
+
+	const [confettiKey, setConfettiKey] = useState(0);
 	const [isDetailFilterOpen, setIsDetailFilterOpen] = useState(false);
 	const [levelFilter, setLevelFilter] = useState<'all' | 'Level 1' | 'Level 2' | 'Level 3' | 'Level 4' | 'Level 5'>(
 		'all',
 	);
 	const [themeFilter, setThemeFilter] = useState<'all' | '속담' | '격언' | '명언'>('all');
+
+	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
 
 	const [levelOpen, setLevelOpen] = useState(false);
 	const [themeOpen, setThemeOpen] = useState(false);
@@ -57,14 +61,15 @@ const ProverbStudyScreen = () => {
 	const DETAIL_FILTER_HEIGHT = 80;
 	const detailFilterHeightAnim = useRef(new Animated.Value(0)).current;
 
-	const [studyHistory, setStudyHistory] = useState<UserProverbStudyHistory>({
-		studyProverbs: [],
+	const [studyHistory, setStudyHistory] = useState<MainDataType.UserStudyHistory>({
+		studyProverbes: [],
 		studyCounts: {},
 		lastStudyAt: new Date(),
+		badges: [],
 	});
 
 	const [filter, setFilter] = useState<'all' | 'learning' | 'learned'>('learning');
-	const progress = proverbs.length > 0 ? studyHistory.studyProverbs.length / proverbs.length : 0;
+	const progress = proverbs.length > 0 ? studyHistory.studyProverbes.length / proverbs.length : 0;
 	const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([
 		{ label: '전체', value: 'all' }, // 기본값
 	]);
@@ -167,9 +172,9 @@ const ProverbStudyScreen = () => {
 		let filtered = proverbs;
 
 		if (filter === 'learned') {
-			filtered = filtered.filter((p) => studyHistory.studyProverbs.includes(p.id));
+			filtered = filtered.filter((p) => studyHistory.studyProverbes.includes(p.id));
 		} else if (filter === 'learning') {
-			filtered = filtered.filter((p) => !studyHistory.studyProverbs.includes(p.id));
+			filtered = filtered.filter((p) => !studyHistory.studyProverbes.includes(p.id));
 		}
 
 		// 🔥 추가된 필터 적용
@@ -213,13 +218,13 @@ const ProverbStudyScreen = () => {
 		if (!currentProverb) return;
 
 		// 1. studyProverbs에서 현재 항목 제거
-		const updatedProverbs = studyHistory.studyProverbs.filter((id) => id !== currentProverb.id);
+		const updatedProverbs = studyHistory.studyProverbes.filter((id) => id !== currentProverb.id);
 
 		// 2. 업데이트된 History 만들기
-		const updatedHistory: UserProverbStudyHistory = {
-			studyProverbs: updatedProverbs,
+		const updatedHistory: MainDataType.UserStudyHistory = {
+			studyProverbes: updatedProverbs,
 			studyCounts: studyHistory.studyCounts,
-			badges: studyHistory.badges,
+			badges: studyHistory.badges || [],
 			lastStudyAt: new Date(),
 		};
 
@@ -247,17 +252,17 @@ const ProverbStudyScreen = () => {
 		const currentProverb = filteredProverbs[currentIndex];
 		if (!currentProverb) return;
 
-		const isLearned = studyHistory.studyProverbs.includes(currentProverb.id);
+		const isLearned = studyHistory.studyProverbes.includes(currentProverb.id);
 
 		if (!isLearned) {
-			const updatedProverbs = [...studyHistory.studyProverbs, currentProverb.id];
+			const updatedProverbs = [...studyHistory.studyProverbes, currentProverb.id];
 			const updatedCounts = {
 				...studyHistory.studyCounts,
 				[currentProverb.id]: (studyHistory.studyCounts?.[currentProverb.id] || 0) + 1,
 			};
 
-			const updatedHistory: UserProverbStudyHistory = {
-				studyProverbs: updatedProverbs,
+			const updatedHistory: MainDataType.UserStudyHistory = {
+				studyProverbes: updatedProverbs,
 				studyCounts: updatedCounts,
 				badges: studyHistory.badges || [],
 				lastStudyAt: new Date(),
@@ -265,6 +270,15 @@ const ProverbStudyScreen = () => {
 
 			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
 			setStudyHistory(updatedHistory);
+
+			// 3. AsyncStorage, 뱃지, 토스트 등은 InteractionManager 이후 처리
+			InteractionManager.runAfterInteractions(() => {
+				// 상태 저장
+				AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
+
+				// 뱃지 검사 및 모달
+				checkAndHandleNewStudyBadges(updatedHistory, setStudyHistory, setBadgeModalVisible, setNewlyEarnedBadges);
+			});
 
 			// handleComplete 내부
 			const newFiltered = getFilteredProverbs(updatedProverbs);
@@ -299,19 +313,50 @@ const ProverbStudyScreen = () => {
 		return proverbs;
 	};
 
-	const frontInterpolate = flipAnim.interpolate({
-		inputRange: [0, 180],
-		outputRange: ['0deg', '180deg'],
-	});
+	/**
+	 * 새로 획득한 학습 뱃지를 인터셉터로 확인 후 업데이트 및 모달 처리
+	 */
+	const checkAndHandleNewStudyBadges = (
+		updatedHistory: MainDataType.UserStudyHistory,
+		setter: React.Dispatch<React.SetStateAction<MainDataType.UserStudyHistory>>,
+		setBadgeModalVisible: (v: boolean) => void,
+		setNewlyEarnedBadges: (badges: MainDataType.UserBadge[]) => void,
+	) => {
+		const currentBadges = updatedHistory.badges ?? [];
 
-	const backInterpolate = flipAnim.interpolate({
-		inputRange: [0, 180],
-		outputRange: ['180deg', '360deg'],
-	});
+		const newBadgeIds = StudyBadgeInterceptor(updatedHistory);
+		const newBadges = newBadgeIds.filter((id) => !currentBadges.includes(id));
+		if (newBadges.length > 0) {
+			const earnedBadges = CONST_BADGES.filter((b) => newBadges.includes(b.id));
+			setNewlyEarnedBadges(earnedBadges);
+			setBadgeModalVisible(true);
+
+			// 👇 추가: scale 애니메이션 실행
+			scaleAnim.setValue(0);
+			Animated.spring(scaleAnim, {
+				toValue: 1,
+				useNativeDriver: true,
+			}).start();
+
+			updatedHistory.badges = [...new Set([...currentBadges, ...newBadges])];
+		}
+
+		AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
+		setter(updatedHistory);
+	};
 
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
 		const mascot = mascotImagesQueue[index % mascotImagesQueue.length];
-		const isLearned = studyHistory.studyProverbs.includes(item.id);
+		const isLearned = studyHistory.studyProverbes.includes(item.id);
+		const frontInterpolate = flipAnim.interpolate({
+			inputRange: [0, 180],
+			outputRange: ['0deg', '180deg'],
+		});
+
+		const backInterpolate = flipAnim.interpolate({
+			inputRange: [0, 180],
+			outputRange: ['180deg', '360deg'],
+		});
 
 		const frontAnimatedStyle = {
 			transform: [{ rotateY: frontInterpolate }],
@@ -388,7 +433,7 @@ const ProverbStudyScreen = () => {
 						<Text style={styles.progressTitle}>학습 현황</Text>
 						<View style={styles.progressBadge}>
 							<Text style={styles.progressBadgeText}>
-								{studyHistory.studyProverbs.length} / {proverbs.length}
+								{studyHistory.studyProverbes.length} / {proverbs.length}
 							</Text>
 						</View>
 					</View>
@@ -582,6 +627,43 @@ const ProverbStudyScreen = () => {
 								</TouchableOpacity>
 							</View>
 						</View>
+					</View>
+				</Modal>
+
+				{/* 뱃지 모달 */}
+				<Modal visible={badgeModalVisible} transparent animationType='fade'>
+					<View style={styles.modalOverlay}>
+						<ConfettiCannon
+							key={confettiKey}
+							count={100}
+							origin={{ x: screenWidth / 2, y: 0 }}
+							fadeOut
+							autoStart
+							explosionSpeed={350}
+						/>
+						<Animated.View style={[styles.badgeModal, { transform: [{ scale: scaleAnim }] }]}>
+							<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지를 획득했어요!</Text>
+							<ScrollView style={{ maxHeight: 300, width: '100%' }} contentContainerStyle={{ paddingHorizontal: 12 }}>
+								{newlyEarnedBadges.map((badge, index) => (
+									<View
+										key={index}
+										style={[styles.badgeCard, styles.badgeCardActive]} // 액티브 카드 스타일 항상 적용
+									>
+										<View style={[styles.iconBox, styles.iconBoxActive]}>
+											{/* @ts-ignore */}
+											<IconComponent type={badge.iconType} name={badge.icon} size={20} color={'#27ae60'} />
+										</View>
+										<View style={styles.badgeTextWrap}>
+											<Text style={[styles.badgeName, styles.badgeTitleActive]}>{badge.name}</Text>
+											<Text style={[styles.badgeDescription, styles.badgeDescActive]}>{badge.description}</Text>
+										</View>
+									</View>
+								))}
+							</ScrollView>
+							<TouchableOpacity onPress={() => setBadgeModalVisible(false)} style={styles.modalConfirmButton2}>
+								<Text style={styles.closeButtonText}>확인</Text>
+							</TouchableOpacity>
+						</Animated.View>
 					</View>
 				</Modal>
 			</View>
@@ -955,5 +1037,125 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'center', // 중앙 정렬 추가
+	},
+
+	badgeModal: {
+		backgroundColor: '#fff',
+		padding: 20,
+		borderRadius: 20,
+		width: '85%',
+		maxHeight: '80%',
+		alignItems: 'center',
+		elevation: 5,
+	},
+	badgeModalTitle: {
+		fontSize: 18,
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		marginBottom: 16,
+		textAlign: 'center',
+	},
+	badgeItem: {
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+		paddingVertical: 10,
+		paddingHorizontal: 12,
+		marginBottom: 12,
+		width: '100%',
+		borderRadius: 12,
+		borderWidth: 1.2,
+		borderColor: '#d1f2eb', // 밝은 초록 계열
+		backgroundColor: '#f9fefc', // 전체 배경도 아주 옅은 초록색
+	},
+	badgeIconWrap: {
+		marginRight: 12,
+		width: 40,
+		height: 40,
+		borderRadius: 20,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#ADD8E6',
+		elevation: 2,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.1,
+		shadowRadius: 2,
+	},
+	badgeName: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		color: '#27ae60', // 초록색 강조
+		marginBottom: 2,
+	},
+
+	badgeTextWrap: {
+		flexShrink: 1,
+		flexGrow: 1,
+		minWidth: 0,
+		maxWidth: '85%', // ✅ 설명 부분이 너무 길지 않게 제한
+	},
+	badgeDescription: {
+		fontSize: 14,
+		color: '#7f8c8d',
+		lineHeight: 20,
+	},
+	modalConfirmText2: {
+		color: '#fff',
+		fontSize: 16,
+		fontWeight: '600',
+	},
+	modalConfirmButton2: {
+		backgroundColor: '#2980b9',
+		paddingVertical: 14,
+		paddingHorizontal: 36,
+		borderRadius: 30,
+		elevation: 3,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
+	},
+	badgeCard: {
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+		backgroundColor: '#f9f9f9',
+		borderRadius: 12,
+		padding: 12,
+		marginBottom: 10,
+		borderWidth: 1,
+		borderColor: '#ddd',
+		width: '100%', // ✅ 명확히 카드 너비 지정
+	},
+	badgeCardActive: {
+		borderColor: '#27ae60',
+		backgroundColor: '#f0fbf4',
+	},
+	iconBox: {
+		width: 32,
+		height: 32,
+		borderRadius: 16,
+		backgroundColor: '#e0e0e0',
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginRight: 12,
+	},
+	iconBoxActive: {
+		backgroundColor: '#d0f0dc',
+	},
+	badgeTitleActive: {
+		color: '#27ae60',
+	},
+	badgeDescActive: {
+		color: '#2d8659',
+	},
+	statusCardValue: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		color: '#2c3e50',
+	},
+	closeButtonText: {
+		color: 'white',
+		fontWeight: '600',
+		fontSize: 15, // 기존 16 → 줄임
 	},
 });

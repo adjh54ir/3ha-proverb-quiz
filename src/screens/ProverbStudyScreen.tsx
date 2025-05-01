@@ -189,6 +189,10 @@ const ProverbStudyScreen = () => {
 	};
 
 	const flipCard = () => {
+		// 드롭다운 닫기 추가
+		setLevelOpen(false);
+		setThemeOpen(false);
+
 		Animated.timing(flipAnim, {
 			toValue: isFlipped ? 0 : 180,
 			duration: 300,
@@ -376,7 +380,7 @@ const ProverbStudyScreen = () => {
 								<FastImage
 									//@ts-ignore
 									source={mascot}
-									style={[styles.subMascotImage, { marginBottom: 16 }]}
+									style={[styles.subMascotImage]}
 									resizeMode='contain'
 								/>
 							)}
@@ -482,7 +486,7 @@ const ProverbStudyScreen = () => {
 					{isDetailFilterOpen && (
 						<Animated.View style={[styles.detailFilterWrapper, { height: detailFilterHeightAnim }]}>
 							<View style={styles.subFilterRow}>
-								<View style={{ flex: 1, zIndex: themeOpen ? 1000 : 2000 }}>
+								<View style={[styles.dropdownWrapper, { flex: 1, zIndex: themeOpen ? 1000 : 2000 }]}>
 									{' '}
 									{/* zIndex 역전 방지 */}
 									<DropDownPicker
@@ -493,7 +497,6 @@ const ProverbStudyScreen = () => {
 										items={levelOptions}
 										style={styles.dropdown}
 										textStyle={{ fontSize: 15, color: '#2c3e50', fontWeight: '500' }}
-										placeholderStyle={{ color: '#95a5a6', fontSize: 14 }}
 										dropDownContainerStyle={styles.dropdownList}
 										containerStyle={{
 											zIndex: 10000, // ✅ 매우 높게 설정
@@ -501,11 +504,13 @@ const ProverbStudyScreen = () => {
 										}}
 										zIndex={10000} // ✅ 최상단 유지
 										zIndexInverse={1000}
+										placeholderStyle={styles.dropdownPlaceholder}
+										iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
 										listMode='SCROLLVIEW' /* 스크롤뷰 모드로 변경 */
 									/>
 								</View>
 								<View style={{ width: 8 }} />
-								<View style={{ flex: 1, zIndex: levelOpen ? 1000 : 2000 }}>
+								<View style={[styles.dropdownWrapperLast, { flex: 1, zIndex: levelOpen ? 1000 : 2000 }]}>
 									<DropDownPicker
 										open={themeOpen}
 										setOpen={setThemeOpen}
@@ -518,6 +523,7 @@ const ProverbStudyScreen = () => {
 										dropDownContainerStyle={styles.dropdownList}
 										containerStyle={{ zIndex: 3000, elevation: 10 }}
 										zIndex={9999} // 높게 설정
+										iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
 										zIndexInverse={1000} // 반대 드롭다운일 경우 대비
 										listMode='SCROLLVIEW' /* 스크롤뷰 모드로 변경 */
 									/>
@@ -533,11 +539,11 @@ const ProverbStudyScreen = () => {
 					</View>
 				) : (
 					<>
-						<Animated.View style={[styles.carouselContainer]}>
+						<Animated.View style={[styles.carouselContainer, { zIndex: 1 }]}>
 							<Carousel
 								ref={carouselRef}
 								width={screenWidth * 0.85}
-								height={screenHeight * 0.5}
+								height={screenHeight * 0.6}
 								data={filteredProverbs}
 								renderItem={renderItem}
 								mode='parallax'
@@ -587,19 +593,6 @@ const ProverbStudyScreen = () => {
 						)}
 					</>
 				)}
-
-				{/* <View style={styles.buttonWrapper}>
-					{studyHistory.studyProverbs.includes(filteredProverbs[currentIndex]?.id) ? (
-						<TouchableOpacity style={styles.retryButton} onPress={handleAgain}>
-							<Text style={styles.buttonText}>다시 학습하기</Text>
-						</TouchableOpacity>
-					) : (
-						<TouchableOpacity style={styles.completeButton} onPress={handleComplete}>
-							<Text style={styles.buttonText}>학습 완료</Text>
-						</TouchableOpacity>
-					)}
-				</View> */}
-
 				<View style={styles.studyEndWrapper}>
 					<TouchableOpacity style={styles.studyEndButton} onPress={() => setShowExitModal(true)}>
 						<Text style={styles.studyEndText}>학습 종료</Text>
@@ -687,7 +680,7 @@ const styles = StyleSheet.create({
 	},
 	card: {
 		width: screenWidth * 0.85,
-		height: screenHeight * 0.5,
+		height: screenHeight * 0.6,
 		backgroundColor: '#fff',
 		borderRadius: 20,
 		justifyContent: 'center',
@@ -775,6 +768,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
+		zIndex: 1, // 👈 반드시 명시
 	},
 	studyEndWrapper: {
 		width: '100%',
@@ -805,29 +799,14 @@ const styles = StyleSheet.create({
 
 	dropdown: {
 		backgroundColor: '#fff',
-		borderColor: '#dfe6e9',
-		borderWidth: 1.2,
-		borderRadius: 12,
-		paddingHorizontal: 12,
+		borderColor: '#ccc',
 		height: 44,
-		elevation: 2,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.06,
-		shadowRadius: 2,
 	},
 	dropdownList: {
 		backgroundColor: '#fff',
 		borderColor: '#dfe6e9',
 		borderWidth: 1.2,
 		borderRadius: 12,
-		elevation: 4,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		paddingBottom: 0,
-		marginBottom: 0,
 	},
 	progressHeader: {
 		paddingVertical: 20,
@@ -877,6 +856,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#f9fafb',
 		paddingHorizontal: 20,
 		paddingTop: 10,
+		zIndex: 9999, // 👈 DropDownPicker보다 상위 부모도 높게
 	},
 	retryButton: {
 		backgroundColor: '#f39c12', // 다시 학습은 노란색 계열
@@ -993,6 +973,7 @@ const styles = StyleSheet.create({
 		height: 150,
 		marginTop: 16,
 		opacity: 0.9, // 조금 더 뚜렷하게
+		marginBottom: 0,
 	},
 	proverbText: {
 		fontSize: 28,
@@ -1000,7 +981,9 @@ const styles = StyleSheet.create({
 		color: '#2c3e50',
 		textAlign: 'center',
 		lineHeight: 34,
-		marginVertical: 10,
+		// ✅ 아래 줄 수정 (기존 10 → 줄이거나 marginTop만 남김)
+		marginTop: 4,
+		marginBottom: 0,
 	},
 	meaningHighlight: {
 		fontSize: 22,
@@ -1157,5 +1140,19 @@ const styles = StyleSheet.create({
 		color: 'white',
 		fontWeight: '600',
 		fontSize: 15, // 기존 16 → 줄임
+	},
+	dropdownWrapper: {
+		flex: 1,
+		marginBottom: 6, // ✅ 여백 조정
+		marginRight: 6, // ← 드롭다운 간의 간격
+	},
+	dropdownWrapperLast: {
+		flex: 1,
+		marginBottom: 6,
+		marginRight: 6, // ✅ 초기화 버튼과 여백 추가!
+	},
+	dropdownPlaceholder: {
+		textAlign: 'center',
+		color: '#999', // 선택 전 컬러도 부드럽게
 	},
 });

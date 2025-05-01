@@ -30,6 +30,26 @@ interface SelectGroupProps {
 type StyleKey = 'level' | 'category';
 type StyleMap = Record<string, { color: string; icon: { type: string; name: string }; type: StyleKey }>;
 
+/**
+ * 사용자 퀴즈 데이터 정의
+ */
+export interface UserQuizHistory {
+	correctProverbId: number[]; // 사용자가 정답을 맞춘 속담의 아이디 목록 (예: [1, 2])
+	wrongProverbId: number[]; // 사용자가 오답을 선택한 속담의 아이디 목록
+	lastAnsweredAt: Date; // 마지막으로 퀴즈를 푼 시간 (Date 객체 또는 ISO 문자열)
+	quizCounts: { [id: number]: number }; // 각 속담별 퀴즈 시도 횟수 (key는 사용자 아이디)
+	badges: string[]; // 사용자가 획득한 뱃지의 ID 목록 (ex: ['asia_master', 'level1_perfect'])
+	totalScore: number; // 사용자의 퀴즈 총 누적 점수
+	bestCombo?: number; // 사용자가 기록한 가장 높은 연속 정답 수 (선택 값)
+}
+
+const LEVEL_LABEL_MAP: Record<string, string> = {
+	'아주 쉬움': 'Level 1',
+	쉬움: 'Level 2',
+	보통: 'Level 3',
+	어려움: 'Level 4',
+};
+
 const QuizStartModal = ({
 	visible,
 	modeStep,
@@ -43,21 +63,35 @@ const QuizStartModal = ({
 	onClose,
 	onStart,
 }: Props) => {
+	const STORAGE_KEY_QUIZ = 'UserQuizHistory';
 	const [levelStats, setLevelStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [categoryStats, setCategoryStats] = useState<Record<string, { total: number; studied: number }>>({});
 
 	useFocusEffect(
 		useCallback(() => {
-			const load = async () => {
-				const raw = await AsyncStorage.getItem('UserStudyHistory');
-				const parsed = raw ? JSON.parse(raw) : { studiedIds: [] };
-				loadLevelStats(parsed.studiedIds ?? []);
-				loadStats(parsed.studiedIds ?? []);
-			};
-			load();
+			loadData();
 		}, []),
 	);
 
+	const loadData = async () => {
+		const raw = await AsyncStorage.getItem(STORAGE_KEY_QUIZ);
+		let correctIds: number[] = [];
+		let wrongIds: number[] = [];
+
+		if (raw) {
+			try {
+				const parsed: UserQuizHistory = JSON.parse(raw);
+				correctIds = parsed.correctProverbId ?? [];
+				wrongIds = parsed.wrongProverbId ?? [];
+			} catch (e) {
+				console.error('UserQuizHistory 파싱 실패:', e);
+			}
+		}
+
+		const studiedIds = Array.from(new Set([...correctIds, ...wrongIds])); // ✅ 중복 제거한 전체 푼 문제 목록
+		loadLevelStats(studiedIds);
+		loadStats(studiedIds);
+	};
 	const loadStats = (studiedIds: number[]) => {
 		const allProverbs = ProverbServices.selectProverbList();
 		const categoryMap: Record<string, { total: number; studied: number }> = {
@@ -174,6 +208,10 @@ const QuizStartModal = ({
 											style={{ marginBottom: 6 }}
 										/>
 									) : null}
+
+									{/* ✅ 레벨 텍스트: 아이콘 아래 */}
+									{isLevel && LEVEL_LABEL_MAP[option] && <Text style={styles.levelLabel}>{LEVEL_LABEL_MAP[option]}</Text>}
+
 									<Text style={[styles.selectButtonText, isSelected && styles.selectButtonTextActive, { textAlign: 'center' }]}>
 										{`${option} ${stats ? `(${stats.studied}/${stats.total})` : ''}`}
 									</Text>
@@ -382,7 +420,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginBottom: 12,
+		marginBottom: 18,
 		gap: 6,
 	},
 	selectTitleEmoji: {
@@ -400,5 +438,11 @@ const styles = StyleSheet.create({
 		color: '#ffffff',
 		textAlign: 'center',
 		lineHeight: 20,
+	},
+	levelLabel: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		color: '#ffffff',
+		marginBottom: 4,
 	},
 });

@@ -15,7 +15,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import Zocial from 'react-native-vector-icons/Zocial';
-import { StyleProp, TextStyle } from 'react-native/types';
+import { Dimensions, StyleProp, TextStyle } from 'react-native';
 
 export type IconType =
 	| 'antdesign'
@@ -61,6 +61,7 @@ interface IconProps {
  */
 const IconComponent: React.FC<IconProps> = ({ type, name, size = 24, color = 'black', style }) => {
 	const normalizedType = type.toLowerCase(); // 소문자 변환
+	const { width: screenWidth } = Dimensions.get('window');
 
 	const iconMap: Record<IconType, any> = {
 		antdesign: AntDesign,
@@ -86,8 +87,10 @@ const IconComponent: React.FC<IconProps> = ({ type, name, size = 24, color = 'bl
 		console.warn(`[IconComponent] '${type}'는 지원되지 않는 아이콘 타입입니다.`);
 		return null;
 	}
-
-	return <Icon name={name} size={size} color={color} style={style} />;
+	// ✅ 375 기준으로 반응형 size 계산 (기본 scale 방식)
+	const scale = screenWidth / 375;
+	const finalSize = size * scale;
+	return <Icon name={name} size={finalSize} color={color} style={style} />;
 };
 
 export default IconComponent;

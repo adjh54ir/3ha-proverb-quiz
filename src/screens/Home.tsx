@@ -19,6 +19,7 @@ import { Paths } from '@/navigation/conf/Paths';
 import IconComponent from './common/atomic/IconComponent';
 import { CONST_BADGES } from '@/const/ConstBadges';
 
+import ConfettiCannon from 'react-native-confetti-cannon';
 const STORAGE_KEY_QUIZ = 'UserQuizHistory';
 const STORAGE_KEY_STUDY = 'UserStudyHistory';
 
@@ -166,6 +167,17 @@ const Home = () => {
 					<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
 						<View style={styles.container}>
 							<View style={styles.imageContainer}>
+								<View style={styles.confettiWrapper}>
+									{showConfetti && (
+										<ConfettiCannon
+											count={40}
+											origin={{ x: 75, y: 30 }} // y를 10 → 30으로 조금 내려서 더 중심에 뿌림
+											fadeOut
+											explosionSpeed={500}
+											fallSpeed={2500}
+										/>
+									)}
+								</View>
 								<View style={styles.speechWrapper}>
 									<View style={styles.speechBubble}>
 										<Text style={styles.speechText}>{greeting}</Text>
@@ -308,6 +320,43 @@ const Home = () => {
 								</TouchableOpacity>
 							</>
 						)}
+					</View>
+				</View>
+			</Modal>
+
+			{/* 획득 가능한 뱃지 모달 */}
+			<Modal transparent visible={showBadgeModal} animationType='fade'>
+				<View style={styles.modalOverlay}>
+					<View style={styles.badgeModalContent}>
+						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowBadgeModal(false)}>
+							<IconComponent type='materialIcons' name='close' size={24} color='#555' />
+						</TouchableOpacity>
+
+						<Text style={styles.pageTitle}>획득 가능한 뱃지</Text>
+
+						<ScrollView contentContainerStyle={{ padding: 10 }} style={{ maxHeight: 400, width: '100%' }}>
+							{CONST_BADGES.map((badge) => (
+								<View key={badge.id} style={[styles.badgeCard]}>
+									<View style={[styles.iconBox]}>
+										<IconComponent
+											name={badge.icon}
+											// @ts-ignore
+											type={badge.iconType}
+											size={20}
+											color={'#2c3e50'}
+										/>
+									</View>
+									<View style={styles.textBox}>
+										<Text style={[styles.badgeTitle]}>{badge.name}</Text>
+										<Text style={[styles.badgeDesc]}>획득조건: {badge.description}</Text>
+									</View>
+								</View>
+							))}
+						</ScrollView>
+
+						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowBadgeModal(false)}>
+							<Text style={styles.modalCloseText}>닫기</Text>
+						</TouchableOpacity>
 					</View>
 				</View>
 			</Modal>

@@ -20,6 +20,7 @@ import IconComponent from './common/atomic/IconComponent';
 import { CONST_BADGES } from '@/const/ConstBadges';
 
 import ConfettiCannon from 'react-native-confetti-cannon';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 const STORAGE_KEY_QUIZ = 'UserQuizHistory';
 const STORAGE_KEY_STUDY = 'UserStudyHistory';
 
@@ -39,6 +40,7 @@ const Home = () => {
 	const earnedBadges = CONST_BADGES.filter((b) => earnedBadgeIds.includes(b.id));
 	const visibleBadges = earnedBadges; // 제한 없이 모두 보여줌
 	const [tooltipBadgeId, setTooltipBadgeId] = useState<string | null>(null);
+	const [showLevelModal, setShowLevelModal] = useState(false);
 
 	const greetingMessages = [
 		'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
@@ -101,6 +103,40 @@ const Home = () => {
 			loadData();
 		}, []),
 	);
+
+	// getTitleByScore 함수 추가
+	const getTitleByScore = (score: number) => {
+		if (score >= 1800)
+			return {
+				label: '속담 마스터',
+				icon: 'trophy',
+				mascot: require('@/assets/images/level4_mascote.png'),
+			};
+		if (score >= 1200)
+			return {
+				label: '속담 능력자',
+				icon: 'tree',
+				mascot: require('@/assets/images/level3_mascote.png'),
+			};
+		if (score >= 600)
+			return {
+				label: '속담 입문자',
+				icon: 'leaf',
+				mascot: require('@/assets/images/level2_mascote.png'),
+			};
+		return {
+			label: '속담 초보자',
+			icon: 'seedling',
+			mascot: require('@/assets/images/level1_mascote.png'),
+		};
+	};
+
+	const getEncourageMessage = (score: number) => {
+		if (score >= 1800) return '📚 속담 마스터에 도달했어요! 대단해요!';
+		if (score >= 1200) return '💡 능력자까지 왔어요! 이제 마스터도 금방이에요!';
+		if (score >= 600) return '✏️ 입문자로서 아주 좋은 출발이에요!';
+		return '🚶‍♂️ 이제 막 시작했어요! 하나씩 배워나가봐요!';
+	};
 
 	const loadData = async () => {
 		const quizData = await AsyncStorage.getItem(STORAGE_KEY_QUIZ);
@@ -198,7 +234,7 @@ const Home = () => {
 															? require('@/assets/images/level2_mascote.png')
 															: require('@/assets/images/level1_mascote.png')
 											}
-											style={{ width: '100%', height: '100%' }}
+											style={styles.image}
 											resizeMode='contain'
 										/>
 									</View>
@@ -208,6 +244,15 @@ const Home = () => {
 								<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
 									<IconComponent type='fontAwesome6' name={icon} size={18} color='#27ae60' />
 									<Text style={{ fontSize: 14, color: '#27ae60', fontWeight: '600', marginLeft: 6 }}>{label}</Text>
+									<TouchableOpacity onPress={() => setShowLevelModal(true)}>
+										<IconComponent
+											type='materialIcons'
+											name='info-outline'
+											size={16}
+											color='#7f8c8d'
+											style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
+										/>
+									</TouchableOpacity>
 								</View>
 
 								{earnedBadges.length > 0 && (
@@ -360,6 +405,42 @@ const Home = () => {
 					</View>
 				</View>
 			</Modal>
+
+			<Modal visible={showLevelModal} transparent animationType='fade'>
+				<View style={styles.modalOverlay}>
+					<View style={[styles.levelModal, { maxHeight: scaleHeight(600) }]}>
+						<Text style={styles.levelModalTitle}>등급 안내</Text>
+
+						<ScrollView
+							style={{ width: '100%' }}
+							contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
+							showsVerticalScrollIndicator={false}>
+							{[...LEVEL_DATA].reverse().map((item) => {
+								const isCurrent = totalScore >= item.score && totalScore < item.next;
+								const mascotImage = getTitleByScore(item.score).mascot;
+
+								return (
+									<View key={item.label} style={[styles.levelCardBox, isCurrent && styles.levelCardBoxActive]}>
+										{isCurrent && (
+											<View style={styles.levelBadge}>
+												<Text style={styles.levelBadgeText}>🏆 현재 등급</Text>
+											</View>
+										)}
+										<FastImage source={mascotImage} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
+										<Text style={styles.levelLabel}>{item.label}</Text>
+										<Text style={styles.levelScore}>{item.score}점 이상</Text>
+										{isCurrent && <Text style={styles.levelEncourage}>{getEncourageMessage(item.score)}</Text>}
+									</View>
+								);
+							})}
+						</ScrollView>
+
+						<TouchableOpacity onPress={() => setShowLevelModal(false)} style={styles.modalConfirmButton}>
+							<Text style={styles.modalConfirmText}>닫기</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</Modal>
 		</>
 	);
 };
@@ -369,12 +450,15 @@ const styles = StyleSheet.create({
 	scrollContainer: { paddingBottom: 40 },
 	container: {
 		flexGrow: 1,
-		paddingHorizontal: 16, // ✅ 기존 12 → 16 (적당한 여백 확보)
-		paddingVertical: 24, // ✅ 기존 20 → 24 (위아래 여백도 약간 늘림)
+		paddingHorizontal: 16,
+		paddingVertical: 12, // ← 이 부분을 줄이거나 0으로
 	},
-	imageContainer: { alignItems: 'center', marginBottom: 20 },
-	image: { width: 150, height: 150 },
-	speechWrapper: { alignItems: 'center', marginBottom: 8 },
+	imageContainer: { alignItems: 'center', marginBottom: 8 },
+	image: {
+		width: scaleWidth(150),
+		height: scaleWidth(150),
+	},
+	speechWrapper: { alignItems: 'center', marginBottom: 0 },
 	speechBubble: {
 		backgroundColor: '#fef9e7',
 		paddingVertical: 12,
@@ -406,17 +490,18 @@ const styles = StyleSheet.create({
 		lineHeight: 22,
 	},
 	levelContainer: { alignItems: 'center', marginBottom: 16 },
-	levelBadge: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
 	levelText: { fontSize: 14, color: '#27ae60', fontWeight: '600', marginLeft: 6 },
 	badgeScrollWrapper: { height: 70, width: '100%', marginTop: 8 },
 	iconBoxActive: {
-		width: 36, // 기존 40보다 살짝 축소
-		height: 36,
-		marginHorizontal: 2,
-		borderRadius: 18,
+		width: scaleWidth(36),
+		height: scaleWidth(36),
+		marginHorizontal: scaleWidth(2),
+		borderRadius: scaleWidth(18),
 		backgroundColor: '#d0f0dc',
 		justifyContent: 'center',
 		alignItems: 'center',
+		borderWidth: 1, // ✅ 추가
+		borderColor: '#27ae60', // ✅ 추가
 	},
 	toggleBadgeText: {
 		color: '#27ae60',
@@ -722,6 +807,87 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		fontSize: 14,
 		textAlign: 'center',
+	},
+	levelModal: {
+		backgroundColor: '#fff',
+		paddingHorizontal: scaleWidth(20),
+		paddingTop: scaleHeight(20),
+		paddingBottom: scaleHeight(12),
+		borderRadius: scaleWidth(16),
+		width: '85%',
+		alignItems: 'center',
+	},
+	levelModalTitle: {
+		fontSize: scaledSize(18),
+		fontWeight: 'bold',
+		marginBottom: scaleHeight(12),
+		color: '#2c3e50',
+	},
+	levelRowItem: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		width: '100%',
+		paddingVertical: scaleHeight(8),
+		borderBottomWidth: 1,
+		borderColor: '#eee',
+	},
+	levelRowItemActive: {
+		backgroundColor: '#eafaf1',
+		borderColor: '#27ae60',
+	},
+	levelCardBox: {
+		backgroundColor: '#fdfdfd',
+		borderRadius: scaleWidth(14),
+		padding: scaleWidth(16),
+		alignItems: 'center',
+		marginBottom: scaleHeight(14),
+		width: '100%',
+		borderWidth: 1,
+		borderColor: '#ececec',
+	},
+
+	levelCardBoxActive: {
+		backgroundColor: '#eafaf1',
+		borderColor: '#2ecc71',
+		borderWidth: 2,
+	},
+	levelBadge: {
+		backgroundColor: '#27ae60',
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(4),
+		borderRadius: scaleWidth(12),
+		marginBottom: scaleHeight(8),
+	},
+
+	levelBadgeText: {
+		color: '#fff',
+		fontSize: scaledSize(12),
+		fontWeight: 'bold',
+	},
+	levelMascot: {
+		width: scaleWidth(80),
+		height: scaleWidth(80),
+		marginBottom: scaleHeight(10),
+	},
+
+	levelLabel: {
+		fontSize: scaledSize(16),
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		marginBottom: scaleHeight(2),
+	},
+
+	levelScore: {
+		fontSize: scaledSize(13),
+		color: '#7f8c8d',
+	},
+
+	levelEncourage: {
+		fontSize: scaledSize(13),
+		color: '#27ae60',
+		marginTop: scaleHeight(6),
+		textAlign: 'center',
+		lineHeight: scaleHeight(20),
 	},
 });
 

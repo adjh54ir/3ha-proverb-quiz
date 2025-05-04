@@ -13,6 +13,7 @@ import ProverbFindQuizScreen from '@/screens/quiz/ProverbFindQuizScreen';
 import ProverbFillBlankQuizScreen from '@/screens/quiz/ProverbFillBlankQuizScreen';
 import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
 import IconComponent from '@/screens/common/atomic/IconComponent';
+import WrongReviewScreen from '@/screens/WrongReviewScreen';
 
 /**
  * Stack Navigator : 일반적인 화면만 출력을 하는 경우
@@ -103,6 +104,19 @@ const StackNavigator = () => {
 						// <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
 						// 	<Icon name='arrow-back' size={24} color='#2c3e50' />
 						// </TouchableOpacity>
+					),
+				})}
+			/>
+			<Stack.Screen
+				name={Paths.QUIZ_WRONG_REVIEW}
+				component={WrongReviewScreen}
+				options={({ navigation }) => ({
+					headerShown: true,
+					title: '오답 복습',
+					headerLeft: () => (
+						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
+							<Icon name='arrow-back' size={24} color='#2c3e50' />
+						</TouchableOpacity>
 					),
 				})}
 			/>

@@ -16,6 +16,8 @@ import IconComponent from './common/atomic/IconComponent';
 import AdmobBannerAd from './common/ads/AdmobBannerAd';
 import ProverbServices from '@/services/ProverbServices';
 import { CONST_BADGES } from '@/const/ConstBadges';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import Contributor9Modal from './common/modal/Contributor9Modal';
 
 const STORAGE_KEYS = {
 	study: 'UserStudyHistory',
@@ -31,6 +33,8 @@ const SettingScreen = () => {
 	// 상태
 	const ALARM_TIME_KEY = 'AlarmTime';
 	const [alarmTime, setAlarmTime] = useState<Date>(new Date());
+
+	const [showDevModal, setShowDevModal] = useState(false);
 
 	useEffect(() => {
 		if (isFocused) {
@@ -55,11 +59,11 @@ const SettingScreen = () => {
 	const getSummaryMessage = (type: 'study' | 'quiz' | 'all') => {
 		let msg = '';
 		if (type === 'study') {
-			msg = '학습 데이터를 초기화하면 해당 정보는 복구할 수 없습니다.';
+			msg = '지금까지 학습했던 내용들이 모두 사라져요.\n정말 다시 시작할까요?';
 		} else if (type === 'quiz') {
-			msg = '퀴즈 데이터를 초기화하면 해당 정보는 복구할 수 없습니다.';
+			msg = '지금까지 풀었던 퀴즈 기록이 초기화돼요.\n다시 도전해볼까요?';
 		} else if (type === 'all') {
-			msg = '모든 데이터를 초기화하면 모든 기록이 사라지며 복구할 수 없습니다.';
+			msg = '지금까지 학습하고 풀었던 모든 기록이 사라져요.\n정말 전부 다시 시작할까요?';
 		}
 		setSummary(msg);
 	};
@@ -67,13 +71,13 @@ const SettingScreen = () => {
 	const getModalTitle = () => {
 		switch (resetType) {
 			case 'study':
-				return '학습 데이터를 초기화할까요?';
+				return '학습을 다시 해볼까요?';
 			case 'quiz':
-				return '퀴즈 내용을 초기화할까요?';
+				return '퀴즈를 다시 풀어볼까요?';
 			case 'all':
-				return '모든 데이터를 초기화할까요?';
+				return '모두 다시 해볼까요?';
 			default:
-				return '정말 초기화할까요?';
+				return '정말 다시 해볼까요?';
 		}
 	};
 
@@ -181,7 +185,13 @@ const SettingScreen = () => {
 						</TouchableOpacity>
 					</View>
 				</View>
+
+				<TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevModal(true)}>
+					<Text style={styles.devText}>제작자 소개</Text>
+				</TouchableOpacity>
 			</ScrollView>
+
+			<Contributor9Modal visible={showDevModal} onClose={() => setShowDevModal(false)} />
 
 			<Modal visible={modalVisible} transparent animationType='fade' onRequestClose={() => setModalVisible(false)}>
 				<View style={styles.modalBackdrop}>
@@ -233,6 +243,7 @@ const styles = StyleSheet.create({
 	buttonText: {
 		color: '#fff',
 		fontWeight: 'bold',
+		fontSize: scaledSize(14), // ✅ 적당한 크기
 	},
 	resetStudy: {
 		backgroundColor: '#1E88E5',
@@ -257,14 +268,18 @@ const styles = StyleSheet.create({
 		padding: 20,
 	},
 	modalTitle: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		marginBottom: 10,
+		color: '#34495e',
+		textAlign: 'center',
+		marginBottom: scaleHeight(12),
 	},
 	modalSummary: {
-		fontSize: 14,
-		color: '#333',
-		marginBottom: 20,
+		fontSize: scaledSize(13.5),
+		color: '#555',
+		textAlign: 'center',
+		lineHeight: scaleHeight(22),
+		marginBottom: scaleHeight(24),
 	},
 	modalButtons: {
 		flexDirection: 'row',
@@ -329,5 +344,25 @@ const styles = StyleSheet.create({
 		padding: 15,
 		borderRadius: 8,
 		marginBottom: 10,
+	},
+	hiddenDevTouchArea: {
+		alignSelf: 'center',
+		width: scaleWidth(80),
+		height: scaleWidth(30),
+		borderRadius: scaleWidth(28), // 반지름도 줄임
+		backgroundColor: '#F8F8F8', // 연한 회색 배경
+		justifyContent: 'center',
+		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOpacity: 0.05,
+		shadowOffset: { width: 0, height: 1 },
+		shadowRadius: 2,
+		marginBottom: scaleHeight(30),
+	},
+	devText: {
+		fontSize: scaledSize(13),
+		color: '#999999', // 조금 더 진한 회색
+		textAlign: 'center',
+		fontWeight: '500',
 	},
 });

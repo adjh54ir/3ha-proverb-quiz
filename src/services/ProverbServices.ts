@@ -4,8 +4,8 @@ import { MainDataType } from '@/types/MainDataType';
 const filterData = CONST_MAIN_DATA.PROVERB;
 
 /**
-	 * 속담 데이터를 관리합니다.
-	 */
+ * 속담 데이터를 관리합니다.
+ */
 export type Proverb = {
 	id: number; // 고유 식별자 (1부터 시작하는 번호)
 	proverb: string; // 속담 본문 (ex: "가는 말이 고와야 오는 말이 곱다")
@@ -76,8 +76,7 @@ class ProverbServices {
 		try {
 			const lowerKeyword = keyword.toLowerCase();
 			return filterData.filter(
-				(item) =>
-					item.proverb.toLowerCase().includes(lowerKeyword) || item.meaning.toLowerCase().includes(lowerKeyword),
+				(item) => item.proverb.toLowerCase().includes(lowerKeyword) || item.meaning.toLowerCase().includes(lowerKeyword),
 			);
 		} catch (error) {
 			console.error(`키워드(${keyword}) 검색 실패:`, error);
@@ -122,8 +121,8 @@ class ProverbServices {
 		}
 	};
 	/**
- * 주어진 속담 ID 배열로부터 정복한 레벨 목록 추출
- */
+	 * 주어진 속담 ID 배열로부터 정복한 레벨 목록 추출
+	 */
 	selectMasterLevelsByStudyIds = (studiedIds: number[]): string[] => {
 		const allProverbs = this.selectProverbList();
 		const levels = allProverbs

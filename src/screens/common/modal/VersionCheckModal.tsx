@@ -1,8 +1,19 @@
 // components/VersionCheckModal.tsx
 import { RootState } from '@/store/RootReducer';
 import { setCurrentAppVerion } from '@/store/slice/UserDeviceInfoSlice';
+import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, Linking, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+	Modal,
+	View,
+	Text,
+	StyleSheet,
+	TouchableOpacity,
+	Linking,
+	KeyboardAvoidingView,
+	Platform,
+	Image,
+} from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -13,7 +24,6 @@ import { useDispatch, useSelector } from 'react-redux';
 const VersionCheckModal = () => {
 	const dispatch = useDispatch();
 	const [showUpdateModal, setShowUpdateModal] = useState(false);
-	const [currAppVer, setCurrAppVer] = useState('');
 	const userDeviceInfoRedux = useSelector((state: RootState) => state.userDeviceInfo);
 
 	useEffect(() => {
@@ -26,10 +36,15 @@ const VersionCheckModal = () => {
 	 */
 	const checkVersion = async (): Promise<void> => {
 		try {
-			const latestVersion = await VersionCheck.getLatestVersion();
+			const platformProvider = Platform.OS === 'android' ? 'playStore' : 'appStore';
+			const latestVersion = await VersionCheck.getLatestVersion({ provider: platformProvider });
 			const currentVersion = VersionCheck.getCurrentVersion();
-			setCurrAppVer(currentVersion);
 
+			// 아직 앱을 출시하지 않은 경우
+			if (latestVersion === undefined) {
+				console.log('[-] 아직 앱이 출시되지 않았습니다.');
+				return;
+			}
 			// 1. Redux에 앱 버전이 없으면 현재 버전을 앱버전으로 지정
 			if (userDeviceInfoRedux.appVer === '' || userDeviceInfoRedux.appVer === undefined) {
 				dispatch(setCurrentAppVerion(currentVersion));
@@ -57,14 +72,18 @@ const VersionCheckModal = () => {
 	 * 버전 업데이트 수행
 	 * @return {Promise<void>}
 	 */
-	const handleUpdate = () => {
-		VersionCheck.needUpdate().then(async (res) => {
-			if (res.isNeeded) {
-				VersionCheck.getStoreUrl().then((url) => {
-					Linking.openURL(url);
-				});
-			}
-		});
+	const handleUpdate = async (): Promise<void> => {
+		const provider = Platform.OS === 'android' ? 'playStore' : 'appStore';
+		const res = await VersionCheck.needUpdate({ provider });
+
+		if (res === undefined) {
+			console.log('[-] 앱이 미 출시 상태입니다.');
+			return;
+		}
+
+		if (res?.isNeeded && res.storeUrl) {
+			Linking.openURL(res.storeUrl);
+		}
 	};
 
 	return (
@@ -72,15 +91,13 @@ const VersionCheckModal = () => {
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
 				<View style={styles.modalContainer}>
 					<View style={styles.modalContent}>
-						<Text style={styles.title}>업데이트 필요</Text>
+						<Text style={styles.title}>업데이트 알림</Text>
+						<Image source={require('@/assets/images/update.png')} style={styles.image} />
 						<Text style={styles.message}>
-							새로운 버전이 출시되었습니다.{'\n'}
-							업데이트가 필요합니다.
-							{'\n\n'}
-							현재 버전: {currAppVer}
+							🎉 새로운 버전이 출시되었습니다 🎉{'\n'}더 편리해진 기능을 만나보세요!{'\n\n'}
 						</Text>
 						<TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
-							<Text style={styles.buttonText}>업데이트</Text>
+							<Text style={styles.buttonText}>지금 업데이트</Text>
 						</TouchableOpacity>
 					</View>
 				</View>
@@ -98,32 +115,38 @@ const styles = StyleSheet.create({
 	},
 	modalContent: {
 		backgroundColor: 'white',
-		borderRadius: 10,
-		padding: 20,
-		width: '80%',
+		borderRadius: moderateScale(10),
+		padding: scaleWidth(20),
+		width: scaleWidth(300), // 375 기준 80%
 		alignItems: 'center',
 	},
 	title: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		marginBottom: 10,
+		marginBottom: scaleHeight(10),
 	},
 	message: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		textAlign: 'center',
-		marginBottom: 20,
-		lineHeight: 22,
+		marginBottom: scaleHeight(6), // ✅ 너무 크지 않게 설정
+		lineHeight: scaleHeight(20), // ✅ 살짝 줄임
 	},
 	updateButton: {
 		backgroundColor: '#007AFF',
-		paddingVertical: 12,
-		paddingHorizontal: 30,
-		borderRadius: 8,
+		paddingVertical: scaleHeight(10), // ✅ 버튼 높이도 살짝 낮춤
+		paddingHorizontal: scaleWidth(30),
+		borderRadius: moderateScale(8),
 	},
 	buttonText: {
 		color: 'white',
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
+	},
+	image: {
+		width: scaleWidth(100),
+		height: scaleWidth(100),
+		marginBottom: scaleHeight(15),
+		resizeMode: 'contain',
 	},
 });
 

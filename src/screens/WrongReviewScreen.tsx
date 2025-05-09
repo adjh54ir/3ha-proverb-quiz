@@ -205,7 +205,6 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(10),
 		width: '100%',
 		alignItems: 'center',
-		elevation: 3,
 	},
 	title: {
 		fontSize: scaledSize(18),
@@ -232,7 +231,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(40),
 		marginBottom: scaleHeight(10),
 		borderRadius: scaleWidth(30),
-		elevation: 2,
 		marginTop: scaleHeight(20),
 	},
 	buttonText: {
@@ -265,7 +263,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
 		shadowRadius: 2,
-		elevation: 2,
 	},
 	reviewRow: {
 		flexDirection: 'row',
@@ -309,7 +306,6 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(24),
 		borderWidth: 1,
 		borderColor: '#ecf0f1',
-		elevation: 2,
 	},
 	modalOverlay: {
 		flex: 1,

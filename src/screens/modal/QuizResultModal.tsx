@@ -64,7 +64,7 @@ const QuizResultModal = ({
 									<Text style={styles.correctInfoLabel}>📌 속담</Text>
 									<Text style={styles.correctInfoText}>{question?.proverb}</Text>
 									<Text style={[styles.correctInfoLabel, { marginTop: 12 }]}>💡 의미</Text>
-									<Text style={styles.correctInfoText}>{question?.meaning}</Text>
+									<Text style={styles.correctInfoText}>{question?.longMeaning}</Text>
 								</View>
 							</>
 						)}
@@ -74,7 +74,7 @@ const QuizResultModal = ({
 									속담: <Text style={styles.proverbText}>{question?.proverb}</Text>
 								</Text>
 								<Text style={styles.resultSubText}>
-									의미: <Text style={styles.meaningText}>{question?.meaning}</Text>
+									의미: <Text style={styles.meaningText}>{question?.longMeaning}</Text>
 								</Text>
 							</>
 						)}
@@ -168,7 +168,6 @@ export const styles = StyleSheet.create({
 		paddingVertical: 14,
 		paddingHorizontal: 36,
 		borderRadius: 30,
-		elevation: 3,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.2,

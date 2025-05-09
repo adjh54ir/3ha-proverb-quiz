@@ -23,6 +23,79 @@ import AdmobBannerAd from './common/ads/AdmobBannerAd';
 
 const PAGE_SIZE = 30;
 
+const COMMON_ALL_OPTION = {
+	label: '전체',
+	value: '전체',
+	icon: () => <Icon name="clipboard-list" size={16} color="#555" />,
+};
+
+const LEVEL_DROPDOWN_ITEMS = [
+	COMMON_ALL_OPTION,
+	{
+		label: '아주 쉬움',
+		value: '아주 쉬움',
+		icon: () => <Icon name="seedling" size={16} color="#85C1E9" />,
+	},
+	{
+		label: '쉬움',
+		value: '쉬움',
+		icon: () => <Icon name="leaf" size={16} color="#F4D03F" />,
+	},
+	{
+		label: '보통',
+		value: '보통',
+		icon: () => <Icon name="tree" size={16} color="#EB984E" />,
+	},
+	{
+		label: '어려움',
+		value: '어려움',
+		icon: () => <Icon name="trophy" size={16} color="#E74C3C" />,
+	},
+];
+const FIELD_DROPDOWN_ITEMS = [
+	COMMON_ALL_OPTION,
+	{
+		label: '운/우연',
+		value: '운/우연',
+		icon: () => <Icon name="dice" size={16} color="#81ecec" />,
+	},
+	{
+		label: '인간관계',
+		value: '인간관계',
+		icon: () => <Icon name="users" size={16} color="#a29bfe" />,
+	},
+	{
+		label: '세상 이치',
+		value: '세상 이치',
+		icon: () => <Icon name="globe" size={16} color="#fdcb6e" />,
+	},
+	{
+		label: '근면/검소',
+		value: '근면/검소',
+		icon: () => <Icon name="hammer" size={16} color="#fab1a0" />,
+	},
+	{
+		label: '노력/성공',
+		value: '노력/성공',
+		icon: () => <Icon name="medal" size={16} color="#55efc4" />,
+	},
+	{
+		label: '경계/조심',
+		value: '경계/조심',
+		icon: () => <Icon name="exclamation-triangle" size={16} color="#ff7675" />,
+	},
+	{
+		label: '욕심/탐욕',
+		value: '욕심/탐욕',
+		icon: () => <Icon name="money-bill-wave" size={16} color="#fd79a8" />,
+	},
+	{
+		label: '배신/불신',
+		value: '배신/불신',
+		icon: () => <Icon name="user-slash" size={16} color="#b2bec3" />,
+	},
+];
+
 const ProverbListScreen = () => {
 	const scrollRef = useRef<FlatList>(null);
 	const searchInputRef = useRef<TextInput>(null);
@@ -46,6 +119,10 @@ const ProverbListScreen = () => {
 	const [levelItems, setLevelItems] = useState([{ label: '', value: '' }]);
 
 	const fetchData = () => {
+
+		setFieldItems(FIELD_DROPDOWN_ITEMS);
+		setLevelItems(LEVEL_DROPDOWN_ITEMS);
+
 		const allData = ProverbServices.selectProverbList();
 		let filtered = allData;
 
@@ -54,7 +131,7 @@ const ProverbListScreen = () => {
 			filtered = filtered.filter(
 				(item) =>
 					(item.proverb && item.proverb.toLowerCase().includes(lowerKeyword)) ||
-					(item.meaning && item.meaning.toLowerCase().includes(lowerKeyword)),
+					(item.longMeaning && item.longMeaning.toLowerCase().includes(lowerKeyword)),
 			);
 		}
 		if (fieldValue !== '전체') {
@@ -70,12 +147,7 @@ const ProverbListScreen = () => {
 
 	useFocusEffect(
 		useCallback(() => {
-			const fieldList = ProverbServices.selectCategoryList();
-			setFieldItems([{ label: '전체', value: '전체' }, ...fieldList.map((field) => ({ label: field, value: field }))]);
-
-			const levelList = ProverbServices.selectLevelNameList();
-			setLevelItems([{ label: '전체', value: '전체' }, ...levelList.map((level) => ({ label: level, value: level }))]);
-
+			handleReset();
 			fetchData();
 		}, [keyword, fieldValue, levelValue]),
 	);
@@ -152,6 +224,8 @@ const ProverbListScreen = () => {
 		setKeyword('');
 		setFieldValue('전체');
 		setLevelValue('전체');
+		setFieldOpen(false); // 🔽 드롭다운 닫기
+		setLevelOpen(false); // 🔽 드롭다운 닫기
 		Keyboard.dismiss(); // 키보드도 닫아줌
 		setTimeout(() => {
 			scrollToTop();
@@ -161,9 +235,9 @@ const ProverbListScreen = () => {
 	return (
 		<TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
 			<View style={{ flex: 1 }}>
-				<View style={styles.bannerContainer}>
-					<AdmobBannerAd />
-				</View>
+				{/* <View style={styles.bannerContainer}>
+					 <AdmobBannerAd />
+				</View> */}
 				{/* 필터 + 드롭다운 영역 */}
 				<View style={{ zIndex: 10, paddingHorizontal: 16, paddingTop: 16 }}>
 					<View style={styles.filterCard}>
@@ -172,43 +246,48 @@ const ProverbListScreen = () => {
 							style={styles.input}
 							placeholder='속담이나 의미를 입력해주세요'
 							placeholderTextColor='#666'
-							onChangeText={setKeyword}
+							onChangeText={(text) => {
+								setKeyword(text);
+								setFieldOpen(false); // 🔽 드롭다운 닫기
+								setLevelOpen(false); // 🔽 드롭다운 닫기
+							}}
 							value={keyword}
 						/>
 						<View style={styles.filterDropdownRow}>
 							<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
 								<DropDownPicker
-									open={fieldOpen}
-									value={fieldValue}
-									items={fieldItems}
-									setOpen={setFieldOpen}
-									setValue={setFieldValue}
-									setItems={setFieldItems}
-									placeholder='분야 선택'
-									placeholderStyle={styles.dropdownPlaceholder}
-									style={styles.dropdown}
-									iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
-									dropDownContainerStyle={styles.dropdownList}
-									zIndex={fieldOpen ? 2000 : 1000}
-									zIndexInverse={fieldOpen ? 1000 : 2000}
+									open={levelOpen}
+									value={levelValue}
+									items={LEVEL_DROPDOWN_ITEMS}
+									setOpen={setLevelOpen}
+									setValue={setLevelValue}
+									setItems={setLevelItems}
+									style={styles.dropdownLevel}
+									dropDownContainerStyle={styles.dropdownListLevel}
+									listItemLabelStyle={{ marginLeft: 6, fontSize: 14 }}
+									labelStyle={{ fontSize: 14, color: '#2c3e50' }}
+									iconContainerStyle={{ marginRight: 8 }}
+									showArrowIcon={true} // 드롭다운 화살표
+									showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
 								/>
 							</View>
 
 							<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000 }]}>
+
 								<DropDownPicker
-									open={levelOpen}
-									value={levelValue}
-									items={levelItems}
-									setOpen={setLevelOpen}
-									setValue={setLevelValue}
-									setItems={setLevelItems}
-									placeholder='수준 선택'
-									placeholderStyle={styles.dropdownPlaceholder}
-									style={styles.dropdown}
-									iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
-									dropDownContainerStyle={styles.dropdownList}
-									zIndex={levelOpen ? 2000 : 1000}
-									zIndexInverse={levelOpen ? 1000 : 2000}
+									open={fieldOpen}
+									value={fieldValue}
+									items={FIELD_DROPDOWN_ITEMS}
+									setOpen={setFieldOpen}
+									setValue={setFieldValue}
+									setItems={setFieldItems}
+									style={styles.dropdownField}
+									dropDownContainerStyle={styles.dropdownListField}
+									listItemLabelStyle={{ marginLeft: 6, fontSize: 14 }}
+									labelStyle={{ fontSize: 14, color: '#2c3e50' }}
+									iconContainerStyle={{ marginRight: 8 }}
+									showArrowIcon={true}
+									showTickIcon={false}
 								/>
 							</View>
 
@@ -253,7 +332,7 @@ const ProverbListScreen = () => {
 									setShowDetailModal(true);
 								}}>
 								<Text style={styles.proverbText}>{item.proverb}</Text>
-								<Text style={styles.meaningText}>- {item.meaning}</Text>
+								<Text style={styles.meaningText}>- {item.longMeaning}</Text>
 								<View style={styles.badgeRow}>
 									<View style={[styles.badge, { backgroundColor: getFieldColor(item.category) }]}>
 										<Text style={styles.badgeText}>{item.category}</Text>
@@ -300,7 +379,7 @@ const ProverbListScreen = () => {
 								)}
 								<View style={styles.modalSection}>
 									<Text style={styles.modalLabel}>의미</Text>
-									<Text style={styles.modalText}>- {selectedProverb?.meaning}</Text>
+									<Text style={styles.modalText}>- {selectedProverb?.longMeaning}</Text>
 								</View>
 
 								<View style={styles.modalSection}>
@@ -347,7 +426,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.05,
 		shadowRadius: 8,
-		elevation: 3,
 	},
 	input: {
 		height: 44, // 드롭다운과 똑같이!
@@ -378,7 +456,6 @@ const styles = StyleSheet.create({
 		borderRadius: 24,
 		alignItems: 'center',
 		justifyContent: 'center',
-		elevation: 6,
 	},
 	itemBox: {
 		backgroundColor: '#fff',
@@ -391,7 +468,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.05,
 		shadowRadius: 8,
-		elevation: 3,
 	},
 	modalContainer: {
 		width: '90%',
@@ -422,7 +498,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
 		shadowRadius: 4,
-		elevation: 2,
 	},
 
 	modalLabel: {
@@ -609,5 +684,29 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1, // ← 상단 배치 시 하단 구분선
 		borderColor: '#ccc',
 		zIndex: 999,
+	},
+	dropdownLevel: {
+		backgroundColor: '#f7f7f7',
+		borderColor: '#ccc',
+		height: 44,
+		paddingHorizontal: 12,
+	},
+	dropdownField: {
+		backgroundColor: '#f7f7f7',
+		borderColor: '#ccc',
+		height: 44,
+		paddingHorizontal: 12,
+	},
+	dropdownListLevel: {
+		backgroundColor: '#ffffff',
+		borderColor: '#ccc',
+		borderWidth: 1,
+		borderRadius: 12,
+	},
+	dropdownListField: {
+		backgroundColor: '#ffffff',
+		borderColor: '#ccc',
+		borderWidth: 1,
+		borderRadius: 12,
 	},
 });

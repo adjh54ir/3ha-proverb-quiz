@@ -774,7 +774,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.15,
 		shadowRadius: 4,
-		elevation: 4,
 	},
 
 	selectRow: {
@@ -834,7 +833,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 12,
 		borderRadius: 12,
 		alignItems: 'center',
-		elevation: 2,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.1,
@@ -862,7 +860,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.2,
 		shadowRadius: 6,
-		elevation: 5,
 	},
 	exitModalTitle: {
 		fontSize: 20,
@@ -893,7 +890,6 @@ const styles = StyleSheet.create({
 		width: '85%',
 		maxHeight: '80%',
 		alignItems: 'center',
-		elevation: 5,
 	},
 	modalButtonRow: {
 		flexDirection: 'row',
@@ -936,7 +932,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 14,
 		paddingHorizontal: 36,
 		borderRadius: 30,
-		elevation: 3,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.2,
@@ -982,7 +977,6 @@ const styles = StyleSheet.create({
 		borderRadius: 16,
 		borderWidth: 1,
 		borderColor: '#ddd',
-		elevation: 3, // 안드로이드용 그림자
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.1,
@@ -1017,7 +1011,6 @@ const styles = StyleSheet.create({
 		paddingBottom: 10,
 		borderBottomWidth: 1,
 		borderColor: '#eee',
-		elevation: 4,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.05,
@@ -1043,7 +1036,6 @@ const styles = StyleSheet.create({
 		borderWidth: 1.5,
 		borderColor: '#dcdde1',
 		marginBottom: 12, // 기존 14 → 줄임
-		elevation: 2,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.08,
@@ -1132,7 +1124,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: '#ADD8E6',
-		elevation: 2,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.1,
@@ -1166,7 +1157,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 14,
 		paddingHorizontal: 36,
 		borderRadius: 30,
-		elevation: 3,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.2,

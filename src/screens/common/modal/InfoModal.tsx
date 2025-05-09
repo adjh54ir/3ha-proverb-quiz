@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 20,
         borderRadius: 12,
-        elevation: 5,
         alignItems: 'center',
     },
     modalCloseButton: {

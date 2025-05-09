@@ -23,10 +23,83 @@ import { useNavigation } from '@react-navigation/native';
 import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
 import ConfettiCannon from 'react-native-confetti-cannon';
+import Icon from 'react-native-vector-icons/FontAwesome6';
 
 const STORAGE_KEY = 'UserStudyHistory';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const COMMON_ALL_OPTION = {
+	label: '전체',
+	value: '전체',
+	icon: () => <Icon name="clipboard-list" size={16} color="#555" />,
+};
+
+const LEVEL_DROPDOWN_ITEMS = [
+	COMMON_ALL_OPTION,
+	{
+		label: '아주 쉬움',
+		value: '아주 쉬움',
+		icon: () => <Icon name="seedling" size={16} color="#85C1E9" />,
+	},
+	{
+		label: '쉬움',
+		value: '쉬움',
+		icon: () => <Icon name="leaf" size={16} color="#F4D03F" />,
+	},
+	{
+		label: '보통',
+		value: '보통',
+		icon: () => <Icon name="tree" size={16} color="#EB984E" />,
+	},
+	{
+		label: '어려움',
+		value: '어려움',
+		icon: () => <Icon name="trophy" size={16} color="#E74C3C" />,
+	},
+];
+const FIELD_DROPDOWN_ITEMS = [
+	COMMON_ALL_OPTION,
+	{
+		label: '운/우연',
+		value: '운/우연',
+		icon: () => <Icon name="dice" size={16} color="#81ecec" />,
+	},
+	{
+		label: '인간관계',
+		value: '인간관계',
+		icon: () => <Icon name="users" size={16} color="#a29bfe" />,
+	},
+	{
+		label: '세상 이치',
+		value: '세상 이치',
+		icon: () => <Icon name="globe" size={16} color="#fdcb6e" />,
+	},
+	{
+		label: '근면/검소',
+		value: '근면/검소',
+		icon: () => <Icon name="hammer" size={16} color="#fab1a0" />,
+	},
+	{
+		label: '노력/성공',
+		value: '노력/성공',
+		icon: () => <Icon name="medal" size={16} color="#55efc4" />,
+	},
+	{
+		label: '경계/조심',
+		value: '경계/조심',
+		icon: () => <Icon name="exclamation-triangle" size={16} color="#ff7675" />,
+	},
+	{
+		label: '욕심/탐욕',
+		value: '욕심/탐욕',
+		icon: () => <Icon name="money-bill-wave" size={16} color="#fd79a8" />,
+	},
+	{
+		label: '배신/불신',
+		value: '배신/불신',
+		icon: () => <Icon name="user-slash" size={16} color="#b2bec3" />,
+	},
+];
 
 const ProverbStudyScreen = () => {
 	const navigation = useNavigation();
@@ -48,10 +121,8 @@ const ProverbStudyScreen = () => {
 
 	const [confettiKey, setConfettiKey] = useState(0);
 	const [isDetailFilterOpen, setIsDetailFilterOpen] = useState(false);
-	const [levelFilter, setLevelFilter] = useState<'all' | 'Level 1' | 'Level 2' | 'Level 3' | 'Level 4' | 'Level 5'>(
-		'all',
-	);
-	const [themeFilter, setThemeFilter] = useState<'all' | '속담' | '격언' | '명언'>('all');
+	const [levelFilter, setLevelFilter] = useState('전체');
+	const [themeFilter, setThemeFilter] = useState('전체');
 
 	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
 
@@ -70,18 +141,7 @@ const ProverbStudyScreen = () => {
 
 	const [filter, setFilter] = useState<'all' | 'learning' | 'learned'>('learning');
 	const progress = proverbs.length > 0 ? studyHistory.studyProverbes.length / proverbs.length : 0;
-	const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([
-		{ label: '전체', value: 'all' }, // 기본값
-	]);
 
-	const levelOptions = [
-		{ label: '전체', value: 'all' },
-		{ label: '아주 쉬움', value: '아주 쉬움' },
-		{ label: '쉬움', value: '쉬움' },
-		{ label: '보통', value: '보통' },
-		{ label: '어려움', value: '어려움' },
-		{ label: '아주 어려움', value: '아주 어려움' },
-	];
 	const completionImages = require('@/assets/images/cheer-up.png');
 
 	const praiseMessages = [
@@ -129,19 +189,6 @@ const ProverbStudyScreen = () => {
 		};
 		fetchData();
 	}, []);
-	useEffect(() => {
-		const loadCategories = () => {
-			try {
-				const categories = ProverbServices.selectCategoryList();
-				const options = [{ label: '전체', value: 'all' }, ...categories.map((cat) => ({ label: cat, value: cat }))];
-				setCategoryOptions(options);
-			} catch (error) {
-				console.error('카테고리 옵션 로드 실패:', error);
-			}
-		};
-
-		loadCategories();
-	}, []);
 
 	useEffect(() => {
 		// 앱 시작할 때 미리 10개 랜덤 뽑기
@@ -177,12 +224,11 @@ const ProverbStudyScreen = () => {
 			filtered = filtered.filter((p) => !studyHistory.studyProverbes.includes(p.id));
 		}
 
-		// 🔥 추가된 필터 적용
-		if (levelFilter !== 'all') {
-			filtered = filtered.filter((p) => p.levelName === levelFilter); // ✅ level → levelName
+		if (levelFilter !== '전체') {
+			filtered = filtered.filter((p) => p.levelName === levelFilter);
 		}
-		if (themeFilter !== 'all') {
-			filtered = filtered.filter((p) => p.category === themeFilter); // ✅ theme → category
+		if (themeFilter !== '전체') {
+			filtered = filtered.filter((p) => p.category === themeFilter);
 		}
 
 		setFilteredProverbs(filtered);
@@ -406,7 +452,7 @@ const ProverbStudyScreen = () => {
 					<View style={styles.cardInner}>
 						<TouchableOpacity activeOpacity={0.9} style={styles.cardContent} onPress={flipCard}>
 							<Text style={styles.cardLabel}>🧠 속담 의미</Text>
-							<Text style={styles.meaningHighlight}>{item.meaning}</Text>
+							<Text style={styles.meaningHighlight}>{item.longMeaning}</Text>
 							<Text style={styles.exampleText}>{item.example ? `✏️ 예시: ${item.example}` : '✏️ 예시가 없는 속담입니다'}</Text>
 						</TouchableOpacity>
 
@@ -494,13 +540,12 @@ const ProverbStudyScreen = () => {
 										setOpen={setLevelOpen}
 										value={levelFilter}
 										setValue={setLevelFilter}
-										items={levelOptions}
+										items={LEVEL_DROPDOWN_ITEMS}
 										style={styles.dropdown}
 										textStyle={{ fontSize: 15, color: '#2c3e50', fontWeight: '500' }}
 										dropDownContainerStyle={styles.dropdownList}
 										containerStyle={{
 											zIndex: 10000, // ✅ 매우 높게 설정
-											elevation: 10,
 										}}
 										zIndex={10000} // ✅ 최상단 유지
 										zIndexInverse={1000}
@@ -516,12 +561,12 @@ const ProverbStudyScreen = () => {
 										setOpen={setThemeOpen}
 										value={themeFilter}
 										setValue={setThemeFilter}
-										items={categoryOptions}
+										items={FIELD_DROPDOWN_ITEMS}
 										style={styles.dropdown}
 										textStyle={{ fontSize: 15, color: '#2c3e50', fontWeight: '500' }}
 										placeholderStyle={{ color: '#95a5a6', fontSize: 14 }}
 										dropDownContainerStyle={styles.dropdownList}
-										containerStyle={{ zIndex: 3000, elevation: 10 }}
+										containerStyle={{ zIndex: 3000 }}
 										zIndex={9999} // 높게 설정
 										iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
 										zIndexInverse={1000} // 반대 드롭다운일 경우 대비
@@ -687,7 +732,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backfaceVisibility: 'hidden',
 		position: 'absolute',
-		elevation: 1, // ✅ 낮게 조정
 		zIndex: 1, // ✅ 낮게 조정
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
@@ -727,7 +771,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 12,
 		paddingHorizontal: 30,
 		borderRadius: 30,
-		elevation: 4,
 	},
 	buttonText: {
 		color: '#fff',
@@ -782,7 +825,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 12,
 		paddingHorizontal: 24,
 		borderRadius: 24,
-		elevation: 2,
 	},
 	studyEndText: {
 		color: '#ffffff',
@@ -863,7 +905,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 12,
 		paddingHorizontal: 30,
 		borderRadius: 30,
-		elevation: 4,
 		marginBottom: 10,
 	},
 	modalOverlay: {
@@ -926,7 +967,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 6 },
 		shadowOpacity: 0.15,
 		shadowRadius: 8,
-		elevation: 10,
 		transform: [{ translateY: -70 }],
 	},
 	toastInner: {
@@ -1029,7 +1069,6 @@ const styles = StyleSheet.create({
 		width: '85%',
 		maxHeight: '80%',
 		alignItems: 'center',
-		elevation: 5,
 	},
 	badgeModalTitle: {
 		fontSize: 18,
@@ -1058,7 +1097,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: '#ADD8E6',
-		elevation: 2,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.1,
@@ -1092,7 +1130,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 14,
 		paddingHorizontal: 36,
 		borderRadius: 30,
-		elevation: 3,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.2,

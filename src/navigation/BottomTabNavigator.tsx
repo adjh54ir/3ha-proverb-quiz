@@ -6,20 +6,52 @@ import SettingScreen from '@/screens/SettingScreen';
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import ProverbListScreen from '@/screens/ProverbListScreen';
 import MyScoreScreen from '@/screens/MyScoreScreen';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import DeviceInfo from 'react-native-device-info';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const BottomTabNavigator = () => {
 	const Tab = createBottomTabNavigator();
+	const isTablet = DeviceInfo.isTablet();
+	const insets = useSafeAreaInsets();
 
+	// 📌 공통 스타일 함수
+	const getScreenOptions = (isTablet: boolean, insets: any) => ({
+		tabBarStyle: {
+			height: scaleWidth(50) + insets.bottom,
+			paddingTop: isTablet ? scaleHeight(8) : 0,
+			backgroundColor: "#fff",
+		},
+		tabBarLabelStyle: {
+			fontSize: isTablet ? scaledSize(12) : scaledSize(11),
+			marginTop: isTablet ? scaleHeight(10) : 0,
+		},
+	});
+
+	const getTabBarIcon = (iconName: string) => {
+		return ({ color, size }: { color: string; size: number }) => (
+			<IconComponent
+				type="materialicons"
+				name={iconName}
+				color={color}
+				style={isTablet ? { marginTop: scaleHeight(25), height: scaleHeight(45), width: scaleWidth(16) } : undefined}
+			/>
+		);
+	};
 	return (
-		<Tab.Navigator initialRouteName={Paths.HOME}>
+		<Tab.Navigator initialRouteName={Paths.HOME}
+			screenOptions={{
+				headerTitleAlign: "center",
+				tabBarLabelPosition: "below-icon",
+				...getScreenOptions(isTablet, insets),
+			}}>
 			<Tab.Screen
 				name={Paths.PROVERB_LIST}
 				component={ProverbListScreen}
 				options={{
-					unmountOnBlur: true,
 					title: '속담 정보',
 					tabBarLabel: '속담 정보',
-					tabBarIcon: ({ color, size }) => <IconComponent type='materialIcons' name='menu-book' size={size} color={color} />,
+					tabBarIcon: getTabBarIcon('menu-book')
 				}}
 			/>
 
@@ -27,10 +59,9 @@ const BottomTabNavigator = () => {
 				name={Paths.HOME}
 				component={Home}
 				options={{
-					unmountOnBlur: true,
 					title: '홈',
 					tabBarLabel: '홈',
-					tabBarIcon: ({ color, size }) => <IconComponent type='materialIcons' name='home' size={size} color={color} />,
+					tabBarIcon: getTabBarIcon('home')
 				}}
 			/>
 
@@ -38,12 +69,9 @@ const BottomTabNavigator = () => {
 				name={Paths.MY_SCORE}
 				component={MyScoreScreen}
 				options={{
-					unmountOnBlur: true,
 					title: '나의 활동',
 					tabBarLabel: '나의 활동',
-					tabBarIcon: ({ color, size }) => (
-						<IconComponent type='materialIcons' name='emoji-events' size={size} color={color} />
-					),
+					tabBarIcon: getTabBarIcon('emoji-events'),
 				}}
 			/>
 
@@ -51,10 +79,9 @@ const BottomTabNavigator = () => {
 				name={Paths.SETTING}
 				component={SettingScreen}
 				options={{
-					unmountOnBlur: true,
 					title: '설정',
 					tabBarLabel: '설정',
-					tabBarIcon: ({ color, size }) => <IconComponent type='materialIcons' name='settings' size={size} color={color} />,
+					tabBarIcon: getTabBarIcon('settings'),
 				}}
 			/>
 		</Tab.Navigator>

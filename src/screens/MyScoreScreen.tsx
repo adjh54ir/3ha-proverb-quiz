@@ -34,6 +34,7 @@ const CapitalResultScreen = () => {
 	const isFocused = useIsFocused();
 	const scrollRef = useRef<ScrollView>(null);
 	const [refreshing, setRefreshing] = useState(false);
+	const levelScrollRef = useRef<ScrollView>(null);
 
 	const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
 	const [totalScore, setTotalScore] = useState<number>(0);
@@ -237,7 +238,7 @@ const CapitalResultScreen = () => {
 		{
 			score: 1200,
 			next: 1800,
-			label: '속담 능력자',
+			label: '속담 숙련자',
 			icon: 'tree',
 			mascot: require('@/assets/images/level3_mascote.png'),
 		},
@@ -249,6 +250,24 @@ const CapitalResultScreen = () => {
 			mascot: require('@/assets/images/level4_mascote.png'),
 		},
 	];
+
+
+	const reversedLevelGuide = [...LEVEL_DATA].reverse();
+	const currentLevelIndex = reversedLevelGuide.findIndex(
+		(item) => totalScore >= item.score && totalScore < item.next
+	);
+	useEffect(() => {
+		if (showLevelModal && levelScrollRef.current) {
+			setTimeout(() => {
+				levelScrollRef.current?.scrollTo({
+					y: currentLevelIndex * scaleHeight(150), // 카드 높이 예상값
+					animated: true,
+				});
+			}, 100); // 모달이 나타난 후 살짝 delay
+		}
+	}, [showLevelModal]);
+
+
 	const levelGuide = [
 		{ score: 0, next: 600, label: '속담 초보자', icon: 'seedling' },
 		{ score: 600, next: 1200, label: '속담 입문자', icon: 'leaf' },
@@ -380,7 +399,6 @@ const CapitalResultScreen = () => {
 											isEarned && {
 												backgroundColor: meta.color,
 												borderColor: meta.color,
-												elevation: 4,
 												shadowColor: '#000',
 												shadowOpacity: 0.2,
 												shadowRadius: 4,
@@ -422,7 +440,6 @@ const CapitalResultScreen = () => {
 												isEarned && {
 													backgroundColor: levelStyle.bg,
 													borderColor: levelStyle.border,
-													elevation: 4,
 													shadowColor: '#000',
 													shadowOpacity: 0.2,
 													shadowRadius: 4,
@@ -507,6 +524,7 @@ const CapitalResultScreen = () => {
 						<Text style={styles.levelModalTitle}>등급 안내</Text>
 
 						<ScrollView
+							ref={levelScrollRef}
 							style={{ width: '100%' }}
 							contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
 							showsVerticalScrollIndicator={false}>
@@ -651,7 +669,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.25,
 		shadowRadius: 2,
-		elevation: 2,
 	},
 	levelModal: {
 		backgroundColor: '#fff',
@@ -883,7 +900,6 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		marginBottom: 12,
 		marginHorizontal: 5,
-		transition: 'all 0.3s ease', // (웹에서는 적용 가능, RN은 LayoutAnimation)
 	},
 	levelCard: {
 		width: 120, // ✅ 픽셀 고정이 안정적 (또는 Dimensions로 계산해도 OK)
@@ -909,7 +925,6 @@ const styles = StyleSheet.create({
 	},
 	cardActive: {
 		backgroundColor: '#f0fbf4',
-		elevation: 3,
 	},
 	summaryStatGrid: {
 		flexDirection: 'row',
@@ -925,7 +940,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		borderWidth: 1,
 		borderColor: '#ecf0f1',
-		elevation: 2,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,

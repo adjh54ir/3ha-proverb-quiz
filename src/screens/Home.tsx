@@ -28,6 +28,7 @@ const Home = () => {
 	const navigation = useNavigation();
 	const { height: screenHeight } = Dimensions.get('window');
 	const scrollRef = useRef<NodeJS.Timeout | null>(null);
+	const levelScrollRef = useRef<ScrollView>(null);
 
 	const [greeting, setGreeting] = useState('🖐️ 안녕! 오늘도 속담 퀴즈 풀 준비 됐니?');
 	const [totalScore, setTotalScore] = useState(0);
@@ -42,6 +43,15 @@ const Home = () => {
 	const [tooltipBadgeId, setTooltipBadgeId] = useState<string | null>(null);
 	const [showLevelModal, setShowLevelModal] = useState(false);
 
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<TouchableOpacity onPress={() => setShowGuideModal(true)} style={{ marginRight: 16 }}>
+					<IconComponent type='materialIcons' name='info-outline' size={24} color='#3498db' />
+				</TouchableOpacity>
+			),
+		});
+	}, [navigation]);
 	const greetingMessages = [
 		'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
 		'🧠 오늘의 속담으로 지혜를 키워봐요!',
@@ -55,6 +65,8 @@ const Home = () => {
 		'🐣 하루 한 속담! 작지만 큰 지혜가 자라나요!',
 	];
 
+
+
 	const LEVEL_DATA = [
 		{
 			score: 0,
@@ -67,7 +79,7 @@ const Home = () => {
 		{
 			score: 1200,
 			next: 1800,
-			label: '속담 능력자',
+			label: '속담 숙련자',
 			icon: 'tree',
 			mascot: '',
 		},
@@ -80,15 +92,22 @@ const Home = () => {
 		},
 	];
 
-	useLayoutEffect(() => {
-		navigation.setOptions({
-			headerRight: () => (
-				<TouchableOpacity onPress={() => setShowGuideModal(true)} style={{ marginRight: 16 }}>
-					<IconComponent type='materialIcons' name='info-outline' size={24} color='#3498db' />
-				</TouchableOpacity>
-			),
-		});
-	}, [navigation]);
+	const reversedLevelGuide = [...LEVEL_DATA].reverse();
+	const currentLevelIndex = reversedLevelGuide.findIndex(
+		(item) => totalScore >= item.score && totalScore < item.next
+	);
+	useEffect(() => {
+		if (showLevelModal && levelScrollRef.current) {
+			setTimeout(() => {
+				levelScrollRef.current?.scrollTo({
+					y: currentLevelIndex * scaleHeight(150), // 카드 높이 예상값
+					animated: true,
+				});
+			}, 100); // 모달이 나타난 후 살짝 delay
+		}
+	}, [showLevelModal]);
+
+
 
 	const getLevelData = (score: number) => {
 		return LEVEL_DATA.find((l) => score >= l.score && score < l.next) || LEVEL_DATA[0];
@@ -243,7 +262,7 @@ const Home = () => {
 							<View style={{ alignItems: 'center', marginBottom: 8 }}>
 								<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
 									<IconComponent type='fontAwesome6' name={icon} size={18} color='#27ae60' />
-									<Text style={{ fontSize: 14, color: '#27ae60', fontWeight: '600', marginLeft: 6 }}>{label}</Text>
+									<Text style={{ fontSize: 16, color: '#27ae60', fontWeight: '700', marginLeft: 6 }}>{label}</Text>
 									<TouchableOpacity onPress={() => setShowLevelModal(true)}>
 										<IconComponent
 											type='materialIcons'
@@ -412,6 +431,7 @@ const Home = () => {
 						<Text style={styles.levelModalTitle}>등급 안내</Text>
 
 						<ScrollView
+							ref={levelScrollRef}
 							style={{ width: '100%' }}
 							contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
 							showsVerticalScrollIndicator={false}>
@@ -469,7 +489,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.07,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 3,
-		elevation: 4,
 	},
 	speechTail: {
 		width: 0,
@@ -563,7 +582,6 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		padding: 20,
 		borderRadius: 12,
-		elevation: 5,
 		alignItems: 'center',
 	},
 	modalCloseButton: {
@@ -600,7 +618,6 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		padding: 20,
 		borderRadius: 12,
-		elevation: 5,
 		alignItems: 'center',
 	},
 	badgeCard: {
@@ -614,7 +631,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.05,
 		shadowOffset: { width: 0, height: 1 },
 		shadowRadius: 2,
-		elevation: 2,
 		width: '100%',
 	},
 	iconBox: {
@@ -661,7 +677,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.04,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 3,
-		elevation: 3,
 	},
 	curiousButtonText: {
 		color: '#2ecc71',
@@ -686,7 +701,6 @@ const styles = StyleSheet.create({
 		width: '88%', // ✅ 적당한 폭 설정 (예: 92% 또는 90%)
 		shadowOffset: { width: 0, height: 1 },
 		shadowRadius: 2,
-		elevation: 3,
 	},
 	iconCircle: {
 		width: 52,
@@ -744,7 +758,6 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 		maxWidth: 180,
 		zIndex: 10,
-		elevation: 4,
 	},
 	tooltipText: {
 		color: '#fff',
@@ -758,7 +771,6 @@ const styles = StyleSheet.create({
 		borderRadius: 16,
 		width: '85%',
 		alignItems: 'center',
-		elevation: 5,
 		position: 'relative',
 	},
 

@@ -171,7 +171,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		paddingHorizontal: 6,
-		elevation: 4,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.15,
@@ -217,7 +216,6 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		padding: 20,
 		borderRadius: 12,
-		elevation: 6,
 	},
 	modalCloseButton: {
 		marginTop: 20,

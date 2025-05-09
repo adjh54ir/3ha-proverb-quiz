@@ -55,7 +55,6 @@ const HamberBottonComponent = () => {
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.25,
 		shadowRadius: 3.84,
-		elevation: 5,
 		zIndex: 100, // zIndex 값 낮춤
 	};
 

@@ -1,4 +1,4 @@
-package com.tha       // TODO 변경 필요
+package com.tha.proverbquiz       // TODO 변경 필요
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

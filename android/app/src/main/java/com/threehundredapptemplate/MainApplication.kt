@@ -1,4 +1,4 @@
-package com.tha     // TODO 변경 필요
+package com.tha.proverbquiz     // TODO 변경 필요
 
 import android.app.Application
 import com.facebook.react.PackageList

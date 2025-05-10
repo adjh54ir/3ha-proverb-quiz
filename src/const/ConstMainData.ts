@@ -104,7 +104,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '갈수록 태산[수미산/심산](이라)',
 			meaning: '갈수록 점점 더 어려운 상황이 닥침.',
 			longMeaning:
-				'갈수록 더욱 어려운 지경에 처하게 되는 경우를 비유적으로 이르는 말. <동의 속담> ‘산 넘어 산이다’ ‘산은 오를수록 높고 물은 건널수록 깊다’ ‘재는 넘을수록 험하고[높고] 내는 건널수록 깊다',
+				'갈수록 더욱 어려운 지경에 처하게 되는 경우를 비유적으로 이르는 말.',
 			sameProverb: [
 				'산 넘어 산이다',
 				'산은 오를수록 높고 물은 건널수록 깊다',
@@ -508,23 +508,6 @@ export const CONST_MAIN_DATA: {
 			synonym: null,
 			antonym: null,
 			difficultyScore: 76,
-		},
-		{
-			id: 29,
-			proverb: '꼬리가 길면 밟힌다',
-			meaning: '나쁜 짓은 오래 숨길 수 없다.',
-			longMeaning:
-				'나쁜 일을 아무리 남모르게 한다고 해도 오래 두고 여러 번 계속하면 결국에는 들키고 만다는 것을 비유적으로 이르는 말.',
-			sameProverb: ['고삐가 길면 밟힌다'],
-			category: '세상 이치',
-			level: 3,
-			levelName: '보통',
-			example: "예를 들어, '꼬리가 길면 밟힌다' 상황에서는 '나쁜 짓은 오래 숨길 수 없다.'라는 교훈을 얻을 수 있습니다.",
-			origin: "'꼬리가 길면 밟힌다'은(는) 오랜 세월 동안 사람들의 경험과 교훈에서 생겨난 속담입니다.",
-			usageTip: "'꼬리가 길면 밟힌다' 속담은 일상 대화나 조언할 때 활용하면 효과적입니다.",
-			synonym: null,
-			antonym: null,
-			difficultyScore: 74,
 		},
 		{
 			id: 30,

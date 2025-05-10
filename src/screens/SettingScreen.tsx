@@ -1,15 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-	View,
-	Text,
-	StyleSheet,
-	ScrollView,
-	TouchableOpacity,
-	Alert,
-	RefreshControl,
-	SafeAreaView,
-	Modal,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
@@ -18,6 +8,7 @@ import ProverbServices from '@/services/ProverbServices';
 import { CONST_BADGES } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import Contributor9Modal from './common/modal/Contributor9Modal';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const STORAGE_KEYS = {
 	study: 'UserStudyHistory',
@@ -145,10 +136,7 @@ const SettingScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-			<ScrollView
-				ref={scrollRef}
-				style={styles.container}
-				refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}>
+			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}>
 				<View>
 					<AdmobBannerAd />
 				</View>

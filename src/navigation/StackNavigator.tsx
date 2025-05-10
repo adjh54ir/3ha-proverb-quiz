@@ -46,7 +46,7 @@ const StackNavigator = () => {
 				name={Paths.PROVERB_MEANING_QUIZ}
 				component={ProverbMeaningQuizScreen}
 				options={({ navigation }) => ({
-					headerShown: true,
+					headerShown: false,
 					title: '뜻 맞추기',
 					headerLeft: () => <></>,
 				})}
@@ -56,7 +56,7 @@ const StackNavigator = () => {
 				name={Paths.PROVERB_FIND_QUIZ}
 				component={ProverbFindQuizScreen}
 				options={({ navigation }) => ({
-					headerShown: true,
+					headerShown: false,
 					title: '속담 찾기',
 					headerLeft: () => <></>,
 				})}
@@ -66,7 +66,7 @@ const StackNavigator = () => {
 				name={Paths.PROVERB_BLANK_QUIZ}
 				component={ProverbFillBlankQuizScreen}
 				options={({ navigation }) => ({
-					headerShown: true,
+					headerShown: false,
 					title: '빈칸 채우기',
 					headerLeft: () => <></>,
 				})}
@@ -85,9 +85,7 @@ const StackNavigator = () => {
 					),
 					headerRight: () => (
 						//@ts-ignore
-						<TouchableOpacity
-							onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })}
-							style={{ marginRight: 16 }}>
+						<TouchableOpacity onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })} style={{ marginRight: 16 }}>
 							<IconComponent type='materialIcons' name='info-outline' size={24} color='#3498db' />
 						</TouchableOpacity>
 					),
@@ -97,7 +95,7 @@ const StackNavigator = () => {
 				name={Paths.PROVERB_STUDY}
 				component={ProverbStudyScreen}
 				options={({ navigation }) => ({
-					headerShown: true,
+					headerShown: false,
 					title: '속담 학습',
 					headerLeft: () => (
 						<></>

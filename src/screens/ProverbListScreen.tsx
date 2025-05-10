@@ -20,13 +20,14 @@ import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import AdmobBannerAd from './common/ads/AdmobBannerAd';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const PAGE_SIZE = 30;
 
 const COMMON_ALL_OPTION = {
 	label: '전체',
 	value: '전체',
-	icon: () => <Icon name="clipboard-list" size={16} color="#555" />,
+	icon: () => <Icon name='clipboard-list' size={16} color='#555' />,
 };
 
 const LEVEL_DROPDOWN_ITEMS = [
@@ -34,22 +35,22 @@ const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '아주 쉬움',
 		value: '아주 쉬움',
-		icon: () => <Icon name="seedling" size={16} color="#85C1E9" />,
+		icon: () => <Icon name='seedling' size={16} color='#85C1E9' />,
 	},
 	{
 		label: '쉬움',
 		value: '쉬움',
-		icon: () => <Icon name="leaf" size={16} color="#F4D03F" />,
+		icon: () => <Icon name='leaf' size={16} color='#F4D03F' />,
 	},
 	{
 		label: '보통',
 		value: '보통',
-		icon: () => <Icon name="tree" size={16} color="#EB984E" />,
+		icon: () => <Icon name='tree' size={16} color='#EB984E' />,
 	},
 	{
 		label: '어려움',
 		value: '어려움',
-		icon: () => <Icon name="trophy" size={16} color="#E74C3C" />,
+		icon: () => <Icon name='trophy' size={16} color='#E74C3C' />,
 	},
 ];
 const FIELD_DROPDOWN_ITEMS = [
@@ -57,42 +58,42 @@ const FIELD_DROPDOWN_ITEMS = [
 	{
 		label: '운/우연',
 		value: '운/우연',
-		icon: () => <Icon name="dice" size={16} color="#81ecec" />,
+		icon: () => <Icon name='dice' size={16} color='#81ecec' />,
 	},
 	{
 		label: '인간관계',
 		value: '인간관계',
-		icon: () => <Icon name="users" size={16} color="#a29bfe" />,
+		icon: () => <Icon name='users' size={16} color='#a29bfe' />,
 	},
 	{
 		label: '세상 이치',
 		value: '세상 이치',
-		icon: () => <Icon name="globe" size={16} color="#fdcb6e" />,
+		icon: () => <Icon name='globe' size={16} color='#fdcb6e' />,
 	},
 	{
 		label: '근면/검소',
 		value: '근면/검소',
-		icon: () => <Icon name="hammer" size={16} color="#fab1a0" />,
+		icon: () => <Icon name='hammer' size={16} color='#fab1a0' />,
 	},
 	{
 		label: '노력/성공',
 		value: '노력/성공',
-		icon: () => <Icon name="medal" size={16} color="#55efc4" />,
+		icon: () => <Icon name='medal' size={16} color='#55efc4' />,
 	},
 	{
 		label: '경계/조심',
 		value: '경계/조심',
-		icon: () => <Icon name="exclamation-triangle" size={16} color="#ff7675" />,
+		icon: () => <Icon name='exclamation-triangle' size={16} color='#ff7675' />,
 	},
 	{
 		label: '욕심/탐욕',
 		value: '욕심/탐욕',
-		icon: () => <Icon name="money-bill-wave" size={16} color="#fd79a8" />,
+		icon: () => <Icon name='money-bill-wave' size={16} color='#fd79a8' />,
 	},
 	{
 		label: '배신/불신',
 		value: '배신/불신',
-		icon: () => <Icon name="user-slash" size={16} color="#b2bec3" />,
+		icon: () => <Icon name='user-slash' size={16} color='#b2bec3' />,
 	},
 ];
 
@@ -119,37 +120,35 @@ const ProverbListScreen = () => {
 	const [levelItems, setLevelItems] = useState([{ label: '', value: '' }]);
 
 	const fetchData = () => {
-
-		setFieldItems(FIELD_DROPDOWN_ITEMS);
-		setLevelItems(LEVEL_DROPDOWN_ITEMS);
-
-		const allData = ProverbServices.selectProverbList();
-		let filtered = allData;
+		const allData = ProverbServices.selectProverbList(); // 이미 필드에 있음
+		let filtered = [...allData];
 
 		if (keyword.trim()) {
 			const lowerKeyword = keyword.trim().toLowerCase();
-			filtered = filtered.filter(
-				(item) =>
-					(item.proverb && item.proverb.toLowerCase().includes(lowerKeyword)) ||
-					(item.longMeaning && item.longMeaning.toLowerCase().includes(lowerKeyword)),
-			);
+			filtered = filtered.filter((item) => item.proverb?.toLowerCase().includes(lowerKeyword) || item.longMeaning?.toLowerCase().includes(lowerKeyword));
 		}
 		if (fieldValue !== '전체') {
-			filtered = filtered.filter((item) => item.category && item.category.trim() === fieldValue);
+			filtered = filtered.filter((item) => item.category?.trim() === fieldValue);
 		}
 		if (levelValue !== '전체') {
-			filtered = filtered.filter((item) => item.levelName && item.levelName.trim() === levelValue);
+			filtered = filtered.filter((item) => item.levelName?.trim() === levelValue);
 		}
+
 		setProverbList(filtered);
 		setPage(1);
 		setVisibleList(filtered.slice(0, PAGE_SIZE));
 	};
 
+	// 🔄 필터 변경 시 데이터만 다시 가져오기
+	useEffect(() => {
+		fetchData();
+	}, [keyword, fieldValue, levelValue]);
+
+	// 🔄 화면 포커스 시 최초 1회 초기화 (필터 상태도 리셋)
 	useFocusEffect(
 		useCallback(() => {
-			handleReset();
-			fetchData();
-		}, [keyword, fieldValue, levelValue]),
+			handleReset(); // keyword, fieldValue 등 초기화
+		}, []),
 	);
 	useFocusEffect(
 		useCallback(() => {
@@ -233,184 +232,215 @@ const ProverbListScreen = () => {
 	};
 
 	return (
-		<TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
-			<View style={{ flex: 1 }}>
-				{/* <View style={styles.bannerContainer}>
-					 <AdmobBannerAd />
-				</View> */}
-				{/* 필터 + 드롭다운 영역 */}
-				<View style={{ zIndex: 10, paddingHorizontal: 16, paddingTop: 16 }}>
-					<View style={styles.filterCard}>
-						<TextInput
-							ref={searchInputRef}
-							style={styles.input}
-							placeholder='속담이나 의미를 입력해주세요'
-							placeholderTextColor='#666'
-							onChangeText={(text) => {
-								setKeyword(text);
-								setFieldOpen(false); // 🔽 드롭다운 닫기
-								setLevelOpen(false); // 🔽 드롭다운 닫기
-							}}
-							value={keyword}
-						/>
-						<View style={styles.filterDropdownRow}>
-							<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
-								<DropDownPicker
-									open={levelOpen}
-									value={levelValue}
-									items={LEVEL_DROPDOWN_ITEMS}
-									setOpen={setLevelOpen}
-									setValue={setLevelValue}
-									setItems={setLevelItems}
-									style={styles.dropdownLevel}
-									dropDownContainerStyle={styles.dropdownListLevel}
-									listItemLabelStyle={{ marginLeft: 6, fontSize: 14 }}
-									labelStyle={{ fontSize: 14, color: '#2c3e50' }}
-									iconContainerStyle={{ marginRight: 8 }}
-									showArrowIcon={true} // 드롭다운 화살표
-									showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
-								/>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }} edges={['top']}>
+			<TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
+				<View style={{ flex: 1 }}>
+					{/* 필터 + 드롭다운 영역 */}
+					<View style={{ zIndex: 10, paddingHorizontal: 16, paddingTop: 16 }}>
+						<View style={styles.filterCard}>
+							<View style={styles.bannerContainer}>
+								<AdmobBannerAd />
 							</View>
-
-							<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000 }]}>
-
-								<DropDownPicker
-									open={fieldOpen}
-									value={fieldValue}
-									items={FIELD_DROPDOWN_ITEMS}
-									setOpen={setFieldOpen}
-									setValue={setFieldValue}
-									setItems={setFieldItems}
-									style={styles.dropdownField}
-									dropDownContainerStyle={styles.dropdownListField}
-									listItemLabelStyle={{ marginLeft: 6, fontSize: 14 }}
-									labelStyle={{ fontSize: 14, color: '#2c3e50' }}
-									iconContainerStyle={{ marginRight: 8 }}
-									showArrowIcon={true}
-									showTickIcon={false}
-								/>
-							</View>
-
-							{/* 초기화 버튼 */}
-							<TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-								<Icon name='rotate-right' size={20} color='#555' />
-							</TouchableOpacity>
-						</View>
-						{/* 리스트 개수 표시 */}
-						<View style={styles.listCountWrapper}>
-							<Text style={styles.listCountText}>총 {proverbList.length}개의 속담이 있어요</Text>
-						</View>
-					</View>
-				</View>
-
-				{/* 리스트 영역 */}
-				<View style={{ flex: 1, zIndex: 0 }}>
-					<FlatList
-						ref={scrollRef}
-						data={visibleList}
-						keyExtractor={(item) => item.id.toString()}
-						refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-						onEndReached={loadMoreData}
-						onEndReachedThreshold={0.5}
-						onScroll={(event) => {
-							const offsetY = event.nativeEvent.contentOffset.y;
-							setShowScrollTop(offsetY > 100);
-						}}
-						scrollEventThrottle={16}
-						keyboardShouldPersistTaps='handled'
-						ListEmptyComponent={() => (
-							<View style={[styles.emptyWrapper, { height: '100%', marginTop: 40 }]}>
-								<FastImage source={emptyImage} style={styles.emptyImage} resizeMode='contain' />
-								<Text style={styles.emptyText}>앗! 조건에 맞는 속담이 없어요.{'\n'}다른 검색어나 필터를 사용해보세요!</Text>
-							</View>
-						)}
-						renderItem={({ item }) => (
-							<TouchableOpacity
-								style={styles.itemBox}
-								onPress={() => {
-									setSelectedProverb(item);
-									setShowDetailModal(true);
-								}}>
-								<Text style={styles.proverbText}>{item.proverb}</Text>
-								<Text style={styles.meaningText}>- {item.longMeaning}</Text>
-								<View style={styles.badgeRow}>
-									<View style={[styles.badge, { backgroundColor: getFieldColor(item.category) }]}>
-										<Text style={styles.badgeText}>{item.category}</Text>
-									</View>
-									<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
-										<Text style={styles.badgeText}>{item.levelName}</Text>
-									</View>
+							<TextInput
+								ref={searchInputRef}
+								style={styles.input}
+								placeholder='속담이나 의미를 입력해주세요'
+								placeholderTextColor='#666'
+								onChangeText={(text) => {
+									setKeyword(text);
+									setFieldOpen(false); // 🔽 드롭다운 닫기
+									setLevelOpen(false); // 🔽 드롭다운 닫기
+								}}
+								value={keyword}
+							/>
+							<View style={styles.filterDropdownRow}>
+								<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
+									<DropDownPicker
+										open={levelOpen}
+										value={levelValue}
+										items={LEVEL_DROPDOWN_ITEMS}
+										setOpen={setLevelOpen}
+										setValue={setLevelValue}
+										setItems={setLevelItems}
+										style={styles.dropdownLevel}
+										dropDownContainerStyle={styles.dropdownListLevel}
+										listItemLabelStyle={{ marginLeft: 6, fontSize: 14 }}
+										labelStyle={{ fontSize: 14, color: '#2c3e50' }}
+										iconContainerStyle={{ marginRight: 8 }}
+										showArrowIcon={true} // 드롭다운 화살표
+										showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
+									/>
 								</View>
-							</TouchableOpacity>
-						)}
-						contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-					/>
-				</View>
 
-				{/* 스크롤 최상단 이동 버튼 */}
-				{showScrollTop && (
-					<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
-						<Icon name='arrow-up' size={20} color='#fff' />
-					</TouchableOpacity>
-				)}
+								<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000 }]}>
+									<DropDownPicker
+										open={fieldOpen}
+										value={fieldValue}
+										items={FIELD_DROPDOWN_ITEMS}
+										setOpen={setFieldOpen}
+										setValue={setFieldValue}
+										setItems={setFieldItems}
+										style={styles.dropdownField}
+										dropDownContainerStyle={styles.dropdownListField}
+										listItemLabelStyle={{ marginLeft: 6, fontSize: 14 }}
+										labelStyle={{ fontSize: 14, color: '#2c3e50' }}
+										iconContainerStyle={{ marginRight: 8 }}
+										showArrowIcon={true}
+										showTickIcon={false}
+									/>
+								</View>
 
-				{/* 상세 모달 */}
-				<Modal
-					visible={showDetailModal}
-					animationType='slide'
-					transparent={true}
-					onRequestClose={() => setShowDetailModal(false)}>
-					<View style={styles.modalOverlay}>
-						<View style={styles.modalContainer}>
-							<View style={styles.modalHeader}>
-								<Text style={styles.modalHeaderTitle}>속담 상세</Text>
-								<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowDetailModal(false)}>
-									<Icon name='xmark' size={20} color='#0984e3' />
+								{/* 초기화 버튼 */}
+								<TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+									<Icon name='rotate-right' size={20} color='#555' />
 								</TouchableOpacity>
 							</View>
-
-							{/* ✅ 스크롤 가능한 영역 */}
-							<ScrollView contentContainerStyle={styles.modalBody}>
-								{/* 속담 본문 크게 강조 */}
-								{selectedProverb?.proverb && (
-									<View style={styles.modalProverbBox}>
-										<Text style={styles.modalProverbText}>{selectedProverb.proverb}</Text>
-									</View>
-								)}
-								<View style={styles.modalSection}>
-									<Text style={styles.modalLabel}>의미</Text>
-									<Text style={styles.modalText}>- {selectedProverb?.longMeaning}</Text>
-								</View>
-
-								<View style={styles.modalSection}>
-									<Text style={styles.modalLabel}>예시</Text>
-									<Text style={styles.modalText}>- {selectedProverb?.example}</Text>
-								</View>
-
-								{selectedProverb?.synonym && (
-									<View style={styles.modalHighlightBox}>
-										<Text style={styles.modalHighlightTitle}>비슷한 속담</Text>
-										<Text style={styles.modalHighlightText}>- {selectedProverb.synonym}</Text>
-									</View>
-								)}
-
-								{selectedProverb?.antonym && (
-									<View style={styles.modalHighlightBox}>
-										<Text style={styles.modalHighlightTitle}>반대 속담</Text>
-										<Text style={styles.modalHighlightText}>- {selectedProverb.antonym}</Text>
-									</View>
-								)}
-							</ScrollView>
-
-							{/* ✅ 닫기 버튼을 모달 맨 하단에 고정 */}
-							<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowDetailModal(false)}>
-								<Text style={styles.modalCloseButtonText}>닫기</Text>
-							</TouchableOpacity>
+							{/* 리스트 개수 표시 */}
+							<View style={styles.listCountWrapper}>
+								<Text style={styles.listCountText}>🔍 총 {proverbList.length}개 속담이 검색되었어요!</Text>
+							</View>
 						</View>
 					</View>
-				</Modal>
-			</View>
-		</TouchableWithoutFeedback>
+
+					{/* 리스트 영역 */}
+					<View style={{ flex: 1, zIndex: 0 }}>
+						<FlatList
+							ref={scrollRef}
+							data={visibleList}
+							keyExtractor={(item) => item.id.toString()}
+							refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+							onEndReached={loadMoreData}
+							onEndReachedThreshold={0.5}
+							onScroll={(event) => {
+								const offsetY = event.nativeEvent.contentOffset.y;
+								setShowScrollTop(offsetY > 100);
+							}}
+							scrollEventThrottle={16}
+							keyboardShouldPersistTaps='handled'
+							ListEmptyComponent={() => (
+								<View style={[styles.emptyWrapper, { height: '100%', marginTop: 40 }]}>
+									<FastImage source={emptyImage} style={styles.emptyImage} resizeMode='contain' />
+									<Text style={styles.emptyText}>앗! 조건에 맞는 속담이 없어요.{'\n'}다른 검색어나 필터를 사용해보세요!</Text>
+								</View>
+							)}
+							contentContainerStyle={{ paddingTop: 8, paddingHorizontal: 16, paddingBottom: 60 }}
+							renderItem={({ item, index }) => {
+								const isLast = index === visibleList.length - 1;
+								return (
+									<TouchableOpacity
+										style={[
+											styles.itemBox,
+											{ marginBottom: isLast ? 24 : 12 }, // 마지막은 좀 더 크게, 그 외는 일정
+										]}
+										onPress={() => {
+											setSelectedProverb(item);
+											setShowDetailModal(true);
+										}}>
+										<View style={styles.proverbBlock}>
+											<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
+											<View style={styles.badgeInlineRow}>
+												<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
+													<Text style={styles.badgeText}>{item.levelName}</Text>
+												</View>
+												<View style={[styles.badge, { backgroundColor: getFieldColor(item.category) }]}>
+													<Text style={styles.badgeText}>{item.category}</Text>
+												</View>
+											</View>
+										</View>
+
+										<Text style={styles.meaningText}>- {item.longMeaning}</Text>
+
+										{Array.isArray(item.sameProverb) && item.sameProverb.filter((p) => p.trim()).length > 0 && (
+											<View style={styles.sameProverbBox}>
+												<Text style={styles.sameProverbTitle}>비슷한 속담</Text>
+												{item.sameProverb
+													.filter((p) => p.trim())
+													.map((p, idx) => (
+														<Text key={idx} style={styles.sameProverbText}>
+															{'\u2022'} {p}
+														</Text>
+													))}
+											</View>
+										)}
+									</TouchableOpacity>
+								);
+							}}
+						/>
+					</View>
+
+					{/* 스크롤 최상단 이동 버튼 */}
+					{showScrollTop && (
+						<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
+							<Icon name='arrow-up' size={20} color='#fff' />
+						</TouchableOpacity>
+					)}
+
+					{/* 상세 모달 */}
+					<Modal visible={showDetailModal} animationType='slide' transparent={true} onRequestClose={() => setShowDetailModal(false)}>
+						<View style={styles.modalOverlay}>
+							<View style={styles.modalContainer}>
+								<View style={styles.modalHeader}>
+									<Text style={styles.modalHeaderTitle}>속담 상세</Text>
+									<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowDetailModal(false)}>
+										<Icon name='xmark' size={20} color='#0984e3' />
+									</TouchableOpacity>
+								</View>
+
+								{/* ✅ 스크롤 가능한 영역 */}
+								<ScrollView contentContainerStyle={styles.modalBody}>
+									{/* 속담 본문 크게 강조 */}
+
+									{selectedProverb && (
+										<>
+											<View style={styles.modalProverbBox}>
+												<Text style={styles.modalProverbText}>{selectedProverb.proverb}</Text>
+											</View>
+
+											<View style={[styles.badgeRow, { marginBottom: 12 }]}>
+												<View style={[styles.badge, { backgroundColor: getLevelColor(selectedProverb.levelName) }]}>
+													<Text style={styles.badgeText}>{selectedProverb.levelName}</Text>
+												</View>
+												<View style={[styles.badge, { backgroundColor: getFieldColor(selectedProverb.category) }]}>
+													<Text style={styles.badgeText}>{selectedProverb.category}</Text>
+												</View>
+											</View>
+
+											<View style={styles.modalSection}>
+												<Text style={styles.modalLabel}>의미</Text>
+												<Text style={styles.modalText}>- {selectedProverb?.longMeaning}</Text>
+											</View>
+
+											<View style={styles.modalSection}>
+												<Text style={styles.modalLabel}>예시</Text>
+												<Text style={styles.modalText}>- {selectedProverb?.example}</Text>
+											</View>
+
+											{Array.isArray(selectedProverb.sameProverb) && selectedProverb.sameProverb.filter((p) => p.trim()).length > 0 && (
+												<View style={styles.sameProverbBox}>
+													<Text style={styles.sameProverbTitle}>비슷한 속담</Text>
+													{selectedProverb.sameProverb
+														.filter((p) => p.trim())
+														.map((p, idx) => (
+															<Text key={idx} style={styles.sameProverbText}>
+																{'\u2022'} {p}
+															</Text>
+														))}
+												</View>
+											)}
+										</>
+									)}
+								</ScrollView>
+
+								{/* ✅ 닫기 버튼을 모달 맨 하단에 고정 */}
+								<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowDetailModal(false)}>
+									<Text style={styles.modalCloseButtonText}>닫기</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					</Modal>
+				</View>
+			</TouchableWithoutFeedback>
+		</SafeAreaView>
 	);
 };
 
@@ -512,14 +542,6 @@ const styles = StyleSheet.create({
 		lineHeight: 22,
 	},
 
-	modalHighlightBox: {
-		backgroundColor: '#f1f8ff',
-		borderLeftWidth: 4,
-		borderLeftColor: '#0984e3',
-		padding: 12,
-		borderRadius: 10,
-		marginBottom: 16,
-	},
 	modalHighlightTitle: {
 		fontSize: 14,
 		fontWeight: 'bold',
@@ -681,18 +703,17 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		alignItems: 'center',
 		paddingVertical: 6,
-		borderBottomWidth: 1, // ← 상단 배치 시 하단 구분선
 		borderColor: '#ccc',
 		zIndex: 999,
 	},
 	dropdownLevel: {
-		backgroundColor: '#f7f7f7',
+		backgroundColor: '#ffffff',
 		borderColor: '#ccc',
 		height: 44,
 		paddingHorizontal: 12,
 	},
 	dropdownField: {
-		backgroundColor: '#f7f7f7',
+		backgroundColor: '#ffffff',
 		borderColor: '#ccc',
 		height: 44,
 		paddingHorizontal: 12,
@@ -708,5 +729,69 @@ const styles = StyleSheet.create({
 		borderColor: '#ccc',
 		borderWidth: 1,
 		borderRadius: 12,
+	},
+	sameProverbBox: {
+		marginTop: 10,
+		padding: 12,
+		backgroundColor: '#eaf6ff',
+		borderRadius: 12,
+		borderWidth: 1,
+		borderColor: '#d0eaff',
+		marginBottom: 4, // 항목 아래 간격 살짝 추가
+	},
+
+	sameProverbTitle: {
+		fontSize: 13,
+		color: '#2980b9',
+		fontWeight: '700',
+		marginBottom: 6,
+	},
+
+	sameProverbText: {
+		fontSize: 13,
+		color: '#34495e',
+		paddingVertical: 2,
+		paddingLeft: 10,
+		position: 'relative',
+	},
+	modalHighlightBox: {
+		backgroundColor: '#f1f8ff',
+		borderLeftWidth: 4,
+		borderLeftColor: '#0984e3',
+		padding: 12,
+		borderRadius: 10,
+		marginBottom: 16,
+		marginTop: 12, // 👈 간격 추가
+	},
+	proverbRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		marginBottom: 6,
+	},
+
+	proverbTextSingle: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		color: '#2d3436',
+		flex: 1,
+		marginRight: 8,
+	},
+	badgeInlineRow: {
+		flexDirection: 'row',
+		flexShrink: 0,
+		gap: 6,
+		marginBottom: 10,
+	},
+	proverbBlock: {
+		marginBottom: 6,
+	},
+
+	proverbTextMulti: {
+		fontSize: 18, // 기존 16 → 18로 키움
+		fontWeight: 'bold',
+		color: '#2d3436',
+		lineHeight: 26, // 더 넓은 줄 간격
+		marginBottom: 8, // 뱃지와 간격 확보
 	},
 });

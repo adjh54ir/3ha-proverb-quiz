@@ -20,7 +20,7 @@ const BottomTabNavigator = () => {
 		tabBarStyle: {
 			height: scaleWidth(50) + insets.bottom,
 			paddingTop: isTablet ? scaleHeight(8) : 0,
-			backgroundColor: "#fff",
+			backgroundColor: '#fff',
 		},
 		tabBarLabelStyle: {
 			fontSize: isTablet ? scaledSize(12) : scaledSize(11),
@@ -31,7 +31,7 @@ const BottomTabNavigator = () => {
 	const getTabBarIcon = (iconName: string) => {
 		return ({ color, size }: { color: string; size: number }) => (
 			<IconComponent
-				type="materialicons"
+				type='materialicons'
 				name={iconName}
 				color={color}
 				style={isTablet ? { marginTop: scaleHeight(25), height: scaleHeight(45), width: scaleWidth(16) } : undefined}
@@ -39,10 +39,11 @@ const BottomTabNavigator = () => {
 		);
 	};
 	return (
-		<Tab.Navigator initialRouteName={Paths.HOME}
+		<Tab.Navigator
+			initialRouteName={Paths.HOME}
 			screenOptions={{
-				headerTitleAlign: "center",
-				tabBarLabelPosition: "below-icon",
+				headerTitleAlign: 'center',
+				tabBarLabelPosition: 'below-icon',
 				...getScreenOptions(isTablet, insets),
 			}}>
 			<Tab.Screen
@@ -51,7 +52,8 @@ const BottomTabNavigator = () => {
 				options={{
 					title: '속담 정보',
 					tabBarLabel: '속담 정보',
-					tabBarIcon: getTabBarIcon('menu-book')
+					tabBarIcon: getTabBarIcon('menu-book'),
+					headerShown: false, // 헤더 숨김
 				}}
 			/>
 
@@ -61,7 +63,8 @@ const BottomTabNavigator = () => {
 				options={{
 					title: '홈',
 					tabBarLabel: '홈',
-					tabBarIcon: getTabBarIcon('home')
+					tabBarIcon: getTabBarIcon('home'),
+					headerShown: false, // 헤더 숨김
 				}}
 			/>
 
@@ -72,6 +75,7 @@ const BottomTabNavigator = () => {
 					title: '나의 활동',
 					tabBarLabel: '나의 활동',
 					tabBarIcon: getTabBarIcon('emoji-events'),
+					headerShown: false, // 헤더 숨김
 				}}
 			/>
 
@@ -82,6 +86,7 @@ const BottomTabNavigator = () => {
 					title: '설정',
 					tabBarLabel: '설정',
 					tabBarIcon: getTabBarIcon('settings'),
+					headerShown: false, // 헤더 숨김
 				}}
 			/>
 		</Tab.Navigator>

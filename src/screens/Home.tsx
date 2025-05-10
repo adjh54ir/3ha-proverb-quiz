@@ -21,6 +21,7 @@ import { CONST_BADGES } from '@/const/ConstBadges';
 
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { SafeAreaView } from 'react-native-safe-area-context';
 const STORAGE_KEY_QUIZ = 'UserQuizHistory';
 const STORAGE_KEY_STUDY = 'UserStudyHistory';
 
@@ -65,8 +66,6 @@ const Home = () => {
 		'🐣 하루 한 속담! 작지만 큰 지혜가 자라나요!',
 	];
 
-
-
 	const LEVEL_DATA = [
 		{
 			score: 0,
@@ -93,9 +92,7 @@ const Home = () => {
 	];
 
 	const reversedLevelGuide = [...LEVEL_DATA].reverse();
-	const currentLevelIndex = reversedLevelGuide.findIndex(
-		(item) => totalScore >= item.score && totalScore < item.next
-	);
+	const currentLevelIndex = reversedLevelGuide.findIndex((item) => totalScore >= item.score && totalScore < item.next);
 	useEffect(() => {
 		if (showLevelModal && levelScrollRef.current) {
 			setTimeout(() => {
@@ -106,8 +103,6 @@ const Home = () => {
 			}, 100); // 모달이 나타난 후 살짝 delay
 		}
 	}, [showLevelModal]);
-
-
 
 	const getLevelData = (score: number) => {
 		return LEVEL_DATA.find((l) => score >= l.score && score < l.next) || LEVEL_DATA[0];
@@ -120,6 +115,14 @@ const Home = () => {
 	useFocusEffect(
 		useCallback(() => {
 			loadData();
+
+			// 💥 빵빠레 자동 실행
+			setShowConfetti(true);
+			scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
+
+			return () => {
+				if (scrollRef.current) clearTimeout(scrollRef.current);
+			};
 		}, []),
 	);
 
@@ -217,123 +220,122 @@ const Home = () => {
 
 	return (
 		<>
-			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-				<KeyboardAvoidingView style={styles.wrapper} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-					<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-						<View style={styles.container}>
-							<View style={styles.imageContainer}>
-								<View style={styles.confettiWrapper}>
-									{showConfetti && (
-										<ConfettiCannon
-											count={40}
-											origin={{ x: 75, y: 30 }} // y를 10 → 30으로 조금 내려서 더 중심에 뿌림
-											fadeOut
-											explosionSpeed={500}
-											fallSpeed={2500}
-										/>
-									)}
-								</View>
-								<View style={styles.speechWrapper}>
-									<View style={styles.speechBubble}>
-										<Text style={styles.speechText}>{greeting}</Text>
+			<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+					<KeyboardAvoidingView style={styles.wrapper} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+						<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+							<View style={styles.container}>
+								<View style={styles.imageContainer}>
+									<View style={styles.confettiWrapper}>
+										{showConfetti && (
+											<ConfettiCannon
+												count={40}
+												origin={{ x: 75, y: 30 }} // y를 10 → 30으로 조금 내려서 더 중심에 뿌림
+												fadeOut
+												explosionSpeed={500}
+												fallSpeed={2500}
+											/>
+										)}
 									</View>
-									<View style={styles.speechTail} />
-								</View>
+									<View style={styles.speechWrapper}>
+										<View style={styles.speechBubble}>
+											<Text style={styles.speechText}>{greeting}</Text>
+										</View>
+										<View style={styles.speechTail} />
+									</View>
 
-								<TouchableOpacity onPress={handleMascotPress}>
-									<View style={{ width: 180, height: 180, alignItems: 'center', justifyContent: 'center' }}>
-										<FastImage
-											key={totalScore} // totalScore가 바뀌면 이미지 강제 갱신
-											source={
-												totalScore >= 1800
-													? require('@/assets/images/level4_mascote.png')
-													: totalScore >= 1200
-														? require('@/assets/images/level3_mascote.png')
-														: totalScore >= 600
-															? require('@/assets/images/level2_mascote.png')
-															: require('@/assets/images/level1_mascote.png')
-											}
-											style={styles.image}
-											resizeMode='contain'
-										/>
-									</View>
-								</TouchableOpacity>
-							</View>
-							<View style={{ alignItems: 'center', marginBottom: 8 }}>
-								<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-									<IconComponent type='fontAwesome6' name={icon} size={18} color='#27ae60' />
-									<Text style={{ fontSize: 16, color: '#27ae60', fontWeight: '700', marginLeft: 6 }}>{label}</Text>
-									<TouchableOpacity onPress={() => setShowLevelModal(true)}>
-										<IconComponent
-											type='materialIcons'
-											name='info-outline'
-											size={16}
-											color='#7f8c8d'
-											style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
-										/>
+									<TouchableOpacity onPress={handleMascotPress}>
+										<View style={{ width: 180, height: 180, alignItems: 'center', justifyContent: 'center' }}>
+											<FastImage
+												key={totalScore} // totalScore가 바뀌면 이미지 강제 갱신
+												source={
+													totalScore >= 1800
+														? require('@/assets/images/level4_mascote.png')
+														: totalScore >= 1200
+															? require('@/assets/images/level3_mascote.png')
+															: totalScore >= 600
+																? require('@/assets/images/level2_mascote.png')
+																: require('@/assets/images/level1_mascote.png')
+												}
+												style={styles.image}
+												resizeMode='contain'
+											/>
+										</View>
 									</TouchableOpacity>
 								</View>
-
-								{earnedBadges.length > 0 && (
-									<View style={{ width: '100%', marginTop: 10 }}>
-										<ScrollView
-											horizontal
-											showsHorizontalScrollIndicator={false}
-											contentContainerStyle={{ paddingHorizontal: 10 }}>
-											{visibleBadges.map((item) => (
-												<View key={item.id} style={{ marginRight: 12, alignItems: 'center' }}>
-													<TouchableOpacity
-														style={styles.iconBoxActive}
-														onPress={() => setSelectedBadge(item)} // ✅ 툴팁 관리 필요없음
-													>
-														<IconComponent name={item.icon} type={item.iconType} size={20} color='#27ae60' />
-													</TouchableOpacity>
-
-													{tooltipBadgeId === item.id && (
-														<View style={styles.tooltipBox}>
-															<Text style={styles.tooltipText}>{item.description}</Text>
-														</View>
-													)}
-												</View>
-											))}
-										</ScrollView>
+								<View style={{ alignItems: 'center', marginBottom: 8 }}>
+									<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(10) }}>
+										<IconComponent type='fontAwesome6' name={icon} size={18} color='#27ae60' />
+										<Text style={{ fontSize: scaledSize(16), color: '#27ae60', fontWeight: '700', marginLeft: scaleWidth(6) }}>{label}</Text>
+										<TouchableOpacity onPress={() => setShowLevelModal(true)}>
+											<IconComponent
+												type='materialIcons'
+												name='info-outline'
+												size={18}
+												color='#7f8c8d'
+												style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
+											/>
+										</TouchableOpacity>
 									</View>
-								)}
+
+									{earnedBadges.length > 0 && (
+										<View style={{ width: '100%', marginTop: 10 }}>
+											<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 10 }}>
+												{visibleBadges.map((item) => (
+													<View key={item.id} style={{ marginRight: 12, alignItems: 'center' }}>
+														<TouchableOpacity
+															style={styles.iconBoxActive}
+															onPress={() => setSelectedBadge(item)} // ✅ 툴팁 관리 필요없음
+														>
+															<IconComponent name={item.icon} type={item.iconType} size={20} color='#27ae60' />
+														</TouchableOpacity>
+
+														{tooltipBadgeId === item.id && (
+															<View style={styles.tooltipBox}>
+																<Text style={styles.tooltipText}>{item.description}</Text>
+															</View>
+														)}
+													</View>
+												))}
+											</ScrollView>
+										</View>
+									)}
+								</View>
 							</View>
-						</View>
 
-						<ActionCard
-							iconName='play-arrow'
-							iconType='materialIcons'
-							label='시작하기'
-							description='속담 뜻, 속담 찾기, 빈칸 채우기 퀴즈를 선택해서 퀴즈를 풀어봐요'
-							color='#3498db'
-							onPress={moveToHandler.quiz}
-						/>
-						<ActionCard
-							iconName='school'
-							iconType='materialIcons'
-							label='학습 모드'
-							description='카드 형식으로 속담과 속담의 의미를 재미있게 익혀봐요'
-							color='#2ecc71'
-							onPress={moveToHandler.study}
-						/>
-						<ActionCard
-							iconName='replay'
-							iconType='materialIcons'
-							label='오답 복습'
-							description='틀린 퀴즈를 다시 풀면서 기억을 더 확실히 다져봐요'
-							color='#f1c40f'
-							onPress={moveToHandler.wrongReview}
-						/>
+							<ActionCard
+								iconName='play-arrow'
+								iconType='materialIcons'
+								label='시작하기'
+								description='속담 뜻, 속담 찾기, 빈칸 채우기 퀴즈를 선택해서 퀴즈를 풀어봐요'
+								color='#3498db'
+								onPress={moveToHandler.quiz}
+							/>
+							<ActionCard
+								iconName='school'
+								iconType='materialIcons'
+								label='학습 모드'
+								description='카드 형식으로 속담과 속담의 의미를 재미있게 익혀봐요'
+								color='#2ecc71'
+								onPress={moveToHandler.study}
+							/>
+							<ActionCard
+								iconName='replay'
+								iconType='materialIcons'
+								label='오답 복습'
+								description='틀린 퀴즈를 다시 풀면서 기억을 더 확실히 다져봐요'
+								color='#f1c40f'
+								onPress={moveToHandler.wrongReview}
+							/>
 
-						<TouchableOpacity style={styles.curiousButton} onPress={() => setShowBadgeModal(true)}>
-							<IconComponent type='materialIcons' name='emoji-events' size={18} color='#2ecc71' />
-							<Text style={styles.curiousButtonText}>숨겨진 뱃지들을 찾아보세요!</Text>
-						</TouchableOpacity>
-					</ScrollView>
-				</KeyboardAvoidingView>
-			</TouchableWithoutFeedback>
+							<TouchableOpacity style={styles.curiousButton} onPress={() => setShowBadgeModal(true)}>
+								<IconComponent type='materialIcons' name='emoji-events' size={18} color='#2ecc71' />
+								<Text style={styles.curiousButtonText}>숨겨진 뱃지들을 찾아보세요!</Text>
+							</TouchableOpacity>
+						</ScrollView>
+					</KeyboardAvoidingView>
+				</TouchableWithoutFeedback>
+			</SafeAreaView>
 
 			{/* 설명 모달 */}
 			<Modal transparent visible={showGuideModal} animationType='fade'>
@@ -345,17 +347,14 @@ const Home = () => {
 						<Text style={styles.modalText}>
 							<Text style={styles.boldText}>🏠 홈 화면{'\n'}</Text>- 주요 기능으로 빠르게 이동할 수 있는 메뉴를 제공합니다.
 							{'\n\n'}
-							<Text style={styles.boldText}>➡️ 시작하기{'\n'}</Text>- 속담 뜻 맞히기, 속담 찾기, 빈칸 채우기 퀴즈를 통해
-							재미있게 속담을 학습할 수 있어요.
+							<Text style={styles.boldText}>➡️ 시작하기{'\n'}</Text>- 속담 뜻 맞히기, 속담 찾기, 빈칸 채우기 퀴즈를 통해 재미있게 속담을 학습할 수 있어요.
 							{'\n\n'}
-							<Text style={styles.boldText}>➡️ 학습 모드{'\n'}</Text>- 카드 형식으로 속담과 그 의미, 예문 등을 쉽게 학습할 수
-							있어요.
+							<Text style={styles.boldText}>➡️ 학습 모드{'\n'}</Text>- 카드 형식으로 속담과 그 의미, 예문 등을 쉽게 학습할 수 있어요.
 							{'\n\n'}
-							<Text style={styles.boldText}>➡️ 오답 복습{'\n'}</Text>- 이전에 틀렸던 문제들을 다시 풀어보며 확실하게 기억할 수
-							있어요.
+							<Text style={styles.boldText}>➡️ 오답 복습{'\n'}</Text>- 이전에 틀렸던 문제들을 다시 풀어보며 확실하게 기억할 수 있어요.
 							{'\n\n'}
-							<Text style={styles.boldText}>🏅 숨겨진 뱃지들을 찾아보세요!{'\n'}</Text>- 학습이나 퀴즈 도중 특정 조건을
-							만족하면 다양한 뱃지를 획득할 수 있어요.{'\n'}- 모은 뱃지는 홈 화면에서 확인할 수 있어요!
+							<Text style={styles.boldText}>🏅 숨겨진 뱃지들을 찾아보세요!{'\n'}</Text>- 학습이나 퀴즈 도중 특정 조건을 만족하면 다양한 뱃지를 획득할 수
+							있어요.{'\n'}- 모은 뱃지는 홈 화면에서 확인할 수 있어요!
 						</Text>
 						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowGuideModal(false)}>
 							<Text style={styles.modalCloseText}>닫기</Text>

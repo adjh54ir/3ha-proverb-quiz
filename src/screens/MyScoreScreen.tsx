@@ -251,11 +251,8 @@ const CapitalResultScreen = () => {
 		},
 	];
 
-
 	const reversedLevelGuide = [...LEVEL_DATA].reverse();
-	const currentLevelIndex = reversedLevelGuide.findIndex(
-		(item) => totalScore >= item.score && totalScore < item.next
-	);
+	const currentLevelIndex = reversedLevelGuide.findIndex((item) => totalScore >= item.score && totalScore < item.next);
 	useEffect(() => {
 		if (showLevelModal && levelScrollRef.current) {
 			setTimeout(() => {
@@ -266,7 +263,6 @@ const CapitalResultScreen = () => {
 			}, 100); // 모달이 나타난 후 살짝 delay
 		}
 	}, [showLevelModal]);
-
 
 	const levelGuide = [
 		{ score: 0, next: 600, label: '속담 초보자', icon: 'seedling' },
@@ -293,21 +289,19 @@ const CapitalResultScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<ScrollView
-				ref={scrollRef}
-				style={styles.container}
-				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+				<View style={styles.adContainer}>
+					<AdmobBannerAd />
+				</View>
 				<View style={styles.sectionBox}>
 					<View style={{ alignItems: 'center', marginVertical: 20 }}>
 						<FastImage source={mascot} style={{ width: 120, height: 120 }} resizeMode={FastImage.resizeMode.contain} />
 					</View>
 					<View style={styles.levelCenteredRow}>
-						<View style={styles.levelIconWrap}>
-							<IconComponent type='fontAwesome6' name={icon} size={18} color='#27ae60' />
-						</View>
+						<IconComponent type='fontAwesome6' name={icon} size={18} color='#27ae60' />
 
 						<Text style={styles.levelTitle}>
-							{label} <Text style={styles.levelScoreText}> ({totalScore}점)</Text>
+							{label} <Text style={styles.levelScoreText}>({totalScore}점)</Text>
 						</Text>
 
 						<TouchableOpacity onPress={() => setShowLevelModal(true)}>
@@ -316,11 +310,10 @@ const CapitalResultScreen = () => {
 								name='info-outline'
 								size={16}
 								color='#7f8c8d'
-								style={{ marginLeft: 4, marginTop: 1 }}
+								style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
 							/>
 						</TouchableOpacity>
-					</View>
-
+					</View>s
 					{/* 👇 간단한 설명으로 변경 */}
 					<Text style={styles.levelDescription}>
 						모든 퀴즈를 풀면<Text style={{ fontWeight: 'bold' }}> 속담 마스터</Text> 등급을 획득할 수 있습니다.
@@ -338,9 +331,7 @@ const CapitalResultScreen = () => {
 							<Text style={styles.statValue}>
 								{studyCountries.length} / {totalCountryCount}
 							</Text>
-							<Text style={styles.statLabel}>
-								학습 완료 속담 ({Math.round((studyCountries.length / totalCountryCount) * 100)}%)
-							</Text>
+							<Text style={styles.statLabel}>학습 완료 속담 ({Math.round((studyCountries.length / totalCountryCount) * 100)}%)</Text>
 						</View>
 						<View style={styles.summaryStatCard}>
 							<Text style={styles.statIcon}>📆</Text>
@@ -405,13 +396,7 @@ const CapitalResultScreen = () => {
 												shadowOffset: { width: 0, height: 2 },
 											},
 										]}>
-										<IconComponent
-											type={meta.icon.type}
-											name={meta.icon.name}
-											size={22}
-											color={isEarned ? '#fff' : '#bdc3c7'}
-											style={{ marginBottom: 6 }}
-										/>
+										<IconComponent type={meta.icon.type} name={meta.icon.name} size={22} color={isEarned ? '#fff' : '#bdc3c7'} style={{ marginBottom: 6 }} />
 										<Text style={[styles.regionText, isEarned && { color: '#fff', fontWeight: 'bold' }]}>{category}</Text>
 									</View>
 								);
@@ -446,13 +431,7 @@ const CapitalResultScreen = () => {
 													shadowOffset: { width: 0, height: 2 },
 												},
 											]}>
-											<IconComponent
-												name={item.icon}
-												type='fontAwesome6'
-												size={22}
-												color={isEarned ? '#fff' : '#bdc3c7'}
-												style={{ marginBottom: 4 }}
-											/>
+											<IconComponent name={item.icon} type='fontAwesome6' size={22} color={isEarned ? '#fff' : '#bdc3c7'} style={{ marginBottom: 4 }} />
 											<Text style={[styles.levelText, isEarned && { color: '#fff', fontWeight: 'bold' }]}> {item.title} </Text>
 											<Text style={[styles.levelSubText, isEarned && { color: '#fff' }]}> {item.subtitle} </Text>
 										</View>
@@ -489,9 +468,7 @@ const CapitalResultScreen = () => {
 
 				{/* 2. 전체 중 미획득 뱃지만 아코디언에 출력 */}
 				<TouchableOpacity onPress={toggleBadgeList} style={{ marginBottom: 12 }}>
-					<Text style={{ color: '#27ae60', textAlign: 'right' }}>
-						{showBadgeList ? '뱃지 목록 닫기 ▲' : '획득 가능한 뱃지 보기 ▼'}
-					</Text>
+					<Text style={{ color: '#27ae60', textAlign: 'right' }}>{showBadgeList ? '뱃지 목록 닫기 ▲' : '획득 가능한 뱃지 보기 ▼'}</Text>
 				</TouchableOpacity>
 
 				{showBadgeList && (
@@ -514,9 +491,6 @@ const CapitalResultScreen = () => {
 					</View>
 				)}
 			</ScrollView>
-			<View style={styles.adContainer}>
-				<AdmobBannerAd marginBottom={0} />
-			</View>
 
 			<Modal visible={showLevelModal} transparent animationType='fade'>
 				<View style={styles.modalOverlay}>
@@ -644,9 +618,10 @@ const styles = StyleSheet.create({
 		marginBottom: 8,
 	},
 	levelTitle: {
-		fontSize: 16,
-		fontWeight: 'bold',
-		color: '#2c3e50',
+		fontSize: scaledSize(16),
+		marginLeft: scaleWidth(6),
+		color: '#27ae60',
+		fontWeight: '700',
 	},
 	quizSummaryBox: {
 		backgroundColor: '#f4f6f7',

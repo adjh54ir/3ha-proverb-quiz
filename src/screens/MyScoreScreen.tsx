@@ -313,13 +313,13 @@ const CapitalResultScreen = () => {
 								style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
 							/>
 						</TouchableOpacity>
-					</View>s
-					{/* 👇 간단한 설명으로 변경 */}
+					</View>
+					s{/* 👇 간단한 설명으로 변경 */}
 					<Text style={styles.levelDescription}>
 						모든 퀴즈를 풀면<Text style={{ fontWeight: 'bold' }}> 속담 마스터</Text> 등급을 획득할 수 있습니다.
 					</Text>
 					<Text style={styles.levelDescription}>
-						틀린 퀴즈는 <Text style={{ fontWeight: 'bold' }}> 오답 복습 </Text>으로 다시 점수를 얻을 수 있습니다.
+						틀린 퀴즈는 <Text style={{ fontWeight: 'bold' }}>오답 복습</Text>으로 다시 점수를 얻을 수 있습니다.
 					</Text>
 				</View>
 
@@ -425,10 +425,6 @@ const CapitalResultScreen = () => {
 												isEarned && {
 													backgroundColor: levelStyle.bg,
 													borderColor: levelStyle.border,
-													shadowColor: '#000',
-													shadowOpacity: 0.2,
-													shadowRadius: 4,
-													shadowOffset: { width: 0, height: 2 },
 												},
 											]}>
 											<IconComponent name={item.icon} type='fontAwesome6' size={22} color={isEarned ? '#fff' : '#bdc3c7'} style={{ marginBottom: 4 }} />
@@ -536,7 +532,7 @@ export default CapitalResultScreen;
 
 const styles = StyleSheet.create({
 	safeArea: { flex: 1, backgroundColor: '#fff' },
-	container: { paddingHorizontal: 16, paddingTop: 20 },
+	container: { paddingHorizontal: 20, paddingTop: 20 },
 	pageTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, color: '#2c3e50' },
 	badgeCard: {
 		flexDirection: 'row',
@@ -584,6 +580,7 @@ const styles = StyleSheet.create({
 	sectionBox: {
 		backgroundColor: '#f9f9f9',
 		padding: 16,
+		paddingHorizontal: 20,
 		borderRadius: 12,
 		marginBottom: 24,
 		borderWidth: 1,
@@ -600,9 +597,9 @@ const styles = StyleSheet.create({
 	},
 	subSectionBox2: {
 		backgroundColor: '#ffffff',
-		padding: 16,
-		borderRadius: 12,
-		marginBottom: 24,
+		padding: scaleWidth(16),
+		borderRadius: scaleWidth(12),
+		marginBottom: scaleHeight(24),
 		borderWidth: 1,
 		borderColor: '#ddd',
 	},
@@ -863,7 +860,7 @@ const styles = StyleSheet.create({
 		marginTop: 6,
 	},
 	regionCard: {
-		width: '30%',
+		width: '28%',
 		height: 100,
 		borderWidth: 1,
 		borderColor: '#ccc',
@@ -877,16 +874,16 @@ const styles = StyleSheet.create({
 		marginHorizontal: 5,
 	},
 	levelCard: {
-		width: 120, // ✅ 픽셀 고정이 안정적 (또는 Dimensions로 계산해도 OK)
+		width: '40%',
 		aspectRatio: 1,
 		borderWidth: 1,
 		borderColor: '#ccc',
-		borderRadius: 12,
+		borderRadius: scaleWidth(12),
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: '#fff',
-		marginHorizontal: 8, // ✅ 카드 간 간격
-		marginBottom: 12,
+		marginHorizontal: scaleWidth(8),
+		marginBottom: scaleHeight(12),
 	},
 	regionText: {
 		fontSize: 14,

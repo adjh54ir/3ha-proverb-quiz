@@ -1,6 +1,6 @@
 // QuizStartModal.tsx
-import React, { useCallback, useState } from 'react';
-import { Modal, ScrollView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Modal, ScrollView, View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import IconComponent from '../common/atomic/IconComponent';
 import ProverbServices from '@/services/ProverbServices';
 import { useFocusEffect } from '@react-navigation/native';
@@ -66,12 +66,20 @@ const QuizStartModal = ({
 	const STORAGE_KEY_QUIZ = 'UserQuizHistory';
 	const [levelStats, setLevelStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [categoryStats, setCategoryStats] = useState<Record<string, { total: number; studied: number }>>({});
+	const [quizHistory, setQuizHistory] = useState<UserQuizHistory | null>(null);
 
 	useFocusEffect(
 		useCallback(() => {
 			loadData();
 		}, []),
 	);
+
+	useEffect(() => {
+		if (quizHistory && Object.keys(levelStats).length > 0) {
+			const allIds = [...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])];
+			loadStats(Array.from(new Set(allIds)));
+		}
+	}, [selectedLevel]);
 
 	const loadData = async () => {
 		const raw = await AsyncStorage.getItem(STORAGE_KEY_QUIZ);
@@ -81,6 +89,7 @@ const QuizStartModal = ({
 		if (raw) {
 			try {
 				const parsed: UserQuizHistory = JSON.parse(raw);
+				setQuizHistory(parsed); // ✅ 여기서 상태 저장
 				correctIds = parsed.correctProverbId ?? [];
 				wrongIds = parsed.wrongProverbId ?? [];
 			} catch (e) {
@@ -88,24 +97,27 @@ const QuizStartModal = ({
 			}
 		}
 
-		const studiedIds = Array.from(new Set([...correctIds, ...wrongIds])); // ✅ 중복 제거한 전체 푼 문제 목록
+		const studiedIds = Array.from(new Set([...correctIds, ...wrongIds]));
 		loadLevelStats(studiedIds);
 		loadStats(studiedIds);
 	};
 	const loadStats = (studiedIds: number[]) => {
 		const allProverbs = ProverbServices.selectProverbList();
+
+		// 🔽 난이도 필터링 추가
+		const filteredProverbs = selectedLevel === '전체' ? allProverbs : allProverbs.filter((p) => p.levelName === selectedLevel);
+
 		const categoryMap: Record<string, { total: number; studied: number }> = {
-			전체: { total: 0, studied: 0 }, // ✅ 전체 기본값 추가
+			전체: { total: 0, studied: 0 },
 		};
 
-		allProverbs.forEach((item) => {
+		filteredProverbs.forEach((item) => {
 			const category = item.category;
-			// 개별 카테고리 누적
+
 			if (!categoryMap[category]) categoryMap[category] = { total: 0, studied: 0 };
 			categoryMap[category].total += 1;
 			if (studiedIds.includes(item.id)) categoryMap[category].studied += 1;
 
-			// 전체 카운트 누적
 			categoryMap['전체'].total += 1;
 			if (studiedIds.includes(item.id)) categoryMap['전체'].studied += 1;
 		});
@@ -151,8 +163,7 @@ const QuizStartModal = ({
 		'욕심/탐욕': { color: '#fd79a8', icon: { type: 'fontAwesome5', name: 'money-bill-wave' }, type: 'category' },
 		'배신/불신': { color: '#b2bec3', icon: { type: 'fontAwesome5', name: 'user-slash' }, type: 'category' },
 	};
-	const getStyleColor = (key: string): string =>
-		STYLE_MAP[key]?.color || (STYLE_MAP[key]?.type === 'level' ? '#0A84FF' : '#dfe6e9');
+	const getStyleColor = (key: string): string => STYLE_MAP[key]?.color || (STYLE_MAP[key]?.type === 'level' ? '#0A84FF' : '#dfe6e9');
 	const getStyleIcon = (key: string): { type: string; name: string } | null => STYLE_MAP[key]?.icon || null;
 
 	const SelectGroup = ({ title, options, selected, compact = false, getIcon }: SelectGroupProps) => {
@@ -192,21 +203,9 @@ const QuizStartModal = ({
 								onPress={() => onSelect(option)}>
 								<View style={{ alignItems: 'center', justifyContent: 'center' }}>
 									{isAll ? (
-										<IconComponent
-											type='fontAwesome5'
-											name='clipboard-list'
-											size={20}
-											color={isSelected ? '#ffffff' : '#eeeeee'}
-											style={{ marginBottom: 6 }}
-										/>
+										<IconComponent type='fontAwesome5' name='clipboard-list' size={20} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: 6 }} />
 									) : iconData ? (
-										<IconComponent
-											type={iconData.type}
-											name={iconData.name}
-											size={18}
-											color={isSelected ? '#ffffff' : '#eeeeee'}
-											style={{ marginBottom: 6 }}
-										/>
+										<IconComponent type={iconData.type} name={iconData.name} size={18} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: 6 }} />
 									) : null}
 
 									{/* ✅ 레벨 텍스트: 아이콘 아래 */}
@@ -235,20 +234,13 @@ const QuizStartModal = ({
 					<Text style={styles.selectTitle}>🧠 퀴즈 모드</Text>
 					<Text style={styles.selectSub}>난이도와 카테고리를 선택해주세요!</Text>
 
-					<View style={[styles.selectSection, { marginBottom: modeStep === 1 ? 30 : 0 }]}>
+					<View style={styles.selectModalContentBox}>
 						{modeStep === 0 ? (
-							<SelectGroup
-								title='난이도 선택'
-								options={levelOptions}
-								selected={selectedLevel}
-								onSelect={setSelectedLevel}
-								getIcon={getStyleIcon}
-							/>
+							<SelectGroup title='난이도 선택' options={levelOptions} selected={selectedLevel} onSelect={setSelectedLevel} getIcon={getStyleIcon} />
 						) : (
-							<ScrollView>
+							<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: 10 }} showsVerticalScrollIndicator={false}>
 								<SelectGroup
 									title='카테고리 선택'
-									compact={true}
 									options={categoryOptions}
 									selected={selectedCategory}
 									onSelect={setSelectedCategory}
@@ -258,7 +250,7 @@ const QuizStartModal = ({
 						)}
 					</View>
 
-					<View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12 }}>
+					<View style={styles.buttonRow}>
 						{modeStep === 1 && (
 							<TouchableOpacity onPress={() => setModeStep(0)} style={[styles.modalButton, styles.backButtonInline]}>
 								<IconComponent type='fontAwesome5' name='arrow-left' size={16} color='#3498db' />
@@ -269,9 +261,7 @@ const QuizStartModal = ({
 							style={[
 								styles.modalButton,
 								{
-									flex: 1,
-									backgroundColor:
-										(modeStep === 0 && selectedLevel) || (modeStep === 1 && selectedCategory) ? '#27ae60' : '#ccc',
+									backgroundColor: (modeStep === 0 && selectedLevel) || (modeStep === 1 && selectedCategory) ? '#27ae60' : '#ccc',
 								},
 							]}
 							disabled={modeStep === 0 ? !selectedLevel : !selectedCategory}
@@ -279,17 +269,25 @@ const QuizStartModal = ({
 								if (modeStep === 0) {
 									setModeStep(1);
 								} else {
+									// 🔽 퀴즈 데이터 유효성 체크
+									const all = ProverbServices.selectProverbList();
+									const filtered = all.filter(
+										(item) =>
+											(selectedLevel === '전체' || item.levelName === selectedLevel) && (selectedCategory === '전체' || item.category === selectedCategory),
+									);
+
+									if (filtered.length === 0) {
+										Alert.alert('잠깐만요!', '선택한 난이도와 카테고리에 맞는 속담이 아직 없어요 🥲');
+										return;
+									}
+
 									onStart();
 								}
 							}}>
-							<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-								{modeStep === 1 && (
-									<IconComponent type='fontAwesome5' name='rocket' size={16} color='#fff' style={{ marginRight: 8 }} />
-								)}
+							<View style={styles.centeredButtonContent}>
+								{modeStep === 1 && <IconComponent type='fontAwesome5' name='rocket' size={16} color='#fff' style={{ marginRight: 8 }} />}
 								<Text style={styles.modalButtonText}>{modeStep === 0 ? '다음' : '퀴즈 시작'}</Text>
-								{modeStep === 0 && (
-									<IconComponent type='fontAwesome5' name='arrow-right' size={16} color='#fff' style={{ marginLeft: 8 }} />
-								)}
+								{modeStep === 0 && <IconComponent type='fontAwesome5' name='arrow-right' size={16} color='#fff' style={{ marginLeft: 8 }} />}
 							</View>
 						</TouchableOpacity>
 					</View>
@@ -324,7 +322,7 @@ const styles = StyleSheet.create({
 		fontSize: 22,
 		fontWeight: 'bold',
 		color: '#2c3e50',
-		marginBottom: 8,
+		marginBottom: 20,
 	},
 	selectSub: {
 		fontSize: 16,
@@ -442,5 +440,25 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: '#ffffff',
 		marginBottom: 4,
+	},
+	selectModalContentBox: {
+		width: '100%',
+		maxWidth: 400,
+		height: 460,
+		marginBottom: 16,
+		justifyContent: 'center', // ✅ 추가
+	},
+	buttonRow: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		gap: 12,
+		width: '100%',
+		marginTop: 12,
+	},
+	centeredButtonContent: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
 });

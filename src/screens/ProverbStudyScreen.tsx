@@ -1155,16 +1155,6 @@ const styles = StyleSheet.create({
 		marginTop: 0,
 		marginBottom: 30, // ✅ 4로 줄이면 타이틀과의 거리 확 줄어듭니다
 	},
-	proverbText: {
-		fontSize: 28,
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		textAlign: 'center',
-		lineHeight: 34,
-		// ✅ 아래 줄 수정 (기존 10 → 줄이거나 marginTop만 남김)
-		marginTop: 4,
-		marginBottom: 0,
-	},
 	meaningHighlight: {
 		fontSize: 22,
 		color: '#ffffff',

@@ -13,14 +13,7 @@ interface QuizResultModalProps {
 	onNext: () => void;
 }
 
-const QuizResultModal = ({
-	visible,
-	resultType,
-	resultTitle,
-	resultMessage,
-	question,
-	onNext,
-}: QuizResultModalProps) => {
+const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, question, onNext }: QuizResultModalProps) => {
 	if (!visible || resultType === '') return null;
 
 	return (
@@ -70,12 +63,19 @@ const QuizResultModal = ({
 						)}
 						{(resultType === 'wrong' || resultType === 'timeout') && (
 							<>
-								<Text style={styles.resultSubText}>
-									속담: <Text style={styles.proverbText}>{question?.proverb}</Text>
+								<Text style={[styles.resultMessageBig, { color: '#e67e22' }]}>{resultMessage}</Text>
+
+								{/* ✅ 정답 강조 구간 추가 */}
+								<Text style={{ fontSize: 15, fontWeight: '600', textAlign: 'center' }}>
+									이번 문제의 정답은 <Text style={{ color: '#27ae60' }}>"{question?.proverb}"</Text>였어요!
 								</Text>
-								<Text style={styles.resultSubText}>
-									의미: <Text style={styles.meaningText}>{question?.longMeaning}</Text>
-								</Text>
+
+								<View style={[styles.correctInfoCard, { backgroundColor: '#fffdf7' }]}>
+									<Text style={[styles.correctInfoLabel, { color: '#e67e22' }]}>📌 속담</Text>
+									<Text style={styles.correctInfoText}>{question?.proverb}</Text>
+									<Text style={[styles.correctInfoLabel, { marginTop: 12, color: '#e67e22' }]}>💡 의미</Text>
+									<Text style={styles.correctInfoText}>{question?.longMeaning}</Text>
+								</View>
 							</>
 						)}
 					</View>
@@ -98,7 +98,7 @@ export const styles = StyleSheet.create({
 	},
 	resultModal: {
 		backgroundColor: '#fff',
-		padding: 24,
+		padding: 15,
 		borderRadius: 16,
 		alignItems: 'center',
 		width: '80%',

@@ -1,8 +1,9 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import IconComponent from '../common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
+import { scaleHeight } from '@/utils';
 
 const ProverbQuizModeSelectScreen = () => {
 	const [showGuideModal, setShowGuideModal] = useState(false);
@@ -72,12 +73,15 @@ const ProverbQuizModeSelectScreen = () => {
 	}, [navigation]);
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-			<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-				<View style={styles.container}>
-					<View style={styles.centerWrapper}>
-						<Text style={styles.title}>🧠 오늘은 어떤 속담 퀴즈로 도전할까요?</Text>
-						<Text style={styles.subTitle}>퀴즈를 선택하면 난이도, 카테고리별로 퀴즈를 선택할 수 있습니다</Text>
+		<>
+			<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+				<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+					<ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps='handled'>
+						<View style={styles.headerSection}>
+							<Text style={styles.title}>🧠 오늘은 어떤 속담 퀴즈로 도전할까요?</Text>
+							<Text style={styles.subTitle}>퀴즈를 선택하면 난이도, 카테고리별로 퀴즈를 선택할 수 있습니다</Text>
+						</View>
+
 						<View style={styles.gridWrap}>
 							{MODES.map((mode) => {
 								const isDisabled = mode.key === 'comingsoon';
@@ -88,21 +92,16 @@ const ProverbQuizModeSelectScreen = () => {
 										activeOpacity={isDisabled ? 1 : 0.7}
 										onPress={() => !isDisabled && moveToHandler(mode.key)}>
 										<View style={isDisabled ? styles.disabledInner : styles.iconTextRow}>
-											<IconComponent
-												type={mode.type}
-												name={mode.icon}
-												size={isDisabled ? 24 : 28}
-												color={isDisabled ? '#bdc3c7' : '#fff'}
-											/>
+											<IconComponent type={mode.type} name={mode.icon} size={isDisabled ? 24 : 28} color={isDisabled ? '#bdc3c7' : '#fff'} />
 											<Text style={[styles.modeLabel, isDisabled && styles.disabledText]}>{mode.label}</Text>
 										</View>
 									</TouchableOpacity>
 								);
 							})}
 						</View>
-					</View>
-				</View>
-			</KeyboardAvoidingView>
+					</ScrollView>
+				</KeyboardAvoidingView>
+			</SafeAreaView>
 
 			{showGuideModal && (
 				<View style={styles.modalOverlay}>
@@ -117,14 +116,14 @@ const ProverbQuizModeSelectScreen = () => {
 							<Text style={styles.boldText}>
 								<IconComponent type='materialCommunityIcons' name='head-question-outline' size={20} /> 퀴즈 모드 안내{'\n\n'}
 							</Text>
-							<Text style={styles.boldText}>1️⃣ 속담 뜻 퀴즈{'\n'}</Text>- 제시된 속담에 대한 올바른 의미를 고르는 4지선다형
-							퀴즈입니다.{'\n'}- 속담의 뜻을 이해하는 능력을 키울 수 있어요.{'\n\n'}
+							<Text style={styles.boldText}>1️⃣ 속담 뜻 퀴즈{'\n'}</Text>- 제시된 속담에 대한 올바른 의미를 고르는 4지선다형 퀴즈입니다.{'\n'}- 속담의 뜻을
+							이해하는 능력을 키울 수 있어요.{'\n\n'}
 							<Text style={styles.boldText}>2️⃣ 속담 찾기 퀴즈{'\n'}</Text>- 제시된 의미에 해당하는 속담을 고르는 퀴즈입니다.
 							{'\n'}- 유사한 의미의 속담 중 정확한 속담을 찾아내는 연습이 돼요.{'\n\n'}
-							<Text style={styles.boldText}>3️⃣ 빈칸 채우기 퀴즈{'\n'}</Text>- 속담의 일부분이 빈칸으로 제시되고, 알맞은 단어를
-							고르는 퀴즈입니다.{'\n'}- 속담의 문장 구조와 정확한 어휘력을 함께 익힐 수 있어요.{'\n\n'}
-							<Text style={styles.boldText}>📌 공통 안내{'\n'}</Text>- 각 퀴즈는 난이도별, 카테고리별로 문제를 선택해 풀 수
-							있습니다.{'\n'}- 이미 푼 문제는 자동으로 제외되어, 복습 또는 도전이 편리해요.
+							<Text style={styles.boldText}>3️⃣ 빈칸 채우기 퀴즈{'\n'}</Text>- 속담의 일부분이 빈칸으로 제시되고, 알맞은 단어를 고르는 퀴즈입니다.{'\n'}-
+							속담의 문장 구조와 정확한 어휘력을 함께 익힐 수 있어요.{'\n\n'}
+							<Text style={styles.boldText}>📌 공통 안내{'\n'}</Text>- 각 퀴즈는 난이도별, 카테고리별로 문제를 선택해 풀 수 있습니다.{'\n'}- 이미 푼 문제는
+							자동으로 제외되어, 복습 또는 도전이 편리해요.
 						</Text>
 
 						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowGuideModal(false)}>
@@ -133,7 +132,7 @@ const ProverbQuizModeSelectScreen = () => {
 					</View>
 				</View>
 			)}
-		</SafeAreaView>
+		</>
 	);
 };
 
@@ -158,14 +157,19 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 	},
 	gridWrap: {
-		width: '100%',
+		paddingTop: scaleHeight(30),
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-		rowGap: 16,
+		justifyContent: 'center',
+		columnGap: 16,
+		rowGap: 20,
+		paddingHorizontal: 12,
+		marginBottom: 30,
 	},
 	gridButtonHalf: {
-		width: '48%',
+		width: '45%',
+		minWidth: 140,
+		maxWidth: 180,
 		height: 120,
 		borderRadius: 16,
 		justifyContent: 'center',
@@ -197,8 +201,8 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: '#7f8c8d',
 		textAlign: 'center',
-		marginBottom: 40,
 		lineHeight: 20,
+		marginTop: 8,
 	},
 	modalOverlay: {
 		position: 'absolute',
@@ -263,8 +267,8 @@ const styles = StyleSheet.create({
 	},
 
 	headerSection: {
-		marginBottom: 36,
 		alignItems: 'center',
+		marginBottom: 36, // 타이틀과 버튼 사이 간격
 	},
 
 	subtitle: {
@@ -307,12 +311,14 @@ const styles = StyleSheet.create({
 		marginBottom: 12,
 	},
 	disabledButton: {
+		width: '45%',
+		minWidth: 150,
+		maxWidth: 200,
+		height: 120,
 		backgroundColor: '#ecf0f1',
 		borderRadius: 16,
 		justifyContent: 'center',
 		alignItems: 'center',
-		width: '48%',
-		height: 120,
 		opacity: 0.6,
 	},
 	disabledText: {
@@ -326,5 +332,12 @@ const styles = StyleSheet.create({
 		color: '#bdc3c7',
 		fontWeight: '500',
 		marginTop: 4,
+	},
+	scrollContent: {
+		flexGrow: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: 15,
+		paddingVertical: 40, // 위아래 균형 잡힌 간격
 	},
 });

@@ -19,8 +19,8 @@ export declare module MainDataType {
 		id: number; // 고유 식별자 (1부터 시작하는 번호)
 		proverb: string; // 속담 본문 (ex: "가는 말이 고와야 오는 말이 곱다")
 		meaning: string; // 속담의 의미 설명 (문장형, 존댓말 처리)
-		longMeaning?: string; // 우리말샘의 긴 의미 
-		sameProverb?: string[]; // 같은 의미 
+		longMeaning: string; // 우리말샘의 긴 의미
+		sameProverb?: string[]; // 같은 의미
 		category: string; // 속담이 속하는 카테고리 (ex: 인간관계, 세상 이치 등)
 		level: number; // 난이도 숫자 (1: 아주 쉬움, 2: 쉬움, 3: 보통, 4: 어려움)
 		levelName: string; // 난이도 이름 (ex: "쉬움", "보통" 등 텍스트)

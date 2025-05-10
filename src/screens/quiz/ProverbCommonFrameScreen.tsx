@@ -123,6 +123,15 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 
 	useEffect(() => {
 		if (!showStartModal) {
+			// 퀴즈 시작과 동시에 최신 기록 반영
+			(async () => {
+				const stored = await AsyncStorage.getItem(STORAGE_KEY);
+				if (stored) {
+					const parsed: MainDataType.UserQuizHistory = JSON.parse(stored);
+					setQuizHistory(parsed);
+					setTotalScore(parsed.totalScore || 0); // ✅ 여기서 totalScore 반영
+				}
+			})();
 			loadQuestion();
 		}
 	}, [showStartModal]);
@@ -148,9 +157,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 		}
 	}, [badgeModalVisible]);
 
-	const solvedCount = quizHistory
-		? new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]).size
-		: 0;
+	const solvedCount = quizHistory ? new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]).size : 0;
 	/**
 	 * 퀴즈 불러오기
 	 * @returns
@@ -163,9 +170,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 		});
 
 		if (filteredProverbs.length === 0) {
-			Alert.alert('문제 없음', '선택한 난이도와 카테고리에 해당하는 문제가 없습니다.', [
-				{ text: '확인', onPress: () => setShowStartModal(true) },
-			]);
+			Alert.alert('문제 없음', '선택한 난이도와 카테고리에 해당하는 문제가 없습니다.', [{ text: '확인', onPress: () => setShowStartModal(true) }]);
 			return;
 		}
 
@@ -183,7 +188,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 		} else if (mode === 'proverb') {
 			// 속담 맞추기
 			allOptions = [...distractors.map((item) => item.proverb), newQuestion.proverb];
-			displayText = newQuestion.meaning;
+			displayText = newQuestion.longMeaning!;
 		} else if (mode === 'fill-blank') {
 			// 빈칸 채우기
 			const blank = pickBlankWord(newQuestion.proverb);
@@ -252,7 +257,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 		let acquiredBadges: string[] = [];
 
 		let correctAnswer = '';
-		if (mode === 'meaning') correctAnswer = question.meaning;
+		if (mode === 'meaning') correctAnswer = question.longMeaning;
 		else if (mode === 'proverb') correctAnswer = question.proverb;
 		else if (mode === 'fill-blank') correctAnswer = blankWord;
 
@@ -325,10 +330,10 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 		if (isFocused) {
 			const title = isTimeout ? '⏰ 시간 초과!' : correct ? '🎉 정답입니다!' : '😢 오답입니다';
 			const message = isTimeout
-				? `시간 초과로 오답 처리됐어요!\n정답은 '${correctAnswer}'입니다.`
+				? '시간 초과로 오답 처리됐어요!'
 				: correct
 					? praiseMessages[Math.floor(Math.random() * praiseMessages.length)]
-					: `앗, 다음엔 맞힐 수 있어요!\n정답은 '${correctAnswer}'입니다.`;
+					: '앗, 다음엔 맞힐 수 있어요!';
 
 			setResultTitle(title);
 			setResultMessage(message);
@@ -476,12 +481,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 									</View>
 								</View>
 								<View style={styles.quizBox}>
-									<AnimatedCircularProgress
-										size={80}
-										width={6}
-										fill={(20 - remainingTime) * 5}
-										tintColor='#3498db'
-										backgroundColor='#ecf0f1'>
+									<AnimatedCircularProgress size={80} width={6} fill={(20 - remainingTime) * 5} tintColor='#3498db' backgroundColor='#ecf0f1'>
 										{() => <Text style={styles.timerText}>{remainingTime}s</Text>}
 									</AnimatedCircularProgress>
 
@@ -490,7 +490,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 											? questionText || '문제 준비중...'
 											: mode === 'meaning'
 												? question?.proverb
-												: question?.meaning || '문제 준비중...'}
+												: question?.longMeaning || '문제 준비중...'}
 									</Text>
 
 									<View style={styles.optionsContainer}>
@@ -520,28 +520,16 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 													<TouchableOpacity
 														onPressIn={handlePressIn}
 														onPressOut={handlePressOut}
-														style={[
-															styles.optionCard,
-															isAnswerCorrect && styles.optionCorrectCard,
-															isAnswerWrong && styles.optionWrongCard,
-														]}
+														style={[styles.optionCard, isAnswerCorrect && styles.optionCorrectCard, isAnswerWrong && styles.optionWrongCard]}
 														onPress={() => handleSelect(option)}
 														disabled={!!selected}>
 														<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
 															<View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
-																<Text style={[styles.optionLabel, { color: labelColors[index], marginRight: 6 }]}>
-																	{['A.', 'B.', 'C.', 'D.'][index]}
-																</Text>
+																<Text style={[styles.optionLabel, { color: labelColors[index], marginRight: 6 }]}>{['A.', 'B.', 'C.', 'D.'][index]}</Text>
 																<Text style={styles.optionContent}>{option}</Text>
 															</View>
 
-															{isSelected && (
-																<Icon
-																	name={isAnswerCorrect ? 'check-circle' : 'cancel'}
-																	size={28}
-																	color={isAnswerCorrect ? '#2ecc71' : '#e74c3c'}
-																/>
-															)}
+															{isSelected && <Icon name={isAnswerCorrect ? 'check-circle' : 'cancel'} size={28} color={isAnswerCorrect ? '#2ecc71' : '#e74c3c'} />}
 														</View>
 													</TouchableOpacity>
 												</Animated.View>
@@ -625,14 +613,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 							{/* 뱃지 모달 */}
 							<Modal visible={badgeModalVisible} transparent animationType='fade'>
 								<View style={styles.modalOverlay}>
-									<ConfettiCannon
-										key={confettiKey}
-										count={100}
-										origin={{ x: screenWidth / 2, y: 0 }}
-										fadeOut
-										autoStart
-										explosionSpeed={350}
-									/>
+									<ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart explosionSpeed={350} />
 									<Animated.View style={[styles.badgeModal, { transform: [{ scale: scaleAnim }] }]}>
 										<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지를 획득했어요!</Text>
 										<ScrollView style={{ maxHeight: 300, width: '100%' }} contentContainerStyle={{ paddingHorizontal: 12 }}>
@@ -664,9 +645,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 								</View>
 							</Modal>
 
-							{confettiKey > 0 && (
-								<ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart />
-							)}
+							{confettiKey > 0 && <ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart />}
 						</View>
 					</View>
 				</TouchableWithoutFeedback>
@@ -1200,5 +1179,15 @@ const styles = StyleSheet.create({
 		color: 'white',
 		fontWeight: '600',
 		fontSize: 15, // 기존 16 → 줄임
+	},
+	modalContentBox: {
+		width: '90%',
+		minHeight: 340, // 카테고리 선택 팝업 기준
+		backgroundColor: '#fff',
+		paddingVertical: 24,
+		paddingHorizontal: 20,
+		borderRadius: 20,
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
 });

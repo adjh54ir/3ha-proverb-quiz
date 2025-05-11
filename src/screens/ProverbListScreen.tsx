@@ -12,6 +12,8 @@ import {
 	Modal,
 	ScrollView,
 	Alert,
+	KeyboardAvoidingView,
+	Platform,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -220,19 +222,42 @@ const ProverbListScreen = () => {
 		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
 	};
 	const handleReset = () => {
-		setKeyword('');
-		setFieldValue('전체');
-		setLevelValue('전체');
-		setFieldOpen(false); // 🔽 드롭다운 닫기
-		setLevelOpen(false); // 🔽 드롭다운 닫기
-		Keyboard.dismiss(); // 키보드도 닫아줌
+		// 1. 드롭다운을 먼저 닫음
+		setFieldOpen(false);
+		setLevelOpen(false);
+
+		// 2. 키보드 닫기
+		Keyboard.dismiss();
+
+		// 3. 약간의 지연 후 값 초기화 (포커싱 이슈 방지)
 		setTimeout(() => {
-			scrollToTop();
-		}, 100); // 상태 반영 후 스크롤 실행
+			setKeyword('');
+			setFieldValue('전체');
+			setLevelValue('전체');
+
+			// 필터 목록 초기화
+			const fieldList = ProverbServices.selectCategoryList();
+			setFieldItems([{ label: '전체', value: '전체' }, ...fieldList.map((field) => ({ label: field, value: field }))]);
+
+			const levelList = ProverbServices.selectLevelNameList();
+			setLevelItems([{ label: '전체', value: '전체' }, ...levelList.map((level) => ({ label: level, value: level }))]);
+
+			scrollToTop(); // 스크롤 이동은 마지막에
+		}, 50);
+	};
+
+	const handleSetLevelOpen = (open: boolean) => {
+		setLevelOpen(open);
+		if (open) scrollToTop();
+	};
+
+	const handleSetFieldOpen = (open: boolean) => {
+		setFieldOpen(open);
+		if (open) scrollToTop();
 	};
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }} edges={['top']}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#f8f9fa' }} edges={['top']}>
 			<TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
 				<View style={{ flex: 1 }}>
 					{/* 필터 + 드롭다운 영역 */}
@@ -271,8 +296,7 @@ const ProverbListScreen = () => {
 										showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
 									/>
 								</View>
-
-								<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000 }]}>
+								<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000, overflow: 'visible' }]}>
 									<DropDownPicker
 										open={fieldOpen}
 										value={fieldValue}
@@ -280,8 +304,20 @@ const ProverbListScreen = () => {
 										setOpen={setFieldOpen}
 										setValue={setFieldValue}
 										setItems={setFieldItems}
+										listMode='SCROLLVIEW'
+										scrollViewProps={{
+											nestedScrollEnabled: true,
+										}}
 										style={styles.dropdownField}
-										dropDownContainerStyle={styles.dropdownListField}
+										dropDownContainerStyle={{
+											...styles.dropdownListField,
+											elevation: 1000, // Android에서 zIndex처럼 동작
+										}}
+										zIndex={5000} // DropDownPicker 자체에 zIndex 주기
+										zIndexInverse={4000} // 다른 Picker와 겹치지 않게
+										containerStyle={{
+											zIndex: 5000,
+										}}
 										listItemLabelStyle={{ marginLeft: 6, fontSize: 14 }}
 										labelStyle={{ fontSize: 14, color: '#2c3e50' }}
 										iconContainerStyle={{ marginRight: 8 }}
@@ -586,6 +622,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 		paddingVertical: 4,
 		borderRadius: 12,
+		backgroundColor: '#f1f2f6', // 연한 회색 배경 추가
 	},
 	badgeText: {
 		color: '#fff',
@@ -620,7 +657,6 @@ const styles = StyleSheet.create({
 		marginTop: 10,
 		alignItems: 'flex-end', // ✅ 오른쪽 정렬
 		paddingHorizontal: 16, // ✅ 양쪽 여백 추가 (리스트랑 맞추기)
-		marginBottom: 8,
 	},
 	listCountText: {
 		fontSize: 14,

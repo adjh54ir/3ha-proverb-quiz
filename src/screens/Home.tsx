@@ -265,13 +265,13 @@ const Home = () => {
 								</View>
 								<View style={{ alignItems: 'center', marginBottom: 8 }}>
 									<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(10) }}>
-										<IconComponent type='fontAwesome6' name={icon} size={18} color='#27ae60' />
-										<Text style={{ fontSize: scaledSize(16), color: '#27ae60', fontWeight: '700', marginLeft: scaleWidth(6) }}>{label}</Text>
+										<IconComponent type='fontAwesome6' name={icon} size={15} color='#27ae60' />
+										<Text style={{ fontSize: scaledSize(17), color: '#27ae60', fontWeight: '700', marginLeft: scaleWidth(6) }}>{label}</Text>
 										<TouchableOpacity onPress={() => setShowLevelModal(true)}>
 											<IconComponent
 												type='materialIcons'
 												name='info-outline'
-												size={18}
+												size={20}
 												color='#7f8c8d'
 												style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
 											/>
@@ -445,8 +445,14 @@ const Home = () => {
 												<Text style={styles.levelBadgeText}>🏆 현재 등급</Text>
 											</View>
 										)}
+
+										{/* 아이콘 추가 위치 */}
+										<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(8) }}>
+											<IconComponent name={item.icon} type='fontAwesome6' size={16} color='#27ae60' />
+											<Text style={[styles.levelLabel, { marginLeft: 6 }]}>{item.label}</Text>
+										</View>
+
 										<FastImage source={mascotImage} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
-										<Text style={styles.levelLabel}>{item.label}</Text>
 										<Text style={styles.levelScore}>{item.score}점 이상</Text>
 										{isCurrent && <Text style={styles.levelEncourage}>{getEncourageMessage(item.score)}</Text>}
 									</View>

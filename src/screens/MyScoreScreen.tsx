@@ -298,7 +298,7 @@ const CapitalResultScreen = () => {
 						<FastImage source={mascot} style={{ width: 120, height: 120 }} resizeMode={FastImage.resizeMode.contain} />
 					</View>
 					<View style={styles.levelCenteredRow}>
-						<IconComponent type='fontAwesome6' name={icon} size={18} color='#27ae60' />
+						<IconComponent type='fontAwesome6' name={icon} size={16} color='#27ae60' />
 
 						<Text style={styles.levelTitle}>
 							{label} <Text style={styles.levelScoreText}>({totalScore}점)</Text>
@@ -308,7 +308,7 @@ const CapitalResultScreen = () => {
 							<IconComponent
 								type='materialIcons'
 								name='info-outline'
-								size={16}
+								size={18}
 								color='#7f8c8d'
 								style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
 							/>
@@ -510,7 +510,10 @@ const CapitalResultScreen = () => {
 											</View>
 										)}
 										<FastImage source={mascotImage} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
-										<Text style={styles.levelLabel}>{item.label}</Text>
+										<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
+											<IconComponent name={item.icon} type='fontAwesome6' size={16} color='#27ae60' />
+											<Text style={[styles.levelLabel, { marginLeft: 6 }]}>{item.label}</Text>
+										</View>
 										<Text style={styles.levelScore}>{item.score}점 이상</Text>
 										{isCurrent && <Text style={styles.levelEncourage}>{getEncourageMessage(item.score)}</Text>}
 									</View>
@@ -781,7 +784,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 6,
 	},
 	levelScoreText: {
-		fontSize: 13,
+		fontSize: 15,
 		color: '#7f8c8d',
 		textAlign: 'center',
 		marginTop: 4,

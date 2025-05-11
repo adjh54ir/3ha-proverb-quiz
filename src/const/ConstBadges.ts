@@ -313,11 +313,10 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		type: 'quiz',
 	},
 
-	// 점수 달성 (퀴즈)
 	{
 		id: 'score_600',
 		name: '600점 돌파',
-		description: '퀴즈 여행을 시작했어요! 첫 발걸음 축하해요!',
+		description: '속담 입문자로서 퀴즈 여행을 시작했어요! 첫 발걸음 축하해요!',
 		iconType: 'fontAwesome6',
 		icon: 'seedling',
 		type: 'quiz',
@@ -325,7 +324,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'score_1200',
 		name: '1200점 달성',
-		description: '이제 속담의 흐름을 완전히 꿰뚫고 있어요!',
+		description: '속담 숙련자가 되었어요! 이제 속담의 흐름을 완전히 꿰뚫고 있어요!',
 		iconType: 'fontAwesome6',
 		icon: 'leaf',
 		type: 'quiz',
@@ -333,17 +332,17 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'score_1800',
 		name: '1800점 달성',
-		description: '속담 탐험가! 이제 세계가 무대예요!',
+		description: '속담 마스터 등극! 속담 탐험가로서 이제 세계가 무대예요!',
 		iconType: 'fontAwesome6',
 		icon: 'tree',
 		type: 'quiz',
 	},
 	{
-		id: 'score_2460',
-		name: '2460점 달성',
-		description: '월드 마스터! 전 세계 속담을 정복했어요!',
+		id: 'score_2160',
+		name: '2160점 달성',
+		description: '속담 문제 완결! 모든 속담을 정복했어요!',
 		iconType: 'fontAwesome6',
 		icon: 'trophy',
 		type: 'quiz',
-	}
+	},
 ];

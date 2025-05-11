@@ -359,7 +359,11 @@ const ProverbListScreen = () => {
 									<Text style={styles.emptyText}>앗! 조건에 맞는 속담이 없어요.{'\n'}다른 검색어나 필터를 사용해보세요!</Text>
 								</View>
 							)}
-							contentContainerStyle={{ paddingTop: 8, paddingHorizontal: 16, paddingBottom: 60 }}
+							contentContainerStyle={{
+								paddingTop: 12, // ✅ 적당한 여백으로 조정
+								paddingHorizontal: 16,
+								paddingBottom: 60,
+							}}
 							renderItem={({ item, index }) => {
 								const isLast = index === visibleList.length - 1;
 								return (
@@ -487,7 +491,8 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		padding: 16,
 		borderRadius: 16,
-		marginBottom: 20,
+		// marginBottom: 20, ❌ 제거 또는 줄이기
+		marginBottom: 8, // ✅ 줄이기
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.05,
@@ -657,6 +662,7 @@ const styles = StyleSheet.create({
 		marginTop: 10,
 		alignItems: 'flex-end', // ✅ 오른쪽 정렬
 		paddingHorizontal: 16, // ✅ 양쪽 여백 추가 (리스트랑 맞추기)
+		marginBottom: 3,
 	},
 	listCountText: {
 		fontSize: 14,

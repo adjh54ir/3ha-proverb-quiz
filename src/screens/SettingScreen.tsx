@@ -113,7 +113,7 @@ const SettingScreen = () => {
 			badges: CONST_BADGES.filter((b) => b.type === 'quiz').map((b) => b.id),
 			correctProverbId: allProverbs.map((p) => p.id),
 			wrongProverbId: [],
-			totalScore: 2390,
+			totalScore: 2160,
 			bestCombo: 20,
 			lastAnsweredAt: new Date().toISOString(),
 			quizCounts: {}, // 원하면 여기서도 id별로 count 넣을 수 있음
@@ -137,9 +137,7 @@ const SettingScreen = () => {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
 			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}>
-				<View>
-					<AdmobBannerAd />
-				</View>
+				<AdmobBannerAd paramMarginTop={20} />
 				<View style={styles.section}>
 					<Text style={styles.title}>학습/퀴즈 다시 풀기 </Text>
 					<View style={styles.buttonGroup}>

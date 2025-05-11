@@ -182,8 +182,8 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 		let displayText: string = '';
 
 		if (mode === 'meaning') {
-			// 뜻 맞추기
-			allOptions = [...distractors.map((item) => item.meaning), newQuestion.meaning];
+			// 뜻 맞추기 (정답: longMeaning 사용)
+			allOptions = [...distractors.map((item) => item.longMeaning), newQuestion.longMeaning!];
 			displayText = newQuestion.proverb;
 		} else if (mode === 'proverb') {
 			// 속담 맞추기
@@ -257,7 +257,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 		let acquiredBadges: string[] = [];
 
 		let correctAnswer = '';
-		if (mode === 'meaning') correctAnswer = question.longMeaning;
+		if (mode === 'meaning') correctAnswer = question.longMeaning!;
 		else if (mode === 'proverb') correctAnswer = question.proverb;
 		else if (mode === 'fill-blank') correctAnswer = blankWord;
 
@@ -439,7 +439,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 						<View style={styles.container}>
 							<View style={styles.inner}>
 								<View style={styles.progressStatusWrapper}>
-									<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
+									<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
 										<Text style={styles.progressText}>진행중인 퀴즈</Text>
 										<Text style={[styles.progressText, { color: '#3498db' }]}>
 											{getSolvedCount()} / {totalCount}
@@ -482,7 +482,11 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 								</View>
 								<View style={styles.quizBox}>
 									<AnimatedCircularProgress size={80} width={6} fill={(20 - remainingTime) * 5} tintColor='#3498db' backgroundColor='#ecf0f1'>
-										{() => <Text style={styles.timerText}>{remainingTime}s</Text>}
+										{() => (
+											<View style={styles.timerInner}>
+												<Text style={styles.timerText}>{remainingTime}s</Text>
+											</View>
+										)}
 									</AnimatedCircularProgress>
 
 									<Text style={styles.questionText}>
@@ -667,14 +671,14 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start', // 👈 상단 정렬로 변경
 		alignItems: 'center',
 		paddingHorizontal: 20,
-		paddingTop: 24, // 👈 여유 간격이 필요하다면 추가 (예: 24)
+		paddingTop: 20, // 👈 여유 간격이 필요하다면 추가 (예: 24)
 	},
 	quizBox: {
 		width: '100%',
 		maxWidth: 460, // 기존 500 → 살짝 줄임
 		alignItems: 'center',
 	},
-	timerText: { fontSize: 18, fontWeight: 'bold', color: '#2c3e50', marginTop: 8 },
+	timerText: { fontSize: 18, fontWeight: 'bold', color: '#2c3e50' },
 	questionText: {
 		fontSize: 18, // 기존 20 → 살짝 축소
 		fontWeight: 'bold',
@@ -705,7 +709,7 @@ const styles = StyleSheet.create({
 	},
 	bottomExitWrapper: {
 		width: '100%',
-		paddingVertical: 14,
+		paddingVertical: 7,
 		alignItems: 'center',
 		backgroundColor: '#fff',
 		borderTopWidth: 1,
@@ -1187,6 +1191,11 @@ const styles = StyleSheet.create({
 		paddingVertical: 24,
 		paddingHorizontal: 20,
 		borderRadius: 20,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	timerInner: {
+		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},

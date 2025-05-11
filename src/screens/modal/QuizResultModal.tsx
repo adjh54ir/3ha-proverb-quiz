@@ -133,6 +133,8 @@ export const styles = StyleSheet.create({
 		borderRadius: 12,
 		padding: 16,
 		marginTop: 10,
+		borderWidth: 1.2, // 추가
+		borderColor: '#27ae60', // 추가 (초록색 계열)
 	},
 	correctInfoLabel: {
 		fontSize: 14,

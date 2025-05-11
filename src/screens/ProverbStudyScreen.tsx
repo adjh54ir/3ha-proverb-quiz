@@ -110,6 +110,9 @@ const ProverbStudyScreen = () => {
 	const flipAnim = useRef(new Animated.Value(0)).current;
 	const toastAnim = useRef(new Animated.Value(0)).current;
 	const scaleAnim = useRef(new Animated.Value(0)).current;
+	const buttonScaleAnim = useRef(new Animated.Value(1)).current;
+	const [buttonScaleAnimList, setButtonScaleAnimList] = useState<Animated.Value[]>([]);
+
 	const [flipAnimList, setFlipAnimList] = useState<Animated.Value[]>([]);
 
 	const [proverbs, setProverbs] = useState<MainDataType.Proverb[]>([]);
@@ -208,8 +211,13 @@ const ProverbStudyScreen = () => {
 	}, []);
 
 	useEffect(() => {
-		const animList = filteredProverbs.map(() => new Animated.Value(0));
+		const animList = filteredProverbs.map(() => new Animated.Value(1));
 		setFlipAnimList(animList);
+	}, [filteredProverbs]);
+
+	useEffect(() => {
+		const scaleList = filteredProverbs.map(() => new Animated.Value(1));
+		setButtonScaleAnimList(scaleList);
 	}, [filteredProverbs]);
 
 	useEffect(() => {
@@ -373,6 +381,8 @@ const ProverbStudyScreen = () => {
 
 			// ✅ 추가: 완료하면 전체보기 모드로 전환
 			setPraiseText(praiseMessages[Math.floor(Math.random() * praiseMessages.length)]);
+			triggerButtonAnimation(currentIndex); // ← index 명시적으로 전달
+
 			showEncourageToast();
 
 			// 포커스 이동 (newFiltered 기준으로 인덱스 조정)
@@ -431,6 +441,24 @@ const ProverbStudyScreen = () => {
 		}, 300);
 	};
 
+	const triggerButtonAnimation = (index: number) => {
+		const anim = buttonScaleAnimList[index];
+		if (!anim) return;
+
+		Animated.sequence([
+			Animated.timing(anim, {
+				toValue: 0.95,
+				duration: 100,
+				useNativeDriver: true,
+			}),
+			Animated.spring(anim, {
+				toValue: 1,
+				friction: 3,
+				useNativeDriver: true,
+			}),
+		]).start();
+	};
+
 	const getFilteredProgress = () => {
 		// ✅ level/theme 필터 반영
 		let filtered = proverbs;
@@ -486,7 +514,7 @@ const ProverbStudyScreen = () => {
 
 		return (
 			<View style={styles.cardWrapper}>
-				<Animated.View style={[styles.card, frontAnimatedStyle]}>
+				<Animated.View style={[styles.card, frontAnimatedStyle, { flex: 1 }]}>
 					<View style={styles.cardInner}>
 						<View style={styles.cardContent}>
 							{/* @ts-ignore */}
@@ -502,20 +530,23 @@ const ProverbStudyScreen = () => {
 							)}
 						</View>
 						<Text style={styles.hintText}>카드를 탭하면 속담 의미를 볼 수 있어요 👆</Text>
-						<TouchableOpacity
-							style={isLearned ? styles.retryButton : styles.cardCompleteButton}
-							onPress={(e) => {
-								e.stopPropagation();
-								if (isButtonDisabled) return;
-								if (isLearned) {
-									handleAgain();
-								} else {
-									handleComplete();
-								}
-							}}
-							disabled={isButtonDisabled}>
-							<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
-						</TouchableOpacity>
+						<Animated.View style={{ transform: [{ scale: buttonScaleAnimList[index] ?? new Animated.Value(1) }] }}>
+							<TouchableOpacity
+								style={isLearned ? styles.retryButton : styles.cardCompleteButton}
+								onPress={(e) => {
+									e.stopPropagation();
+									if (isButtonDisabled) return;
+									triggerButtonAnimation(index);
+									if (isLearned) {
+										handleAgain();
+									} else {
+										handleComplete();
+									}
+								}}
+								disabled={isButtonDisabled}>
+								<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
+							</TouchableOpacity>
+						</Animated.View>
 					</View>
 				</Animated.View>
 
@@ -531,42 +562,48 @@ const ProverbStudyScreen = () => {
 							backgroundColor: '#4a90e2',
 						},
 					]}>
-					<View style={styles.cardInner}>
+					<View style={[styles.cardInner, { flex: 1 }]}>
 						<ScrollView
+							style={{ flex: 1 }} // ✅ 추가
 							contentContainerStyle={{
 								flexGrow: 1,
 								justifyContent: 'flex-start',
 								paddingTop: 24,
 								paddingBottom: 30, // 하단 버튼 여백 유지
 							}}
+							keyboardShouldPersistTaps='handled'
+							showsVerticalScrollIndicator={true}
+							scrollEnabled={true}
 							overScrollMode='always' // Android 전용
-							showsVerticalScrollIndicator={true}>
-							<TouchableOpacity activeOpacity={1} onPress={() => flipCard(index)}>
-								<Text style={styles.cardLabel}>🧠 속담 의미</Text>
-								<Text style={styles.meaningHighlight}>{item.longMeaning}</Text>
+						>
+							<View>
+								<TouchableOpacity activeOpacity={1} onPress={() => flipCard(index)}>
+									<Text style={styles.cardLabel}>🧠 속담 의미</Text>
+									<Text style={styles.meaningHighlight}>{item.longMeaning}</Text>
 
-								{/* 예시 */}
-								{item.example && (
-									<View style={styles.sectionWrapper}>
-										<Text style={styles.sectionTitle}>✏️ 예시</Text>
-										<Text style={styles.sectionText}>{item.example}</Text>
-									</View>
-								)}
+									{/* 예시 */}
+									{item.example && (
+										<View style={styles.sectionWrapper}>
+											<Text style={styles.sectionTitle}>✏️ 예시</Text>
+											<Text style={styles.sectionText}>{item.example}</Text>
+										</View>
+									)}
 
-								{/* 같은 속담 */}
-								{item.sameProverb && item.sameProverb.filter((sp) => sp.trim() !== '').length > 0 && (
-									<View style={styles.sectionWrapper}>
-										<Text style={styles.sectionTitle}>🔁 같은 속담</Text>
-										{item.sameProverb
-											.filter((sp) => sp.trim() !== '')
-											.map((sp, idx) => (
-												<Text key={idx} style={styles.sectionText}>
-													• {sp}
-												</Text>
-											))}
-									</View>
-								)}
-							</TouchableOpacity>
+									{/* 같은 속담 */}
+									{item.sameProverb && item.sameProverb.filter((sp) => sp.trim() !== '').length > 0 && (
+										<View style={styles.sectionWrapper}>
+											<Text style={styles.sectionTitle}>🔁 같은 속담</Text>
+											{item.sameProverb
+												.filter((sp) => sp.trim() !== '')
+												.map((sp, idx) => (
+													<Text key={idx} style={styles.sectionText}>
+														• {sp}
+													</Text>
+												))}
+										</View>
+									)}
+								</TouchableOpacity>
+							</View>
 						</ScrollView>
 
 						<TouchableOpacity
@@ -658,8 +695,7 @@ const ProverbStudyScreen = () => {
 					{isDetailFilterOpen && (
 						<Animated.View style={[styles.detailFilterWrapper, { height: detailFilterHeightAnim }]}>
 							<View style={styles.subFilterRow}>
-								<View style={[styles.dropdownWrapper, { flex: 1, zIndex: themeOpen ? 1000 : 2000 }]}>
-									{' '}
+								<View style={[styles.dropdownWrapper, { width: '48%', zIndex: themeOpen ? 1000 : 2000 }]}>
 									{/* zIndex 역전 방지 */}
 									<DropDownPicker
 										open={levelOpen}
@@ -685,7 +721,7 @@ const ProverbStudyScreen = () => {
 									/>
 								</View>
 								<View style={{ width: 8 }} />
-								<View style={[styles.dropdownWrapperLast, { flex: 1, zIndex: levelOpen ? 1000 : 2000 }]}>
+								<View style={[styles.dropdownWrapperLast, { width: '48%', zIndex: levelOpen ? 1000 : 2000 }]}>
 									<DropDownPicker
 										open={themeOpen}
 										setOpen={setThemeOpen}
@@ -861,11 +897,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backfaceVisibility: 'hidden',
 		position: 'absolute',
-		zIndex: 1, // ✅ 낮게 조정
+		zIndex: 1,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.2,
 		shadowRadius: 4,
+
+		/** 🔽 추가 */
+		borderWidth: 1,
+		borderColor: '#4a90e2', // 원하는 색
+		borderStyle: 'solid',
 	},
 	cardBack: {
 		backgroundColor: '#4a90e2',
@@ -875,7 +916,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		width: '100%',
 		padding: 20,
-		justifyContent: 'center',
 		minHeight: '100%', // ✅ 높이 강제 지정
 	},
 	hintText: {
@@ -974,6 +1014,7 @@ const styles = StyleSheet.create({
 	subFilterRow: {
 		flexDirection: 'row',
 		marginTop: scaleHeight(5),
+		
 	},
 
 	dropdown: {
@@ -990,11 +1031,14 @@ const styles = StyleSheet.create({
 		maxHeight: 180, // ✅ 너무 길어지는 걸 방지 (필요시 150~220 사이로 조정)
 	},
 	progressHeader: {
-		paddingVertical: 20,
+		margin: 16,
+		paddingTop: 20,
 		backgroundColor: '#ffffff',
-		borderBottomWidth: 1,
-		borderBottomColor: '#eee',
+		borderWidth: 1,
+		borderColor: '#dcdde1',
+		borderRadius: 12,
 		alignItems: 'center',
+		
 	},
 	progressTopRow: {
 		flexDirection: 'row',
@@ -1036,7 +1080,7 @@ const styles = StyleSheet.create({
 		width: '100%',
 		backgroundColor: '#ffffff', // ✅ f9fafb → 완전한 흰색으로 변경
 		paddingTop: 10,
-		paddingHorizontal: 35,
+		paddingHorizontal: 20,
 		zIndex: 9999,
 	},
 	retryButton: {
@@ -1318,11 +1362,13 @@ const styles = StyleSheet.create({
 		flex: 1,
 		marginBottom: 6, // ✅ 여백 조정
 		marginRight: 6, // ← 드롭다운 간의 간격
+		width: '48%', // ✅ 추가
 	},
 	dropdownWrapperLast: {
 		flex: 1,
 		marginBottom: 6,
 		marginRight: 6, // ✅ 초기화 버튼과 여백 추가!
+		width: '48%', // ✅ 추가
 	},
 	dropdownPlaceholder: {
 		textAlign: 'center',
@@ -1363,7 +1409,7 @@ const styles = StyleSheet.create({
 	proverbContainer: {
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleHeight(15),
+		paddingHorizontal: scaleHeight(3),
 	},
 	sectionWrapper: {
 		marginTop: 20,

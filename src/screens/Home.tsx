@@ -900,7 +900,7 @@ const styles = StyleSheet.create({
 	},
 
 	levelEncourage: {
-		fontSize: scaledSize(13),
+		fontSize: scaledSize(12),
 		color: '#27ae60',
 		marginTop: scaleHeight(6),
 		textAlign: 'center',

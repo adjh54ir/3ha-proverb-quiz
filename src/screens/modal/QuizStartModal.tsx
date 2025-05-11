@@ -181,10 +181,10 @@ const QuizStartModal = ({
 
 		return (
 			<View style={styles.selectGroupWrapper}>
-				<View style={styles.selectTitleBox}>
+				{/* <View style={styles.selectTitleBox}>
 					<Text style={styles.selectTitleEmoji}>🎯</Text>
 					<Text style={styles.selectTitleText}>{title}</Text>
-				</View>
+				</View> */}
 				<View style={styles.selectSection}>
 					{options.map((option, idx) => {
 						const iconData = getIcon?.(option);
@@ -202,18 +202,25 @@ const QuizStartModal = ({
 								]}
 								onPress={() => onSelect(option)}>
 								<View style={{ alignItems: 'center', justifyContent: 'center' }}>
+									{/* 아이콘 */}
 									{isAll ? (
-										<IconComponent type='fontAwesome5' name='clipboard-list' size={20} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: 6 }} />
+										<IconComponent type='fontAwesome5' name='clipboard-list' size={20} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: 4 }} />
 									) : iconData ? (
-										<IconComponent type={iconData.type} name={iconData.name} size={18} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: 6 }} />
+										<IconComponent type={iconData.type} name={iconData.name} size={18} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: 4 }} />
 									) : null}
 
-									{/* ✅ 레벨 텍스트: 아이콘 아래 */}
-									{isLevel && LEVEL_LABEL_MAP[option] && <Text style={styles.levelLabel}>{LEVEL_LABEL_MAP[option]}</Text>}
+									{/* ✅ 난이도: 상단 라벨 (Level 1 등) */}
+									{isLevel && LEVEL_LABEL_MAP[option] && <Text style={styles.levelTopLabel}>{LEVEL_LABEL_MAP[option]}</Text>}
 
-									<Text style={[styles.selectButtonText, isSelected && styles.selectButtonTextActive, { textAlign: 'center' }]}>
-										{`${option} ${stats ? `(${stats.studied}/${stats.total})` : ''}`}
-									</Text>
+									{/* ✅ 중간 라벨: 아주 쉬움 등 */}
+									<Text style={styles.levelMainLabel}>{option}</Text>
+
+									{/* ✅ 하단 통계: (3/20) */}
+									{stats && (
+										<Text style={styles.levelStatLabel}>
+											({stats.studied}/{stats.total})
+										</Text>
+									)}
 								</View>
 							</TouchableOpacity>
 						);
@@ -227,26 +234,42 @@ const QuizStartModal = ({
 		<Modal visible={visible} transparent animationType='fade'>
 			<View style={styles.modalOverlay}>
 				<View style={styles.selectModal}>
-					<TouchableOpacity style={styles.closeButton} onPress={onClose}>
-						<IconComponent type='materialIcons' name='close' size={24} color='#7f8c8d' />
-					</TouchableOpacity>
-
-					<Text style={styles.selectTitle}>🧠 퀴즈 모드</Text>
-					<Text style={styles.selectSub}>난이도와 카테고리를 선택해주세요!</Text>
+					{/* 최상단 타이틀 */}
+					<View style={styles.modalHeader}>
+						<Text style={styles.modalTitle}>🧠 퀴즈 모드</Text>
+						<TouchableOpacity style={styles.closeButton} onPress={onClose}>
+							<IconComponent type='materialIcons' name='close' size={24} color='#7f8c8d' />
+						</TouchableOpacity>
+					</View>
+					{/* <Text style={styles.selectSub}>난이도와 카테고리를 선택해주세요!</Text> */}
 
 					<View style={styles.selectModalContentBox}>
 						{modeStep === 0 ? (
-							<SelectGroup title='난이도 선택' options={levelOptions} selected={selectedLevel} onSelect={setSelectedLevel} getIcon={getStyleIcon} />
+							<>
+								<View style={styles.selectTitleBox}>
+									<View style={styles.selectTitleBox}>
+										<Text style={styles.selectTitleEmoji}>🧠</Text>
+										<Text style={styles.selectTitleText}>나에게 맞는 난이도를 골라보세요!</Text>
+									</View>
+								</View>
+								<SelectGroup title='난이도 선택' options={levelOptions} selected={selectedLevel} onSelect={setSelectedLevel} getIcon={getStyleIcon} />
+							</>
 						) : (
-							<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: 10 }} showsVerticalScrollIndicator={false}>
-								<SelectGroup
-									title='카테고리 선택'
-									options={categoryOptions}
-									selected={selectedCategory}
-									onSelect={setSelectedCategory}
-									getIcon={getStyleIcon}
-								/>
-							</ScrollView>
+							<>
+								<View style={styles.selectTitleBox}>
+									<Text style={styles.selectTitleEmoji}>🎯</Text>
+									<Text style={styles.selectTitleText}>관심 있는 주제를 골라볼까요?</Text>
+								</View>
+								<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: 10 }} showsVerticalScrollIndicator={false}>
+									<SelectGroup
+										title='카테고리 선택'
+										options={categoryOptions}
+										selected={selectedCategory}
+										onSelect={setSelectedCategory}
+										getIcon={getStyleIcon}
+									/>
+								</ScrollView>
+							</>
 						)}
 					</View>
 
@@ -305,24 +328,11 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		paddingHorizontal: 24,
 		paddingBottom: 24,
-		paddingTop: 48,
+		paddingTop: 10,
 		borderRadius: 16,
 		alignItems: 'center',
 		width: '90%',
 		position: 'relative',
-	},
-	closeButton: {
-		position: 'absolute',
-		top: 12,
-		right: 12,
-		zIndex: 10,
-		padding: 4,
-	},
-	selectTitle: {
-		fontSize: 22,
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: 20,
 	},
 	selectSub: {
 		fontSize: 16,
@@ -362,7 +372,8 @@ const styles = StyleSheet.create({
 	selectGroupWrapper: {
 		backgroundColor: '#f2f4f5',
 		borderRadius: 12,
-		padding: 16,
+		paddingTop: 16,
+		paddingHorizontal: 16,
 		marginBottom: 0,
 		width: '100%',
 		borderWidth: 1,
@@ -422,11 +433,13 @@ const styles = StyleSheet.create({
 	selectTitleEmoji: {
 		fontSize: 22,
 	},
-
 	selectTitleText: {
-		fontSize: 18,
-		fontWeight: '700',
-		color: '#2c3e50',
+		fontSize: 17,
+		fontWeight: '600',
+		color: '#2d3436',
+		textAlign: 'center',
+		lineHeight: 24,
+		flexShrink: 1,
 	},
 	selectButtonText: {
 		fontSize: 15,
@@ -444,8 +457,7 @@ const styles = StyleSheet.create({
 	selectModalContentBox: {
 		width: '100%',
 		maxWidth: 400,
-		height: 460,
-		marginBottom: 16,
+		height: 550, // 카테고리 선택 시 더 크게!
 		justifyContent: 'center', // ✅ 추가
 	},
 	buttonRow: {
@@ -460,5 +472,57 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
+	},
+	levelTopLabel: {
+		fontSize: 13,
+		color: '#ecf0f1',
+		fontWeight: '600',
+		marginBottom: 2,
+	},
+
+	levelMainLabel: {
+		fontSize: 16,
+		fontWeight: '700',
+		color: '#ffffff',
+		textAlign: 'center',
+		lineHeight: 20,
+	},
+
+	levelStatLabel: {
+		fontSize: 12,
+		color: '#ecf0f1',
+		opacity: 0.8,
+		marginTop: 2,
+	},
+	selectTitle: {
+		fontSize: 22,
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		marginBottom: 12,
+		marginTop: 12, // ✅ 추가
+		textAlign: 'center',
+	},
+	modalHeader: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center', // 타이틀을 중앙에 놓기 위해 center
+		width: '100%',
+		paddingTop: 16,
+		paddingBottom: 12,
+		position: 'relative',
+	},
+
+	modalTitle: {
+		fontSize: 20,
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		textAlign: 'center',
+	},
+
+	closeButton: {
+		position: 'absolute',
+		right: 0,
+		top: 8,
+		padding: 8,
 	},
 });

@@ -109,22 +109,24 @@ const ProverbQuizModeSelectScreen = () => {
 						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowGuideModal(false)}>
 							<IconComponent type='materialIcons' name='close' size={24} color='#555' />
 						</TouchableOpacity>
-						<Text style={styles.modalTitle}>
-							<IconComponent type='materialCommunityIcons' name='head-question-outline' size={20} /> 퀴즈 모드 안내
-						</Text>
-						<Text style={styles.modalText}>
-							<Text style={styles.boldText}>
-								<IconComponent type='materialCommunityIcons' name='head-question-outline' size={20} /> 퀴즈 모드 안내{'\n\n'}
+						<ScrollView style={{ maxHeight: '100%' }} showsVerticalScrollIndicator={true}>
+							<Text style={styles.modalTitle}>
+								<IconComponent type='materialCommunityIcons' name='head-question-outline' size={20} /> 퀴즈 모드 안내
 							</Text>
-							<Text style={styles.boldText}>1️⃣ 속담 뜻 퀴즈{'\n'}</Text>- 제시된 속담에 대한 올바른 의미를 고르는 4지선다형 퀴즈입니다.{'\n'}- 속담의 뜻을
-							이해하는 능력을 키울 수 있어요.{'\n\n'}
-							<Text style={styles.boldText}>2️⃣ 속담 찾기 퀴즈{'\n'}</Text>- 제시된 의미에 해당하는 속담을 고르는 퀴즈입니다.
-							{'\n'}- 유사한 의미의 속담 중 정확한 속담을 찾아내는 연습이 돼요.{'\n\n'}
-							<Text style={styles.boldText}>3️⃣ 빈칸 채우기 퀴즈{'\n'}</Text>- 속담의 일부분이 빈칸으로 제시되고, 알맞은 단어를 고르는 퀴즈입니다.{'\n'}-
-							속담의 문장 구조와 정확한 어휘력을 함께 익힐 수 있어요.{'\n\n'}
-							<Text style={styles.boldText}>📌 공통 안내{'\n'}</Text>- 각 퀴즈는 난이도별, 카테고리별로 문제를 선택해 풀 수 있습니다.{'\n'}- 이미 푼 문제는
-							자동으로 제외되어, 복습 또는 도전이 편리해요.
-						</Text>
+							<Text style={styles.modalText}>
+								<Text style={styles.boldText}>
+									<IconComponent type='materialCommunityIcons' name='head-question-outline' size={20} /> 퀴즈 모드 안내{'\n\n'}
+								</Text>
+								<Text style={styles.boldText}>1️⃣ 속담 뜻 퀴즈{'\n'}</Text>- 제시된 속담에 대한 올바른 의미를 고르는 4지선다형 퀴즈입니다.{'\n'}- 속담의 뜻을
+								이해하는 능력을 키울 수 있어요.{'\n\n'}
+								<Text style={styles.boldText}>2️⃣ 속담 찾기 퀴즈{'\n'}</Text>- 제시된 의미에 해당하는 속담을 고르는 퀴즈입니다.
+								{'\n'}- 유사한 의미의 속담 중 정확한 속담을 찾아내는 연습이 돼요.{'\n\n'}
+								<Text style={styles.boldText}>3️⃣ 빈칸 채우기 퀴즈{'\n'}</Text>- 속담의 일부분이 빈칸으로 제시되고, 알맞은 단어를 고르는 퀴즈입니다.{'\n'}-
+								속담의 문장 구조와 정확한 어휘력을 함께 익힐 수 있어요.{'\n\n'}
+								<Text style={styles.boldText}>📌 공통 안내{'\n'}</Text>- 각 퀴즈는 난이도별, 카테고리별로 문제를 선택해 풀 수 있습니다.{'\n'}- 이미 푼 문제는
+								자동으로 제외되어, 복습 또는 도전이 편리해요.
+							</Text>
+						</ScrollView>
 
 						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowGuideModal(false)}>
 							<Text style={styles.modalCloseText}>닫기</Text>
@@ -220,6 +222,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		padding: 20,
 		borderRadius: 12,
+		maxHeight: '75%', // 👈 높이 제한 추가
 	},
 	modalCloseButton: {
 		marginTop: 20,

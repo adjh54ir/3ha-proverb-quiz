@@ -11,6 +11,8 @@ import {
 	Modal,
 	LayoutAnimation,
 	FlatList,
+	NativeSyntheticEvent,
+	NativeScrollEvent,
 } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
@@ -48,6 +50,7 @@ const CapitalResultScreen = () => {
 	const [studyCountries, setStudyCountries] = useState<string[]>([]);
 	const [lastStudyAt, setLastStudyAt] = useState<string>('');
 	const [totalStudyCount, setTotalStudyCount] = useState<number>(0);
+	const [showScrollTop, setShowScrollTop] = useState(false);
 
 	const [categoryMaster, setCategoryMaster] = useState<string[]>([]);
 	const [totalCountryCount, setTotalCountryCount] = useState<number>(0);
@@ -180,10 +183,10 @@ const CapitalResultScreen = () => {
 
 			setCategoryMaster(conqueredCategories);
 
+			// 🔽 earnedBadgeIds 대신 allBadges 사용
 			const conqueredLevels = Object.entries(STYLE_MAP)
-				.filter(([_, v]) => earnedBadgeIds.includes(v.badgeId))
+				.filter(([_, v]) => allBadges.includes(v.badgeId)) // ✅ 수정됨
 				.map(([k]) => {
-					// subtitle이 '아주 쉬움'이라면 'Level 1'로 매핑
 					switch (k) {
 						case '아주 쉬움':
 							return 'Level 1';
@@ -197,6 +200,7 @@ const CapitalResultScreen = () => {
 							return '';
 					}
 				});
+
 			setLevelMaster(conqueredLevels);
 		} catch (e) {
 			console.error('❌ 데이터 로딩 실패:', e);
@@ -264,6 +268,47 @@ const CapitalResultScreen = () => {
 		}
 	}, [showLevelModal]);
 
+	/**
+	 * 스크롤을 관리하는 Handler
+	 */
+	const scrollHandler = (() => {
+		return {
+			/**
+			 * 스크롤 최상단으로 당기면 Refresh 기능
+			 */
+			onRefresh: () => {
+				// TODO: 로직을 불러오는 부분을 추가해야함.
+				setRefreshing(true);
+			},
+
+			/**
+			 * 스크롤을 일정 높이 만큼 움직였을때 아이콘 등장 처리
+			 * @param event
+			 */
+			onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+				const offsetY = event.nativeEvent.contentOffset.y;
+				setShowScrollTop(offsetY > 100);
+			},
+			/**
+			 * 스크롤 최상단으로 이동
+			 * @return {void}
+			 */
+			toTop: (): void => {
+				scrollRef.current?.scrollTo({ y: 0, animated: true });
+			},
+
+			/**
+			 * 스크롤 뷰 최하단으로 이동
+			 * @return {void}
+			 */
+			toBottom: (): void => {
+				setTimeout(() => {
+					scrollRef.current?.scrollToEnd({ animated: true });
+				}, 100);
+			},
+		};
+	})();
+
 	const levelGuide = [
 		{ score: 0, next: 600, label: '속담 초보자', icon: 'seedling' },
 		{ score: 600, next: 1200, label: '속담 입문자', icon: 'leaf' },
@@ -288,246 +333,260 @@ const CapitalResultScreen = () => {
 	const { label, icon, mascot } = getTitleByScore(totalScore);
 
 	return (
-		<SafeAreaView style={styles.safeArea}>
-			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-				<View style={styles.adContainer}>
-					<AdmobBannerAd />
-				</View>
-				<View style={styles.sectionBox}>
-					<View style={{ alignItems: 'center', marginVertical: 20 }}>
-						<FastImage source={mascot} style={{ width: 120, height: 120 }} resizeMode={FastImage.resizeMode.contain} />
+		<>
+			<SafeAreaView style={styles.safeArea}>
+				<ScrollView
+					ref={scrollRef}
+					style={styles.container}
+					contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
+					onScroll={scrollHandler.onScroll}
+					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+					<View style={styles.adContainer}>
+						<AdmobBannerAd />
 					</View>
-					<View style={styles.levelCenteredRow}>
-						<IconComponent type='fontAwesome6' name={icon} size={16} color='#27ae60' />
+					<View style={styles.sectionBox}>
+						<View style={{ alignItems: 'center', marginVertical: 20 }}>
+							<FastImage source={mascot} style={{ width: 120, height: 120 }} resizeMode={FastImage.resizeMode.contain} />
+						</View>
+						<View style={styles.levelCenteredRow}>
+							<IconComponent type='fontAwesome6' name={icon} size={16} color='#27ae60' />
 
-						<Text style={styles.levelTitle}>
-							{label} <Text style={styles.levelScoreText}>({totalScore}점)</Text>
-						</Text>
-
-						<TouchableOpacity onPress={() => setShowLevelModal(true)}>
-							<IconComponent
-								type='materialIcons'
-								name='info-outline'
-								size={18}
-								color='#7f8c8d'
-								style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
-							/>
-						</TouchableOpacity>
-					</View>
-					s{/* 👇 간단한 설명으로 변경 */}
-					<Text style={styles.levelDescription}>
-						모든 퀴즈를 풀면<Text style={{ fontWeight: 'bold' }}> 속담 마스터</Text> 등급을 획득할 수 있습니다.
-					</Text>
-					<Text style={styles.levelDescription}>
-						틀린 퀴즈는 <Text style={{ fontWeight: 'bold' }}>오답 복습</Text>으로 다시 점수를 얻을 수 있습니다.
-					</Text>
-				</View>
-
-				<Text style={[styles.sectionTitle, { marginTop: 20 }]}>📚 나의 학습 활동 </Text>
-				<View style={styles.activityCardBox}>
-					<View style={styles.summaryStatGrid}>
-						<View style={styles.summaryStatCard}>
-							<Text style={styles.statIcon}>🎯</Text>
-							<Text style={styles.statValue}>
-								{studyCountries.length} / {totalCountryCount}
+							<Text style={styles.levelTitle}>
+								{label} <Text style={styles.levelScoreText}>({totalScore}점)</Text>
 							</Text>
-							<Text style={styles.statLabel}>학습 완료 속담 ({Math.round((studyCountries.length / totalCountryCount) * 100)}%)</Text>
-						</View>
-						<View style={styles.summaryStatCard}>
-							<Text style={styles.statIcon}>📆</Text>
-							<Text style={styles.statValue}> {lastStudyAt ? moment(lastStudyAt).format('YY.MM.DD') : '없음'} </Text>
-							<Text style={styles.statLabel}> 마지막 학습일 </Text>
-						</View>
-					</View>
-				</View>
 
-				{/* 나의 퀴즈 활동 요약 */}
-				<Text style={[styles.sectionTitle, { marginTop: 20 }]}>📊 나의 퀴즈 활동 </Text>
-				<View style={styles.activityCardBox}>
-					<View style={styles.summaryStatCard}>
-						<Text style={styles.statIcon}>🧮</Text>
-						<Text style={styles.statValue}>
-							{totalSolved} / {totalCountryCount}
+							<TouchableOpacity onPress={() => setShowLevelModal(true)}>
+								<IconComponent
+									type='materialIcons'
+									name='info-outline'
+									size={18}
+									color='#7f8c8d'
+									style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
+								/>
+							</TouchableOpacity>
+						</View>
+						s{/* 👇 간단한 설명으로 변경 */}
+						<Text style={styles.levelDescription}>
+							모든 퀴즈를 풀면<Text style={{ fontWeight: 'bold' }}> 속담 마스터</Text> 등급을 획득할 수 있습니다.
 						</Text>
-						<Text style={styles.statLabel}> 총 푼 퀴즈 ({Math.round((totalSolved / totalCountryCount) * 100)}%) </Text>
-						<View style={styles.progressBarBackground}>
-							<View style={[styles.progressBarFill, { width: `${Math.round((totalSolved / totalCountryCount) * 100)}%` }]} />
-						</View>
+						<Text style={styles.levelDescription}>
+							틀린 퀴즈는 <Text style={{ fontWeight: 'bold' }}>오답 복습</Text>으로 다시 점수를 얻을 수 있습니다.
+						</Text>
 					</View>
-					<View style={styles.summaryStatGrid}>
-						<View style={styles.summaryStatCard}>
-							<Text style={styles.statIcon}>🔥</Text>
-							<Text style={styles.statValue}> {bestCombo} Combo </Text>
-							<Text style={styles.statLabel}> 최고 콤보 </Text>
-						</View>
-						<View style={styles.summaryStatCard}>
-							<Text style={styles.statIcon}>✅</Text>
-							<Text style={styles.statValue}> {accuracy} % </Text>
-							<Text style={styles.statLabel}> 정답률 </Text>
-						</View>
-						<View style={styles.summaryStatCard}>
-							<Text style={styles.statIcon}>📅</Text>
-							<Text style={styles.statValue}> {lastAnsweredAt ? moment(lastAnsweredAt).format('YY.MM.DD') : '없음'} </Text>
-							<Text style={styles.statLabel}> 마지막 퀴즈일 </Text>
+
+					<Text style={[styles.sectionTitle, { marginTop: 20 }]}>📚 나의 학습 활동 </Text>
+					<View style={styles.activityCardBox}>
+						<View style={styles.summaryStatGrid}>
+							<View style={styles.summaryStatCard}>
+								<Text style={styles.statIcon}>🎯</Text>
+								<Text style={styles.statValue}>
+									{studyCountries.length} / {totalCountryCount}
+								</Text>
+								<Text style={styles.statLabel}>학습 완료 속담 ({Math.round((studyCountries.length / totalCountryCount) * 100)}%)</Text>
+							</View>
+							<View style={styles.summaryStatCard}>
+								<Text style={styles.statIcon}>📆</Text>
+								<Text style={styles.statValue}> {lastStudyAt ? moment(lastStudyAt).format('YY.MM.DD') : '없음'} </Text>
+								<Text style={styles.statLabel}> 마지막 학습일 </Text>
+							</View>
 						</View>
 					</View>
 
-					{/* ✅ 정복한 카테고리 출력 */}
-					<View style={styles.subSectionBox1}>
-						<Text style={styles.sectionSubtitle}>
-							🧠 정복한 카테고리 ({categoryMaster.length} / {allCategories.length})
-						</Text>
-						<Text style={styles.regionHelperText}>- 다양한 분야의 속담을 학습해보세요!</Text>
-						<View style={styles.gridRowNoBottomGap}>
-							{allCategories.map((category) => {
-								const isEarned = categoryMaster.includes(category);
-								const meta = CATEGORY_META[category];
-								return (
-									<View
-										key={category}
-										style={[
-											styles.regionCard,
-											isEarned && {
-												backgroundColor: meta.color,
-												borderColor: meta.color,
-												shadowColor: '#000',
-												shadowOpacity: 0.2,
-												shadowRadius: 4,
-												shadowOffset: { width: 0, height: 2 },
-											},
-										]}>
-										<IconComponent type={meta.icon.type} name={meta.icon.name} size={22} color={isEarned ? '#fff' : '#bdc3c7'} style={{ marginBottom: 6 }} />
-										<Text style={[styles.regionText, isEarned && { color: '#fff', fontWeight: 'bold' }]}>{category}</Text>
-									</View>
-								);
-							})}
+					{/* 나의 퀴즈 활동 요약 */}
+					<Text style={[styles.sectionTitle, { marginTop: 20 }]}>📊 나의 퀴즈 활동 </Text>
+					<View style={styles.activityCardBox}>
+						<View style={styles.summaryStatCard}>
+							<Text style={styles.statIcon}>🧮</Text>
+							<Text style={styles.statValue}>
+								{totalSolved} / {totalCountryCount}
+							</Text>
+							<Text style={styles.statLabel}> 총 푼 퀴즈 ({Math.round((totalSolved / totalCountryCount) * 100)}%) </Text>
+							<View style={styles.progressBarBackground}>
+								<View style={[styles.progressBarFill, { width: `${Math.round((totalSolved / totalCountryCount) * 100)}%` }]} />
+							</View>
 						</View>
-					</View>
-					<View style={styles.subSectionBox2}>
-						<Text style={styles.sectionSubtitle}>
-							🏅 정복한 레벨 ({levelMaster.length} / {DIFFICULTIES.length})
-						</Text>
-						<Text style={styles.levelHelperText}> - 각 레벨을 마스터하며 진정한 수도 퀴즈 고수가 되어보세요! </Text>
-						<View style={{ alignItems: 'center' }}>
-							<FlatList
-								data={DIFFICULTIES}
-								keyExtractor={(item) => item.key}
-								numColumns={2}
-								scrollEnabled={false}
-								columnWrapperStyle={{ justifyContent: 'space-around' }}
-								renderItem={({ item }) => {
-									const isEarned = levelMaster.includes(item.title);
-									const levelStyle = getLevelStyle(item.subtitle);
+						<View style={styles.summaryStatGrid}>
+							<View style={styles.summaryStatCard}>
+								<Text style={styles.statIcon}>🔥</Text>
+								<Text style={styles.statValue}> {bestCombo} Combo </Text>
+								<Text style={styles.statLabel}> 최고 콤보 </Text>
+							</View>
+							<View style={styles.summaryStatCard}>
+								<Text style={styles.statIcon}>✅</Text>
+								<Text style={styles.statValue}> {accuracy}% </Text>
+								<Text style={styles.statLabel}> 정답률 </Text>
+							</View>
+							<View style={styles.summaryStatCard}>
+								<Text style={styles.statIcon}>📅</Text>
+								<Text style={styles.statValue}> {lastAnsweredAt ? moment(lastAnsweredAt).format('YY.MM.DD') : '없음'} </Text>
+								<Text style={styles.statLabel}> 마지막 퀴즈일 </Text>
+							</View>
+						</View>
+
+						{/* ✅ 정복한 카테고리 출력 */}
+						<View style={styles.subSectionBox1}>
+							<Text style={styles.sectionSubtitle}>
+								🧠 정복한 카테고리 ({categoryMaster.length} / {allCategories.length})
+							</Text>
+							<Text style={styles.regionHelperText}>- 다양한 분야의 속담을 학습해보세요!</Text>
+							<View style={styles.gridRowNoBottomGap}>
+								{allCategories.map((category) => {
+									const isEarned = categoryMaster.includes(category);
+									const meta = CATEGORY_META[category];
 									return (
 										<View
+											key={category}
 											style={[
-												styles.levelCard,
+												styles.regionCard,
 												isEarned && {
-													backgroundColor: levelStyle.bg,
-													borderColor: levelStyle.border,
+													backgroundColor: meta.color,
+													borderColor: meta.color,
+													shadowColor: '#000',
+													shadowOpacity: 0.2,
+													shadowRadius: 4,
+													shadowOffset: { width: 0, height: 2 },
 												},
 											]}>
-											<IconComponent name={item.icon} type='fontAwesome6' size={22} color={isEarned ? '#fff' : '#bdc3c7'} style={{ marginBottom: 4 }} />
-											<Text style={[styles.levelText, isEarned && { color: '#fff', fontWeight: 'bold' }]}> {item.title} </Text>
-											<Text style={[styles.levelSubText, isEarned && { color: '#fff' }]}> {item.subtitle} </Text>
+											<IconComponent type={meta.icon.type} name={meta.icon.name} size={22} color={isEarned ? '#fff' : '#bdc3c7'} style={{ marginBottom: 6 }} />
+											<Text style={[styles.regionText, isEarned && { color: '#fff', fontWeight: 'bold' }]}>{category}</Text>
 										</View>
 									);
-								}}
-							/>
+								})}
+							</View>
+						</View>
+						<View style={styles.subSectionBox2}>
+							<Text style={styles.sectionSubtitle}>
+								🏅 정복한 레벨 ({levelMaster.length} / {DIFFICULTIES.length})
+							</Text>
+							<Text style={styles.levelHelperText}> - 각 레벨을 마스터하며 진정한 수도 퀴즈 고수가 되어보세요! </Text>
+							<View style={{ alignItems: 'center' }}>
+								<FlatList
+									data={DIFFICULTIES}
+									keyExtractor={(item) => item.key}
+									numColumns={2}
+									scrollEnabled={false}
+									columnWrapperStyle={{ justifyContent: 'space-around' }}
+									renderItem={({ item }) => {
+										const isEarned = levelMaster.includes(item.title);
+										const levelStyle = getLevelStyle(item.subtitle);
+										return (
+											<View
+												style={[
+													styles.levelCard,
+													isEarned && {
+														backgroundColor: levelStyle.bg,
+														borderColor: levelStyle.border,
+													},
+												]}>
+												<IconComponent name={item.icon} type='fontAwesome6' size={22} color={isEarned ? '#fff' : '#bdc3c7'} style={{ marginBottom: 4 }} />
+												<Text style={[styles.levelText, isEarned && { color: '#fff', fontWeight: 'bold' }]}> {item.title} </Text>
+												<Text style={[styles.levelSubText, isEarned && { color: '#fff' }]}> {item.subtitle} </Text>
+											</View>
+										);
+									}}
+								/>
+							</View>
 						</View>
 					</View>
-				</View>
 
-				{/* 1. 나의 뱃지 목록 (획득한 뱃지만 보여줌) */}
-				<Text style={styles.sectionTitle}>🏅 획득한 뱃지 목록 </Text>
-				<View style={styles.sectionBox}>
-					{earnedBadgeIds.length === 0 ? (
-						<Text style={styles.emptyText}> 획득한 뱃지가 없습니다.</Text>
-					) : (
-						earnedBadgeIds.map((badgeId) => {
-							const badge = CONST_BADGES.find((b) => b.id === badgeId);
-							if (!badge) return null;
-							return (
-								<View key={badge.id} style={[styles.badgeCard, styles.badgeCardActive]}>
-									<View style={[styles.iconBox, styles.iconBoxActive]}>
-										<IconComponent name={badge.icon} type={badge.iconType} size={20} color='#27ae60' />
-									</View>
-									<View style={styles.textBox}>
-										<Text style={[styles.badgeTitle, styles.badgeTitleActive]}> {badge.name} </Text>
-										<Text style={[styles.badgeDesc, styles.badgeDescActive]}> {badge.description} </Text>
-									</View>
-								</View>
-							);
-						})
-					)}
-				</View>
-
-				{/* 2. 전체 중 미획득 뱃지만 아코디언에 출력 */}
-				<TouchableOpacity onPress={toggleBadgeList} style={{ marginBottom: 12 }}>
-					<Text style={{ color: '#27ae60', textAlign: 'right' }}>{showBadgeList ? '뱃지 목록 닫기 ▲' : '획득 가능한 뱃지 보기 ▼'}</Text>
-				</TouchableOpacity>
-
-				{showBadgeList && (
+					{/* 1. 나의 뱃지 목록 (획득한 뱃지만 보여줌) */}
+					<Text style={styles.sectionTitle}>🏅 획득한 뱃지 목록 </Text>
 					<View style={styles.sectionBox}>
-						{CONST_BADGES.filter((badge) => !earnedBadgeIds.includes(badge.id)).length === 0 ? (
-							<Text style={styles.emptyText}> 모든 뱃지를 획득했어요! 🎉</Text>
+						{earnedBadgeIds.length === 0 ? (
+							<Text style={styles.emptyText}> 획득한 뱃지가 없습니다.</Text>
 						) : (
-							CONST_BADGES.filter((badge) => !earnedBadgeIds.includes(badge.id)).map((badge) => (
-								<View key={badge.id} style={styles.badgeCard}>
-									<View style={styles.iconBox}>
-										<IconComponent name={badge.icon} type={badge.iconType} size={20} color='#2c3e50' />
-									</View>
-									<View style={styles.textBox}>
-										<Text style={styles.badgeTitle}> {badge.name} </Text>
-										<Text style={styles.badgeDesc}> {badge.description} </Text>
-									</View>
-								</View>
-							))
-						)}
-					</View>
-				)}
-			</ScrollView>
-
-			<Modal visible={showLevelModal} transparent animationType='fade'>
-				<View style={styles.modalOverlay}>
-					<View style={[styles.levelModal, { maxHeight: scaleHeight(600) }]}>
-						<Text style={styles.levelModalTitle}>등급 안내</Text>
-
-						<ScrollView
-							ref={levelScrollRef}
-							style={{ width: '100%' }}
-							contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
-							showsVerticalScrollIndicator={false}>
-							{[...LEVEL_DATA].reverse().map((item) => {
-								const isCurrent = totalScore >= item.score && totalScore < item.next;
-								const mascotImage = getTitleByScore(item.score).mascot;
-
+							earnedBadgeIds.map((badgeId) => {
+								const badge = CONST_BADGES.find((b) => b.id === badgeId);
+								if (!badge) return null;
 								return (
-									<View key={item.label} style={[styles.levelCardBox, isCurrent && styles.levelCardBoxActive]}>
-										{isCurrent && (
-											<View style={styles.levelBadge}>
-												<Text style={styles.levelBadgeText}>🏆 현재 등급</Text>
-											</View>
-										)}
-										<FastImage source={mascotImage} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
-										<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
-											<IconComponent name={item.icon} type='fontAwesome6' size={16} color='#27ae60' />
-											<Text style={[styles.levelLabel, { marginLeft: 6 }]}>{item.label}</Text>
+									<View key={badge.id} style={[styles.badgeCard, styles.badgeCardActive]}>
+										<View style={[styles.iconBox, styles.iconBoxActive]}>
+											<IconComponent name={badge.icon} type={badge.iconType} size={20} color='#27ae60' />
 										</View>
-										<Text style={styles.levelScore}>{item.score}점 이상</Text>
-										{isCurrent && <Text style={styles.levelEncourage}>{getEncourageMessage(item.score)}</Text>}
+										<View style={styles.textBox}>
+											<Text style={[styles.badgeTitle, styles.badgeTitleActive]}> {badge.name} </Text>
+											<Text style={[styles.badgeDesc, styles.badgeDescActive]}> {badge.description} </Text>
+										</View>
 									</View>
 								);
-							})}
-						</ScrollView>
-
-						<TouchableOpacity onPress={() => setShowLevelModal(false)} style={styles.modalConfirmButton}>
-							<Text style={styles.modalConfirmText}>닫기</Text>
-						</TouchableOpacity>
+							})
+						)}
 					</View>
-				</View>
-			</Modal>
-		</SafeAreaView>
+
+					{/* 2. 전체 중 미획득 뱃지만 아코디언에 출력 */}
+					<TouchableOpacity onPress={toggleBadgeList} style={{ marginBottom: 12 }}>
+						<Text style={{ color: '#27ae60', textAlign: 'center' }}>{showBadgeList ? '뱃지 목록 닫기 ▲' : '획득 가능한 뱃지 보기 ▼'}</Text>
+					</TouchableOpacity>
+
+					{showBadgeList && (
+						<View style={styles.sectionBox}>
+							{CONST_BADGES.filter((badge) => !earnedBadgeIds.includes(badge.id)).length === 0 ? (
+								<Text style={styles.emptyText}> 모든 뱃지를 획득했어요! 🎉</Text>
+							) : (
+								CONST_BADGES.filter((badge) => !earnedBadgeIds.includes(badge.id)).map((badge) => (
+									<View key={badge.id} style={styles.badgeCard}>
+										<View style={styles.iconBox}>
+											<IconComponent name={badge.icon} type={badge.iconType} size={20} color='#2c3e50' />
+										</View>
+										<View style={styles.textBox}>
+											<Text style={styles.badgeTitle}> {badge.name} </Text>
+											<Text style={styles.badgeDesc}> {badge.description} </Text>
+										</View>
+									</View>
+								))
+							)}
+						</View>
+					)}
+				</ScrollView>
+
+				<Modal visible={showLevelModal} transparent animationType='fade'>
+					<View style={styles.modalOverlay}>
+						<View style={[styles.levelModal, { maxHeight: scaleHeight(600) }]}>
+							<Text style={styles.levelModalTitle}>등급 안내</Text>
+
+							<ScrollView
+								ref={levelScrollRef}
+								style={{ width: '100%' }}
+								contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
+								showsVerticalScrollIndicator={false}>
+								{[...LEVEL_DATA].reverse().map((item) => {
+									const isCurrent = totalScore >= item.score && totalScore < item.next;
+									const mascotImage = getTitleByScore(item.score).mascot;
+
+									return (
+										<View key={item.label} style={[styles.levelCardBox, isCurrent && styles.levelCardBoxActive]}>
+											{isCurrent && (
+												<View style={styles.levelBadge}>
+													<Text style={styles.levelBadgeText}>🏆 현재 등급</Text>
+												</View>
+											)}
+											<FastImage source={mascotImage} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
+											<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
+												<IconComponent name={item.icon} type='fontAwesome6' size={16} color='#27ae60' />
+												<Text style={[styles.levelLabel, { marginLeft: 6 }]}>{item.label}</Text>
+											</View>
+											<Text style={styles.levelScore}>{item.score}점 이상</Text>
+											{isCurrent && <Text style={styles.levelEncourage}>{getEncourageMessage(item.score)}</Text>}
+										</View>
+									);
+								})}
+							</ScrollView>
+
+							<TouchableOpacity onPress={() => setShowLevelModal(false)} style={styles.modalConfirmButton}>
+								<Text style={styles.modalConfirmText}>닫기</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</Modal>
+			</SafeAreaView>
+
+			{/* 최하단에 위치할것!! */}
+			{showScrollTop && (
+				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop}>
+					<IconComponent type='fontawesome6' name='arrow-up' size={20} color='#ffffff' />
+				</TouchableOpacity>
+			)}
+		</>
 	);
 };
 
@@ -540,7 +599,7 @@ const styles = StyleSheet.create({
 	badgeCard: {
 		flexDirection: 'row',
 		alignItems: 'flex-start',
-		backgroundColor: '#f9f9f9',
+		backgroundColor: '#ffffff',
 		borderRadius: 12,
 		padding: 12,
 		marginBottom: 10,
@@ -720,7 +779,7 @@ const styles = StyleSheet.create({
 	},
 
 	levelEncourage: {
-		fontSize: scaledSize(13),
+		fontSize: scaledSize(12),
 		color: '#27ae60',
 		marginTop: scaleHeight(6),
 		textAlign: 'center',
@@ -781,7 +840,6 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		lineHeight: 18,
 		marginBottom: 4,
-		paddingHorizontal: 6,
 	},
 	levelScoreText: {
 		fontSize: 15,
@@ -994,5 +1052,16 @@ const styles = StyleSheet.create({
 	regionTextActive: {
 		color: '#27ae60',
 		fontWeight: 'bold',
+	},
+	scrollTopButton: {
+		position: 'absolute',
+		right: 16,
+		bottom: 16,
+		backgroundColor: '#2196F3',
+		width: 40,
+		height: 40,
+		borderRadius: 20,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 });

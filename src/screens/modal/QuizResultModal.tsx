@@ -53,11 +53,13 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 						{resultType === 'correct' && (
 							<>
 								<Text style={styles.resultMessageBig}>{resultMessage}</Text>
+
 								<View style={styles.correctInfoCard}>
+									<Text style={styles.correctInfoSubLabelInCard}>📖 속담 해설</Text>
 									<Text style={styles.correctInfoLabel}>📌 속담</Text>
-									<Text style={styles.correctInfoText}>{question?.proverb}</Text>
+									<Text style={styles.correctInfoText}>- {question?.proverb}</Text>
 									<Text style={[styles.correctInfoLabel, { marginTop: 12 }]}>💡 의미</Text>
-									<Text style={styles.correctInfoText}>{question?.longMeaning}</Text>
+									<Text style={styles.correctInfoText}>- {question?.longMeaning}</Text>
 								</View>
 							</>
 						)}
@@ -66,15 +68,17 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 								<Text style={[styles.resultMessageBig, { color: '#e67e22' }]}>{resultMessage}</Text>
 
 								{/* ✅ 정답 강조 구간 추가 */}
-								<Text style={{ fontSize: 15, fontWeight: '600', textAlign: 'center' }}>
-									이번 문제의 정답은 <Text style={{ color: '#27ae60' }}>"{question?.proverb}"</Text>였어요!
+								<Text style={{ fontSize: 15, fontWeight: '600', textAlign: 'center', padding: 20 }}>
+									정답은 <Text style={{ color: '#27ae60' }}>"{question?.proverb}"</Text>였어요!
 								</Text>
 
 								<View style={[styles.correctInfoCard, { backgroundColor: '#fffdf7' }]}>
+									<Text style={styles.correctInfoSubLabelInCard}>📖 속담 해설</Text>
+
 									<Text style={[styles.correctInfoLabel, { color: '#e67e22' }]}>📌 속담</Text>
-									<Text style={styles.correctInfoText}>{question?.proverb}</Text>
+									<Text style={styles.correctInfoText}>- {question?.proverb}</Text>
 									<Text style={[styles.correctInfoLabel, { marginTop: 12, color: '#e67e22' }]}>💡 의미</Text>
-									<Text style={styles.correctInfoText}>{question?.longMeaning}</Text>
+									<Text style={styles.correctInfoText}>- {question?.longMeaning}</Text>
 								</View>
 							</>
 						)}
@@ -112,7 +116,6 @@ export const styles = StyleSheet.create({
 	resultMascot: {
 		width: 150,
 		height: 150,
-		marginVertical: 5,
 	},
 	resultMessageContainer: {
 		alignItems: 'center',
@@ -181,6 +184,21 @@ export const styles = StyleSheet.create({
 		fontSize: 16,
 		fontWeight: '600',
 	},
+	correctInfoSubLabel: {
+		fontSize: 13,
+		color: '#7f8c8d',
+		fontWeight: '500',
+		marginBottom: 6,
+		textAlign: "left",
+	},
+	correctInfoSubLabelInCard: {
+		fontSize: 15,
+		fontWeight: '700',
+		color: '#34495e',
+		marginBottom: 10,
+		textAlign: 'center',
+	},
+
 });
 
 export default QuizResultModal;

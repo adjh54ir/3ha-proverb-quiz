@@ -514,11 +514,16 @@ const ProverbStudyScreen = () => {
 
 		return (
 			<View style={styles.cardWrapper}>
-				<Animated.View style={[styles.card, frontAnimatedStyle, { flex: 1 }]}>
+				<Animated.View style={[styles.cardFront, frontAnimatedStyle, { flex: 1 }]}>
 					<View style={styles.cardInner}>
 						<View style={styles.cardContent}>
 							{/* @ts-ignore */}
 							<FastImage source={mascot} style={styles.subMascotImage} resizeMode='contain' />
+							{item.category && (
+								<View style={styles.categoryBadge}>
+									<Text style={styles.categoryBadgeText}>{item.category}</Text>
+								</View>
+							)}
 							<Text style={styles.cardTitle}>📘 속담</Text>
 							<View style={styles.proverbContainer}>
 								<Text style={styles.proverbText}>{item.proverb}</Text>
@@ -529,7 +534,9 @@ const ProverbStudyScreen = () => {
 								</View>
 							)}
 						</View>
-						<Text style={styles.hintText}>카드를 탭하면 속담 의미를 볼 수 있어요 👆</Text>
+						<View style={{ marginBottom: 10 }}>
+							<Text style={styles.hintText}>카드를 탭하면 속담 의미를 볼 수 있어요 👆</Text>
+						</View>
 						<Animated.View style={{ transform: [{ scale: buttonScaleAnimList[index] ?? new Animated.Value(1) }] }}>
 							<TouchableOpacity
 								style={isLearned ? styles.retryButton : styles.cardCompleteButton}
@@ -552,7 +559,7 @@ const ProverbStudyScreen = () => {
 
 				<Animated.View
 					style={[
-						styles.card,
+						styles.cardFront,
 						{
 							transform: [{ rotateY: backInterpolate }],
 							backfaceVisibility: 'hidden',
@@ -578,21 +585,24 @@ const ProverbStudyScreen = () => {
 						>
 							<View>
 								<TouchableOpacity activeOpacity={1} onPress={() => flipCard(index)}>
+									<Text style={styles.levelLabel}>
+										난이도: {item.levelName ?? '미지정'}
+									</Text>
 									<Text style={styles.cardLabel}>🧠 속담 의미</Text>
 									<Text style={styles.meaningHighlight}>{item.longMeaning}</Text>
 
 									{/* 예시 */}
-									{item.example && (
+									{/* {item.example && (
 										<View style={styles.sectionWrapper}>
 											<Text style={styles.sectionTitle}>✏️ 예시</Text>
 											<Text style={styles.sectionText}>{item.example}</Text>
 										</View>
-									)}
+									)} */}
 
 									{/* 같은 속담 */}
 									{item.sameProverb && item.sameProverb.filter((sp) => sp.trim() !== '').length > 0 && (
 										<View style={styles.sectionWrapper}>
-											<Text style={styles.sectionTitle}>🔁 같은 속담</Text>
+											<Text style={styles.sectionTitle}>🔁 비슷한 속담</Text>
 											{item.sameProverb
 												.filter((sp) => sp.trim() !== '')
 												.map((sp, idx) => (
@@ -607,7 +617,12 @@ const ProverbStudyScreen = () => {
 						</ScrollView>
 
 						<TouchableOpacity
-							style={isLearned ? styles.retryButton : styles.cardCompleteButton}
+							style={[
+								styles.button,
+								{ width: '100%', alignSelf: 'center' }, // ✅ 수정된 부분
+								isLearned ? styles.retryButton : styles.cardCompleteButton,
+								{ opacity: isButtonDisabled ? 0.6 : 1 },
+							]}
 							onPress={() => {
 								if (isButtonDisabled) return;
 								if (isLearned) {
@@ -888,7 +903,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		zIndex: 1,
 	},
-	card: {
+	cardFront: {
 		width: screenWidth * 0.85,
 		height: screenHeight * 0.6,
 		backgroundColor: '#fff',
@@ -898,10 +913,6 @@ const styles = StyleSheet.create({
 		backfaceVisibility: 'hidden',
 		position: 'absolute',
 		zIndex: 1,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
 
 		/** 🔽 추가 */
 		borderWidth: 1,
@@ -923,7 +934,6 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: '#7f8c8d',
 		textAlign: 'center',
-		marginBottom: scaleHeight(10),
 	},
 	progressWrapper: {
 		alignItems: 'center',
@@ -970,6 +980,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		minHeight: 36, // ✅ 버튼 높이 일정하게 유지
 		justifyContent: 'center', // ✅ 수직 정렬 보정
+		marginBottom: 10,
 	},
 	filterButtonActive: {
 		backgroundColor: '#4a90e2',
@@ -1014,7 +1025,7 @@ const styles = StyleSheet.create({
 	subFilterRow: {
 		flexDirection: 'row',
 		marginTop: scaleHeight(5),
-		
+
 	},
 
 	dropdown: {
@@ -1038,7 +1049,7 @@ const styles = StyleSheet.create({
 		borderColor: '#dcdde1',
 		borderRadius: 12,
 		alignItems: 'center',
-		
+		overflow: 'hidden', // ✅ 추가: border가 잘리는 현상 방지
 	},
 	progressTopRow: {
 		flexDirection: 'row',
@@ -1079,7 +1090,7 @@ const styles = StyleSheet.create({
 	detailFilterWrapper: {
 		width: '100%',
 		backgroundColor: '#ffffff', // ✅ f9fafb → 완전한 흰색으로 변경
-		paddingTop: 10,
+		paddingTop: 0,
 		paddingHorizontal: 20,
 		zIndex: 9999,
 	},
@@ -1200,7 +1211,7 @@ const styles = StyleSheet.create({
 		marginBottom: 30, // ✅ 4로 줄이면 타이틀과의 거리 확 줄어듭니다
 	},
 	meaningHighlight: {
-		fontSize: 22,
+		fontSize: 20,
 		color: '#ffffff',
 		fontWeight: 'bold',
 		textAlign: 'center',
@@ -1411,24 +1422,55 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: scaleHeight(3),
 	},
+	categoryBadge: {
+		alignSelf: 'center',
+		backgroundColor: '#dfe6e9',
+		paddingHorizontal: 10,
+		paddingVertical: 4,
+		borderRadius: 12,
+		marginBottom: 12,
+	},
+	categoryBadgeText: {
+		fontSize: 13,
+		color: '#2c3e50',
+		fontWeight: '500',
+	},
 	sectionWrapper: {
 		marginTop: 20,
-		alignItems: 'center',
+		alignItems: 'flex-start', // 왼쪽 정렬
 		paddingHorizontal: 12,
+		width: '100%', // 💡 너비 지정
 	},
-
 	sectionTitle: {
 		fontSize: 16,
 		fontWeight: 'bold',
 		color: '#ffffff',
 		marginBottom: 6,
-		textAlign: 'center',
+		textAlign: 'left', // 왼쪽 정렬
+		width: '100%',
 	},
-
 	sectionText: {
 		fontSize: 14,
 		color: '#ecf0f1',
 		lineHeight: 20,
+		textAlign: 'left', // 왼쪽 정렬
+		width: '100%',
+	},
+	levelLabel: {
+		fontSize: 14,
+		color: '#f1c40f',
+		fontWeight: '600',
 		textAlign: 'center',
+		marginBottom: 30,
+	},
+	button: {
+		height: scaleHeight(50),
+		marginTop: scaleHeight(16),
+		borderRadius: scaleWidth(30),
+		backgroundColor: '#3b82f6',
+		justifyContent: 'center',
+		alignItems: 'center', // ✅ 변경 (기존 `alignContent` → `alignItems`)
+		width: '100%', // ✅ 항상 100% 사용
+		alignSelf: 'center', // ✅ 중앙 정렬
 	},
 });

@@ -156,11 +156,11 @@ const QuizStartModal = ({
 		// 카테고리
 		'운/우연': { color: '#81ecec', icon: { type: 'fontAwesome5', name: 'dice' }, type: 'category' },
 		인간관계: { color: '#a29bfe', icon: { type: 'fontAwesome5', name: 'users' }, type: 'category' },
-		'세상 이치': { color: '#ffeaa7', icon: { type: 'fontAwesome5', name: 'globe' }, type: 'category' },
+		'세상 이치': { color: '#f39c12', icon: { type: 'fontAwesome5', name: 'globe' }, type: 'category' },
 		'근면/검소': { color: '#fab1a0', icon: { type: 'fontAwesome5', name: 'hammer' }, type: 'category' },
 		'노력/성공': { color: '#55efc4', icon: { type: 'fontAwesome5', name: 'medal' }, type: 'category' },
 		'경계/조심': { color: '#ff7675', icon: { type: 'fontAwesome5', name: 'exclamation-triangle' }, type: 'category' },
-		'욕심/탐욕': { color: '#fd79a8', icon: { type: 'fontAwesome5', name: 'money-bill-wave' }, type: 'category' },
+		'욕심/탐욕': { color: '#fd79a8', icon: { type: 'fontAwesome5', name: 'hand-holding-usd' }, type: 'category' },
 		'배신/불신': { color: '#b2bec3', icon: { type: 'fontAwesome5', name: 'user-slash' }, type: 'category' },
 	};
 	const getStyleColor = (key: string): string => STYLE_MAP[key]?.color || (STYLE_MAP[key]?.type === 'level' ? '#0A84FF' : '#dfe6e9');
@@ -299,6 +299,11 @@ const QuizStartModal = ({
 											(selectedLevel === '전체' || item.levelName === selectedLevel) && (selectedCategory === '전체' || item.category === selectedCategory),
 									);
 
+									const stat = (categoryStats[selectedCategory] || categoryStats['전체']);
+									if (stat.total > 0 && stat.total === stat.studied) {
+										Alert.alert('대단해요! 👏', '이 카테고리는 이미 다 풀었어요. 다른 주제를 골라볼까요? 😄');
+										return;
+									}
 									if (filtered.length === 0) {
 										Alert.alert('잠깐만요!', '선택한 난이도와 카테고리에 맞는 속담이 아직 없어요 🥲');
 										return;
@@ -384,6 +389,7 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
 		gap: 5,
+		paddingBottom: 16, // 👈 하단 여백 추가
 	},
 
 	halfWidthButton: {
@@ -414,10 +420,12 @@ const styles = StyleSheet.create({
 	selectButtonActive: {
 		borderWidth: 2,
 		borderColor: '#27ae60',
+		// backgroundColor: '#1abc9c', // ❌ 이 줄 삭제 또는 주석 처리
 		shadowColor: '#27ae60',
 		shadowOffset: { width: 0, height: 0 },
-		shadowOpacity: 0.7,
-		shadowRadius: 6,
+		shadowOpacity: 0.6,
+		shadowRadius: 4,
+		transform: [{ scale: 1.02 }],
 	},
 
 	selectButtonTextActive: {
@@ -475,14 +483,14 @@ const styles = StyleSheet.create({
 	},
 	levelTopLabel: {
 		fontSize: 13,
+		fontWeight: '700', // 강조
 		color: '#ecf0f1',
-		fontWeight: '600',
 		marginBottom: 2,
 	},
 
 	levelMainLabel: {
 		fontSize: 16,
-		fontWeight: '700',
+		fontWeight: '800', // 더 강조
 		color: '#ffffff',
 		textAlign: 'center',
 		lineHeight: 20,

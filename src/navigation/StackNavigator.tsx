@@ -83,12 +83,13 @@ const StackNavigator = () => {
 							<Icon name='arrow-back' size={24} color='#2c3e50' />
 						</TouchableOpacity>
 					),
-					headerRight: () => (
-						//@ts-ignore
-						<TouchableOpacity onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })} style={{ marginRight: 16 }}>
-							<IconComponent type='materialIcons' name='info-outline' size={24} color='#3498db' />
-						</TouchableOpacity>
-					),
+					headerRight: () => (<></>)
+					// headerRight: () => (
+					// 	//@ts-ignore
+					// 	<TouchableOpacity onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })} style={{ marginRight: 16 }}>
+					// 		<IconComponent type='materialIcons' name='info-outline' size={24} color='#3498db' />
+					// 	</TouchableOpacity>
+					// ),
 				})}
 			/>
 			<Stack.Screen

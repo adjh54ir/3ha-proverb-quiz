@@ -175,7 +175,7 @@ const WrongReviewScreen = () => {
 							<View style={styles.guideDescriptionBox}>
 								<Text style={styles.guideDescription}>
 									❗ 이전 퀴즈에서 틀린 문제들을 다시 풀 수 있어요.{'\n\n'}
-									틀린 국가들의 수도가 반복 출제되며,{'\n'}
+									틀린 국가들의 속담이 반복 출제되며,{'\n'}
 									<Text style={styles.guideHighlight}>정답을 맞히면 오답 목록에서 자동 제거</Text>돼요!{'\n\n'}
 									일반 퀴즈처럼 <Text style={styles.guideHighlight}>4지선다</Text>로 구성되고,{'\n'}
 									<Text style={styles.guideHighlight}>정답 시 10점</Text>을 받을 수 있어요 🎯

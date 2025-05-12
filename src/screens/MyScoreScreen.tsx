@@ -71,7 +71,7 @@ const CapitalResultScreen = () => {
 		'근면/검소': { color: '#fab1a0', icon: { type: 'fontAwesome5', name: 'hammer' } },
 		'노력/성공': { color: '#55efc4', icon: { type: 'fontAwesome5', name: 'medal' } },
 		'경계/조심': { color: '#ff7675', icon: { type: 'fontAwesome5', name: 'exclamation-triangle' } },
-		'욕심/탐욕': { color: '#fd79a8', icon: { type: 'fontAwesome5', name: 'money-bill-wave' } },
+		'욕심/탐욕': { color: '#fd79a8', icon: { type: 'fontAwesome5', name: 'hand-holding-usd' } },
 		'배신/불신': { color: '#b2bec3', icon: { type: 'fontAwesome5', name: 'user-slash' } },
 	};
 
@@ -458,7 +458,7 @@ const CapitalResultScreen = () => {
 							<Text style={styles.sectionSubtitle}>
 								🏅 정복한 레벨 ({levelMaster.length} / {DIFFICULTIES.length})
 							</Text>
-							<Text style={styles.levelHelperText}> - 각 레벨을 마스터하며 진정한 수도 퀴즈 고수가 되어보세요! </Text>
+							<Text style={styles.levelHelperText}> - 각 레벨을 마스터하며 진정한 속담 퀴즈 고수가 되어보세요! </Text>
 							<View style={{ alignItems: 'center' }}>
 								<FlatList
 									data={DIFFICULTIES}

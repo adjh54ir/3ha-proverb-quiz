@@ -59,27 +59,16 @@ const ProverbQuizModeSelectScreen = () => {
 		}
 	};
 
-	/**
-	 * showGuide 파라미터를 통해 모달 자동 오픈
-	 */
-	useLayoutEffect(() => {
-		navigation.setOptions({
-			headerRight: () => (
-				<TouchableOpacity onPress={() => setShowGuideModal(true)} style={{ marginRight: 16 }}>
-					<IconComponent type='materialIcons' name='info-outline' size={24} color='#3498db' />
-				</TouchableOpacity>
-			),
-		});
-	}, [navigation]);
-
 	return (
 		<>
 			<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
 				<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 					<ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps='handled'>
-						<View style={styles.headerSection}>
-							<Text style={styles.title}>🧠 오늘은 어떤 속담 퀴즈로 도전할까요?</Text>
-							<Text style={styles.subTitle}>퀴즈를 선택하면 난이도, 카테고리별로 퀴즈를 선택할 수 있습니다</Text>
+						<View style={styles.titleRow}>
+							<Text style={styles.title}>🧠오늘은 어떤 속담 퀴즈로 도전할까요?</Text>
+							<TouchableOpacity onPress={() => setShowGuideModal(true)} style={styles.inlineInfoIcon}>
+								<IconComponent type='materialIcons' name='info-outline' size={20} color='#3498db' />
+							</TouchableOpacity>
 						</View>
 
 						<View style={styles.gridWrap}>
@@ -114,14 +103,11 @@ const ProverbQuizModeSelectScreen = () => {
 								<IconComponent type='materialCommunityIcons' name='head-question-outline' size={20} /> 퀴즈 모드 안내
 							</Text>
 							<Text style={styles.modalText}>
-								<Text style={styles.boldText}>
-									<IconComponent type='materialCommunityIcons' name='head-question-outline' size={20} /> 퀴즈 모드 안내{'\n\n'}
-								</Text>
 								<Text style={styles.boldText}>1️⃣ 속담 뜻 퀴즈{'\n'}</Text>- 제시된 속담에 대한 올바른 의미를 고르는 4지선다형 퀴즈입니다.{'\n'}- 속담의 뜻을
 								이해하는 능력을 키울 수 있어요.{'\n\n'}
-								<Text style={styles.boldText}>2️⃣ 속담 찾기 퀴즈{'\n'}</Text>- 제시된 의미에 해당하는 속담을 고르는 퀴즈입니다.
+								<Text style={styles.boldText}>2️⃣ 속담 찾기 퀴즈{'\n'}</Text>- 제시된 의미에 해당하는 속담을 고르는 4지선다형 퀴즈입니다.
 								{'\n'}- 유사한 의미의 속담 중 정확한 속담을 찾아내는 연습이 돼요.{'\n\n'}
-								<Text style={styles.boldText}>3️⃣ 빈칸 채우기 퀴즈{'\n'}</Text>- 속담의 일부분이 빈칸으로 제시되고, 알맞은 단어를 고르는 퀴즈입니다.{'\n'}-
+								<Text style={styles.boldText}>3️⃣ 빈칸 채우기 퀴즈{'\n'}</Text>- 속담의 일부분이 빈칸으로 제시되고, 알맞은 단어를 고르는 4지선다형 퀴즈입니다.{'\n'}-
 								속담의 문장 구조와 정확한 어휘력을 함께 익힐 수 있어요.{'\n\n'}
 								<Text style={styles.boldText}>📌 공통 안내{'\n'}</Text>- 각 퀴즈는 난이도별, 카테고리별로 문제를 선택해 풀 수 있습니다.{'\n'}- 이미 푼 문제는
 								자동으로 제외되어, 복습 또는 도전이 편리해요.
@@ -342,5 +328,17 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: 15,
 		paddingVertical: 40, // 위아래 균형 잡힌 간격
+	},
+	titleRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		flexWrap: 'nowrap',
+	},
+
+	inlineInfoIcon: {
+		marginLeft: 6,
+		padding: 4,
+		marginBottom: 12,
 	},
 });

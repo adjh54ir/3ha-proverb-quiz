@@ -90,7 +90,7 @@ const FIELD_DROPDOWN_ITEMS = [
 	{
 		label: '욕심/탐욕',
 		value: '욕심/탐욕',
-		icon: () => <Icon name='money-bill-wave' size={16} color='#fd79a8' />,
+		icon: () => <Icon name='hand-holding-usd' size={16} color='#fd79a8' />,
 	},
 	{
 		label: '배신/불신',

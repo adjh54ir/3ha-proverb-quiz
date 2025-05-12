@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl, Modal, Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
@@ -136,7 +136,7 @@ const SettingScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}>
+			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => { }} />}>
 				<AdmobBannerAd paramMarginTop={20} />
 				<View style={styles.section}>
 					<Text style={styles.title}>학습/퀴즈 다시 풀기 </Text>
@@ -171,10 +171,20 @@ const SettingScreen = () => {
 						</TouchableOpacity>
 					</View>
 				</View>
-
 				<TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevModal(true)}>
 					<Text style={styles.devText}>제작자 소개</Text>
 				</TouchableOpacity>
+				<View style={{ marginTop: 30, marginBottom: 10 }}>
+					<Text style={{ fontSize: 12, color: '#7f8c8d', textAlign: 'center', padding: 40, }}>
+						📚 본 앱의 일부 콘텐츠는{' '}
+						<Text style={{ textDecorationLine: 'underline', color: '#3498db' }} onPress={() => Linking.openURL('https://opendict.korean.go.kr/main')}>
+							국립국어원 표준국어대사전
+						</Text>
+						을(를) 기반으로 제작되었습니다.
+					</Text>
+				</View>
+
+
 			</ScrollView>
 
 			<Contributor9Modal visible={showDevModal} onClose={() => setShowDevModal(false)} />
@@ -342,7 +352,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.05,
 		shadowOffset: { width: 0, height: 1 },
 		shadowRadius: 2,
-		marginBottom: scaleHeight(30),
 	},
 	devText: {
 		fontSize: scaledSize(13),

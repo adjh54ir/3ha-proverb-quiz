@@ -9,7 +9,7 @@ const CapitalListScreen = () => {
 			{loading ? (
 				<View style={styles.center}>
 					<ActivityIndicator size='large' color='#0000ff' />
-					<Text>수도 정보를 불러오는 중입니다...</Text>
+					<Text>속담 정보를 불러오는 중입니다...</Text>
 				</View>
 			) : null}
 		</>

@@ -82,7 +82,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 
 	const praiseMessages = [
 		'정답이에요! 정말 똑똑하네요! 🎉\n이번 퀴즈를 정확히 짚어냈어요!',
-		'대단해요! 완벽한 정답이에요! 🏆\n계속 이렇게만 간다면 금방 수도 마스터가 되겠어요!',
+		'대단해요! 완벽한 정답이에요! 🏆\n계속 이렇게만 간다면 금방 속담 마스터가 되겠어요!',
 		'굿잡! 멋져요! 💯\n지금까지의 학습이 빛을 발하고 있네요!',
 		'똑소리 나는 정답이에요! 🤓✨\n집중력이 정말 뛰어나네요!',
 		'정답을 쏙쏙 맞히네요! 🌟\n공부한 보람이 느껴지죠?\n계속 도전해봐요!',
@@ -429,6 +429,19 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 				loadQuestion();
 			}
 		}, 300);
+	}
+
+	const getModeLabel = (mode: 'meaning' | 'proverb' | 'fill-blank') => {
+		switch (mode) {
+			case 'meaning':
+				return '뜻 맞추기';
+			case 'proverb':
+				return '속담 맞추기';
+			case 'fill-blank':
+				return '빈칸 채우기';
+			default:
+				return '';
+		}
 	};
 
 	return (
@@ -439,12 +452,17 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 						<View style={styles.container}>
 							<View style={styles.inner}>
 								<View style={styles.progressStatusWrapper}>
-									<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-										<Text style={styles.progressText}>진행중인 퀴즈</Text>
+									<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5, }}>
+										<Text style={styles.progressText}>
+											진행중인 퀴즈 : {getModeLabel(mode)}
+										</Text>
 										<Text style={[styles.progressText, { color: '#3498db' }]}>
 											{getSolvedCount()} / {totalCount}
 										</Text>
 									</View>
+									<Text style={styles.quizSubText}>
+										난이도: {selectedLevel} / 카테고리: {selectedCategory}
+									</Text>
 
 									<View style={styles.progressBarWrapper}>
 										<View style={[styles.progressBarFill, { width: `${(solvedCount / totalCount) * 100}%` }]} />
@@ -490,11 +508,12 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 									</AnimatedCircularProgress>
 
 									<Text style={styles.questionText}>
-										{mode === 'fill-blank'
-											? questionText || '문제 준비중...'
-											: mode === 'meaning'
-												? question?.proverb
-												: question?.longMeaning || '문제 준비중...'}
+										{`Q. ${mode === 'fill-blank'
+												? questionText || '문제 준비중...'
+												: mode === 'meaning'
+													? question?.proverb
+													: question?.longMeaning || '문제 준비중...'
+											}`}
 									</Text>
 
 									<View style={styles.optionsContainer}>
@@ -671,7 +690,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start', // 👈 상단 정렬로 변경
 		alignItems: 'center',
 		paddingHorizontal: 20,
-		paddingTop: 20, // 👈 여유 간격이 필요하다면 추가 (예: 24)
+		paddingTop: 8, // 👈 여유 간격이 필요하다면 추가 (예: 24)
 	},
 	quizBox: {
 		width: '100%',
@@ -682,7 +701,8 @@ const styles = StyleSheet.create({
 	questionText: {
 		fontSize: 18, // 기존 20 → 살짝 축소
 		fontWeight: 'bold',
-		marginVertical: 24, // 기존 30 → 줄임
+		marginTop: 12,
+		marginBottom: 24,
 		textAlign: 'center',
 		color: '#3498db',
 	},
@@ -806,7 +826,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		width: '100%',
-		marginBottom: 16,
+		marginBottom: 3,
 	},
 
 	statusCard: {
@@ -1198,5 +1218,38 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'center',
+	},
+	selectedInfoRow: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		marginTop: 4,
+		marginBottom: 12,
+	},
+
+	selectedInfoItem: {
+		fontSize: 13,
+		color: '#7f8c8d',
+		fontWeight: '500',
+		backgroundColor: '#f1f2f6',
+		paddingHorizontal: 8,
+		paddingVertical: 4,
+		borderRadius: 8,
+		overflow: 'hidden',
+	},
+	quizTypeLabel: {
+		fontSize: 13,
+		color: '#7f8c8d',
+		textAlign: 'center',
+		marginTop: 4,
+		fontWeight: '500',
+	},
+	quizSubText: {
+		fontSize: 13,
+		color: '#7f8c8d',
+		fontWeight: '500',
+		textAlign: 'left', // 또는 'center'도 OK
+		marginBottom: 8,
+		marginTop: -4, // 너무 벌어지지 않게 미세 간격 조절
 	},
 });

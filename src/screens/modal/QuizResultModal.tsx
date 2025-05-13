@@ -1,4 +1,6 @@
+import { Paths } from '@/navigation/conf/Paths';
 import { MainDataType } from '@/types/MainDataType';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -14,6 +16,8 @@ interface QuizResultModalProps {
 }
 
 const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, question, onNext }: QuizResultModalProps) => {
+
+	const navigation = useNavigation();
 	if (!visible || resultType === '') return null;
 
 	return (
@@ -50,31 +54,32 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 					/>
 
 					<View style={styles.resultMessageContainer}>
-						{resultType === 'correct' && (
+						{resultType === 'done' ? (
+							<>
+								<Text style={styles.resultMessage}>{resultMessage}</Text>
+								<TouchableOpacity onPress={onNext}>
+									<Text style={styles.replayText}>👉 처음부터 다시 시작하려면 여기를 눌러주세요!</Text>
+								</TouchableOpacity>
+							</>
+						) : resultType === 'correct' ? (
 							<>
 								<Text style={styles.resultMessageBig}>{resultMessage}</Text>
-
 								<View style={styles.correctInfoCard}>
 									<Text style={styles.correctInfoSubLabelInCard}>📖 속담 해설</Text>
 									<Text style={styles.correctInfoLabel}>📌 속담</Text>
-									<Text style={styles.correctInfoText}>- {question?.proverb}</Text>
+									<Text style={[styles.correctInfoText, { width: '100%' }]}>- {question?.proverb}</Text>
 									<Text style={[styles.correctInfoLabel, { marginTop: 12 }]}>💡 의미</Text>
-									<Text style={styles.correctInfoText}>- {question?.longMeaning}</Text>
+									<Text style={[styles.correctInfoText, { width: '100%' }]}>- {question?.longMeaning}</Text>
 								</View>
 							</>
-						)}
-						{(resultType === 'wrong' || resultType === 'timeout') && (
+						) : (
 							<>
 								<Text style={[styles.resultMessageBig, { color: '#e67e22' }]}>{resultMessage}</Text>
-
-								{/* ✅ 정답 강조 구간 추가 */}
 								<Text style={{ fontSize: 15, fontWeight: '600', textAlign: 'center', padding: 20 }}>
 									정답은 <Text style={{ color: '#27ae60' }}>"{question?.proverb}"</Text>였어요!
 								</Text>
-
 								<View style={[styles.correctInfoCard, { backgroundColor: '#fffdf7' }]}>
 									<Text style={styles.correctInfoSubLabelInCard}>📖 속담 해설</Text>
-
 									<Text style={[styles.correctInfoLabel, { color: '#e67e22' }]}>📌 속담</Text>
 									<Text style={styles.correctInfoText}>- {question?.proverb}</Text>
 									<Text style={[styles.correctInfoLabel, { marginTop: 12, color: '#e67e22' }]}>💡 의미</Text>
@@ -84,12 +89,18 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 						)}
 					</View>
 
-					<TouchableOpacity style={styles.modalConfirmButton} onPress={onNext}>
+					<TouchableOpacity style={styles.modalConfirmButton} onPress={() => {
+						if (resultType === 'done') {
+							navigation.goBack(); // ✅ 뒤로 가기 수행
+						} else {
+							onNext(); // ✅ 다음 문제 로직 실행
+						}
+					}}>
 						<Text style={styles.modalConfirmText}>{resultType === 'done' ? '뒤로 가기' : '다음 퀴즈'}</Text>
 					</TouchableOpacity>
 				</View>
 			</View>
-		</Modal>
+		</Modal >
 	);
 };
 
@@ -197,6 +208,24 @@ export const styles = StyleSheet.create({
 		color: '#34495e',
 		marginBottom: 10,
 		textAlign: 'center',
+	},
+	resultMessage: {
+		fontSize: 16,
+		color: '#34495e',
+		textAlign: 'center',
+		marginBottom: 12,
+	},
+
+	replayText: {
+		fontSize: 14,
+		fontWeight: '500',
+		color: '#2980b9',
+		textAlign: 'center',
+		textDecorationLine: 'underline',
+	},
+	fixedMeaningHeight: {
+		minHeight: 66,      // 대략 3줄 기준
+		maxHeight: 120,     // 너무 길 경우 제한
 	},
 
 });

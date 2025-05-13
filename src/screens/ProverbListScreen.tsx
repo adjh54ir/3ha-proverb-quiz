@@ -222,6 +222,8 @@ const ProverbListScreen = () => {
 
 		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
 	};
+
+
 	const handleReset = () => {
 		// 1. 드롭다운을 먼저 닫음
 		setFieldOpen(false);

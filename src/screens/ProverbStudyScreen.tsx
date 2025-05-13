@@ -114,6 +114,7 @@ const ProverbStudyScreen = () => {
 	const scaleAnim = useRef(new Animated.Value(0)).current;
 	const buttonScaleAnim = useRef(new Animated.Value(1)).current;
 	const [buttonScaleAnimList, setButtonScaleAnimList] = useState<Animated.Value[]>([]);
+	const [flipDegreesList, setFlipDegreesList] = useState<number[]>([]);
 
 	const [flipAnimList, setFlipAnimList] = useState<Animated.Value[]>([]);
 
@@ -231,6 +232,11 @@ const ProverbStudyScreen = () => {
 	}, [isDetailFilterOpen]);
 
 	useEffect(() => {
+		const degrees = filteredProverbs.map(() => 0);
+		setFlipDegreesList(degrees);
+	}, [filteredProverbs]);
+
+	useEffect(() => {
 		filterData(undefined, undefined, undefined, false); // 🔒 인덱스 유지
 		flipAnim.setValue(0); // 카드만 초기화
 	}, [proverbs, studyHistory, filter]);
@@ -271,22 +277,30 @@ const ProverbStudyScreen = () => {
 		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
 	};
 
+	const isCardFlipped = (index: number) => {
+		return flipDegreesList[index] >= 90;
+	};
+
 	const flipCard = (index: number) => {
-		if (isButtonDisabled) return; // 🔒 버튼 눌리는 동안 뒤집기 차단
+		if (isButtonDisabled) return;
 		setLevelOpen(false);
 		setThemeOpen(false);
 
 		const currentAnim = flipAnimList[index];
-		const isCardFlipped = isFlipped && index === currentIndex;
+		const isFlipped = flipDegreesList[index] >= 90;
 
 		if (currentAnim) {
 			Animated.timing(currentAnim, {
-				toValue: isCardFlipped ? 0 : 180,
+				toValue: isFlipped ? 0 : 180,
 				duration: 300,
 				useNativeDriver: true,
 			}).start(() => {
-				setIsFlipped(!isCardFlipped);
 				setCurrentIndex(index);
+				setFlipDegreesList((prev) => {
+					const newList = [...prev];
+					newList[index] = isFlipped ? 0 : 180;
+					return newList;
+				});
 			});
 		}
 	};
@@ -383,8 +397,7 @@ const ProverbStudyScreen = () => {
 			setFilteredProverbs(newFiltered);
 
 			// 카드 앞면으로 돌리기
-			if (isFlipped) {
-				setIsFlipped(false);
+			if (isCardFlipped(currentIndex)) {
 				const currentAnim = flipAnimList[currentIndex];
 				if (currentAnim) {
 					currentAnim.setValue(0);
@@ -638,7 +651,6 @@ const ProverbStudyScreen = () => {
 
 							<TouchableOpacity
 								style={[
-									styles.button,
 									isLearned ? styles.retryButton : styles.cardCompleteButton,
 									{ opacity: isButtonDisabled ? 0.6 : 1 },
 								]}
@@ -810,9 +822,14 @@ const ProverbStudyScreen = () => {
 									}}
 									onSnapToItem={(index) => {
 										setCurrentIndex(index);
-										setIsFlipped(false);
+
 										InteractionManager.runAfterInteractions(() => {
-											flipAnimList.forEach((anim) => anim.setValue(0));
+											// ❗ 해당 카드 외엔 초기화하지 않음
+											flipAnimList.forEach((anim, i) => {
+												if (i !== index) {
+													anim.setValue(0);
+												}
+											});
 										});
 									}}
 								/>
@@ -944,7 +961,6 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		borderWidth: 1,
 		borderColor: '#ddd', // ✅ 테두리 추가
-
 	},
 	cardBack: {
 		backgroundColor: '#4a90e2',
@@ -955,17 +971,8 @@ const styles = StyleSheet.create({
 		width: '100%',
 		padding: 20,
 		minHeight: '100%', // ✅ 높이 강제 지정
-		height: scaleHeight(480),
-		backgroundColor: '#ffffff',
-		borderRadius: scaleWidth(20),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 6 },
-		shadowOpacity: 0.15,
-		shadowRadius: 10,
-		justifyContent: 'space-between',
-		alignSelf: 'center',
-		borderWidth: 1,
-		borderColor: '#ddd', // ✅ 테두리 추가
+
+
 	},
 	hintText: {
 		marginTop: scaleHeight(80),

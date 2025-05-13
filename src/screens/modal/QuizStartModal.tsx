@@ -67,6 +67,8 @@ const QuizStartModal = ({
 	const [levelStats, setLevelStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [categoryStats, setCategoryStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [quizHistory, setQuizHistory] = useState<UserQuizHistory | null>(null);
+	const [isShowLevelInfo, setIsShowLevelInfo] = useState(false);
+	const [isShowCategoryInfo, setIsShowCategoryInfo] = useState(false);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -75,11 +77,11 @@ const QuizStartModal = ({
 	);
 
 	useEffect(() => {
-		if (quizHistory && Object.keys(levelStats).length > 0) {
-			const allIds = [...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])];
-			loadStats(Array.from(new Set(allIds)));
-		}
-	}, [selectedLevel]);
+		if (!quizHistory) return;
+
+		const allIds = [...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])];
+		loadStats(Array.from(new Set(allIds)));
+	}, [selectedLevel, quizHistory]);
 
 	const loadData = async () => {
 		const raw = await AsyncStorage.getItem(STORAGE_KEY_QUIZ);
@@ -163,6 +165,17 @@ const QuizStartModal = ({
 		'욕심/탐욕': { color: '#fd79a8', icon: { type: 'fontAwesome5', name: 'hand-holding-usd' }, type: 'category' },
 		'배신/불신': { color: '#b2bec3', icon: { type: 'fontAwesome5', name: 'user-slash' }, type: 'category' },
 	};
+
+	const CATEGORY_DESCRIPTIONS: Record<string, string> = {
+		'운/우연': '예기치 않은 상황이나 운명에 관한 속담이에요.',
+		'인간관계': '사람과 사람 사이의 관계나 처세에 관한 속담이에요.',
+		'세상 이치': '세상의 이치나 진리에 대해 알려주는 속담이에요.',
+		'근면/검소': '성실함과 검소함의 중요성을 알려주는 속담이에요.',
+		'노력/성공': '노력 끝에 얻는 보람이나 성공에 관한 속담이에요.',
+		'경계/조심': '조심성과 주의의 필요성을 담은 속담이에요.',
+		'욕심/탐욕': '지나친 욕심이 부작용을 일으킬 수 있음을 경고하는 속담이에요.',
+		'배신/불신': '믿음을 저버리거나 신뢰를 잃는 상황을 담은 속담이에요.',
+	};
 	const getStyleColor = (key: string): string => STYLE_MAP[key]?.color || (STYLE_MAP[key]?.type === 'level' ? '#0A84FF' : '#dfe6e9');
 	const getStyleIcon = (key: string): { type: string; name: string } | null => STYLE_MAP[key]?.icon || null;
 
@@ -231,97 +244,123 @@ const QuizStartModal = ({
 	};
 
 	return (
-		<Modal visible={visible} transparent animationType='fade'>
-			<View style={styles.modalOverlay}>
-				<View style={styles.selectModal}>
-					{/* 최상단 타이틀 */}
-					<View style={styles.modalHeader}>
-						<Text style={styles.modalTitle}>🧠 퀴즈 모드</Text>
-						<TouchableOpacity style={styles.closeButton} onPress={onClose}>
-							<IconComponent type='materialIcons' name='close' size={24} color='#7f8c8d' />
-						</TouchableOpacity>
-					</View>
-					{/* <Text style={styles.selectSub}>난이도와 카테고리를 선택해주세요!</Text> */}
-
-					<View style={styles.selectModalContentBox}>
-						{modeStep === 0 ? (
-							<>
-								<View style={styles.selectTitleBox}>
-									<View style={styles.selectTitleBox}>
-										<Text style={styles.selectTitleEmoji}>🧠</Text>
-										<Text style={styles.selectTitleText}>나에게 맞는 난이도를 골라보세요!</Text>
-									</View>
-								</View>
-								<SelectGroup title='난이도 선택' options={levelOptions} selected={selectedLevel} onSelect={setSelectedLevel} getIcon={getStyleIcon} />
-							</>
-						) : (
-							<>
-								<View style={styles.selectTitleBox}>
-									<Text style={styles.selectTitleEmoji}>🎯</Text>
-									<Text style={styles.selectTitleText}>관심 있는 주제를 골라볼까요?</Text>
-								</View>
-								<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: 10 }} showsVerticalScrollIndicator={false}>
-									<SelectGroup
-										title='카테고리 선택'
-										options={categoryOptions}
-										selected={selectedCategory}
-										onSelect={setSelectedCategory}
-										getIcon={getStyleIcon}
-									/>
-								</ScrollView>
-							</>
-						)}
-					</View>
-
-					<View style={styles.buttonRow}>
-						{modeStep === 1 && (
-							<TouchableOpacity onPress={() => setModeStep(0)} style={[styles.modalButton, styles.backButtonInline]}>
-								<IconComponent type='fontAwesome5' name='arrow-left' size={16} color='#3498db' />
-								<Text style={styles.backButtonText}>이전</Text>
+		<>
+			<Modal visible={visible} transparent animationType='fade'>
+				<View style={styles.modalOverlay}>
+					<View style={styles.selectModal}>
+						{/* 최상단 타이틀 */}
+						<View style={styles.modalHeader}>
+							<Text style={styles.modalTitle}>🧠 퀴즈 모드</Text>
+							<TouchableOpacity style={styles.closeButton} onPress={onClose}>
+								<IconComponent type='materialIcons' name='close' size={24} color='#7f8c8d' />
 							</TouchableOpacity>
-						)}
-						<TouchableOpacity
-							style={[
-								styles.modalButton,
-								{
-									backgroundColor: (modeStep === 0 && selectedLevel) || (modeStep === 1 && selectedCategory) ? '#27ae60' : '#ccc',
-								},
-							]}
-							disabled={modeStep === 0 ? !selectedLevel : !selectedCategory}
-							onPress={() => {
-								if (modeStep === 0) {
-									setModeStep(1);
-								} else {
-									// 🔽 퀴즈 데이터 유효성 체크
-									const all = ProverbServices.selectProverbList();
-									const filtered = all.filter(
-										(item) =>
-											(selectedLevel === '전체' || item.levelName === selectedLevel) && (selectedCategory === '전체' || item.category === selectedCategory),
-									);
+						</View>
+						{/* <Text style={styles.selectSub}>난이도와 카테고리를 선택해주세요!</Text> */}
 
-									const stat = (categoryStats[selectedCategory] || categoryStats['전체']);
-									if (stat.total > 0 && stat.total === stat.studied) {
-										Alert.alert('대단해요! 👏', '이 카테고리는 이미 다 풀었어요. 다른 주제를 골라볼까요? 😄');
-										return;
-									}
-									if (filtered.length === 0) {
-										Alert.alert('잠깐만요!', '선택한 난이도와 카테고리에 맞는 속담이 아직 없어요 🥲');
-										return;
-									}
+						<View style={styles.selectModalContentBox}>
+							{modeStep === 0 ? (
+								<>
+									<View style={styles.selectTitleBox}>
+										<View style={styles.selectTitleBox}>
+											<Text style={styles.selectTitleEmoji}>🧠</Text>
+											<Text style={styles.selectTitleText}>나에게 맞는 난이도를 골라보세요!</Text>
+										</View>
+									</View>
+									<SelectGroup title='난이도 선택' options={levelOptions} selected={selectedLevel} onSelect={setSelectedLevel} getIcon={getStyleIcon} />
+								</>
+							) : (
+								<>
+									<View style={styles.selectTitleBox}>
+										<Text style={styles.selectTitleEmoji}>🎯</Text>
+										<Text style={styles.selectTitleText}>관심 있는 주제를 골라볼까요?</Text>
+										<TouchableOpacity onPress={() => setIsShowCategoryInfo(true)}>
+											<IconComponent type='materialIcons' name='info-outline' size={18} color='#636e72' />
+										</TouchableOpacity>
+									</View>
+									<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: 10 }} showsVerticalScrollIndicator={false}>
+										<SelectGroup
+											title='카테고리 선택'
+											options={categoryOptions}
+											selected={selectedCategory}
+											onSelect={setSelectedCategory}
+											getIcon={getStyleIcon}
+										/>
+									</ScrollView>
+								</>
+							)}
+						</View>
 
-									onStart();
-								}
-							}}>
-							<View style={styles.centeredButtonContent}>
-								{modeStep === 1 && <IconComponent type='fontAwesome5' name='rocket' size={16} color='#fff' style={{ marginRight: 8 }} />}
-								<Text style={styles.modalButtonText}>{modeStep === 0 ? '다음' : '퀴즈 시작'}</Text>
-								{modeStep === 0 && <IconComponent type='fontAwesome5' name='arrow-right' size={16} color='#fff' style={{ marginLeft: 8 }} />}
-							</View>
-						</TouchableOpacity>
+						<View style={styles.buttonRow}>
+							{modeStep === 1 && (
+								<TouchableOpacity onPress={() => setModeStep(0)} style={[styles.modalButton, styles.backButtonInline]}>
+									<IconComponent type='fontAwesome5' name='arrow-left' size={16} color='#3498db' />
+									<Text style={styles.backButtonText}>이전</Text>
+								</TouchableOpacity>
+							)}
+							<TouchableOpacity
+								style={[
+									styles.modalButton,
+									{
+										backgroundColor: (modeStep === 0 && selectedLevel) || (modeStep === 1 && selectedCategory) ? '#27ae60' : '#ccc',
+									},
+								]}
+								disabled={modeStep === 0 ? !selectedLevel : !selectedCategory}
+								onPress={() => {
+									if (modeStep === 0) {
+										setModeStep(1);
+									} else {
+										// 🔽 퀴즈 데이터 유효성 체크
+										const all = ProverbServices.selectProverbList();
+										const filtered = all.filter(
+											(item) =>
+												(selectedLevel === '전체' || item.levelName === selectedLevel) && (selectedCategory === '전체' || item.category === selectedCategory),
+										);
+
+										const stat = (categoryStats[selectedCategory] || categoryStats['전체']);
+										if (stat.total > 0 && stat.total === stat.studied) {
+											Alert.alert('대단해요! 👏', '이 카테고리는 이미 다 풀었어요. 다른 주제를 골라볼까요? 😄');
+											return;
+										}
+										if (filtered.length === 0) {
+											Alert.alert('잠깐만요!', '선택한 난이도와 카테고리에 맞는 속담이 아직 없어요 🥲');
+											return;
+										}
+
+										onStart();
+									}
+								}}>
+								<View style={styles.centeredButtonContent}>
+									{modeStep === 1 && <IconComponent type='fontAwesome5' name='rocket' size={16} color='#fff' style={{ marginRight: 8 }} />}
+									<Text style={styles.modalButtonText}>{modeStep === 0 ? '다음' : '퀴즈 시작'}</Text>
+									{modeStep === 0 && <IconComponent type='fontAwesome5' name='arrow-right' size={16} color='#fff' style={{ marginLeft: 8 }} />}
+								</View>
+							</TouchableOpacity>
+						</View>
 					</View>
 				</View>
-			</View>
-		</Modal>
+			</Modal>
+			{/* <Modal visible={isShowCategoryInfo} transparent animationType="fade" onRequestClose={() => setIsShowCategoryInfo(false)}>
+				<View style={styles.modalOverlay}>
+					<View style={styles.modalOverlay}>
+						<View style={styles.infoModalBox}>
+							<Text style={styles.modalTitle}>📚 카테고리 안내</Text>
+							<ScrollView style={{ maxHeight: 400 }}>
+								{Object.entries(CATEGORY_DESCRIPTIONS).map(([key, desc]) => (
+									<View key={key} style={{ marginBottom: 12 }}>
+										<Text style={{ fontWeight: 'bold', fontSize: 16 }}>{key}</Text>
+										<Text style={{ color: '#636e72', fontSize: 14 }}>{desc}</Text>
+									</View>
+								))}
+							</ScrollView>
+							<TouchableOpacity onPress={() => setIsShowCategoryInfo(false)} style={styles.modalButton}>
+								<Text style={styles.modalButtonText}>확인</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</View>
+			</Modal> */}
+		</>
+
 	);
 };
 
@@ -532,5 +571,14 @@ const styles = StyleSheet.create({
 		right: 0,
 		top: 8,
 		padding: 8,
+	},
+	infoModalBox: {
+		backgroundColor: '#fff',
+		borderRadius: 16,
+		padding: 20,
+		width: '85%',
+		maxWidth: 400,
+		maxHeight: '80%',
+		alignItems: 'center',
 	},
 });

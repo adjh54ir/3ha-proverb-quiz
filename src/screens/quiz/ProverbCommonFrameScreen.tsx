@@ -28,6 +28,7 @@ import QuizResultModal from '../modal/QuizResultModal';
 import { QuizBadgeInterceptor } from '@/services/interceptor/QuizBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
 import IconComponent from '../common/atomic/IconComponent';
+import { Paths } from '@/navigation/conf/Paths';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -113,6 +114,13 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 		})();
 	}, []);
 
+	useEffect(() => {
+		if (showExitModal && timerRef.current) {
+			clearInterval(timerRef.current);
+			timerRef.current = null;
+		}
+	}, [showExitModal]);
+
 	// 퀴즈 시작 전 데이터 불러오기
 	useEffect(() => {
 		const levels = ProverbServices.selectLevelNameList();
@@ -169,37 +177,51 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 			return levelMatch && categoryMatch;
 		});
 
-		if (filteredProverbs.length === 0) {
-			Alert.alert('문제 없음', '선택한 난이도와 카테고리에 해당하는 문제가 없습니다.', [{ text: '확인', onPress: () => setShowStartModal(true) }]);
+		const solvedSet = new Set([
+			...(quizHistory?.correctProverbId ?? []),
+			...(quizHistory?.wrongProverbId ?? []),
+		]);
+
+		// 현재 문제도 중복 방지에 포함되도록 처리 (백업)
+		if (question) {
+			solvedSet.add(question.id);
+		}
+
+		const remainingProverbs = filteredProverbs.filter((p) => !solvedSet.has(p.id));
+
+		if (remainingProverbs.length === 0) {
+			setResultType('done');
+			setResultTitle('모든 퀴즈 완료!');
+			setResultMessage('훌륭해요! 모든 문제를 마쳤어요 🎉');
+			setShowResultModal(true);
 			return;
 		}
 
-		const shuffled = [...filteredProverbs].sort(() => Math.random() - 0.5);
+		const shuffled = [...remainingProverbs].sort(() => Math.random() - 0.5);
 		const newQuestion = shuffled[0];
-		const distractors = shuffled.slice(1, 4);
+		const distractorPool = filteredProverbs.filter(p => p.id !== newQuestion.id);
+		const shuffledDistractors = [...distractorPool].sort(() => Math.random() - 0.5).slice(0, 3);
 
 		let allOptions: string[] = [];
 		let displayText: string = '';
 
 		if (mode === 'meaning') {
-			// 뜻 맞추기 (정답: longMeaning 사용)
-			allOptions = [...distractors.map((item) => item.longMeaning), newQuestion.longMeaning!];
+			allOptions = [...shuffledDistractors.map((item) => item.longMeaning), newQuestion.longMeaning!];
 			displayText = newQuestion.proverb;
 		} else if (mode === 'proverb') {
-			// 속담 맞추기
-			allOptions = [...distractors.map((item) => item.proverb), newQuestion.proverb];
+			allOptions = [...shuffledDistractors.map((item) => item.proverb), newQuestion.proverb];
 			displayText = newQuestion.longMeaning!;
 		} else if (mode === 'fill-blank') {
-			// 빈칸 채우기
 			const blank = pickBlankWord(newQuestion.proverb);
 			displayText = newQuestion.proverb.replace(blank, '(____)');
-			allOptions = [...distractors.map((item) => pickBlankWord(item.proverb)), blank];
-			setBlankWord(blank); // 따로 기억해둬야 함
+			allOptions = [...shuffledDistractors.map((item) => pickBlankWord(item.proverb)), blank];
+			setBlankWord(blank);
 		}
+
 
 		setQuestion(newQuestion);
 		setOptions(allOptions.sort(() => Math.random() - 0.5));
-		setQuestionText(displayText); // 문제 텍스트 따로 저장
+		setQuestionText(displayText);
 		setSelected(null);
 		setIsCorrect(null);
 		setRemainingTime(20);
@@ -209,7 +231,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 			setRemainingTime((prev) => {
 				if (prev <= 1) {
 					clearInterval(timerRef.current!);
-					handleSelect(''); // 타임아웃 처리
+					handleSelect('');
 					return 0;
 				}
 				return prev - 1;
@@ -227,20 +249,17 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 	};
 
 	const startTimer = () => {
-		if (!question || hasAnsweredRef.current) return;
+		if (!question || hasAnsweredRef.current || timerRef.current) return; // ✅ 이미 타이머 돌고 있으면 막기
 
-		if (timerRef.current) clearInterval(timerRef.current);
 		timerRef.current = setInterval(() => {
 			setRemainingTime((prev) => {
-				const next = prev - 1;
-				if (next <= 0) {
+				if (prev <= 1) {
 					clearInterval(timerRef.current!);
-					// 🔒 포커스 확인
-					if (isFocused && question) {
-						handleSelect('');
-					}
+					timerRef.current = null;
+					if (isFocused && question) handleSelect('');
+					return 0;
 				}
-				return next;
+				return prev - 1;
 			});
 		}, 1000);
 	};
@@ -340,6 +359,31 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 			setShowResultModal(true);
 		}
 	};
+	const getLevelColor = (levelName: string) => {
+		const levelColorMap: Record<string, string> = {
+			'아주 쉬움': '#dfe6e9',
+			쉬움: '#74b9ff',
+			보통: '#0984e3',
+			어려움: '#2d3436',
+		};
+
+		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
+	};
+
+	const getFieldColor = (field: string) => {
+		const categoryColorMap: Record<string, string> = {
+			'운/우연': '#00cec9',
+			인간관계: '#6c5ce7',
+			'세상 이치': '#fdcb6e',
+			'근면/검소': '#e17055',
+			'노력/성공': '#00b894',
+			'경계/조심': '#d63031',
+			'욕심/탐욕': '#e84393',
+			'배신/불신': '#2d3436',
+		};
+		return categoryColorMap[field] || '#b2bec3';
+	};
+
 
 	const pickBlankWord = (text: string) => {
 		const words = text.split(' ').filter((w) => w.length > 1);
@@ -349,14 +393,20 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 	const getSolvedCount = () => {
 		if (!quizHistory) return 0;
 
-		const solvedSet = new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]);
+		const solvedSet = new Set([
+			...(quizHistory.correctProverbId ?? []),
+			...(quizHistory.wrongProverbId ?? []),
+		]);
 
-		if (selected && question?.id && !solvedSet.has(question.id)) {
-			// 방금 푼 문제를 아직 history에 반영 안 된 상태라면 1개 더해줌
-			return solvedSet.size + 1;
-		}
+		const filteredProverbs = proverbs.filter((p) => {
+			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+			return levelMatch && categoryMatch;
+		});
 
-		return solvedSet.size;
+		const filteredSolved = filteredProverbs.filter((p) => solvedSet.has(p.id));
+
+		return filteredSolved.length;
 	};
 	const totalCount = proverbs.filter((p) => {
 		const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
@@ -444,6 +494,8 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 		}
 	};
 
+	const progressPercent = totalCount > 0 ? (getSolvedCount() / totalCount) * 100 : 0;
+
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
 			<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -460,12 +512,19 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 											{getSolvedCount()} / {totalCount}
 										</Text>
 									</View>
-									<Text style={styles.quizSubText}>
-										난이도: {selectedLevel} / 카테고리: {selectedCategory}
-									</Text>
+									{question?.category && (
+										<View style={styles.badgeRow}>
+											<View style={[styles.pillBadge, { borderColor: getLevelColor(question.levelName) }]}>
+												<Text style={[styles.pillBadgeText, { color: getLevelColor(question.levelName) }]}>{question.levelName}</Text>
+											</View>
+											<View style={[styles.pillBadge, { borderColor: getFieldColor(question.category) }]}>
+												<Text style={[styles.pillBadgeText, { color: getFieldColor(question.category) }]}>{question.category}</Text>
+											</View>
+										</View>
+									)}
 
 									<View style={styles.progressBarWrapper}>
-										<View style={[styles.progressBarFill, { width: `${(solvedCount / totalCount) * 100}%` }]} />
+										<View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
 									</View>
 
 									<View style={styles.statusCardRow}>
@@ -509,10 +568,10 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 
 									<Text style={styles.questionText}>
 										{`Q. ${mode === 'fill-blank'
-												? questionText || '문제 준비중...'
-												: mode === 'meaning'
-													? question?.proverb
-													: question?.longMeaning || '문제 준비중...'
+											? questionText || '문제 준비중...'
+											: mode === 'meaning'
+												? question?.proverb
+												: question?.longMeaning || '문제 준비중...'
 											}`}
 									</Text>
 
@@ -630,7 +689,18 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 								resultTitle={resultTitle}
 								resultMessage={resultMessage}
 								question={question}
-								onNext={handleNextQuestion}
+								onNext={() => {
+									setShowResultModal(false); // 먼저 모달 닫기
+
+									if (resultType === 'done') {
+										setTimeout(() => {
+											//@ts-ignore
+											navigation.navigate(Paths.MAIN_TAB, { screen: Paths.SETTING });
+										}, 300); // 약간의 시간 차를 주어 애니메이션 자연스럽게
+									} else {
+										loadQuestion();
+									}
+								}}
 							/>
 
 							{/* 뱃지 모달 */}
@@ -699,12 +769,13 @@ const styles = StyleSheet.create({
 	},
 	timerText: { fontSize: 18, fontWeight: 'bold', color: '#2c3e50' },
 	questionText: {
-		fontSize: 18, // 기존 20 → 살짝 축소
+		fontSize: 20, // 기존 18 → 더 눈에 띄게
 		fontWeight: 'bold',
 		marginTop: 12,
 		marginBottom: 24,
 		textAlign: 'center',
 		color: '#3498db',
+		lineHeight: 28, // 추가
 	},
 	optionsContainer: { width: '100%' },
 	optionButton: { backgroundColor: '#ecf0f1', padding: 16, borderRadius: 12, marginBottom: 12 },
@@ -1034,14 +1105,14 @@ const styles = StyleSheet.create({
 	},
 	optionCard: {
 		backgroundColor: '#fff',
-		padding: 12, // 기존 16 → 줄임
-		borderRadius: 14,
-		borderWidth: 1.5,
-		borderColor: '#dcdde1',
-		marginBottom: 12, // 기존 14 → 줄임
+		padding: 14,
+		borderRadius: 16,
+		borderWidth: 1.2,
+		borderColor: '#dfe6e9',
+		marginBottom: 14,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.08,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
 		shadowRadius: 3,
 	},
 
@@ -1251,5 +1322,33 @@ const styles = StyleSheet.create({
 		textAlign: 'left', // 또는 'center'도 OK
 		marginBottom: 8,
 		marginTop: -4, // 너무 벌어지지 않게 미세 간격 조절
+	},
+	badge: {
+		paddingVertical: 4,
+		paddingHorizontal: 10,
+		borderRadius: 12,
+	},
+	badgeText: {
+		color: '#fff',
+		fontSize: 13,
+		fontWeight: '600',
+	},
+	pillBadgeText: {
+		fontSize: 12,
+		fontWeight: '600',
+	},
+	badgeRow: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginBottom: 8,
+	},
+	pillBadge: {
+		borderWidth: 1,
+		paddingHorizontal: 10,
+		paddingVertical: 4,
+		borderRadius: 14,
+		marginHorizontal: 4,
+		backgroundColor: 'rgba(0,0,0,0.02)', // 살짝 강조
 	},
 });

@@ -165,7 +165,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_all',
 		name: '퀴즈 정복자',
-		description: '모든 문제 완료! 세계 정복 완료예요!',
+		description: '모든 문제 완료! 속담 퀴즈 정복 완료예요!',
 		iconType: 'materialIcons',
 		icon: 'verified',
 		type: 'quiz',

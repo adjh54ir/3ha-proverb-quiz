@@ -23,13 +23,14 @@ import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import AdmobBannerAd from './common/ads/AdmobBannerAd';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import IconComponent from './common/atomic/IconComponent';
 
 const PAGE_SIZE = 30;
 
 const COMMON_ALL_OPTION = {
 	label: '전체',
 	value: '전체',
-	icon: () => <Icon name='clipboard-list' size={16} color='#555' />,
+	icon: () => <IconComponent type='FontAwesome6' name='clipboard-list' size={16} color='#555' />,
 };
 
 const LEVEL_DROPDOWN_ITEMS = [
@@ -37,22 +38,22 @@ const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '아주 쉬움',
 		value: '아주 쉬움',
-		icon: () => <Icon name='seedling' size={16} color='#85C1E9' />,
+		icon: () => <IconComponent type='FontAwesome6' name='seedling' size={16} color='#85C1E9' />,
 	},
 	{
 		label: '쉬움',
 		value: '쉬움',
-		icon: () => <Icon name='leaf' size={16} color='#F4D03F' />,
+		icon: () => <IconComponent type='FontAwesome6' name='leaf' size={16} color='#F4D03F' />,
 	},
 	{
 		label: '보통',
 		value: '보통',
-		icon: () => <Icon name='tree' size={16} color='#EB984E' />,
+		icon: () => <IconComponent type='FontAwesome6' name='tree' size={16} color='#EB984E' />,
 	},
 	{
 		label: '어려움',
 		value: '어려움',
-		icon: () => <Icon name='trophy' size={16} color='#E74C3C' />,
+		icon: () => <IconComponent type='FontAwesome6' name='trophy' size={16} color='#E74C3C' />,
 	},
 ];
 const FIELD_DROPDOWN_ITEMS = [
@@ -60,42 +61,42 @@ const FIELD_DROPDOWN_ITEMS = [
 	{
 		label: '운/우연',
 		value: '운/우연',
-		icon: () => <Icon name='dice' size={16} color='#81ecec' />,
+		icon: () => <IconComponent type='FontAwesome6' name='dice' size={16} color='#81ecec' />,
 	},
 	{
 		label: '인간관계',
 		value: '인간관계',
-		icon: () => <Icon name='users' size={16} color='#a29bfe' />,
+		icon: () => <IconComponent type='FontAwesome6' name='users' size={16} color='#a29bfe' />,
 	},
 	{
 		label: '세상 이치',
 		value: '세상 이치',
-		icon: () => <Icon name='globe' size={16} color='#fdcb6e' />,
+		icon: () => <IconComponent type='fontawesome5' name='globe' size={16} color='#fdcb6e' />,
 	},
 	{
 		label: '근면/검소',
 		value: '근면/검소',
-		icon: () => <Icon name='hammer' size={16} color='#fab1a0' />,
+		icon: () => <IconComponent type='fontawesome5' name='hammer' size={16} color='#fab1a0' />,
 	},
 	{
 		label: '노력/성공',
 		value: '노력/성공',
-		icon: () => <Icon name='medal' size={16} color='#55efc4' />,
+		icon: () => <IconComponent type='fontawesome5' name='medal' size={16} color='#55efc4' />,
 	},
 	{
 		label: '경계/조심',
 		value: '경계/조심',
-		icon: () => <Icon name='exclamation-triangle' size={16} color='#ff7675' />,
+		icon: () => <IconComponent type='fontawesome5' name='exclamation-triangle' size={16} color='#ff7675' />,
 	},
 	{
 		label: '욕심/탐욕',
 		value: '욕심/탐욕',
-		icon: () => <Icon name='hand-holding-usd' size={16} color='#fd79a8' />,
+		icon: () => <IconComponent type='fontawesome5' name='hand-holding-usd' size={16} color='#fd79a8' />,
 	},
 	{
 		label: '배신/불신',
 		value: '배신/불신',
-		icon: () => <Icon name='user-slash' size={16} color='#b2bec3' />,
+		icon: () => <IconComponent type='fontawesome5' name='user-slash' size={16} color='#b2bec3' />,
 	},
 ];
 
@@ -264,7 +265,7 @@ const ProverbListScreen = () => {
 					<View style={{ zIndex: 10, paddingHorizontal: 16, paddingTop: 16 }}>
 						<View style={styles.filterCard}>
 							<View style={styles.bannerContainer}>
-								<AdmobBannerAd />
+								<AdmobBannerAd paramMarginBottom={8} />
 							</View>
 							<TextInput
 								ref={searchInputRef}
@@ -377,7 +378,6 @@ const ProverbListScreen = () => {
 											setShowDetailModal(true);
 										}}>
 										<View style={styles.proverbBlock}>
-											<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
 											<View style={styles.badgeInlineRow}>
 												<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
 													<Text style={styles.badgeText}>{item.levelName}</Text>
@@ -386,6 +386,7 @@ const ProverbListScreen = () => {
 													<Text style={styles.badgeText}>{item.category}</Text>
 												</View>
 											</View>
+											<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
 										</View>
 
 										<Text style={styles.meaningText}>- {item.longMeaning}</Text>
@@ -397,7 +398,7 @@ const ProverbListScreen = () => {
 													.filter((p) => p.trim())
 													.map((p, idx) => (
 														<Text key={idx} style={styles.sameProverbText}>
-															{'\u2022'} {p}
+															- {p}
 														</Text>
 													))}
 											</View>
@@ -432,10 +433,6 @@ const ProverbListScreen = () => {
 
 									{selectedProverb && (
 										<>
-											<View style={styles.modalProverbBox}>
-												<Text style={styles.modalProverbText}>{selectedProverb.proverb}</Text>
-											</View>
-
 											<View style={[styles.badgeRow, { marginBottom: 12 }]}>
 												<View style={[styles.badge, { backgroundColor: getLevelColor(selectedProverb.levelName) }]}>
 													<Text style={styles.badgeText}>{selectedProverb.levelName}</Text>
@@ -444,6 +441,11 @@ const ProverbListScreen = () => {
 													<Text style={styles.badgeText}>{selectedProverb.category}</Text>
 												</View>
 											</View>
+											<View style={styles.modalProverbBox}>
+												<Text style={styles.modalProverbText}>{selectedProverb.proverb}</Text>
+											</View>
+
+
 
 											<View style={styles.modalSection}>
 												<Text style={styles.modalLabel}>의미</Text>
@@ -456,15 +458,13 @@ const ProverbListScreen = () => {
 											</View>
 
 											{Array.isArray(selectedProverb.sameProverb) && selectedProverb.sameProverb.filter((p) => p.trim()).length > 0 && (
-												<View style={styles.sameProverbBox}>
-													<Text style={styles.sameProverbTitle}>비슷한 속담</Text>
-													{selectedProverb.sameProverb
-														.filter((p) => p.trim())
-														.map((p, idx) => (
-															<Text key={idx} style={styles.sameProverbText}>
-																{'\u2022'} {p}
-															</Text>
-														))}
+												<View style={styles.modalSection}>
+													<Text style={styles.modalLabel}>비슷한 속담</Text>
+													{selectedProverb.sameProverb.map((p, idx) => (
+														<Text key={idx} style={styles.modalText}>
+															- {p}
+														</Text>
+													))}
 												</View>
 											)}
 										</>
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
 	},
 
 	modalLabel: {
-		fontSize: 14,
+		fontSize: 17,
 		fontWeight: 'bold',
 		color: '#0984e3',
 		marginBottom: 6,
@@ -580,7 +580,7 @@ const styles = StyleSheet.create({
 	modalText: {
 		fontSize: 15,
 		color: '#2d3436',
-		lineHeight: 22,
+		lineHeight: 24,
 	},
 
 	modalHighlightTitle: {
@@ -614,14 +614,16 @@ const styles = StyleSheet.create({
 		marginBottom: 8,
 	},
 	meaningText: {
-		fontSize: 14,
-		color: '#636e72',
-		lineHeight: 20,
+		fontSize: 15,
+		color: '#2d3436',
+		fontWeight: '400', // 강조 추가
+		lineHeight: 24,
 		marginBottom: 12,
 	},
 	badgeRow: {
 		flexDirection: 'row',
 		gap: 8,
+		justifyContent: "center",
 	},
 	badge: {
 		paddingHorizontal: 10,
@@ -735,7 +737,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	modalHeaderTitle: {
-		fontSize: 18,
+		fontSize: 22,
 		marginTop: 5,
 		fontWeight: 'bold',
 		color: '#2d3436',
@@ -774,27 +776,22 @@ const styles = StyleSheet.create({
 	},
 	sameProverbBox: {
 		marginTop: 10,
-		padding: 12,
-		backgroundColor: '#eaf6ff',
-		borderRadius: 12,
-		borderWidth: 1,
-		borderColor: '#d0eaff',
-		marginBottom: 4, // 항목 아래 간격 살짝 추가
+		padding: 10,
+		backgroundColor: '#f4f6f8', // 회색톤으로 변경
+		borderRadius: 10,
 	},
-
 	sameProverbTitle: {
-		fontSize: 13,
-		color: '#2980b9',
-		fontWeight: '700',
+		fontSize: 14,
+		color: '#0984e3', // 더 진한 텍스트 색상
+		fontWeight: '600',
 		marginBottom: 6,
 	},
 
 	sameProverbText: {
 		fontSize: 13,
-		color: '#34495e',
-		paddingVertical: 2,
-		paddingLeft: 10,
-		position: 'relative',
+		color: '#34495e', // 더 진한 회색
+		fontWeight: '500', // 기존보다 더 강조
+		lineHeight: 22,
 	},
 	modalHighlightBox: {
 		backgroundColor: '#f1f8ff',
@@ -835,5 +832,26 @@ const styles = StyleSheet.create({
 		color: '#2d3436',
 		lineHeight: 26, // 더 넓은 줄 간격
 		marginBottom: 8, // 뱃지와 간격 확보
+	},
+	// 모달 영역에서 사용하는 스타일 복구
+	sameProverbBoxModal: {
+		marginTop: 10,
+		padding: 12,
+		backgroundColor: '#eaf6ff', // 밝은 파랑 원래값
+		borderRadius: 12,
+		borderWidth: 1,
+		borderColor: '#d0eaff',
+	},
+	sameProverbTitleModal: {
+		fontSize: 13,
+		color: '#2980b9', // 파란 강조
+		fontWeight: '700',
+		marginBottom: 6,
+	},
+	sameProverbTextModal: {
+		fontSize: 13,
+		color: '#34495e',
+		paddingVertical: 2,
+		paddingLeft: 10,
 	},
 });

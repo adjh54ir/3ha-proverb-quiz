@@ -77,7 +77,7 @@ const StackNavigator = () => {
 				component={ProverbQuizModeSelectScreen}
 				options={({ navigation }) => ({
 					headerShown: true,
-					title: '퀴즈모드 선택',
+					title: '퀴즈 모드 선택',
 					headerLeft: () => (
 						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
 							<Icon name='arrow-back' size={24} color='#2c3e50' />

@@ -60,7 +60,7 @@ import { MainDataType } from '@/types/MainDataType';
 - 600점: ✈️ 퀴즈 여행을 시작했어요! 첫 발걸음 축하해요!
 - 1200점: 🏞️ 대륙을 넘나드는 정복자!
 - 1800점: 🧳 국가 탐험가! 이제 세계가 무대예요!
-- 2460점: 👑 월드 마스터! 전 세계 속담을 정복했어요!
+- 2460점: 👑 속담 마스터! 전 세계 속담을 정복했어요!
 */
 export const CONST_BADGES: MainDataType.UserBadge[] = [
 	// 학습 뱃지

@@ -2,7 +2,7 @@ import { Paths } from '@/navigation/conf/Paths';
 import { MainDataType } from '@/types/MainDataType';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 // ✅ QuizResultModal.tsx
@@ -53,7 +53,11 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 						resizeMode={FastImage.resizeMode.contain}
 					/>
 
-					<View style={styles.resultMessageContainer}>
+					<ScrollView
+						style={{ maxHeight: 500, width: '100%' }} // 🔽 모달 높이 제한
+						contentContainerStyle={{ paddingBottom: 10 }}
+						showsVerticalScrollIndicator={true}
+					>
 						{resultType === 'done' ? (
 							<>
 								<Text style={styles.resultMessage}>{resultMessage}</Text>
@@ -87,7 +91,7 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 								</View>
 							</>
 						)}
-					</View>
+					</ScrollView>
 
 					<TouchableOpacity style={styles.modalConfirmButton} onPress={() => {
 						if (resultType === 'done') {
@@ -117,6 +121,7 @@ export const styles = StyleSheet.create({
 		borderRadius: 16,
 		alignItems: 'center',
 		width: '80%',
+		maxHeight: '85%', // ✅ 추가: 화면 넘지 않게 제한
 	},
 	resultTitle: {
 		fontSize: 22,
@@ -161,6 +166,9 @@ export const styles = StyleSheet.create({
 		color: '#2c3e50',
 		lineHeight: 22,
 		fontWeight: '500',
+		width: '100%',     // ✅ 너비 제한
+		flexWrap: 'wrap',  // ✅ 줄바꿈 허용
+		flexShrink: 1,     // ✅ 너무 길면 줄이기
 	},
 	resultSubText: {
 		fontSize: 15,

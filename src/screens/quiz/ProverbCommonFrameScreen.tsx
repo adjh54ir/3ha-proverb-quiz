@@ -470,9 +470,10 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 		setOptions([]);
 		setQuestionText('');
 		setBlankWord('');
-		setQuestion(null);
+
 
 		setTimeout(() => {
+			setQuestion(null);
 			if (isFinal) {
 				safelyGoBack();
 			} else {
@@ -566,57 +567,83 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 										)}
 									</AnimatedCircularProgress>
 
-									<Text style={styles.questionText}>
-										{`Q. ${mode === 'fill-blank'
-											? questionText || '문제 준비중...'
-											: mode === 'meaning'
-												? question?.proverb
-												: question?.longMeaning || '문제 준비중...'
-											}`}
-									</Text>
+									{question ? (
+										<View style={styles.quizBox}>
+											<Text style={styles.questionText}>
+												{`Q. ${mode === 'fill-blank'
+													? questionText || '문제 준비중...'
+													: mode === 'meaning'
+														? question?.proverb
+														: question?.longMeaning || '문제 준비중...'
+													}`}
+											</Text>
+										</View>
+									) : (
+										<Text>문제 불러오는 중...</Text>
+									)}
 
 									<View style={styles.optionsContainer}>
-										{options.map((option, index) => {
-											const scaleAnim = scaleAnims.current[index] ?? new Animated.Value(1); // 방어코드
+										<ScrollView
+											style={{ maxHeight: 400 }} // 원하는 높이만큼 제한
+											nestedScrollEnabled
+											showsVerticalScrollIndicator
+											contentContainerStyle={{ paddingBottom: 8 }}
+										>
+											{options.map((option, index) => {
+												const scaleAnim = scaleAnims.current[index] ?? new Animated.Value(1); // 방어코드
 
-											const isSelected = selected === option;
-											const isAnswerCorrect = isCorrect && isSelected;
-											const isAnswerWrong = !isCorrect && isSelected;
+												const isSelected = selected === option;
+												const isAnswerCorrect = isCorrect && isSelected;
+												const isAnswerWrong = !isCorrect && isSelected;
 
-											const handlePressIn = () => {
-												Animated.spring(scaleAnim, {
-													toValue: 0.97,
-													useNativeDriver: true,
-												}).start();
-											};
+												const handlePressIn = () => {
+													Animated.spring(scaleAnim, {
+														toValue: 0.97,
+														useNativeDriver: true,
+													}).start();
+												};
 
-											const handlePressOut = () => {
-												Animated.spring(scaleAnim, {
-													toValue: 1,
-													useNativeDriver: true,
-												}).start();
-											};
+												const handlePressOut = () => {
+													Animated.spring(scaleAnim, {
+														toValue: 1,
+														useNativeDriver: true,
+													}).start();
+												};
 
-											return (
-												<Animated.View key={index} style={{ transform: [{ scale: scaleAnim }] }}>
-													<TouchableOpacity
-														onPressIn={handlePressIn}
-														onPressOut={handlePressOut}
-														style={[styles.optionCard, isAnswerCorrect && styles.optionCorrectCard, isAnswerWrong && styles.optionWrongCard]}
-														onPress={() => handleSelect(option)}
-														disabled={!!selected}>
-														<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-															<View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
-																<Text style={[styles.optionLabel, { color: labelColors[index], marginRight: 6 }]}>{['A.', 'B.', 'C.', 'D.'][index]}</Text>
-																<Text style={styles.optionContent}>{option}</Text>
+												return (
+													<Animated.View key={index} style={{ transform: [{ scale: scaleAnim }] }}>
+														<TouchableOpacity
+															onPressIn={handlePressIn}
+															onPressOut={handlePressOut}
+															style={[
+																styles.optionCard,
+																isAnswerCorrect && styles.optionCorrectCard,
+																isAnswerWrong && styles.optionWrongCard,
+															]}
+															onPress={() => handleSelect(option)}
+															disabled={!!selected}
+														>
+															<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+																<Text style={[styles.optionLabel, { color: labelColors[index], marginRight: 6 }]}>
+																	{['A.', 'B.', 'C.', 'D.'][index]}
+																</Text>
+
+																<View style={{ flex: 1 }}>
+																	<Text style={styles.optionContent}>{option}</Text>
+																</View>
+																{isSelected && (
+																	<Icon
+																		name={isAnswerCorrect ? 'check-circle' : 'cancel'}
+																		size={28}
+																		color={isAnswerCorrect ? '#2ecc71' : '#e74c3c'}
+																	/>
+																)}
 															</View>
-
-															{isSelected && <Icon name={isAnswerCorrect ? 'check-circle' : 'cancel'} size={28} color={isAnswerCorrect ? '#2ecc71' : '#e74c3c'} />}
-														</View>
-													</TouchableOpacity>
-												</Animated.View>
-											);
-										})}
+														</TouchableOpacity>
+													</Animated.View>
+												);
+											})}
+										</ScrollView>
 									</View>
 								</View>
 							</View>

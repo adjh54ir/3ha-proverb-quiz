@@ -559,7 +559,8 @@ const styles = StyleSheet.create({
 
 	modalBody: {
 		paddingHorizontal: 20,
-		paddingVertical: 16,
+		paddingTop: 8,
+		paddingBottom: 16
 	},
 
 	modalSection: {

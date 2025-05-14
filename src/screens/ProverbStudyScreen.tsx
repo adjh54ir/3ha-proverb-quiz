@@ -24,9 +24,9 @@ import { useNavigation } from '@react-navigation/native';
 import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import Icon from 'react-native-vector-icons/FontAwesome6';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 
 const STORAGE_KEY = 'UserStudyHistory';
 
@@ -154,6 +154,9 @@ const ProverbStudyScreen = () => {
 	const [filter, setFilter] = useState<'all' | 'learning' | 'learned'>('learning');
 
 	const completionImages = require('@/assets/images/cheer-up.png');
+
+
+	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
 	const praiseMessages = [
 		'속담 박사님 등장! 🎓',
@@ -589,10 +592,10 @@ const ProverbStudyScreen = () => {
 						styles.cardBack,
 						{
 							transform: [{ rotateY: backInterpolate }],
-							backfaceVisibility: 'hidden',
 							position: 'absolute',
 							top: 0,
 							left: 0,
+							zIndex: 2, // 👈 뒷면이 위로 오게
 						},
 					]}>
 					<TouchableOpacity
@@ -606,7 +609,7 @@ const ProverbStudyScreen = () => {
 								contentContainerStyle={{
 									flexGrow: 1,
 									justifyContent: 'flex-start',
-									paddingTop: 24,
+									paddingTop: 15,
 									paddingBottom: 30, // 하단 버튼 여백 유지
 								}}
 								keyboardShouldPersistTaps='handled'
@@ -818,7 +821,6 @@ const ProverbStudyScreen = () => {
 									modeConfig={{
 										parallaxScrollingScale: 0.9,
 										parallaxScrollingOffset: 40,
-										parallaxAdjacentItemScale: 0.9,
 									}}
 									onSnapToItem={(index) => {
 										setCurrentIndex(index);
@@ -934,7 +936,6 @@ const styles = StyleSheet.create({
 		backgroundColor: '#f9fafb', // 기존보다 덜 눈부심
 	},
 	cardWrapper: {
-		position: 'absolute',
 		left: 0,
 		right: 0,
 		alignItems: 'center',
@@ -964,7 +965,8 @@ const styles = StyleSheet.create({
 	},
 	cardBack: {
 		backgroundColor: '#4a90e2',
-		elevation: 1, // ✅ Android용 뒷면 보정
+		// elevation: 1, // ✅ Android용 뒷면 보정
+		zIndex: 2,
 	},
 	cardInner: {
 		flex: 1,
@@ -1155,9 +1157,12 @@ const styles = StyleSheet.create({
 	},
 	retryButton: {
 		backgroundColor: '#f39c12', // 다시 학습은 노란색 계열
-		paddingVertical: 12,
+		height: 48, // ✅ 높이 명확히 지정
+		borderRadius: 24,
+		alignItems: 'center',
+		justifyContent: 'center',
 		paddingHorizontal: 30,
-		borderRadius: 30,
+		marginTop: 20,
 		marginBottom: 10,
 	},
 	modalOverlay: {

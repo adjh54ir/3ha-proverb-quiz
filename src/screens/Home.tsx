@@ -396,25 +396,58 @@ const Home = () => {
 						</TouchableOpacity>
 
 						<Text style={styles.pageTitle}>획득 가능한 뱃지</Text>
+						<Text style={styles.badgeProgressText}>
+							총 {CONST_BADGES.length}개 뱃지 중{' '}
+							<Text style={{ fontWeight: 'bold', color: '#27ae60' }}>
+								{earnedBadgeIds.length}개를 획득했어요!
+							</Text>
+						</Text>
 
 						<ScrollView contentContainerStyle={{ padding: 10 }} style={{ maxHeight: 400, width: '100%' }}>
-							{CONST_BADGES.map((badge) => (
-								<View key={badge.id} style={[styles.badgeCard]}>
-									<View style={[styles.iconBox]}>
-										<IconComponent
-											name={badge.icon}
-											// @ts-ignore
-											type={badge.iconType}
-											size={20}
-											color={'#2c3e50'}
-										/>
+							{CONST_BADGES.map((badge) => {
+								const isEarned = earnedBadgeIds.includes(badge.id);
+								return (
+									<View
+										key={badge.id}
+										style={[
+											styles.badgeCard,
+											isEarned && styles.badgeCardActive, // ✅ 활성화된 스타일 적용
+										]}
+									>
+										<View
+											style={[
+												styles.iconBox,
+												isEarned && styles.badgeCardActive, // 아이콘 박스도 강조
+											]}
+										>
+											<IconComponent
+												name={badge.icon}
+												type={badge.iconType}
+												size={20}
+												color={isEarned ? '#27ae60' : '#2c3e50'} // ✅ 색상 강조
+											/>
+										</View>
+										<View style={styles.textBox}>
+											<Text
+												style={[
+													styles.badgeTitle,
+													isEarned && styles.badgeTitleActive, // 텍스트 강조
+												]}
+											>
+												{badge.name}
+											</Text>
+											<Text
+												style={[
+													styles.badgeDesc,
+													isEarned && styles.badgeDescActive, // 설명 강조
+												]}
+											>
+												획득조건: {badge.description}
+											</Text>
+										</View>
 									</View>
-									<View style={styles.textBox}>
-										<Text style={[styles.badgeTitle]}>{badge.name}</Text>
-										<Text style={[styles.badgeDesc]}>획득조건: {badge.description}</Text>
-									</View>
-								</View>
-							))}
+								);
+							})}
 						</ScrollView>
 
 						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowBadgeModal(false)}>

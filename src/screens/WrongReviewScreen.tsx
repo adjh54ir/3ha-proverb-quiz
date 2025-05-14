@@ -26,26 +26,12 @@ export interface UserQuizHistory {
 	bestCombo?: number; // 사용자가 기록한 가장 높은 연속 정답 수 (선택 값)
 }
 
-export type Proverb = {
-	id: number; // 고유 식별자 (1부터 시작하는 번호)
-	proverb: string; // 속담 본문 (ex: "가는 말이 고와야 오는 말이 곱다")
-	meaning: string; // 속담의 의미 설명 (문장형, 존댓말 처리)
-	category: string; // 속담이 속하는 카테고리 (ex: 인간관계, 세상 이치 등)
-	level: number; // 난이도 숫자 (1: 아주 쉬움, 2: 쉬움, 3: 보통, 4: 어려움)
-	levelName: string; // 난이도 이름 (ex: "쉬움", "보통" 등 텍스트)
-	example: string; // 속담을 활용한 예시 문장
-	origin: string; // 속담의 유래나 배경 설명
-	usageTip: string; // 속담을 사용할 수 있는 팁 또는 상황 설명
-	synonym: string | null; // 비슷한 의미의 다른 속담 (없으면 null)
-	antonym: string | null; // 반대 의미의 속담 (없으면 null)
-	difficultyScore: number; // 난이도를 세분화한 점수 (1~100 범위)
-};
 
 const WrongReviewScreen = () => {
 	const navigation = useNavigation();
 	const isFocused = useIsFocused();
 	const [loading, setLoading] = useState(true);
-	const [wrongCountries, setWrongCountries] = useState<Proverb[]>([]);
+	const [wrongCountries, setWrongCountries] = useState<MainDataType.Proverb[]>([]);
 	const [showGuideModal, setShowGuideModal] = useState(false);
 	const [totalSolvedCount, setTotalSolvedCount] = useState(0);
 	const [correctCount, setCorrectCount] = useState(0);
@@ -117,34 +103,33 @@ const WrongReviewScreen = () => {
 
 	return (
 		<ScrollView contentContainerStyle={styles.scrollContainer}>
-			<View style={[styles.headerRow]}>
+			{/* <View style={[styles.headerRow]}>
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<IconComponent type='materialIcons' name='replay' size={26} color='#f39c12' style={{ marginRight: 6 }} />
+					<IconComponent type='materialIcons' name='replay' size={24} color='#f39c12' style={{ marginRight: 6 }} />
 					<Text style={styles.headerTitle}>오답 복습</Text>
 				</View>
 				<TouchableOpacity onPress={() => setShowGuideModal(true)}>
-					<IconComponent type='materialIcons' name='help-outline' size={24} color='#3498db' />
+					<IconComponent type='materialIcons' name='help-outline' size={22} color='#3498db' />
 				</TouchableOpacity>
-			</View>
-			<View style={styles.activityCardBox}>
-				<View style={styles.card}>
-					<Text style={styles.title}>
-						총 {totalSolvedCount}문제 중 <Text style={styles.highlight}>{wrongCountries.length}</Text>문제가 조금 아쉬웠어요!
-						{'\n'}다시 풀어볼까요? 😊
+			</View> */}
+			<View style={styles.card}>
+				<Text style={styles.title}>
+					총 {totalSolvedCount}문제 중 <Text style={styles.highlight}>{wrongCountries.length}</Text>문제가 조금 아쉬웠어요!
+					{'\n'}다시 풀어볼까요? 😊
+				</Text>
+				<Text style={styles.subText}>
+					지금까지 정답률은{' '}
+					<Text style={styles.highlight2}>
+						{totalSolvedCount > 0 ? Math.round((correctCount / totalSolvedCount) * 100) : 0}%
 					</Text>
-					<Text style={styles.subText}>
-						지금까지 정답률은{' '}
-						<Text style={styles.highlight2}>
-							{totalSolvedCount > 0 ? Math.round((correctCount / totalSolvedCount) * 100) : 0}%
-						</Text>
-						예요!{'\n'}조금씩 실력이 쑥쑥 오르고 있어요! 🎯
-					</Text>
-				</View>
+					예요!{'\n'}조금씩 실력이 쑥쑥 오르고 있어요! 🎯
+				</Text>
 
-				<TouchableOpacity style={styles.startButton} onPress={startWrongReview}>
-					<Text style={styles.buttonText}>🚀 실력 업! 오답 다시 풀어보기</Text>
-				</TouchableOpacity>
+
 			</View>
+			<TouchableOpacity style={styles.startButton} onPress={startWrongReview}>
+				<Text style={styles.buttonText}>🚀 실력 업! 오답 다시 풀어보기</Text>
+			</TouchableOpacity>
 
 			<TouchableOpacity style={styles.toggleButton} onPress={() => setShowWrongList((prev) => !prev)}>
 				<Text style={styles.toggleButtonText}>{showWrongList ? '⬆️ 오답 목록 접기' : '⬇️ 오답 목록 펼치기'}</Text>
@@ -158,8 +143,8 @@ const WrongReviewScreen = () => {
 					</View>
 					{wrongCountries.map((proverb) => (
 						<View key={proverb.id} style={styles.reviewRow}>
-							<Text style={styles.reviewCell}>{proverb.proverb}</Text>
-							<Text style={styles.reviewCell}>{proverb.meaning}</Text>
+							<Text style={[styles.reviewCell, { flex: 4 }]}>{proverb.proverb}</Text>
+							<Text style={[styles.reviewCell, { flex: 6 }]}>{proverb.longMeaning}</Text>
 						</View>
 					))}
 				</View>
@@ -198,7 +183,7 @@ const styles = StyleSheet.create({
 	card: {
 		backgroundColor: '#ffffff',
 		paddingVertical: scaleHeight(28),
-		paddingHorizontal: scaleWidth(20),
+		paddingHorizontal: scaleWidth(10),
 		borderRadius: scaleWidth(16),
 		borderWidth: 1,
 		borderColor: '#dfe6e9',
@@ -207,7 +192,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	title: {
-		fontSize: scaledSize(18),
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 		textAlign: 'center',
@@ -229,7 +214,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#f1c40f',
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(40),
-		marginBottom: scaleHeight(10),
+		marginBottom: scaleHeight(30),
 		borderRadius: scaleWidth(30),
 		marginTop: scaleHeight(20),
 	},
@@ -303,7 +288,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#ffffff',
 		borderRadius: scaleWidth(16),
 		padding: scaleWidth(10),
-		marginBottom: scaleHeight(24),
+		marginBottom: scaleHeight(12),
 		borderWidth: 1,
 		borderColor: '#ecf0f1',
 	},
@@ -350,10 +335,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginBottom: scaleHeight(20),
+		marginBottom: scaleHeight(10),
 	},
 	headerTitle: {
-		fontSize: scaledSize(20),
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 		marginRight: scaleWidth(5),
@@ -380,7 +365,7 @@ const styles = StyleSheet.create({
 		marginLeft: scaleWidth(8),
 	},
 	guideDescription: {
-		fontSize: scaledSize(15),
+		fontSize: scaledSize(14),
 		color: '#34495e',
 		textAlign: 'left',
 		lineHeight: scaleHeight(22),
@@ -409,7 +394,6 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(12),
 		padding: scaleWidth(16),
 		width: '100%',
-		marginBottom: scaleHeight(20),
 	},
 	mascotImage: {
 		width: scaleWidth(120),

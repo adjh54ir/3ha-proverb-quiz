@@ -317,7 +317,7 @@ const CapitalResultScreen = () => {
 	];
 
 	const getEncourageMessage = (score: number) => {
-		if (score >= 1800) return '🌎 당신은 월드 마스터! 모두가 당신을 주목해요!';
+		if (score >= 1800) return '🌎 당신은 속담 마스터! 모두가 당신을 주목해요!';
 		if (score >= 1200) return '🌍 이제 마스터까지 한 걸음! 계속 도전해요!';
 		if (score >= 600) return '✈️ 더 넓은 세계가 당신을 기다리고 있어요!';
 		return '🚀 지금부터 시작이에요! 차근차근 도전해봐요!';

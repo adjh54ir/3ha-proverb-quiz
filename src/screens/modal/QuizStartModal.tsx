@@ -168,7 +168,7 @@ const QuizStartModal = ({
 
 	const CATEGORY_DESCRIPTIONS: Record<string, string> = {
 		'운/우연': '예기치 않은 상황이나 운명에 관한 속담이에요.',
-		'인간관계': '사람과 사람 사이의 관계나 처세에 관한 속담이에요.',
+		인간관계: '사람과 사람 사이의 관계나 처세에 관한 속담이에요.',
 		'세상 이치': '세상의 이치나 진리에 대해 알려주는 속담이에요.',
 		'근면/검소': '성실함과 검소함의 중요성을 알려주는 속담이에요.',
 		'노력/성공': '노력 끝에 얻는 보람이나 성공에 관한 속담이에요.',
@@ -271,11 +271,13 @@ const QuizStartModal = ({
 							) : (
 								<>
 									<View style={styles.selectTitleBox}>
-										<Text style={styles.selectTitleEmoji}>🎯</Text>
-										<Text style={styles.selectTitleText}>관심 있는 주제를 골라볼까요?</Text>
-										<TouchableOpacity onPress={() => setIsShowCategoryInfo(true)}>
-											<IconComponent type='materialIcons' name='info-outline' size={18} color='#636e72' />
-										</TouchableOpacity>
+										<View style={styles.titleRowCenter}>
+											<Text style={styles.selectTitleEmoji}>🎯 </Text>
+											<Text style={styles.selectTitleText}>관심 있는 주제를 골라볼까요?</Text>
+											<TouchableOpacity onPress={() => setIsShowCategoryInfo(true)} style={{ marginLeft: 6 }}>
+												<IconComponent type='materialIcons' name='info-outline' size={18} color='#636e72' />
+											</TouchableOpacity>
+										</View>
 									</View>
 									<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: 10 }} showsVerticalScrollIndicator={false}>
 										<SelectGroup
@@ -316,7 +318,7 @@ const QuizStartModal = ({
 												(selectedLevel === '전체' || item.levelName === selectedLevel) && (selectedCategory === '전체' || item.category === selectedCategory),
 										);
 
-										const stat = (categoryStats[selectedCategory] || categoryStats['전체']);
+										const stat = categoryStats[selectedCategory] || categoryStats['전체'];
 										if (stat.total > 0 && stat.total === stat.studied) {
 											Alert.alert('대단해요! 👏', '이 카테고리는 이미 다 풀었어요. 다른 주제를 골라볼까요? 😄');
 											return;
@@ -360,7 +362,6 @@ const QuizStartModal = ({
 				</View>
 			</Modal> */}
 		</>
-
 	);
 };
 
@@ -458,9 +459,10 @@ const styles = StyleSheet.create({
 	},
 	selectButtonActive: {
 		borderWidth: 2,
-		borderColor: '#27ae60',
+		borderColor: '#888', // 테두리도 검정으로 변경
 		// backgroundColor: '#1abc9c', // ❌ 이 줄 삭제 또는 주석 처리
-		shadowColor: '#27ae60',
+		// shadowColor: '#27ae60',
+		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 0 },
 		shadowOpacity: 0.6,
 		shadowRadius: 4,
@@ -474,11 +476,14 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginBottom: 18,
+		marginTop: 16,
+		marginBottom: 8,
 		gap: 6,
 	},
 	selectTitleEmoji: {
 		fontSize: 22,
+		justifyContent: "center",
+		alignContent: "center",
 	},
 	selectTitleText: {
 		fontSize: 17,
@@ -580,5 +585,11 @@ const styles = StyleSheet.create({
 		maxWidth: 400,
 		maxHeight: '80%',
 		alignItems: 'center',
+	},
+	titleRowCenter: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		flexShrink: 1,
 	},
 });

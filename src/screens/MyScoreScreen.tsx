@@ -341,9 +341,9 @@ const CapitalResultScreen = () => {
 					contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
 					onScroll={scrollHandler.onScroll}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-					<View style={styles.adContainer}>
+					{/* <View style={styles.adContainer}>
 						<AdmobBannerAd />
-					</View>
+					</View> */}
 					<View style={styles.sectionBox}>
 						<View style={{ alignItems: 'center', marginVertical: 20 }}>
 							<FastImage source={mascot} style={{ width: 120, height: 120 }} resizeMode={FastImage.resizeMode.contain} />

@@ -9,6 +9,7 @@ import { CONST_BADGES } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import Contributor9Modal from './common/modal/Contributor9Modal';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import VersionCheck from 'react-native-version-check';
 
 const STORAGE_KEYS = {
 	study: 'UserStudyHistory',
@@ -26,6 +27,13 @@ const SettingScreen = () => {
 	const [alarmTime, setAlarmTime] = useState<Date>(new Date());
 
 	const [showDevModal, setShowDevModal] = useState(false);
+
+	const [appVersion, setAppVersion] = useState('');
+
+	useEffect(() => {
+		const version = VersionCheck.getCurrentVersion();
+		setAppVersion(version);
+	}, []);
 
 	useEffect(() => {
 		if (isFocused) {
@@ -136,8 +144,9 @@ const SettingScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => { }} />}>
+			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}>
 				<AdmobBannerAd paramMarginTop={20} />
+				{/* <View style={styles.section}></View> */}
 				<View style={styles.section}>
 					<Text style={styles.title}>학습/퀴즈 다시 풀기 </Text>
 					<View style={styles.buttonGroup}>
@@ -171,11 +180,18 @@ const SettingScreen = () => {
 						</TouchableOpacity>
 					</View>
 				</View>
+
+				<View style={{ marginBottom: 20 }}>
+					<Text style={{ fontSize: 12, color: '#95a5a6', textAlign: 'center' }}>
+						📱 현재 앱 버전: <Text style={{ fontWeight: 'bold' }}>v{appVersion}</Text>
+					</Text>
+				</View>
+
 				<TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevModal(true)}>
 					<Text style={styles.devText}>제작자 소개</Text>
 				</TouchableOpacity>
 				<View style={{ marginTop: 30, marginBottom: 10 }}>
-					<Text style={{ fontSize: 12, color: '#7f8c8d', textAlign: 'center', padding: 40, }}>
+					<Text style={{ fontSize: 12, color: '#7f8c8d', textAlign: 'center', padding: 40 }}>
 						📚 본 앱의 일부 콘텐츠는{' '}
 						<Text style={{ textDecorationLine: 'underline', color: '#3498db' }} onPress={() => Linking.openURL('https://opendict.korean.go.kr/main')}>
 							국립국어원 표준국어대사전
@@ -183,8 +199,6 @@ const SettingScreen = () => {
 						을(를) 기반으로 제작되었습니다.
 					</Text>
 				</View>
-
-
 			</ScrollView>
 
 			<Contributor9Modal visible={showDevModal} onClose={() => setShowDevModal(false)} />
@@ -226,6 +240,7 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.1,
 		shadowRadius: 4,
+		marginTop: 20,
 	},
 	title: {
 		fontSize: 20,

@@ -26,7 +26,6 @@ export interface UserQuizHistory {
 	bestCombo?: number; // 사용자가 기록한 가장 높은 연속 정답 수 (선택 값)
 }
 
-
 const WrongReviewScreen = () => {
 	const navigation = useNavigation();
 	const isFocused = useIsFocused();
@@ -43,10 +42,7 @@ const WrongReviewScreen = () => {
 		const fetchWrongData = async () => {
 			setLoading(true);
 			try {
-				const [wrongIdList, correctIdList] = await Promise.all([
-					QuizHistoryService.getWrongProverbIds(),
-					QuizHistoryService.getCorrectProverbIds(),
-				]);
+				const [wrongIdList, correctIdList] = await Promise.all([QuizHistoryService.getWrongProverbIds(), QuizHistoryService.getCorrectProverbIds()]);
 
 				setTotalSolvedCount(wrongIdList.length + correctIdList.length);
 				setCorrectCount(correctIdList.length);
@@ -103,6 +99,15 @@ const WrongReviewScreen = () => {
 
 	return (
 		<ScrollView contentContainerStyle={styles.scrollContainer}>
+			<View style={styles.guideCard}>
+				<Text style={styles.guideCardTitle}>📘 오답 복습이란?</Text>
+				<Text style={styles.guideCardContent}>
+					❗ 이전 퀴즈에서 틀린 문제들을 다시 풀 수 있어요.{'\n\n'}- 틀린 속담이 반복 출제되며,{' '}
+					<Text style={styles.guideHighlight}>정답을 맞히면 오답 목록에서 자동 제거</Text>돼요!{'\n'}- 일반 퀴즈처럼{' '}
+					<Text style={styles.guideHighlight}>4지선다</Text>로 구성되고, <Text style={styles.guideHighlight}>정답 시 10점</Text>을 받을 수 있어요 🎯
+				</Text>
+			</View>
+
 			{/* <View style={[styles.headerRow]}>
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 					<IconComponent type='materialIcons' name='replay' size={24} color='#f39c12' style={{ marginRight: 6 }} />
@@ -118,33 +123,24 @@ const WrongReviewScreen = () => {
 					{'\n'}다시 풀어볼까요? 😊
 				</Text>
 				<Text style={styles.subText}>
-					지금까지 정답률은{' '}
-					<Text style={styles.highlight2}>
-						{totalSolvedCount > 0 ? Math.round((correctCount / totalSolvedCount) * 100) : 0}%
-					</Text>
+					지금까지 정답률은 <Text style={styles.highlight2}>{totalSolvedCount > 0 ? Math.round((correctCount / totalSolvedCount) * 100) : 0}%</Text>
 					예요!{'\n'}조금씩 실력이 쑥쑥 오르고 있어요! 🎯
 				</Text>
-
-
 			</View>
 			<TouchableOpacity style={styles.startButton} onPress={startWrongReview}>
 				<Text style={styles.buttonText}>🚀 실력 업! 오답 다시 풀어보기</Text>
 			</TouchableOpacity>
 
 			<TouchableOpacity style={styles.toggleButton} onPress={() => setShowWrongList((prev) => !prev)}>
-				<Text style={styles.toggleButtonText}>{showWrongList ? '⬆️ 오답 목록 접기' : '⬇️ 오답 목록 펼치기'}</Text>
+				<Text style={styles.toggleButtonText}>{showWrongList ? '⬆️ 나의 오답 목록 접기' : '⬇️ 나의 오답 목록 펼치기'}</Text>
 			</TouchableOpacity>
 
 			{showWrongList && (
-				<View style={styles.reviewTable}>
-					<View style={[styles.reviewRow, styles.reviewHeader]}>
-						<Text style={[styles.reviewCell, styles.headerCell]}>틀린 속담</Text>
-						<Text style={[styles.reviewCell, styles.headerCell]}>뜻풀이</Text>
-					</View>
+				<View style={styles.reviewCardList}>
 					{wrongCountries.map((proverb) => (
-						<View key={proverb.id} style={styles.reviewRow}>
-							<Text style={[styles.reviewCell, { flex: 4 }]}>{proverb.proverb}</Text>
-							<Text style={[styles.reviewCell, { flex: 6 }]}>{proverb.longMeaning}</Text>
+						<View key={proverb.id} style={styles.reviewCard}>
+							<Text style={styles.reviewProverbText}>📝 {proverb.proverb}</Text>
+							<Text style={styles.reviewMeaningText}>- {proverb.longMeaning}</Text>
 						</View>
 					))}
 				</View>
@@ -153,10 +149,7 @@ const WrongReviewScreen = () => {
 				<View style={styles.modalOverlay}>
 					<View style={[styles.guideModal, { maxHeight: scaleHeight(600) }]}>
 						<Text style={styles.modalTitle}>오답 복습 안내</Text>
-						<ScrollView
-							style={{ width: '100%' }}
-							contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
-							showsVerticalScrollIndicator={false}>
+						<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: scaleHeight(12) }} showsVerticalScrollIndicator={false}>
 							<View style={styles.guideDescriptionBox}>
 								<Text style={styles.guideDescription}>
 									❗ 이전 퀴즈에서 틀린 문제들을 다시 풀 수 있어요.{'\n\n'}
@@ -399,5 +392,58 @@ const styles = StyleSheet.create({
 		width: scaleWidth(120),
 		height: scaleWidth(120),
 		marginBottom: scaleHeight(10),
+	},
+
+	guideCard: {
+		backgroundColor: '#fefefe',
+		borderWidth: 1,
+		borderColor: '#dfe6e9',
+		borderRadius: scaleWidth(14),
+		padding: scaleWidth(16),
+		marginBottom: scaleHeight(20),
+		width: '100%',
+	},
+	guideCardTitle: {
+		fontSize: scaledSize(16),
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		marginBottom: scaleHeight(8),
+	},
+	guideCardContent: {
+		fontSize: scaledSize(13),
+		color: '#34495e',
+		lineHeight: scaleHeight(20),
+	},
+
+	reviewCardList: {
+		width: '100%',
+		marginTop: scaleHeight(16),
+	},
+
+	reviewCard: {
+		backgroundColor: '#ffffff',
+		borderRadius: scaleWidth(14),
+		paddingVertical: scaleHeight(14),
+		paddingHorizontal: scaleWidth(16),
+		marginBottom: scaleHeight(12),
+		borderWidth: 1,
+		borderColor: '#ecf0f1',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.05,
+		shadowRadius: 2,
+	},
+
+	reviewProverbText: {
+		fontSize: scaledSize(15),
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		marginBottom: scaleHeight(12),
+	},
+
+	reviewMeaningText: {
+		fontSize: scaledSize(14),
+		color: '#636e72',
+		lineHeight: scaleHeight(20),
 	},
 });

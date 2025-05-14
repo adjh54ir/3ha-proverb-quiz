@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform } from 'react-native';
+import { KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform, StatusBar } from 'react-native';
 import BottomTabNavigator from './BottomTabNavigator';
 import DrawerNavigator from './DrawerNavigator';
 import StackNavigator from './StackNavigator';
@@ -15,6 +15,8 @@ import ZTemplateDradwerNavigator from './ZTemplateDradwerNavigator';
 const ApplicationNavigator = () => {
 	return (
 		<SafeAreaProvider>
+			<StatusBar translucent backgroundColor='transparent' barStyle='dark-content' />
+			{/* <StatusBar backgroundColor='#ffffff' translucent={false} /> */}
 			<NavigationContainer>
 				{/* 키보드가 텍스트를 가리는 증상 방지 */}
 				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>

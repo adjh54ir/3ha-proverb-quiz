@@ -238,7 +238,7 @@ const ProverbCommonFrameScreen = ({ mode }: ProverbQuizScreenProps) => {
 			});
 		}, 1000);
 
-		if (filteredProverbs.length === 1) {
+		if (remainingProverbs.length === 0) {
 			// 마지막 문제를 풀고 나면 종료
 			setResultType('done');
 			setResultTitle('모든 퀴즈 완료!');

@@ -341,9 +341,9 @@ const CapitalResultScreen = () => {
 					contentContainerStyle={{ paddingBottom: scaleHeight(40), flexGrow: 1 }}
 					onScroll={scrollHandler.onScroll}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-					{/* <View style={styles.adContainer}>
+					<View style={styles.adContainer}>
 						<AdmobBannerAd />
-					</View> */}
+					</View>
 					<View style={styles.sectionBox}>
 						<View style={{ alignItems: 'center', marginVertical: scaleHeight(20) }}>
 							<FastImage source={mascot} style={{ width: scaleWidth(120), height: scaleHeight(120) }} resizeMode={FastImage.resizeMode.contain} />
@@ -515,7 +515,7 @@ const CapitalResultScreen = () => {
 
 					{/* 2. 전체 중 미획득 뱃지만 아코디언에 출력 */}
 					<TouchableOpacity onPress={toggleBadgeList} style={{ marginBottom: scaleHeight(12) }}>
-						<Text style={{ color: '#27ae60', textAlign: 'center' }}>{showBadgeList ? '뱃지 목록 닫기 ▲' : '획득 가능한 뱃지 보기 ▼'}</Text>
+						<Text style={{ color: '#27ae60', textAlign: 'center', fontSize: scaledSize(13) }}>{showBadgeList ? '뱃지 목록 닫기 ▲' : '획득 가능한 뱃지 보기 ▼'}</Text>
 					</TouchableOpacity>
 
 					{showBadgeList && (

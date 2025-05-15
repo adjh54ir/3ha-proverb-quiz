@@ -410,8 +410,9 @@ const styles = StyleSheet.create({
 		borderColor: '#3498db',
 	},
 	backButtonText: {
+		width: "100%",
 		marginLeft: scaleWidth(8),
-		fontSize: scaledSize(16),
+		fontSize: scaledSize(15),
 		fontWeight: '600',
 		color: '#3498db',
 	},

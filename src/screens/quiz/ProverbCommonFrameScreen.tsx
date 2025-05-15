@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
 	View,
 	Text,
@@ -11,9 +11,9 @@ import {
 	Dimensions,
 	Platform,
 	Alert,
-	SafeAreaView,
 	Animated,
 	ScrollView,
+	FlatList,
 } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
@@ -30,6 +30,7 @@ import { CONST_BADGES } from '@/const/ConstBadges';
 import IconComponent from '../common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -108,6 +109,11 @@ const ProverbCommonFrameScreen = () => {
 	const [showScoreBonus, setShowScoreBonus] = useState(false);
 
 	const [reviewIndex, setReviewIndex] = useState(0);
+	const [questionData, setQuestionData] = useState<{
+		question: MainDataType.Proverb | null;
+		options: string[];
+		displayText: string;
+	}>({ question: null, options: [], displayText: '' });
 
 	const praiseMessages = [
 		'정답이에요! 정말 똑똑하네요! 🎉\n이번 퀴즈를 정확히 짚어냈어요!',
@@ -215,12 +221,26 @@ const ProverbCommonFrameScreen = () => {
 	}, [badgeModalVisible]);
 
 	const solvedCount = quizHistory ? new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]).size : 0;
+	const filteredProverbs = useMemo(() => {
+		return proverbs.filter((p) => {
+			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+			return levelMatch && categoryMatch;
+		});
+	}, [proverbs, selectedLevel, selectedCategory]);
+
+	const remainingProverbs = useMemo(() => {
+		const solvedSet = new Set([...(quizHistory?.correctProverbId ?? []), ...(quizHistory?.wrongProverbId ?? [])]);
+		if (question) solvedSet.add(question.id);
+		return filteredProverbs.filter((p) => !solvedSet.has(p.id));
+	}, [filteredProverbs, quizHistory, question]);
+
+
 	/**
 	 * 퀴즈 불러오기
 	 * @returns
 	 */
 	const loadQuestion = () => {
-		let filteredProverbs: MainDataType.Proverb[];
 
 		if (isWrongReview && questionPool) {
 			if (reviewIndex >= questionPool.length) {
@@ -274,13 +294,6 @@ const ProverbCommonFrameScreen = () => {
 
 
 
-
-		filteredProverbs = proverbs.filter((p) => {
-			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-			return levelMatch && categoryMatch;
-		});
-
 		const solvedSet = new Set([
 			...(quizHistory?.correctProverbId ?? []),
 			...(quizHistory?.wrongProverbId ?? []),
@@ -291,7 +304,8 @@ const ProverbCommonFrameScreen = () => {
 			solvedSet.add(question.id);
 		}
 
-		const remainingProverbs = filteredProverbs.filter((p) => !solvedSet.has(p.id));
+
+
 
 		if (remainingProverbs.length === 0) {
 			setResultType('done');
@@ -321,7 +335,6 @@ const ProverbCommonFrameScreen = () => {
 			allOptions = [...shuffledDistractors.map((item) => pickBlankWord(item.proverb)), blank];
 			setBlankWord(blank);
 		}
-
 
 		setQuestion(newQuestion);
 		setOptions(allOptions.sort(() => Math.random() - 0.5));
@@ -621,13 +634,17 @@ const ProverbCommonFrameScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-			<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+			<KeyboardAvoidingView
+				style={{ flex: 1 }}
+				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+				keyboardVerticalOffset={Platform.OS === 'android' ? 80 : 0} // 이 값 조정
+			>
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 					<View style={{ flex: 1 }}>
 						<View style={styles.container}>
 							<View style={styles.inner}>
 								<View style={styles.progressStatusWrapper}>
-									<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5, }}>
+									<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: scaleHeight(5), }}>
 										<Text style={styles.progressText}>
 											진행중인 퀴즈 : {getModeLabel(mode)}
 										</Text>
@@ -685,6 +702,7 @@ const ProverbCommonFrameScreen = () => {
 										size={scaleWidth(70)}
 										width={scaleWidth(6)} // ✅ 기존 8 → 6
 										fill={(20 - remainingTime) * 5}
+										duration={500}
 										tintColor='#3498db'
 										backgroundColor='#ecf0f1'>
 										{() => (
@@ -695,31 +713,27 @@ const ProverbCommonFrameScreen = () => {
 									</AnimatedCircularProgress>
 
 									{question ? (
-										<View style={styles.quizBox}>
-											<Text style={styles.questionText}>
-												{`Q. ${mode === 'fill-blank'
-													? questionText || '문제 준비중...'
-													: mode === 'meaning'
-														? question?.proverb
-														: question?.longMeaning || '문제 준비중...'
-													}`}
-											</Text>
-										</View>
+										<Text style={styles.questionText}>
+											{`Q. ${mode === 'fill-blank'
+												? questionText || '문제 준비중...'
+												: mode === 'meaning'
+													? question?.proverb
+													: question?.longMeaning || '문제 준비중...'
+												}`}
+										</Text>
 									) : (
 										<Text>문제 불러오는 중...</Text>
 									)}
 
-									<View style={styles.optionsContainer}>
-										<ScrollView
-											style={{ maxHeight: scaleHeight(400) }} // 원하는 높이만큼 제한
-											nestedScrollEnabled
+									<View style={[styles.optionsContainer, { flex: 1, width: '100%', marginTop: scaleHeight(5), }]}>
+										<FlatList
+											data={options}
+											keyExtractor={(item, index) => `${item}-${index}`}
+											contentContainerStyle={{ paddingBottom: scaleHeight(20) }}
 											showsVerticalScrollIndicator
-											contentContainerStyle={{ paddingBottom: scaleHeight(8) }}
-										>
-											{options.map((option, index) => {
-												const scaleAnim = scaleAnims.current[index] ?? new Animated.Value(1); // 방어코드
-
-												const isSelected = selected === option;
+											renderItem={({ item, index }) => {
+												const scaleAnim = scaleAnims.current[index] ?? new Animated.Value(1);
+												const isSelected = selected === item;
 												const isAnswerCorrect = isCorrect && isSelected;
 												const isAnswerWrong = !isCorrect && isSelected;
 
@@ -738,7 +752,7 @@ const ProverbCommonFrameScreen = () => {
 												};
 
 												return (
-													<Animated.View key={index} style={{ transform: [{ scale: scaleAnim }] }}>
+													<Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
 														<TouchableOpacity
 															onPressIn={handlePressIn}
 															onPressOut={handlePressOut}
@@ -747,7 +761,7 @@ const ProverbCommonFrameScreen = () => {
 																isAnswerCorrect && styles.optionCorrectCard,
 																isAnswerWrong && styles.optionWrongCard,
 															]}
-															onPress={() => handleSelect(option)}
+															onPress={() => handleSelect(item)}
 															disabled={!!selected}
 														>
 															<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -756,8 +770,9 @@ const ProverbCommonFrameScreen = () => {
 																</Text>
 
 																<View style={{ flex: 1 }}>
-																	<Text style={styles.optionContent}>{option}</Text>
+																	<Text style={styles.optionContent}>{item}</Text>
 																</View>
+
 																{isSelected && (
 																	<Icon
 																		name={isAnswerCorrect ? 'check-circle' : 'cancel'}
@@ -769,8 +784,8 @@ const ProverbCommonFrameScreen = () => {
 														</TouchableOpacity>
 													</Animated.View>
 												);
-											})}
-										</ScrollView>
+											}}
+										/>
 									</View>
 								</View>
 							</View>
@@ -917,8 +932,8 @@ const styles = StyleSheet.create({
 		paddingTop: scaleHeight(8),
 	},
 	quizBox: {
+		flex: 1,
 		width: '100%',
-		maxWidth: scaleWidth(460),
 		alignItems: 'center',
 	},
 	timerText: {
@@ -1237,7 +1252,7 @@ const styles = StyleSheet.create({
 	},
 	progressStatusWrapper: {
 		width: '100%',
-		maxWidth: 500,
+		maxWidth: scaleWidth(500),
 		backgroundColor: '#fff',
 		padding: scaleWidth(16),
 		marginBottom: scaleHeight(12),

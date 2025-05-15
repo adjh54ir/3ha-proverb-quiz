@@ -23,7 +23,7 @@ const BottomTabNavigator = () => {
 			backgroundColor: '#fff',
 		},
 		tabBarLabelStyle: {
-			fontSize: isTablet ? scaledSize(12) : scaledSize(11),
+			fontSize: isTablet ? scaledSize(11) : scaledSize(11),
 			marginTop: isTablet ? scaleHeight(10) : 0,
 		},
 	});
@@ -34,7 +34,21 @@ const BottomTabNavigator = () => {
 				type='materialicons'
 				name={iconName}
 				color={color}
-				style={isTablet ? { marginTop: scaleHeight(25), height: scaleHeight(45), width: scaleWidth(16) } : undefined}
+				style={
+					isTablet
+						? {
+							height: scaleHeight(32),
+							width: scaleWidth(26),
+							marginLeft: 4,
+							justifyContent: "center",
+							alignContent: "center",
+							// backgroundColor: "red"
+						}
+						: {
+							height: scaleHeight(22),
+							width: scaleWidth(22),
+						}
+				}
 			/>
 		);
 	};

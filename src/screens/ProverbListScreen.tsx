@@ -25,13 +25,17 @@ import AdmobBannerAd from './common/ads/AdmobBannerAd';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import DeviceInfo from 'react-native-device-info';
 
 const PAGE_SIZE = 30;
 
 const COMMON_ALL_OPTION = {
 	label: '전체',
 	value: '전체',
-	icon: () => <IconComponent type='FontAwesome6' name='clipboard-list' size={16} color='#555' />,
+	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={16} color="#555" />,
+	labelStyle: {
+		marginLeft: scaleWidth(6), fontSize: scaledSize(14)
+	},
 };
 
 const LEVEL_DROPDOWN_ITEMS = [
@@ -122,6 +126,8 @@ const ProverbListScreen = () => {
 
 	const [fieldItems, setFieldItems] = useState([{ label: '', value: '' }]);
 	const [levelItems, setLevelItems] = useState([{ label: '', value: '' }]);
+
+	const isTablet = DeviceInfo.isTablet();
 
 	const fetchData = () => {
 		const allData = ProverbServices.selectProverbList(); // 이미 필드에 있음
@@ -270,18 +276,23 @@ const ProverbListScreen = () => {
 							<View style={styles.bannerContainer}>
 								<AdmobBannerAd paramMarginBottom={8} />
 							</View>
-							<TextInput
-								ref={searchInputRef}
-								style={styles.input}
-								placeholder='속담이나 의미를 입력해주세요'
-								placeholderTextColor='#666'
-								onChangeText={(text) => {
-									setKeyword(text);
-									setFieldOpen(false); // 🔽 드롭다운 닫기
-									setLevelOpen(false); // 🔽 드롭다운 닫기
-								}}
-								value={keyword}
-							/>
+							<View style={styles.searchRow}>
+								<TextInput
+									ref={searchInputRef}
+									style={styles.input}
+									placeholder='속담이나 의미를 입력해주세요'
+									placeholderTextColor='#666'
+									onChangeText={(text) => {
+										setKeyword(text);
+										setFieldOpen(false);
+										setLevelOpen(false);
+									}}
+									value={keyword}
+								/>
+								<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset}>
+									<Icon name='rotate-right' size={18} color='#555' />
+								</TouchableOpacity>
+							</View>
 							<View style={styles.filterDropdownRow}>
 								<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
 									<DropDownPicker
@@ -292,7 +303,15 @@ const ProverbListScreen = () => {
 										setValue={setLevelValue}
 										setItems={setLevelItems}
 										style={styles.dropdownLevel}
-										dropDownContainerStyle={styles.dropdownListLevel}
+										scrollViewProps={{
+											nestedScrollEnabled: true,
+										}}
+										dropDownContainerStyle={{
+											...styles.dropdownListLevel,
+											overflow: 'visible', // 🟢 부모와 같이 설정
+											zIndex: 3000,
+											elevation: 10,
+										}}
 										listItemLabelStyle={{ marginLeft: scaleWidth(6), fontSize: scaledSize(14) }}
 										labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
 										iconContainerStyle={{ marginRight: scaleWidth(8) }}
@@ -302,38 +321,78 @@ const ProverbListScreen = () => {
 								</View>
 								<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000, overflow: 'visible' }]}>
 									<DropDownPicker
+										listMode="MODAL"
 										open={fieldOpen}
 										value={fieldValue}
 										items={FIELD_DROPDOWN_ITEMS}
 										setOpen={setFieldOpen}
 										setValue={setFieldValue}
 										setItems={setFieldItems}
-										listMode='SCROLLVIEW'
+										dropDownDirection="BOTTOM" // ✅ 추가
 										scrollViewProps={{
 											nestedScrollEnabled: true,
 										}}
 										style={styles.dropdownField}
 										dropDownContainerStyle={{
+											overflow: 'visible', // 중요
+											zIndex: 3000,
 											...styles.dropdownListField,
 											elevation: 1000, // Android에서 zIndex처럼 동작
+											maxHeight: scaleHeight(200), // 또는 250~300 등 충분한 높이
 										}}
 										zIndex={5000} // DropDownPicker 자체에 zIndex 주기
 										zIndexInverse={4000} // 다른 Picker와 겹치지 않게
 										containerStyle={{
 											zIndex: 5000,
 										}}
-										listItemLabelStyle={{ marginLeft: scaleWidth(6), fontSize: scaledSize(14) }}
 										labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
 										iconContainerStyle={{ marginRight: scaleWidth(8) }}
 										showArrowIcon={true}
 										showTickIcon={false}
+										modalProps={{
+											animationType: 'fade', // slide → fade로 부드럽게
+											presentationStyle: 'overFullScreen', // 배경 흐림 없이 띄움
+											transparent: true,
+										}}
+										modalContentContainerStyle={{
+											width: '85%',
+											alignContent: "center",
+											maxHeight: scaleHeight(500), // ✅ 높이 증가로 스크롤 확보
+											backgroundColor: '#fff',
+											borderRadius: scaleWidth(20),
+											alignSelf: 'center',
+											paddingHorizontal: scaleWidth(16),
+											paddingVertical: scaleHeight(20),
+											shadowColor: '#000',
+											shadowOpacity: 0.15,
+											shadowOffset: { width: 0, height: 6 },
+											shadowRadius: scaleWidth(8),
+											elevation: 10,
+											alignItems: 'stretch', // ✅ 추가
+											flex: 1, // ✅ 반드시 필요
+											justifyContent: 'center',
+										}}
+										listItemLabelStyle={{
+											flex: 1,
+											fontSize: scaledSize(15),
+											color: '#2c3e50',
+											fontWeight: '500',
+											lineHeight: scaleHeight(22),
+											flexShrink: 1, // ✅ 텍스트 줄바꿈을 위해
+											flexWrap: 'wrap', // ✅ 줄바꿈 허용
+										}}
+										listItemContainerStyle={{
+											paddingVertical: scaleHeight(14), // 충분한 위아래 여백
+											minHeight: scaleHeight(48),       // iOS에서 텍스트 짤림 방지
+											alignItems: 'stretch', // ✅ 핵심 추가
+										}}
 									/>
 								</View>
 
 								{/* 초기화 버튼 */}
-								<TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+								{/* <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
 									<Icon name='rotate-right' size={20} color='#555' />
-								</TouchableOpacity>
+								</TouchableOpacity> */}
 							</View>
 							{/* 리스트 개수 표시 */}
 							<View style={styles.listCountWrapper}>
@@ -347,6 +406,7 @@ const ProverbListScreen = () => {
 						<FlatList
 							ref={scrollRef}
 							data={visibleList}
+							scrollEnabled={!fieldOpen && !levelOpen} // ⛔ 드롭다운 열려 있으면 스크롤 막기
 							keyExtractor={(item) => item.id.toString()}
 							refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 							onEndReached={loadMoreData}
@@ -411,7 +471,7 @@ const ProverbListScreen = () => {
 					{/* 스크롤 최상단 이동 버튼 */}
 					{showScrollTop && (
 						<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
-							<Icon name='arrow-up' size={20} color='#fff' />
+							<IconComponent type='fontawesome6' name='arrow-up' size={20} color='#ffffff' />
 						</TouchableOpacity>
 					)}
 
@@ -495,8 +555,10 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.05,
 		shadowRadius: scaleWidth(8),
+		overflow: 'visible', // ✅ 추가
 	},
 	input: {
+		width: '80%',
 		height: scaleHeight(44),
 		borderWidth: 1,
 		borderColor: '#ccc',
@@ -517,14 +579,14 @@ const styles = StyleSheet.create({
 	},
 	scrollTopButton: {
 		position: 'absolute',
-		right: scaleWidth(20),
-		bottom: scaleHeight(30),
-		backgroundColor: '#3b5998',
-		width: scaleWidth(48),
-		height: scaleWidth(48),
-		borderRadius: scaleWidth(24),
-		alignItems: 'center',
+		right: scaleWidth(16),
+		bottom: scaleHeight(16),
+		backgroundColor: '#2196F3',
+		width: scaleWidth(40),
+		height: scaleWidth(40),
+		borderRadius: scaleWidth(20),
 		justifyContent: 'center',
+		alignItems: 'center',
 	},
 	itemBox: {
 		backgroundColor: '#fff',
@@ -852,10 +914,25 @@ const styles = StyleSheet.create({
 		zIndex: 10,
 		paddingHorizontal: scaleWidth(16),
 		paddingTop: scaleHeight(16),
+		overflow: 'visible', // ✅ 추가
 	},
 	flatListCotent: {
 		paddingTop: scaleHeight(12),
 		paddingHorizontal: scaleWidth(16),
 		paddingBottom: scaleHeight(60),
+	},
+	searchRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	resetButtonInline: {
+		marginLeft: scaleWidth(8),
+		backgroundColor: '#eee',
+		paddingHorizontal: scaleWidth(12),
+		height: scaleHeight(44),
+		borderRadius: scaleWidth(8),
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginBottom: scaleHeight(10),
 	},
 });

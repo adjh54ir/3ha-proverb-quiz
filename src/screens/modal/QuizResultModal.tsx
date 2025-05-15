@@ -121,7 +121,7 @@ export const styles = StyleSheet.create({
 		padding: scaleWidth(15),
 		borderRadius: scaleWidth(16),
 		alignItems: 'center',
-		width: '80%',
+		width: '90%',
 		maxHeight: '85%',
 	},
 	resultTitle: {
@@ -131,8 +131,8 @@ export const styles = StyleSheet.create({
 		marginBottom: scaleHeight(12),
 	},
 	resultMascot: {
-		width: scaleWidth(150),
-		height: scaleWidth(150),
+		width: scaleWidth(100),
+		height: scaleWidth(100),
 	},
 	resultMessageContainer: {
 		alignItems: 'center',

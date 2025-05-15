@@ -22,6 +22,7 @@ import { CONST_BADGES } from '@/const/ConstBadges';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import CatService from '@/services/CatService';
 const STORAGE_KEY_QUIZ = 'UserQuizHistory';
 const STORAGE_KEY_STUDY = 'UserStudyHistory';
 
@@ -42,6 +43,7 @@ const Home = () => {
 	const visibleBadges = earnedBadges; // 제한 없이 모두 보여줌
 	const [tooltipBadgeId, setTooltipBadgeId] = useState<string | null>(null);
 	const [showLevelModal, setShowLevelModal] = useState(false);
+
 
 	useLayoutEffect(() => {
 		navigation.setOptions({

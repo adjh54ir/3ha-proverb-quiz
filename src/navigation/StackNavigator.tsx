@@ -14,6 +14,7 @@ import ProverbFillBlankQuizScreen from '@/screens/quiz/ProverbFillBlankQuizScree
 import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import WrongReviewScreen from '@/screens/WrongReviewScreen';
+import { scaledSize, scaleWidth } from '@/utils';
 
 /**
  * Stack Navigator : 일반적인 화면만 출력을 하는 경우
@@ -30,7 +31,7 @@ const StackNavigator = () => {
 					backgroundColor: '#f9f9f9',
 				},
 				headerTitleStyle: {
-					fontSize: 18,
+					fontSize: scaledSize(18),
 					fontWeight: 'bold',
 					color: '#2c3e50',
 				},
@@ -79,7 +80,7 @@ const StackNavigator = () => {
 					headerShown: true,
 					title: '퀴즈 모드 선택',
 					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
+						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
 							<Icon name='arrow-back' size={24} color='#2c3e50' />
 						</TouchableOpacity>
 					),
@@ -113,7 +114,7 @@ const StackNavigator = () => {
 					headerShown: true,
 					title: '오답 복습',
 					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
+						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
 							<Icon name='arrow-back' size={24} color='#2c3e50' />
 						</TouchableOpacity>
 					),

@@ -779,18 +779,56 @@ const ProverbStudyScreen = () => {
 										setValue={(callback) => {
 											const newValue = typeof callback === 'function' ? callback(themeFilter) : callback;
 											setThemeFilter(newValue);
-											filterData(levelFilter, newValue); // ✅ theme 필터 기준으로 명시적 호출
+											filterData(levelFilter, newValue);
 										}}
 										items={FIELD_DROPDOWN_ITEMS}
 										style={styles.dropdown}
-										textStyle={{ fontSize: scaledSize(14), color: '#2c3e50', fontWeight: '500' }}
+										textStyle={{ fontSize: scaledSize(14), color: '#2c3e50', fontWeight: '500', }}
 										placeholderStyle={{ color: '#95a5a6', fontSize: scaledSize(14) }}
 										dropDownContainerStyle={styles.dropdownList}
 										containerStyle={{ zIndex: 3000 }}
-										zIndex={9999} // 높게 설정
+										zIndex={9999}
 										iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
-										zIndexInverse={1000} // 반대 드롭다운일 경우 대비
-										listMode='SCROLLVIEW' /* 스크롤뷰 모드로 변경 */
+										zIndexInverse={1000}
+										listMode='MODAL'
+										modalProps={{
+											animationType: 'fade', // slide → fade로 부드럽게
+											presentationStyle: 'overFullScreen', // 배경 흐림 없이 띄움
+											transparent: true,
+										}}
+										modalContentContainerStyle={{
+											width: '85%',
+											maxHeight: scaleHeight(500), // ✅ 높이 증가로 스크롤 확보
+											backgroundColor: '#fff',
+											borderRadius: scaleWidth(20),
+											alignSelf: 'center',
+											paddingHorizontal: scaleWidth(16),
+											paddingVertical: scaleHeight(20),
+											shadowColor: '#000',
+											shadowOpacity: 0.15,
+											shadowOffset: { width: 0, height: 6 },
+											shadowRadius: scaleWidth(8),
+											elevation: 10,
+											alignItems: 'stretch', // ✅ 추가
+											flex: 1, // ✅ 반드시 필요
+											justifyContent: 'center',
+										}}
+										listItemLabelStyle={{
+											flex: 1,
+											fontSize: scaledSize(15),
+											color: '#2c3e50',
+											fontWeight: '500',
+											lineHeight: scaleHeight(22),
+											flexShrink: 1, // ✅ 텍스트 줄바꿈을 위해
+											flexWrap: 'wrap', // ✅ 줄바꿈 허용
+										}}
+										listItemContainerStyle={{
+											paddingVertical: scaleHeight(14), // 충분한 위아래 여백
+											minHeight: scaleHeight(48),       // iOS에서 텍스트 짤림 방지
+											alignItems: 'stretch', // ✅ 핵심 추가
+										}}
+										closeOnBackPressed={true}
+										searchable={false}
 									/>
 								</View>
 							</View>
@@ -1465,7 +1503,7 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(12),
 	},
 	proverbText: {
-		fontSize: scaledSize(28),
+		fontSize: scaledSize(23),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 		textAlign: 'center',

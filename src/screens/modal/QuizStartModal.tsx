@@ -6,6 +6,8 @@ import ProverbServices from '@/services/ProverbServices';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import AdmobFrontAd from '../common/ads/AdmobFrontAd'; // 광고 컴포넌트 import
+import { GOOGLE_ADMOV_FRONT_PERCENT } from '@env';
 
 interface Props {
 	visible: boolean;
@@ -68,8 +70,9 @@ const QuizStartModal = ({
 	const [levelStats, setLevelStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [categoryStats, setCategoryStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [quizHistory, setQuizHistory] = useState<UserQuizHistory | null>(null);
-	const [isShowLevelInfo, setIsShowLevelInfo] = useState(false);
 	const [isShowCategoryInfo, setIsShowCategoryInfo] = useState(false);
+	const [showAd, setShowAd] = useState(false);
+	const shouldShowAd = Math.random() < GOOGLE_ADMOV_FRONT_PERCENT; // 20% 확률
 
 	useFocusEffect(
 		useCallback(() => {
@@ -312,11 +315,11 @@ const QuizStartModal = ({
 									if (modeStep === 0) {
 										setModeStep(1);
 									} else {
-										// 🔽 퀴즈 데이터 유효성 체크
 										const all = ProverbServices.selectProverbList();
 										const filtered = all.filter(
 											(item) =>
-												(selectedLevel === '전체' || item.levelName === selectedLevel) && (selectedCategory === '전체' || item.category === selectedCategory),
+												(selectedLevel === '전체' || item.levelName === selectedLevel) &&
+												(selectedCategory === '전체' || item.category === selectedCategory),
 										);
 
 										const stat = categoryStats[selectedCategory] || categoryStats['전체'];
@@ -329,7 +332,14 @@ const QuizStartModal = ({
 											return;
 										}
 
-										onStart();
+										if (shouldShowAd) {
+											onClose(); // ✅ 1. 먼저 모달 닫기
+											setTimeout(() => {
+												setShowAd(true); // ✅ 2. 모달이 닫힌 뒤 광고 띄우기
+											}, 300); // 살짝 여유를 줌 (모달 애니메이션 시간)
+										} else {
+											onStart(); // 바로 시작
+										}
 									}
 								}}>
 								<View style={styles.centeredButtonContent}>
@@ -341,7 +351,16 @@ const QuizStartModal = ({
 						</View>
 					</View>
 				</View>
-			</Modal>
+			</Modal >
+			{showAd && (
+				<AdmobFrontAd
+					onAdClosed={() => {
+						setShowAd(false);
+						onStart(); // 광고 본 후 퀴즈 시작
+					}}
+				/>
+			)
+			}
 			{/* <Modal visible={isShowCategoryInfo} transparent animationType="fade" onRequestClose={() => setIsShowCategoryInfo(false)}>
 				<View style={styles.modalOverlay}>
 					<View style={styles.modalOverlay}>

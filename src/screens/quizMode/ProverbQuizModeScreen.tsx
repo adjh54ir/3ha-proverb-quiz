@@ -1,9 +1,9 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import IconComponent from '../common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
-import { scaleHeight } from '@/utils';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 
 const ProverbQuizModeSelectScreen = () => {
 	const [showGuideModal, setShowGuideModal] = useState(false);
@@ -135,50 +135,50 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: 40,
+		paddingHorizontal: scaleWidth(40),
 	},
 	title: {
-		fontSize: 20,
+		fontSize: scaledSize(20),
 		fontWeight: '700',
 		color: '#2c3e50',
 		textAlign: 'center',
-		marginBottom: 10,
+		marginBottom: scaleHeight(10),
 	},
 	gridWrap: {
 		paddingTop: scaleHeight(30),
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		justifyContent: 'center',
-		columnGap: 16,
-		rowGap: 20,
-		paddingHorizontal: 12,
-		marginBottom: 30,
+		columnGap: scaleWidth(16),
+		rowGap: scaleHeight(20),
+		paddingHorizontal: scaleWidth(12),
+		marginBottom: scaleHeight(30),
 	},
 	gridButtonHalf: {
 		width: '45%',
-		minWidth: 140,
-		maxWidth: 180,
-		height: 120,
-		borderRadius: 16,
+		minWidth: scaleWidth(140),
+		maxWidth: scaleWidth(180),
+		height: scaleHeight(120),
+		borderRadius: scaleWidth(16),
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: 6,
+		paddingHorizontal: scaleWidth(6),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
+		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.15,
-		shadowRadius: 4,
+		shadowRadius: scaleWidth(4),
 	},
 	iconTextRow: {
 		flexDirection: 'column',
 		alignItems: 'center',
-		gap: 6,
+		gap: scaleHeight(6),
 	},
 	modeLabel: {
 		color: '#fff',
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: '600',
 		textAlign: 'center',
-		lineHeight: 22,
+		lineHeight: scaleHeight(22),
 	},
 	disabledInner: {
 		alignItems: 'center',
@@ -186,11 +186,11 @@ const styles = StyleSheet.create({
 		opacity: 0.6,
 	},
 	subTitle: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#7f8c8d',
 		textAlign: 'center',
-		lineHeight: 20,
-		marginTop: 8,
+		lineHeight: scaleHeight(20),
+		marginTop: scaleHeight(8),
 	},
 	modalOverlay: {
 		position: 'absolute',
@@ -206,71 +206,68 @@ const styles = StyleSheet.create({
 	modalContent: {
 		width: '85%',
 		backgroundColor: '#fff',
-		padding: 20,
-		borderRadius: 12,
-		maxHeight: '75%', // 👈 높이 제한 추가
+		padding: scaleWidth(20),
+		borderRadius: scaleWidth(12),
+		maxHeight: '75%',
 	},
 	modalCloseButton: {
-		marginTop: 20,
+		marginTop: scaleHeight(20),
 		alignSelf: 'center',
 		backgroundColor: '#3498db',
-		paddingVertical: 10,
-		paddingHorizontal: 30,
-		borderRadius: 8,
+		paddingVertical: scaleHeight(10),
+		paddingHorizontal: scaleWidth(30),
+		borderRadius: scaleWidth(8),
 	},
 	modalCloseText: {
 		color: '#fff',
 		fontWeight: '600',
-		fontSize: 15,
+		fontSize: scaledSize(15),
 	},
 	modalTitle: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#2c3e50',
-		marginBottom: 14,
+		marginBottom: scaleHeight(14),
 		textAlign: 'center',
 	},
 	modalText: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#34495e',
-		lineHeight: 22,
+		lineHeight: scaleHeight(22),
 		textAlign: 'left',
-		marginTop: 10,
-		marginBottom: 20,
+		marginTop: scaleHeight(10),
+		marginBottom: scaleHeight(20),
 	},
 	boldText: {
 		fontWeight: 'bold',
 	},
-
 	modalCloseIcon: {
 		position: 'absolute',
-		top: 10,
-		right: 10,
+		top: scaleHeight(10),
+		right: scaleWidth(10),
 		zIndex: 2,
-		padding: 5,
+		padding: scaleWidth(5),
 	},
 	homeButtonWrap: {
 		width: '100%',
 		alignItems: 'center',
-		marginTop: 24,
+		marginTop: scaleHeight(24),
 	},
-
 	headerSection: {
 		alignItems: 'center',
-		marginBottom: 36, // 타이틀과 버튼 사이 간격
+		marginBottom: scaleHeight(36),
 	},
-
 	subtitle: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		color: '#7f8c8d',
 		textAlign: 'center',
-		lineHeight: 20,
-		marginTop: 4,
-		paddingHorizontal: 12,
+		lineHeight: scaleHeight(20),
+		marginTop: scaleHeight(4),
+		paddingHorizontal: scaleWidth(12),
 	},
 	bottomExitWrapper: {
 		width: '100%',
-		paddingVertical: 24,
+		paddingVertical: scaleHeight(24),
 		alignItems: 'center',
 		backgroundColor: '#fff',
 		borderTopWidth: 1,
@@ -278,56 +275,55 @@ const styles = StyleSheet.create({
 	},
 	homeButton: {
 		flexDirection: 'row',
-		alignItems: 'center', // ✅ 수직 중앙 정렬
+		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: '#28a745',
-		paddingVertical: 14,
-		paddingHorizontal: 28,
-		borderRadius: 30,
+		paddingVertical: scaleHeight(14),
+		paddingHorizontal: scaleWidth(28),
+		borderRadius: scaleWidth(30),
 	},
 	buttonText: {
 		color: '#fff',
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		fontWeight: '600',
 		textAlign: 'center',
-		lineHeight: 22, // ✅ 텍스트가 수직 기준에서 올라오는 현상 완화
+		lineHeight: scaleHeight(22),
 	},
-
 	row: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		width: '100%',
-		marginBottom: 12,
+		marginBottom: scaleHeight(12),
 	},
 	disabledButton: {
 		width: '45%',
-		minWidth: 150,
-		maxWidth: 200,
-		height: 120,
+		minWidth: scaleWidth(150),
+		maxWidth: scaleWidth(200),
+		height: scaleHeight(120),
 		backgroundColor: '#ecf0f1',
-		borderRadius: 16,
+		borderRadius: scaleWidth(16),
 		justifyContent: 'center',
 		alignItems: 'center',
 		opacity: 0.6,
 	},
 	disabledText: {
 		color: '#95a5a6',
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: '600',
 		textAlign: 'center',
 	},
 	comingSoon: {
-		fontSize: 12,
+		fontSize: scaledSize(12),
 		color: '#bdc3c7',
 		fontWeight: '500',
-		marginTop: 4,
+		marginTop: scaleHeight(4),
 	},
 	scrollContent: {
 		flexGrow: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: 15,
-		paddingVertical: 40, // 위아래 균형 잡힌 간격
+		paddingHorizontal: scaleWidth(15),
+		paddingVertical: scaleHeight(40),
 	},
 	titleRow: {
 		flexDirection: 'row',
@@ -335,10 +331,9 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		flexWrap: 'nowrap',
 	},
-
 	inlineInfoIcon: {
-		marginLeft: 6,
-		padding: 4,
-		marginBottom: 12,
+		marginLeft: scaleWidth(6),
+		padding: scaleWidth(4),
+		marginBottom: scaleHeight(12),
 	},
 });

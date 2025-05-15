@@ -338,15 +338,15 @@ const CapitalResultScreen = () => {
 				<ScrollView
 					ref={scrollRef}
 					style={styles.container}
-					contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
+					contentContainerStyle={{ paddingBottom: scaleHeight(40), flexGrow: 1 }}
 					onScroll={scrollHandler.onScroll}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 					{/* <View style={styles.adContainer}>
 						<AdmobBannerAd />
 					</View> */}
 					<View style={styles.sectionBox}>
-						<View style={{ alignItems: 'center', marginVertical: 20 }}>
-							<FastImage source={mascot} style={{ width: 120, height: 120 }} resizeMode={FastImage.resizeMode.contain} />
+						<View style={{ alignItems: 'center', marginVertical: scaleHeight(20) }}>
+							<FastImage source={mascot} style={{ width: scaleWidth(120), height: scaleHeight(120) }} resizeMode={FastImage.resizeMode.contain} />
 						</View>
 						<View style={styles.levelCenteredRow}>
 							<IconComponent type='fontAwesome6' name={icon} size={16} color='#27ae60' />
@@ -374,7 +374,7 @@ const CapitalResultScreen = () => {
 						</Text>
 					</View>
 
-					<Text style={[styles.sectionTitle, { marginTop: 20 }]}>📚 나의 학습 활동 </Text>
+					<Text style={[styles.sectionTitle, { marginTop: scaleHeight(20) }]}>📚 나의 학습 활동 </Text>
 					<View style={styles.activityCardBox}>
 						<View style={styles.summaryStatGrid}>
 							<View style={styles.summaryStatCard}>
@@ -393,7 +393,7 @@ const CapitalResultScreen = () => {
 					</View>
 
 					{/* 나의 퀴즈 활동 요약 */}
-					<Text style={[styles.sectionTitle, { marginTop: 20 }]}>📊 나의 퀴즈 활동 </Text>
+					<Text style={[styles.sectionTitle, { marginTop: scaleHeight(20) }]}>📊 나의 퀴즈 활동 </Text>
 					<View style={styles.activityCardBox}>
 						<View style={styles.summaryStatCard}>
 							<Text style={styles.statIcon}>🧮</Text>
@@ -514,7 +514,7 @@ const CapitalResultScreen = () => {
 					</View>
 
 					{/* 2. 전체 중 미획득 뱃지만 아코디언에 출력 */}
-					<TouchableOpacity onPress={toggleBadgeList} style={{ marginBottom: 12 }}>
+					<TouchableOpacity onPress={toggleBadgeList} style={{ marginBottom: scaleHeight(12) }}>
 						<Text style={{ color: '#27ae60', textAlign: 'center' }}>{showBadgeList ? '뱃지 목록 닫기 ▲' : '획득 가능한 뱃지 보기 ▼'}</Text>
 					</TouchableOpacity>
 
@@ -563,7 +563,7 @@ const CapitalResultScreen = () => {
 											<FastImage source={mascotImage} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
 											<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
 												<IconComponent name={item.icon} type='fontAwesome6' size={16} color='#27ae60' />
-												<Text style={[styles.levelLabel, { marginLeft: 6 }]}>{item.label}</Text>
+												<Text style={[styles.levelLabel, { marginLeft: scaleWidth(6) }]}>{item.label}</Text>
 											</View>
 											<Text style={styles.levelScore}>{item.score}점 이상</Text>
 											{isCurrent && <Text style={styles.levelEncourage}>{getEncourageMessage(item.score)}</Text>}
@@ -594,15 +594,23 @@ export default CapitalResultScreen;
 
 const styles = StyleSheet.create({
 	safeArea: { flex: 1, backgroundColor: '#fff' },
-	container: { paddingHorizontal: 20, paddingTop: 20 },
-	pageTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, color: '#2c3e50' },
+	container: {
+		paddingHorizontal: scaleWidth(20),
+		paddingTop: scaleHeight(20),
+	},
+	pageTitle: {
+		fontSize: scaledSize(20),
+		fontWeight: 'bold',
+		marginBottom: scaleHeight(20),
+		color: '#2c3e50',
+	},
 	badgeCard: {
 		flexDirection: 'row',
 		alignItems: 'flex-start',
 		backgroundColor: '#ffffff',
-		borderRadius: 12,
-		padding: 12,
-		marginBottom: 10,
+		borderRadius: scaleWidth(12),
+		padding: scaleWidth(12),
+		marginBottom: scaleHeight(10),
 		borderWidth: 1,
 		borderColor: '#ddd',
 	},
@@ -611,19 +619,19 @@ const styles = StyleSheet.create({
 		backgroundColor: '#f0fbf4',
 	},
 	iconBox: {
-		width: 32,
-		height: 32,
-		borderRadius: 16,
+		width: scaleWidth(32),
+		height: scaleWidth(32),
+		borderRadius: scaleWidth(16),
 		backgroundColor: '#e0e0e0',
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginRight: 12,
+		marginRight: scaleWidth(12),
 	},
 	iconBoxActive: {
 		backgroundColor: '#d0f0dc',
 	},
 	badgeTitle: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		fontWeight: '600',
 		color: '#2c3e50',
 	},
@@ -631,29 +639,28 @@ const styles = StyleSheet.create({
 		color: '#27ae60',
 	},
 	badgeDesc: {
-		fontSize: 13,
+		fontSize: scaledSize(13),
 		color: '#7f8c8d',
-		marginTop: 2,
-		lineHeight: 18,
+		marginTop: scaleHeight(2),
+		lineHeight: scaleHeight(18),
 	},
 	badgeDescActive: {
 		color: '#2d8659',
 	},
 	sectionBox: {
 		backgroundColor: '#f9f9f9',
-		padding: 16,
-		paddingHorizontal: 20,
-		borderRadius: 12,
-		marginBottom: 24,
+		padding: scaleWidth(16),
+		paddingHorizontal: scaleWidth(20),
+		borderRadius: scaleWidth(12),
+		marginBottom: scaleHeight(24),
 		borderWidth: 1,
 		borderColor: '#ddd',
 	},
-
 	subSectionBox1: {
 		backgroundColor: '#ffffff',
-		padding: 16,
-		borderRadius: 12,
-		marginBottom: 24,
+		padding: scaleWidth(16),
+		borderRadius: scaleWidth(12),
+		marginBottom: scaleHeight(24),
 		borderWidth: 1,
 		borderColor: '#ddd',
 	},
@@ -665,16 +672,37 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: '#ddd',
 	},
-	sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 12, color: '#2c3e50' },
-	statItem: { fontSize: 14, color: '#34495e', marginBottom: 6 },
-	subTitle: { fontSize: 15, fontWeight: '600', color: '#2c3e50', marginBottom: 6 },
-	tagItem: { fontSize: 14, color: '#27ae60', marginBottom: 4 },
-	emptyText: { fontSize: 13, color: '#95a5a6' },
+	sectionTitle: {
+		fontSize: scaledSize(18),
+		fontWeight: 'bold',
+		marginBottom: scaleHeight(12),
+		color: '#2c3e50',
+	},
+	statItem: {
+		fontSize: scaledSize(14),
+		color: '#34495e',
+		marginBottom: scaleHeight(6),
+	},
+	subTitle: {
+		fontSize: scaledSize(15),
+		fontWeight: '600',
+		color: '#2c3e50',
+		marginBottom: scaleHeight(6),
+	},
+	tagItem: {
+		fontSize: scaledSize(14),
+		color: '#27ae60',
+		marginBottom: scaleHeight(4),
+	},
+	emptyText: {
+		fontSize: scaledSize(13),
+		color: '#95a5a6',
+	},
 	textBox: { flex: 1 },
 	levelRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: 8,
+		marginBottom: scaleHeight(8),
 	},
 	levelTitle: {
 		fontSize: scaledSize(16),
@@ -684,21 +712,21 @@ const styles = StyleSheet.create({
 	},
 	quizSummaryBox: {
 		backgroundColor: '#f4f6f7',
-		borderRadius: 12,
-		padding: 12,
-		marginTop: 8,
-		marginBottom: 16,
+		borderRadius: scaleWidth(12),
+		padding: scaleWidth(12),
+		marginTop: scaleHeight(8),
+		marginBottom: scaleHeight(16),
 	},
 	levelIconWrap: {
-		width: 36,
-		height: 36,
-		borderRadius: 18,
+		width: scaleWidth(36),
+		height: scaleWidth(36),
+		borderRadius: scaleWidth(18),
 		borderWidth: 2,
 		borderColor: '#27ae60',
 		backgroundColor: '#eafaf1',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: 8,
+		marginRight: scaleWidth(8),
 		shadowColor: '#27ae60',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.25,
@@ -741,7 +769,6 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: '#ececec',
 	},
-
 	levelCardBoxActive: {
 		backgroundColor: '#eafaf1',
 		borderColor: '#2ecc71',
@@ -754,7 +781,6 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(8),
 	},
-
 	levelBadgeText: {
 		color: '#fff',
 		fontSize: scaledSize(12),
@@ -765,19 +791,16 @@ const styles = StyleSheet.create({
 		height: scaleWidth(80),
 		marginBottom: scaleHeight(10),
 	},
-
 	levelLabel: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 		marginBottom: scaleHeight(2),
 	},
-
 	levelScore: {
 		fontSize: scaledSize(13),
 		color: '#7f8c8d',
 	},
-
 	levelEncourage: {
 		fontSize: scaledSize(12),
 		color: '#27ae60',
@@ -786,26 +809,26 @@ const styles = StyleSheet.create({
 		lineHeight: scaleHeight(20),
 	},
 	levelIconWrapSmall: {
-		width: 28,
-		height: 28,
-		borderRadius: 14,
+		width: scaleWidth(28),
+		height: scaleWidth(28),
+		borderRadius: scaleWidth(14),
 		backgroundColor: '#d0f0dc',
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginRight: 10,
+		marginRight: scaleWidth(10),
 	},
 	levelModalText: {
 		flex: 1,
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#2c3e50',
 	},
 	levelModalScore: {
-		fontSize: 13,
+		fontSize: scaledSize(13),
 		color: '#7f8c8d',
 	},
 	levelNowText: {
-		marginLeft: 6,
-		fontSize: 14,
+		marginLeft: scaleWidth(6),
+		fontSize: scaledSize(14),
 		color: '#27ae60',
 		fontWeight: 'bold',
 	},
@@ -816,49 +839,47 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	modalConfirmButton: {
-		marginTop: 16,
-		paddingVertical: 10,
-		paddingHorizontal: 24,
+		marginTop: scaleHeight(16),
+		paddingVertical: scaleHeight(10),
+		paddingHorizontal: scaleWidth(24),
 		backgroundColor: '#27ae60',
-		borderRadius: 8,
+		borderRadius: scaleWidth(8),
 	},
 	modalConfirmText: {
 		color: '#fff',
 		fontWeight: '600',
-		fontSize: 14,
+		fontSize: scaledSize(14),
 	},
 	levelCenteredRow: {
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginBottom: 12,
+		marginBottom: scaleHeight(12),
 	},
-
 	levelDescription: {
-		fontSize: 13,
+		fontSize: scaledSize(13),
 		color: '#7f8c8d',
 		textAlign: 'center',
-		lineHeight: 18,
-		marginBottom: 4,
+		lineHeight: scaleHeight(18),
+		marginBottom: scaleHeight(4),
 	},
 	levelScoreText: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		color: '#7f8c8d',
 		textAlign: 'center',
-		marginTop: 4,
+		marginTop: scaleHeight(4),
 	},
-
 	levelScoreHighlight: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#27ae60',
-		marginTop: 4,
+		marginTop: scaleHeight(4),
 	},
 	activityCardBox: {
 		backgroundColor: '#f4f6f7',
-		borderRadius: 12,
-		padding: 16,
-		marginBottom: 24,
+		borderRadius: scaleWidth(12),
+		padding: scaleWidth(16),
+		marginBottom: scaleHeight(24),
 		borderWidth: 1,
 		borderColor: '#e0e0e0',
 	},
@@ -866,73 +887,72 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginBottom: 10,
+		marginBottom: scaleHeight(10),
 	},
 	activityLabel: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#2c3e50',
 	},
 	activityValue: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		fontWeight: 'bold',
 		color: '#34495e',
 	},
-
 	summaryCard: {
 		backgroundColor: '#fff8e1',
-		padding: 16,
-		borderRadius: 12,
-		marginBottom: 16,
+		padding: scaleWidth(16),
+		borderRadius: scaleWidth(12),
+		marginBottom: scaleHeight(16),
 		borderWidth: 1,
 		borderColor: '#f1c40f',
 	},
 	summaryTitle: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 		color: '#f39c12',
-		marginBottom: 8,
+		marginBottom: scaleHeight(8),
 	},
 	progressRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 	},
 	progressText: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#2c3e50',
-		marginRight: 12,
+		marginRight: scaleWidth(12),
 	},
 	progressBarBackground: {
-		width: '80%', // 약간 좁게 해서 정중앙 느낌 강조
-		height: 6,
+		width: '80%',
+		height: scaleHeight(6),
 		backgroundColor: '#ecf0f1',
-		borderRadius: 3,
-		marginTop: 6,
-		alignSelf: 'center', // 👉 중앙 정렬 추가
+		borderRadius: scaleHeight(3),
+		marginTop: scaleHeight(6),
+		alignSelf: 'center',
 	},
 	progressBarFill: {
-		height: 6,
+		height: scaleHeight(6),
 		backgroundColor: '#27ae60',
-		borderRadius: 3,
+		borderRadius: scaleHeight(3),
 	},
 	gridRow: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
-		marginTop: 6,
+		marginTop: scaleHeight(6),
 	},
 	regionCard: {
 		width: '28%',
-		height: 100,
+		height: scaleHeight(100),
 		borderWidth: 1,
 		borderColor: '#ccc',
-		borderRadius: 16,
+		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 		justifyContent: 'center',
-		paddingHorizontal: 6,
-		paddingVertical: 8,
+		paddingHorizontal: scaleWidth(6),
+		paddingVertical: scaleHeight(8),
 		backgroundColor: '#fff',
-		marginBottom: 12,
-		marginHorizontal: 5,
+		marginBottom: scaleHeight(12),
+		marginHorizontal: scaleWidth(5),
 	},
 	levelCard: {
 		width: '40%',
@@ -947,12 +967,12 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(12),
 	},
 	regionText: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		textAlign: 'center',
-		color: '#7f8c8d', // 기본 회색
+		color: '#7f8c8d',
 	},
 	levelText: {
-		fontSize: 15, // ✅ 12 → 14
+		fontSize: scaledSize(15),
 		textAlign: 'center',
 		color: '#7f8c8d',
 	},
@@ -963,13 +983,12 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 	},
-
 	summaryStatCard: {
 		flex: 1,
 		backgroundColor: '#ffffff',
-		borderRadius: 12,
-		paddingVertical: 16,
-		marginHorizontal: 4,
+		borderRadius: scaleWidth(12),
+		paddingVertical: scaleHeight(16),
+		marginHorizontal: scaleWidth(4),
 		alignItems: 'center',
 		borderWidth: 1,
 		borderColor: '#ecf0f1',
@@ -977,71 +996,68 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
 		shadowRadius: 2,
-		marginBottom: 12,
+		marginBottom: scaleHeight(12),
 	},
-
 	statIcon: {
-		fontSize: 22,
-		marginBottom: 4,
+		fontSize: scaledSize(22),
+		marginBottom: scaleHeight(4),
 	},
-
 	statValue: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 		color: '#2c3e50',
-		marginBottom: 4,
+		marginBottom: scaleHeight(4),
 	},
-
 	statLabel: {
-		fontSize: 13,
+		fontSize: scaledSize(13),
 		color: '#7f8c8d',
 	},
 	regionSubText: {
-		fontSize: 10,
+		fontSize: scaledSize(10),
 		color: '#b0b0b0',
 		textAlign: 'center',
-		marginTop: 1,
-		lineHeight: 13,
+		marginTop: scaleHeight(1),
+		lineHeight: scaleHeight(13),
 		fontWeight: '400',
 	},
 	levelSubText: {
-		fontSize: 12,
+		fontSize: scaledSize(12),
 		color: '#b0b0b0',
 		textAlign: 'center',
-		marginTop: 1,
-		lineHeight: 13,
+		marginTop: scaleHeight(1),
+		lineHeight: scaleHeight(13),
 		fontWeight: '400',
 	},
 	sectionSubtitle: {
-		fontSize: 15, // 좀 더 작은 폰트
+		fontSize: scaledSize(15),
 		color: '#2c3e50',
-		marginBottom: 12,
-		marginTop: 8,
+		marginBottom: scaleHeight(12),
+		marginTop: scaleHeight(8),
 		fontWeight: 'bold',
 	},
 	gridRowNoBottomGap: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
-		marginTop: 12,
-		paddingBottom: 6, // 또는 marginBottom: -6
+		marginTop: scaleHeight(12),
+		paddingBottom: scaleHeight(6),
 	},
 	regionHelperText: {
-		fontSize: 12,
+		fontSize: scaledSize(12),
 		color: '#7f8c8d',
-		marginBottom: 10,
+		marginBottom: scaleHeight(10),
 	},
 	levelHelperText: {
-		fontSize: 12,
+		fontSize: scaledSize(12),
 		color: '#7f8c8d',
-		marginTop: 3,
-		marginBottom: 15,
+		marginTop: scaleHeight(3),
+		marginBottom: scaleHeight(15),
 	},
 	adContainer: {
 		backgroundColor: '#fff',
 		alignItems: 'center',
 		justifyContent: 'center',
-		paddingVertical: 6,
+		paddingVertical: scaleHeight(6),
 		borderTopWidth: 1,
 		borderTopColor: '#eee',
 	},
@@ -1055,13 +1071,14 @@ const styles = StyleSheet.create({
 	},
 	scrollTopButton: {
 		position: 'absolute',
-		right: 16,
-		bottom: 16,
+		right: scaleWidth(16),
+		bottom: scaleHeight(16),
 		backgroundColor: '#2196F3',
-		width: 40,
-		height: 40,
-		borderRadius: 20,
+		width: scaleWidth(40),
+		height: scaleWidth(40),
+		borderRadius: scaleWidth(20),
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
 });
+

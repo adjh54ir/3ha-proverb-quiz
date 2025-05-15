@@ -27,7 +27,6 @@ const STORAGE_KEY_STUDY = 'UserStudyHistory';
 
 const Home = () => {
 	const navigation = useNavigation();
-	const { height: screenHeight } = Dimensions.get('window');
 	const scrollRef = useRef<NodeJS.Timeout | null>(null);
 	const levelScrollRef = useRef<ScrollView>(null);
 
@@ -207,8 +206,6 @@ const Home = () => {
 	}) => (
 		<TouchableOpacity style={[styles.actionCard, { borderColor: color }]} onPress={onPress}>
 			<View style={[styles.iconCircle, { backgroundColor: color }]}>
-				{/* @ts-ignore */}
-
 				<IconComponent name={iconName} type={iconType} size={24} color='#fff' />
 			</View>
 			<View style={styles.cardTextBox}>
@@ -220,7 +217,7 @@ const Home = () => {
 
 	return (
 		<>
-			<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+			<SafeAreaView style={styles.main}>
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 					<KeyboardAvoidingView style={styles.wrapper} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 						<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
@@ -245,7 +242,7 @@ const Home = () => {
 									</View>
 
 									<TouchableOpacity onPress={handleMascotPress}>
-										<View style={{ width: 180, height: 180, alignItems: 'center', justifyContent: 'center' }}>
+										<View style={styles.mascoteView}>
 											<FastImage
 												key={totalScore} // totalScore가 바뀌면 이미지 강제 갱신
 												source={
@@ -263,10 +260,10 @@ const Home = () => {
 										</View>
 									</TouchableOpacity>
 								</View>
-								<View style={{ alignItems: 'center', marginBottom: 8 }}>
-									<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(10) }}>
+								<View style={styles.iconView}>
+									<View style={styles.iconViewInner}>
 										<IconComponent type='fontAwesome6' name={icon} size={15} color='#27ae60' />
-										<Text style={{ fontSize: scaledSize(17), color: '#27ae60', fontWeight: '700', marginLeft: scaleWidth(6) }}>{label}</Text>
+										<Text style={styles.myScoreLabel}>{label}</Text>
 										<TouchableOpacity onPress={() => setShowLevelModal(true)}>
 											<IconComponent
 												type='materialIcons'
@@ -279,10 +276,10 @@ const Home = () => {
 									</View>
 
 									{earnedBadges.length > 0 && (
-										<View style={{ width: '100%', marginTop: 10 }}>
-											<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 10 }}>
+										<View style={styles.badgeView}>
+											<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: scaleWidth(10) }}>
 												{visibleBadges.map((item) => (
-													<View key={item.id} style={{ marginRight: 12, alignItems: 'center' }}>
+													<View key={item.id} style={styles.badgeViewInner}>
 														<TouchableOpacity
 															style={styles.iconBoxActive}
 															onPress={() => setSelectedBadge(item)} // ✅ 툴팁 관리 필요없음
@@ -403,7 +400,7 @@ const Home = () => {
 							</Text>
 						</Text>
 
-						<ScrollView contentContainerStyle={{ padding: 10 }} style={{ maxHeight: 400, width: '100%' }}>
+						<ScrollView contentContainerStyle={{ padding: 10 }} style={styles.badgeScrollView}>
 							{CONST_BADGES.map((badge) => {
 								const isEarned = earnedBadgeIds.includes(badge.id);
 								return (
@@ -459,13 +456,13 @@ const Home = () => {
 
 			<Modal visible={showLevelModal} transparent animationType='fade'>
 				<View style={styles.modalOverlay}>
-					<View style={[styles.levelModal, { maxHeight: scaleHeight(600) }]}>
+					<View style={[styles.levelModal]}>
 						<Text style={styles.levelModalTitle}>등급 안내</Text>
 
 						<ScrollView
 							ref={levelScrollRef}
 							style={{ width: '100%' }}
-							contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
+							contentContainerStyle={styles.gradeScrollView}
 							showsVerticalScrollIndicator={false}>
 							{[...LEVEL_DATA].reverse().map((item) => {
 								const isCurrent = totalScore >= item.score && totalScore < item.next;
@@ -482,7 +479,7 @@ const Home = () => {
 										{/* 아이콘 추가 위치 */}
 										<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(8) }}>
 											<IconComponent name={item.icon} type='fontAwesome6' size={16} color='#27ae60' />
-											<Text style={[styles.levelLabel, { marginLeft: 6 }]}>{item.label}</Text>
+											<Text style={[styles.levelLabel]}>{item.label}</Text>
 										</View>
 
 										<FastImage source={mascotImage} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
@@ -503,52 +500,62 @@ const Home = () => {
 	);
 };
 
+
 const styles = StyleSheet.create({
 	wrapper: { flex: 1, backgroundColor: '#fff' },
-	scrollContainer: { paddingBottom: 40 },
+	scrollContainer: { paddingBottom: scaleHeight(40) },
 	container: {
 		flexGrow: 1,
-		paddingHorizontal: 16,
-		paddingVertical: 12, // ← 이 부분을 줄이거나 0으로
+		paddingHorizontal: scaleWidth(16),
+		paddingVertical: scaleHeight(12), // ← 이 부분을 줄이거나 0으로
 	},
-	imageContainer: { alignItems: 'center', marginBottom: 8 },
+	imageContainer: { alignItems: 'center', marginBottom: scaleHeight(8) },
 	image: {
 		width: scaleWidth(150),
 		height: scaleWidth(150),
 	},
-	speechWrapper: { alignItems: 'center', marginBottom: -20 },
+	speechWrapper: { alignItems: 'center', marginBottom: scaleHeight(-20) },
 	speechBubble: {
 		backgroundColor: '#fef9e7',
-		paddingVertical: 12,
-		paddingHorizontal: 20,
-		borderRadius: 20,
-		maxWidth: '95%', // ✅ 기존 90% → 85%, 더 자연스럽게 말풍선 위치됨
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(20),
+		borderRadius: scaleWidth(20),
+		maxWidth: '95%',
 		shadowColor: '#000',
 		shadowOpacity: 0.07,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 3,
+		shadowOffset: { width: 0, height: scaleHeight(2) },
+		shadowRadius: scaleWidth(3),
 	},
 	speechTail: {
 		width: 0,
 		height: 0,
-		borderLeftWidth: 10,
-		borderRightWidth: 10,
-		borderTopWidth: 10,
+		borderLeftWidth: scaleWidth(10),
+		borderRightWidth: scaleWidth(10),
+		borderTopWidth: scaleHeight(10),
 		borderLeftColor: 'transparent',
 		borderRightColor: 'transparent',
 		borderTopColor: '#fef9e7',
 		alignSelf: 'center',
 	},
 	speechText: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		color: '#2c3e50',
 		textAlign: 'center',
 		fontWeight: '600',
-		lineHeight: 22,
+		lineHeight: scaleHeight(22),
 	},
-	levelContainer: { alignItems: 'center', marginBottom: 16 },
-	levelText: { fontSize: 14, color: '#27ae60', fontWeight: '600', marginLeft: 6 },
-	badgeScrollWrapper: { height: 70, width: '100%', marginTop: 8 },
+	levelContainer: { alignItems: 'center', marginBottom: scaleHeight(16) },
+	levelText: {
+		fontSize: scaledSize(14),
+		color: '#27ae60',
+		fontWeight: '600',
+		marginLeft: scaleWidth(6),
+	},
+	badgeScrollWrapper: {
+		height: scaleHeight(70),
+		width: '100%',
+		marginTop: scaleHeight(8),
+	},
 	iconBoxActive: {
 		width: scaleWidth(36),
 		height: scaleWidth(36),
@@ -557,31 +564,31 @@ const styles = StyleSheet.create({
 		backgroundColor: '#d0f0dc',
 		justifyContent: 'center',
 		alignItems: 'center',
-		borderWidth: 1, // ✅ 추가
-		borderColor: '#27ae60', // ✅ 추가
+		borderWidth: 1,
+		borderColor: '#27ae60',
 	},
 	toggleBadgeText: {
 		color: '#27ae60',
-		fontSize: 13,
-		marginTop: 4,
+		fontSize: scaledSize(13),
+		marginTop: scaleHeight(4),
 		textAlign: 'center',
 	},
 	greetingText: {
-		fontSize: 20,
+		fontSize: scaledSize(20),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 		textAlign: 'center',
 	},
 	actionButton: {
-		width: 260,
-		paddingVertical: 14,
-		borderRadius: 10,
-		marginVertical: 8,
+		width: scaleWidth(260),
+		paddingVertical: scaleHeight(14),
+		borderRadius: scaleWidth(10),
+		marginVertical: scaleHeight(8),
 		alignSelf: 'center',
 	},
 	buttonText: {
 		color: '#fff',
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 	},
 	buttonContent: {
@@ -592,22 +599,22 @@ const styles = StyleSheet.create({
 	helpButton: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginTop: 30,
+		marginTop: scaleHeight(30),
 		alignSelf: 'center',
 		backgroundColor: '#95a5a6',
-		paddingHorizontal: 18,
-		paddingVertical: 10,
-		borderRadius: 8,
+		paddingHorizontal: scaleWidth(18),
+		paddingVertical: scaleHeight(10),
+		borderRadius: scaleWidth(8),
 		opacity: 0.9,
 	},
 	helpButtonText: {
 		color: '#fff',
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		fontWeight: '500',
-		marginLeft: 6,
+		marginLeft: scaleWidth(6),
 	},
 	helpIcon: {
-		marginRight: 4,
+		marginRight: scaleWidth(4),
 	},
 	modalOverlay: {
 		flex: 1,
@@ -618,35 +625,35 @@ const styles = StyleSheet.create({
 	modalContent: {
 		width: '85%',
 		backgroundColor: '#fff',
-		padding: 20,
-		borderRadius: 12,
+		padding: scaleWidth(20),
+		borderRadius: scaleWidth(12),
 		alignItems: 'center',
 	},
 	modalCloseButton: {
 		backgroundColor: '#3498db',
-		paddingVertical: 10,
-		paddingHorizontal: 20,
-		borderRadius: 8,
-		marginTop: 20, // ✅ 간격 추가
+		paddingVertical: scaleHeight(10),
+		paddingHorizontal: scaleWidth(20),
+		borderRadius: scaleWidth(8),
+		marginTop: scaleHeight(20),
 	},
 	modalCloseText: {
 		color: '#fff',
 		fontWeight: '600',
 	},
 	modalTitle: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#2c3e50',
-		marginBottom: 14,
+		marginBottom: scaleHeight(14),
 		textAlign: 'center',
 	},
 	modalText: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#34495e',
-		lineHeight: 22,
+		lineHeight: scaleHeight(22),
 		textAlign: 'left',
-		marginTop: 10,
-		marginBottom: 20,
+		marginTop: scaleHeight(10),
+		marginBottom: scaleHeight(20),
 	},
 	boldText: {
 		fontWeight: 'bold',
@@ -654,58 +661,58 @@ const styles = StyleSheet.create({
 	badgeModalContent: {
 		width: '90%',
 		backgroundColor: '#fff',
-		padding: 20,
-		borderRadius: 12,
+		padding: scaleWidth(20),
+		borderRadius: scaleWidth(12),
 		alignItems: 'center',
 	},
 	badgeCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		backgroundColor: '#f4f6f8',
-		borderRadius: 12,
-		padding: 16,
-		marginBottom: 12,
+		borderRadius: scaleWidth(12),
+		padding: scaleWidth(16),
+		marginBottom: scaleHeight(12),
 		shadowColor: '#000',
 		shadowOpacity: 0.05,
-		shadowOffset: { width: 0, height: 1 },
-		shadowRadius: 2,
+		shadowOffset: { width: 0, height: scaleHeight(1) },
+		shadowRadius: scaleWidth(2),
 		width: '100%',
 	},
 	iconBox: {
-		width: 40,
-		height: 40,
-		borderRadius: 20,
+		width: scaleWidth(40),
+		height: scaleWidth(40),
+		borderRadius: scaleWidth(20),
 		backgroundColor: '#e0e0e0',
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginRight: 16,
+		marginRight: scaleWidth(16),
 	},
 	textBox: {
 		flex: 1,
 	},
 	badgeTitle: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 		color: '#34495e',
 	},
 	badgeDesc: {
-		fontSize: 13,
+		fontSize: scaledSize(13),
 		color: '#7f8c8d',
-		marginTop: 4,
+		marginTop: scaleHeight(4),
 	},
 	pageTitle: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#2c3e50',
-		marginBottom: 16,
+		marginBottom: scaleHeight(16),
 		textAlign: 'center',
 	},
 	curiousButton: {
-		marginTop: 24,
-		alignSelf: 'center', // ✅ 중앙 정렬
-		paddingHorizontal: 14, // ✅ 텍스트 좌우 여백만 제공
-		paddingVertical: 10,
-		borderRadius: 30,
+		marginTop: scaleHeight(24),
+		alignSelf: 'center',
+		paddingHorizontal: scaleWidth(14),
+		paddingVertical: scaleHeight(10),
+		borderRadius: scaleWidth(30),
 		borderWidth: 1,
 		borderColor: '#2ecc71',
 		backgroundColor: '#ffffff',
@@ -713,51 +720,51 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOpacity: 0.04,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 3,
+		shadowOffset: { width: 0, height: scaleHeight(2) },
+		shadowRadius: scaleWidth(3),
 	},
 	curiousButtonText: {
 		color: '#2ecc71',
 		fontWeight: '600',
-		fontSize: 14,
-		marginLeft: 8,
+		fontSize: scaledSize(14),
+		marginLeft: scaleWidth(8),
 		textAlign: 'center',
 	},
 	actionCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		borderRadius: 16,
-		marginHorizontal: 0, // ✅ 카드가 container의 패딩 내에서만 정렬되도록 설정
-		marginBottom: 16, // ✅ 카드 사이 간격 조금 더 띄움
-		padding: 14, // ✅ 내용물과 테두리 간 간격 약간 늘림
+		borderRadius: scaleWidth(16),
+		marginHorizontal: 0,
+		marginBottom: scaleHeight(16),
+		padding: scaleWidth(14),
 		backgroundColor: '#ffffff',
 		borderWidth: 1,
 		borderColor: '#e0e0e0',
 		shadowColor: '#000',
 		shadowOpacity: 0.05,
-		alignSelf: 'center', // ✅ 중앙 정렬
-		width: '88%', // ✅ 적당한 폭 설정 (예: 92% 또는 90%)
-		shadowOffset: { width: 0, height: 1 },
-		shadowRadius: 2,
+		alignSelf: 'center',
+		width: '88%',
+		shadowOffset: { width: 0, height: scaleHeight(1) },
+		shadowRadius: scaleWidth(2),
 	},
 	iconCircle: {
-		width: 52,
-		height: 52,
-		borderRadius: 26,
+		width: scaleWidth(52),
+		height: scaleWidth(52),
+		borderRadius: scaleWidth(26),
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginRight: 16,
+		marginRight: scaleWidth(16),
 	},
 	cardTitle: {
-		fontSize: 16,
-		fontWeight: '700', // ✅ 강조
+		fontSize: scaledSize(16),
+		fontWeight: '700',
 		color: '#2c3e50',
 	},
 	cardDescription: {
-		fontSize: 13,
+		fontSize: scaledSize(13),
 		color: '#7f8c8d',
-		marginTop: 4,
-		lineHeight: 18,
+		marginTop: scaleHeight(4),
+		lineHeight: scaleHeight(18),
 	},
 	cardTextBox: {
 		flex: 1,
@@ -774,88 +781,84 @@ const styles = StyleSheet.create({
 		color: '#2d8659',
 	},
 	badgeProgressText: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		fontWeight: '600',
 		color: '#27ae60',
-		marginBottom: 12,
+		marginBottom: scaleHeight(12),
 		textAlign: 'center',
 	},
 	confettiWrapper: {
 		position: 'absolute',
 		top: 0,
 		left: 0,
-		width: 150,
-		height: 280, // ✅ 캐릭터 + 뱃지 리스트까지 덮도록 확장
+		width: scaleWidth(150),
+		height: scaleHeight(280),
 		zIndex: 10,
 	},
 	tooltipBox: {
-		marginTop: 6,
+		marginTop: scaleHeight(6),
 		backgroundColor: '#2c3e50',
-		paddingVertical: 6,
-		paddingHorizontal: 10,
-		borderRadius: 8,
-		maxWidth: 180,
+		paddingVertical: scaleHeight(6),
+		paddingHorizontal: scaleWidth(10),
+		borderRadius: scaleWidth(8),
+		maxWidth: scaleWidth(180),
 		zIndex: 10,
 	},
 	tooltipText: {
 		color: '#fff',
-		fontSize: 12,
+		fontSize: scaledSize(12),
 		textAlign: 'center',
-		lineHeight: 18,
+		lineHeight: scaleHeight(18),
 	},
 	badgeDetailModal: {
 		backgroundColor: '#fff',
-		padding: 24,
-		borderRadius: 16,
+		padding: scaleWidth(24),
+		borderRadius: scaleWidth(16),
 		width: '85%',
 		alignItems: 'center',
 		position: 'relative',
 	},
-
 	badgeIconWrapper: {
-		width: 80,
-		height: 80,
-		borderRadius: 40,
+		width: scaleWidth(80),
+		height: scaleWidth(80),
+		borderRadius: scaleWidth(40),
 		backgroundColor: '#eafaf1',
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginBottom: 16,
+		marginBottom: scaleHeight(16),
 	},
-
 	badgeDetailTitle: {
-		fontSize: 20,
+		fontSize: scaledSize(20),
 		fontWeight: 'bold',
 		color: '#2c3e50',
-		marginBottom: 8,
+		marginBottom: scaleHeight(8),
 		textAlign: 'center',
 	},
-
 	badgeDetailDescription: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#7f8c8d',
 		textAlign: 'center',
-		lineHeight: 22,
+		lineHeight: scaleHeight(22),
 	},
-
 	modalCloseIcon: {
 		position: 'absolute',
-		top: 10,
-		right: 10,
+		top: scaleHeight(10),
+		right: scaleWidth(10),
 		zIndex: 2,
-		padding: 5,
+		padding: scaleWidth(5),
 	},
 	modalConfirmButton: {
 		backgroundColor: '#27ae60',
-		paddingVertical: 10,
-		paddingHorizontal: 20,
-		borderRadius: 8,
-		marginTop: 20,
+		paddingVertical: scaleHeight(10),
+		paddingHorizontal: scaleWidth(20),
+		borderRadius: scaleWidth(8),
+		marginTop: scaleHeight(20),
 		alignSelf: 'center',
 	},
 	modalConfirmText: {
 		color: '#ffffff',
 		fontWeight: '600',
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		textAlign: 'center',
 	},
 	levelModal: {
@@ -866,6 +869,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(16),
 		width: '85%',
 		alignItems: 'center',
+		maxHeight: scaleHeight(600),
 	},
 	levelModalTitle: {
 		fontSize: scaledSize(18),
@@ -895,7 +899,6 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: '#ececec',
 	},
-
 	levelCardBoxActive: {
 		backgroundColor: '#eafaf1',
 		borderColor: '#2ecc71',
@@ -908,7 +911,6 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(8),
 	},
-
 	levelBadgeText: {
 		color: '#fff',
 		fontSize: scaledSize(12),
@@ -919,19 +921,17 @@ const styles = StyleSheet.create({
 		height: scaleWidth(80),
 		marginBottom: scaleHeight(10),
 	},
-
 	levelLabel: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 		marginBottom: scaleHeight(2),
+		marginLeft: scaleWidth(6),
 	},
-
 	levelScore: {
 		fontSize: scaledSize(13),
 		color: '#7f8c8d',
 	},
-
 	levelEncourage: {
 		fontSize: scaledSize(12),
 		color: '#27ae60',
@@ -939,6 +939,42 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		lineHeight: scaleHeight(20),
 	},
+	main: { flex: 1, backgroundColor: '#fff' },
+	mascoteView: {
+		width: scaleWidth(180),
+		height: scaleWidth(180),
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	iconView: {
+		alignItems: 'center',
+		marginBottom: scaleHeight(8),
+	},
+	iconViewInner: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: scaleHeight(10),
+	},
+	myScoreLabel: {
+		fontSize: scaledSize(17),
+		color: '#27ae60',
+		fontWeight: '700',
+		marginLeft: scaleWidth(6),
+	},
+	badgeView: { width: '100%', marginTop: scaleHeight(10) },
+	badgeViewInner: {
+		marginRight: scaleWidth(12),
+		alignItems: 'center',
+	},
+	badgeScrollView: {
+		maxHeight: scaleHeight(400),
+		width: '100%',
+	},
+	gradeScrollView: {
+		paddingBottom: scaleHeight(12),
+	},
 });
+
+
 
 export default Home;

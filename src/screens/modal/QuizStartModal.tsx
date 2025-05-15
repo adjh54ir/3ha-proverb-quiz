@@ -5,6 +5,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import ProverbServices from '@/services/ProverbServices';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 
 interface Props {
 	visible: boolean;
@@ -217,9 +218,9 @@ const QuizStartModal = ({
 								<View style={{ alignItems: 'center', justifyContent: 'center' }}>
 									{/* 아이콘 */}
 									{isAll ? (
-										<IconComponent type='fontAwesome5' name='clipboard-list' size={20} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: 4 }} />
+										<IconComponent type='fontAwesome5' name='clipboard-list' size={20} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: scaleHeight(4) }} />
 									) : iconData ? (
-										<IconComponent type={iconData.type} name={iconData.name} size={18} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: 4 }} />
+										<IconComponent type={iconData.type} name={iconData.name} size={18} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: scaleHeight(4) }} />
 									) : null}
 
 									{/* ✅ 난이도: 상단 라벨 (Level 1 등) */}
@@ -274,12 +275,12 @@ const QuizStartModal = ({
 										<View style={styles.titleRowCenter}>
 											<Text style={styles.selectTitleEmoji}>🎯 </Text>
 											<Text style={styles.selectTitleText}>관심 있는 주제를 골라볼까요?</Text>
-											<TouchableOpacity onPress={() => setIsShowCategoryInfo(true)} style={{ marginLeft: 6 }}>
+											<TouchableOpacity onPress={() => setIsShowCategoryInfo(true)} style={{ marginLeft: scaleWidth(6) }}>
 												<IconComponent type='materialIcons' name='info-outline' size={18} color='#636e72' />
 											</TouchableOpacity>
 										</View>
 									</View>
-									<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: 10 }} showsVerticalScrollIndicator={false}>
+									<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: scaleHeight(10) }} showsVerticalScrollIndicator={false}>
 										<SelectGroup
 											title='카테고리 선택'
 											options={categoryOptions}
@@ -371,30 +372,30 @@ const styles = StyleSheet.create({
 	modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
 	selectModal: {
 		backgroundColor: '#fff',
-		paddingHorizontal: 24,
-		paddingBottom: 24,
-		paddingTop: 10,
-		borderRadius: 16,
+		paddingHorizontal: scaleWidth(24),
+		paddingBottom: scaleHeight(24),
+		paddingTop: scaleHeight(10),
+		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 		width: '90%',
 		position: 'relative',
 	},
 	selectSub: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		color: '#34495e',
-		marginBottom: 20,
+		marginBottom: scaleHeight(20),
 		textAlign: 'center',
 	},
 	modalButton: {
 		backgroundColor: '#3498db',
-		paddingVertical: 14,
-		paddingHorizontal: 40,
-		borderRadius: 30,
-		marginTop: 20,
+		paddingVertical: scaleHeight(14),
+		paddingHorizontal: scaleWidth(40),
+		borderRadius: scaleWidth(30),
+		marginTop: scaleHeight(20),
 	},
 	modalButtonText: {
 		color: '#fff',
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: '600',
 	},
 	backButtonInline: {
@@ -403,22 +404,22 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: '#fff',
-		paddingVertical: 14,
-		borderRadius: 30,
+		paddingVertical: scaleHeight(14),
+		borderRadius: scaleWidth(30),
 		borderWidth: 2,
 		borderColor: '#3498db',
 	},
 	backButtonText: {
-		marginLeft: 8,
-		fontSize: 16,
+		marginLeft: scaleWidth(8),
+		fontSize: scaledSize(16),
 		fontWeight: '600',
 		color: '#3498db',
 	},
 	selectGroupWrapper: {
 		backgroundColor: '#f2f4f5',
-		borderRadius: 12,
-		paddingTop: 16,
-		paddingHorizontal: 16,
+		borderRadius: scaleWidth(12),
+		paddingTop: scaleHeight(16),
+		paddingHorizontal: scaleWidth(16),
 		marginBottom: 0,
 		width: '100%',
 		borderWidth: 1,
@@ -428,47 +429,42 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
-		gap: 5,
-		paddingBottom: 16, // 👈 하단 여백 추가
+		gap: scaleWidth(5),
+		paddingBottom: scaleHeight(16),
 	},
-
 	halfWidthButton: {
 		width: '46%',
-		minHeight: 56, // 기존보다 줄임
-		borderRadius: 12,
+		minHeight: scaleHeight(56),
+		borderRadius: scaleWidth(12),
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: 8, // 내부 여백도 소폭 줄임
-		paddingVertical: 10,
+		paddingHorizontal: scaleWidth(8),
+		paddingVertical: scaleHeight(10),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
+		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.1,
-		shadowRadius: 3,
-		marginBottom: 6, // 🔽 여기도 줄이기
+		shadowRadius: scaleWidth(3),
+		marginBottom: scaleHeight(6),
 	},
-
 	fullWidthButton: {
 		width: '100%',
-		minHeight: 56, // 동일하게 줄임
-		borderRadius: 12,
+		minHeight: scaleHeight(56),
+		borderRadius: scaleWidth(12),
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: 8,
-		paddingVertical: 10,
-		marginBottom: 10,
+		paddingHorizontal: scaleWidth(8),
+		paddingVertical: scaleHeight(10),
+		marginBottom: scaleHeight(10),
 	},
 	selectButtonActive: {
 		borderWidth: 2,
-		borderColor: '#888', // 테두리도 검정으로 변경
-		// backgroundColor: '#1abc9c', // ❌ 이 줄 삭제 또는 주석 처리
-		// shadowColor: '#27ae60',
+		borderColor: '#888',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 0 },
 		shadowOpacity: 0.6,
-		shadowRadius: 4,
+		shadowRadius: scaleWidth(4),
 		transform: [{ scale: 1.02 }],
 	},
-
 	selectButtonTextActive: {
 		color: '#fff',
 	},
@@ -476,49 +472,49 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginTop: 16,
-		marginBottom: 8,
-		gap: 6,
+		marginTop: scaleHeight(16),
+		marginBottom: scaleHeight(8),
+		gap: scaleWidth(6),
 	},
 	selectTitleEmoji: {
-		fontSize: 22,
-		justifyContent: "center",
-		alignContent: "center",
+		fontSize: scaledSize(22),
+		justifyContent: 'center',
+		alignContent: 'center',
 	},
 	selectTitleText: {
-		fontSize: 17,
+		fontSize: scaledSize(17),
 		fontWeight: '600',
 		color: '#2d3436',
 		textAlign: 'center',
-		lineHeight: 24,
+		lineHeight: scaleHeight(24),
 		flexShrink: 1,
 	},
 	selectButtonText: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		fontWeight: '600',
 		color: '#ffffff',
 		textAlign: 'center',
-		lineHeight: 20,
+		lineHeight: scaleHeight(20),
 	},
 	levelLabel: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 		color: '#ffffff',
-		marginBottom: 4,
+		marginBottom: scaleHeight(4),
 	},
 	selectModalContentBox: {
 		width: '100%',
-		maxWidth: 400,
-		height: 550, // 카테고리 선택 시 더 크게!
-		justifyContent: 'center', // ✅ 추가
+		maxWidth: scaleWidth(400),
+		height: scaleHeight(550),
+		justifyContent: 'center',
 	},
 	buttonRow: {
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
-		gap: 12,
+		gap: scaleWidth(12),
 		width: '100%',
-		marginTop: 12,
+		marginTop: scaleHeight(12),
 	},
 	centeredButtonContent: {
 		flexDirection: 'row',
@@ -526,63 +522,59 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	levelTopLabel: {
-		fontSize: 13,
-		fontWeight: '700', // 강조
+		fontSize: scaledSize(13),
+		fontWeight: '700',
 		color: '#ecf0f1',
-		marginBottom: 2,
+		marginBottom: scaleHeight(2),
 	},
-
 	levelMainLabel: {
-		fontSize: 16,
-		fontWeight: '800', // 더 강조
+		fontSize: scaledSize(16),
+		fontWeight: '800',
 		color: '#ffffff',
 		textAlign: 'center',
-		lineHeight: 20,
+		lineHeight: scaleHeight(20),
 	},
-
 	levelStatLabel: {
-		fontSize: 12,
+		fontSize: scaledSize(12),
 		color: '#ecf0f1',
 		opacity: 0.8,
-		marginTop: 2,
+		marginTop: scaleHeight(2),
 	},
 	selectTitle: {
-		fontSize: 22,
+		fontSize: scaledSize(22),
 		fontWeight: 'bold',
 		color: '#2c3e50',
-		marginBottom: 12,
-		marginTop: 12, // ✅ 추가
+		marginBottom: scaleHeight(12),
+		marginTop: scaleHeight(12),
 		textAlign: 'center',
 	},
 	modalHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		justifyContent: 'center', // 타이틀을 중앙에 놓기 위해 center
+		justifyContent: 'center',
 		width: '100%',
-		paddingTop: 16,
-		paddingBottom: 12,
+		paddingTop: scaleHeight(16),
+		paddingBottom: scaleHeight(12),
 		position: 'relative',
 	},
-
 	modalTitle: {
-		fontSize: 20,
+		fontSize: scaledSize(20),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 		textAlign: 'center',
 	},
-
 	closeButton: {
 		position: 'absolute',
 		right: 0,
-		top: 8,
-		padding: 8,
+		top: scaleHeight(8),
+		padding: scaleWidth(8),
 	},
 	infoModalBox: {
 		backgroundColor: '#fff',
-		borderRadius: 16,
-		padding: 20,
+		borderRadius: scaleWidth(16),
+		padding: scaleWidth(20),
 		width: '85%',
-		maxWidth: 400,
+		maxWidth: scaleWidth(400),
 		maxHeight: '80%',
 		alignItems: 'center',
 	},

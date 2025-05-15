@@ -24,6 +24,7 @@ import FastImage from 'react-native-fast-image';
 import AdmobBannerAd from './common/ads/AdmobBannerAd';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 
 const PAGE_SIZE = 30;
 
@@ -264,7 +265,7 @@ const ProverbListScreen = () => {
 			<TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
 				<View style={{ flex: 1 }}>
 					{/* 필터 + 드롭다운 영역 */}
-					<View style={{ zIndex: 10, paddingHorizontal: 16, paddingTop: 16 }}>
+					<View style={styles.container}>
 						<View style={styles.filterCard}>
 							<View style={styles.bannerContainer}>
 								<AdmobBannerAd paramMarginBottom={8} />
@@ -292,9 +293,9 @@ const ProverbListScreen = () => {
 										setItems={setLevelItems}
 										style={styles.dropdownLevel}
 										dropDownContainerStyle={styles.dropdownListLevel}
-										listItemLabelStyle={{ marginLeft: 6, fontSize: 14 }}
-										labelStyle={{ fontSize: 14, color: '#2c3e50' }}
-										iconContainerStyle={{ marginRight: 8 }}
+										listItemLabelStyle={{ marginLeft: scaleWidth(6), fontSize: scaledSize(14) }}
+										labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
+										iconContainerStyle={{ marginRight: scaleWidth(8) }}
 										showArrowIcon={true} // 드롭다운 화살표
 										showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
 									/>
@@ -321,9 +322,9 @@ const ProverbListScreen = () => {
 										containerStyle={{
 											zIndex: 5000,
 										}}
-										listItemLabelStyle={{ marginLeft: 6, fontSize: 14 }}
-										labelStyle={{ fontSize: 14, color: '#2c3e50' }}
-										iconContainerStyle={{ marginRight: 8 }}
+										listItemLabelStyle={{ marginLeft: scaleWidth(6), fontSize: scaledSize(14) }}
+										labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
+										iconContainerStyle={{ marginRight: scaleWidth(8) }}
 										showArrowIcon={true}
 										showTickIcon={false}
 									/>
@@ -357,23 +358,19 @@ const ProverbListScreen = () => {
 							scrollEventThrottle={16}
 							keyboardShouldPersistTaps='handled'
 							ListEmptyComponent={() => (
-								<View style={[styles.emptyWrapper, { height: '100%', marginTop: 40 }]}>
+								<View style={[styles.emptyWrapper, { height: '100%', marginTop: scaleHeight(40) }]}>
 									<FastImage source={emptyImage} style={styles.emptyImage} resizeMode='contain' />
 									<Text style={styles.emptyText}>앗! 조건에 맞는 속담이 없어요.{'\n'}다른 검색어나 필터를 사용해보세요!</Text>
 								</View>
 							)}
-							contentContainerStyle={{
-								paddingTop: 12, // ✅ 적당한 여백으로 조정
-								paddingHorizontal: 16,
-								paddingBottom: 60,
-							}}
+							contentContainerStyle={styles.flatListCotent}
 							renderItem={({ item, index }) => {
 								const isLast = index === visibleList.length - 1;
 								return (
 									<TouchableOpacity
 										style={[
 											styles.itemBox,
-											{ marginBottom: isLast ? 24 : 12 }, // 마지막은 좀 더 크게, 그 외는 일정
+											{ marginBottom: isLast ? scaleHeight(24) : scaleHeight(12) }, // 마지막은 좀 더 크게, 그 외는 일정
 										]}
 										onPress={() => {
 											setSelectedProverb(item);
@@ -435,7 +432,7 @@ const ProverbListScreen = () => {
 
 									{selectedProverb && (
 										<>
-											<View style={[styles.badgeRow, { marginBottom: 12 }]}>
+											<View style={[styles.badgeRow, { marginBottom: scaleHeight(12) }]}>
 												<View style={[styles.badge, { backgroundColor: getLevelColor(selectedProverb.levelName) }]}>
 													<Text style={styles.badgeText}>{selectedProverb.levelName}</Text>
 												</View>
@@ -491,25 +488,24 @@ export default ProverbListScreen;
 const styles = StyleSheet.create({
 	filterCard: {
 		backgroundColor: '#fff',
-		padding: 16,
-		borderRadius: 16,
-		// marginBottom: 20, ❌ 제거 또는 줄이기
-		marginBottom: 8, // ✅ 줄이기
+		padding: scaleWidth(16),
+		borderRadius: scaleWidth(16),
+		marginBottom: scaleHeight(8),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
+		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.05,
-		shadowRadius: 8,
+		shadowRadius: scaleWidth(8),
 	},
 	input: {
-		height: 44, // 드롭다운과 똑같이!
+		height: scaleHeight(44),
 		borderWidth: 1,
 		borderColor: '#ccc',
-		borderRadius: 8,
-		fontSize: 16,
-		paddingHorizontal: 12, // 좌우 패딩만
-		paddingVertical: 0, // 위아래 패딩 없애야 높이 딱 맞아
-		marginBottom: 12,
-		textAlignVertical: 'center', // 텍스트 수직 중앙 정렬
+		borderRadius: scaleWidth(8),
+		fontSize: scaledSize(16),
+		paddingHorizontal: scaleWidth(12),
+		paddingVertical: 0,
+		marginBottom: scaleHeight(12),
+		textAlignVertical: 'center',
 	},
 	filterRow: {
 		flexDirection: 'row',
@@ -517,173 +513,173 @@ const styles = StyleSheet.create({
 	dropdown: {
 		backgroundColor: '#fff',
 		borderColor: '#ccc',
-		height: 44,
+		height: scaleHeight(44),
 	},
 	scrollTopButton: {
 		position: 'absolute',
-		right: 20,
-		bottom: 30,
+		right: scaleWidth(20),
+		bottom: scaleHeight(30),
 		backgroundColor: '#3b5998',
-		width: 48,
-		height: 48,
-		borderRadius: 24,
+		width: scaleWidth(48),
+		height: scaleWidth(48),
+		borderRadius: scaleWidth(24),
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 	itemBox: {
 		backgroundColor: '#fff',
-		padding: 20,
-		borderRadius: 16,
-		marginBottom: 16,
+		padding: scaleWidth(20),
+		borderRadius: scaleWidth(16),
+		marginBottom: scaleHeight(16),
 		borderWidth: 1,
 		borderColor: '#eee',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
+		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.05,
-		shadowRadius: 8,
+		shadowRadius: scaleWidth(8),
 	},
 	modalContainer: {
 		width: '90%',
 		backgroundColor: '#fff',
-		borderRadius: 20,
+		borderRadius: scaleWidth(20),
 		overflow: 'hidden',
 		maxHeight: '85%',
 	},
 
 	modalTitle: {
-		fontSize: 20,
+		fontSize: scaledSize(20),
 		fontWeight: 'bold',
 		color: '#2d3436',
 		flexShrink: 1,
 	},
 
 	modalBody: {
-		paddingHorizontal: 20,
-		paddingTop: 8,
-		paddingBottom: 16
+		paddingHorizontal: scaleWidth(20),
+		paddingTop: scaleHeight(8),
+		paddingBottom: scaleHeight(16),
 	},
 
 	modalSection: {
-		marginBottom: 16,
+		marginBottom: scaleHeight(16),
 		backgroundColor: '#f9f9f9',
-		padding: 12,
-		borderRadius: 12,
+		padding: scaleWidth(12),
+		borderRadius: scaleWidth(12),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
+		shadowOffset: { width: 0, height: scaleHeight(1) },
 		shadowOpacity: 0.05,
-		shadowRadius: 4,
+		shadowRadius: scaleWidth(4),
 	},
 
 	modalLabel: {
-		fontSize: 17,
+		fontSize: scaledSize(17),
 		fontWeight: 'bold',
 		color: '#0984e3',
-		marginBottom: 6,
+		marginBottom: scaleHeight(6),
 	},
 	modalText: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		color: '#2d3436',
-		lineHeight: 24,
+		lineHeight: scaleHeight(24),
 	},
 
 	modalHighlightTitle: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		fontWeight: 'bold',
 		color: '#0984e3',
-		marginBottom: 4,
+		marginBottom: scaleHeight(4),
 	},
 	modalHighlightText: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		color: '#2d3436',
-		lineHeight: 22,
+		lineHeight: scaleHeight(22),
 	},
 
 	modalCloseButton: {
 		backgroundColor: '#0984e3',
-		paddingVertical: 14,
+		paddingVertical: scaleHeight(14),
 		alignItems: 'center',
-		borderBottomLeftRadius: 20,
-		borderBottomRightRadius: 20,
+		borderBottomLeftRadius: scaleWidth(20),
+		borderBottomRightRadius: scaleWidth(20),
 	},
 	modalCloseButtonText: {
 		color: '#fff',
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 	},
 	proverbText: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#2d3436',
-		marginBottom: 8,
+		marginBottom: scaleHeight(8),
 	},
 	meaningText: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		color: '#2d3436',
-		fontWeight: '400', // 강조 추가
-		lineHeight: 24,
-		marginBottom: 12,
+		fontWeight: '400',
+		lineHeight: scaleHeight(24),
+		marginBottom: scaleHeight(12),
 	},
 	badgeRow: {
 		flexDirection: 'row',
-		gap: 8,
-		justifyContent: "center",
+		gap: scaleWidth(8),
+		justifyContent: 'center',
 	},
 	badge: {
-		paddingHorizontal: 10,
-		paddingVertical: 4,
-		borderRadius: 12,
-		backgroundColor: '#f1f2f6', // 연한 회색 배경 추가
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(4),
+		borderRadius: scaleWidth(12),
+		backgroundColor: '#f1f2f6',
 	},
 	badgeText: {
 		color: '#fff',
-		fontSize: 12,
+		fontSize: scaledSize(12),
 		fontWeight: '600',
 	},
 	filterDropdownRow: {
 		flexDirection: 'row',
-		marginBottom: 8,
+		marginBottom: scaleHeight(8),
 	},
 	dropdownWrapper: {
 		flex: 1,
-		marginBottom: 6, // ✅ 여백 조정
-		marginRight: 6, // ← 드롭다운 간의 간격
+		marginBottom: scaleHeight(6),
+		marginRight: scaleWidth(6),
 	},
 	dropdownPlaceholder: {
 		textAlign: 'center',
-		color: '#999', // 선택 전 컬러도 부드럽게
+		color: '#999',
 	},
 	dropdownList: {
 		backgroundColor: '#fff',
 		borderColor: '#dfe6e9',
 		borderWidth: 1.2,
-		borderRadius: 12,
+		borderRadius: scaleWidth(12),
 	},
 	dropdownWrapperLast: {
 		flex: 1,
-		marginBottom: 6,
-		marginRight: 6, // ✅ 초기화 버튼과 여백 추가!
+		marginBottom: scaleHeight(6),
+		marginRight: scaleWidth(6),
 	},
 	listCountWrapper: {
-		marginTop: 10,
-		alignItems: 'flex-end', // ✅ 오른쪽 정렬
-		paddingHorizontal: 16, // ✅ 양쪽 여백 추가 (리스트랑 맞추기)
-		marginBottom: 3,
+		marginTop: scaleHeight(10),
+		alignItems: 'flex-end',
+		paddingHorizontal: scaleWidth(16),
+		marginBottom: scaleHeight(3),
 	},
 	listCountText: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#666',
 	},
 	resetButton: {
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: '#eee',
-		height: 50,
-		width: 44, // ✅ 정사각형으로 통일
-		borderRadius: 8,
+		height: scaleHeight(50),
+		width: scaleWidth(44),
+		borderRadius: scaleWidth(8),
 	},
 	resetButtonText: {
 		color: '#555',
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		fontWeight: 'bold',
 	},
 	modalOverlay: {
@@ -695,53 +691,52 @@ const styles = StyleSheet.create({
 	emptyWrapper: {
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: 20,
+		paddingHorizontal: scaleWidth(20),
 	},
 	emptyImage: {
-		width: 200,
-		height: 200,
-		marginBottom: 20,
+		width: scaleWidth(200),
+		height: scaleWidth(200),
+		marginBottom: scaleHeight(20),
 	},
 	emptyText: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		color: '#636e72',
 		textAlign: 'center',
-		lineHeight: 22,
+		lineHeight: scaleHeight(22),
 	},
 	modalCloseIcon: {
 		position: 'absolute',
-		top: 16,
-		right: 16,
-		padding: 4,
+		top: scaleHeight(16),
+		right: scaleWidth(16),
+		padding: scaleWidth(4),
 		zIndex: 10,
 	},
 	modalHeader: {
 		backgroundColor: '#fff',
-		paddingVertical: 16,
-		paddingHorizontal: 20,
+		paddingVertical: scaleHeight(16),
+		paddingHorizontal: scaleWidth(20),
 		justifyContent: 'center',
 		alignItems: 'center',
 		position: 'relative',
 	},
-
 	modalProverbText: {
-		fontSize: 20,
+		fontSize: scaledSize(20),
 		fontWeight: 'bold',
 		color: '#2d3436',
 		textAlign: 'center',
-		lineHeight: 30,
+		lineHeight: scaleHeight(30),
 	},
 	modalProverbBox: {
-		backgroundColor: '#f1f2f6', // 회색 배경
-		borderRadius: 12,
-		paddingVertical: 16,
-		paddingHorizontal: 20,
-		marginBottom: 20,
+		backgroundColor: '#f1f2f6',
+		borderRadius: scaleWidth(12),
+		paddingVertical: scaleHeight(16),
+		paddingHorizontal: scaleWidth(20),
+		marginBottom: scaleHeight(20),
 		alignItems: 'center',
 	},
 	modalHeaderTitle: {
-		fontSize: 22,
-		marginTop: 5,
+		fontSize: scaledSize(22),
+		marginTop: scaleHeight(5),
 		fontWeight: 'bold',
 		color: '#2d3436',
 		textAlign: 'center',
@@ -749,112 +744,118 @@ const styles = StyleSheet.create({
 	bannerContainer: {
 		backgroundColor: '#fff',
 		alignItems: 'center',
-		paddingVertical: 6,
+		paddingVertical: scaleHeight(6),
 		borderColor: '#ccc',
 		zIndex: 999,
 	},
 	dropdownLevel: {
 		backgroundColor: '#ffffff',
 		borderColor: '#ccc',
-		height: 44,
-		paddingHorizontal: 12,
+		height: scaleHeight(44),
+		paddingHorizontal: scaleWidth(12),
 	},
 	dropdownField: {
 		backgroundColor: '#ffffff',
 		borderColor: '#ccc',
-		height: 44,
-		paddingHorizontal: 12,
+		height: scaleHeight(44),
+		paddingHorizontal: scaleWidth(12),
 	},
 	dropdownListLevel: {
 		backgroundColor: '#ffffff',
 		borderColor: '#ccc',
 		borderWidth: 1,
-		borderRadius: 12,
+		borderRadius: scaleWidth(12),
 	},
 	dropdownListField: {
 		backgroundColor: '#ffffff',
 		borderColor: '#ccc',
 		borderWidth: 1,
-		borderRadius: 12,
+		borderRadius: scaleWidth(12),
 	},
 	sameProverbBox: {
-		marginTop: 10,
-		padding: 10,
-		backgroundColor: '#f4f6f8', // 회색톤으로 변경
-		borderRadius: 10,
+		marginTop: scaleHeight(10),
+		padding: scaleWidth(10),
+		backgroundColor: '#f4f6f8',
+		borderRadius: scaleWidth(10),
 	},
 	sameProverbTitle: {
-		fontSize: 14,
-		color: '#0984e3', // 더 진한 텍스트 색상
+		fontSize: scaledSize(14),
+		color: '#0984e3',
 		fontWeight: '600',
-		marginBottom: 6,
+		marginBottom: scaleHeight(6),
 	},
-
 	sameProverbText: {
-		fontSize: 13,
-		color: '#34495e', // 더 진한 회색
-		fontWeight: '500', // 기존보다 더 강조
-		lineHeight: 22,
+		fontSize: scaledSize(13),
+		color: '#34495e',
+		fontWeight: '500',
+		lineHeight: scaleHeight(22),
 	},
 	modalHighlightBox: {
 		backgroundColor: '#f1f8ff',
-		borderLeftWidth: 4,
+		borderLeftWidth: scaleWidth(4),
 		borderLeftColor: '#0984e3',
-		padding: 12,
-		borderRadius: 10,
-		marginBottom: 16,
-		marginTop: 12, // 👈 간격 추가
+		padding: scaleWidth(12),
+		borderRadius: scaleWidth(10),
+		marginBottom: scaleHeight(16),
+		marginTop: scaleHeight(12),
 	},
 	proverbRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		marginBottom: 6,
+		marginBottom: scaleHeight(6),
 	},
-
 	proverbTextSingle: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 		color: '#2d3436',
 		flex: 1,
-		marginRight: 8,
+		marginRight: scaleWidth(8),
 	},
 	badgeInlineRow: {
 		flexDirection: 'row',
 		flexShrink: 0,
-		gap: 6,
-		marginBottom: 10,
+		gap: scaleWidth(6),
+		marginBottom: scaleHeight(10),
 	},
 	proverbBlock: {
-		marginBottom: 6,
+		marginBottom: scaleHeight(6),
 	},
-
 	proverbTextMulti: {
-		fontSize: 18, // 기존 16 → 18로 키움
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#2d3436',
-		lineHeight: 26, // 더 넓은 줄 간격
-		marginBottom: 8, // 뱃지와 간격 확보
+		lineHeight: scaleHeight(26),
+		marginBottom: scaleHeight(8),
 	},
-	// 모달 영역에서 사용하는 스타일 복구
 	sameProverbBoxModal: {
-		marginTop: 10,
-		padding: 12,
-		backgroundColor: '#eaf6ff', // 밝은 파랑 원래값
-		borderRadius: 12,
+		marginTop: scaleHeight(10),
+		padding: scaleWidth(12),
+		backgroundColor: '#eaf6ff',
+		borderRadius: scaleWidth(12),
 		borderWidth: 1,
 		borderColor: '#d0eaff',
 	},
 	sameProverbTitleModal: {
-		fontSize: 13,
-		color: '#2980b9', // 파란 강조
+		fontSize: scaledSize(13),
+		color: '#2980b9',
 		fontWeight: '700',
-		marginBottom: 6,
+		marginBottom: scaleHeight(6),
 	},
 	sameProverbTextModal: {
-		fontSize: 13,
+		fontSize: scaledSize(13),
 		color: '#34495e',
-		paddingVertical: 2,
-		paddingLeft: 10,
+		paddingVertical: scaleHeight(2),
+		paddingLeft: scaleWidth(10),
+	},
+	container: {
+		zIndex: 10,
+		paddingHorizontal: scaleWidth(16),
+		paddingTop: scaleHeight(16),
+	},
+	flatListCotent: {
+		paddingTop: scaleHeight(12),
+		paddingHorizontal: scaleWidth(16),
+		paddingBottom: scaleHeight(60),
 	},
 });

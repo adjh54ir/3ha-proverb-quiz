@@ -1,5 +1,6 @@
 import { Paths } from '@/navigation/conf/Paths';
 import { MainDataType } from '@/types/MainDataType';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -54,8 +55,8 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 					/>
 
 					<ScrollView
-						style={{ maxHeight: 500, width: '100%' }} // 🔽 모달 높이 제한
-						contentContainerStyle={{ paddingBottom: 10 }}
+						style={styles.scrollView} // 🔽 모달 높이 제한
+						contentContainerStyle={{ paddingBottom: scaleHeight(10) }}
 						showsVerticalScrollIndicator={true}
 					>
 						{resultType === 'done' ? (
@@ -72,21 +73,21 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 									<Text style={styles.correctInfoSubLabelInCard}>📖 속담 해설</Text>
 									<Text style={styles.correctInfoLabel}>📌 속담</Text>
 									<Text style={[styles.correctInfoText, { width: '100%' }]}>- {question?.proverb}</Text>
-									<Text style={[styles.correctInfoLabel, { marginTop: 12 }]}>💡 의미</Text>
+									<Text style={[styles.correctInfoLabel, { marginTop: scaleHeight(12) }]}>💡 의미</Text>
 									<Text style={[styles.correctInfoText, { width: '100%' }]}>- {question?.longMeaning}</Text>
 								</View>
 							</>
 						) : (
 							<>
 								<Text style={[styles.resultMessageBig, { color: '#e67e22' }]}>{resultMessage}</Text>
-								<Text style={{ fontSize: 15, fontWeight: '600', textAlign: 'center', padding: 20 }}>
+								<Text style={{ fontSize: scaledSize(15), fontWeight: '600', textAlign: 'center', padding: scaleWidth(20) }}>
 									정답은 <Text style={{ color: '#27ae60' }}>"{question?.proverb}"</Text>였어요!
 								</Text>
 								<View style={[styles.correctInfoCard, { backgroundColor: '#fffdf7' }]}>
 									<Text style={styles.correctInfoSubLabelInCard}>📖 속담 해설</Text>
 									<Text style={[styles.correctInfoLabel, { color: '#e67e22' }]}>📌 속담</Text>
 									<Text style={styles.correctInfoText}>- {question?.proverb}</Text>
-									<Text style={[styles.correctInfoLabel, { marginTop: 12, color: '#e67e22' }]}>💡 의미</Text>
+									<Text style={[styles.correctInfoLabel, { marginTop: scaleHeight(12), color: '#e67e22' }]}>💡 의미</Text>
 									<Text style={styles.correctInfoText}>- {question?.longMeaning}</Text>
 								</View>
 							</>
@@ -117,124 +118,124 @@ export const styles = StyleSheet.create({
 	},
 	resultModal: {
 		backgroundColor: '#fff',
-		padding: 15,
-		borderRadius: 16,
+		padding: scaleWidth(15),
+		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 		width: '80%',
-		maxHeight: '85%', // ✅ 추가: 화면 넘지 않게 제한
+		maxHeight: '85%',
 	},
 	resultTitle: {
-		fontSize: 22,
+		fontSize: scaledSize(22),
 		fontWeight: 'bold',
 		color: '#2c3e50',
-		marginBottom: 12,
+		marginBottom: scaleHeight(12),
 	},
 	resultMascot: {
-		width: 150,
-		height: 150,
+		width: scaleWidth(150),
+		height: scaleWidth(150),
 	},
 	resultMessageContainer: {
 		alignItems: 'center',
 		justifyContent: 'center',
-		minHeight: 90,
+		minHeight: scaleHeight(90),
 	},
 	resultMessageBig: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#2ecc71',
 		textAlign: 'center',
-		lineHeight: 24,
-		marginBottom: 16,
+		lineHeight: scaleHeight(24),
+		marginBottom: scaleHeight(16),
 	},
 	correctInfoCard: {
 		width: '100%',
 		backgroundColor: '#eafaf1',
-		borderRadius: 12,
-		padding: 16,
-		marginTop: 10,
-		borderWidth: 1.2, // 추가
-		borderColor: '#27ae60', // 추가 (초록색 계열)
+		borderRadius: scaleWidth(12),
+		padding: scaleWidth(16),
+		marginTop: scaleHeight(10),
+		borderWidth: 1.2,
+		borderColor: '#27ae60',
 	},
 	correctInfoLabel: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		fontWeight: '600',
 		color: '#27ae60',
-		marginBottom: 4,
+		marginBottom: scaleHeight(4),
 	},
 	correctInfoText: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		color: '#2c3e50',
-		lineHeight: 22,
+		lineHeight: scaleHeight(22),
 		fontWeight: '500',
-		width: '100%',     // ✅ 너비 제한
-		flexWrap: 'wrap',  // ✅ 줄바꿈 허용
-		flexShrink: 1,     // ✅ 너무 길면 줄이기
+		width: '100%',
+		flexWrap: 'wrap',
+		flexShrink: 1,
 	},
 	resultSubText: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		color: '#34495e',
-		marginTop: 6,
+		marginTop: scaleHeight(6),
 		textAlign: 'center',
-		lineHeight: 22,
+		lineHeight: scaleHeight(22),
 	},
 	proverbText: {
 		fontWeight: '700',
 		color: '#2c3e50',
-		fontSize: 16,
+		fontSize: scaledSize(16),
 	},
 	meaningText: {
 		fontWeight: '700',
 		color: '#2980b9',
-		fontSize: 16,
+		fontSize: scaledSize(16),
 	},
 	modalConfirmButton: {
 		backgroundColor: '#2980b9',
-		paddingVertical: 14,
-		paddingHorizontal: 36,
-		borderRadius: 30,
+		paddingVertical: scaleHeight(14),
+		paddingHorizontal: scaleWidth(36),
+		borderRadius: scaleWidth(30),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
+		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.2,
-		shadowRadius: 4,
-		marginTop: 16,
+		shadowRadius: scaleWidth(4),
+		marginTop: scaleHeight(16),
 	},
 	modalConfirmText: {
 		color: '#fff',
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: '600',
 	},
 	correctInfoSubLabel: {
-		fontSize: 13,
+		fontSize: scaledSize(13),
 		color: '#7f8c8d',
 		fontWeight: '500',
-		marginBottom: 6,
-		textAlign: "left",
+		marginBottom: scaleHeight(6),
+		textAlign: 'left',
 	},
 	correctInfoSubLabelInCard: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		fontWeight: '700',
 		color: '#34495e',
-		marginBottom: 10,
+		marginBottom: scaleHeight(10),
 		textAlign: 'center',
 	},
 	resultMessage: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		color: '#34495e',
 		textAlign: 'center',
-		marginBottom: 12,
+		marginBottom: scaleHeight(12),
 	},
-
 	replayText: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		fontWeight: '500',
 		color: '#2980b9',
 		textAlign: 'center',
 		textDecorationLine: 'underline',
 	},
 	fixedMeaningHeight: {
-		minHeight: 66,      // 대략 3줄 기준
-		maxHeight: 120,     // 너무 길 경우 제한
+		minHeight: scaleHeight(66),
+		maxHeight: scaleHeight(120),
 	},
+	scrollView: { maxHeight: scaleHeight(500), width: '100%' }
 
 });
 

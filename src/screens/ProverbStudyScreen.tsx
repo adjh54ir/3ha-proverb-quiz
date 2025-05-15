@@ -563,7 +563,7 @@ const ProverbStudyScreen = () => {
 								</View>
 							)}
 						</View>
-						<View style={{ marginBottom: 10 }}>
+						<View style={{ marginBottom: scaleHeight(10) }}>
 							<Text style={styles.hintText}>카드를 탭하면 속담 의미를 볼 수 있어요 👆</Text>
 						</View>
 						<Animated.View style={{ transform: [{ scale: buttonScaleAnimList[index] ?? new Animated.Value(1) }] }}>
@@ -609,8 +609,8 @@ const ProverbStudyScreen = () => {
 								contentContainerStyle={{
 									flexGrow: 1,
 									justifyContent: 'flex-start',
-									paddingTop: 15,
-									paddingBottom: 30, // 하단 버튼 여백 유지
+									paddingTop: scaleHeight(15),
+									paddingBottom: scaleHeight(30), // 하단 버튼 여백 유지
 								}}
 								keyboardShouldPersistTaps='handled'
 								showsVerticalScrollIndicator={true}
@@ -758,7 +758,7 @@ const ProverbStudyScreen = () => {
 										}}
 										items={LEVEL_DROPDOWN_ITEMS}
 										style={styles.dropdown}
-										textStyle={{ fontSize: 15, color: '#2c3e50', fontWeight: '500' }}
+										textStyle={{ fontSize: scaledSize(15), color: '#2c3e50', fontWeight: '500' }}
 										dropDownContainerStyle={styles.dropdownList}
 										containerStyle={{
 											zIndex: 10000, // ✅ 매우 높게 설정
@@ -770,7 +770,7 @@ const ProverbStudyScreen = () => {
 										listMode='SCROLLVIEW' /* 스크롤뷰 모드로 변경 */
 									/>
 								</View>
-								<View style={{ width: 8 }} />
+								<View style={{ width: scaleWidth(8) }} />
 								<View style={{ flex: 1, zIndex: levelOpen ? 1000 : 2000 }}>
 									<DropDownPicker
 										open={themeOpen}
@@ -900,7 +900,7 @@ const ProverbStudyScreen = () => {
 						<ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart explosionSpeed={350} />
 						<Animated.View style={[styles.badgeModal, { transform: [{ scale: scaleAnim }] }]}>
 							<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지를 획득했어요!</Text>
-							<ScrollView style={{ maxHeight: 300, width: '100%' }} contentContainerStyle={{ paddingHorizontal: 12 }}>
+							<ScrollView style={{ maxHeight: scaleHeight(300), width: '100%' }} contentContainerStyle={{ paddingHorizontal: scaleWidth(12) }}>
 								{newlyEarnedBadges.map((badge, index) => (
 									<View
 										key={index}
@@ -933,77 +933,71 @@ export default ProverbStudyScreen;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#f9fafb', // 기존보다 덜 눈부심
+		backgroundColor: '#f9fafb',
 	},
 	cardWrapper: {
 		left: 0,
 		right: 0,
 		alignItems: 'center',
-		// ✅ zIndex 명확히
 		zIndex: 1,
-
-		// ✅ 추가 (테두리 깨짐 방지)
 		backfaceVisibility: 'hidden',
 	},
 	cardFront: {
 		width: screenWidth * 0.85,
 		height: screenHeight * 0.6,
 		backgroundColor: '#fff',
-		borderRadius: 20,
+		borderRadius: scaleWidth(20),
 		justifyContent: 'center',
 		alignItems: 'center',
 		backfaceVisibility: 'hidden',
 		position: 'absolute',
 		zIndex: 1,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 6 },
+		shadowOffset: { width: 0, height: scaleHeight(6) },
 		shadowOpacity: 0.15,
-		shadowRadius: 10,
+		shadowRadius: scaleWidth(10),
 		alignSelf: 'center',
 		borderWidth: 1,
-		borderColor: '#ddd', // ✅ 테두리 추가
+		borderColor: '#ddd',
 	},
 	cardBack: {
 		backgroundColor: '#4a90e2',
-		// elevation: 1, // ✅ Android용 뒷면 보정
 		zIndex: 2,
 	},
 	cardInner: {
 		flex: 1,
 		width: '100%',
-		padding: 20,
-		minHeight: '100%', // ✅ 높이 강제 지정
-
-
+		padding: scaleWidth(20),
+		minHeight: '100%',
 	},
 	hintText: {
 		marginTop: scaleHeight(80),
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#7f8c8d',
 		textAlign: 'center',
 	},
 	progressWrapper: {
 		alignItems: 'center',
-		marginVertical: 20,
+		marginVertical: scaleHeight(20),
 	},
 	progressText: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: '600',
 		color: '#2c3e50',
 	},
 	buttonWrapper: {
 		alignItems: 'center',
-		marginVertical: 20,
+		marginVertical: scaleHeight(20),
 	},
 	completeButton: {
 		backgroundColor: '#27ae60',
-		paddingVertical: 12,
-		paddingHorizontal: 30,
-		borderRadius: 30,
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(30),
+		borderRadius: scaleWidth(30),
 	},
 	buttonText: {
 		color: '#fff',
-		fontSize: 17, // ✅ 살짝 키움
+		fontSize: scaledSize(17),
 		fontWeight: '600',
 		textAlign: 'center',
 	},
@@ -1020,22 +1014,22 @@ const styles = StyleSheet.create({
 	filterButton: {
 		borderWidth: 1,
 		borderColor: '#4a90e2',
-		borderRadius: 20,
-		paddingVertical: 8, // 기존 6 → 8 (더 여유있게)
-		paddingHorizontal: 14,
-		marginHorizontal: 6,
+		borderRadius: scaleWidth(20),
+		paddingVertical: scaleHeight(8),
+		paddingHorizontal: scaleWidth(14),
+		marginHorizontal: scaleWidth(6),
 		backgroundColor: '#fff',
-		minHeight: 36, // ✅ 버튼 높이 일정하게 유지
-		justifyContent: 'center', // ✅ 수직 정렬 보정
-		marginBottom: 10,
+		minHeight: scaleHeight(36),
+		justifyContent: 'center',
+		marginBottom: scaleHeight(10),
 	},
 	filterButtonActive: {
 		backgroundColor: '#4a90e2',
 	},
 	filterText: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#4a90e2',
-		lineHeight: 20, // ✅ 추가: 텍스트 세로 정렬 보정
+		lineHeight: scaleHeight(20),
 		textAlign: 'center',
 	},
 	filterTextActive: {
@@ -1045,30 +1039,32 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		zIndex: 1, // 👈 반드시 명시
+		zIndex: 1,
 	},
 	studyEndWrapper: {
 		width: '100%',
 		alignItems: 'center',
-		paddingVertical: 12,
+		paddingVertical: scaleHeight(12),
 		borderTopWidth: 1,
 		borderColor: '#ecf0f1',
 	},
 	studyEndButton: {
-		backgroundColor: '#7f8c8d', // 진한 그레이
-		paddingVertical: 12,
-		paddingHorizontal: 24,
-		borderRadius: 24,
+		backgroundColor: '#7f8c8d',
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(24),
+		borderRadius: scaleWidth(24),
 	},
 	studyEndText: {
 		color: '#ffffff',
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 	},
 	detailToggleButton: {
-		marginLeft: 8,
-		padding: 4,
+		marginLeft: scaleWidth(8),
+		padding: scaleWidth(4),
 	},
+
+
 	subFilterRow: {
 		flexDirection: 'row',
 		marginTop: scaleHeight(5),
@@ -1082,9 +1078,9 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(12),
 		height: scaleHeight(44),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
+		shadowOffset: { width: 0, height: scaleHeight(1) },
 		shadowOpacity: 0.06,
-		shadowRadius: 2,
+		shadowRadius: scaleWidth(2),
 	},
 	dropdownList: {
 		backgroundColor: '#fff',
@@ -1092,9 +1088,9 @@ const styles = StyleSheet.create({
 		borderWidth: 1.2,
 		borderRadius: scaleWidth(12),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
+		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.1,
-		shadowRadius: 4,
+		shadowRadius: scaleWidth(4),
 		paddingBottom: 0,
 		marginBottom: 0,
 	},
@@ -1102,68 +1098,65 @@ const styles = StyleSheet.create({
 		paddingTop: scaleHeight(20),
 		backgroundColor: '#ffffff',
 		alignItems: 'center',
-		// ✅ border 스타일 추가
 		borderWidth: 1,
 		borderColor: '#dcdde1',
-		borderRadius: 16,
+		borderRadius: scaleWidth(16),
 		paddingBottom: 0,
-
-		// ✅ 좌우 여백을 주어 라운드 형태가 보이도록
-		marginHorizontal: 16,
-		marginTop: 12,
+		marginHorizontal: scaleWidth(16),
+		marginTop: scaleHeight(12),
 	},
 	progressTopRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginBottom: 8,
+		marginBottom: scaleHeight(8),
 	},
 	progressTitle: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: '600',
 		color: '#2c3e50',
-		marginRight: 10,
+		marginRight: scaleWidth(10),
 	},
 	progressBadge: {
 		backgroundColor: '#4a90e2',
-		paddingVertical: 4,
-		paddingHorizontal: 10,
-		borderRadius: 12,
+		paddingVertical: scaleHeight(4),
+		paddingHorizontal: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 	},
 	progressBadgeText: {
 		color: '#fff',
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		fontWeight: '600',
 	},
 	progressBarWrapper: {
 		width: '80%',
-		height: 10,
-		borderRadius: 5,
+		height: scaleHeight(10),
+		borderRadius: scaleHeight(5),
 		backgroundColor: '#dcdde1',
-		marginTop: 10,
+		marginTop: scaleHeight(10),
 		overflow: 'hidden',
 	},
 	progressBarFill: {
 		height: '100%',
-		borderRadius: 5,
+		borderRadius: scaleHeight(5),
 		backgroundColor: '#4a90e2',
 	},
 	detailFilterWrapper: {
 		width: '100%',
-		backgroundColor: '#ffffff', // ✅ f9fafb → 완전한 흰색으로 변경
+		backgroundColor: '#ffffff',
 		paddingTop: 0,
-		paddingHorizontal: 20,
+		paddingHorizontal: scaleWidth(20),
 		zIndex: 9999,
 	},
 	retryButton: {
-		backgroundColor: '#f39c12', // 다시 학습은 노란색 계열
-		height: 48, // ✅ 높이 명확히 지정
-		borderRadius: 24,
+		backgroundColor: '#f39c12',
+		height: scaleHeight(48),
+		borderRadius: scaleWidth(24),
 		alignItems: 'center',
 		justifyContent: 'center',
-		paddingHorizontal: 30,
-		marginTop: 20,
-		marginBottom: 10,
+		paddingHorizontal: scaleWidth(30),
+		marginTop: scaleHeight(20),
+		marginBottom: scaleHeight(10),
 	},
 	modalOverlay: {
 		flex: 1,
@@ -1174,20 +1167,20 @@ const styles = StyleSheet.create({
 	exitModalBox: {
 		width: '80%',
 		backgroundColor: '#fff',
-		padding: 24,
-		borderRadius: 16,
+		padding: scaleWidth(24),
+		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 	},
 	exitTitle: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#2c3e50',
-		marginBottom: 8,
+		marginBottom: scaleHeight(8),
 	},
 	exitSub: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#7f8c8d',
-		marginBottom: 20,
+		marginBottom: scaleHeight(20),
 	},
 	exitButtonRow: {
 		flexDirection: 'row',
@@ -1196,15 +1189,15 @@ const styles = StyleSheet.create({
 	},
 	exitButton: {
 		flex: 1,
-		marginHorizontal: 4,
-		paddingVertical: 12,
-		borderRadius: 8,
+		marginHorizontal: scaleWidth(4),
+		paddingVertical: scaleHeight(12),
+		borderRadius: scaleWidth(8),
 		alignItems: 'center',
 	},
 	exitButtonText: {
 		color: '#fff',
 		fontWeight: 'bold',
-		fontSize: 15,
+		fontSize: scaledSize(15),
 	},
 	toastWrapper: {
 		position: 'absolute',
@@ -1215,208 +1208,203 @@ const styles = StyleSheet.create({
 		zIndex: 999,
 	},
 	toastContainer: {
-		width: screenWidth * 0.9, // 화면의 90% 차지
-		maxWidth: 500, // 큰 기기에서도 제한
+		width: screenWidth * 0.9,
+		maxWidth: scaleWidth(500),
 		backgroundColor: 'rgba(255,255,255,0.95)',
-		borderRadius: 24,
-		paddingVertical: 16,
-		paddingHorizontal: 20,
+		borderRadius: scaleWidth(24),
+		paddingVertical: scaleHeight(16),
+		paddingHorizontal: scaleWidth(20),
 		alignItems: 'center',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 6 },
+		shadowOffset: { width: 0, height: scaleHeight(6) },
 		shadowOpacity: 0.15,
-		shadowRadius: 8,
+		shadowRadius: scaleWidth(8),
 		transform: [{ translateY: -70 }],
 	},
 	toastInner: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		flexWrap: 'wrap', // 내용이 넘치면 줄바꿈
+		flexWrap: 'wrap',
 	},
 	toastImage: {
-		width: 50,
-		height: 50,
-		marginRight: 16,
-		borderRadius: 12,
+		width: scaleWidth(50),
+		height: scaleWidth(50),
+		marginRight: scaleWidth(16),
+		borderRadius: scaleWidth(12),
 	},
-
 	toastTextBox: {
 		flex: 1,
 	},
-
 	toastTitle: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#2d3436',
-		marginBottom: 4,
+		marginBottom: scaleHeight(4),
 	},
-
 	toastText: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		color: '#636e72',
-		lineHeight: 22,
+		lineHeight: scaleHeight(22),
 	},
 	completedBadge: {
-		marginTop: 8,
+		marginTop: scaleHeight(8),
 		backgroundColor: '#2ecc71',
-		paddingVertical: 4,
-		paddingHorizontal: 10,
-		borderRadius: 12,
+		paddingVertical: scaleHeight(4),
+		paddingHorizontal: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 	},
 	completedBadgeText: {
-		fontSize: 12,
+		fontSize: scaledSize(12),
 		color: '#fff',
 		fontWeight: '600',
 	},
 	subMascotImage: {
-		width: 120,
-		height: 120,
-		marginTop: 0,
-		marginBottom: 10, // ✅ 4로 줄이면 타이틀과의 거리 확 줄어듭니다
+		width: scaleWidth(120),
+		height: scaleWidth(120),
+		marginTop: scaleHeight(0),
+		marginBottom: scaleHeight(10),
 	},
 	meaningHighlight: {
-		fontSize: 20,
+		fontSize: scaledSize(20),
 		color: '#ffffff',
 		fontWeight: 'bold',
 		textAlign: 'left',
-		lineHeight: 30,
-		marginVertical: 10,
-		paddingHorizontal: 10, // 👉 좌우 여백 추가
-		flexShrink: 1,          // 💡 너무 길면 줄이도록
-		flexWrap: 'wrap',       // 💡 텍스트 감싸기 허용
-		overflow: 'visible',    // 💡 잘림 방지
+		lineHeight: scaleHeight(30),
+		marginVertical: scaleHeight(10),
+		paddingHorizontal: scaleWidth(10),
+		flexShrink: 1,
+		flexWrap: 'wrap',
+		overflow: 'visible',
 	},
 	exampleText: {
-		fontSize: 15,
+		fontSize: scaledSize(15),
 		color: '#dfe6e9',
 		fontStyle: 'italic',
 		textAlign: 'center',
-		lineHeight: 22,
-		marginTop: 20, // 👉 기존보다 살짝 줄여도 좋음
-		paddingHorizontal: 10, // 👉 추가
+		lineHeight: scaleHeight(22),
+		marginTop: scaleHeight(20),
+		paddingHorizontal: scaleWidth(10),
 	},
 	cardLabel: {
-		fontSize: 17,
+		fontSize: scaledSize(17),
 		color: '#ffffff',
-		marginBottom: 3,
+		marginBottom: scaleHeight(3),
 		fontWeight: '600',
 		textAlign: 'left',
 		marginLeft: scaleWidth(10),
 	},
 	cardCompleteButton: {
 		backgroundColor: '#27ae60',
-		height: 48, // ✅ 높이 명확히 지정
-		borderRadius: 24,
+		height: scaleHeight(48),
+		borderRadius: scaleWidth(24),
 		alignItems: 'center',
 		justifyContent: 'center',
-		paddingHorizontal: 30,
-		marginTop: 20,
-		marginBottom: 10,
+		paddingHorizontal: scaleWidth(30),
+		marginTop: scaleHeight(20),
+		marginBottom: scaleHeight(10),
 	},
 	cardContent: {
 		flex: 1,
 		alignItems: 'center',
-		paddingTop: 8,
-		paddingBottom: 5,
-		paddingHorizontal: 12, // 👉 텍스트도 양옆 여유
+		paddingTop: scaleHeight(8),
+		paddingBottom: scaleHeight(5),
+		paddingHorizontal: scaleWidth(12),
 	},
-
 	badgeModal: {
 		backgroundColor: '#fff',
-		padding: 20,
-		borderRadius: 20,
+		padding: scaleWidth(20),
+		borderRadius: scaleWidth(20),
 		width: '85%',
 		maxHeight: '80%',
 		alignItems: 'center',
 	},
 	badgeModalTitle: {
-		fontSize: 18,
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#2c3e50',
-		marginBottom: 16,
+		marginBottom: scaleHeight(16),
 		textAlign: 'center',
 	},
 	badgeItem: {
 		flexDirection: 'row',
 		alignItems: 'flex-start',
-		paddingVertical: 10,
-		paddingHorizontal: 12,
-		marginBottom: 12,
+		paddingVertical: scaleHeight(10),
+		paddingHorizontal: scaleWidth(12),
+		marginBottom: scaleHeight(12),
 		width: '100%',
-		borderRadius: 12,
+		borderRadius: scaleWidth(12),
 		borderWidth: 1.2,
-		borderColor: '#d1f2eb', // 밝은 초록 계열
-		backgroundColor: '#f9fefc', // 전체 배경도 아주 옅은 초록색
+		borderColor: '#d1f2eb',
+		backgroundColor: '#f9fefc',
 	},
 	badgeIconWrap: {
-		marginRight: 12,
-		width: 40,
-		height: 40,
-		borderRadius: 20,
+		marginRight: scaleWidth(12),
+		width: scaleWidth(40),
+		height: scaleWidth(40),
+		borderRadius: scaleWidth(20),
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: '#ADD8E6',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
+		shadowOffset: { width: 0, height: scaleHeight(1) },
 		shadowOpacity: 0.1,
-		shadowRadius: 2,
+		shadowRadius: scaleWidth(2),
 	},
 	badgeName: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#27ae60', // 초록색 강조
-		marginBottom: 2,
+		color: '#27ae60',
+		marginBottom: scaleHeight(2),
 	},
-
 	badgeTextWrap: {
 		flexShrink: 1,
 		flexGrow: 1,
 		minWidth: 0,
-		maxWidth: '85%', // ✅ 설명 부분이 너무 길지 않게 제한
+		maxWidth: '85%',
 	},
 	badgeDescription: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#7f8c8d',
-		lineHeight: 20,
+		lineHeight: scaleHeight(20),
 	},
 	modalConfirmText2: {
 		color: '#fff',
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: '600',
 	},
 	modalConfirmButton2: {
 		backgroundColor: '#2980b9',
-		paddingVertical: 14,
-		paddingHorizontal: 36,
-		borderRadius: 30,
+		paddingVertical: scaleHeight(14),
+		paddingHorizontal: scaleWidth(36),
+		borderRadius: scaleWidth(30),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
+		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.2,
-		shadowRadius: 4,
+		shadowRadius: scaleWidth(4),
 	},
 	badgeCard: {
 		flexDirection: 'row',
 		alignItems: 'flex-start',
 		backgroundColor: '#f9f9f9',
-		borderRadius: 12,
-		padding: 12,
-		marginBottom: 10,
+		borderRadius: scaleWidth(12),
+		padding: scaleWidth(12),
+		marginBottom: scaleHeight(10),
 		borderWidth: 1,
 		borderColor: '#ddd',
-		width: '100%', // ✅ 명확히 카드 너비 지정
+		width: '100%',
 	},
 	badgeCardActive: {
 		borderColor: '#27ae60',
 		backgroundColor: '#f0fbf4',
 	},
 	iconBox: {
-		width: 32,
-		height: 32,
-		borderRadius: 16,
+		width: scaleWidth(32),
+		height: scaleWidth(32),
+		borderRadius: scaleWidth(16),
 		backgroundColor: '#e0e0e0',
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginRight: 12,
+		marginRight: scaleWidth(12),
 	},
 	iconBoxActive: {
 		backgroundColor: '#d0f0dc',
@@ -1428,30 +1416,30 @@ const styles = StyleSheet.create({
 		color: '#2d8659',
 	},
 	statusCardValue: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 	},
 	closeButtonText: {
 		color: 'white',
 		fontWeight: '600',
-		fontSize: 15, // 기존 16 → 줄임
+		fontSize: scaledSize(15),
 	},
 	dropdownWrapper: {
 		flex: 1,
-		marginBottom: 6, // ✅ 여백 조정
-		marginRight: 6, // ← 드롭다운 간의 간격
-		width: '48%', // ✅ 추가
+		marginBottom: scaleHeight(6),
+		marginRight: scaleWidth(6),
+		width: '48%',
 	},
 	dropdownWrapperLast: {
 		flex: 1,
-		marginBottom: 6,
-		marginRight: 6, // ✅ 초기화 버튼과 여백 추가!
-		width: '48%', // ✅ 추가
+		marginBottom: scaleHeight(6),
+		marginRight: scaleWidth(6),
+		width: '48%',
 	},
 	dropdownPlaceholder: {
 		textAlign: 'center',
-		color: '#999', // 선택 전 컬러도 부드럽게
+		color: '#999',
 	},
 	emptyImage: {
 		width: scaleWidth(100),
@@ -1466,24 +1454,24 @@ const styles = StyleSheet.create({
 		lineHeight: scaleHeight(24),
 	},
 	resetButton: {
-		marginLeft: 6,
-		padding: 4,
+		marginLeft: scaleWidth(6),
+		padding: scaleWidth(4),
 	},
 	cardTitle: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#7f8c8d',
 		fontWeight: '600',
 		textAlign: 'center',
-		marginBottom: 12, // 기존 8 → 4로 간격 좁힘
+		marginBottom: scaleHeight(12),
 	},
 	proverbText: {
-		fontSize: 28,
+		fontSize: scaledSize(28),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 		textAlign: 'center',
-		lineHeight: 34,
-		marginTop: 0, // 기존 4 → 0
-		marginBottom: 0,
+		lineHeight: scaleHeight(34),
+		marginTop: scaleHeight(0),
+		marginBottom: scaleHeight(0),
 	},
 	proverbContainer: {
 		justifyContent: 'center',
@@ -1493,43 +1481,43 @@ const styles = StyleSheet.create({
 	categoryBadge: {
 		alignSelf: 'center',
 		backgroundColor: '#dfe6e9',
-		paddingHorizontal: 10,
-		paddingVertical: 4,
-		borderRadius: 12,
-		marginBottom: 12,
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(4),
+		borderRadius: scaleWidth(12),
+		marginBottom: scaleHeight(12),
 	},
 	categoryBadgeText: {
-		fontSize: 13,
+		fontSize: scaledSize(13),
 		color: '#2c3e50',
 		fontWeight: '500',
 	},
 	sectionWrapper: {
-		marginTop: 20,
-		alignItems: 'flex-start', // 왼쪽 정렬
-		paddingHorizontal: 12,
-		width: '100%', // 💡 너비 지정
+		marginTop: scaleHeight(20),
+		alignItems: 'flex-start',
+		paddingHorizontal: scaleWidth(12),
+		width: '100%',
 	},
 	sectionTitle: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: '600',
 		color: '#ffffff',
-		marginBottom: 6,
-		textAlign: 'left', // 왼쪽 정렬
+		marginBottom: scaleHeight(6),
+		textAlign: 'left',
 		width: '100%',
 	},
 	sectionText: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#ecf0f1',
-		lineHeight: 20,
-		textAlign: 'left', // 왼쪽 정렬
+		lineHeight: scaleHeight(20),
+		textAlign: 'left',
 		width: '100%',
 	},
 	levelLabel: {
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		color: '#f1c40f',
 		fontWeight: '600',
 		textAlign: 'center',
-		marginBottom: 20,
+		marginBottom: scaleHeight(20),
 	},
 	button: {
 		height: scaleHeight(50),
@@ -1537,22 +1525,22 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(30),
 		backgroundColor: '#3b82f6',
 		justifyContent: 'center',
-		alignItems: 'center', // ✅ 변경 (기존 `alignContent` → `alignItems`)
-		width: '100%', // ✅ 항상 100% 사용
-		alignSelf: 'center', // ✅ 중앙 정렬
+		alignItems: 'center',
+		width: '100%',
+		alignSelf: 'center',
 	},
 	badge: {
 		maxWidth: '60%',
 		alignSelf: 'center',
-		paddingHorizontal: 10,
-		paddingVertical: 4,
-		borderRadius: 12,
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(4),
+		borderRadius: scaleWidth(12),
 		backgroundColor: '#f1f2f6',
-		marginBottom: 20,
+		marginBottom: scaleHeight(20),
 	},
 	badgeText: {
 		color: '#fff',
-		fontSize: 12,
+		fontSize: scaledSize(12),
 		fontWeight: '600',
 	},
 });

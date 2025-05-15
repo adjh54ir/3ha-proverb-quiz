@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
-		shadowRadius: 2,
+		shadowRadius: scaleWidth(2),
 	},
 	reviewRow: {
 		flexDirection: 'row',
@@ -340,16 +340,16 @@ const styles = StyleSheet.create({
 		color: '#e67e22',
 	},
 	guideConfirmButton: {
-		marginTop: 16,
-		paddingVertical: 10,
-		paddingHorizontal: 24,
+		marginTop: scaleHeight(16),
+		paddingVertical: scaleHeight(10),
+		paddingHorizontal: scaleWidth(24),
 		backgroundColor: '#27ae60',
-		borderRadius: 8,
+		borderRadius: scaleWidth(8),
 	},
 	guideConfirmText: {
 		color: '#fff',
 		fontWeight: '600',
-		fontSize: 14,
+		fontSize: scaledSize(14),
 	},
 	guideDescriptionBox: {
 		backgroundColor: '#f9f9f9',
@@ -364,9 +364,8 @@ const styles = StyleSheet.create({
 		height: scaleWidth(120),
 		marginBottom: scaleHeight(10),
 	},
-
 	guideCard: {
-		backgroundColor: '#ffffff', // 기존 '#fefefe' → 완전 흰색으로 변경
+		backgroundColor: '#ffffff',
 		borderWidth: 1,
 		borderColor: '#dfe6e9',
 		borderRadius: scaleWidth(14),
@@ -385,12 +384,10 @@ const styles = StyleSheet.create({
 		color: '#34495e',
 		lineHeight: scaleHeight(20),
 	},
-
 	reviewCardList: {
 		width: '100%',
 		marginTop: scaleHeight(16),
 	},
-
 	reviewCard: {
 		backgroundColor: '#ffffff',
 		borderRadius: scaleWidth(14),
@@ -402,16 +399,14 @@ const styles = StyleSheet.create({
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
-		shadowRadius: 2,
+		shadowRadius: scaleWidth(2),
 	},
-
 	reviewProverbText: {
 		fontSize: scaledSize(15),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 		marginBottom: scaleHeight(12),
 	},
-
 	reviewMeaningText: {
 		fontSize: scaledSize(14),
 		color: '#636e72',

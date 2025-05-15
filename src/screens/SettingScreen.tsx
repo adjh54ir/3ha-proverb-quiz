@@ -144,7 +144,7 @@ const SettingScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}>
+			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => { }} />}>
 				<AdmobBannerAd paramMarginTop={20} />
 				{/* <View style={styles.section}></View> */}
 				<View style={styles.section}>
@@ -190,8 +190,8 @@ const SettingScreen = () => {
 				<TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevModal(true)}>
 					<Text style={styles.devText}>제작자 소개</Text>
 				</TouchableOpacity>
-				<View style={{ marginTop: 30, marginBottom: 10 }}>
-					<Text style={{ fontSize: 12, color: '#7f8c8d', textAlign: 'center', padding: 40 }}>
+				<View style={{ marginTop: scaleHeight(30), marginBottom: scaleHeight(10) }}>
+					<Text style={{ fontSize: scaledSize(12), color: '#7f8c8d', textAlign: 'center', padding: scaleWidth(40) }}>
 						📚 본 앱의 일부 콘텐츠는{' '}
 						<Text style={{ textDecorationLine: 'underline', color: '#3498db' }} onPress={() => Linking.openURL('https://opendict.korean.go.kr/main')}>
 							국립국어원 표준국어대사전
@@ -232,28 +232,28 @@ const styles = StyleSheet.create({
 	},
 
 	section: {
-		margin: 20,
+		margin: scaleWidth(20),
 		backgroundColor: '#f8f9fa',
-		padding: 25,
-		borderRadius: 10,
+		padding: scaleWidth(25),
+		borderRadius: scaleWidth(10),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
+		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		marginTop: 20,
+		shadowRadius: scaleWidth(4),
+		marginTop: scaleHeight(20),
 	},
 	title: {
-		fontSize: 20,
+		fontSize: scaledSize(20),
 		fontWeight: 'bold',
-		marginBottom: 20,
+		marginBottom: scaleHeight(20),
 	},
 	buttonGroup: {
-		gap: 10,
+		gap: scaleHeight(10),
 	},
 	buttonText: {
 		color: '#fff',
 		fontWeight: 'bold',
-		fontSize: scaledSize(14), // ✅ 적당한 크기
+		fontSize: scaledSize(14),
 	},
 	resetStudy: {
 		backgroundColor: '#1E88E5',
@@ -274,8 +274,8 @@ const styles = StyleSheet.create({
 	modalContainer: {
 		width: '80%',
 		backgroundColor: '#fff',
-		borderRadius: 10,
-		padding: 20,
+		borderRadius: scaleWidth(10),
+		padding: scaleWidth(20),
 	},
 	modalTitle: {
 		fontSize: scaledSize(18),
@@ -297,10 +297,10 @@ const styles = StyleSheet.create({
 	},
 	modalButton: {
 		flex: 1,
-		padding: 12,
-		borderRadius: 8,
+		padding: scaleHeight(12),
+		borderRadius: scaleWidth(8),
 		alignItems: 'center',
-		marginHorizontal: 5,
+		marginHorizontal: scaleWidth(5),
 	},
 	modalCancel: {
 		backgroundColor: '#9E9E9E',
@@ -316,28 +316,28 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginBottom: 16,
+		marginBottom: scaleHeight(16),
 	},
 	label: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		color: '#2c3e50',
 	},
 	timeButton: {
-		paddingVertical: 10,
-		paddingHorizontal: 16,
+		paddingVertical: scaleHeight(10),
+		paddingHorizontal: scaleWidth(16),
 		backgroundColor: '#ecf0f1',
-		borderRadius: 8,
-		marginBottom: 8,
+		borderRadius: scaleWidth(8),
+		marginBottom: scaleHeight(8),
 	},
 	timeText: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		color: '#34495e',
 	},
 	addButton: {
-		marginTop: 10,
+		marginTop: scaleHeight(10),
 		backgroundColor: '#3498db',
-		padding: 12,
-		borderRadius: 8,
+		padding: scaleHeight(12),
+		borderRadius: scaleWidth(8),
 		alignItems: 'center',
 	},
 	addButtonText: {
@@ -345,22 +345,22 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 	},
 	iconLeft: {
-		marginRight: 8,
+		marginRight: scaleWidth(8),
 	},
 	button: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		padding: 15,
-		borderRadius: 8,
-		marginBottom: 10,
+		padding: scaleHeight(15),
+		borderRadius: scaleWidth(8),
+		marginBottom: scaleHeight(10),
 	},
 	hiddenDevTouchArea: {
 		alignSelf: 'center',
 		width: scaleWidth(80),
 		height: scaleWidth(30),
-		borderRadius: scaleWidth(28), // 반지름도 줄임
-		backgroundColor: '#F8F8F8', // 연한 회색 배경
+		borderRadius: scaleWidth(28),
+		backgroundColor: '#F8F8F8',
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: '#000',
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
 	},
 	devText: {
 		fontSize: scaledSize(13),
-		color: '#999999', // 조금 더 진한 회색
+		color: '#999999',
 		textAlign: 'center',
 		fontWeight: '500',
 	},

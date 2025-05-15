@@ -11,7 +11,6 @@ import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import QuizHistoryService from '@/services/QuizHistoryService';
 
-const STORAGE_KEY = 'UserQuizHistory';
 
 /**
  * 사용자 퀴즈 데이터 정의
@@ -31,7 +30,6 @@ const WrongReviewScreen = () => {
 	const isFocused = useIsFocused();
 	const [loading, setLoading] = useState(true);
 	const [wrongCountries, setWrongCountries] = useState<MainDataType.Proverb[]>([]);
-	const [showGuideModal, setShowGuideModal] = useState(false);
 	const [totalSolvedCount, setTotalSolvedCount] = useState(0);
 	const [correctCount, setCorrectCount] = useState(0);
 	const [showWrongList, setShowWrongList] = useState(false);
@@ -63,14 +61,13 @@ const WrongReviewScreen = () => {
 	const startWrongReview = () => {
 		if (wrongCountries.length === 0) return;
 
-		Alert.alert('개발 중입니다!!');
-
-		// // @ts-ignore
-		// navigation.navigate(Paths.QUIZ_MAIN, {
-		// 	questionPool: wrongCountries,
-		// 	title: '오답 복습',
-		// 	isWrongReview: true,
-		// });
+		// @ts-ignore
+		navigation.navigate(Paths.PROVERB_MEANING_QUIZ, {
+			mode: 'meaning',
+			questionPool: wrongCountries,
+			title: '오답 복습',
+			isWrongReview: true,
+		});
 	};
 
 	if (loading) {
@@ -99,34 +96,29 @@ const WrongReviewScreen = () => {
 
 	return (
 		<ScrollView contentContainerStyle={styles.scrollContainer}>
+			<View style={styles.card}>
+				<Text style={styles.title}>
+					지금까지 <Text style={styles.highlight}>{totalSolvedCount}</Text>문제를 직접 풀었어요!{'\n'}
+					그중 <Text style={styles.highlight}>{wrongCountries.length}</Text>문제는 조금 아쉬웠네요 😅{'\n'}
+					한 번 더 도전해볼까요? 💪
+				</Text>
+				<Text style={styles.subText}>
+					나의 정답률은 <Text style={styles.highlight2}>{totalSolvedCount > 0 ? Math.round((correctCount / totalSolvedCount) * 100) : 0}%</Text>
+					예요!{'\n'}정말 열심히 하고 있어요, 계속 힘내봐요! 🚀
+				</Text>
+			</View>
 			<View style={styles.guideCard}>
 				<Text style={styles.guideCardTitle}>📘 오답 복습이란?</Text>
 				<Text style={styles.guideCardContent}>
-					❗ 이전 퀴즈에서 틀린 문제들을 다시 풀 수 있어요.{'\n\n'}- 틀린 속담이 반복 출제되며,{' '}
-					<Text style={styles.guideHighlight}>정답을 맞히면 오답 목록에서 자동 제거</Text>돼요!{'\n'}- 일반 퀴즈처럼{' '}
-					<Text style={styles.guideHighlight}>4지선다</Text>로 구성되고, <Text style={styles.guideHighlight}>정답 시 10점</Text>을 받을 수 있어요 🎯
+					❗ 이전 퀴즈에서 틀린 문제들을 다시 풀 수 있어요.{'\n'}
+					- 틀린 속담이 반복 출제되며, <Text style={styles.guideHighlight}>정답을 맞히면 오답 목록에서 자동 제거</Text>돼요!{'\n'}
+					- 문제는 항상 <Text style={styles.guideHighlight}>뜻 맞추기</Text> 형식으로 출제되고 <Text style={styles.guideHighlight}>정답 시 10점</Text>을 받을 수 있어요 🎯{'\n'}
+					- 만약 오답 복습 중에 다시 틀린 문제는 <Text style={styles.guideHighlight}>오답 목록에 그대로 남게</Text> 되며, 반복적으로 복습할 수 있어요! 🔄{'\n'}
+					- 여러 번 틀리더라도 걱정하지 말고, 계속 도전하면서 실력을 쌓아가세요! 💪
 				</Text>
 			</View>
 
-			{/* <View style={[styles.headerRow]}>
-				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<IconComponent type='materialIcons' name='replay' size={24} color='#f39c12' style={{ marginRight: 6 }} />
-					<Text style={styles.headerTitle}>오답 복습</Text>
-				</View>
-				<TouchableOpacity onPress={() => setShowGuideModal(true)}>
-					<IconComponent type='materialIcons' name='help-outline' size={22} color='#3498db' />
-				</TouchableOpacity>
-			</View> */}
-			<View style={styles.card}>
-				<Text style={styles.title}>
-					총 {totalSolvedCount}문제 중 <Text style={styles.highlight}>{wrongCountries.length}</Text>문제가 조금 아쉬웠어요!
-					{'\n'}다시 풀어볼까요? 😊
-				</Text>
-				<Text style={styles.subText}>
-					지금까지 정답률은 <Text style={styles.highlight2}>{totalSolvedCount > 0 ? Math.round((correctCount / totalSolvedCount) * 100) : 0}%</Text>
-					예요!{'\n'}조금씩 실력이 쑥쑥 오르고 있어요! 🎯
-				</Text>
-			</View>
+
 			<TouchableOpacity style={styles.startButton} onPress={startWrongReview}>
 				<Text style={styles.buttonText}>🚀 실력 업! 오답 다시 풀어보기</Text>
 			</TouchableOpacity>
@@ -145,27 +137,6 @@ const WrongReviewScreen = () => {
 					))}
 				</View>
 			)}
-			<Modal visible={showGuideModal} transparent animationType='fade' onRequestClose={() => setShowGuideModal(false)}>
-				<View style={styles.modalOverlay}>
-					<View style={[styles.guideModal, { maxHeight: scaleHeight(600) }]}>
-						<Text style={styles.modalTitle}>오답 복습 안내</Text>
-						<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: scaleHeight(12) }} showsVerticalScrollIndicator={false}>
-							<View style={styles.guideDescriptionBox}>
-								<Text style={styles.guideDescription}>
-									❗ 이전 퀴즈에서 틀린 문제들을 다시 풀 수 있어요.{'\n\n'}
-									틀린 국가들의 속담이 반복 출제되며,{'\n'}
-									<Text style={styles.guideHighlight}>정답을 맞히면 오답 목록에서 자동 제거</Text>돼요!{'\n\n'}
-									일반 퀴즈처럼 <Text style={styles.guideHighlight}>4지선다</Text>로 구성되고,{'\n'}
-									<Text style={styles.guideHighlight}>정답 시 10점</Text>을 받을 수 있어요 🎯
-								</Text>
-							</View>
-						</ScrollView>
-						<TouchableOpacity style={styles.guideConfirmButton} onPress={() => setShowGuideModal(false)}>
-							<Text style={styles.guideConfirmText}>확인했어요</Text>
-						</TouchableOpacity>
-					</View>
-				</View>
-			</Modal>
 		</ScrollView>
 	);
 };
@@ -395,7 +366,7 @@ const styles = StyleSheet.create({
 	},
 
 	guideCard: {
-		backgroundColor: '#fefefe',
+		backgroundColor: '#ffffff', // 기존 '#fefefe' → 완전 흰색으로 변경
 		borderWidth: 1,
 		borderColor: '#dfe6e9',
 		borderRadius: scaleWidth(14),

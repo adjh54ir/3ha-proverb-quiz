@@ -43,16 +43,16 @@ const ProverbQuizModeSelectScreen = () => {
 	const moveToHandler = (modeKey: string) => {
 		switch (modeKey) {
 			case 'meaning':
-				//@ts-ignore
-				navigation.push(Paths.PROVERB_MEANING_QUIZ);
+				// @ts-ignore
+				navigation.push(Paths.PROVERB_MEANING_QUIZ, { mode: 'meaning' });
 				break;
 			case 'proverb':
-				//@ts-ignore
-				navigation.push(Paths.PROVERB_FIND_QUIZ);
+				// @ts-ignore
+				navigation.push(Paths.PROVERB_FIND_QUIZ, { mode: 'proverb' });
 				break;
 			case 'blank':
-				//@ts-ignore
-				navigation.push(Paths.PROVERB_BLANK_QUIZ);
+				// @ts-ignore
+				navigation.push(Paths.PROVERB_BLANK_QUIZ, { mode: 'fill-blank' });
 				break;
 			default:
 				break;

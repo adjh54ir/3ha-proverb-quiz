@@ -3,7 +3,7 @@ import ProverbQuizScreen from './ProverbCommonFrameScreen';
 
 const ProverbFillBlankQuizScreen = () => {
 	return (
-		<ProverbQuizScreen mode="fill-blank" />
+		<ProverbQuizScreen />
 	);
 };
 

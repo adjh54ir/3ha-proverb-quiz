@@ -23,7 +23,6 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import QuizStartModal from '../modal/QuizStartModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import QuizResultModal from '../modal/QuizResultModal';
 import { QuizBadgeInterceptor } from '@/services/interceptor/QuizBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
@@ -31,6 +30,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AdmobFrontAd from '../common/ads/AdmobFrontAd';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -77,6 +77,8 @@ const ProverbCommonFrameScreen = () => {
 
 	const [quizHistory, setQuizHistory] = useState<MainDataType.UserQuizHistory | null>(null);
 
+	const [pendingStart, setPendingStart] = useState(false);
+	const [showAd, setShowAd] = useState(false);
 	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
 
 	const [proverbs, setProverbs] = useState<MainDataType.Proverb[]>([]);
@@ -191,10 +193,10 @@ const ProverbCommonFrameScreen = () => {
 	}, [showStartModal]);
 
 	useEffect(() => {
-		if (!showStartModal && proverbs.length > 0) {
-			loadQuestion(); // 이제 proverbs가 준비된 후 실행됨
+		if (!showStartModal && proverbs.length > 0 && !showAd) {
+			loadQuestion(); // 광고가 아닌 경우에만 문제를 로드
 		}
-	}, [showStartModal, proverbs]);
+	}, [showStartModal, proverbs, showAd]);
 
 
 
@@ -593,7 +595,7 @@ const ProverbCommonFrameScreen = () => {
 
 	const handleNextQuestion = () => {
 		const isFinal = resultType === 'done';
-
+		setShowStartModal(false); // ✅ 이전 모달 깜빡임 방지
 		setResultTitle('');
 		setResultMessage('');
 		setShowResultModal(false);
@@ -602,19 +604,17 @@ const ProverbCommonFrameScreen = () => {
 		setOptions([]);
 		setQuestionText('');
 		setBlankWord('');
-		setTimeout(() => {
-			setQuestion(null);
+		setQuestion(null);
 
-			if (isFinal) {
-				safelyGoBack();
+		if (isFinal) {
+			safelyGoBack();
+		} else {
+			if (isWrongReview) {
+				setReviewIndex((prev) => prev + 1); // ✅ 이것만
 			} else {
-				if (isWrongReview) {
-					setReviewIndex((prev) => prev + 1); // ✅ 이것만
-				} else {
-					loadQuestion(); // 일반 퀴즈는 직접 호출
-				}
+				loadQuestion(); // 일반 퀴즈는 직접 호출
 			}
-		}, 300);
+		}
 	};
 
 	const getModeLabel = (mode: 'meaning' | 'proverb' | 'fill-blank') => {
@@ -627,6 +627,20 @@ const ProverbCommonFrameScreen = () => {
 				return '빈칸 채우기';
 			default:
 				return '';
+		}
+	};
+	const onStart = (skipLoad?: boolean) => {
+		setShowStartModal(false);
+
+		const filtered = ProverbServices.selectProverbList().filter((p) => {
+			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+			return levelMatch && categoryMatch;
+		});
+		setProverbs(filtered);
+
+		if (!skipLoad && filtered.length > 0) {
+			loadQuestion();
 		}
 	};
 
@@ -774,7 +788,7 @@ const ProverbCommonFrameScreen = () => {
 																</View>
 
 																{isSelected && (
-																	<Icon
+																	<IconComponent type='MaterialIcons'
 																		name={isAnswerCorrect ? 'check-circle' : 'cancel'}
 																		size={28}
 																		color={isAnswerCorrect ? '#2ecc71' : '#e74c3c'}
@@ -797,7 +811,7 @@ const ProverbCommonFrameScreen = () => {
 							</View>
 
 							{/* ======================= 퀴즈 시작 팝업 ============================ */}
-							{!isWrongReview && (
+							{showStartModal && !isWrongReview && (
 								<QuizStartModal
 									visible={showStartModal}
 									modeStep={modeStep}
@@ -816,6 +830,26 @@ const ProverbCommonFrameScreen = () => {
 										setShowStartModal(false);
 										console.log('선택된 난이도:', selectedLevel);
 										console.log('선택된 카테고리:', selectedCategory);
+									}}
+
+									onCompleteStart={() => {
+										setShowStartModal(false);      // 모달 닫기
+										if (timerRef.current) {
+											clearInterval(timerRef.current); // ✅ 타이머 중단
+											timerRef.current = null;
+										}
+										setShowAd(true);               // 광고 표시
+									}}
+								/>
+							)}
+
+							{/* // 광고 컴포넌트 */}
+							{showAd && (
+								<AdmobFrontAd
+									onAdClosed={() => {
+										setShowAd(false);
+										onStart(true);  // ✅ 문제 다시 뽑지 않음
+										startTimer();       // ✅ 타이머 재시작
 									}}
 								/>
 							)}
@@ -942,10 +976,10 @@ const styles = StyleSheet.create({
 		color: '#2c3e50',
 	},
 	questionText: {
-		fontSize: scaledSize(20),
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		marginTop: scaleHeight(12),
-		marginBottom: scaleHeight(24),
+		marginTop: scaleHeight(6),
+		marginBottom: scaleHeight(12),
 		textAlign: 'center',
 		color: '#3498db',
 		lineHeight: scaleHeight(28),
@@ -1318,7 +1352,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(16),
 		borderWidth: 1.2,
 		borderColor: '#dfe6e9',
-		marginBottom: scaleHeight(14),
+		marginBottom: scaleHeight(10),
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.06,
@@ -1333,7 +1367,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fdecea',
 	},
 	optionLabel: {
-		fontSize: scaledSize(16),
+		fontSize: scaledSize(15),
 		fontWeight: '600',
 		color: '#2c3e50',
 		marginBottom: 0,

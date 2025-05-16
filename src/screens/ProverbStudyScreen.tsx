@@ -758,7 +758,11 @@ const ProverbStudyScreen = () => {
 										}}
 										items={LEVEL_DROPDOWN_ITEMS}
 										style={styles.dropdown}
-										textStyle={{ fontSize: scaledSize(15), color: '#2c3e50', fontWeight: '500' }}
+										textStyle={{
+											fontSize: scaledSize(12), // 더 작게
+											color: '#2c3e50',
+											fontWeight: '500',
+										}}
 										dropDownContainerStyle={styles.dropdownList}
 										containerStyle={{
 											zIndex: 10000, // ✅ 매우 높게 설정
@@ -783,7 +787,11 @@ const ProverbStudyScreen = () => {
 										}}
 										items={FIELD_DROPDOWN_ITEMS}
 										style={styles.dropdown}
-										textStyle={{ fontSize: scaledSize(14), color: '#2c3e50', fontWeight: '500', }}
+										textStyle={{
+											fontSize: scaledSize(13),  // ⬅ 작게
+											color: '#2c3e50',
+											fontWeight: '500',
+										}}
 										placeholderStyle={{ color: '#95a5a6', fontSize: scaledSize(14) }}
 										dropDownContainerStyle={styles.dropdownList}
 										containerStyle={{ zIndex: 3000 }}
@@ -815,16 +823,16 @@ const ProverbStudyScreen = () => {
 										}}
 										listItemLabelStyle={{
 											flex: 1,
-											fontSize: scaledSize(15),
+											fontSize: scaledSize(13), // ⬅ 작게
+											lineHeight: scaleHeight(20), // ⬅ 줄임
 											color: '#2c3e50',
 											fontWeight: '500',
-											lineHeight: scaleHeight(22),
 											flexShrink: 1, // ✅ 텍스트 줄바꿈을 위해
 											flexWrap: 'wrap', // ✅ 줄바꿈 허용
 										}}
 										listItemContainerStyle={{
-											paddingVertical: scaleHeight(14), // 충분한 위아래 여백
-											minHeight: scaleHeight(48),       // iOS에서 텍스트 짤림 방지
+											paddingVertical: scaleHeight(10),  // ⬅ 여백 줄임
+											minHeight: scaleHeight(40),        // ⬅ 최소 높이 낮춤
 											alignItems: 'stretch', // ✅ 핵심 추가
 										}}
 										closeOnBackPressed={true}
@@ -1052,23 +1060,23 @@ const styles = StyleSheet.create({
 	filterButton: {
 		borderWidth: 1,
 		borderColor: '#4a90e2',
-		borderRadius: scaleWidth(20),
-		paddingVertical: scaleHeight(8),
-		paddingHorizontal: scaleWidth(14),
-		marginHorizontal: scaleWidth(6),
+		borderRadius: scaleWidth(16), // ⬅ 더 작게
+		paddingVertical: scaleHeight(4), // ⬅ 줄임
+		paddingHorizontal: scaleWidth(10), // ⬅ 줄임
+		marginHorizontal: scaleWidth(4), // ⬅ 좁게
 		backgroundColor: '#fff',
-		minHeight: scaleHeight(36),
+		minHeight: scaleHeight(30), // ⬅ 낮게
 		justifyContent: 'center',
 		marginBottom: scaleHeight(10),
 	},
+	filterText: {
+		fontSize: scaledSize(12), // ⬅ 작게
+		color: '#4a90e2',
+		lineHeight: scaleHeight(16), // ⬅ 줄임
+		textAlign: 'center',
+	},
 	filterButtonActive: {
 		backgroundColor: '#4a90e2',
-	},
-	filterText: {
-		fontSize: scaledSize(14),
-		color: '#4a90e2',
-		lineHeight: scaleHeight(20),
-		textAlign: 'center',
 	},
 	filterTextActive: {
 		color: '#fff',
@@ -1105,35 +1113,30 @@ const styles = StyleSheet.create({
 
 	subFilterRow: {
 		flexDirection: 'row',
-		marginTop: scaleHeight(5),
-		paddingHorizontal: scaleWidth(10),
+		marginTop: scaleHeight(3),
+		paddingHorizontal: scaleWidth(5),
 	},
 	dropdown: {
 		backgroundColor: '#fff',
 		borderColor: '#dfe6e9',
-		borderWidth: 1.2,
-		borderRadius: scaleWidth(12),
-		paddingHorizontal: scaleWidth(12),
-		height: scaleHeight(44),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowOpacity: 0.06,
-		shadowRadius: scaleWidth(2),
+		borderWidth: 1,
+		borderRadius: scaleWidth(8),
+		paddingHorizontal: scaleWidth(8), // 여백도 줄임
 	},
 	dropdownList: {
 		backgroundColor: '#fff',
 		borderColor: '#dfe6e9',
-		borderWidth: 1.2,
-		borderRadius: scaleWidth(12),
+		borderWidth: 1,
+		borderRadius: scaleWidth(10),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.1,
-		shadowRadius: scaleWidth(4),
+		shadowOffset: { width: 0, height: scaleHeight(1) },
+		shadowOpacity: 0.06,
+		shadowRadius: scaleWidth(2),
 		paddingBottom: 0,
 		marginBottom: 0,
 	},
 	progressHeader: {
-		paddingTop: scaleHeight(20),
+		paddingTop: scaleHeight(12),
 		backgroundColor: '#ffffff',
 		alignItems: 'center',
 		borderWidth: 1,
@@ -1147,7 +1150,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginBottom: scaleHeight(8),
+		marginBottom: scaleHeight(3),
 	},
 	progressTitle: {
 		fontSize: scaledSize(18),
@@ -1478,6 +1481,7 @@ const styles = StyleSheet.create({
 	dropdownPlaceholder: {
 		textAlign: 'center',
 		color: '#999',
+		fontSize: scaledSize(13),  // ⬅ 작게
 	},
 	emptyImage: {
 		width: scaleWidth(100),

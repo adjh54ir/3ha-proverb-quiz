@@ -342,7 +342,7 @@ const CapitalResultScreen = () => {
 					onScroll={scrollHandler.onScroll}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 					<View style={styles.adContainer}>
-						<AdmobBannerAd />
+						<AdmobBannerAd paramMarginTop={5} />
 					</View>
 					<View style={styles.sectionBox}>
 						<View style={{ alignItems: 'center', marginVertical: scaleHeight(20) }}>
@@ -1058,8 +1058,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		paddingVertical: scaleHeight(6),
-		borderTopWidth: 1,
-		borderTopColor: '#eee',
 	},
 	regionCardActive: {
 		backgroundColor: '#eafaf1',

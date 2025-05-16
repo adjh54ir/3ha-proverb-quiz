@@ -1,6 +1,6 @@
 // QuizStartModal.tsx
-import React, { useCallback, useEffect, useState } from 'react';
-import { Modal, ScrollView, View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Modal, ScrollView, View, Text, TouchableOpacity, StyleSheet, Alert, Animated, TouchableWithoutFeedback, Dimensions, findNodeHandle, UIManager } from 'react-native';
 import IconComponent from '../common/atomic/IconComponent';
 import ProverbServices from '@/services/ProverbServices';
 import { useFocusEffect } from '@react-navigation/native';
@@ -21,6 +21,7 @@ interface Props {
 	setSelectedCategory: (val: string) => void;
 	onClose: () => void;
 	onStart: () => void;
+	onCompleteStart: () => void; // 광고 포함 여부 관계없이 "퀴즈 시작 버튼 클릭" 콜백
 }
 interface SelectGroupProps {
 	title: string;
@@ -65,14 +66,13 @@ const QuizStartModal = ({
 	setSelectedCategory,
 	onClose,
 	onStart,
+	onCompleteStart
 }: Props) => {
 	const STORAGE_KEY_QUIZ = 'UserQuizHistory';
 	const [levelStats, setLevelStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [categoryStats, setCategoryStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [quizHistory, setQuizHistory] = useState<UserQuizHistory | null>(null);
-	const [isShowCategoryInfo, setIsShowCategoryInfo] = useState(false);
-	const [showAd, setShowAd] = useState(false);
-	const shouldShowAd = Math.random() < GOOGLE_ADMOV_FRONT_PERCENT; // 20% 확률
+	const shouldShowAd = Math.random() < 0.1; // 20% 확률
 
 	useFocusEffect(
 		useCallback(() => {
@@ -81,11 +81,11 @@ const QuizStartModal = ({
 	);
 
 	useEffect(() => {
-		if (!quizHistory) return;
+		if (!visible || !quizHistory) return;
 
 		const allIds = [...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])];
 		loadStats(Array.from(new Set(allIds)));
-	}, [selectedLevel, quizHistory]);
+	}, [selectedLevel, quizHistory, visible]); // visible 조건 추가
 
 	const loadData = async () => {
 		const raw = await AsyncStorage.getItem(STORAGE_KEY_QUIZ);
@@ -180,8 +180,94 @@ const QuizStartModal = ({
 		'욕심/탐욕': '지나친 욕심이 부작용을 일으킬 수 있음을 경고하는 속담이에요.',
 		'배신/불신': '믿음을 저버리거나 신뢰를 잃는 상황을 담은 속담이에요.',
 	};
+	const tooltipText = Object.entries(CATEGORY_DESCRIPTIONS)
+		.map(([key, desc]) => `• ${key}: ${desc}`)
+		.join('\n');
 	const getStyleColor = (key: string): string => STYLE_MAP[key]?.color || (STYLE_MAP[key]?.type === 'level' ? '#0A84FF' : '#dfe6e9');
 	const getStyleIcon = (key: string): { type: string; name: string } | null => STYLE_MAP[key]?.icon || null;
+
+
+	const InlineTooltip = ({ marginLeft = 0, marginTop = 0 }: { marginLeft?: number; marginTop?: number }) => {
+		const [showTooltip, setShowTooltip] = useState(false);
+		const [tooltipPosition, setTooltipPosition] = useState<'left' | 'right'>('left');
+		const iconRef = useRef(null);
+
+		const toggleTooltip = () => {
+			if (!showTooltip) {
+				const nodeHandle = findNodeHandle(iconRef.current);
+				if (nodeHandle) {
+					UIManager.measure(nodeHandle, (x, y, width, height, pageX, pageY) => {
+						const screenWidth = Dimensions.get('window').width;
+						const tooltipWidth = 280;
+						const margin = 10;
+						setTooltipPosition(pageX + tooltipWidth + margin > screenWidth ? 'right' : 'left');
+						setShowTooltip(true);
+					});
+				}
+			} else {
+				setShowTooltip(false);
+			}
+		};
+
+		const closeTooltip = () => setShowTooltip(false);
+
+		return (
+			<View style={{ position: 'relative', marginLeft, marginTop }}>
+				<TouchableOpacity ref={iconRef} onPress={toggleTooltip}>
+					<IconComponent type='fontawesome6' name="circle-question" size={16} color="#666" />
+				</TouchableOpacity>
+
+				{showTooltip && (
+					<>
+						<TouchableWithoutFeedback onPress={closeTooltip}>
+							<View style={{
+								position: 'absolute',
+								top: 0, left: 0,
+								width: Dimensions.get('window').width,
+								height: Dimensions.get('window').height,
+								zIndex: 10000,
+							}} />
+						</TouchableWithoutFeedback>
+
+						<View style={{
+							position: 'absolute',
+							top: scaleHeight(28),
+							[tooltipPosition]: 0,
+							backgroundColor: 'rgba(0, 0, 0, 0.88)',
+							padding: scaleWidth(12),
+							borderRadius: 8,
+							width: scaleWidth(280),
+							zIndex: 10001,
+						}}>
+							{Object.entries(CATEGORY_DESCRIPTIONS).map(([key, desc]) => (
+								<View key={key} style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 }}>
+									{STYLE_MAP[key] && (
+										<IconComponent
+											type={STYLE_MAP[key].icon.type}
+											name={STYLE_MAP[key].icon.name}
+											size={13}
+											color={STYLE_MAP[key].color}
+											style={{ marginRight: scaleWidth(6), marginTop: scaleHeight(2) }}
+										/>
+									)}
+									<View style={{ flex: 1 }}>
+										<Text style={{
+											color: STYLE_MAP[key]?.color || '#FFD700',
+											fontWeight: 'bold',
+											fontSize: scaledSize(13),
+										}}>
+											{key}
+										</Text>
+										<Text style={{ color: '#ecf0f1', fontSize: scaledSize(12), lineHeight: scaleHeight(17) }}>{desc}</Text>
+									</View>
+								</View>
+							))}
+						</View>
+					</>
+				)}
+			</View>
+		);
+	};
 
 	const SelectGroup = ({ title, options, selected, compact = false, getIcon }: SelectGroupProps) => {
 		const isLevel = title.includes('난이도');
@@ -195,6 +281,8 @@ const QuizStartModal = ({
 		};
 
 		const getColor = (val: string) => getStyleColor(val);
+
+
 
 		return (
 			<View style={styles.selectGroupWrapper}>
@@ -212,44 +300,56 @@ const QuizStartModal = ({
 						return (
 							<TouchableOpacity
 								key={option}
-								style={[
-									isAll ? styles.fullWidthButton : styles.halfWidthButton,
-									{ backgroundColor: isAll ? '#5DADE2' : getColor(option) },
-									isSelected && styles.selectButtonActive,
-								]}
+								style={
+									[
+										isAll ? styles.fullWidthButton : styles.halfWidthButton,
+										{ backgroundColor: isAll ? '#5DADE2' : getColor(option) },
+										isSelected && styles.selectButtonActive,
+									]
+								}
 								onPress={() => onSelect(option)}>
-								<View style={{ alignItems: 'center', justifyContent: 'center' }}>
-									{/* 아이콘 */}
-									{isAll ? (
-										<IconComponent type='fontAwesome5' name='clipboard-list' size={20} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: scaleHeight(4) }} />
-									) : iconData ? (
-										<IconComponent type={iconData.type} name={iconData.name} size={18} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: scaleHeight(4) }} />
-									) : null}
+								<Animated.View
+									style={
+										[
+											isSelected && {
+												transform: [{ scale: 1.02 }],
+											},
+										]}>
+									<View style={{ alignItems: 'center', justifyContent: 'center' }}>
+										{/* 아이콘 */}
+										{isAll ? (
+											<IconComponent type='fontAwesome5' name='clipboard-list' size={20} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: scaleHeight(4) }} />
+										) : iconData ? (
+											<IconComponent type={iconData.type} name={iconData.name} size={18} color={isSelected ? '#ffffff' : '#eeeeee'} style={{ marginBottom: scaleHeight(4) }} />
+										) : null}
 
-									{/* ✅ 난이도: 상단 라벨 (Level 1 등) */}
-									{isLevel && LEVEL_LABEL_MAP[option] && <Text style={styles.levelTopLabel}>{LEVEL_LABEL_MAP[option]}</Text>}
+										{/* ✅ 난이도: 상단 라벨 (Level 1 등) */}
+										{isLevel && LEVEL_LABEL_MAP[option] && <Text style={styles.levelTopLabel}>{LEVEL_LABEL_MAP[option]}</Text>}
 
-									{/* ✅ 중간 라벨: 아주 쉬움 등 */}
-									<Text style={styles.levelMainLabel}>{option}</Text>
+										{/* ✅ 중간 라벨: 아주 쉬움 등 */}
+										<Text style={styles.levelMainLabel}>{option}</Text>
 
-									{/* ✅ 하단 통계: (3/20) */}
-									{stats && (
-										<Text style={styles.levelStatLabel}>
-											({stats.studied}/{stats.total})
-										</Text>
-									)}
-								</View>
+										{/* ✅ 하단 통계: (3/20) */}
+										{stats && (
+											<Text style={styles.levelStatLabel}>
+												({stats.studied}/{stats.total})
+											</Text>
+										)}
+
+									</View>
+								</Animated.View>
 							</TouchableOpacity>
 						);
-					})}
-				</View>
-			</View>
+					})
+					}
+				</View >
+			</View >
 		);
 	};
 
 	return (
 		<>
-			<Modal visible={visible} transparent animationType='fade'>
+			<Modal visible={visible} transparent animationType='none'>
 				<View style={styles.modalOverlay}>
 					<View style={styles.selectModal}>
 						{/* 최상단 타이틀 */}
@@ -278,9 +378,12 @@ const QuizStartModal = ({
 										<View style={styles.titleRowCenter}>
 											<Text style={styles.selectTitleEmoji}>🎯 </Text>
 											<Text style={styles.selectTitleText}>관심 있는 주제를 골라볼까요?</Text>
-											<TouchableOpacity onPress={() => setIsShowCategoryInfo(true)} style={{ marginLeft: scaleWidth(6) }}>
+											<View style={{ justifyContent: "center", alignContent: "center", }}>
+												<InlineTooltip />
+											</View>
+											{/* <TouchableOpacity onPress={() => setIsShowCategoryInfo(true)} style={{ marginLeft: scaleWidth(6) }}>
 												<IconComponent type='materialIcons' name='info-outline' size={18} color='#636e72' />
-											</TouchableOpacity>
+											</TouchableOpacity> */}
 										</View>
 									</View>
 									<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: scaleHeight(10) }} showsVerticalScrollIndicator={false}>
@@ -332,11 +435,9 @@ const QuizStartModal = ({
 											return;
 										}
 
+										// 광고 출력시
 										if (shouldShowAd) {
-											onClose(); // ✅ 1. 먼저 모달 닫기
-											setTimeout(() => {
-												setShowAd(true); // ✅ 2. 모달이 닫힌 뒤 광고 띄우기
-											}, 300); // 살짝 여유를 줌 (모달 애니메이션 시간)
+											onCompleteStart(); // 부모가 광고 처리
 										} else {
 											onStart(); // 바로 시작
 										}
@@ -352,35 +453,6 @@ const QuizStartModal = ({
 					</View>
 				</View>
 			</Modal >
-			{showAd && (
-				<AdmobFrontAd
-					onAdClosed={() => {
-						setShowAd(false);
-						onStart(); // 광고 본 후 퀴즈 시작
-					}}
-				/>
-			)
-			}
-			{/* <Modal visible={isShowCategoryInfo} transparent animationType="fade" onRequestClose={() => setIsShowCategoryInfo(false)}>
-				<View style={styles.modalOverlay}>
-					<View style={styles.modalOverlay}>
-						<View style={styles.infoModalBox}>
-							<Text style={styles.modalTitle}>📚 카테고리 안내</Text>
-							<ScrollView style={{ maxHeight: 400 }}>
-								{Object.entries(CATEGORY_DESCRIPTIONS).map(([key, desc]) => (
-									<View key={key} style={{ marginBottom: 12 }}>
-										<Text style={{ fontWeight: 'bold', fontSize: 16 }}>{key}</Text>
-										<Text style={{ color: '#636e72', fontSize: 14 }}>{desc}</Text>
-									</View>
-								))}
-							</ScrollView>
-							<TouchableOpacity onPress={() => setIsShowCategoryInfo(false)} style={styles.modalButton}>
-								<Text style={styles.modalButtonText}>확인</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				</View>
-			</Modal> */}
 		</>
 	);
 };
@@ -483,7 +555,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 0 },
 		shadowOpacity: 0.6,
 		shadowRadius: scaleWidth(4),
-		transform: [{ scale: 1.02 }],
 	},
 	selectButtonTextActive: {
 		color: '#fff',
@@ -508,6 +579,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		lineHeight: scaleHeight(24),
 		flexShrink: 1,
+		marginRight: scaleWidth(5),
 	},
 	selectButtonText: {
 		fontSize: scaledSize(15),

@@ -19,7 +19,7 @@ interface QuizResultModalProps {
 const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, question, onNext }: QuizResultModalProps) => {
 
 	const navigation = useNavigation();
-	if (!visible || resultType === '') return null;
+	if (!visible) return null;
 
 	return (
 		<Modal visible={visible} transparent animationType='fade'>

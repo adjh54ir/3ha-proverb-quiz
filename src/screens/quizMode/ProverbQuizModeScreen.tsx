@@ -65,7 +65,7 @@ const ProverbQuizModeSelectScreen = () => {
 				<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 					<ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps='handled'>
 						<View style={styles.titleRow}>
-							<Text style={styles.title}>🧠오늘은 어떤 속담 퀴즈로 도전할까요?</Text>
+							<Text style={styles.title}>🧠오늘은 어떤 퀴즈로 도전해볼까요?</Text>
 							<TouchableOpacity onPress={() => setShowGuideModal(true)} style={styles.inlineInfoIcon}>
 								<IconComponent type='materialIcons' name='info-outline' size={20} color='#3498db' />
 							</TouchableOpacity>

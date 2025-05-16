@@ -56,10 +56,11 @@ export const ToolTipComponent: React.FC<TooltipProps> = ({ text, marginLeft = 0,
 		},
 		tooltip: {
 			position: 'absolute',
-			top: '100%',
+			top: 28, // 🔽 여기서 툴팁 표시 위치를 아래로 내림 (원래는 '100%')
 			backgroundColor: 'rgba(0, 0, 0, 0.85)',
 			padding: 8,
 			borderRadius: 6,
+			width: 300, // ✅ 고정 너비
 			minWidth: 250,
 			maxWidth: 300,
 			zIndex: 10001, // 툴팁은 위에

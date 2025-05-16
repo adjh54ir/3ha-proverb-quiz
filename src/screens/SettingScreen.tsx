@@ -167,7 +167,7 @@ const SettingScreen = () => {
 				</View>
 
 				{/* 기존 설정 UI */}
-				<View style={styles.section}>
+				{/* <View style={styles.section}>
 					<Text style={styles.title}>📌 관리자 패널</Text>
 					<View style={styles.buttonGroup}>
 						<TouchableOpacity style={[styles.button, { backgroundColor: '#6a1b9a' }]} onPress={handleCompleteAllQuiz}>
@@ -179,7 +179,7 @@ const SettingScreen = () => {
 							<Text style={styles.buttonText}>모든 학습 완료로 설정</Text>
 						</TouchableOpacity>
 					</View>
-				</View>
+				</View> */}
 
 				<View style={{ marginBottom: 20 }}>
 					<Text style={{ fontSize: 12, color: '#95a5a6', textAlign: 'center' }}>

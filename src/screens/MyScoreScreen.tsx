@@ -6,7 +6,6 @@ import {
 	ScrollView,
 	TouchableOpacity,
 	RefreshControl,
-	SafeAreaView,
 	Alert,
 	Modal,
 	LayoutAnimation,
@@ -26,6 +25,7 @@ import AdmobBannerAd from './common/ads/AdmobBannerAd';
 import ProverbServices from '@/services/ProverbServices';
 import { CONST_BADGES } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 moment.locale('ko'); // 로케일 설정
 
@@ -342,7 +342,7 @@ const CapitalResultScreen = () => {
 					onScroll={scrollHandler.onScroll}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 					<View style={styles.adContainer}>
-						<AdmobBannerAd paramMarginTop={5} />
+						<AdmobBannerAd />
 					</View>
 					<View style={styles.sectionBox}>
 						<View style={{ alignItems: 'center', marginVertical: scaleHeight(20) }}>
@@ -1057,6 +1057,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		alignItems: 'center',
 		justifyContent: 'center',
+		marginTop: scaleHeight(10),
 		paddingVertical: scaleHeight(6),
 	},
 	regionCardActive: {

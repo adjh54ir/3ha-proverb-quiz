@@ -1,7 +1,7 @@
 /**
  * 공통 타입을 관리하는 모듈
  */
-export declare module MainDataType {
+export declare namespace MainDataType {
 	/**
 	 * 사용자 학습 데이터 정의
 	 */

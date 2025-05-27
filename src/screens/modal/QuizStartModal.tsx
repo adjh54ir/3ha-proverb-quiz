@@ -72,7 +72,7 @@ const QuizStartModal = ({
 	const [levelStats, setLevelStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [categoryStats, setCategoryStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [quizHistory, setQuizHistory] = useState<UserQuizHistory | null>(null);
-	const shouldShowAd = Math.random() < 0.1; // 20% 확률
+	const shouldShowAd = Math.random() < 0.2; // 20% 확률
 
 	useFocusEffect(
 		useCallback(() => {

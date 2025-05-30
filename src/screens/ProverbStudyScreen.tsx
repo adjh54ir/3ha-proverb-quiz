@@ -684,7 +684,7 @@ const ProverbStudyScreen = () => {
 	}
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }} edges={['top']}>
 			<View style={styles.container}>
 				<View style={styles.progressHeader}>
 					<View style={styles.progressTopRow}>
@@ -1093,6 +1093,7 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(12),
 		borderTopWidth: 1,
 		borderColor: '#ecf0f1',
+		marginBottom: scaleHeight(5),
 	},
 	studyEndButton: {
 		backgroundColor: '#7f8c8d',

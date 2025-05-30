@@ -273,9 +273,9 @@ const ProverbListScreen = () => {
 					{/* 필터 + 드롭다운 영역 */}
 					<View style={styles.container}>
 						<View style={styles.filterCard}>
-							<View style={styles.bannerContainer}>
+							{/* <View style={styles.bannerContainer}>
 								<AdmobBannerAd paramMarginBottom={8} />
-							</View>
+							</View> */}
 							<View style={styles.searchRow}>
 								<TextInput
 									ref={searchInputRef}

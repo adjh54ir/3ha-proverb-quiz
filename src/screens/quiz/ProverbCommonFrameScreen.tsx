@@ -590,7 +590,9 @@ const ProverbCommonFrameScreen = () => {
 	};
 
 	const safelyGoBack = () => {
-		navigation.goBack(); // 그래도 예외적으로 강제로
+		// @ts-ignore
+		navigation.replace(Paths.MAIN_TAB, { screen: Paths.HOME });
+		// navigation.goBack(); // 그래도 예외적으로 강제로
 	};
 
 	const handleNextQuestion = () => {

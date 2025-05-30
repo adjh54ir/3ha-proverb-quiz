@@ -334,16 +334,16 @@ const CapitalResultScreen = () => {
 
 	return (
 		<>
-			<SafeAreaView style={styles.safeArea}>
+			<SafeAreaView style={styles.safeArea} edges={['top']}>
 				<ScrollView
 					ref={scrollRef}
 					style={styles.container}
 					contentContainerStyle={{ paddingBottom: scaleHeight(40), flexGrow: 1 }}
 					onScroll={scrollHandler.onScroll}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-					<View style={styles.adContainer}>
+					{/* <View style={styles.adContainer}>
 						<AdmobBannerAd />
-					</View>
+					</View> */}
 					<View style={styles.sectionBox}>
 						<View style={{ alignItems: 'center', marginVertical: scaleHeight(20) }}>
 							<FastImage source={mascot} style={{ width: scaleWidth(120), height: scaleHeight(120) }} resizeMode={FastImage.resizeMode.contain} />

@@ -24,7 +24,8 @@ const BottomTabNavigator = () => {
 		},
 		tabBarLabelStyle: {
 			fontSize: isTablet ? scaledSize(11) : scaledSize(11),
-			marginTop: isTablet ? scaleHeight(10) : 0,
+			marginLeft: scaleWidth(2),
+			marginTop: isTablet ? scaleHeight(10) : scaleHeight(2.5),
 		},
 	});
 

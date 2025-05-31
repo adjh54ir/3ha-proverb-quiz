@@ -10,6 +10,8 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import Contributor9Modal from './common/modal/Contributor9Modal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import VersionCheck from 'react-native-version-check';
+import TermsScreen from './setting/TermScreen';
+import OpenSourceScreen from './setting/OpenSourceScreen';
 
 const STORAGE_KEYS = {
 	study: 'UserStudyHistory',
@@ -30,6 +32,9 @@ const SettingScreen = () => {
 
 	const [appVersion, setAppVersion] = useState('');
 
+	const [showTerms, setShowTerms] = useState(false);
+	const [showOpenSource, setShowOpenSource] = useState(false);
+
 	useEffect(() => {
 		const version = VersionCheck.getCurrentVersion();
 		setAppVersion(version);
@@ -43,7 +48,9 @@ const SettingScreen = () => {
 
 	useEffect(() => {
 		AsyncStorage.getItem(ALARM_TIME_KEY).then((time) => {
-			if (time) setAlarmTime(new Date(time));
+			if (time) {
+				setAlarmTime(new Date(time));
+			}
 		});
 	}, []);
 
@@ -88,7 +95,9 @@ const SettingScreen = () => {
 
 	// handleConfirmDelete 내부 수정
 	const handleConfirmDelete = async () => {
-		if (!resetType) return;
+		if (!resetType) {
+			return;
+		}
 
 		try {
 			if (resetType === 'study') {
@@ -144,23 +153,23 @@ const SettingScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }} edges={['top']}>
-			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => { }} />}>
+			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}>
 				{/* <AdmobBannerAd paramMarginTop={20} /> */}
 				{/* <View style={styles.section}></View> */}
 				<View style={styles.section}>
 					<Text style={styles.title}>학습/퀴즈 다시 풀기 </Text>
 					<View style={styles.buttonGroup}>
 						<TouchableOpacity style={[styles.button, styles.resetStudy]} onPress={() => confirmReset('study')}>
-							<IconComponent type='materialCommunityIcons' name='refresh' size={18} color='#fff' style={styles.iconLeft} />
+							<IconComponent type="materialCommunityIcons" name="refresh" size={18} color="#fff" style={styles.iconLeft} />
 							<Text style={styles.buttonText}>학습 다시 하기</Text>
 						</TouchableOpacity>
 						<TouchableOpacity style={[styles.button, styles.resetQuiz]} onPress={() => confirmReset('quiz')}>
-							<IconComponent type='materialCommunityIcons' name='refresh' size={18} color='#fff' style={styles.iconLeft} />
+							<IconComponent type="materialCommunityIcons" name="refresh" size={18} color="#fff" style={styles.iconLeft} />
 							<Text style={styles.buttonText}>퀴즈 다시 풀기</Text>
 						</TouchableOpacity>
 
 						<TouchableOpacity style={[styles.button, styles.resetAll]} onPress={() => confirmReset('all')}>
-							<IconComponent type='materialCommunityIcons' name='delete' size={18} color='#fff' style={styles.iconLeft} />
+							<IconComponent type="materialCommunityIcons" name="delete" size={18} color="#fff" style={styles.iconLeft} />
 							<Text style={styles.buttonText}>모두 다시 풀기</Text>
 						</TouchableOpacity>
 					</View>
@@ -181,10 +190,25 @@ const SettingScreen = () => {
 					</View>
 				</View> */}
 
-				<View style={{ marginBottom: 20 }}>
-					<Text style={{ fontSize: 12, color: '#95a5a6', textAlign: 'center' }}>
-						📱 현재 앱 버전: <Text style={{ fontWeight: 'bold' }}>v{appVersion}</Text>
+				{/* ============== 이용약관 및 개인정보처리방침 ==============*/}
+				<TouchableOpacity style={styles.policyAccordionHeader} onPress={() => setShowTerms((prev) => !prev)}>
+					<Text style={styles.policyAccordionText}>개인정보 처리 방침 및 이용약관 {showTerms ? '▲' : '▼'}</Text>
+				</TouchableOpacity>
+				{showTerms && <TermsScreen />}
+
+				{/* ============== 오픈소스 라이브러리 ==============*/}
+				<TouchableOpacity style={styles.policyAccordionHeader} onPress={() => setShowOpenSource((prev) => !prev)}>
+					<Text style={styles.policyAccordionText}>오픈소스 라이브러리 {showOpenSource ? '▲' : '▼'}</Text>
+				</TouchableOpacity>
+				{showOpenSource && <OpenSourceScreen />}
+				{/* ✅ 하단 앱 정보 */}
+				<View style={styles.footer}>
+					<Text style={styles.appVerText}>
+						📱 현재 앱 버전: <Text style={styles.appVerBoldText}>v{appVersion}</Text>
 					</Text>
+					<TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevModal(true)}>
+						<Text style={styles.devText}>제작자 소개</Text>
+					</TouchableOpacity>
 				</View>
 
 				<TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevModal(true)}>
@@ -203,7 +227,7 @@ const SettingScreen = () => {
 
 			<Contributor9Modal visible={showDevModal} onClose={() => setShowDevModal(false)} />
 
-			<Modal visible={modalVisible} transparent animationType='fade' onRequestClose={() => setModalVisible(false)}>
+			<Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>
 				<View style={styles.modalBackdrop}>
 					<View style={styles.modalContainer}>
 						<Text style={styles.modalTitle}>{getModalTitle()}</Text>
@@ -368,9 +392,58 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 1 },
 		shadowRadius: 2,
 	},
+	policyAccordionHeader: {
+		width: 'auto',
+		alignSelf: 'stretch', // ✅ 전체 너비에서 margin만큼 빠짐
+		marginHorizontal: scaleWidth(20), // ✅ 좌우 여백 추가
+		borderWidth: 1,
+		borderColor: '#dcdde1',
+		backgroundColor: '#f8f9fa',
+		paddingVertical: scaleHeight(14),
+		paddingHorizontal: scaleWidth(20),
+		marginBottom: scaleHeight(10),
+		borderRadius: scaleWidth(8),
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	policyAccordionText: {
+		fontSize: scaledSize(14),
+		color: '#2c3e50',
+		fontWeight: '600',
+	},
+	scrollTopButton: {
+		position: 'absolute',
+		right: 16,
+		bottom: 16,
+		backgroundColor: '#007AFF',
+		width: 48,
+		height: 48,
+		borderRadius: 24,
+		justifyContent: 'center',
+		alignItems: 'center',
+		elevation: 4,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.25,
+		shadowRadius: 4,
+	},
+	footer: {
+		marginTop: scaleHeight(30),
+		marginBottom: scaleHeight(20),
+		alignItems: 'center',
+	},
+	appVerText: {
+		fontSize: 12,
+		color: '#95a5a6',
+		textAlign: 'center',
+		marginBottom: scaleHeight(20),
+	},
+	appVerBoldText: {
+		fontWeight: 'bold',
+	},
 	devText: {
 		fontSize: scaledSize(13),
-		color: '#999999',
+		color: '#999999', // 조금 더 진한 회색
 		textAlign: 'center',
 		fontWeight: '500',
 	},

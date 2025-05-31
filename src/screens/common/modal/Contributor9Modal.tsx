@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, Text, Image, StyleSheet, TouchableOpacity, Linking, ScrollView } from 'react-native';
+import { Modal, View, Text, Image, StyleSheet, TouchableOpacity, Linking, ScrollView, Platform } from 'react-native';
 import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import IconComponent from '../atomic/IconComponent';
 
@@ -9,19 +9,19 @@ interface Props {
 }
 
 /**
- * 개발자 팝업 
- * Type1 
- * 
- * 
+ * 개발자 팝업
+ * Type1
+ *
+ *
   	const [showDevInfo, setShowDevInfo] = useState(false);
-  
+
  	<TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevInfo(true)}>
 		<Text style={styles.devText}>제작자 소개</Text>
 	</TouchableOpacity>
 
 	<Contributor9Modal visible={showDevModal} onClose={() => setShowDevInfo(false)} />
 
-	
+
 	hiddenDevTouchArea: {
 		alignItems: 'center',
 		marginTop: scaleHeight(10),
@@ -67,17 +67,17 @@ interface Props {
 		textAlign: 'center',
 		fontWeight: '500',
 	},
- * 
- * 
- * @param param0 
- * @returns 
+ *
+ *
+ * @param param0
+ * @returns
  */
 
 const Contributor9Modal = ({ visible, onClose }: Props) => {
 	const handleOpenUrl = (url: string) => Linking.openURL(url);
 
 	return (
-		<Modal animationType='slide' transparent visible={visible} onRequestClose={onClose}>
+		<Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
 			<View style={styles.overlay}>
 				<View style={styles.container}>
 					<ScrollView contentContainerStyle={styles.scroll}>
@@ -90,40 +90,37 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 							<TouchableOpacity
 								style={styles.rightButton}
 								activeOpacity={0.85}
-								onPress={() => handleOpenUrl('https://adjh54.notion.site/1e816d47b05b80d08c29d5a039846dd6?pvs=4')}>
-								<IconComponent type='materialIcons' name='apps' size={scaledSize(16)} color='#007AFF' />
+								onPress={() =>
+									handleOpenUrl(
+										Platform.OS === 'android'
+											? 'https://adjh54.notion.site/1e816d47b05b80d08c29d5a039846dd6?pvs=4'
+											: 'https://adjh54.notion.site/Contributor9-iOS-20316d47b05b803ca1dbdb199e664950?pvs=74',
+									)
+								}>
+								<IconComponent type="materialIcons" name="apps" size={scaledSize(16)} color="#007AFF" />
 								<Text style={styles.buttonText}>바로가기</Text>
 							</TouchableOpacity>
 						</View>
 						<View style={styles.rowItem}>
 							<Text style={styles.labelText}>📝 개발자 블로그</Text>
-							<TouchableOpacity
-								style={styles.rightButton}
-								activeOpacity={0.85}
-								onPress={() => handleOpenUrl('https://adjh54.tistory.com/')}>
-								<IconComponent type='materialIcons' name='language' size={scaledSize(16)} color='#007AFF' />
+							<TouchableOpacity style={styles.rightButton} activeOpacity={0.85} onPress={() => handleOpenUrl('https://adjh54.tistory.com/')}>
+								<IconComponent type="materialIcons" name="language" size={scaledSize(16)} color="#007AFF" />
 								<Text style={styles.buttonText}>방문하기</Text>
 							</TouchableOpacity>
 						</View>
 
 						<View style={styles.rowItem}>
 							<Text style={styles.labelText}>💻 GitHub</Text>
-							<TouchableOpacity
-								style={styles.rightButton}
-								activeOpacity={0.85}
-								onPress={() => handleOpenUrl('https://github.com/adjh54ir')}>
-								<IconComponent type='materialCommunityIcons' name='github' size={scaledSize(16)} color='#007AFF' />
+							<TouchableOpacity style={styles.rightButton} activeOpacity={0.85} onPress={() => handleOpenUrl('https://github.com/adjh54ir')}>
+								<IconComponent type="materialCommunityIcons" name="github" size={scaledSize(16)} color="#007AFF" />
 								<Text style={styles.buttonText}>둘러보기</Text>
 							</TouchableOpacity>
 						</View>
 
 						<View style={styles.rowItem}>
 							<Text style={styles.labelText}>📩 메일 문의</Text>
-							<TouchableOpacity
-								style={styles.rightButton}
-								activeOpacity={0.85}
-								onPress={() => handleOpenUrl('mailto:adjh54ir@gmail.com')}>
-								<IconComponent type='materialIcons' name='email' size={scaledSize(16)} color='#007AFF' />
+							<TouchableOpacity style={styles.rightButton} activeOpacity={0.85} onPress={() => handleOpenUrl('mailto:adjh54ir@gmail.com')}>
+								<IconComponent type="materialIcons" name="email" size={scaledSize(16)} color="#007AFF" />
 								<Text style={styles.buttonText}>보내기</Text>
 							</TouchableOpacity>
 						</View>

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>korea</string>
 	<key>CFBundleDisplayName</key>
-	<string>속담 맞추기</string>
+	<string>속픽: 속담 맞추기</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

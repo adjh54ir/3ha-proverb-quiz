@@ -154,7 +154,7 @@ const SettingScreen = () => {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }} edges={['top']}>
 			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}>
-				{/* <AdmobBannerAd paramMarginTop={20} /> */}
+				<AdmobBannerAd paramMarginTop={20} />
 				{/* <View style={styles.section}></View> */}
 				<View style={styles.section}>
 					<Text style={styles.title}>학습/퀴즈 다시 풀기 </Text>
@@ -210,10 +210,6 @@ const SettingScreen = () => {
 						<Text style={styles.devText}>제작자 소개</Text>
 					</TouchableOpacity>
 				</View>
-
-				<TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevModal(true)}>
-					<Text style={styles.devText}>제작자 소개</Text>
-				</TouchableOpacity>
 				<View style={{ marginTop: scaleHeight(30), marginBottom: scaleHeight(10) }}>
 					<Text style={{ fontSize: scaledSize(12), color: '#7f8c8d', textAlign: 'center', padding: scaleWidth(40) }}>
 						📚 본 앱의 일부 콘텐츠는{' '}

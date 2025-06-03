@@ -104,12 +104,12 @@ const CapitalResultScreen = () => {
 
 	const getLevelStyle = (subtitle: string) => {
 		const entry = STYLE_MAP[subtitle];
-		if (!entry) return { bg: '#fff', border: '#ccc' };
+		if (!entry) {return { bg: '#fff', border: '#ccc' };}
 		return { bg: entry.color, border: entry.color };
 	};
 
 	useEffect(() => {
-		if (isFocused) handleScrollToTop();
+		if (isFocused) {handleScrollToTop();}
 	}, [isFocused]);
 
 	useFocusEffect(
@@ -317,9 +317,9 @@ const CapitalResultScreen = () => {
 	];
 
 	const getEncourageMessage = (score: number) => {
-		if (score >= 1800) return '🌎 당신은 속담 마스터! 모두가 당신을 주목해요!';
-		if (score >= 1200) return '🌍 이제 마스터까지 한 걸음! 계속 도전해요!';
-		if (score >= 600) return '✈️ 더 넓은 세계가 당신을 기다리고 있어요!';
+		if (score >= 1800) {return '🌎 당신은 속담 마스터! 모두가 당신을 주목해요!';}
+		if (score >= 1200) {return '🌍 이제 마스터까지 한 걸음! 계속 도전해요!';}
+		if (score >= 600) {return '✈️ 더 넓은 세계가 당신을 기다리고 있어요!';}
 		return '🚀 지금부터 시작이에요! 차근차근 도전해봐요!';
 	};
 	const getTitleByScore = (score: number) => {
@@ -341,15 +341,15 @@ const CapitalResultScreen = () => {
 					contentContainerStyle={{ paddingBottom: scaleHeight(40), flexGrow: 1 }}
 					onScroll={scrollHandler.onScroll}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-					{/* <View style={styles.adContainer}>
+					<View style={styles.adContainer}>
 						<AdmobBannerAd />
-					</View> */}
+					</View>
 					<View style={styles.sectionBox}>
 						<View style={{ alignItems: 'center', marginVertical: scaleHeight(20) }}>
 							<FastImage source={mascot} style={{ width: scaleWidth(120), height: scaleHeight(120) }} resizeMode={FastImage.resizeMode.contain} />
 						</View>
 						<View style={styles.levelCenteredRow}>
-							<IconComponent type='fontAwesome6' name={icon} size={16} color='#27ae60' />
+							<IconComponent type="fontAwesome6" name={icon} size={16} color="#27ae60" />
 
 							<Text style={styles.levelTitle}>
 								{label} <Text style={styles.levelScoreText}>({totalScore}점)</Text>
@@ -357,10 +357,10 @@ const CapitalResultScreen = () => {
 
 							<TouchableOpacity onPress={() => setShowLevelModal(true)}>
 								<IconComponent
-									type='materialIcons'
-									name='info-outline'
+									type="materialIcons"
+									name="info-outline"
 									size={18}
-									color='#7f8c8d'
+									color="#7f8c8d"
 									style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
 								/>
 							</TouchableOpacity>
@@ -478,7 +478,7 @@ const CapitalResultScreen = () => {
 														borderColor: levelStyle.border,
 													},
 												]}>
-												<IconComponent name={item.icon} type='fontAwesome6' size={22} color={isEarned ? '#fff' : '#bdc3c7'} style={{ marginBottom: 4 }} />
+												<IconComponent name={item.icon} type="fontAwesome6" size={22} color={isEarned ? '#fff' : '#bdc3c7'} style={{ marginBottom: 4 }} />
 												<Text style={[styles.levelText, isEarned && { color: '#fff', fontWeight: 'bold' }]}> {item.title} </Text>
 												<Text style={[styles.levelSubText, isEarned && { color: '#fff' }]}> {item.subtitle} </Text>
 											</View>
@@ -497,11 +497,11 @@ const CapitalResultScreen = () => {
 						) : (
 							earnedBadgeIds.map((badgeId) => {
 								const badge = CONST_BADGES.find((b) => b.id === badgeId);
-								if (!badge) return null;
+								if (!badge) {return null;}
 								return (
 									<View key={badge.id} style={[styles.badgeCard, styles.badgeCardActive]}>
 										<View style={[styles.iconBox, styles.iconBoxActive]}>
-											<IconComponent name={badge.icon} type={badge.iconType} size={20} color='#27ae60' />
+											<IconComponent name={badge.icon} type={badge.iconType} size={20} color="#27ae60" />
 										</View>
 										<View style={styles.textBox}>
 											<Text style={[styles.badgeTitle, styles.badgeTitleActive]}> {badge.name} </Text>
@@ -526,7 +526,7 @@ const CapitalResultScreen = () => {
 								CONST_BADGES.filter((badge) => !earnedBadgeIds.includes(badge.id)).map((badge) => (
 									<View key={badge.id} style={styles.badgeCard}>
 										<View style={styles.iconBox}>
-											<IconComponent name={badge.icon} type={badge.iconType} size={20} color='#2c3e50' />
+											<IconComponent name={badge.icon} type={badge.iconType} size={20} color="#2c3e50" />
 										</View>
 										<View style={styles.textBox}>
 											<Text style={styles.badgeTitle}> {badge.name} </Text>
@@ -539,7 +539,7 @@ const CapitalResultScreen = () => {
 					)}
 				</ScrollView>
 
-				<Modal visible={showLevelModal} transparent animationType='fade'>
+				<Modal visible={showLevelModal} transparent animationType="fade">
 					<View style={styles.modalOverlay}>
 						<View style={[styles.levelModal, { maxHeight: scaleHeight(600) }]}>
 							<Text style={styles.levelModalTitle}>등급 안내</Text>
@@ -562,7 +562,7 @@ const CapitalResultScreen = () => {
 											)}
 											<FastImage source={mascotImage} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
 											<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
-												<IconComponent name={item.icon} type='fontAwesome6' size={16} color='#27ae60' />
+												<IconComponent name={item.icon} type="fontAwesome6" size={16} color="#27ae60" />
 												<Text style={[styles.levelLabel, { marginLeft: scaleWidth(6) }]}>{item.label}</Text>
 											</View>
 											<Text style={styles.levelScore}>{item.score}점 이상</Text>
@@ -583,7 +583,7 @@ const CapitalResultScreen = () => {
 			{/* 최하단에 위치할것!! */}
 			{showScrollTop && (
 				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop}>
-					<IconComponent type='fontawesome6' name='arrow-up' size={20} color='#ffffff' />
+					<IconComponent type="fontawesome6" name="arrow-up" size={20} color="#ffffff" />
 				</TouchableOpacity>
 			)}
 		</>

@@ -34,7 +34,7 @@ const COMMON_ALL_OPTION = {
 	value: '전체',
 	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={16} color="#555" />,
 	labelStyle: {
-		marginLeft: scaleWidth(6), fontSize: scaledSize(14)
+		marginLeft: scaleWidth(6), fontSize: scaledSize(14),
 	},
 };
 
@@ -43,22 +43,22 @@ const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '아주 쉬움',
 		value: '아주 쉬움',
-		icon: () => <IconComponent type='FontAwesome6' name='seedling' size={16} color='#85C1E9' />,
+		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={16} color="#85C1E9" />,
 	},
 	{
 		label: '쉬움',
 		value: '쉬움',
-		icon: () => <IconComponent type='FontAwesome6' name='leaf' size={16} color='#F4D03F' />,
+		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={16} color="#F4D03F" />,
 	},
 	{
 		label: '보통',
 		value: '보통',
-		icon: () => <IconComponent type='FontAwesome6' name='tree' size={16} color='#EB984E' />,
+		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#EB984E" />,
 	},
 	{
 		label: '어려움',
 		value: '어려움',
-		icon: () => <IconComponent type='FontAwesome6' name='trophy' size={16} color='#E74C3C' />,
+		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={16} color="#E74C3C" />,
 	},
 ];
 const FIELD_DROPDOWN_ITEMS = [
@@ -66,42 +66,42 @@ const FIELD_DROPDOWN_ITEMS = [
 	{
 		label: '운/우연',
 		value: '운/우연',
-		icon: () => <IconComponent type='FontAwesome6' name='dice' size={16} color='#81ecec' />,
+		icon: () => <IconComponent type="FontAwesome6" name="dice" size={16} color="#81ecec" />,
 	},
 	{
 		label: '인간관계',
 		value: '인간관계',
-		icon: () => <IconComponent type='FontAwesome6' name='users' size={16} color='#a29bfe' />,
+		icon: () => <IconComponent type="FontAwesome6" name="users" size={16} color="#a29bfe" />,
 	},
 	{
 		label: '세상 이치',
 		value: '세상 이치',
-		icon: () => <IconComponent type='fontawesome5' name='globe' size={16} color='#fdcb6e' />,
+		icon: () => <IconComponent type="fontawesome5" name="globe" size={16} color="#fdcb6e" />,
 	},
 	{
 		label: '근면/검소',
 		value: '근면/검소',
-		icon: () => <IconComponent type='fontawesome5' name='hammer' size={16} color='#fab1a0' />,
+		icon: () => <IconComponent type="fontawesome5" name="hammer" size={16} color="#fab1a0" />,
 	},
 	{
 		label: '노력/성공',
 		value: '노력/성공',
-		icon: () => <IconComponent type='fontawesome5' name='medal' size={16} color='#55efc4' />,
+		icon: () => <IconComponent type="fontawesome5" name="medal" size={16} color="#55efc4" />,
 	},
 	{
 		label: '경계/조심',
 		value: '경계/조심',
-		icon: () => <IconComponent type='fontawesome5' name='exclamation-triangle' size={16} color='#ff7675' />,
+		icon: () => <IconComponent type="fontawesome5" name="exclamation-triangle" size={16} color="#ff7675" />,
 	},
 	{
 		label: '욕심/탐욕',
 		value: '욕심/탐욕',
-		icon: () => <IconComponent type='fontawesome5' name='hand-holding-usd' size={16} color='#fd79a8' />,
+		icon: () => <IconComponent type="fontawesome5" name="hand-holding-usd" size={16} color="#fd79a8" />,
 	},
 	{
 		label: '배신/불신',
 		value: '배신/불신',
-		icon: () => <IconComponent type='fontawesome5' name='user-slash' size={16} color='#b2bec3' />,
+		icon: () => <IconComponent type="fontawesome5" name="user-slash" size={16} color="#b2bec3" />,
 	},
 ];
 
@@ -258,12 +258,12 @@ const ProverbListScreen = () => {
 
 	const handleSetLevelOpen = (open: boolean) => {
 		setLevelOpen(open);
-		if (open) scrollToTop();
+		if (open) {scrollToTop();}
 	};
 
 	const handleSetFieldOpen = (open: boolean) => {
 		setFieldOpen(open);
-		if (open) scrollToTop();
+		if (open) {scrollToTop();}
 	};
 
 	return (
@@ -273,15 +273,15 @@ const ProverbListScreen = () => {
 					{/* 필터 + 드롭다운 영역 */}
 					<View style={styles.container}>
 						<View style={styles.filterCard}>
-							{/* <View style={styles.bannerContainer}>
+							<View style={styles.bannerContainer}>
 								<AdmobBannerAd paramMarginBottom={8} />
-							</View> */}
+							</View>
 							<View style={styles.searchRow}>
 								<TextInput
 									ref={searchInputRef}
 									style={styles.input}
-									placeholder='속담이나 의미를 입력해주세요'
-									placeholderTextColor='#666'
+									placeholder="속담이나 의미를 입력해주세요"
+									placeholderTextColor="#666"
 									onChangeText={(text) => {
 										setKeyword(text);
 										setFieldOpen(false);
@@ -290,7 +290,7 @@ const ProverbListScreen = () => {
 									value={keyword}
 								/>
 								<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset}>
-									<Icon name='rotate-right' size={18} color='#555' />
+									<Icon name="rotate-right" size={18} color="#555" />
 								</TouchableOpacity>
 							</View>
 							<View style={styles.filterDropdownRow}>
@@ -356,7 +356,7 @@ const ProverbListScreen = () => {
 										}}
 										modalContentContainerStyle={{
 											width: '85%',
-											alignContent: "center",
+											alignContent: 'center',
 											maxHeight: scaleHeight(500), // ✅ 높이 증가로 스크롤 확보
 											backgroundColor: '#fff',
 											borderRadius: scaleWidth(20),
@@ -416,10 +416,10 @@ const ProverbListScreen = () => {
 								setShowScrollTop(offsetY > 100);
 							}}
 							scrollEventThrottle={16}
-							keyboardShouldPersistTaps='handled'
+							keyboardShouldPersistTaps="handled"
 							ListEmptyComponent={() => (
 								<View style={[styles.emptyWrapper, { height: '100%', marginTop: scaleHeight(40) }]}>
-									<FastImage source={emptyImage} style={styles.emptyImage} resizeMode='contain' />
+									<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
 									<Text style={styles.emptyText}>앗! 조건에 맞는 속담이 없어요.{'\n'}다른 검색어나 필터를 사용해보세요!</Text>
 								</View>
 							)}
@@ -471,18 +471,18 @@ const ProverbListScreen = () => {
 					{/* 스크롤 최상단 이동 버튼 */}
 					{showScrollTop && (
 						<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
-							<IconComponent type='fontawesome6' name='arrow-up' size={20} color='#ffffff' />
+							<IconComponent type="fontawesome6" name="arrow-up" size={20} color="#ffffff" />
 						</TouchableOpacity>
 					)}
 
 					{/* 상세 모달 */}
-					<Modal visible={showDetailModal} animationType='slide' transparent={true} onRequestClose={() => setShowDetailModal(false)}>
+					<Modal visible={showDetailModal} animationType="slide" transparent={true} onRequestClose={() => setShowDetailModal(false)}>
 						<View style={styles.modalOverlay}>
 							<View style={styles.modalContainer}>
 								<View style={styles.modalHeader}>
 									<Text style={styles.modalHeaderTitle}>속담 상세</Text>
 									<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowDetailModal(false)}>
-										<Icon name='xmark' size={20} color='#0984e3' />
+										<Icon name="xmark" size={20} color="#0984e3" />
 									</TouchableOpacity>
 								</View>
 

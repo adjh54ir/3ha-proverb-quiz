@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>korea</string>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>속픽: 속담 맞추기</string>
 	<key>CFBundleExecutable</key>
@@ -24,6 +24,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-1996095472780376~4250183260</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -33,10 +35,11 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-	<!-- ===================================================== 권한들을 관리합니다 ======================================================== -->
-	<!-- 광고 네트워크 설정 -->
+	<key>NSCameraUsageDescription</key>
+	<string>사진 촬영을 위해 카메라 접근 권한이 필요합니다.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>앱에서 사진을 선택하거나 저장하기 위해 사진 라이브러리 접근이 필요합니다.</string>
 	<key>SKAdNetworkItems</key>
-	<!-- ===================================================== 권한들을 관리합니다 ======================================================== -->
 	<array>
 		<dict>
 			<key>SKAdNetworkIdentifier</key>

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
 	View,
@@ -127,6 +128,17 @@ const Home = () => {
 			};
 		}, []),
 	);
+	useEffect(() => {
+		setShowConfetti(true);
+
+		// 일정 시간 후 자동 종료
+		const timeout = setTimeout(() => {
+			setShowConfetti(false);
+		}, 3000);
+
+		// 정리
+		return () => clearTimeout(timeout);
+	}, []);
 
 	// getTitleByScore 함수 추가
 	const getTitleByScore = (score: number) => {
@@ -233,22 +245,16 @@ const Home = () => {
 
 	return (
 		<SafeAreaView style={styles.main} edges={['top']}>
+			{showConfetti && (
+				<View style={styles.globalConfettiWrapper}>
+					<ConfettiCannon count={60} origin={{ x: scaleWidth(180), y: 0 }} fadeOut explosionSpeed={500} fallSpeed={2500} />
+				</View>
+			)}
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 				<KeyboardAvoidingView style={styles.wrapper} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 					<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
 						<View style={styles.container}>
 							<View style={styles.imageContainer}>
-								<View style={styles.confettiWrapper}>
-									{showConfetti && (
-										<ConfettiCannon
-											count={40}
-											origin={{ x: 75, y: 30 }} // y를 10 → 30으로 조금 내려서 더 중심에 뿌림
-											fadeOut
-											explosionSpeed={500}
-											fallSpeed={2500}
-										/>
-									)}
-								</View>
 								<View style={styles.speechWrapper}>
 									<View style={styles.speechBubble}>
 										<Text style={styles.speechText}>{greeting}</Text>
@@ -540,7 +546,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 	},
 	speechText: {
-		fontSize: scaledSize(15),
+		fontSize: scaledSize(13),
 		color: '#2c3e50',
 		textAlign: 'center',
 		fontWeight: '600',
@@ -974,6 +980,15 @@ const styles = StyleSheet.create({
 	},
 	gradeScrollView: {
 		paddingBottom: scaleHeight(12),
+	},
+	globalConfettiWrapper: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		zIndex: 999,
+		pointerEvents: 'none',
 	},
 });
 

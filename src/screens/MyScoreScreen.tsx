@@ -104,12 +104,16 @@ const CapitalResultScreen = () => {
 
 	const getLevelStyle = (subtitle: string) => {
 		const entry = STYLE_MAP[subtitle];
-		if (!entry) {return { bg: '#fff', border: '#ccc' };}
+		if (!entry) {
+			return { bg: '#fff', border: '#ccc' };
+		}
 		return { bg: entry.color, border: entry.color };
 	};
 
 	useEffect(() => {
-		if (isFocused) {handleScrollToTop();}
+		if (isFocused) {
+			handleScrollToTop();
+		}
 	}, [isFocused]);
 
 	useFocusEffect(
@@ -317,9 +321,15 @@ const CapitalResultScreen = () => {
 	];
 
 	const getEncourageMessage = (score: number) => {
-		if (score >= 1800) {return '🌎 당신은 속담 마스터! 모두가 당신을 주목해요!';}
-		if (score >= 1200) {return '🌍 이제 마스터까지 한 걸음! 계속 도전해요!';}
-		if (score >= 600) {return '✈️ 더 넓은 세계가 당신을 기다리고 있어요!';}
+		if (score >= 1800) {
+			return '🌎 당신은 속담 마스터! 모두가 당신을 주목해요!';
+		}
+		if (score >= 1200) {
+			return '🌍 이제 마스터까지 한 걸음! 계속 도전해요!';
+		}
+		if (score >= 600) {
+			return '✈️ 더 넓은 세계가 당신을 기다리고 있어요!';
+		}
 		return '🚀 지금부터 시작이에요! 차근차근 도전해봐요!';
 	};
 	const getTitleByScore = (score: number) => {
@@ -497,7 +507,9 @@ const CapitalResultScreen = () => {
 						) : (
 							earnedBadgeIds.map((badgeId) => {
 								const badge = CONST_BADGES.find((b) => b.id === badgeId);
-								if (!badge) {return null;}
+								if (!badge) {
+									return null;
+								}
 								return (
 									<View key={badge.id} style={[styles.badgeCard, styles.badgeCardActive]}>
 										<View style={[styles.iconBox, styles.iconBoxActive]}>
@@ -515,7 +527,9 @@ const CapitalResultScreen = () => {
 
 					{/* 2. 전체 중 미획득 뱃지만 아코디언에 출력 */}
 					<TouchableOpacity onPress={toggleBadgeList} style={{ marginBottom: scaleHeight(12) }}>
-						<Text style={{ color: '#27ae60', textAlign: 'center', fontSize: scaledSize(13) }}>{showBadgeList ? '뱃지 목록 닫기 ▲' : '획득 가능한 뱃지 보기 ▼'}</Text>
+						<Text style={{ color: '#27ae60', textAlign: 'center', fontSize: scaledSize(13) }}>
+							{showBadgeList ? '뱃지 목록 닫기 ▲' : '획득 가능한 뱃지 보기 ▼'}
+						</Text>
 					</TouchableOpacity>
 
 					{showBadgeList && (
@@ -594,10 +608,7 @@ export default CapitalResultScreen;
 
 const styles = StyleSheet.create({
 	safeArea: { flex: 1, backgroundColor: '#fff' },
-	container: {
-		paddingHorizontal: scaleWidth(20),
-		paddingTop: scaleHeight(20),
-	},
+	container: { paddingHorizontal: scaleWidth(16) },
 	pageTitle: {
 		fontSize: scaledSize(20),
 		fontWeight: 'bold',
@@ -1080,4 +1091,3 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 });
-

@@ -454,18 +454,16 @@ const ProverbCommonFrameScreen = () => {
 		}
 
 		// ✅ 뱃지가 없을 경우에만 결과 모달 출력
-		if (isFocused) {
-			const title = isTimeout ? '⏰ 시간 초과!' : correct ? '🎉 정답입니다!' : '😢 오답입니다';
-			const message = isTimeout
-				? '시간 초과로 오답 처리됐어요!'
-				: correct
-					? praiseMessages[Math.floor(Math.random() * praiseMessages.length)]
-					: '앗, 다음엔 맞힐 수 있어요!';
+		const title = isTimeout ? '⏰ 시간 초과!' : correct ? '🎉 정답입니다!' : '😢 오답입니다';
+		const message = isTimeout
+			? '시간 초과로 오답 처리됐어요!'
+			: correct
+				? praiseMessages[Math.floor(Math.random() * praiseMessages.length)]
+				: '앗, 다음엔 맞힐 수 있어요!';
 
-			setResultTitle(title);
-			setResultMessage(message);
-			setShowResultModal(true);
-		}
+		setResultTitle(title);
+		setResultMessage(message);
+		setShowResultModal(true);
 	};
 	const getLevelColor = (levelName: string) => {
 		const levelColorMap: Record<string, string> = {

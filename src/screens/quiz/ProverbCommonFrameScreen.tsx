@@ -1,3 +1,8 @@
+/* eslint-disable jsx-quotes */
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable curly */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
 	View,
@@ -34,13 +39,9 @@ import AdmobFrontAd from '../common/ads/AdmobFrontAd';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-interface ProverbQuizScreenProps {
-	mode: 'meaning' | 'proverb' | 'fill-blank'; // 추가!
-}
 const labelColors = ['#1abc9c', '#3498db', '#9b59b6', '#e67e22'];
 
 const STORAGE_KEY = 'UserQuizHistory';
-
 
 type QuizRouteParams = {
 	mode: 'meaning' | 'proverb' | 'fill-blank';
@@ -51,19 +52,9 @@ type QuizRouteParams = {
 
 type QuizRoute = RouteProp<{ ProverbCommonFrame: QuizRouteParams }, 'ProverbCommonFrame'>;
 
-
-
-
 const ProverbCommonFrameScreen = () => {
-
-
 	const route = useRoute<QuizRoute>();
-	const {
-		mode: routeMode,
-		questionPool,
-		isWrongReview = false,
-		title = '',
-	} = route.params;
+	const { mode: routeMode, questionPool, isWrongReview = false, title = '' } = route.params;
 
 	const mode: 'meaning' | 'proverb' | 'fill-blank' = isWrongReview ? 'meaning' : routeMode;
 
@@ -198,8 +189,6 @@ const ProverbCommonFrameScreen = () => {
 		}
 	}, [showStartModal, proverbs, showAd]);
 
-
-
 	useEffect(() => {
 		if (options.length) {
 			scaleAnims.current = options.map(() => new Animated.Value(1));
@@ -237,13 +226,11 @@ const ProverbCommonFrameScreen = () => {
 		return filteredProverbs.filter((p) => !solvedSet.has(p.id));
 	}, [filteredProverbs, quizHistory, question]);
 
-
 	/**
 	 * 퀴즈 불러오기
 	 * @returns
 	 */
 	const loadQuestion = () => {
-
 		if (isWrongReview && questionPool) {
 			if (reviewIndex >= questionPool.length) {
 				setResultType('done');
@@ -253,21 +240,21 @@ const ProverbCommonFrameScreen = () => {
 				return;
 			}
 			const newQuestion = questionPool[reviewIndex];
-			const distractors = questionPool.filter(p => p.id !== newQuestion.id);
+			const distractors = questionPool.filter((p) => p.id !== newQuestion.id);
 			const shuffledDistractors = [...distractors].sort(() => Math.random() - 0.5).slice(0, 3);
 
 			let allOptions: string[] = [];
 			let displayText = '';
 
 			if (mode === 'meaning') {
-				allOptions = [...shuffledDistractors.map(p => p.longMeaning!), newQuestion.longMeaning!];
+				allOptions = [...shuffledDistractors.map((p) => p.longMeaning!), newQuestion.longMeaning!];
 				displayText = newQuestion.proverb;
 			} else if (mode === 'proverb') {
-				allOptions = [...shuffledDistractors.map(p => p.proverb), newQuestion.proverb];
+				allOptions = [...shuffledDistractors.map((p) => p.proverb), newQuestion.proverb];
 				displayText = newQuestion.longMeaning!;
 			} else if (mode === 'fill-blank') {
 				const blank = pickBlankWord(newQuestion.proverb);
-				allOptions = [...shuffledDistractors.map(p => pickBlankWord(p.proverb)), blank];
+				allOptions = [...shuffledDistractors.map((p) => pickBlankWord(p.proverb)), blank];
 				displayText = newQuestion.proverb.replace(blank, '(____)');
 				setBlankWord(blank);
 			}
@@ -281,7 +268,7 @@ const ProverbCommonFrameScreen = () => {
 
 			if (timerRef.current) clearInterval(timerRef.current);
 			timerRef.current = setInterval(() => {
-				setRemainingTime(prev => {
+				setRemainingTime((prev) => {
 					if (prev <= 1) {
 						clearInterval(timerRef.current!);
 						handleSelect('');
@@ -294,20 +281,12 @@ const ProverbCommonFrameScreen = () => {
 			return;
 		}
 
-
-
-		const solvedSet = new Set([
-			...(quizHistory?.correctProverbId ?? []),
-			...(quizHistory?.wrongProverbId ?? []),
-		]);
+		const solvedSet = new Set([...(quizHistory?.correctProverbId ?? []), ...(quizHistory?.wrongProverbId ?? [])]);
 
 		// 현재 문제도 중복 방지에 포함되도록 처리 (백업)
 		if (question) {
 			solvedSet.add(question.id);
 		}
-
-
-
 
 		if (remainingProverbs.length === 0) {
 			setResultType('done');
@@ -319,7 +298,7 @@ const ProverbCommonFrameScreen = () => {
 
 		const shuffled = [...remainingProverbs].sort(() => Math.random() - 0.5);
 		const newQuestion = shuffled[0];
-		const distractorPool = filteredProverbs.filter(p => p.id !== newQuestion.id);
+		const distractorPool = filteredProverbs.filter((p) => p.id !== newQuestion.id);
 		const shuffledDistractors = [...distractorPool].sort(() => Math.random() - 0.5).slice(0, 3);
 
 		let allOptions: string[] = [];
@@ -420,7 +399,6 @@ const ProverbCommonFrameScreen = () => {
 				triggerComboAnimation();
 				return newCombo;
 			});
-
 		} else {
 			setCombo(0);
 		}
@@ -433,7 +411,6 @@ const ProverbCommonFrameScreen = () => {
 
 			updated.quizCounts[id] = (updated.quizCounts[id] || 0) + 1;
 			updated.lastAnsweredAt = new Date();
-
 
 			// 오답 복습 모드일 경우 오답 → 정답 처리 먼저 실행
 			if (correct && isWrongReview && updated.wrongProverbId.includes(id)) {
@@ -515,7 +492,6 @@ const ProverbCommonFrameScreen = () => {
 		return categoryColorMap[field] || '#b2bec3';
 	};
 
-
 	const pickBlankWord = (text: string) => {
 		const words = text.split(' ').filter((w) => w.length > 1);
 		const randomWord = words[Math.floor(Math.random() * words.length)];
@@ -528,10 +504,7 @@ const ProverbCommonFrameScreen = () => {
 
 		if (!quizHistory) return 0;
 
-		const solvedSet = new Set([
-			...(quizHistory.correctProverbId ?? []),
-			...(quizHistory.wrongProverbId ?? []),
-		]);
+		const solvedSet = new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]);
 
 		const filteredProverbs = proverbs.filter((p) => {
 			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
@@ -542,13 +515,14 @@ const ProverbCommonFrameScreen = () => {
 		const filteredSolved = filteredProverbs.filter((p) => solvedSet.has(p.id));
 		return filteredSolved.length;
 	};
-	const totalCount = isWrongReview && questionPool
-		? questionPool.length // ✅ 오답 복습 모드일 땐 고정
-		: proverbs.filter((p) => {
-			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-			return levelMatch && categoryMatch;
-		}).length;
+	const totalCount =
+		isWrongReview && questionPool
+			? questionPool.length // ✅ 오답 복습 모드일 땐 고정
+			: proverbs.filter((p) => {
+					const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+					const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+					return levelMatch && categoryMatch;
+				}).length;
 
 	const triggerComboAnimation = () => {
 		comboAnim.setValue(0);
@@ -660,10 +634,8 @@ const ProverbCommonFrameScreen = () => {
 						<View style={styles.container}>
 							<View style={styles.inner}>
 								<View style={styles.progressStatusWrapper}>
-									<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: scaleHeight(5), }}>
-										<Text style={styles.progressText}>
-											진행중인 퀴즈 : {getModeLabel(mode)}
-										</Text>
+									<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: scaleHeight(5) }}>
+										<Text style={styles.progressText}>진행중인 퀴즈 : {getModeLabel(mode)}</Text>
 										<Text style={[styles.progressText, { color: '#3498db' }]}>
 											{getSolvedCount()} / {totalCount}
 										</Text>
@@ -730,18 +702,19 @@ const ProverbCommonFrameScreen = () => {
 
 									{question ? (
 										<Text style={styles.questionText}>
-											{`Q. ${mode === 'fill-blank'
-												? questionText || '문제 준비중...'
-												: mode === 'meaning'
-													? question?.proverb
-													: question?.longMeaning || '문제 준비중...'
-												}`}
+											{`Q. ${
+												mode === 'fill-blank'
+													? questionText || '문제 준비중...'
+													: mode === 'meaning'
+														? question?.proverb
+														: question?.longMeaning || '문제 준비중...'
+											}`}
 										</Text>
 									) : (
 										<Text>문제 불러오는 중...</Text>
 									)}
 
-									<View style={[styles.optionsContainer, { flex: 1, width: '100%', marginTop: scaleHeight(5), }]}>
+									<View style={[styles.optionsContainer, { flex: 1, width: '100%', marginTop: scaleHeight(5) }]}>
 										<FlatList
 											data={options}
 											keyExtractor={(item, index) => `${item}-${index}`}
@@ -772,25 +745,19 @@ const ProverbCommonFrameScreen = () => {
 														<TouchableOpacity
 															onPressIn={handlePressIn}
 															onPressOut={handlePressOut}
-															style={[
-																styles.optionCard,
-																isAnswerCorrect && styles.optionCorrectCard,
-																isAnswerWrong && styles.optionWrongCard,
-															]}
+															style={[styles.optionCard, isAnswerCorrect && styles.optionCorrectCard, isAnswerWrong && styles.optionWrongCard]}
 															onPress={() => handleSelect(item)}
-															disabled={!!selected}
-														>
+															disabled={!!selected}>
 															<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-																<Text style={[styles.optionLabel, { color: labelColors[index], marginRight: scaleWidth(6) }]}>
-																	{['A.', 'B.', 'C.', 'D.'][index]}
-																</Text>
+																<Text style={[styles.optionLabel, { color: labelColors[index], marginRight: scaleWidth(6) }]}>{['A.', 'B.', 'C.', 'D.'][index]}</Text>
 
 																<View style={{ flex: 1 }}>
 																	<Text style={styles.optionContent}>{item}</Text>
 																</View>
 
 																{isSelected && (
-																	<IconComponent type='MaterialIcons'
+																	<IconComponent
+																		type='MaterialIcons'
 																		name={isAnswerCorrect ? 'check-circle' : 'cancel'}
 																		size={28}
 																		color={isAnswerCorrect ? '#2ecc71' : '#e74c3c'}
@@ -833,14 +800,13 @@ const ProverbCommonFrameScreen = () => {
 										console.log('선택된 난이도:', selectedLevel);
 										console.log('선택된 카테고리:', selectedCategory);
 									}}
-
 									onCompleteStart={() => {
-										setShowStartModal(false);      // 모달 닫기
+										setShowStartModal(false); // 모달 닫기
 										if (timerRef.current) {
 											clearInterval(timerRef.current); // ✅ 타이머 중단
 											timerRef.current = null;
 										}
-										setShowAd(true);               // 광고 표시
+										setShowAd(true); // 광고 표시
 									}}
 								/>
 							)}
@@ -850,8 +816,8 @@ const ProverbCommonFrameScreen = () => {
 								<AdmobFrontAd
 									onAdClosed={() => {
 										setShowAd(false);
-										onStart(true);  // ✅ 문제 다시 뽑지 않음
-										startTimer();       // ✅ 타이머 재시작
+										onStart(true); // ✅ 문제 다시 뽑지 않음
+										startTimer(); // ✅ 타이머 재시작
 									}}
 								/>
 							)}
@@ -891,20 +857,22 @@ const ProverbCommonFrameScreen = () => {
 							</Modal>
 
 							<QuizResultModal
-								visible={showResultModal || badgeModalVisible} // 항상 true가 아니면, 적어도 연속 조건이 되게
+								visible={showResultModal && !badgeModalVisible} // ✅ 동시에 보이지 않도록 수정
 								resultType={resultType}
 								resultTitle={resultTitle}
 								resultMessage={resultMessage}
 								question={question}
 								onNext={() => {
-									setShowResultModal(false); // 닫기 트리거는 여기만
+									setShowResultModal(false);
+									if (badgeModalVisible) return; // ✅ 뱃지 모달이 있으면 대기
+
 									if (resultType === 'done') {
 										setTimeout(() => {
 											//@ts-ignore
 											navigation.navigate(Paths.MAIN_TAB, { screen: Paths.SETTING });
-										}, 300); // 약간의 시간 차를 주어 애니메이션 자연스럽게
+										}, 300);
 									} else {
-										handleNextQuestion(); // ✅ 여기에 맡기고 loadQuestion 제거
+										handleNextQuestion();
 									}
 								}}
 							/>
@@ -935,7 +903,7 @@ const ProverbCommonFrameScreen = () => {
 										<TouchableOpacity
 											onPress={() => {
 												setBadgeModalVisible(false); // 모달 닫기
-												handleNextQuestion(); // 다음 문제로 진행
+												handleNextQuestion(); // 다음 문제로 이동
 											}}
 											style={styles.modalConfirmButton}>
 											<Text style={styles.closeButtonText2}>확인</Text>
@@ -1308,7 +1276,6 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 
-
 	progressBarWrapper: {
 		height: scaleHeight(10),
 		width: '100%',
@@ -1409,7 +1376,6 @@ const styles = StyleSheet.create({
 		lineHeight: scaleHeight(22),
 		fontWeight: '500',
 	},
-
 
 	badgeModalTitle: {
 		fontSize: scaledSize(18),

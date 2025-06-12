@@ -13,9 +13,9 @@ interface Props {
  * Type1
  *
  *
-  	const [showDevInfo, setShowDevInfo] = useState(false);
+		const [showDevInfo, setShowDevInfo] = useState(false);
 
- 	<TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevInfo(true)}>
+	  <TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevInfo(true)}>
 		<Text style={styles.devText}>제작자 소개</Text>
 	</TouchableOpacity>
 
@@ -90,13 +90,7 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 							<TouchableOpacity
 								style={styles.rightButton}
 								activeOpacity={0.85}
-								onPress={() =>
-									handleOpenUrl(
-										Platform.OS === 'android'
-											? 'https://adjh54.notion.site/1e816d47b05b80d08c29d5a039846dd6?pvs=4'
-											: 'https://adjh54.notion.site/Contributor9-iOS-20316d47b05b803ca1dbdb199e664950?pvs=74',
-									)
-								}>
+								onPress={() => handleOpenUrl('https://adjh54.notion.site/1e816d47b05b80d08c29d5a039846dd6?pvs=4')}>
 								<IconComponent type="materialIcons" name="apps" size={scaledSize(16)} color="#007AFF" />
 								<Text style={styles.buttonText}>바로가기</Text>
 							</TouchableOpacity>

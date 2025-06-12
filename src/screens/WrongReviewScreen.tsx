@@ -35,7 +35,7 @@ const WrongReviewScreen = () => {
 	const [showWrongList, setShowWrongList] = useState(false);
 
 	useEffect(() => {
-		if (!isFocused) return;
+		if (!isFocused) {return;}
 
 		const fetchWrongData = async () => {
 			setLoading(true);
@@ -59,7 +59,7 @@ const WrongReviewScreen = () => {
 	}, [isFocused]);
 
 	const startWrongReview = () => {
-		if (wrongCountries.length === 0) return;
+		if (wrongCountries.length === 0) {return;}
 
 		// @ts-ignore
 		navigation.navigate(Paths.PROVERB_MEANING_QUIZ, {
@@ -73,7 +73,7 @@ const WrongReviewScreen = () => {
 	if (loading) {
 		return (
 			<View style={styles.center}>
-				<ActivityIndicator size='large' color='#3498db' />
+				<ActivityIndicator size="large" color="#3498db" />
 			</View>
 		);
 	}
@@ -85,7 +85,7 @@ const WrongReviewScreen = () => {
 				<FastImage
 					source={require('@/assets/images/no_wrong.png')} // 예시: 해피한 마스코트
 					style={styles.mascotImage}
-					resizeMode='contain'
+					resizeMode="contain"
 				/>
 
 				{/* 텍스트 메시지 */}
@@ -99,7 +99,7 @@ const WrongReviewScreen = () => {
 			<View style={styles.card}>
 				<Text style={styles.title}>
 					지금까지 <Text style={styles.highlight}>{totalSolvedCount}</Text>문제를 직접 풀었어요!{'\n'}
-					그중 <Text style={styles.highlight}>{wrongCountries.length}</Text>문제는 조금 아쉬웠네요 😅{'\n'}
+					그 중 <Text style={styles.highlight}>{wrongCountries.length}</Text>문제는 조금 아쉬웠네요 😅{'\n'}
 					한 번 더 도전해볼까요? 💪
 				</Text>
 				<Text style={styles.subText}>

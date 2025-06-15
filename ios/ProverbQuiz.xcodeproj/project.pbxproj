@@ -278,7 +278,7 @@
 				DEVELOPMENT_TEAM = XH6C349554;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = ProverbQuiz/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "속픽: 속담 맞추기";
+				INFOPLIST_KEY_CFBundleDisplayName = "속픽: 속담 퀴즈";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				IPHONEOS_DEPLOYMENT_TARGET = 16;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -313,7 +313,7 @@
 				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = XH6C349554;
 				INFOPLIST_FILE = ProverbQuiz/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "속픽: 속담 맞추기";
+				INFOPLIST_KEY_CFBundleDisplayName = "속픽: 속담 퀴즈";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				IPHONEOS_DEPLOYMENT_TARGET = 16;
 				LD_RUNPATH_SEARCH_PATHS = (

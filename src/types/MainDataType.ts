@@ -55,4 +55,46 @@ export declare namespace MainDataType {
 		totalScore: number; // 사용자의 퀴즈 총 누적 점수
 		bestCombo?: number; // 사용자가 기록한 가장 높은 연속 정답 수 (선택 값)
 	}
+	/**
+	 * [공통] 설정 정보 관리
+	 */
+	export interface SettingInfo {
+		isUseAlarm: boolean; // 알람 여부
+		alarmTime: string; // 예: '2025-06-17T10:15:00' (ISO 형식의 문자열)
+	}
+	interface TodayQuizList {
+		quizDate: string;
+		isCheckedIn: boolean;
+		todayQuizIdArr: number[];
+		correctQuizIdArr: number[];
+		worngQuizIdArr: number[];
+		answerResults: { [quizId: number]: boolean };
+		selectedAnswers: {
+			[quizId: number]: {
+				value: string; // 보기 텍스트
+				index: number; // 몇 번째 보기인지 (0부터 시작)
+			};
+		};
+		prevQuizIdArr?: number[];
+	}
+	type AllTodayQuizzes = TodayQuizList[];
+
+	// 개별 타임 챌린지 결과 타입
+	export interface TimeChallengeResult {
+		quizDate: string; // 챌린지를 푼 날짜 (예: '2025-06-18')
+		finalScore: number; // 최종 획득 점수
+		totalQuestions: number; // 출제된 전체 문제 수
+		solvedQuestions: number; // 실제로 푼 문제 수 (정답 + 오답)
+		correctCount: number; // 맞힌 문제 수
+		wrongCount: number; // 틀린 문제 수
+		maxCombo: number; // 최대 연속 정답 콤보 수
+		timeUsedMs: number; // 사용한 시간 (단위: 밀리초)
+		hasUsedChance: boolean; // 찬스 사요여부
+		hasUsedSkip: boolean; // 스킵 기능을 사용했는지 여부
+		quizIdList: number[]; // 출제된 사자성어 ID 목록
+		correctQuizIdList: number[]; // 정답 맞춘 문제의 ID 목록
+		wrongQuizIdList: number[]; // 오답 문제의 ID 목록
+	}
+	// 전체 타임 챌린지 기록 배열 타입
+	export type TimeChallengeHistory = TimeChallengeResult[];
 }

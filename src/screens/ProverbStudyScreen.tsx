@@ -27,8 +27,9 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 
-const STORAGE_KEY = 'UserStudyHistory';
+const STORAGE_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const COMMON_ALL_OPTION = {

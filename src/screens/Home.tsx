@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
 	View,
 	Text,
@@ -9,9 +9,10 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 	Modal,
-	Dimensions,
 	Keyboard,
 	TouchableWithoutFeedback,
+	Animated,
+	Easing,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -23,9 +24,74 @@ import { CONST_BADGES } from '@/const/ConstBadges';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import CatService from '@/services/CatService';
-const STORAGE_KEY_QUIZ = 'UserQuizHistory';
-const STORAGE_KEY_STUDY = 'UserStudyHistory';
+import { MainStorageKeyType } from '@/types/MainStorageKeyType';
+import { MainDataType } from '@/types/MainDataType';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
+import { CONST_MAIN_DATA } from '@/const/ConstMainData';
+
+
+
+
+const greetingMessages = [
+	'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
+	'🧠 오늘의 속담으로 지혜를 키워봐요!',
+	'📚 기억력 자신 있죠? 속담 퀴즈에 도전!',
+	'📝 속담 하나, 교훈 하나! 함께 배워봐요!',
+	'✨ 속담으로 생각을 키워보는 시간이에요!',
+	'💡 옛말 속 지혜, 오늘도 한마디 배워볼까요?',
+	'👀 퀴즈로 속담을 익히면 재미가 두 배!',
+	'🔍 뜻을 알면 더 재밌는 속담! 지금 풀어보세요!',
+	'🧩 맞히는 재미, 배우는 즐거움! 속담 퀴즈 GO!',
+	'🐣 하루 한 속담! 작지만 큰 지혜가 자라나요!',
+];
+
+const LEVEL_DATA = [
+	{
+		score: 0,
+		next: 600,
+		label: '속담 초보자',
+		icon: 'seedling',
+		encouragement: '🌱 첫걸음을 뗐어요! 이제 속담의 세계로!',
+		description: '속담의 세계에 첫 발을 내딛었어요.\n익숙한 속담부터 하나씩 알아가며 시작해봐요!',
+		mascot: require('@/assets/images/level1_mascote.png'),
+	},
+	{
+		score: 600,
+		next: 1200,
+		label: '속담 입문자',
+		icon: 'leaf',
+		encouragement: '🍃 차근차근 익혀가는 중이에요!\n조금씩 자신감이 붙고 있어요!',
+		description: '기본적인 속담을 어느 정도 익혔군요!\n이제 다양한 상황에 맞는 속담을 골라보는 연습을 해봐요.',
+		mascot: require('@/assets/images/level2_mascote.png'),
+	},
+	{
+		score: 1200,
+		next: 1800,
+		label: '속담 숙련자',
+		icon: 'tree',
+		encouragement: '🌳 멋져요! 속담 실력이 부쩍 늘었어요!',
+		description: '속담 퀴즈에 익숙해진 당신!\n뜻을 정확히 파악하고 응용하는 실력이 느껴져요.',
+		mascot: require('@/assets/images/level3_mascote.png'),
+	},
+	{
+		score: 1800,
+		next: 2461,
+		label: '속담 마스터',
+		icon: 'trophy',
+		encouragement: '🏆 속담 마스터에 도달했어요! 정말 대단해요!',
+		description: '속담의 의미와 맥락을 완벽히 이해했어요.\n이제 누가 봐도 속담 달인입니다!',
+		mascot: require('@/assets/images/level4_mascote.png'),
+	},
+];
+
+LocaleConfig.locales.kr = {
+	monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '11월'],
+	monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '11월'],
+	dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+	dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+};
+
+LocaleConfig.defaultLocale = 'kr';
 
 const Home = () => {
 	const navigation = useNavigation();
@@ -42,55 +108,56 @@ const Home = () => {
 
 	const earnedBadges = CONST_BADGES.filter((b) => earnedBadgeIds.includes(b.id));
 	const visibleBadges = earnedBadges; // 제한 없이 모두 보여줌
-	const [tooltipBadgeId, setTooltipBadgeId] = useState<string | null>(null);
 	const [showLevelModal, setShowLevelModal] = useState(false);
 
-	useLayoutEffect(() => {
-		navigation.setOptions({
-			headerRight: () => (
-				<TouchableOpacity onPress={() => setShowGuideModal(true)} style={{ marginRight: 16 }}>
-					<IconComponent type="materialIcons" name="info-outline" size={24} color="#3498db" />
-				</TouchableOpacity>
-			),
-		});
-	}, [navigation]);
-	const greetingMessages = [
-		'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
-		'🧠 오늘의 속담으로 지혜를 키워봐요!',
-		'📚 기억력 자신 있죠? 속담 퀴즈에 도전!',
-		'📝 속담 하나, 교훈 하나! 함께 배워봐요!',
-		'✨ 속담으로 생각을 키워보는 시간이에요!',
-		'💡 옛말 속 지혜, 오늘도 한마디 배워볼까요?',
-		'👀 퀴즈로 속담을 익히면 재미가 두 배!',
-		'🔍 뜻을 알면 더 재밌는 속담! 지금 풀어보세요!',
-		'🧩 맞히는 재미, 배우는 즐거움! 속담 퀴즈 GO!',
-		'🐣 하루 한 속담! 작지만 큰 지혜가 자라나요!',
+	// 오늘의 퀴즈
+	const USER_QUIZ_HISTORY_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
+	const USER_STUDY_HISTORY_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
+	const TODAY_QUIZ_LIST_KEY = MainStorageKeyType.TODAY_QUIZ_LIST;
+
+	const hasAutoCheckedIn = useRef(false); // ✅ 중복 방지용
+	const [stampAnim] = useState(new Animated.Value(0));
+	const [isCheckedIn, setIsCheckedIn] = useState(false);
+	const [petLevel, setPetLevel] = useState(-1);
+	const [showStamp, setShowStamp] = useState(false);
+	const [checkedInDates, setCheckedInDates] = useState<{ [date: string]: any }>({});
+	const [showCheckInModal, setShowCheckInModal] = useState(false); // 초기값 false
+	const PET_REWARDS = [
+		{ day: 7, image: require('@/assets/images/pet_level1_org.png') },
+		{ day: 14, image: require('@/assets/images/pet_level2_org.png') },
+		{ day: 30, image: require('@/assets/images/pet_level3_org.png') },
 	];
 
-	const LEVEL_DATA = [
-		{
-			score: 0,
-			next: 600,
-			label: '속담 초보자',
-			icon: 'seedling',
-			mascot: '',
-		},
-		{ score: 600, next: 1200, label: '속담 입문자', icon: 'leaf', mascot: '' },
-		{
-			score: 1200,
-			next: 1800,
-			label: '속담 숙련자',
-			icon: 'tree',
-			mascot: '',
-		},
-		{
-			score: 1800,
-			next: 2461,
-			label: '속담 마스터',
-			icon: 'trophy',
-			mascot: '',
-		},
-	];
+
+
+
+
+
+	useFocusEffect(
+		useCallback(() => {
+			ensureTodayQuizExists();
+			loadData();
+			checkTodayCheckIn();
+			loadCheckedInDates();
+
+			// 💥 빵빠레 자동 실행
+			setShowConfetti(true);
+			scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
+
+			return () => {
+				if (scrollRef.current) {
+					clearTimeout(scrollRef.current);
+				}
+			};
+		}, []),
+	);
+	useEffect(() => {
+		if (showCheckInModal && !isCheckedIn && !hasAutoCheckedIn.current) {
+			handleCheckIn();
+			hasAutoCheckedIn.current = true; // 중복 호출 방지
+		}
+	}, [showCheckInModal, isCheckedIn]);
+
 
 	const reversedLevelGuide = [...LEVEL_DATA].reverse();
 	const currentLevelIndex = reversedLevelGuide.findIndex((item) => totalScore >= item.score && totalScore < item.next);
@@ -111,23 +178,13 @@ const Home = () => {
 	// 이걸 기존 getLevelData 아래에 추가해
 	const levelData = useMemo(() => getLevelData(totalScore), [totalScore]);
 
-	const { label, icon, mascot } = levelData;
+	const reversedLevelData = useMemo(() => [...LEVEL_DATA].reverse(), []);
 
-	useFocusEffect(
-		useCallback(() => {
-			loadData();
+	const { label, icon, mascot, description } = levelData;
 
-			// 💥 빵빠레 자동 실행
-			setShowConfetti(true);
-			scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
 
-			return () => {
-				if (scrollRef.current) {
-					clearTimeout(scrollRef.current);
-				}
-			};
-		}, []),
-	);
+
+
 	useEffect(() => {
 		setShowConfetti(true);
 
@@ -139,6 +196,93 @@ const Home = () => {
 		// 정리
 		return () => clearTimeout(timeout);
 	}, []);
+
+	const getPetLevel = (checkedIn: { [date: string]: any }) => {
+		const count = Object.keys(checkedIn).length;
+		if (count >= 30) {
+			return 2;
+		}
+		if (count >= 14) {
+			return 1;
+		}
+		if (count >= 7) {
+			return 0;
+		}
+		return -1;
+	};
+	const stampStyle = {
+		position: 'absolute',
+		top: '50%',
+		left: '50%',
+		transform: [
+			{ translateX: -scaleWidth(60) },
+			{ translateY: -scaleHeight(60) },
+			{
+				scale: stampAnim.interpolate({
+					inputRange: [0, 0.5, 1],
+					outputRange: [0, 1.2, 1],
+				}),
+			},
+			{
+				rotate: stampAnim.interpolate({
+					inputRange: [0, 1],
+					outputRange: ['0deg', '-10deg'],
+				}),
+			},
+		],
+		opacity: stampAnim.interpolate({
+			inputRange: [0, 0.2, 1],
+			outputRange: [0, 1, 1],
+		}),
+	} as const;
+
+	const handleCheckIn = async () => {
+		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
+		if (!json) {
+			return;
+		}
+
+		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
+		const todayStr = getKSTDateString();
+		const updated = arr.map((item) => (item.quizDate.slice(0, 10) === todayStr ? { ...item, isCheckedIn: true } : item));
+		await AsyncStorage.setItem(TODAY_QUIZ_LIST_KEY, JSON.stringify(updated));
+		setIsCheckedIn(true);
+
+		setShowStamp(true); // 애니메이션용 플래그
+
+		stampAnim.setValue(0); // 초기화
+		Animated.timing(stampAnim, {
+			toValue: 1,
+			duration: 700,
+			useNativeDriver: true,
+			easing: Easing.out(Easing.exp),
+		}).start(() => {
+			// 애니메이션이 끝나면 잠깐 보여주고 사라지게
+			setTimeout(() => setShowStamp(false), 3000);
+		});
+
+		// ✅ 바로 달력에 반영
+		setCheckedInDates((prev) => ({
+			...prev,
+			[todayStr]: {
+				customStyles: {
+					container: {
+						backgroundColor: '#27ae60', // ✅ 오늘은 초록색
+						borderRadius: scaleWidth(6),
+					},
+					text: {
+						color: '#ffffff',
+						fontWeight: 'bold',
+					},
+				},
+			},
+		}));
+
+		if (scrollRef.current) {
+			clearTimeout(scrollRef.current);
+		}
+		scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
+	};
 
 	// getTitleByScore 함수 추가
 	const getTitleByScore = (score: number) => {
@@ -183,19 +327,136 @@ const Home = () => {
 		return '🚶‍♂️ 이제 막 시작했어요! 하나씩 배워나가봐요!';
 	};
 
+	const getKSTDateString = () => {
+		const now = new Date();
+		const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+		return kst.toISOString().slice(0, 10);
+	};
+
 	const loadData = async () => {
-		const quizData = await AsyncStorage.getItem(STORAGE_KEY_QUIZ);
-		const studyData = await AsyncStorage.getItem(STORAGE_KEY_STUDY);
+		const quizData = await AsyncStorage.getItem(USER_QUIZ_HISTORY_KEY);
+		const studyData = await AsyncStorage.getItem(USER_STUDY_HISTORY_KEY);
+		const todayQuiz = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
 
 		let realScore = 0;
 		if (quizData) {
 			realScore = JSON.parse(quizData).totalScore || 0;
+			if (todayQuiz) {
+				const parsed = JSON.parse(todayQuiz);
+				console.log('parsed : ', todayQuiz);
+				const todayStr = getKSTDateString();
+				const todayItem = parsed.find((q: any) => q.quizDate.slice(0, 10) === todayStr);
+				if (todayItem) {
+					setIsCheckedIn(todayItem.isCheckedIn || false);
+				}
+			}
 		}
 
 		setTotalScore(realScore);
 		const quizBadges = quizData ? JSON.parse(quizData).badges || [] : [];
 		const studyBadges = studyData ? JSON.parse(studyData).badges || [] : [];
 		setEarnedBadgeIds([...new Set([...quizBadges, ...studyBadges])]);
+	};
+	// 필요 시 랜덤 퀴즈 생성기 로직
+	const generateTodayQuizIds = (count: number): number[] => {
+		const allIds = CONST_MAIN_DATA.PROVERB.map((item) => item.id);
+		const shuffled = allIds.sort(() => Math.random() - 0.5);
+		return shuffled.slice(0, count);
+	};
+	const ensureTodayQuizExists = async () => {
+		const todayStr = getKSTDateString();
+
+		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
+
+		if (json) {
+			const list: MainDataType.TodayQuizList[] = JSON.parse(json);
+			const exists = list.some((item) => item.quizDate.slice(0, 10) === todayStr);
+			if (exists) {
+				console.log('✅ 이미 오늘의 퀴즈 항목이 존재합니다');
+				return;
+			}
+
+			// 오늘 항목이 없으면 추가
+			const newQuizItem: MainDataType.TodayQuizList = {
+				quizDate: new Date().toISOString(),
+				isCheckedIn: false,
+				todayQuizIdArr: generateTodayQuizIds(5),
+				correctQuizIdArr: [],
+				worngQuizIdArr: [],
+				answerResults: {},
+				selectedAnswers: {},
+			};
+
+			await AsyncStorage.setItem(TODAY_QUIZ_LIST_KEY, JSON.stringify([...list, newQuizItem]));
+			console.log('📌 오늘 퀴즈 추가됨');
+		} else {
+			// 키 자체가 없음: 새로 생성
+			const newQuizItem: MainDataType.TodayQuizList = {
+				quizDate: new Date().toISOString(),
+				isCheckedIn: false,
+				todayQuizIdArr: generateTodayQuizIds(5),
+				correctQuizIdArr: [],
+				worngQuizIdArr: [],
+				answerResults: {},
+				selectedAnswers: {},
+			};
+
+			await AsyncStorage.setItem(TODAY_QUIZ_LIST_KEY, JSON.stringify([newQuizItem]));
+			console.log('📌 오늘 퀴즈 리스트 새로 생성됨');
+		}
+	};
+
+	const checkTodayCheckIn = async () => {
+		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
+		if (!json) {
+			return;
+		}
+
+		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
+		const todayStr = getKSTDateString();
+		const todayItem = arr.find((q) => q.quizDate.slice(0, 10) === todayStr);
+
+		if (todayItem) {
+			const checked = todayItem.isCheckedIn || false;
+			setIsCheckedIn(checked);
+
+			if (!checked) {
+				setShowCheckInModal(true); // ✅ 출석 안했을 때만 모달 표시
+			}
+		}
+	};
+
+	const loadCheckedInDates = async () => {
+		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
+		if (!json) {
+			return;
+		}
+
+		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
+		const todayStr = getKSTDateString();
+
+		const marked: { [date: string]: any } = {};
+		arr.forEach((item) => {
+			if (item.isCheckedIn) {
+				const date = item.quizDate.slice(0, 10);
+				const isToday = date === todayStr;
+
+				marked[date] = {
+					customStyles: {
+						container: {
+							backgroundColor: isToday ? '#27ae60' : '#2980b9', // ✅ 초록: 오늘, 파랑: 이전 출석
+							borderRadius: scaleWidth(6),
+						},
+						text: {
+							color: '#ffffff',
+							fontWeight: 'bold',
+						},
+					},
+				};
+			}
+		});
+		setCheckedInDates(marked);
+		setPetLevel(getPetLevel(marked)); // ✅ 추가
 	};
 
 	const handleMascotPress = () => {
@@ -216,6 +477,8 @@ const Home = () => {
 		study: () => navigation.navigate(Paths.PROVERB_STUDY),
 		//@ts-ignore
 		wrongReview: () => navigation.navigate(Paths.QUIZ_WRONG_REVIEW),
+		//@ts-ignore
+		timechalleng: () => navigation.navigate(Paths.INIT_TIME_CHANLLENGE),
 	};
 	const ActionCard = ({
 		iconName,
@@ -262,43 +525,60 @@ const Home = () => {
 									<View style={styles.speechTail} />
 								</View>
 
-								<TouchableOpacity onPress={handleMascotPress}>
-									<View style={styles.mascoteView}>
-										<FastImage
-											key={totalScore} // totalScore가 바뀌면 이미지 강제 갱신
-											source={
-												totalScore >= 1800
-													? require('@/assets/images/level4_mascote.png')
-													: totalScore >= 1200
-														? require('@/assets/images/level3_mascote.png')
-														: totalScore >= 600
-															? require('@/assets/images/level2_mascote.png')
-															: require('@/assets/images/level1_mascote.png')
-											}
-											style={styles.image}
-											resizeMode="contain"
-										/>
-									</View>
-								</TouchableOpacity>
-							</View>
-							<View style={styles.iconView}>
-								<View style={styles.iconViewInner}>
-									<IconComponent type="fontAwesome6" name={icon} size={15} color="#27ae60" />
-									<Text style={styles.myScoreLabel}>{label}</Text>
-									<TouchableOpacity onPress={() => setShowLevelModal(true)}>
-										<IconComponent
-											type="materialIcons"
-											name="info-outline"
-											size={20}
-											color="#7f8c8d"
-											style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
-										/>
+								<View
+									style={styles.petView}>
+									<TouchableOpacity onPress={handleMascotPress}>
+										<View style={styles.mascoteView}>
+											<FastImage key={totalScore} source={mascot} style={styles.image} resizeMode="contain" />
+										</View>
 									</TouchableOpacity>
-								</View>
 
+									{petLevel >= 0 && (
+										<View
+											style={styles.petContent}>
+											<FastImage
+												source={PET_REWARDS[petLevel].image}
+												style={styles.petImage}
+												resizeMode="cover"
+											/>
+										</View>
+									)}
+								</View>
+							</View>
+							<View style={styles.titleContainer}>
+								<View style={{ alignItems: 'center' }}>
+									{/* 타이틀 라인 */}
+									<View style={styles.innerTitleContainer}>
+										<IconComponent type="fontAwesome6" name={icon} size={18} color="#27ae60" />
+										<Text
+											style={styles.titleText}>
+											{label}
+										</Text>
+										<TouchableOpacity onPress={() => setShowLevelModal(true)}>
+											<IconComponent
+												type="materialIcons"
+												name="info-outline"
+												size={18}
+												color="#7f8c8d"
+												style={styles.infoIcon}
+											/>
+										</TouchableOpacity>
+									</View>
+
+									{/* 점수 뱃지 */}
+									<View style={styles.scoreBadgeItem}>
+										<IconComponent name="leaderboard" type="materialIcons" size={14} color="#fff" />
+										<Text style={styles.scoreBadgeTextItem}>{totalScore.toLocaleString()}점</Text>
+									</View>
+									{/* 설명 */}
+									<Text style={[styles.levelDescription]}>{description}</Text>
+								</View>
 								{earnedBadges.length > 0 && (
 									<View style={styles.badgeView}>
-										<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: scaleWidth(10) }}>
+										<ScrollView
+											horizontal
+											showsHorizontalScrollIndicator={false}
+											contentContainerStyle={{ paddingHorizontal: scaleWidth(10) }}>
 											{visibleBadges.map((item) => (
 												<View key={item.id} style={styles.badgeViewInner}>
 													<TouchableOpacity
@@ -307,12 +587,6 @@ const Home = () => {
 													>
 														<IconComponent name={item.icon} type={item.iconType} size={20} color="#27ae60" />
 													</TouchableOpacity>
-
-													{tooltipBadgeId === item.id && (
-														<View style={styles.tooltipBox}>
-															<Text style={styles.tooltipText}>{item.description}</Text>
-														</View>
-													)}
 												</View>
 											))}
 										</ScrollView>
@@ -345,40 +619,34 @@ const Home = () => {
 							color="#f1c40f"
 							onPress={moveToHandler.wrongReview}
 						/>
+						<ActionCard
+							iconName="schedule"
+							iconType="materialIcons"
+							label="타임 챌린지"
+							description="180초 제한 시간 안에 5개의 하트로 문제를 최대한 많이 풀어보세요!"
+							color="#e67e22"
+							onPress={moveToHandler.timechalleng}
+						/>
 
 						<TouchableOpacity style={styles.curiousButton} onPress={() => setShowBadgeModal(true)}>
 							<IconComponent type="materialIcons" name="emoji-events" size={18} color="#2ecc71" />
 							<Text style={styles.curiousButtonText}>숨겨진 뱃지들을 찾아보세요!</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							style={[
+								styles.curiousButton2,
+								{ borderColor: '#9b59b6' }, // 💜 보라색 계열로 변경
+							]}
+							onPress={() => setShowCheckInModal(true)}>
+							<IconComponent type="materialIcons" name="event-available" size={18} color="#9b59b6" />
+							<Text style={[styles.curiousButtonText, { color: '#9b59b6' }]}>오늘의 출석 확인하기</Text>
 						</TouchableOpacity>
 					</ScrollView>
 				</KeyboardAvoidingView>
 			</TouchableWithoutFeedback>
 
 			{/* 설명 모달 */}
-			<Modal transparent visible={showGuideModal} animationType="fade">
-				<View style={styles.modalOverlay}>
-					<View style={styles.modalContent}>
-						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowGuideModal(false)}>
-							<IconComponent type="materialIcons" name="close" size={24} color="#555" />
-						</TouchableOpacity>
-						<Text style={styles.modalText}>
-							<Text style={styles.boldText}>🏠 홈 화면{'\n'}</Text>- 주요 기능으로 빠르게 이동할 수 있는 메뉴를 제공합니다.
-							{'\n\n'}
-							<Text style={styles.boldText}>➡️ 시작하기{'\n'}</Text>- 속담 뜻 맞히기, 속담 찾기, 빈칸 채우기 퀴즈를 통해 재미있게 속담을 학습할 수 있어요.
-							{'\n\n'}
-							<Text style={styles.boldText}>➡️ 학습 모드{'\n'}</Text>- 카드 형식으로 속담과 그 의미, 예문 등을 쉽게 학습할 수 있어요.
-							{'\n\n'}
-							<Text style={styles.boldText}>➡️ 오답 복습{'\n'}</Text>- 이전에 틀렸던 문제들을 다시 풀어보며 확실하게 기억할 수 있어요.
-							{'\n\n'}
-							<Text style={styles.boldText}>🏅 숨겨진 뱃지들을 찾아보세요!{'\n'}</Text>- 학습이나 퀴즈 도중 특정 조건을 만족하면 다양한 뱃지를 획득할 수
-							있어요.{'\n'}- 모은 뱃지는 홈 화면에서 확인할 수 있어요!
-						</Text>
-						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowGuideModal(false)}>
-							<Text style={styles.modalCloseText}>닫기</Text>
-						</TouchableOpacity>
-					</View>
-				</View>
-			</Modal>
 			<Modal visible={!!selectedBadge} transparent animationType="fade">
 				<View style={styles.modalOverlay}>
 					<View style={styles.badgeDetailModal}>
@@ -469,14 +737,17 @@ const Home = () => {
 
 			<Modal visible={showLevelModal} transparent animationType="fade">
 				<View style={styles.modalOverlay}>
-					<View style={[styles.levelModal]}>
+					<View style={[styles.levelModal, { maxHeight: scaleHeight(600) }]}>
 						<Text style={styles.levelModalTitle}>등급 안내</Text>
+						{/* ✅ 내 점수 출력 */}
 
-						<ScrollView ref={levelScrollRef} style={{ width: '100%' }} contentContainerStyle={styles.gradeScrollView} showsVerticalScrollIndicator={false}>
-							{[...LEVEL_DATA].reverse().map((item) => {
+						<ScrollView
+							ref={levelScrollRef}
+							style={{ width: '100%' }}
+							contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
+							showsVerticalScrollIndicator={false}>
+							{reversedLevelData.map((item) => {
 								const isCurrent = totalScore >= item.score && totalScore < item.next;
-								const mascotImage = getTitleByScore(item.score).mascot;
-
 								return (
 									<View key={item.label} style={[styles.levelCardBox, isCurrent && styles.levelCardBoxActive]}>
 										{isCurrent && (
@@ -484,16 +755,11 @@ const Home = () => {
 												<Text style={styles.levelBadgeText}>🏆 현재 등급</Text>
 											</View>
 										)}
-
-										{/* 아이콘 추가 위치 */}
-										<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(8) }}>
-											<IconComponent name={item.icon} type="fontAwesome6" size={16} color="#27ae60" />
-											<Text style={[styles.levelLabel]}>{item.label}</Text>
-										</View>
-
-										<FastImage source={mascotImage} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
+										<FastImage source={item.mascot} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
+										<Text style={styles.levelLabel}>{item.label}</Text>
 										<Text style={styles.levelScore}>{item.score}점 이상</Text>
-										{isCurrent && <Text style={styles.levelEncourage}>{getEncourageMessage(item.score)}</Text>}
+										{isCurrent && <Text style={styles.levelEncourage}>{item.encouragement}</Text>}
+										<Text style={styles.levelDetailDescription}>{item.description}</Text>
 									</View>
 								);
 							})}
@@ -502,6 +768,124 @@ const Home = () => {
 						<TouchableOpacity onPress={() => setShowLevelModal(false)} style={styles.modalConfirmButton}>
 							<Text style={styles.modalConfirmText}>닫기</Text>
 						</TouchableOpacity>
+					</View>
+				</View>
+			</Modal>
+			<Modal visible={showCheckInModal} transparent animationType="fade">
+				<View style={styles.modalOverlay}>
+					<View style={[styles.modalContent]}>
+						<TouchableOpacity
+							style={styles.modalCloseIcon}
+							onPress={() => {
+								setShowCheckInModal(false);
+								loadCheckedInDates(); // 출석 기록 다시 불러오기
+								loadData(); // 점수/뱃지 등 다시 로드
+							}}>
+							<IconComponent type="materialIcons" name="close" size={24} color="#555" />
+						</TouchableOpacity>
+
+						<Text style={styles.modalTitle}>오늘의 출석</Text>
+
+						<ScrollView
+							style={{ width: '100%' }}
+							contentContainerStyle={{ paddingBottom: scaleHeight(20) }}
+							showsVerticalScrollIndicator={false}>
+							<View style={styles.rowCentered}>
+								<FastImage
+									source={mascot}
+									style={styles.mascotImage}
+									resizeMode={FastImage.resizeMode.cover}
+								/>
+								<Text style={[styles.modalText2, { flex: 1 }]}>
+									매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어줘요!{'\n'}
+								</Text>
+							</View>
+
+							<View style={styles.highlightBox}>
+								<Text style={styles.highlightText}>
+									연속 출석을 통해 3단계로 진화하는 귀여운 펫도 함께 얻을 수 있답니다 🐾{'\n'}
+									획득한 펫은 캐릭터 옆에 항상 따라다녀요!
+								</Text>
+							</View>
+
+							<View style={styles.petScrollContainer}>
+								<ScrollView
+									horizontal
+									showsHorizontalScrollIndicator={false}
+									contentContainerStyle={styles.petScrollContent}>
+									{[
+										{ label: '7일 출석', image: require('@/assets/images/pet_level1_org.png') },
+										{ label: '14일 출석', image: require('@/assets/images/pet_level2_org.png') },
+										{ label: '한 달 출석', image: require('@/assets/images/pet_level3_org.png') },
+									].map((item, index, arr) => (
+										<View
+											key={index}
+											style={[
+												styles.petItemBox,
+												{ marginRight: index !== arr.length - 1 ? scaleWidth(10) : 0 },
+											]}>
+											<FastImage
+												source={item.image}
+												style={styles.petImage2}
+												resizeMode="contain"
+											/>
+											<Text style={styles.petLabelText}>{item.label}</Text>
+											<Text style={styles.petStageText}>
+												{['새싹 친구', '잎사귀 친구', '꽃잎 친구'][index]}
+											</Text>
+
+											{index < arr.length - 1 && (
+												<IconComponent
+													name="chevron-right"
+													type="fontAwesome"
+													size={12}
+													color="#7f8c8d"
+													style={styles.arrowIcon}
+												/>
+											)}
+										</View>
+									))}
+								</ScrollView>
+							</View>
+							<Calendar
+								markingType="custom"
+								markedDates={checkedInDates}
+								disableAllTouchEventsForDisabledDays={true}
+								theme={{
+									todayTextColor: '#e74c3c',
+									arrowColor: '#2ecc71',
+									textDayFontSize: scaledSize(13),
+									textMonthFontSize: scaledSize(14),
+									textDayHeaderFontSize: scaledSize(15),
+								}}
+								renderHeader={(date) => {
+									const year = date.getFullYear();
+									const month = (date.getMonth() + 1).toString().padStart(2, '0');
+									return (
+										<Text style={styles.calendarHeaderText}>
+											{`${year}년 ${month}월`} 출석
+										</Text>
+									);
+								}}
+								hideArrows
+								style={styles.calendarContainer}
+							/>
+							{showStamp && (
+								<Animated.View style={[stampStyle, styles.stampContainer]}>
+									<FastImage
+										source={mascot}
+										style={styles.stampImage}
+										resizeMode="contain"
+									/>
+									<Text style={styles.stampText}>오늘 출석 완료!</Text>
+								</Animated.View>
+							)}
+							{isCheckedIn && (
+								<Text style={styles.checkInCompleteText}>
+									🎉 오늘도 출석 완료! 🎉
+								</Text>
+							)}
+						</ScrollView>
 					</View>
 				</View>
 			</Modal>
@@ -716,7 +1100,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	curiousButton: {
-		marginTop: scaleHeight(24),
+		marginTop: scaleHeight(16),
 		alignSelf: 'center',
 		paddingHorizontal: scaleWidth(14),
 		paddingVertical: scaleHeight(10),
@@ -728,8 +1112,9 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOpacity: 0.04,
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowRadius: scaleWidth(3),
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 3,
+		marginBottom: scaleHeight(24),
 	},
 	curiousButtonText: {
 		color: '#2ecc71',
@@ -989,6 +1374,193 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		zIndex: 999,
 		pointerEvents: 'none',
+	},
+	rowCentered: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+	},
+	mascotImage: {
+		width: scaleWidth(48),
+		height: scaleWidth(48),
+		borderRadius: scaleWidth(24),
+		borderWidth: 2,
+		borderColor: '#27ae60',
+		marginRight: scaleWidth(10),
+	},
+	modalText2: {
+		fontSize: scaledSize(13),
+		color: '#2c3e50',
+		lineHeight: scaleHeight(20),
+		marginTop: scaleHeight(6),
+		fontWeight: '500',
+	},
+	highlightBox: {
+		padding: scaleHeight(10),
+		backgroundColor: '#fef9e7',
+		borderRadius: scaleWidth(10),
+		borderWidth: 1,
+		borderColor: '#f1c40f',
+	},
+	highlightText: {
+		fontSize: scaledSize(12),
+		color: '#2c3e50',
+		textAlign: 'center',
+		lineHeight: scaleHeight(20),
+		fontWeight: '500',
+	},
+	petScrollContainer: {
+		marginTop: scaleHeight(12),
+		marginBottom: scaleHeight(12),
+	},
+	petScrollContent: {
+		paddingHorizontal: scaleWidth(12),
+	},
+	petItemBox: {
+		width: scaleWidth(90),
+		alignItems: 'center',
+		padding: scaleWidth(6),
+		borderRadius: scaleWidth(8),
+		backgroundColor: '#f8f9fa',
+		borderWidth: 1,
+		borderColor: '#dcdcdc',
+		position: 'relative',
+	},
+	petImage2: {
+		width: scaleWidth(48),
+		height: scaleWidth(48),
+		borderRadius: scaleWidth(24),
+		borderWidth: 2,
+		borderColor: '#27ae60',
+		marginBottom: scaleHeight(6),
+	},
+	petLabelText: {
+		fontSize: scaledSize(11),
+		color: '#2c3e50',
+		fontWeight: '600',
+		textAlign: 'center',
+	},
+	petStageText: {
+		fontSize: scaledSize(10),
+		color: '#7f8c8d',
+		marginTop: scaleHeight(2),
+		textAlign: 'center',
+	},
+	arrowIcon: {
+		position: 'absolute',
+		right: -scaleWidth(8),
+		top: '45%',
+	},
+	calendarContainer: {
+		width: '100%',
+		borderRadius: scaleWidth(8),
+		borderWidth: 1,
+		borderColor: '#27ae60',
+		overflow: 'hidden',
+		marginTop: scaleHeight(4),
+		marginBottom: scaleHeight(4),
+	},
+	calendarHeaderText: {
+		fontSize: scaledSize(18),
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		textAlign: 'center',
+		marginVertical: scaleHeight(10),
+	},
+	stampContainer: {
+		alignItems: 'center',
+	},
+	stampImage: {
+		width: scaleWidth(120),
+		height: scaleWidth(120),
+		marginBottom: scaleHeight(6),
+	},
+	stampText: {
+		fontSize: scaledSize(16),
+		color: '#e74c3c',
+		fontWeight: 'bold',
+		textShadowColor: 'rgba(0,0,0,0.2)',
+		textShadowOffset: { width: 1, height: 1 },
+		textShadowRadius: 2,
+	},
+	checkInCompleteText: {
+		fontSize: scaledSize(14),
+		color: '#27ae60',
+		marginTop: scaleHeight(10),
+		fontWeight: 'bold',
+		textAlign: 'center',
+	},
+	petView: { alignItems: 'center', justifyContent: 'center', marginTop: scaleHeight(8), position: 'relative' },
+	petContent: {
+		position: 'absolute',
+		right: scaleWidth(-35), // ✅ 너무 멀리 떨어져 있음
+		top: scaleHeight(10),
+		width: scaleWidth(60),
+		height: scaleWidth(60),
+		borderRadius: scaleWidth(30),
+		borderWidth: 2,
+		borderColor: '#27ae60',
+		overflow: 'hidden',
+	},
+	petImage: { width: '100%', height: '100%' },
+	titleContainer: {
+		alignItems: 'center',
+		marginBottom: scaleHeight(10),
+	},
+	curiousButton2: {
+		alignSelf: 'center',
+		paddingHorizontal: scaleWidth(14),
+		paddingVertical: scaleHeight(10),
+		borderRadius: scaleWidth(30),
+		borderWidth: 1,
+		borderColor: '#2ecc71',
+		backgroundColor: '#ffffff',
+		flexDirection: 'row',
+		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOpacity: 0.04,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 3,
+		marginBottom: scaleHeight(24),
+	},
+	innerTitleContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) },
+	titleText: {
+		fontSize: scaledSize(16),
+		color: '#27ae60',
+		fontWeight: '700',
+		marginLeft: scaleWidth(6),
+		marginBottom: scaleHeight(5),
+	},
+	infoIcon: { marginLeft: scaleWidth(4), marginTop: scaleHeight(-3) },
+	scoreBadgeItem: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: '#27ae60',
+		borderRadius: scaleHeight(12),
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(4),
+		marginBottom: scaleHeight(10),
+	},
+	scoreBadgeTextItem: {
+		color: '#fff',
+		fontSize: scaledSize(14),
+		fontWeight: '600',
+		marginLeft: scaleWidth(4),
+	},
+	levelDescription: {
+		fontSize: scaledSize(13),
+		color: '#7f8c8d',
+		textAlign: 'center',
+		marginTop: scaleHeight(4),
+		marginBottom: scaleHeight(8),
+		lineHeight: scaleHeight(20),
+		paddingHorizontal: scaleWidth(8),
+	},
+	levelDetailDescription: {
+		fontSize: scaledSize(12),
+		color: '#7f8c8d',
+		textAlign: 'center',
+		marginTop: scaleHeight(6),
+		lineHeight: scaleHeight(18),
 	},
 });
 

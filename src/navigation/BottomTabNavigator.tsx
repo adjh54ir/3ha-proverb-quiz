@@ -9,6 +9,7 @@ import MyScoreScreen from '@/screens/MyScoreScreen';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import DeviceInfo from 'react-native-device-info';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import TodayQuizScreen from '@/screens/TodayQuizScreen';
 
 const BottomTabNavigator = () => {
 	const Tab = createBottomTabNavigator();
@@ -29,27 +30,21 @@ const BottomTabNavigator = () => {
 		},
 	});
 
-	const getTabBarIcon = (iconName: string) => {
-		return ({ color, size }: { color: string; size: number }) => (
+	// materialicons
+
+	/**
+   * 반응형 태블릿 처리에 대한 Helper
+   * @param iconName 
+   * @param isTablet 
+   * @returns 
+   */
+	const getTabBarIcon = (iconType: Parameters<typeof IconComponent>[0]['type'], iconName: string, isTablet: boolean) => {
+		return ({ color }: { color: string; size: number }) => (
 			<IconComponent
-				type='materialicons'
+				type={iconType}
 				name={iconName}
 				color={color}
-				style={
-					isTablet
-						? {
-							height: scaleHeight(32),
-							width: scaleWidth(26),
-							marginLeft: 4,
-							justifyContent: "center",
-							alignContent: "center",
-							// backgroundColor: "red"
-						}
-						: {
-							height: scaleHeight(22),
-							width: scaleWidth(22),
-						}
-				}
+				style={isTablet ? { marginTop: scaleHeight(25), height: scaleHeight(45), width: scaleWidth(16) } : undefined}
 			/>
 		);
 	};
@@ -67,8 +62,19 @@ const BottomTabNavigator = () => {
 				options={{
 					title: '속담 정보',
 					tabBarLabel: '속담 정보',
-					tabBarIcon: getTabBarIcon('menu-book'),
+					tabBarIcon: getTabBarIcon('materialicons', 'menu-book', isTablet),
 					headerShown: false, // 헤더 숨김
+				}}
+			/>
+
+			<Tab.Screen
+				name={Paths.TODAY_QUIZ}
+				component={TodayQuizScreen}
+				options={{
+					title: '오늘의 퀴즈',
+					tabBarLabel: '오늘의 퀴즈',
+					headerShown: false, // 헤더 숨김
+					tabBarIcon: getTabBarIcon('MaterialCommunityIcons', 'calendar-question', isTablet),
 				}}
 			/>
 
@@ -78,7 +84,7 @@ const BottomTabNavigator = () => {
 				options={{
 					title: '홈',
 					tabBarLabel: '홈',
-					tabBarIcon: getTabBarIcon('home'),
+					tabBarIcon: getTabBarIcon('materialicons', 'home', isTablet),
 					headerShown: false, // 헤더 숨김
 				}}
 			/>
@@ -89,7 +95,7 @@ const BottomTabNavigator = () => {
 				options={{
 					title: '나의 활동',
 					tabBarLabel: '나의 활동',
-					tabBarIcon: getTabBarIcon('emoji-events'),
+					tabBarIcon: getTabBarIcon('materialicons', 'emoji-events', isTablet),
 					headerShown: false, // 헤더 숨김
 				}}
 			/>
@@ -100,7 +106,7 @@ const BottomTabNavigator = () => {
 				options={{
 					title: '설정',
 					tabBarLabel: '설정',
-					tabBarIcon: getTabBarIcon('settings'),
+					tabBarIcon: getTabBarIcon('materialicons', 'settings', isTablet),
 					headerShown: false, // 헤더 숨김
 				}}
 			/>

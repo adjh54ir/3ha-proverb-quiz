@@ -12,17 +12,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import VersionCheck from 'react-native-version-check';
 import TermsScreen from './setting/TermScreen';
 import OpenSourceScreen from './setting/OpenSourceScreen';
+import { MainStorageKeyType } from '@/types/MainStorageKeyType';
+
 
 const STORAGE_KEYS = {
-	study: 'UserStudyHistory',
-	quiz: 'UserQuizHistory',
+	study: MainStorageKeyType.USER_STUDY_HISTORY,
+	quiz: MainStorageKeyType.USER_QUIZ_HISTORY,
 };
 
 const SettingScreen = () => {
 	const isFocused = useIsFocused();
 	const scrollRef = useRef<ScrollView>(null);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [resetType, setResetType] = useState<'study' | 'quiz' | 'all' | null>(null);
+	const [resetType, setResetType] = useState<'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'all' | null>(null);
 	const [summary, setSummary] = useState<string>('');
 	// 상태
 	const ALARM_TIME_KEY = 'AlarmTime';
@@ -62,15 +64,29 @@ const SettingScreen = () => {
 		scrollRef.current?.scrollTo({ y: 0, animated: true });
 	};
 
-	const getSummaryMessage = (type: 'study' | 'quiz' | 'all') => {
+	const getSummaryMessage = (type: 'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'all') => {
 		let msg = '';
-		if (type === 'study') {
-			msg = '지금까지 학습했던 내용들이 모두 사라져요.\n정말 다시 시작할까요?';
-		} else if (type === 'quiz') {
-			msg = '지금까지 풀었던 퀴즈 기록이 초기화돼요.\n다시 도전해볼까요?';
-		} else if (type === 'all') {
-			msg = '지금까지 학습하고 풀었던 모든 기록이 사라져요.\n정말 전부 다시 시작할까요?';
+
+		switch (type) {
+			case 'study':
+				msg = '지금까지 학습했던 내용들이 모두 사라져요.\n정말 다시 시작할까요?';
+				break;
+			case 'quiz':
+				msg = '지금까지 풀었던 퀴즈 기록이 초기화돼요.\n다시 도전해볼까요?';
+				break;
+			case 'timeChallenge':
+				msg = '타임 챌린지 기록이 모두 초기화돼요.\n괜찮으신가요?';
+				break;
+			case 'todayQuiz':
+				msg = '오늘의 퀴즈 기록이 사라져요.\n다시 새로 시작할까요?';
+				break;
+			case 'all':
+				msg = '지금까지 학습하고 풀었던 모든 기록이 사라져요.\n정말 전부 다시 시작할까요?';
+				break;
+			default:
+				msg = '정말 초기화하시겠어요?';
 		}
+
 		setSummary(msg);
 	};
 	// 모달 타이틀을 타입에 따라 변경
@@ -86,13 +102,12 @@ const SettingScreen = () => {
 				return '정말 다시 해볼까요?';
 		}
 	};
-
-	const confirmReset = async (type: 'study' | 'quiz' | 'all') => {
+	const confirmReset = async (type: 'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'all') => {
+		console.log(type);
 		setResetType(type);
 		getSummaryMessage(type);
 		setModalVisible(true);
 	};
-
 	// handleConfirmDelete 내부 수정
 	const handleConfirmDelete = async () => {
 		if (!resetType) {
@@ -153,7 +168,7 @@ const SettingScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }} edges={['top']}>
-			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}>
+			<ScrollView ref={scrollRef} style={styles.container} refreshControl={<RefreshControl refreshing={false} onRefresh={() => { }} />}>
 				<AdmobBannerAd paramMarginTop={20} />
 				{/* <View style={styles.section}></View> */}
 				<View style={styles.section}>
@@ -171,6 +186,24 @@ const SettingScreen = () => {
 						<TouchableOpacity style={[styles.button, styles.resetAll]} onPress={() => confirmReset('all')}>
 							<IconComponent type="materialCommunityIcons" name="delete" size={18} color="#fff" style={styles.iconLeft} />
 							<Text style={styles.buttonText}>모두 다시 풀기</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+				<View style={styles.section}>
+					<Text style={styles.title}>🧹 기타 데이터 초기화</Text>
+					<View style={styles.buttonGroup}>
+						<TouchableOpacity
+							style={[styles.button, { backgroundColor: '#16a085' }]}
+							onPress={() => confirmReset('todayQuiz')}>
+							<IconComponent type="materialIcons" name="today" size={18} color="#fff" style={styles.iconLeft} />
+							<Text style={styles.buttonText}>오늘의 퀴즈 다시 풀기</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							style={[styles.button, { backgroundColor: '#e67e22' }]}
+							onPress={() => confirmReset('timeChallenge')}>
+							<IconComponent type="materialIcons" name="alarm" size={18} color="#fff" style={styles.iconLeft} />
+							<Text style={styles.buttonText}>타임 챌린지 기록 초기화</Text>
 						</TouchableOpacity>
 					</View>
 				</View>

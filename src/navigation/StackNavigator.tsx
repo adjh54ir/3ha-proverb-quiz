@@ -15,6 +15,8 @@ import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import WrongReviewScreen from '@/screens/WrongReviewScreen';
 import { scaledSize, scaleWidth } from '@/utils';
+import InitTimeChallengeScreen from '@/screens/InitTimeChallengeScreen';
+import TimeChanllengeScreen from '@/screens/TimeChanllengeScreen';
 
 /**
  * Stack Navigator : 일반적인 화면만 출력을 하는 경우
@@ -50,6 +52,29 @@ const StackNavigator = () => {
 					headerShown: false,
 					title: '뜻 맞추기',
 					headerLeft: () => <></>,
+				})}
+			/>
+			<Stack.Screen
+				name={Paths.TIME_CHANLLENGE}
+				component={TimeChanllengeScreen}
+				options={({ navigation }) => ({
+					headerShown: false,
+					title: '타임 챌린지',
+					headerLeft: () => <></>,
+				})}
+			/>
+			<Stack.Screen
+				name={Paths.INIT_TIME_CHANLLENGE}
+				component={InitTimeChallengeScreen}
+				options={({ navigation }) => ({
+					headerShown: true,
+					title: '타임 챌린지',
+					headerLeft: () => <></>
+					// headerLeft: () => (
+					// 	<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
+					// 		<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
+					// 	</TouchableOpacity>
+					// ),
 				})}
 			/>
 

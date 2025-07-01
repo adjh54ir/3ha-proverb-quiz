@@ -26,6 +26,11 @@ class ProverbServices {
 			return undefined;
 		}
 	};
+	// ProverbServices.ts
+	selectProverbByIds(ids: number[]): MainDataType.Proverb[] {
+		const all = this.selectProverbList();
+		return all.filter((p) => ids.includes(p.id));
+	}
 
 	/**
 	 * level(초등/중등/고등/성인/심화)별 속담 조회

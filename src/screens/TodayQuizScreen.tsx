@@ -243,7 +243,7 @@ const TodayQuizScreen = () => {
                 const isCorrect = idx % 2 === 0;
                 answerResults2[item.id] = isCorrect;
                 selectedAnswers2[item.id] = {
-                    value: isCorrect ? item.meaning : '틀린 보기',
+                    value: isCorrect ? item.longMeaning : '틀린 보기',
                     index: isCorrect ? 1 : 2,
                 };
             });
@@ -277,6 +277,8 @@ const TodayQuizScreen = () => {
     const initQuiz = async () => {
         const todayISO = getTodayISO();
 
+        if (showTodayReview) setShowTodayReview(false); // 👈 이 줄 추가
+
         const settings = await notifee.getNotificationSettings();
         const hasPermission = settings.authorizationStatus === 1;
 
@@ -308,6 +310,7 @@ const TodayQuizScreen = () => {
                 await saveTodayQuizToStorage(newQuizData);
                 setQuizList(finalQuizList);
                 generateQuizOptions(finalQuizList);
+
             } else {
                 // 기존 퀴즈 복원
                 const finalQuizList = ProverbServices.selectProverbByIds(todayData.todayQuizIdArr);
@@ -323,15 +326,15 @@ const TodayQuizScreen = () => {
         const optionsMap: { [id: number]: string[] } = {};
         quizListParam.forEach((item) => {
             const wrongMeanings = ProverbServices.selectProverbList()
-                .filter((p) => p.id !== item.id && !!p.meaning)
-                .map((p) => p.meaning);
+                .filter((p) => p.id !== item.id && !!p.longMeaning)
+                .map((p) => p.longMeaning);
             const shuffledWrong = wrongMeanings.sort(() => Math.random() - 0.5).slice(0, 3);
 
             while (shuffledWrong.length < 3) {
                 shuffledWrong.push('모름');
             }
 
-            const options = [...shuffledWrong, item.meaning].sort(() => Math.random() - 0.5);
+            const options = [...shuffledWrong, item.longMeaning].sort(() => Math.random() - 0.5);
             optionsMap[item.id] = options;
         });
         setQuizOptionsMap(optionsMap);
@@ -353,10 +356,10 @@ const TodayQuizScreen = () => {
         }
     };
 
-    const scheduleDailyQuizNotification = async () => {
+    const scheduleDailyQuizNotification = async (time: Date) => {
         const trigger: TimestampTrigger = {
             type: TriggerType.TIMESTAMP,
-            timestamp: getNextTriggerTime(),
+            timestamp: getNextTriggerTime(time),
             repeatFrequency: RepeatFrequency.DAILY,
         };
 
@@ -393,13 +396,13 @@ const TodayQuizScreen = () => {
         return settings.authorizationStatus === 1;
     };
 
-    const getNextTriggerTime = () => {
+    const getNextTriggerTime = (baseTime?: Date) => {
         const now = new Date();
-        const next = new Date(alarmTime); // 선택된 시간 기반
+        const next = new Date(baseTime ?? alarmTime); // ✅ baseTime 우선 사용
         next.setSeconds(0);
         next.setMilliseconds(0);
         if (next <= now) {
-            next.setDate(next.getDate() + 1); // 오늘 이미 지난 시간이면 내일로
+            next.setDate(next.getDate() + 1);
         }
         return next.getTime();
     };
@@ -419,11 +422,18 @@ const TodayQuizScreen = () => {
                 const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
                 const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
 
+
+
+                const newAlarmTime = new Date();
+                newAlarmTime.setHours(tempSelectedHour, 0, 0, 0);
                 const todayData = storedArr.find((q) => q.quizDate.slice(0, 10) === todayStr);
 
+                // KST 보정 후 저장 (UTC 기준에서 9시간 빼기)
+                const offsetFixedISO = new Date(newAlarmTime.getTime() - 9 * 60 * 60 * 1000).toISOString();
+
                 await saveSettingInfo({
-                    isUseAlarm: value,
-                    alarmTime: alarmTime.toISOString(),
+                    isUseAlarm: true,
+                    alarmTime: offsetFixedISO,
                 });
 
                 if (todayData) {
@@ -454,7 +464,7 @@ const TodayQuizScreen = () => {
                     console.log('🆕 새로운 오늘 퀴즈 생성 및 저장 완료');
                 }
 
-                await scheduleDailyQuizNotification();
+                await scheduleDailyQuizNotification(tempAlarmTime);
                 setIsAlarmEnabled(true);
                 await getScheduledAlarmTime();
 
@@ -478,8 +488,8 @@ const TodayQuizScreen = () => {
 
             setAlarmTime(defaultTime);
             setTempAlarmTime(defaultTime); // ✅ DatePicker용 값도 초기화
-
             setShowTodayReview(false); // ✅ 문제 다시 보기 닫기
+            setTempSelectedHour(15); // ✅ 텍스트용 시간도 15시로 설정
 
             setIsAlarmEnabled(false);
             // ✅ 끈 상태도 저장
@@ -559,19 +569,38 @@ const TodayQuizScreen = () => {
     const handleResetTodayQuiz = async () => {
         const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
         const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
-
         const todayStr = toKSTDateString(todayDate);
+
+        const todayData = storedArr.find((q) => toKSTDateString(q.quizDate) === todayStr);
         const filteredArr = storedArr.filter((q) => toKSTDateString(q.quizDate) !== todayStr);
 
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filteredArr));
+        // 출석 정보 유지
+        const preservedIsCheckedIn = todayData?.isCheckedIn ?? false;
+
+        // 새로운 퀴즈 생성
+        const newQuizList = getTodayQuiz();
+        const newTodayData: MainDataType.TodayQuizList = {
+            quizDate: getTodayISO(),
+            isCheckedIn: preservedIsCheckedIn, // ✅ 출석 정보 유지
+            todayQuizIdArr: newQuizList.map((q) => q.id),
+            correctQuizIdArr: [],
+            worngQuizIdArr: [],
+            answerResults: {},
+            selectedAnswers: {},
+            prevQuizIdArr: todayData?.todayQuizIdArr ?? [],
+        };
+
+        const updatedArr = [...filteredArr, newTodayData];
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedArr));
 
         // 상태 초기화
         setAnswerResults({});
         setSelectedAnswers({});
         setProgressPercent(0);
-        setQuizList([]);
+        setQuizList(newQuizList);
         setQuizOptionsMap({});
         setCurrentIndex(0);
+        generateQuizOptions(newQuizList);
 
         // 새로운 오늘 퀴즈 다시 생성
         initQuiz();
@@ -598,7 +627,7 @@ const TodayQuizScreen = () => {
                 <View
                     style={styles.quizSubContainer}>
                     <Text style={styles.questionCombined}>
-                        <Text style={styles.questionMain}>{`${item.proverb}`}</Text>
+                        <Text style={styles.questionMain}>{item.proverb}</Text>
                         {!isQuizCompleted && <Text style={styles.questionSub}> 의미는?</Text>}
                     </Text>
                     {result !== undefined && (
@@ -609,7 +638,6 @@ const TodayQuizScreen = () => {
                 {/* 정답만 보여주는 조건 */}
                 {result !== undefined && isQuizCompleted ? (
                     <View style={styles.explanationBox}>
-
                         <Text style={styles.correctMeaning}>
                             ➤ 정답: <Text style={styles.correctMeaningHighlight}>{item.longMeaning}</Text>
                         </Text>
@@ -619,14 +647,14 @@ const TodayQuizScreen = () => {
                     // 아직 안 풀었으면 보기 보여주기
                     options.map((option, idx) => {
                         const isAnswered = result !== undefined;
-                        const isCorrect = option === item.meaning;
+                        const isCorrect = option === item.longMeaning;
                         const isUserSelected = selected?.value === option;
                         const shouldHighlight = highlightAnswerId === item.id && isCorrect;
 
                         return (
                             <TouchableOpacity
                                 key={idx}
-                                onPress={() => handleAnswer(item.id, option, item.meaning)}
+                                onPress={() => handleAnswer(item.id, option, item.longMeaning)}
                                 disabled={isAnswered}
                                 style={[
                                     styles.option,
@@ -647,6 +675,15 @@ const TodayQuizScreen = () => {
     return (
         <SafeAreaView style={styles.main} edges={['top', 'bottom']}>
             <AdmobBannerAd paramMarginTop={5} paramMarginBottom={4} />
+            {/* {__DEV__ && (
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.resetButton} onPress={seedDummyWeeklyQuizzes}>
+                        <Text style={{ fontSize: scaledSize(13), color: '#007AFF', fontWeight: 'bold' }}>
+                            🧪 더미 데이터 생성 (1주일)
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )} */}
 
             {isAlarmEnabled && (
                 <View style={styles.buttonRow}>
@@ -895,20 +932,30 @@ const TodayQuizScreen = () => {
                                 style={styles.saveButton}
                                 onPress={async () => {
                                     setShowAlarmModal(false);
+
+                                    let finalAlarmTime = tempAlarmTime;
+
+                                    if (!tempIsAlarmEnabled) {
+                                        // 알림 끈 경우 15:00으로 고정
+                                        finalAlarmTime = new Date();
+                                        finalAlarmTime.setHours(15, 0, 0, 0);
+                                        setTempSelectedHour(15); // ✅ 여기 추가
+                                    }
+
                                     await saveSettingInfo({
                                         isUseAlarm: tempIsAlarmEnabled,
-                                        alarmTime: tempAlarmTime.toISOString(),
+                                        alarmTime: finalAlarmTime.toISOString(),
                                     });
 
                                     if (tempIsAlarmEnabled) {
                                         await cancelScheduledNotification();
-                                        await scheduleDailyQuizNotification();
+                                        await scheduleDailyQuizNotification(finalAlarmTime);
                                     } else {
                                         await cancelScheduledNotification();
                                     }
 
-                                    setAlarmTime(tempAlarmTime); // ✅ 여기서 진짜 시간 반영
-                                    setTempAlarmTime(tempAlarmTime);
+                                    setAlarmTime(finalAlarmTime); // ✅ 여기서 반영
+                                    setTempAlarmTime(finalAlarmTime); // ✅ 임시 값도 갱신
                                     setIsAlarmEnabled(tempIsAlarmEnabled);
                                     setShowTodayReview(false);
 
@@ -974,14 +1021,21 @@ const TodayQuizScreen = () => {
 
                                                 return (
                                                     <View key={item.id} style={styles.quizCard}>
-                                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                            <Text style={styles.quizTitle}>
-                                                                {item.proverb}
-                                                            </Text>
-                                                            {isCorrect && <Text style={{ color: '#4CAF50', fontWeight: 'bold' }}>⭕ 정답</Text>}
-                                                            {isWrong && <Text style={{ color: '#F44336', fontWeight: 'bold' }}>❌ 오답</Text>}
+                                                        <View style={{
+                                                            flexDirection: 'row',
+                                                            justifyContent: 'space-between',
+                                                            alignItems: 'center',
+                                                            minHeight: scaleHeight(28), // 정중앙 정렬을 위해 높이 고정 (조정 가능)
+                                                        }}>
+                                                            <View style={{ flex: 1, justifyContent: 'center' }}>
+                                                                <Text style={styles.quizTitle}>{item.proverb}</Text>
+                                                            </View>
+                                                            <View style={{ justifyContent: 'center', alignItems: 'flex-end', minWidth: scaleWidth(60), marginBottom: scaleHeight(13) }}>
+                                                                {isCorrect && <Text style={{ color: '#4CAF50', fontWeight: 'bold' }}>⭕ 정답</Text>}
+                                                                {isWrong && <Text style={{ color: '#F44336', fontWeight: 'bold' }}>❌ 오답</Text>}
+                                                            </View>
                                                         </View>
-                                                        <Text style={styles.quizMeaning}>➤ 의미: {item.meaning}</Text>
+                                                        <Text style={styles.quizMeaning}>➤ 의미: {item.longMeaning}</Text>
                                                         <Text style={styles.quizExample}>✦ 예문: {item.example}</Text>
                                                     </View>
                                                 );
@@ -1592,6 +1646,10 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
     },
 
+    iconSpacing: {
+        marginRight: scaleWidth(4),
+    },
+
     rightAlignedRow: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
@@ -1786,7 +1844,4 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline',
     },
 
-    iconSpacing: {
-        marginRight: scaleWidth(4),
-    },
 });

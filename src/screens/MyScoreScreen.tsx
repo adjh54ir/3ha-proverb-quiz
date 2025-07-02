@@ -35,6 +35,8 @@ moment.locale('ko'); // 로케일 설정
 
 const STORAGE_KEY_QUIZ = MainStorageKeyType.USER_QUIZ_HISTORY;
 const STORAGE_KEY_STUDY = MainStorageKeyType.USER_STUDY_HISTORY;
+const STORAGE_KEY_TIME = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
+const STORAGE_KEY_TODAY = MainStorageKeyType.TODAY_QUIZ_LIST;
 
 const PET_REWARDS = [
 	{ day: 7, image: require('@/assets/images/pet_level1_org.png') },
@@ -124,6 +126,8 @@ const CapitalResultScreen = () => {
 	const [todayQuizDataList, setTodayQuizDataList] = useState<MainDataType.TodayQuizList[]>([]);
 	const [selectedQuizData, setSelectedQuizData] = useState<MainDataType.TodayQuizList | null>(null);
 
+	const [timeChallengeResults, setTimeChallengeResults] = useState<MainDataType.TimeChallengeResult[]>([]);
+
 	const allCategories = ProverbServices.selectCategoryList(); // 전체 카테고리 (8개)
 
 
@@ -178,6 +182,9 @@ const CapitalResultScreen = () => {
 			setLastAnsweredAt(quizJson?.lastAnsweredAt ?? '');
 			setBestCombo(quizJson?.bestCombo ?? 0);
 
+			const timeData = await AsyncStorage.getItem(STORAGE_KEY_TIME);
+			const timeResults: MainDataType.TimeChallengeResult[] = timeData ? JSON.parse(timeData) : [];
+			setTimeChallengeResults(timeResults.slice(0, 3)); // 최근 3개만 보기
 			// 전체 카테고리별 속담 수 초기화
 			allProverbs.forEach((item) => {
 				const cat = item.category;
@@ -233,6 +240,50 @@ const CapitalResultScreen = () => {
 				});
 
 			setLevelMaster(conqueredLevels);
+
+			const todayJson = await AsyncStorage.getItem(STORAGE_KEY_TODAY);
+			const todayData: MainDataType.TodayQuizList[] = todayJson ? JSON.parse(todayJson) : [];
+
+			const marked = todayData.reduce(
+				(acc, item) => {
+					const dateKey = item.quizDate.slice(0, 10);
+					acc[dateKey] = {
+						marked: true,
+						dotColor: '#4CAF50',
+						customStyles: {
+							container: {
+								backgroundColor: '#e8f5e9',
+							},
+							text: {
+								color: '#2e7d32',
+								fontWeight: 'bold',
+							},
+						},
+					};
+					return acc;
+				},
+				{} as Record<string, any>,
+			);
+
+			const todayStr = moment().format('YYYY-MM-DD');
+
+			marked[todayStr] = {
+				...(marked[todayStr] || {}),
+				customStyles: {
+					container: {
+						backgroundColor: '#3498db', // 🎨 밝은 파란색
+					},
+					text: {
+						color: '#ffffff',
+						fontWeight: 'bold',
+					},
+				},
+			};
+			console.log('todayData :', todayData);
+
+			setTodayQuizDataList(todayData); // todayData를 상태로 저장
+
+			setMarkedQuizDates(marked);
 		} catch (e) {
 			console.error('❌ 데이터 로딩 실패:', e);
 		}
@@ -262,7 +313,7 @@ const CapitalResultScreen = () => {
 			label: '속담 초보자',
 			icon: 'seedling',
 			encouragement: '🌱 첫걸음을 뗐어요! 이제 속담의 세계로!',
-			description: '속담의 세계에 첫 발을 내딛었어요.\n익숙한 속담부터 하나씩 알아가며 시작해봐요!',
+			description: '속담 학습의 출발선에 선 단계로,\n기초적인 표현부터 차근히 익히는 시기예요.',
 			mascot: require('@/assets/images/level1_mascote.png'),
 		},
 		{
@@ -271,7 +322,7 @@ const CapitalResultScreen = () => {
 			label: '속담 입문자',
 			icon: 'leaf',
 			encouragement: '🍃 차근차근 익혀가는 중이에요!\n조금씩 자신감이 붙고 있어요!',
-			description: '기본적인 속담을 어느 정도 익혔군요!\n이제 다양한 상황에 맞는 속담을 골라보는 연습을 해봐요.',
+			description: '기초 속담에 익숙해지고,\n다양한 표현을 접하며 감을 잡아가는 단계예요.',
 			mascot: require('@/assets/images/level2_mascote.png'),
 		},
 		{
@@ -280,7 +331,7 @@ const CapitalResultScreen = () => {
 			label: '속담 숙련자',
 			icon: 'tree',
 			encouragement: '🌳 멋져요! 속담 실력이 부쩍 늘었어요!',
-			description: '속담 퀴즈에 익숙해진 당신!\n뜻을 정확히 파악하고 응용하는 실력이 느껴져요.',
+			description: '속담의 뜻과 쓰임새를 잘 이해하고 있으며,\n실전 문제에도 능숙하게 대응할 수 있는 단계예요.',
 			mascot: require('@/assets/images/level3_mascote.png'),
 		},
 		{
@@ -289,7 +340,7 @@ const CapitalResultScreen = () => {
 			label: '속담 마스터',
 			icon: 'trophy',
 			encouragement: '🏆 속담 마스터에 도달했어요! 정말 대단해요!',
-			description: '속담의 의미와 맥락을 완벽히 이해했어요.\n이제 누가 봐도 속담 달인입니다!',
+			description: '속담에 대한 깊은 이해와 활용 능력을 갖춘 최상위 단계로,\n누구에게나 모범이 될 수 있는 수준이에요.',
 			mascot: require('@/assets/images/level4_mascote.png'),
 		},
 	];
@@ -612,7 +663,7 @@ const CapitalResultScreen = () => {
 						</View>
 					)}
 					<TouchableOpacity style={styles.sectionHeader} onPress={() => setShowTodayQuizSection(!showTodayQuizSection)}>
-						<View style={styles.iconCircle3}>
+						<View style={styles.iconCircle4}>
 							<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(16)} color="#ffffff" />
 						</View>
 						<Text style={styles.sectionTitle}>나의 오늘의 퀴즈</Text>
@@ -760,6 +811,85 @@ const CapitalResultScreen = () => {
 										);
 									})}
 								</View>
+							)}
+						</View>
+					)}
+					{/* 기존 결과 화면 */}
+					<TouchableOpacity style={styles.sectionHeader} onPress={() => setShowTimeSection(!showTimeSection)}>
+						<View style={styles.iconCircle3}>
+							<IconComponent type="materialIcons" name="timer" size={scaledSize(16)} color="#ffffff" />
+						</View>
+						<Text style={styles.sectionTitle}>나의 타임 챌린지 결과</Text>
+						<IconComponent
+							type="materialIcons"
+							name={showTimeSection ? 'expand-less' : 'expand-more'}
+							size={20}
+							color="#27ae60"
+							style={{ marginLeft: 'auto' }}
+						/>
+					</TouchableOpacity>
+
+					{showTimeSection && (
+						<View style={styles.sectionBox}>
+							<Text style={styles.topRankingTitle}>📋 나의 랭킹 TOP 3</Text>
+
+							{timeChallengeResults.length === 0 ? (
+								<Text style={styles.noRecordText}>아직 기록이 없습니다. 챌린지를 시작해보세요!</Text>
+							) : (
+								[...timeChallengeResults]
+									.sort((a, b) => b.finalScore - a.finalScore)
+									.slice(0, 3)
+									.map((item, index) => (
+										<View key={index} style={styles.recordCard}>
+											<View style={styles.rankRow}>
+												{index === 0 && (
+													<>
+														<IconComponent
+															name="trophy"
+															type="FontAwesome"
+															size={24}
+															color="#f1c40f"
+															style={{ marginRight: scaleWidth(8) }}
+														/>
+														<Text style={styles.firstRankLabel}>1등</Text>
+														<Text style={styles.firstRankScore}>
+															{item.finalScore}점<Text style={styles.rankDate}> ({item.quizDate})</Text>
+														</Text>
+													</>
+												)}
+												{index === 1 && (
+													<>
+														<IconComponent
+															name="trophy"
+															type="FontAwesome"
+															size={20}
+															color="#bdc3c7"
+															style={{ marginRight: scaleWidth(13) }}
+														/>
+														<Text style={styles.secondRankLabel}>2등</Text>
+														<Text style={styles.secondRankScore}>
+															{item.finalScore}점<Text style={styles.rankDate}> ({item.quizDate})</Text>
+														</Text>
+													</>
+												)}
+												{index === 2 && (
+													<>
+														<IconComponent
+															name="trophy"
+															type="FontAwesome"
+															size={18}
+															color="#cd7f32"
+															style={{ marginRight: scaleWidth(16) }}
+														/>
+														<Text style={styles.thirdRankLabel}>3등</Text>
+														<Text style={styles.thirdRankScore}>
+															{item.finalScore}점<Text style={styles.rankDate}> ({item.quizDate})</Text>
+														</Text>
+													</>
+												)}
+											</View>
+										</View>
+									))
 							)}
 						</View>
 					)}
@@ -1436,10 +1566,88 @@ const styles = StyleSheet.create({
 		marginRight: scaleWidth(6),
 		backgroundColor: '#d0e8ff', // 🎨 밝은 파랑 배경 추가
 	},
+	iconCircle5: {
+		width: scaleWidth(30),
+		height: scaleWidth(30),
+		borderRadius: scaleWidth(18),
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginRight: scaleWidth(6),
+		backgroundColor: '#9b59b6', // 🟠 추천 색상: 진한 주황색 (희망, 성취 느낌)
+	},
 	calendarStyle: {
 		alignSelf: 'stretch', // 또는 width: '100%'
 		borderRadius: scaleWidth(12),
 		overflow: 'hidden',
 		marginBottom: scaleHeight(10),
+	},
+	topRankingTitle: {
+		fontSize: scaledSize(16),
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		marginBottom: scaleHeight(12),
+	},
+
+	noRecordText: {
+		fontSize: scaledSize(13),
+		color: '#95a5a6',
+		textAlign: 'center',
+		marginTop: scaleHeight(12),
+	},
+
+	recordCard: {
+		paddingVertical: scaleHeight(10),
+		paddingHorizontal: scaleWidth(14),
+		backgroundColor: '#fff',
+		borderRadius: scaleWidth(12),
+		borderWidth: 1,
+		borderColor: '#ddd',
+		marginBottom: scaleHeight(10),
+	},
+
+	rankRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+
+	firstRankLabel: {
+		fontSize: scaledSize(15),
+		color: '#f1c40f',
+		fontWeight: 'bold',
+		marginRight: scaleWidth(8),
+	},
+
+	secondRankLabel: {
+		fontSize: scaledSize(14),
+		color: '#7f8c8d',
+		fontWeight: 'bold',
+		marginRight: scaleWidth(8),
+	},
+
+	thirdRankLabel: {
+		fontSize: scaledSize(14),
+		color: '#cd7f32',
+		fontWeight: 'bold',
+		marginRight: scaleWidth(8),
+	},
+
+	firstRankScore: {
+		fontSize: scaledSize(15),
+		color: '#2c3e50',
+	},
+
+	secondRankScore: {
+		fontSize: scaledSize(14),
+		color: '#2c3e50',
+	},
+
+	thirdRankScore: {
+		fontSize: scaledSize(14),
+		color: '#2c3e50',
+	},
+
+	rankDate: {
+		fontSize: scaledSize(12),
+		color: '#7f8c8d',
 	},
 });

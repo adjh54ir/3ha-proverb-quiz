@@ -258,287 +258,289 @@ const ProverbListScreen = () => {
 
 	const handleSetLevelOpen = (open: boolean) => {
 		setLevelOpen(open);
-		if (open) {scrollToTop();}
+		if (open) { scrollToTop(); }
 	};
 
 	const handleSetFieldOpen = (open: boolean) => {
 		setFieldOpen(open);
-		if (open) {scrollToTop();}
+		if (open) { scrollToTop(); }
 	};
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#f8f9fa' }} edges={['top']}>
-			<TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
-				<View style={{ flex: 1 }}>
-					{/* 필터 + 드롭다운 영역 */}
-					<View style={styles.container}>
-						<View style={styles.filterCard}>
-							<View style={styles.bannerContainer}>
-								<AdmobBannerAd paramMarginBottom={8} />
-							</View>
-							<View style={styles.searchRow}>
-								<TextInput
-									ref={searchInputRef}
-									style={styles.input}
-									placeholder="속담이나 의미를 입력해주세요"
-									placeholderTextColor="#666"
-									onChangeText={(text) => {
-										setKeyword(text);
-										setFieldOpen(false);
-										setLevelOpen(false);
-									}}
-									value={keyword}
-								/>
-								<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset}>
-									<Icon name="rotate-right" size={18} color="#555" />
-								</TouchableOpacity>
-							</View>
-							<View style={styles.filterDropdownRow}>
-								<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
-									<DropDownPicker
-										open={levelOpen}
-										value={levelValue}
-										items={LEVEL_DROPDOWN_ITEMS}
-										setOpen={setLevelOpen}
-										setValue={setLevelValue}
-										setItems={setLevelItems}
-										style={styles.dropdownLevel}
-										scrollViewProps={{
-											nestedScrollEnabled: true,
-										}}
-										dropDownContainerStyle={{
-											...styles.dropdownListLevel,
-											overflow: 'visible', // 🟢 부모와 같이 설정
-											zIndex: 3000,
-											elevation: 10,
-										}}
-										listItemLabelStyle={{ marginLeft: scaleWidth(6), fontSize: scaledSize(14) }}
-										labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
-										iconContainerStyle={{ marginRight: scaleWidth(8) }}
-										showArrowIcon={true} // 드롭다운 화살표
-										showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
-									/>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#f8f9fa', marginTop: scaleHeight(-18), }} edges={['top']}>
+			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+				<TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
+					<View style={{ flex: 1 }}>
+						{/* 필터 + 드롭다운 영역 */}
+						<View style={styles.container}>
+							<View style={styles.filterCard}>
+								<View style={styles.bannerContainer}>
+									<AdmobBannerAd paramMarginBottom={8} />
 								</View>
-								<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000, overflow: 'visible' }]}>
-									<DropDownPicker
-										listMode="MODAL"
-										open={fieldOpen}
-										value={fieldValue}
-										items={FIELD_DROPDOWN_ITEMS}
-										setOpen={setFieldOpen}
-										setValue={setFieldValue}
-										setItems={setFieldItems}
-										dropDownDirection="BOTTOM" // ✅ 추가
-										scrollViewProps={{
-											nestedScrollEnabled: true,
+								<View style={styles.searchRow}>
+									<TextInput
+										ref={searchInputRef}
+										style={styles.input}
+										placeholder="속담이나 의미를 입력해주세요"
+										placeholderTextColor="#666"
+										onChangeText={(text) => {
+											setKeyword(text);
+											setFieldOpen(false);
+											setLevelOpen(false);
 										}}
-										style={styles.dropdownField}
-										dropDownContainerStyle={{
-											overflow: 'visible', // 중요
-											zIndex: 3000,
-											...styles.dropdownListField,
-											elevation: 1000, // Android에서 zIndex처럼 동작
-											maxHeight: scaleHeight(200), // 또는 250~300 등 충분한 높이
-										}}
-										zIndex={5000} // DropDownPicker 자체에 zIndex 주기
-										zIndexInverse={4000} // 다른 Picker와 겹치지 않게
-										containerStyle={{
-											zIndex: 5000,
-										}}
-										labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
-										iconContainerStyle={{ marginRight: scaleWidth(8) }}
-										showArrowIcon={true}
-										showTickIcon={false}
-										modalProps={{
-											animationType: 'fade', // slide → fade로 부드럽게
-											presentationStyle: 'overFullScreen', // 배경 흐림 없이 띄움
-											transparent: true,
-										}}
-										modalContentContainerStyle={{
-											width: '85%',
-											alignContent: 'center',
-											maxHeight: scaleHeight(500), // ✅ 높이 증가로 스크롤 확보
-											backgroundColor: '#fff',
-											borderRadius: scaleWidth(20),
-											alignSelf: 'center',
-											paddingHorizontal: scaleWidth(16),
-											paddingVertical: scaleHeight(20),
-											shadowColor: '#000',
-											shadowOpacity: 0.15,
-											shadowOffset: { width: 0, height: 6 },
-											shadowRadius: scaleWidth(8),
-											elevation: 10,
-											alignItems: 'stretch', // ✅ 추가
-											flex: 1, // ✅ 반드시 필요
-											justifyContent: 'center',
-										}}
-										listItemLabelStyle={{
-											flex: 1,
-											fontSize: scaledSize(15),
-											color: '#2c3e50',
-											fontWeight: '500',
-											lineHeight: scaleHeight(22),
-											flexShrink: 1, // ✅ 텍스트 줄바꿈을 위해
-											flexWrap: 'wrap', // ✅ 줄바꿈 허용
-										}}
-										listItemContainerStyle={{
-											paddingVertical: scaleHeight(14), // 충분한 위아래 여백
-											minHeight: scaleHeight(48),       // iOS에서 텍스트 짤림 방지
-											alignItems: 'stretch', // ✅ 핵심 추가
-										}}
+										value={keyword}
 									/>
+									<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset}>
+										<Icon name="rotate-right" size={18} color="#555" />
+									</TouchableOpacity>
 								</View>
+								<View style={styles.filterDropdownRow}>
+									<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
+										<DropDownPicker
+											open={levelOpen}
+											value={levelValue}
+											items={LEVEL_DROPDOWN_ITEMS}
+											setOpen={setLevelOpen}
+											setValue={setLevelValue}
+											setItems={setLevelItems}
+											style={styles.dropdownLevel}
+											scrollViewProps={{
+												nestedScrollEnabled: true,
+											}}
+											dropDownContainerStyle={{
+												...styles.dropdownListLevel,
+												overflow: 'visible', // 🟢 부모와 같이 설정
+												zIndex: 3000,
+												elevation: 10,
+											}}
+											listItemLabelStyle={{ marginLeft: scaleWidth(6), fontSize: scaledSize(14) }}
+											labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
+											iconContainerStyle={{ marginRight: scaleWidth(8) }}
+											showArrowIcon={true} // 드롭다운 화살표
+											showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
+										/>
+									</View>
+									<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000, overflow: 'visible' }]}>
+										<DropDownPicker
+											listMode="MODAL"
+											open={fieldOpen}
+											value={fieldValue}
+											items={FIELD_DROPDOWN_ITEMS}
+											setOpen={setFieldOpen}
+											setValue={setFieldValue}
+											setItems={setFieldItems}
+											dropDownDirection="BOTTOM" // ✅ 추가
+											scrollViewProps={{
+												nestedScrollEnabled: true,
+											}}
+											style={styles.dropdownField}
+											dropDownContainerStyle={{
+												overflow: 'visible', // 중요
+												zIndex: 3000,
+												...styles.dropdownListField,
+												elevation: 1000, // Android에서 zIndex처럼 동작
+												maxHeight: scaleHeight(200), // 또는 250~300 등 충분한 높이
+											}}
+											zIndex={5000} // DropDownPicker 자체에 zIndex 주기
+											zIndexInverse={4000} // 다른 Picker와 겹치지 않게
+											containerStyle={{
+												zIndex: 5000,
+											}}
+											labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
+											iconContainerStyle={{ marginRight: scaleWidth(8) }}
+											showArrowIcon={true}
+											showTickIcon={false}
+											modalProps={{
+												animationType: 'fade', // slide → fade로 부드럽게
+												presentationStyle: 'overFullScreen', // 배경 흐림 없이 띄움
+												transparent: true,
+											}}
+											modalContentContainerStyle={{
+												width: '85%',
+												alignContent: 'center',
+												maxHeight: scaleHeight(500), // ✅ 높이 증가로 스크롤 확보
+												backgroundColor: '#fff',
+												borderRadius: scaleWidth(20),
+												alignSelf: 'center',
+												paddingHorizontal: scaleWidth(16),
+												paddingVertical: scaleHeight(20),
+												shadowColor: '#000',
+												shadowOpacity: 0.15,
+												shadowOffset: { width: 0, height: 6 },
+												shadowRadius: scaleWidth(8),
+												elevation: 10,
+												alignItems: 'stretch', // ✅ 추가
+												flex: 1, // ✅ 반드시 필요
+												justifyContent: 'center',
+											}}
+											listItemLabelStyle={{
+												flex: 1,
+												fontSize: scaledSize(15),
+												color: '#2c3e50',
+												fontWeight: '500',
+												lineHeight: scaleHeight(22),
+												flexShrink: 1, // ✅ 텍스트 줄바꿈을 위해
+												flexWrap: 'wrap', // ✅ 줄바꿈 허용
+											}}
+											listItemContainerStyle={{
+												paddingVertical: scaleHeight(14), // 충분한 위아래 여백
+												minHeight: scaleHeight(48),       // iOS에서 텍스트 짤림 방지
+												alignItems: 'stretch', // ✅ 핵심 추가
+											}}
+										/>
+									</View>
 
-								{/* 초기화 버튼 */}
-								{/* <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+									{/* 초기화 버튼 */}
+									{/* <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
 									<Icon name='rotate-right' size={20} color='#555' />
 								</TouchableOpacity> */}
-							</View>
-							{/* 리스트 개수 표시 */}
-							<View style={styles.listCountWrapper}>
-								<Text style={styles.listCountText}>🔍 총 {proverbList.length}개 속담이 검색되었어요!</Text>
+								</View>
+								{/* 리스트 개수 표시 */}
+								<View style={styles.listCountWrapper}>
+									<Text style={styles.listCountText}>🔍 총 {proverbList.length}개 속담이 검색되었어요!</Text>
+								</View>
 							</View>
 						</View>
-					</View>
 
-					{/* 리스트 영역 */}
-					<View style={{ flex: 1, zIndex: 0 }}>
-						<FlatList
-							ref={scrollRef}
-							data={visibleList}
-							scrollEnabled={!fieldOpen && !levelOpen} // ⛔ 드롭다운 열려 있으면 스크롤 막기
-							keyExtractor={(item) => item.id.toString()}
-							refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-							onEndReached={loadMoreData}
-							onEndReachedThreshold={0.5}
-							onScroll={(event) => {
-								const offsetY = event.nativeEvent.contentOffset.y;
-								setShowScrollTop(offsetY > 100);
-							}}
-							scrollEventThrottle={16}
-							keyboardShouldPersistTaps="handled"
-							ListEmptyComponent={() => (
-								<View style={[styles.emptyWrapper, { height: '100%', marginTop: scaleHeight(40) }]}>
-									<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
-									<Text style={styles.emptyText}>앗! 조건에 맞는 속담이 없어요.{'\n'}다른 검색어나 필터를 사용해보세요!</Text>
-								</View>
-							)}
-							contentContainerStyle={styles.flatListCotent}
-							renderItem={({ item, index }) => {
-								const isLast = index === visibleList.length - 1;
-								return (
-									<TouchableOpacity
-										style={[
-											styles.itemBox,
-											{ marginBottom: isLast ? scaleHeight(24) : scaleHeight(12) }, // 마지막은 좀 더 크게, 그 외는 일정
-										]}
-										onPress={() => {
-											setSelectedProverb(item);
-											setShowDetailModal(true);
-										}}>
-										<View style={styles.proverbBlock}>
-											<View style={styles.badgeInlineRow}>
-												<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
-													<Text style={styles.badgeText}>{item.levelName}</Text>
+						{/* 리스트 영역 */}
+						<View style={{ flex: 1, zIndex: 0 }}>
+							<FlatList
+								ref={scrollRef}
+								data={visibleList}
+								scrollEnabled={!fieldOpen && !levelOpen} // ⛔ 드롭다운 열려 있으면 스크롤 막기
+								keyExtractor={(item) => item.id.toString()}
+								refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+								onEndReached={loadMoreData}
+								onEndReachedThreshold={0.5}
+								onScroll={(event) => {
+									const offsetY = event.nativeEvent.contentOffset.y;
+									setShowScrollTop(offsetY > 100);
+								}}
+								scrollEventThrottle={16}
+								keyboardShouldPersistTaps="handled"
+								ListEmptyComponent={() => (
+									<View style={[styles.emptyWrapper, { height: '100%', marginTop: scaleHeight(40) }]}>
+										<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
+										<Text style={styles.emptyText}>앗! 조건에 맞는 속담이 없어요.{'\n'}다른 검색어나 필터를 사용해보세요!</Text>
+									</View>
+								)}
+								contentContainerStyle={styles.flatListCotent}
+								renderItem={({ item, index }) => {
+									const isLast = index === visibleList.length - 1;
+									return (
+										<TouchableOpacity
+											style={[
+												styles.itemBox,
+												{ marginBottom: isLast ? scaleHeight(24) : scaleHeight(12) }, // 마지막은 좀 더 크게, 그 외는 일정
+											]}
+											onPress={() => {
+												setSelectedProverb(item);
+												setShowDetailModal(true);
+											}}>
+											<View style={styles.proverbBlock}>
+												<View style={styles.badgeInlineRow}>
+													<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
+														<Text style={styles.badgeText}>{item.levelName}</Text>
+													</View>
+													<View style={[styles.badge, { backgroundColor: getFieldColor(item.category) }]}>
+														<Text style={styles.badgeText}>{item.category}</Text>
+													</View>
 												</View>
-												<View style={[styles.badge, { backgroundColor: getFieldColor(item.category) }]}>
-													<Text style={styles.badgeText}>{item.category}</Text>
-												</View>
-											</View>
-											<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
-										</View>
-
-										<Text style={styles.meaningText}>- {item.longMeaning}</Text>
-
-										{Array.isArray(item.sameProverb) && item.sameProverb.filter((p) => p.trim()).length > 0 && (
-											<View style={styles.sameProverbBox}>
-												<Text style={styles.sameProverbTitle}>비슷한 속담</Text>
-												{item.sameProverb
-													.filter((p) => p.trim())
-													.map((p, idx) => (
-														<Text key={idx} style={styles.sameProverbText}>
-															- {p}
-														</Text>
-													))}
-											</View>
-										)}
-									</TouchableOpacity>
-								);
-							}}
-						/>
-					</View>
-
-					{/* 스크롤 최상단 이동 버튼 */}
-					{showScrollTop && (
-						<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
-							<IconComponent type="fontawesome6" name="arrow-up" size={20} color="#ffffff" />
-						</TouchableOpacity>
-					)}
-
-					{/* 상세 모달 */}
-					<Modal visible={showDetailModal} animationType="slide" transparent={true} onRequestClose={() => setShowDetailModal(false)}>
-						<View style={styles.modalOverlay}>
-							<View style={styles.modalContainer}>
-								<View style={styles.modalHeader}>
-									<Text style={styles.modalHeaderTitle}>속담 상세</Text>
-									<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowDetailModal(false)}>
-										<Icon name="xmark" size={20} color="#0984e3" />
-									</TouchableOpacity>
-								</View>
-
-								{/* ✅ 스크롤 가능한 영역 */}
-								<ScrollView contentContainerStyle={styles.modalBody}>
-									{/* 속담 본문 크게 강조 */}
-
-									{selectedProverb && (
-										<>
-											<View style={[styles.badgeRow, { marginBottom: scaleHeight(12) }]}>
-												<View style={[styles.badge, { backgroundColor: getLevelColor(selectedProverb.levelName) }]}>
-													<Text style={styles.badgeText}>{selectedProverb.levelName}</Text>
-												</View>
-												<View style={[styles.badge, { backgroundColor: getFieldColor(selectedProverb.category) }]}>
-													<Text style={styles.badgeText}>{selectedProverb.category}</Text>
-												</View>
-											</View>
-											<View style={styles.modalProverbBox}>
-												<Text style={styles.modalProverbText}>{selectedProverb.proverb}</Text>
+												<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
 											</View>
 
+											<Text style={styles.meaningText}>- {item.longMeaning}</Text>
 
-
-											<View style={styles.modalSection}>
-												<Text style={styles.modalLabel}>의미</Text>
-												<Text style={styles.modalText}>- {selectedProverb?.longMeaning}</Text>
-											</View>
-
-											<View style={styles.modalSection}>
-												<Text style={styles.modalLabel}>예시</Text>
-												<Text style={styles.modalText}>- {selectedProverb?.example}</Text>
-											</View>
-
-											{Array.isArray(selectedProverb.sameProverb) && selectedProverb.sameProverb.filter((p) => p.trim()).length > 0 && (
-												<View style={styles.modalSection}>
-													<Text style={styles.modalLabel}>비슷한 속담</Text>
-													{selectedProverb.sameProverb.map((p, idx) => (
-														<Text key={idx} style={styles.modalText}>
-															- {p}
-														</Text>
-													))}
+											{Array.isArray(item.sameProverb) && item.sameProverb.filter((p) => p.trim()).length > 0 && (
+												<View style={styles.sameProverbBox}>
+													<Text style={styles.sameProverbTitle}>비슷한 속담</Text>
+													{item.sameProverb
+														.filter((p) => p.trim())
+														.map((p, idx) => (
+															<Text key={idx} style={styles.sameProverbText}>
+																- {p}
+															</Text>
+														))}
 												</View>
 											)}
-										</>
-									)}
-								</ScrollView>
-
-								{/* ✅ 닫기 버튼을 모달 맨 하단에 고정 */}
-								<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowDetailModal(false)}>
-									<Text style={styles.modalCloseButtonText}>닫기</Text>
-								</TouchableOpacity>
-							</View>
+										</TouchableOpacity>
+									);
+								}}
+							/>
 						</View>
-					</Modal>
-				</View>
-			</TouchableWithoutFeedback>
+
+						{/* 스크롤 최상단 이동 버튼 */}
+						{showScrollTop && (
+							<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
+								<IconComponent type="fontawesome6" name="arrow-up" size={20} color="#ffffff" />
+							</TouchableOpacity>
+						)}
+
+						{/* 상세 모달 */}
+						<Modal visible={showDetailModal} animationType="slide" transparent={true} onRequestClose={() => setShowDetailModal(false)}>
+							<View style={styles.modalOverlay}>
+								<View style={styles.modalContainer}>
+									<View style={styles.modalHeader}>
+										<Text style={styles.modalHeaderTitle}>속담 상세</Text>
+										<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowDetailModal(false)}>
+											<Icon name="xmark" size={20} color="#0984e3" />
+										</TouchableOpacity>
+									</View>
+
+									{/* ✅ 스크롤 가능한 영역 */}
+									<ScrollView contentContainerStyle={styles.modalBody}>
+										{/* 속담 본문 크게 강조 */}
+
+										{selectedProverb && (
+											<>
+												<View style={[styles.badgeRow, { marginBottom: scaleHeight(12) }]}>
+													<View style={[styles.badge, { backgroundColor: getLevelColor(selectedProverb.levelName) }]}>
+														<Text style={styles.badgeText}>{selectedProverb.levelName}</Text>
+													</View>
+													<View style={[styles.badge, { backgroundColor: getFieldColor(selectedProverb.category) }]}>
+														<Text style={styles.badgeText}>{selectedProverb.category}</Text>
+													</View>
+												</View>
+												<View style={styles.modalProverbBox}>
+													<Text style={styles.modalProverbText}>{selectedProverb.proverb}</Text>
+												</View>
+
+
+
+												<View style={styles.modalSection}>
+													<Text style={styles.modalLabel}>의미</Text>
+													<Text style={styles.modalText}>- {selectedProverb?.longMeaning}</Text>
+												</View>
+
+												<View style={styles.modalSection}>
+													<Text style={styles.modalLabel}>예시</Text>
+													<Text style={styles.modalText}>- {selectedProverb?.example}</Text>
+												</View>
+
+												{Array.isArray(selectedProverb.sameProverb) && selectedProverb.sameProverb.filter((p) => p.trim()).length > 0 && (
+													<View style={styles.modalSection}>
+														<Text style={styles.modalLabel}>비슷한 속담</Text>
+														{selectedProverb.sameProverb.map((p, idx) => (
+															<Text key={idx} style={styles.modalText}>
+																- {p}
+															</Text>
+														))}
+													</View>
+												)}
+											</>
+										)}
+									</ScrollView>
+
+									{/* ✅ 닫기 버튼을 모달 맨 하단에 고정 */}
+									<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowDetailModal(false)}>
+										<Text style={styles.modalCloseButtonText}>닫기</Text>
+									</TouchableOpacity>
+								</View>
+							</View>
+						</Modal>
+					</View>
+				</TouchableWithoutFeedback>
+			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 };
@@ -722,7 +724,7 @@ const styles = StyleSheet.create({
 		marginRight: scaleWidth(6),
 	},
 	listCountWrapper: {
-		marginTop: scaleHeight(10),
+		marginTop: scaleHeight(3),
 		alignItems: 'flex-end',
 		paddingHorizontal: scaleWidth(16),
 		marginBottom: scaleHeight(3),

@@ -52,7 +52,7 @@ const LEVEL_DATA = [
 		label: '속담 초보자',
 		icon: 'seedling',
 		encouragement: '🌱 첫걸음을 뗐어요! 이제 속담의 세계로!',
-		description: '속담의 세계에 첫 발을 내딛었어요.\n익숙한 속담부터 하나씩 알아가며 시작해봐요!',
+		description: '속담 학습의 출발선에 선 단계로,\n기초적인 표현부터 차근히 익히는 시기예요.',
 		mascot: require('@/assets/images/level1_mascote.png'),
 	},
 	{
@@ -61,7 +61,7 @@ const LEVEL_DATA = [
 		label: '속담 입문자',
 		icon: 'leaf',
 		encouragement: '🍃 차근차근 익혀가는 중이에요!\n조금씩 자신감이 붙고 있어요!',
-		description: '기본적인 속담을 어느 정도 익혔군요!\n이제 다양한 상황에 맞는 속담을 골라보는 연습을 해봐요.',
+		description: '기초 속담에 익숙해지고,\n다양한 표현을 접하며 감을 잡아가는 단계예요.',
 		mascot: require('@/assets/images/level2_mascote.png'),
 	},
 	{
@@ -70,7 +70,7 @@ const LEVEL_DATA = [
 		label: '속담 숙련자',
 		icon: 'tree',
 		encouragement: '🌳 멋져요! 속담 실력이 부쩍 늘었어요!',
-		description: '속담 퀴즈에 익숙해진 당신!\n뜻을 정확히 파악하고 응용하는 실력이 느껴져요.',
+		description: '속담의 뜻과 쓰임새를 잘 이해하고 있으며,\n실전 문제에도 능숙하게 대응할 수 있는 단계예요.',
 		mascot: require('@/assets/images/level3_mascote.png'),
 	},
 	{
@@ -79,7 +79,7 @@ const LEVEL_DATA = [
 		label: '속담 마스터',
 		icon: 'trophy',
 		encouragement: '🏆 속담 마스터에 도달했어요! 정말 대단해요!',
-		description: '속담의 의미와 맥락을 완벽히 이해했어요.\n이제 누가 봐도 속담 달인입니다!',
+		description: '속담에 대한 깊은 이해와 활용 능력을 갖춘 최상위 단계로,\n누구에게나 모범이 될 수 있는 수준이에요.',
 		mascot: require('@/assets/images/level4_mascote.png'),
 	},
 ];
@@ -97,12 +97,12 @@ const Home = () => {
 	const navigation = useNavigation();
 	const scrollRef = useRef<NodeJS.Timeout | null>(null);
 	const levelScrollRef = useRef<ScrollView>(null);
+	const scrollViewRef = useRef<ScrollView>(null);
 
 	const [greeting, setGreeting] = useState('🖐️ 안녕! 오늘도 속담 퀴즈 풀 준비 됐니?');
 	const [totalScore, setTotalScore] = useState(0);
 	const [showConfetti, setShowConfetti] = useState(false);
 	const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
-	const [showGuideModal, setShowGuideModal] = useState(false);
 	const [showBadgeModal, setShowBadgeModal] = useState(false);
 	const [selectedBadge, setSelectedBadge] = useState<(typeof CONST_BADGES)[number] | null>(null);
 
@@ -129,20 +129,20 @@ const Home = () => {
 	];
 
 
-
-
-
-
 	useFocusEffect(
 		useCallback(() => {
-			ensureTodayQuizExists();
-			loadData();
-			checkTodayCheckIn();
-			loadCheckedInDates();
-
-			// 💥 빵빠레 자동 실행
 			setShowConfetti(true);
 			scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
+			hasAutoCheckedIn.current = false;
+
+			(async () => {
+				await ensureTodayQuizExists(); // ✅ 오늘 퀴즈 항목 생성 먼저
+				await loadData();
+				await checkTodayCheckIn();
+				await loadCheckedInDates();
+			})();
+
+			scrollViewRef.current?.scrollTo({ y: 0, animated: true });
 
 			return () => {
 				if (scrollRef.current) {
@@ -151,6 +151,7 @@ const Home = () => {
 			};
 		}, []),
 	);
+
 	useEffect(() => {
 		if (showCheckInModal && !isCheckedIn && !hasAutoCheckedIn.current) {
 			handleCheckIn();
@@ -312,19 +313,6 @@ const Home = () => {
 			icon: 'seedling',
 			mascot: require('@/assets/images/level1_mascote.png'),
 		};
-	};
-
-	const getEncourageMessage = (score: number) => {
-		if (score >= 1800) {
-			return '📚 속담 마스터에 도달했어요! 대단해요!';
-		}
-		if (score >= 1200) {
-			return '💡 능력자까지 왔어요! 이제 마스터도 금방이에요!';
-		}
-		if (score >= 600) {
-			return '✏️ 입문자로서 아주 좋은 출발이에요!';
-		}
-		return '🚶‍♂️ 이제 막 시작했어요! 하나씩 배워나가봐요!';
 	};
 
 	const getKSTDateString = () => {
@@ -515,7 +503,7 @@ const Home = () => {
 			)}
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 				<KeyboardAvoidingView style={styles.wrapper} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-					<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+					<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false} ref={scrollViewRef}>
 						<View style={styles.container}>
 							<View style={styles.imageContainer}>
 								<View style={styles.speechWrapper}>
@@ -901,7 +889,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(16),
 		paddingVertical: scaleHeight(12), // ← 이 부분을 줄이거나 0으로
 	},
-	imageContainer: { alignItems: 'center', marginBottom: scaleHeight(8) },
+	imageContainer: { alignItems: 'center' },
 	image: {
 		width: scaleWidth(150),
 		height: scaleWidth(150),
@@ -912,7 +900,7 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(12),
 		paddingHorizontal: scaleWidth(20),
 		borderRadius: scaleWidth(20),
-		maxWidth: '95%',
+		maxWidth: '100%',
 		shadowColor: '#000',
 		shadowOpacity: 0.07,
 		shadowOffset: { width: 0, height: scaleHeight(2) },
@@ -930,7 +918,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 	},
 	speechText: {
-		fontSize: scaledSize(13),
+		fontSize: scaledSize(14),
 		color: '#2c3e50',
 		textAlign: 'center',
 		fontWeight: '600',

@@ -63,6 +63,8 @@ const getShuffledChoices = (correct: string, allMeanings: string[]) => {
 const InfinityQuizScreen = () => {
 	const TIME_CHALLENGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 
+	const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+
 	const navigation = useNavigation();
 
 	const scrollViewRef = useRef<ScrollView>(null);
@@ -71,6 +73,7 @@ const InfinityQuizScreen = () => {
 	const comboShake = useRef(new Animated.Value(0)).current;
 	const comboEffectAnim = useRef(new Animated.Value(0)).current;
 	const [comboEffectText, setComboEffectText] = useState('');
+	const [toastRemainingSec, setToastRemainingSec] = useState<number | null>(null);
 
 	const [lives, setLives] = useState(MAX_LIVES);
 	const [score, setScore] = useState(0);
@@ -462,14 +465,63 @@ const InfinityQuizScreen = () => {
 		}
 	};
 
-	const showToast = (message: string) => {
+	const handleChance = () => {
+		// if (hasUsedChance) return;
+
+		const current = questionList[currentIndex];
+
+		const example = current.example || '예문 없음';
+		const category = current.category || '카테고리 없음';
+		const sameProverb = current.sameProverb || '없음';
+
+		// 여러 줄 구성
+		const message = `
+📂 카테고리 
+${category}
+
+📘 예문
+${example}
+
+🔍 비슷한 속담들
+${sameProverb ? sameProverb : '-'}
+`;
+
+		showLongToast(message);
+		// setHasUsedChance(true);
+	};
+
+	const showToast = (message: string, durationSec: number = 3) => {
 		setToastMessage(message);
+		setToastRemainingSec(durationSec);
 		toastOpacity.setValue(0);
+
+		// 기존 타이머가 있으면 정리
+		if (toastTimerRef.current) {
+			clearInterval(toastTimerRef.current);
+			toastTimerRef.current = null;
+		}
+
+		// 카운트다운 시작
+		let count = durationSec;
+		toastTimerRef.current = setInterval(() => {
+			count -= 1;
+			if (count <= 0) {
+				clearInterval(toastTimerRef.current!);
+				toastTimerRef.current = null;
+				setToastRemainingSec(null);
+			} else {
+				setToastRemainingSec(count);
+			}
+		}, 1000);
+
 		Animated.sequence([
 			Animated.timing(toastOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-			Animated.delay(1200),
+			Animated.delay(durationSec * 1000),
 			Animated.timing(toastOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
-		]).start();
+		]).start(() => {
+			setToastMessage('');
+			setToastRemainingSec(null); // 여기만 유지
+		});
 	};
 
 	const resetGame = () => {
@@ -576,19 +628,7 @@ const InfinityQuizScreen = () => {
 						{!hasUsedChance && (
 							<View style={styles.leftFixed}>
 								<TouchableOpacity
-									onPress={() => {
-
-										// TODO: 찬스 부분 개선 필요
-										// const current = questionList[currentIndex];
-
-										// const characterInfo = current.characters.map((char) => `• ${char.char}: ${char.meaning}`).join('\n');
-
-										// const example = current.example || '예문 없음';
-
-										// const message = `🀄 한자 구성:\n${characterInfo}\n\n📘 예문: ${example}`;
-										// showLongToast(message);
-										// setHasUsedChance(true); // ✅ 사용 처리
-									}}
+									onPress={handleChance}
 									style={styles.chanceContent}>
 									<IconComponent name="magic" type="FontAwesome" color="#27ae60" size={16} />
 									<Text style={styles.chanceText}>찬스 (1)</Text>
@@ -1054,7 +1094,7 @@ const InfinityQuizScreen = () => {
 				<Animated.View
 					style={{
 						position: 'absolute',
-						top: '40%', // 중앙
+						top: '10%',
 						left: 0,
 						right: 0,
 						alignItems: 'center',
@@ -1064,29 +1104,49 @@ const InfinityQuizScreen = () => {
 					<View
 						style={{
 							backgroundColor: '#2c3e50',
-							paddingVertical: scaleHeight(28), // 🔼 높이 크게
-							paddingHorizontal: scaleWidth(32),
-							borderRadius: scaleWidth(28),
-							minHeight: scaleHeight(80), // 🔼 최소 높이 추가
+							paddingVertical: scaleHeight(20),
+							paddingHorizontal: scaleWidth(20),
+							borderRadius: scaleWidth(20),
 							minWidth: scaleWidth(200),
 							maxWidth: '85%',
-							justifyContent: 'center',
 							alignItems: 'center',
-							shadowColor: '#000',
-							shadowOffset: { width: 0, height: 4 },
-							shadowOpacity: 0.3,
-							shadowRadius: 6,
 						}}>
 						<Text
 							style={{
 								color: '#fff',
-								fontSize: scaledSize(18), // 🔼 텍스트 크기 증가
+								fontSize: scaledSize(16),
 								fontWeight: '700',
 								textAlign: 'center',
-								lineHeight: scaleHeight(28),
+								lineHeight: scaleHeight(24),
 							}}>
 							{toastMessage}
 						</Text>
+
+						{/* {toastRemainingSec !== null && (
+							<Text
+								style={{
+									color: '#bbb',
+									marginTop: scaleHeight(6),
+									fontSize: scaledSize(13),
+									opacity: 1, // 강제로 항상 보이게
+								}}>
+								{toastRemainingSec}초 뒤에 닫힘
+							</Text>
+						)} */}
+
+						<TouchableOpacity
+							onPress={() => {
+								toastOpacity.setValue(0);
+								setToastMessage('');
+								setToastRemainingSec(null);
+								if (toastTimerRef.current) {
+									clearInterval(toastTimerRef.current);
+									toastTimerRef.current = null;
+								}
+							}}
+							style={{ marginTop: scaleHeight(6) }}>
+							<Text style={{ color: '#ddd', fontSize: scaledSize(13), textDecorationLine: 'underline' }}>닫기</Text>
+						</TouchableOpacity>
 					</View>
 				</Animated.View>
 			)}

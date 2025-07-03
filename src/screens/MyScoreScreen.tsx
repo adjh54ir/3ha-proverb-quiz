@@ -381,7 +381,6 @@ const CapitalResultScreen = () => {
 		setShowTimeSection(nextState);
 		setShowBadgeSection(nextState);
 		setShowTodayQuizSection(nextState); // ✅ 추가됨
-		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 	};
 
 
@@ -712,6 +711,13 @@ const CapitalResultScreen = () => {
 									{allCategories.map((category) => {
 										const isEarned = categoryMaster.includes(category);
 										const meta = CATEGORY_META[category];
+
+										// meta가 없으면 기본값 처리
+										if (!meta) {
+											console.warn(`❗ CATEGORY_META에 정의되지 않은 카테고리: ${category}`);
+											return null;
+										}
+
 										return (
 											<View
 												key={category}
@@ -726,7 +732,7 @@ const CapitalResultScreen = () => {
 														shadowOffset: { width: 0, height: 2 },
 													},
 												]}>
-												<IconComponent type={meta.icon.type} name={meta.icon.name} size={22} color={isEarned ? '#fff' : '#bdc3c7'} style={{ marginBottom: 6 }} />
+												<IconComponent type={meta.icon.type} name={meta.icon.name} size={22} color={isEarned ? '#fff' : '#bdc3c7'} />
 												<Text style={[styles.regionText, isEarned && { color: '#fff', fontWeight: 'bold' }]}>{category}</Text>
 											</View>
 										);

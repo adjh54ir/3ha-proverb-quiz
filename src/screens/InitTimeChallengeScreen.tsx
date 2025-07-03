@@ -9,6 +9,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
+import { GOOGLE_ADMOV_FRONT_PERCENT } from '@env';
+import AdmobFrontAd from './common/ads/AdmobFrontAd';
 
 const InitTimeChallengeScreen = () => {
 	const STORAGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
@@ -19,6 +21,10 @@ const InitTimeChallengeScreen = () => {
 	const [showAllRules, setShowAllRules] = useState(false);
 	const [isCountingDown, setIsCountingDown] = useState(false);
 	const [top5History, setTop5History] = useState<MainDataType.TimeChallengeResult[]>([]);
+	// 1. 상태 추가
+	const [showAd, setShowAd] = useState(false);
+	const [adWatched, setAdWatched] = useState(false); // 광고 본 후 시작
+	const shouldShowAd = Math.random() < GOOGLE_ADMOV_FRONT_PERCENT; // ✅ 20% 확률
 
 	useEffect(() => {
 		fetchTopHistory();
@@ -78,7 +84,14 @@ const InitTimeChallengeScreen = () => {
 		}
 	};
 
+
 	const handleStartChallenge = () => {
+
+		if (!adWatched && shouldShowAd) {
+			setShowAd(true); // ✅ 먼저 광고를 보여줌
+			return;
+		}
+
 		setIsCountingDown(true);
 		setShowAllRules(false);
 
@@ -376,6 +389,17 @@ const InitTimeChallengeScreen = () => {
 					</View>
 				</View>
 			)}
+
+			{showAd && (
+				<AdmobFrontAd
+					onAdClosed={() => {
+						setShowAd(false);
+						setAdWatched(true);
+						handleStartChallenge(); // 광고 시청 후 카운트다운 재호출
+					}}
+				/>
+			)}
+
 		</SafeAreaView>
 	);
 };

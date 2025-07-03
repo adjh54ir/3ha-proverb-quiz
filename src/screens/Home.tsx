@@ -125,7 +125,7 @@ const Home = () => {
 	const PET_REWARDS = [
 		{ day: 7, image: require('@/assets/images/pet_level1_org.png') },
 		{ day: 14, image: require('@/assets/images/pet_level2_org.png') },
-		{ day: 30, image: require('@/assets/images/pet_level3_org.png') },
+		{ day: 21, image: require('@/assets/images/pet_level3_org.png') },
 	];
 
 
@@ -804,7 +804,7 @@ const Home = () => {
 									{[
 										{ label: '7일 출석', image: require('@/assets/images/pet_level1_org.png') },
 										{ label: '14일 출석', image: require('@/assets/images/pet_level2_org.png') },
-										{ label: '한 달 출석', image: require('@/assets/images/pet_level3_org.png') },
+										{ label: '21일 출석', image: require('@/assets/images/pet_level3_org.png') },
 									].map((item, index, arr) => (
 										<View
 											key={index}

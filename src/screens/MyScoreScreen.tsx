@@ -42,7 +42,7 @@ const STORAGE_KEY_TODAY = MainStorageKeyType.TODAY_QUIZ_LIST;
 const PET_REWARDS = [
 	{ day: 7, image: require('@/assets/images/pet_level1_org.png') },
 	{ day: 14, image: require('@/assets/images/pet_level2_org.png') },
-	{ day: 30, image: require('@/assets/images/pet_level3_org.png') },
+	{ day: 21, image: require('@/assets/images/pet_level3_org.png') },
 ];
 const DIFFICULTIES = [
 	{ key: 'Level 1', title: 'Level 1', subtitle: '아주 쉬움', icon: 'seedling' },

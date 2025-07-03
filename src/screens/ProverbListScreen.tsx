@@ -26,6 +26,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import DeviceInfo from 'react-native-device-info';
+import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 
 const PAGE_SIZE = 30;
 
@@ -127,7 +128,7 @@ const ProverbListScreen = () => {
 	const [fieldItems, setFieldItems] = useState([{ label: '', value: '' }]);
 	const [levelItems, setLevelItems] = useState([{ label: '', value: '' }]);
 
-	const isTablet = DeviceInfo.isTablet();
+	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
 	const fetchData = () => {
 		const allData = ProverbServices.selectProverbList(); // 이미 필드에 있음
@@ -267,7 +268,7 @@ const ProverbListScreen = () => {
 	};
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#f8f9fa', marginTop: scaleHeight(-18), }} edges={['top']}>
+		<SafeAreaView style={styles.main} edges={['top']}>
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
 				<TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
 					<View style={{ flex: 1 }}>
@@ -323,6 +324,7 @@ const ProverbListScreen = () => {
 									<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000, overflow: 'visible' }]}>
 										<DropDownPicker
 											listMode="MODAL"
+											modalTitle="카테고리 선택"
 											open={fieldOpen}
 											value={fieldValue}
 											items={FIELD_DROPDOWN_ITEMS}
@@ -356,12 +358,12 @@ const ProverbListScreen = () => {
 												transparent: true,
 											}}
 											modalContentContainerStyle={{
+												marginTop: scaleHeight(50),
 												width: '85%',
-												alignContent: 'center',
-												maxHeight: scaleHeight(500), // ✅ 높이 증가로 스크롤 확보
+												alignSelf: 'center',
+												maxHeight: scaleHeight(500),
 												backgroundColor: '#fff',
 												borderRadius: scaleWidth(20),
-												alignSelf: 'center',
 												paddingHorizontal: scaleWidth(16),
 												paddingVertical: scaleHeight(20),
 												shadowColor: '#000',
@@ -369,9 +371,7 @@ const ProverbListScreen = () => {
 												shadowOffset: { width: 0, height: 6 },
 												shadowRadius: scaleWidth(8),
 												elevation: 10,
-												alignItems: 'stretch', // ✅ 추가
-												flex: 1, // ✅ 반드시 필요
-												justifyContent: 'center',
+												position: 'relative',
 											}}
 											listItemLabelStyle={{
 												flex: 1,
@@ -548,6 +548,11 @@ const ProverbListScreen = () => {
 export default ProverbListScreen;
 
 const styles = StyleSheet.create({
+	main: {
+		flex: 1,
+		backgroundColor: '#f8f9fa',
+		marginTop: scaleHeight(-18),
+	},
 	filterCard: {
 		backgroundColor: '#fff',
 		padding: scaleWidth(16),

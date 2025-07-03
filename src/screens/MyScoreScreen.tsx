@@ -29,6 +29,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { MainDataType } from '@/types/MainDataType';
+import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 
 LocaleConfig.defaultLocale = 'kr';
 moment.locale('ko'); // 로케일 설정
@@ -130,6 +131,8 @@ const CapitalResultScreen = () => {
 
 	const allCategories = ProverbServices.selectCategoryList(); // 전체 카테고리 (8개)
 
+	useBlockBackHandler(true); // 뒤로가기 모션 막기
+
 
 
 
@@ -152,6 +155,18 @@ const CapitalResultScreen = () => {
 			loadData();
 		}, []),
 	);
+	useFocusEffect(
+		useCallback(() => {
+			// 탭 이동 시 진입할 때마다 접힌 상태로 초기화
+			setIsAllExpanded(false);
+			setShowStudySection(false);
+			setShowQuizSection(false);
+			setShowTimeSection(false);
+			setShowBadgeSection(false);
+			setShowTodayQuizSection(false);
+		}, []),
+	);
+
 
 	const loadData = async () => {
 		try {
@@ -410,6 +425,57 @@ const CapitalResultScreen = () => {
 			},
 		};
 	})();
+	const updateMarkedQuizDatesOnSelect = (
+		date: string,
+		prevDate: string | null,
+		setMarkedQuizDates: React.Dispatch<React.SetStateAction<{ [date: string]: any }>>,
+		todayQuizDataList: MainDataType.TodayQuizList[],
+	) => {
+		setMarkedQuizDates((prev) => {
+			const updated = { ...prev };
+
+			// ✅ 이전 선택 날짜 초기화
+			if (prevDate && updated[prevDate]) {
+				const wasChecked = todayQuizDataList.some(
+					(item) => moment(item.quizDate).format('YYYY-MM-DD') === prevDate,
+				);
+
+				if (wasChecked) {
+					updated[prevDate] = {
+						marked: true,
+						dotColor: '#4CAF50',
+						customStyles: {
+							container: {
+								backgroundColor: '#e8f5e9',
+							},
+							text: {
+								color: '#2e7d32',
+								fontWeight: 'bold',
+							},
+						},
+					};
+				} else {
+					delete updated[prevDate];
+				}
+			}
+
+			// ✅ 새 선택 날짜 강조
+			updated[date] = {
+				...(updated[date] || {}),
+				customStyles: {
+					container: {
+						backgroundColor: '#dfe6e9',
+					},
+					text: {
+						color: '#2c3e50',
+						fontWeight: 'bold',
+					},
+				},
+			};
+
+			return updated;
+		});
+	};
 
 	const levelGuide = [
 		{ score: 0, next: 600, label: '속담 초보자', icon: 'seedling' },
@@ -417,6 +483,46 @@ const CapitalResultScreen = () => {
 		{ score: 1200, next: 1800, label: '여행 능력자', icon: 'tree' },
 		{ score: 1800, next: 2461, label: '속담 마스터', icon: 'trophy' },
 	];
+	// ISO 형식 대응 버전
+	const getRelativeDateLabel = (isoString: string): string => {
+		try {
+			const inputDate = new Date(isoString);
+			const now = new Date();
+
+			const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+			const startOfInput = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate());
+
+			const diffMs = startOfToday.getTime() - startOfInput.getTime();
+			const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+			const hour = inputDate.getHours();
+			const minute = inputDate.getMinutes();
+			const timeStr = `${hour}:${String(minute).padStart(2, '0')}`;
+
+			if (diffDays === 0) {
+				return `오늘, ${timeStr}`;
+			}
+			if (diffDays === 1) {
+				return `어제, ${timeStr}`;
+			}
+			if (diffDays === 2) {
+				return `그제, ${timeStr}`;
+			}
+			if (diffDays < 7) {
+				return `${diffDays}일 전`;
+			}
+			if (diffDays < 30) {
+				return `${Math.floor(diffDays / 7)}주 전`;
+			}
+
+			const y = inputDate.getFullYear();
+			const m = String(inputDate.getMonth() + 1).padStart(2, '0');
+			const d = String(inputDate.getDate()).padStart(2, '0');
+			return `${y}. ${m}. ${d}. ${timeStr}`;
+		} catch {
+			return isoString;
+		}
+	};
 
 	const getEncourageMessage = (score: number) => {
 		if (score >= 1800) {
@@ -684,50 +790,13 @@ const CapitalResultScreen = () => {
 								style={[styles.calendarStyle, { width: '100%' }]}
 								onDayPress={(day) => {
 									const date = day.dateString;
+									const matchedData = todayQuizDataList.find((item) =>
+										moment(item.quizDate).format('YYYY-MM-DD') === date,
+									);
 									setSelectedDate(date);
-
-									const matchedData = todayQuizDataList.find((item) => moment(item.quizDate).format('YYYY-MM-DD') === date);
 									setSelectedQuizData(matchedData ?? null);
 
-									setMarkedQuizDates((prev) => {
-										const updated = { ...prev };
-
-										// ✅ 이전 선택 날짜를 초기화
-										if (selectedDate && updated[selectedDate]) {
-											// 해당 날짜가 완료된 퀴즈라면 기존 마킹 유지
-											const isDone = todayQuizDataList.some((item) => moment(item.quizDate).format('YYYY-MM-DD') === selectedDate);
-
-											updated[selectedDate] = {
-												marked: isDone,
-												dotColor: '#4CAF50',
-												customStyles: {
-													container: {
-														backgroundColor: isDone ? '#e8f5e9' : undefined,
-													},
-													text: {
-														color: isDone ? '#2e7d32' : '#2c3e50',
-														fontWeight: 'bold',
-													},
-												},
-											};
-										}
-
-										// ✅ 새로 선택한 날짜에 강조 스타일 적용
-										updated[date] = {
-											...(updated[date] || {}),
-											customStyles: {
-												container: {
-													backgroundColor: '#dfe6e9',
-												},
-												text: {
-													color: '#2c3e50',
-													fontWeight: 'bold',
-												},
-											},
-										};
-
-										return updated;
-									});
+									updateMarkedQuizDatesOnSelect(date, selectedDate, setMarkedQuizDates, todayQuizDataList);
 								}}
 								theme={{
 									calendarBackground: '#fff',
@@ -754,8 +823,8 @@ const CapitalResultScreen = () => {
 										marginTop: scaleHeight(10),
 										alignSelf: 'stretch',
 									}}>
-									<Text style={{ fontSize: scaledSize(13), color: '#95a5a6', textAlign: 'center' }}>
-										- 선택한 날짜에 푼 오늘의 퀴즈가 없습니다.
+									<Text style={{ fontSize: scaledSize(13), color: '#95a5a6', textAlign: 'left' }}>
+										선택한 날짜에는 오늘의 퀴즈를 풀지 않았어요
 									</Text>
 								</View>
 							)}
@@ -853,7 +922,7 @@ const CapitalResultScreen = () => {
 														/>
 														<Text style={styles.firstRankLabel}>1등</Text>
 														<Text style={styles.firstRankScore}>
-															{item.finalScore}점<Text style={styles.rankDate}> ({item.quizDate})</Text>
+															{item.finalScore}점<Text style={styles.rankDate}>  ({getRelativeDateLabel(item.quizDate)})</Text>
 														</Text>
 													</>
 												)}
@@ -868,7 +937,7 @@ const CapitalResultScreen = () => {
 														/>
 														<Text style={styles.secondRankLabel}>2등</Text>
 														<Text style={styles.secondRankScore}>
-															{item.finalScore}점<Text style={styles.rankDate}> ({item.quizDate})</Text>
+															{item.finalScore}점<Text style={styles.rankDate}>  ({getRelativeDateLabel(item.quizDate)})</Text>
 														</Text>
 													</>
 												)}
@@ -883,7 +952,7 @@ const CapitalResultScreen = () => {
 														/>
 														<Text style={styles.thirdRankLabel}>3등</Text>
 														<Text style={styles.thirdRankScore}>
-															{item.finalScore}점<Text style={styles.rankDate}> ({item.quizDate})</Text>
+															{item.finalScore}점<Text style={styles.rankDate}>  ({getRelativeDateLabel(item.quizDate)})</Text>
 														</Text>
 													</>
 												)}

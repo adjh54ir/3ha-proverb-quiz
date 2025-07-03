@@ -89,6 +89,7 @@ const InfinityQuizScreen = () => {
 	const [hasUsedSkip, setHasUsedSkip] = useState(false);
 	const [timeLeftMs, setTimeLeftMs] = useState(180_000); // 180초 → 180,000ms
 	const [hasUsedChance, setHasUsedChance] = useState(false);
+	const [isToastClosable, setIsToastClosable] = useState(false);
 
 	const formattedTime = `${(timeLeftMs / 1000).toFixed(2)}초`;
 	const [isPaused, setIsPaused] = useState(false);
@@ -411,13 +412,16 @@ const InfinityQuizScreen = () => {
 		}).start();
 	};
 	const showLongToast = (message: string) => {
+		setIsToastClosable(true); // 닫기 버튼 보이기
 		setToastMessage(message);
 		toastOpacity.setValue(0);
 		Animated.sequence([
 			Animated.timing(toastOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-			Animated.delay(5000), // ✅ 5초 이상 유지
+			Animated.delay(5000), // 5초 이상 유지
 			Animated.timing(toastOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
-		]).start();
+		]).start(() => {
+			setToastMessage('');
+		});
 	};
 
 	const triggerComboShake = () => {
@@ -466,7 +470,7 @@ const InfinityQuizScreen = () => {
 	};
 
 	const handleChance = () => {
-		// if (hasUsedChance) return;
+		if (hasUsedChance) return;
 
 		const current = questionList[currentIndex];
 
@@ -487,10 +491,11 @@ ${sameProverb ? sameProverb : '-'}
 `;
 
 		showLongToast(message);
-		// setHasUsedChance(true);
+		setHasUsedChance(true);
 	};
 
 	const showToast = (message: string, durationSec: number = 3) => {
+		setIsToastClosable(false); // 닫기 버튼 숨기기
 		setToastMessage(message);
 		setToastRemainingSec(durationSec);
 		toastOpacity.setValue(0);
@@ -1094,7 +1099,7 @@ ${sameProverb ? sameProverb : '-'}
 				<Animated.View
 					style={{
 						position: 'absolute',
-						top: '10%',
+						top: '20%',
 						left: 0,
 						right: 0,
 						alignItems: 'center',
@@ -1105,48 +1110,54 @@ ${sameProverb ? sameProverb : '-'}
 						style={{
 							backgroundColor: '#2c3e50',
 							paddingVertical: scaleHeight(20),
-							paddingHorizontal: scaleWidth(20),
-							borderRadius: scaleWidth(20),
+							paddingHorizontal: scaleWidth(24),
+							borderRadius: scaleWidth(28),
+							minHeight: scaleHeight(100),
 							minWidth: scaleWidth(200),
 							maxWidth: '85%',
+							justifyContent: 'center',
 							alignItems: 'center',
+							shadowColor: '#000',
+							shadowOffset: { width: 0, height: 4 },
+							shadowOpacity: 0.3,
+							shadowRadius: 6,
 						}}>
 						<Text
 							style={{
 								color: '#fff',
-								fontSize: scaledSize(16),
+								fontSize: scaledSize(18),
 								fontWeight: '700',
 								textAlign: 'center',
-								lineHeight: scaleHeight(24),
+								lineHeight: scaleHeight(28),
+								marginBottom: isToastClosable ? scaleHeight(12) : 0,
 							}}>
 							{toastMessage}
 						</Text>
 
-						{/* {toastRemainingSec !== null && (
-							<Text
+						{/* ✅ 하단 닫기 버튼: long toast에만 표시 */}
+						{isToastClosable && (
+							<TouchableOpacity
+								onPress={() => {
+									setToastMessage('');
+									toastOpacity.setValue(0);
+								}}
 								style={{
-									color: '#bbb',
-									marginTop: scaleHeight(6),
-									fontSize: scaledSize(13),
-									opacity: 1, // 강제로 항상 보이게
+									marginTop: scaleHeight(4),
+									backgroundColor: '#34495e',
+									paddingVertical: scaleHeight(6),
+									paddingHorizontal: scaleWidth(16),
+									borderRadius: scaleWidth(12),
 								}}>
-								{toastRemainingSec}초 뒤에 닫힘
-							</Text>
-						)} */}
-
-						<TouchableOpacity
-							onPress={() => {
-								toastOpacity.setValue(0);
-								setToastMessage('');
-								setToastRemainingSec(null);
-								if (toastTimerRef.current) {
-									clearInterval(toastTimerRef.current);
-									toastTimerRef.current = null;
-								}
-							}}
-							style={{ marginTop: scaleHeight(6) }}>
-							<Text style={{ color: '#ddd', fontSize: scaledSize(13), textDecorationLine: 'underline' }}>닫기</Text>
-						</TouchableOpacity>
+								<Text
+									style={{
+										color: '#fff',
+										fontSize: scaledSize(14),
+										fontWeight: '600',
+									}}>
+									닫기
+								</Text>
+							</TouchableOpacity>
+						)}
 					</View>
 				</Animated.View>
 			)}

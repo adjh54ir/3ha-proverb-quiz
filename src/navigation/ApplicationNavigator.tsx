@@ -19,21 +19,12 @@ const ApplicationNavigator = () => {
 			<StatusBar translucent backgroundColor='transparent' barStyle='dark-content' />
 			{/* <StatusBar backgroundColor='#ffffff' translucent={false} /> */}
 			<NavigationContainer>
-				{/* 키보드가 텍스트를 가리는 증상 방지 */}
-				<KeyboardAvoidingView
-					style={{ flex: 1 }}
-					behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-				>
-					{/* 키보드 외 영역을 누르는 경우 제외 */}
-					<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-						{/* 아래의 각각 Navigation 내의 Path는 중복이 발생하면 안됩니다. */}
-						{/* <ZTemplateDradwerNavigator /> */}
-						{/* <DrawerNavigator /> */}
-						{/* <BottomTabNavigator /> */}
-						<StackNavigator />
-						{/* <TopNavigator /> */}
-					</TouchableWithoutFeedback>
-				</KeyboardAvoidingView>
+				{/* 아래의 각각 Navigation 내의 Path는 중복이 발생하면 안됩니다. */}
+				{/* <ZTemplateDradwerNavigator /> */}
+				{/* <DrawerNavigator /> */}
+				{/* <BottomTabNavigator /> */}
+				<StackNavigator />
+				{/* <TopNavigator /> */}
 			</NavigationContainer>
 		</SafeAreaProvider >
 	);

@@ -10,6 +10,7 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import QuizHistoryService from '@/services/QuizHistoryService';
+import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 
 
 /**
@@ -34,8 +35,10 @@ const WrongReviewScreen = () => {
 	const [correctCount, setCorrectCount] = useState(0);
 	const [showWrongList, setShowWrongList] = useState(false);
 
+	useBlockBackHandler(true); // 뒤로가기 모션 막기
+
 	useEffect(() => {
-		if (!isFocused) {return;}
+		if (!isFocused) { return; }
 
 		const fetchWrongData = async () => {
 			setLoading(true);
@@ -59,7 +62,7 @@ const WrongReviewScreen = () => {
 	}, [isFocused]);
 
 	const startWrongReview = () => {
-		if (wrongCountries.length === 0) {return;}
+		if (wrongCountries.length === 0) { return; }
 
 		// @ts-ignore
 		navigation.navigate(Paths.PROVERB_MEANING_QUIZ, {

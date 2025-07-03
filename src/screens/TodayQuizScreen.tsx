@@ -24,6 +24,7 @@ import AdmobBannerAd from './common/ads/AdmobBannerAd';
 import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
+import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 
 const NOTIFICATION_ID = 'daily-quiz-reminder';
 
@@ -78,6 +79,8 @@ const TodayQuizScreen = () => {
     console.log('getTodayStr :  ', getTodayStr(), 'getTodayISO : ', getTodayISO());
 
     const scrollRef = useRef<ScrollView>(null);
+
+    useBlockBackHandler(true); // 뒤로가기 모션 막기
 
     useFocusEffect(
         useCallback(() => {
@@ -201,7 +204,7 @@ const TodayQuizScreen = () => {
     const sendInstantPush = async () => {
         await notifee.displayNotification({
             title: '✨ 오늘의 퀴즈가 도착했어요!',
-            body: '사자성어 퀴즈 풀고 보상도 받아보세요!',
+            body: '속담 퀴즈 풀고 보상도 받아보세요!',
             android: {
                 channelId: await createAndroidChannel(),
                 pressAction: {
@@ -366,8 +369,8 @@ const TodayQuizScreen = () => {
         await notifee.createTriggerNotification(
             {
                 id: NOTIFICATION_ID,
-                title: '사자성어 퀴즈가 도착했습니다. 🍀',
-                body: '출석 체크도 하고 문제도 풀어서 사자성어 지식을 넓혀보아요!',
+                title: '속담 퀴즈가 도착했습니다. 🍀',
+                body: '출석 체크도 하고 문제도 풀어서 속담 지식을 넓혀보아요!',
                 android: {
                     channelId: await createAndroidChannel(),
                     pressAction: { id: 'default' },
@@ -715,7 +718,7 @@ const TodayQuizScreen = () => {
                     <View style={{ alignSelf: 'flex-start', marginTop: scaleHeight(6) }}>
                         <View style={styles.bulletRow}>
                             <Text style={styles.bullet}>•</Text>
-                            <Text style={styles.bulletText}>매일 5개의 사자성어 퀴즈가 도착해요.</Text>
+                            <Text style={styles.bulletText}>매일 5개의 속담 퀴즈가 도착해요.</Text>
                         </View>
                         <View style={styles.bulletRow}>
                             <Text style={styles.bullet}>•</Text>

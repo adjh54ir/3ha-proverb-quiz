@@ -25,6 +25,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import TermsScreen from './setting/TermScreen';
 import OpenSourceScreen from './setting/OpenSourceScreen';
+import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 
 const STORAGE_KEYS = {
 	study: MainStorageKeyType.USER_STUDY_HISTORY,
@@ -42,6 +43,8 @@ const SettingScreen = () => {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [resetType, setResetType] = useState<'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'all' | null>(null);
 	const [summary, setSummary] = useState<string>('');
+
+	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
 	useFocusEffect(
 		useCallback(() => {

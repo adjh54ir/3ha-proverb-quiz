@@ -48,6 +48,25 @@ const BottomTabNavigator = () => {
 			/>
 		);
 	};
+	/**
+	 * 현재 탭을 다시 눌렀을 때 Stack을 초기화하는 리스너 반환 함수
+	 * @param navigation 
+	 * @param routeName 
+	 * @returns 
+	 */
+	const getTabPressResetListener = (navigation: any, routeName: string) => ({
+		tabPress: (e: any) => {
+			const state = navigation.getState();
+			const currentTab = state.routes[state.index];
+
+			if (currentTab.name === routeName) {
+				navigation.reset({
+					index: 0,
+					routes: [{ name: routeName }],
+				});
+			}
+		},
+	});
 	return (
 		<Tab.Navigator
 			initialRouteName={Paths.HOME}
@@ -55,7 +74,8 @@ const BottomTabNavigator = () => {
 				headerTitleAlign: 'center',
 				tabBarLabelPosition: 'below-icon',
 				...getScreenOptions(isTablet, insets),
-			}}>
+			}}
+		>
 			<Tab.Screen
 				name={Paths.PROVERB_LIST}
 				component={ProverbListScreen}
@@ -65,6 +85,7 @@ const BottomTabNavigator = () => {
 					tabBarIcon: getTabBarIcon('materialicons', 'menu-book', isTablet),
 					headerShown: false, // 헤더 숨김
 				}}
+				listeners={({ navigation, route }) => getTabPressResetListener(navigation, route.name)}
 			/>
 
 			<Tab.Screen
@@ -76,6 +97,7 @@ const BottomTabNavigator = () => {
 					headerShown: false, // 헤더 숨김
 					tabBarIcon: getTabBarIcon('MaterialCommunityIcons', 'calendar-question', isTablet),
 				}}
+				listeners={({ navigation, route }) => getTabPressResetListener(navigation, route.name)}
 			/>
 
 			<Tab.Screen
@@ -87,6 +109,7 @@ const BottomTabNavigator = () => {
 					tabBarIcon: getTabBarIcon('materialicons', 'home', isTablet),
 					headerShown: false, // 헤더 숨김
 				}}
+				listeners={({ navigation, route }) => getTabPressResetListener(navigation, route.name)}
 			/>
 
 			<Tab.Screen
@@ -98,6 +121,7 @@ const BottomTabNavigator = () => {
 					tabBarIcon: getTabBarIcon('materialicons', 'emoji-events', isTablet),
 					headerShown: false, // 헤더 숨김
 				}}
+				listeners={({ navigation, route }) => getTabPressResetListener(navigation, route.name)}
 			/>
 
 			<Tab.Screen
@@ -109,6 +133,7 @@ const BottomTabNavigator = () => {
 					tabBarIcon: getTabBarIcon('materialicons', 'settings', isTablet),
 					headerShown: false, // 헤더 숨김
 				}}
+				listeners={({ navigation, route }) => getTabPressResetListener(navigation, route.name)}
 			/>
 		</Tab.Navigator>
 	);

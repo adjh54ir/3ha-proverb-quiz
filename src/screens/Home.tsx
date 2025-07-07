@@ -28,6 +28,7 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { CONST_MAIN_DATA } from '@/const/ConstMainData';
+import DateUtils from '@/utils/DateUtils';
 
 
 
@@ -128,6 +129,9 @@ const Home = () => {
 		{ day: 21, image: require('@/assets/images/pet_level3_org.png') },
 	];
 
+	const [showMascotHint, setShowMascotHint] = useState(true);
+
+	const { getLocalDateString, getLocalParamDateToString } = DateUtils
 
 	useFocusEffect(
 		useCallback(() => {
@@ -244,7 +248,7 @@ const Home = () => {
 		}
 
 		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-		const todayStr = getKSTDateString();
+		const todayStr = getLocalDateString();
 		const updated = arr.map((item) => (item.quizDate.slice(0, 10) === todayStr ? { ...item, isCheckedIn: true } : item));
 		await AsyncStorage.setItem(TODAY_QUIZ_LIST_KEY, JSON.stringify(updated));
 		setIsCheckedIn(true);
@@ -315,12 +319,6 @@ const Home = () => {
 		};
 	};
 
-	const getKSTDateString = () => {
-		const now = new Date();
-		const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-		return kst.toISOString().slice(0, 10);
-	};
-
 	const loadData = async () => {
 		const quizData = await AsyncStorage.getItem(USER_QUIZ_HISTORY_KEY);
 		const studyData = await AsyncStorage.getItem(USER_STUDY_HISTORY_KEY);
@@ -332,7 +330,7 @@ const Home = () => {
 			if (todayQuiz) {
 				const parsed = JSON.parse(todayQuiz);
 				console.log('parsed : ', todayQuiz);
-				const todayStr = getKSTDateString();
+				const todayStr = getLocalDateString();
 				const todayItem = parsed.find((q: any) => q.quizDate.slice(0, 10) === todayStr);
 				if (todayItem) {
 					setIsCheckedIn(todayItem.isCheckedIn || false);
@@ -352,7 +350,7 @@ const Home = () => {
 		return shuffled.slice(0, count);
 	};
 	const ensureTodayQuizExists = async () => {
-		const todayStr = getKSTDateString();
+		const todayStr = getLocalDateString();
 
 		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
 
@@ -401,7 +399,7 @@ const Home = () => {
 		}
 
 		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-		const todayStr = getKSTDateString();
+		const todayStr = getLocalDateString();
 		const todayItem = arr.find((q) => q.quizDate.slice(0, 10) === todayStr);
 
 		if (todayItem) {
@@ -421,7 +419,7 @@ const Home = () => {
 		}
 
 		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-		const todayStr = getKSTDateString();
+		const todayStr = getLocalDateString();
 
 		const marked: { [date: string]: any } = {};
 		arr.forEach((item) => {
@@ -451,6 +449,10 @@ const Home = () => {
 		const random = greetingMessages[Math.floor(Math.random() * greetingMessages.length)];
 		setGreeting(random);
 		setShowConfetti(false);
+
+		// 빵빠레 텍스트는 한 번 클릭하면 사라지게
+		if (showMascotHint) setShowMascotHint(false);
+
 		requestAnimationFrame(() => setShowConfetti(true));
 		if (scrollRef.current) {
 			clearTimeout(scrollRef.current);
@@ -520,6 +522,10 @@ const Home = () => {
 											<FastImage key={totalScore} source={mascot} style={styles.image} resizeMode="contain" />
 										</View>
 									</TouchableOpacity>
+									{/* ✅ 회색 작게 안내 텍스트 추가 */}
+									{showMascotHint && (
+										<Text style={styles.mascotHintText}>캐릭터를 누르면 빵빠레가 터져요!</Text>
+									)}
 
 									{petLevel >= 0 && (
 										<View
@@ -1549,6 +1555,13 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		marginTop: scaleHeight(6),
 		lineHeight: scaleHeight(18),
+	},
+	mascotHintText: {
+		marginTop: scaleHeight(4),
+		marginBottom: scaleHeight(6),
+		fontSize: scaledSize(11),
+		color: '#7f8c8d',
+		textAlign: 'center',
 	},
 });
 

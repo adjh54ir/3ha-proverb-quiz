@@ -25,6 +25,7 @@ import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import DateUtils from '@/utils/DateUtils';
 
 const NOTIFICATION_ID = 'daily-quiz-reminder';
 
@@ -74,10 +75,7 @@ const TodayQuizScreen = () => {
 
     const isQuizCompleted = Object.keys(answerResults).length === quizList.length;
 
-    const getTodayStr = () => todayDate.toISOString().slice(0, 10);
-    const getTodayISO = () => todayDate.toISOString();
-    console.log('getTodayStr :  ', getTodayStr(), 'getTodayISO : ', getTodayISO());
-
+    const { getLocalDateString, getLocalParamDateToString } = DateUtils
     const scrollRef = useRef<ScrollView>(null);
 
     useBlockBackHandler(true); // 뒤로가기 모션 막기
@@ -144,8 +142,8 @@ const TodayQuizScreen = () => {
             const existing: MainDataType.TodayQuizList[] = existingJson ? JSON.parse(existingJson) : [];
 
             // 같은 날짜가 있는 경우 제외하고 새로 저장
-            const todayStr = getTodayStr(); // ✅ 이렇게 바꿔야 함
-            const updated = [...existing.filter((q) => toKSTDateString(q.quizDate) !== toKSTDateString(todayDate)), newData];
+            const todayStr = getLocalDateString(); // ✅ 이렇게 바꿔야 함
+            const updated = [...existing.filter((q) => getLocalParamDateToString(q.quizDate) !== getLocalParamDateToString(todayDate)), newData];
 
             await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
             console.log('퀴즈 저장 완료');
@@ -166,11 +164,6 @@ const TodayQuizScreen = () => {
         };
     };
 
-    const toKSTDateString = (input: string | Date) => {
-        const date = typeof input === 'string' ? new Date(input) : new Date(input.getTime());
-        date.setHours(date.getHours() + 9);
-        return date.toISOString().slice(0, 10);
-    };
 
     /**
      * 지난 문제 리스트
@@ -183,8 +176,8 @@ const TodayQuizScreen = () => {
 
         const sorted = [...stored].sort((a, b) => new Date(b.quizDate).getTime() - new Date(a.quizDate).getTime());
 
-        const todayStr = toKSTDateString(todayDate);
-        const pastQuizzes = sorted.filter((q) => toKSTDateString(q.quizDate) !== todayStr);
+        const todayStr = getLocalParamDateToString(todayDate);
+        const pastQuizzes = sorted.filter((q) => getLocalParamDateToString(q.quizDate) !== todayStr);
 
         const grouped: GroupedPrevQuiz[] = pastQuizzes.map((entry) => {
             const formatted = formatQuizDate(entry.quizDate);
@@ -278,7 +271,7 @@ const TodayQuizScreen = () => {
     };
 
     const initQuiz = async () => {
-        const todayISO = getTodayISO();
+        const todayISO = getLocalDateString();
 
         if (showTodayReview) setShowTodayReview(false); // 👈 이 줄 추가
 
@@ -286,16 +279,16 @@ const TodayQuizScreen = () => {
         const hasPermission = settings.authorizationStatus === 1;
 
         if (hasPermission) {
-            const todayStr = getTodayStr();
+            const todayStr = getLocalDateString();
             const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
             const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
             // 여기서 KST 기준 비교로 todayData 찾기
-            const todayData = storedArr.find((q) => toKSTDateString(q.quizDate) === todayStr); // ✅ 중요
+            const todayData = storedArr.find((q) => getLocalParamDateToString(q.quizDate) === todayStr); // ✅ 중요
 
             const shouldGenerateNewQuiz =
                 !todayData ||
                 todayData.todayQuizIdArr.length < 5 ||
-                toKSTDateString(todayData.quizDate) !== toKSTDateString(todayDate);
+                getLocalParamDateToString(todayData.quizDate) !== getLocalParamDateToString(todayDate);
 
             if (shouldGenerateNewQuiz) {
                 // 새로운 퀴즈 생성
@@ -308,7 +301,7 @@ const TodayQuizScreen = () => {
                     worngQuizIdArr: [],
                     answerResults: {},
                     selectedAnswers: {},
-                    prevQuizIdArr: storedArr.at(-1)?.todayQuizIdArr || [],
+                    prevQuizIdArr: storedArr.length > 0 ? storedArr[storedArr.length - 1].todayQuizIdArr : []
                 };
                 await saveTodayQuizToStorage(newQuizData);
                 setQuizList(finalQuizList);
@@ -421,7 +414,7 @@ const TodayQuizScreen = () => {
         if (value) {
             const granted = await requestPermission();
             if (granted) {
-                const todayStr = getTodayStr();
+                const todayStr = getLocalDateString();
                 const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
                 const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
 
@@ -454,7 +447,7 @@ const TodayQuizScreen = () => {
                     setQuizList(newQuiz);
 
                     const todayQuizData: MainDataType.TodayQuizList = {
-                        quizDate: getTodayISO(),
+                        quizDate: getLocalDateString(),
                         isCheckedIn: false,
                         todayQuizIdArr: newQuiz.map((q) => q.id),
                         correctQuizIdArr: [],
@@ -540,8 +533,8 @@ const TodayQuizScreen = () => {
         const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
         const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
 
-        const todayStr = toKSTDateString(todayDate);
-        const todayIndex = storedArr.findIndex((q) => toKSTDateString(q.quizDate) === todayStr);
+        const todayStr = getLocalParamDateToString(todayDate);
+        const todayIndex = storedArr.findIndex((q) => getLocalParamDateToString(q.quizDate) === todayStr);
 
         if (todayIndex !== -1) {
             const updatedToday = {
@@ -572,10 +565,10 @@ const TodayQuizScreen = () => {
     const handleResetTodayQuiz = async () => {
         const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
         const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
-        const todayStr = toKSTDateString(todayDate);
+        const todayStr = getLocalParamDateToString(todayDate);
 
-        const todayData = storedArr.find((q) => toKSTDateString(q.quizDate) === todayStr);
-        const filteredArr = storedArr.filter((q) => toKSTDateString(q.quizDate) !== todayStr);
+        const todayData = storedArr.find((q) => getLocalParamDateToString(q.quizDate) === todayStr);
+        const filteredArr = storedArr.filter((q) => getLocalParamDateToString(q.quizDate) !== todayStr);
 
         // 출석 정보 유지
         const preservedIsCheckedIn = todayData?.isCheckedIn ?? false;
@@ -583,7 +576,7 @@ const TodayQuizScreen = () => {
         // 새로운 퀴즈 생성
         const newQuizList = getTodayQuiz();
         const newTodayData: MainDataType.TodayQuizList = {
-            quizDate: getTodayISO(),
+            quizDate: getLocalDateString(),
             isCheckedIn: preservedIsCheckedIn, // ✅ 출석 정보 유지
             todayQuizIdArr: newQuizList.map((q) => q.id),
             correctQuizIdArr: [],
@@ -840,13 +833,15 @@ const TodayQuizScreen = () => {
                                 </TouchableOpacity>
 
                                 {showTodayReview && (
-                                    <FlatList
-                                        style={styles.reviewList}
-                                        data={quizList}
-                                        keyExtractor={(item) => item.id.toString()}
-                                        renderItem={renderItem}
-                                        showsVerticalScrollIndicator={false}
-                                    />
+                                    <View style={styles.todayReviewBox}>
+                                        <FlatList
+                                            style={styles.reviewList}
+                                            data={quizList}
+                                            keyExtractor={(item) => item.id.toString()}
+                                            renderItem={renderItem}
+                                            showsVerticalScrollIndicator={false}
+                                        />
+                                    </View>
                                 )}
                             </>
                         )}
@@ -1845,6 +1840,15 @@ const styles = StyleSheet.create({
         fontSize: scaledSize(12),
         color: '#888',
         textDecorationLine: 'underline',
+    },
+
+    todayReviewBox: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: scaleWidth(12),
+        padding: scaleHeight(12),
+        marginHorizontal: scaleWidth(16),
+        backgroundColor: '#fff',
     },
 
 });

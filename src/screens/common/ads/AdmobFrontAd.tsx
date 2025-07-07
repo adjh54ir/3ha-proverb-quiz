@@ -48,34 +48,34 @@ const AD_UNIT_ID = Platform.select({
  */
 const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => {
   const [loaded, setLoaded] = useState(false);
+  const hasClosed = useRef(false); // ✅ 이미 닫힘 처리됐는지 여부
   const adRef = useRef<InterstitialAd | null>(null);
-
-  useEffect(() => {
-    if (loaded && adRef.current) {
-      console.log('🚀 광고 show 실행');
-      adRef.current.show();
-    }
-  }, [loaded]);
 
   useEffect(() => {
     const ad = InterstitialAd.createForAdRequest(AD_UNIT_ID);
     adRef.current = ad;
+    hasClosed.current = false; // 새 광고 시작 시 초기화
 
     const unsubscribeLoaded = ad.addAdEventListener(AdEventType.LOADED, () => {
       console.log('✅ 전면 광고 로딩 완료');
-      setLoaded(true); // 이 시점에서 loaded만 true로 설정
+      setLoaded(true);
+      ad.show();
     });
 
     const unsubscribeClosed = ad.addAdEventListener(AdEventType.CLOSED, () => {
+      if (hasClosed.current) return; // ✅ 중복 방지
+      hasClosed.current = true;
       console.log('✅ 전면 광고 닫힘');
       setLoaded(false);
       onAdClosed?.();
     });
 
     const unsubscribeFailed = ad.addAdEventListener(AdEventType.ERROR, (error) => {
+      if (hasClosed.current) return;
+      hasClosed.current = true;
       console.warn('❌ 광고 로딩 실패:', error?.message ?? error);
       setLoaded(false);
-      onAdClosed?.(); // 실패 시에도 콜백 실행
+      onAdClosed?.();
     });
 
     console.log('📦 전면 광고 로드 시작');

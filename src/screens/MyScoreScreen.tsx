@@ -621,7 +621,7 @@ const CapitalResultScreen = () => {
 							borderRadius: scaleWidth(20),
 						}}>
 						<Text style={{ fontSize: scaledSize(13), color: '#2c3e50' }}>
-							{isAllExpanded ? '나의 모든 결과 접기 ▲' : '나의 모든 결과 보기 ▼'}
+							{isAllExpanded ? '나의 모든 활동 결과 접기 ▲' : '나의 모든 활동 결과 보기 ▼'}
 						</Text>
 					</TouchableOpacity>
 

@@ -30,9 +30,6 @@ import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { CONST_MAIN_DATA } from '@/const/ConstMainData';
 import DateUtils from '@/utils/DateUtils';
 
-
-
-
 const greetingMessages = [
 	'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
 	'🧠 오늘의 속담으로 지혜를 키워봐요!',
@@ -131,7 +128,8 @@ const Home = () => {
 
 	const [showMascotHint, setShowMascotHint] = useState(true);
 
-	const { getLocalDateString, getLocalParamDateToString } = DateUtils
+	const { getLocalDateString, getLocalParamDateToString } = DateUtils;
+	const todayStr = getLocalDateString();
 
 	useFocusEffect(
 		useCallback(() => {
@@ -163,7 +161,6 @@ const Home = () => {
 		}
 	}, [showCheckInModal, isCheckedIn]);
 
-
 	const reversedLevelGuide = [...LEVEL_DATA].reverse();
 	const currentLevelIndex = reversedLevelGuide.findIndex((item) => totalScore >= item.score && totalScore < item.next);
 	useEffect(() => {
@@ -186,9 +183,6 @@ const Home = () => {
 	const reversedLevelData = useMemo(() => [...LEVEL_DATA].reverse(), []);
 
 	const { label, icon, mascot, description } = levelData;
-
-
-
 
 	useEffect(() => {
 		setShowConfetti(true);
@@ -248,7 +242,6 @@ const Home = () => {
 		}
 
 		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-		const todayStr = getLocalDateString();
 		const updated = arr.map((item) => (item.quizDate.slice(0, 10) === todayStr ? { ...item, isCheckedIn: true } : item));
 		await AsyncStorage.setItem(TODAY_QUIZ_LIST_KEY, JSON.stringify(updated));
 		setIsCheckedIn(true);
@@ -330,7 +323,6 @@ const Home = () => {
 			if (todayQuiz) {
 				const parsed = JSON.parse(todayQuiz);
 				console.log('parsed : ', todayQuiz);
-				const todayStr = getLocalDateString();
 				const todayItem = parsed.find((q: any) => q.quizDate.slice(0, 10) === todayStr);
 				if (todayItem) {
 					setIsCheckedIn(todayItem.isCheckedIn || false);
@@ -350,7 +342,6 @@ const Home = () => {
 		return shuffled.slice(0, count);
 	};
 	const ensureTodayQuizExists = async () => {
-		const todayStr = getLocalDateString();
 
 		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
 
@@ -364,7 +355,7 @@ const Home = () => {
 
 			// 오늘 항목이 없으면 추가
 			const newQuizItem: MainDataType.TodayQuizList = {
-				quizDate: new Date().toISOString(),
+				quizDate: todayStr,
 				isCheckedIn: false,
 				todayQuizIdArr: generateTodayQuizIds(5),
 				correctQuizIdArr: [],
@@ -378,7 +369,7 @@ const Home = () => {
 		} else {
 			// 키 자체가 없음: 새로 생성
 			const newQuizItem: MainDataType.TodayQuizList = {
-				quizDate: new Date().toISOString(),
+				quizDate: todayStr,
 				isCheckedIn: false,
 				todayQuizIdArr: generateTodayQuizIds(5),
 				correctQuizIdArr: [],
@@ -399,7 +390,6 @@ const Home = () => {
 		}
 
 		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-		const todayStr = getLocalDateString();
 		const todayItem = arr.find((q) => q.quizDate.slice(0, 10) === todayStr);
 
 		if (todayItem) {
@@ -419,7 +409,6 @@ const Home = () => {
 		}
 
 		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-		const todayStr = getLocalDateString();
 
 		const marked: { [date: string]: any } = {};
 		arr.forEach((item) => {
@@ -451,7 +440,9 @@ const Home = () => {
 		setShowConfetti(false);
 
 		// 빵빠레 텍스트는 한 번 클릭하면 사라지게
-		if (showMascotHint) setShowMascotHint(false);
+		if (showMascotHint) {
+			setShowMascotHint(false);
+		}
 
 		requestAnimationFrame(() => setShowConfetti(true));
 		if (scrollRef.current) {
@@ -515,26 +506,18 @@ const Home = () => {
 									<View style={styles.speechTail} />
 								</View>
 
-								<View
-									style={styles.petView}>
+								<View style={styles.petView}>
 									<TouchableOpacity onPress={handleMascotPress}>
 										<View style={styles.mascoteView}>
 											<FastImage key={totalScore} source={mascot} style={styles.image} resizeMode="contain" />
 										</View>
 									</TouchableOpacity>
 									{/* ✅ 회색 작게 안내 텍스트 추가 */}
-									{showMascotHint && (
-										<Text style={styles.mascotHintText}>캐릭터를 누르면 빵빠레가 터져요!</Text>
-									)}
+									{showMascotHint && <Text style={styles.mascotHintText}>캐릭터를 누르면 빵빠레가 터져요!</Text>}
 
 									{petLevel >= 0 && (
-										<View
-											style={styles.petContent}>
-											<FastImage
-												source={PET_REWARDS[petLevel].image}
-												style={styles.petImage}
-												resizeMode="cover"
-											/>
+										<View style={styles.petContent}>
+											<FastImage source={PET_REWARDS[petLevel].image} style={styles.petImage} resizeMode="cover" />
 										</View>
 									)}
 								</View>
@@ -544,18 +527,9 @@ const Home = () => {
 									{/* 타이틀 라인 */}
 									<View style={styles.innerTitleContainer}>
 										<IconComponent type="fontAwesome6" name={icon} size={18} color="#27ae60" />
-										<Text
-											style={styles.titleText}>
-											{label}
-										</Text>
+										<Text style={styles.titleText}>{label}</Text>
 										<TouchableOpacity onPress={() => setShowLevelModal(true)}>
-											<IconComponent
-												type="materialIcons"
-												name="info-outline"
-												size={18}
-												color="#7f8c8d"
-												style={styles.infoIcon}
-											/>
+											<IconComponent type="materialIcons" name="info-outline" size={18} color="#7f8c8d" style={styles.infoIcon} />
 										</TouchableOpacity>
 									</View>
 
@@ -569,10 +543,7 @@ const Home = () => {
 								</View>
 								{earnedBadges.length > 0 && (
 									<View style={styles.badgeView}>
-										<ScrollView
-											horizontal
-											showsHorizontalScrollIndicator={false}
-											contentContainerStyle={{ paddingHorizontal: scaleWidth(10) }}>
+										<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: scaleWidth(10) }}>
 											{visibleBadges.map((item) => (
 												<View key={item.id} style={styles.badgeViewInner}>
 													<TouchableOpacity
@@ -780,19 +751,10 @@ const Home = () => {
 
 						<Text style={styles.modalTitle}>오늘의 출석</Text>
 
-						<ScrollView
-							style={{ width: '100%' }}
-							contentContainerStyle={{ paddingBottom: scaleHeight(20) }}
-							showsVerticalScrollIndicator={false}>
+						<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: scaleHeight(20) }} showsVerticalScrollIndicator={false}>
 							<View style={styles.rowCentered}>
-								<FastImage
-									source={mascot}
-									style={styles.mascotImage}
-									resizeMode={FastImage.resizeMode.cover}
-								/>
-								<Text style={[styles.modalText2, { flex: 1 }]}>
-									매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어줘요!{'\n'}
-								</Text>
+								<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.cover} />
+								<Text style={[styles.modalText2, { flex: 1 }]}>매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어줘요!{'\n'}</Text>
 							</View>
 
 							<View style={styles.highlightBox}>
@@ -803,40 +765,18 @@ const Home = () => {
 							</View>
 
 							<View style={styles.petScrollContainer}>
-								<ScrollView
-									horizontal
-									showsHorizontalScrollIndicator={false}
-									contentContainerStyle={styles.petScrollContent}>
+								<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.petScrollContent}>
 									{[
 										{ label: '7일 출석', image: require('@/assets/images/pet_level1_org.png') },
 										{ label: '14일 출석', image: require('@/assets/images/pet_level2_org.png') },
 										{ label: '21일 출석', image: require('@/assets/images/pet_level3_org.png') },
 									].map((item, index, arr) => (
-										<View
-											key={index}
-											style={[
-												styles.petItemBox,
-												{ marginRight: index !== arr.length - 1 ? scaleWidth(10) : 0 },
-											]}>
-											<FastImage
-												source={item.image}
-												style={styles.petImage2}
-												resizeMode="contain"
-											/>
+										<View key={index} style={[styles.petItemBox, { marginRight: index !== arr.length - 1 ? scaleWidth(10) : 0 }]}>
+											<FastImage source={item.image} style={styles.petImage2} resizeMode="contain" />
 											<Text style={styles.petLabelText}>{item.label}</Text>
-											<Text style={styles.petStageText}>
-												{['새싹 친구', '잎사귀 친구', '꽃잎 친구'][index]}
-											</Text>
+											<Text style={styles.petStageText}>{['새싹 친구', '잎사귀 친구', '꽃잎 친구'][index]}</Text>
 
-											{index < arr.length - 1 && (
-												<IconComponent
-													name="chevron-right"
-													type="fontAwesome"
-													size={12}
-													color="#7f8c8d"
-													style={styles.arrowIcon}
-												/>
-											)}
+											{index < arr.length - 1 && <IconComponent name="chevron-right" type="fontAwesome" size={12} color="#7f8c8d" style={styles.arrowIcon} />}
 										</View>
 									))}
 								</ScrollView>
@@ -855,30 +795,18 @@ const Home = () => {
 								renderHeader={(date) => {
 									const year = date.getFullYear();
 									const month = (date.getMonth() + 1).toString().padStart(2, '0');
-									return (
-										<Text style={styles.calendarHeaderText}>
-											{`${year}년 ${month}월`} 출석
-										</Text>
-									);
+									return <Text style={styles.calendarHeaderText}>{`${year}년 ${month}월`} 출석</Text>;
 								}}
 								hideArrows
 								style={styles.calendarContainer}
 							/>
 							{showStamp && (
 								<Animated.View style={[stampStyle, styles.stampContainer]}>
-									<FastImage
-										source={mascot}
-										style={styles.stampImage}
-										resizeMode="contain"
-									/>
+									<FastImage source={mascot} style={styles.stampImage} resizeMode="contain" />
 									<Text style={styles.stampText}>오늘 출석 완료!</Text>
 								</Animated.View>
 							)}
-							{isCheckedIn && (
-								<Text style={styles.checkInCompleteText}>
-									🎉 오늘도 출석 완료! 🎉
-								</Text>
-							)}
+							{isCheckedIn && <Text style={styles.checkInCompleteText}>🎉 오늘도 출석 완료! 🎉</Text>}
 						</ScrollView>
 					</View>
 				</View>

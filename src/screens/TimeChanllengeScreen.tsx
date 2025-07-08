@@ -31,11 +31,7 @@ const CHOICE_COUNT = 4;
 const SCORE_ENCOURAGEMENTS: { min: number; messages: string[] }[] = [
 	{
 		min: 1000,
-		messages: [
-			'🏆 정말 대단해요! 이건 거의 신급이에요!',
-			'🎉 환상적인 성과! 축하드립니다!',
-			'🌟 당신은 진정한 속담 마스터!',
-		],
+		messages: ['🏆 정말 대단해요! 이건 거의 신급이에요!', '🎉 환상적인 성과! 축하드립니다!', '🌟 당신은 진정한 속담 마스터!'],
 	},
 	{
 		min: 500,
@@ -47,11 +43,7 @@ const SCORE_ENCOURAGEMENTS: { min: number; messages: string[] }[] = [
 	},
 	{
 		min: 0,
-		messages: [
-			'🌱 시작이 반이에요! 포기하지 마세요!',
-			'🙌 계속 도전하면 분명 좋아질 거예요!',
-			'🐾 한 걸음 한 걸음 앞으로!',
-		],
+		messages: ['🌱 시작이 반이에요! 포기하지 마세요!', '🙌 계속 도전하면 분명 좋아질 거예요!', '🐾 한 걸음 한 걸음 앞으로!'],
 	},
 ];
 const getShuffledChoices = (correct: string, allMeanings: string[]) => {
@@ -271,7 +263,6 @@ const InfinityQuizScreen = () => {
 	const handleGameOver = () => {
 		const quizDate = new Date().toISOString(); // 예: '2025-06-26T14:20:00.000Z'
 
-		const totalQuestions = currentIndex + 1;
 		const correctQuizIdList = questionList
 			.slice(0, currentIndex + 1)
 			.filter((q) => resultMap[q.id] === 'correct')
@@ -281,10 +272,12 @@ const InfinityQuizScreen = () => {
 			.filter((q) => resultMap[q.id] === 'wrong')
 			.map((q) => q.id);
 
+		const solvedCount = correctQuizIdList.length + wrongQuizIdList.length;
+
 		const result: MainDataType.TimeChallengeResult = {
 			quizDate,
 			finalScore: score,
-			totalQuestions,
+			totalQuestions: solvedCount, // 👈 여기 수정
 			solvedQuestions: correctQuizIdList.length + wrongQuizIdList.length,
 			correctCount: correctQuizIdList.length,
 			wrongCount: wrongQuizIdList.length,
@@ -377,14 +370,14 @@ const InfinityQuizScreen = () => {
 					setLives((prev) => prev - 1);
 					setCombo(0);
 				}
-
 				setTimeout(() => {
 					setFeedback(null);
-					const isLastLife = lives - (isCorrect ? 0 : 1) <= 0;
+					// 수정 코드
+					const newLives = isCorrect ? lives : lives - 1;
 
-					if (isLastLife) {
+					if (newLives <= 0) {
+						handleGameOver();
 						setIsGameOver(true);
-						handleGameOver(); // <- 저장
 					} else {
 						setCurrentIndex((prev) => prev + 1);
 					}
@@ -470,7 +463,9 @@ const InfinityQuizScreen = () => {
 	};
 
 	const handleChance = () => {
-		if (hasUsedChance) return;
+		if (hasUsedChance) {
+			return;
+		}
 
 		const current = questionList[currentIndex];
 
@@ -559,11 +554,7 @@ ${sameProverb ? sameProverb : '-'}
 
 	return (
 		<SafeAreaView style={styles.container} edges={['bottom']}>
-			<ScrollView
-				ref={scrollViewRef}
-				style={{ flex: 1 }}
-				onScroll={scrollHandler.onScroll}
-				keyboardShouldPersistTaps="handled">
+			<ScrollView ref={scrollViewRef} style={{ flex: 1 }} onScroll={scrollHandler.onScroll} keyboardShouldPersistTaps="handled">
 				{!isGameOver && (
 					<View style={styles.statusBoxRow}>
 						{/* 🎯 점수 */}
@@ -632,9 +623,7 @@ ${sameProverb ? sameProverb : '-'}
 					<View style={styles.lifeBarWrapper}>
 						{!hasUsedChance && (
 							<View style={styles.leftFixed}>
-								<TouchableOpacity
-									onPress={handleChance}
-									style={styles.chanceContent}>
+								<TouchableOpacity onPress={handleChance} style={styles.chanceContent}>
 									<IconComponent name="magic" type="FontAwesome" color="#27ae60" size={16} />
 									<Text style={styles.chanceText}>찬스 (1)</Text>
 								</TouchableOpacity>
@@ -679,26 +668,14 @@ ${sameProverb ? sameProverb : '-'}
 					<>
 						{showConfetti && (
 							<View style={styles.globalConfettiWrapper}>
-								<ConfettiCannon
-									count={200}
-									origin={{ x: scaleWidth(180), y: 0 }}
-									fadeOut
-									explosionSpeed={500}
-									fallSpeed={2500}
-								/>
+								<ConfettiCannon count={200} origin={{ x: scaleWidth(180), y: 0 }} fadeOut explosionSpeed={500} fallSpeed={2500} />
 							</View>
 						)}
 						<View style={styles.resultWrapper}>
 							<View style={styles.gameOverBox}>
 								<View style={styles.resultTitleCard}>
 									<View style={{ flexDirection: 'row', alignContent: 'center' }}>
-										<IconComponent
-											name="schedule"
-											type="MaterialIcons"
-											size={28}
-											color="#e67e22"
-											style={{ marginRight: scaleWidth(8) }}
-										/>
+										<IconComponent name="schedule" type="MaterialIcons" size={28} color="#e67e22" style={{ marginRight: scaleWidth(8) }} />
 										<Text style={styles.gameOverText}>타임 챌린지 결과</Text>
 									</View>
 								</View>
@@ -780,7 +757,8 @@ ${sameProverb ? sameProverb : '-'}
 										<View style={styles.resultRow}>
 											<IconComponent name="times" type="FontAwesome" color="#e74c3c" size={20} />
 											<Text style={styles.resultText}>
-												{' '}오답 수: <Text style={styles.bold}>{gameResult.wrongCount}문제</Text>
+												{' '}
+												오답 수: <Text style={styles.bold}>{gameResult.wrongCount}문제</Text>
 											</Text>
 										</View>
 										<View style={styles.resultRow}>
@@ -826,13 +804,7 @@ ${sameProverb ? sameProverb : '-'}
 											//@ts-ignore
 											navigation.navigate(Paths.INIT_TIME_CHANLLENGE); // 실제 경로로 변경
 										}}>
-										<IconComponent
-											name="bar-chart"
-											type="FontAwesome"
-											size={18}
-											color="#fff"
-											style={{ marginRight: scaleWidth(8) }}
-										/>
+										<IconComponent name="bar-chart" type="FontAwesome" size={18} color="#fff" style={{ marginRight: scaleWidth(8) }} />
 										<Text style={{ fontSize: scaledSize(14), fontWeight: 'bold', color: '#fff' }}>랭킹 보러가기</Text>
 									</TouchableOpacity>
 
@@ -848,13 +820,7 @@ ${sameProverb ? sameProverb : '-'}
 											alignItems: 'center',
 										}}
 										onPress={startCountdownAndReset}>
-										<IconComponent
-											name="refresh"
-											type="FontAwesome"
-											color="#fff"
-											size={18}
-											style={{ marginRight: scaleWidth(8) }}
-										/>
+										<IconComponent name="refresh" type="FontAwesome" color="#fff" size={18} style={{ marginRight: scaleWidth(8) }} />
 										<Text style={{ fontSize: scaledSize(14), fontWeight: 'bold', color: '#fff' }}>다시 도전하기</Text>
 									</TouchableOpacity>
 								</View>
@@ -906,12 +872,7 @@ ${sameProverb ? sameProverb : '-'}
 						)}
 					</>
 				) : (
-					<View
-						style={[
-							styles.questionBox,
-							feedback === 'correct' && styles.questionBoxCorrect,
-							feedback === 'wrong' && styles.questionBoxWrong,
-						]}>
+					<View style={[styles.questionBox, feedback === 'correct' && styles.questionBoxCorrect, feedback === 'wrong' && styles.questionBoxWrong]}>
 						<View style={{ marginBottom: scaleHeight(20) }}>
 							<Text style={styles.questionText}>{current.proverb}</Text>
 							{feedback && (
@@ -930,8 +891,7 @@ ${sameProverb ? sameProverb : '-'}
 
 						{choices.map((choice, index) => {
 							const isCorrectAnswer = choice === current.longMeaning;
-							const isUserSelected =
-								feedback !== null && choice === choices.find((c) => c === choice && c === questionList[currentIndex].longMeaning);
+							const isUserSelected = feedback !== null && choice === choices.find((c) => c === choice && c === questionList[currentIndex].longMeaning);
 							const wasUserWrong = feedback === 'wrong' && isUserSelected && !isCorrectAnswer;
 
 							let borderColor = labelColors[index];
@@ -956,27 +916,27 @@ ${sameProverb ? sameProverb : '-'}
 									style={[
 										styles.choiceBtn,
 										feedback &&
-										(() => {
-											if (feedback === 'correct' && isCorrectAnswer) {
-												return {
-													backgroundColor: '#d4edda',
-													borderColor: '#2ecc71', // ✅ 초록 테두리
-												};
-											} else if (feedback === 'wrong') {
-												if (isUserSelected && !isCorrectAnswer) {
-													return {
-														backgroundColor: '#f8d7da',
-														borderColor: '#e74c3c', // ✅ 빨간 테두리 (오답)
-													};
-												} else if (isCorrectAnswer) {
+											(() => {
+												if (feedback === 'correct' && isCorrectAnswer) {
 													return {
 														backgroundColor: '#d4edda',
-														borderColor: '#2ecc71', // ✅ 정답
+														borderColor: '#2ecc71', // ✅ 초록 테두리
 													};
+												} else if (feedback === 'wrong') {
+													if (isUserSelected && !isCorrectAnswer) {
+														return {
+															backgroundColor: '#f8d7da',
+															borderColor: '#e74c3c', // ✅ 빨간 테두리 (오답)
+														};
+													} else if (isCorrectAnswer) {
+														return {
+															backgroundColor: '#d4edda',
+															borderColor: '#2ecc71', // ✅ 정답
+														};
+													}
 												}
-											}
-											return {};
-										})(),
+												return {};
+											})(),
 									]}
 									onPress={() => handleAnswer(choice)}
 									disabled={feedback !== null}>
@@ -1042,9 +1002,7 @@ ${sameProverb ? sameProverb : '-'}
 			{isCountingDown && (
 				<View style={StyleSheet.absoluteFillObject}>
 					<View style={styles.countdownOverlay}>
-						<Animated.Text style={[styles.countdownText, { transform: [{ scale: scaleAnim }] }]}>
-							{count === 0 ? '시작!' : count}
-						</Animated.Text>
+						<Animated.Text style={[styles.countdownText, { transform: [{ scale: scaleAnim }] }]}>{count === 0 ? '시작!' : count}</Animated.Text>
 						<Text style={styles.countdownMessage}>
 							{count === 3 ? '심호흡 하세요…' : count === 2 ? '준비하세요!' : count === 1 ? '곧 시작됩니다!' : ''}
 						</Text>

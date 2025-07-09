@@ -29,6 +29,7 @@ import { MainDataType } from '@/types/MainDataType';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { CONST_MAIN_DATA } from '@/const/ConstMainData';
 import DateUtils from '@/utils/DateUtils';
+import notifee, { EventType } from '@notifee/react-native';
 
 
 
@@ -201,6 +202,38 @@ const Home = () => {
 		// 정리
 		return () => clearTimeout(timeout);
 	}, []);
+
+	/**
+	 * navigation 관리 
+	 */
+	useEffect(() => {
+		// 푸시 클릭했을 때
+		const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
+			if (type === EventType.PRESS) {
+				const screen = detail.notification?.data?.moveToScreen;
+				if (screen) {
+					// @ts-ignore
+					navigation.navigate(screen)
+				}
+			}
+		});
+
+		// 앱 종료 상태에서 푸시 누른 경우
+		notifee.getInitialNotification()
+			.then(initialNotification => {
+				console.log("앱 종료 상태에서 푸시 누른 경우")
+				if (initialNotification) {
+					const screen = initialNotification.notification?.data?.moveToScreen;
+					if (screen) {
+						// @ts-ignore
+						navigate(screen)
+					}
+				}
+			});
+		return () => {
+			unsubscribe();
+		};
+	}, [])
 
 	const getPetLevel = (checkedIn: { [date: string]: any }) => {
 		const count = Object.keys(checkedIn).length;
@@ -524,7 +557,7 @@ const Home = () => {
 									</TouchableOpacity>
 									{/* ✅ 회색 작게 안내 텍스트 추가 */}
 									{showMascotHint && (
-										<Text style={styles.mascotHintText}>캐릭터를 누르면 빵빠레가 터져요!</Text>
+										<Text style={styles.mascotHintText}>캐릭터를 누르면 빵빠레가 팡팡!</Text>
 									)}
 
 									{petLevel >= 0 && (

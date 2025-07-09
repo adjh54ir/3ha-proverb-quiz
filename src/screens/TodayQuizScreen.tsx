@@ -368,6 +368,9 @@ const TodayQuizScreen = () => {
                     channelId: await createAndroidChannel(),
                     pressAction: { id: 'default' },
                 },
+                data: {
+                    moveToScreen: Paths.TODAY_QUIZ, // ✅ 목적지 명시
+                },
             },
             trigger,
         );
@@ -704,6 +707,19 @@ const TodayQuizScreen = () => {
             )}
 
             <View style={styles.rightAlignedRow} />
+
+            {__DEV__ && (
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        style={styles.resetButton}
+                        onPress={sendInstantPush}
+                    >
+                        <Text style={{ fontSize: scaledSize(13), color: '#007AFF', fontWeight: 'bold' }}>
+                            🔔 푸시 테스트 발송
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )}
             {!isAlarmEnabled && (
                 <View style={styles.content}>
                     <Text style={styles.title}>🍀 매일 '오늘의 퀴즈'가 도착해요! 🍀</Text>
@@ -827,9 +843,7 @@ const TodayQuizScreen = () => {
                                         color="#333"
                                         style={{ marginRight: 8 }}
                                     />
-                                    <Text style={styles.acodianTxt}>
-                                        {showTodayReview ? '오늘 문제 접기' : '오늘 문제 다시 보기'}
-                                    </Text>
+                                    <Text style={styles.acodianTxt}>{showTodayReview ? '오늘의 퀴즈 접기' : '오늘의 퀴즈 다시 보기'}</Text>
                                 </TouchableOpacity>
 
                                 {showTodayReview && (

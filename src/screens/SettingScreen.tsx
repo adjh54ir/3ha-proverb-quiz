@@ -130,17 +130,17 @@ const SettingScreen = () => {
 		await AsyncStorage.setItem(STORAGE_KEYS.quiz, JSON.stringify(parsed));
 		Alert.alert('처리됨', '모든 퀴즈 완료 + 뱃지 지급!');
 	};
-	// const handleCompleteAllStudy = async () => {
-	// 	const allProverbs = ProverbServices.selectProverbList();
-	// 	const parsed: MainDataType.UserStudyHistory = {
-	// 		badges: CONST_BADGES.filter((b) => b.type === 'study').map((b) => b.id),
-	// 		studyProverbs: allProverbs.map((p) => p.id),
-	// 		lastStudyAt: new Date(),
-	// 		studyCounts: {}, // 원하면 각 사자성어 id별 학습 횟수 설정 가능
-	// 	};
-	// 	await AsyncStorage.setItem(STORAGE_KEYS.study, JSON.stringify(parsed));
-	// 	Alert.alert('처리됨', '모든 학습 완료 + 뱃지 지급!');
-	// };
+	const handleCompleteAllStudy = async () => {
+		const allProverbs = ProverbServices.selectProverbList();
+		const parsed: MainDataType.UserStudyHistory = {
+			badges: CONST_BADGES.filter((b) => b.type === 'study').map((b) => b.id),
+			studyProverbs: allProverbs.map((p) => p.id),
+			lastStudyAt: new Date(),
+			studyCounts: {}, // 원하면 각 사자성어 id별 학습 횟수 설정 가능
+		};
+		await AsyncStorage.setItem(STORAGE_KEYS.study, JSON.stringify(parsed));
+		Alert.alert('처리됨', '모든 학습 완료 + 뱃지 지급!');
+	};
 
 	// 모달 타이틀을 타입에 따라 변경
 	const getModalTitle = () => {

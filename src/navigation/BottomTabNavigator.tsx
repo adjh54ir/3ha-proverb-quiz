@@ -24,9 +24,8 @@ const BottomTabNavigator = () => {
 			backgroundColor: '#fff',
 		},
 		tabBarLabelStyle: {
-			fontSize: isTablet ? scaledSize(11) : scaledSize(11),
-			marginLeft: scaleWidth(2),
-			marginTop: isTablet ? scaleHeight(10) : scaleHeight(2.5),
+			fontSize: isTablet ? scaledSize(12) : scaledSize(11),
+			marginTop: isTablet ? scaleHeight(10) : 0,
 		},
 	});
 

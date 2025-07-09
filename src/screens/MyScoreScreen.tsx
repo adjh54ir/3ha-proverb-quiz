@@ -51,8 +51,6 @@ const DIFFICULTIES = [
 	{ key: 'Level 4', title: 'Level 4', subtitle: '어려움', icon: 'trophy' },
 ];
 
-
-
 const CATEGORY_META: Record<string, { color: string; icon: { type: string; name: string } }> = {
 	'운/우연': { color: '#81ecec', icon: { type: 'fontAwesome5', name: 'dice' } },
 	인간관계: { color: '#a29bfe', icon: { type: 'fontAwesome5', name: 'users' } },
@@ -133,9 +131,6 @@ const CapitalResultScreen = () => {
 
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
-
-
-
 	const getLevelStyle = (subtitle: string) => {
 		const entry = STYLE_MAP[subtitle];
 		if (!entry) {
@@ -166,7 +161,6 @@ const CapitalResultScreen = () => {
 			setShowTodayQuizSection(false);
 		}, []),
 	);
-
 
 	const loadData = async () => {
 		try {
@@ -299,6 +293,15 @@ const CapitalResultScreen = () => {
 			setTodayQuizDataList(todayData); // todayData를 상태로 저장
 
 			setMarkedQuizDates(marked);
+
+			// loadData 함수 안의 맨 아래에 추가
+			if (!selectedDate) {
+				const todayStr = moment().format('YYYY-MM-DD');
+				const todayQuiz = todayData.find((item) => moment(item.quizDate).format('YYYY-MM-DD') === todayStr);
+				setSelectedDate(todayStr);
+				setSelectedQuizData(todayQuiz ?? null);
+				updateMarkedQuizDatesOnSelect(todayStr, null, setMarkedQuizDates, todayData);
+			}
 		} catch (e) {
 			console.error('❌ 데이터 로딩 실패:', e);
 		}
@@ -383,7 +386,6 @@ const CapitalResultScreen = () => {
 		setShowTodayQuizSection(nextState); // ✅ 추가됨
 	};
 
-
 	/**
 	 * 스크롤을 관리하는 Handler
 	 */
@@ -435,9 +437,7 @@ const CapitalResultScreen = () => {
 
 			// ✅ 이전 선택 날짜 초기화
 			if (prevDate && updated[prevDate]) {
-				const wasChecked = todayQuizDataList.some(
-					(item) => moment(item.quizDate).format('YYYY-MM-DD') === prevDate,
-				);
+				const wasChecked = todayQuizDataList.some((item) => moment(item.quizDate).format('YYYY-MM-DD') === prevDate);
 
 				if (wasChecked) {
 					updated[prevDate] = {
@@ -559,11 +559,7 @@ const CapitalResultScreen = () => {
 					</View>
 					<View style={styles.sectionBox}>
 						<View style={{ alignItems: 'center', marginVertical: scaleHeight(8) }}>
-							<FastImage
-								source={mascot}
-								style={{ width: scaleWidth(120), height: scaleHeight(120) }}
-								resizeMode={FastImage.resizeMode.contain}
-							/>
+							<FastImage source={mascot} style={{ width: scaleWidth(120), height: scaleHeight(120) }} resizeMode={FastImage.resizeMode.contain} />
 
 							{petLevel >= 0 && (
 								<View
@@ -584,9 +580,7 @@ const CapitalResultScreen = () => {
 						<View style={{ alignItems: 'center' }}>
 							<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(10) }}>
 								<IconComponent type="fontAwesome6" name={icon} size={18} color="#27ae60" />
-								<Text style={{ fontSize: scaledSize(16), color: '#27ae60', fontWeight: '700', marginLeft: scaleWidth(6) }}>
-									{label}
-								</Text>
+								<Text style={{ fontSize: scaledSize(16), color: '#27ae60', fontWeight: '700', marginLeft: scaleWidth(6) }}>{label}</Text>
 								<TouchableOpacity onPress={() => setShowLevelModal(true)}>
 									<IconComponent
 										type="materialIcons"
@@ -796,9 +790,7 @@ const CapitalResultScreen = () => {
 								style={[styles.calendarStyle, { width: '100%' }]}
 								onDayPress={(day) => {
 									const date = day.dateString;
-									const matchedData = todayQuizDataList.find((item) =>
-										moment(item.quizDate).format('YYYY-MM-DD') === date,
-									);
+									const matchedData = todayQuizDataList.find((item) => moment(item.quizDate).format('YYYY-MM-DD') === date);
 									setSelectedDate(date);
 									setSelectedQuizData(matchedData ?? null);
 
@@ -812,9 +804,7 @@ const CapitalResultScreen = () => {
 									textDayHeaderFontSize: 13,
 								}}
 							/>
-							<Text style={{ fontSize: scaledSize(12), color: '#7f8c8d', marginTop: scaleHeight(8) }}>
-								🟢 표시는 오늘의 퀴즈를 모두 푼 날입니다.
-							</Text>
+							<Text style={{ fontSize: scaledSize(12), color: '#7f8c8d', marginTop: scaleHeight(8) }}>🟢 표시는 오늘의 퀴즈를 모두 푼 날입니다.</Text>
 
 							{selectedDate === null && <Text style={styles.emptyText}>📅 날짜를 선택해 주세요.</Text>}
 
@@ -829,9 +819,7 @@ const CapitalResultScreen = () => {
 										marginTop: scaleHeight(10),
 										alignSelf: 'stretch',
 									}}>
-									<Text style={{ fontSize: scaledSize(13), color: '#95a5a6', textAlign: 'left' }}>
-										선택한 날짜에는 오늘의 퀴즈를 풀지 않았어요
-									</Text>
+									<Text style={{ fontSize: scaledSize(13), color: '#95a5a6', textAlign: 'left' }}>선택한 날짜에는 오늘의 퀴즈를 풀지 않았어요</Text>
 								</View>
 							)}
 
@@ -919,46 +907,28 @@ const CapitalResultScreen = () => {
 											<View style={styles.rankRow}>
 												{index === 0 && (
 													<>
-														<IconComponent
-															name="trophy"
-															type="FontAwesome"
-															size={24}
-															color="#f1c40f"
-															style={{ marginRight: scaleWidth(8) }}
-														/>
+														<IconComponent name="trophy" type="FontAwesome" size={24} color="#f1c40f" style={{ marginRight: scaleWidth(8) }} />
 														<Text style={styles.firstRankLabel}>1등</Text>
 														<Text style={styles.firstRankScore}>
-															{item.finalScore}점<Text style={styles.rankDate}>  ({getRelativeDateLabel(item.quizDate)})</Text>
+															{item.finalScore}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
 														</Text>
 													</>
 												)}
 												{index === 1 && (
 													<>
-														<IconComponent
-															name="trophy"
-															type="FontAwesome"
-															size={20}
-															color="#bdc3c7"
-															style={{ marginRight: scaleWidth(13) }}
-														/>
+														<IconComponent name="trophy" type="FontAwesome" size={20} color="#bdc3c7" style={{ marginRight: scaleWidth(13) }} />
 														<Text style={styles.secondRankLabel}>2등</Text>
 														<Text style={styles.secondRankScore}>
-															{item.finalScore}점<Text style={styles.rankDate}>  ({getRelativeDateLabel(item.quizDate)})</Text>
+															{item.finalScore}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
 														</Text>
 													</>
 												)}
 												{index === 2 && (
 													<>
-														<IconComponent
-															name="trophy"
-															type="FontAwesome"
-															size={18}
-															color="#cd7f32"
-															style={{ marginRight: scaleWidth(16) }}
-														/>
+														<IconComponent name="trophy" type="FontAwesome" size={18} color="#cd7f32" style={{ marginRight: scaleWidth(16) }} />
 														<Text style={styles.thirdRankLabel}>3등</Text>
 														<Text style={styles.thirdRankScore}>
-															{item.finalScore}점<Text style={styles.rankDate}>  ({getRelativeDateLabel(item.quizDate)})</Text>
+															{item.finalScore}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
 														</Text>
 													</>
 												)}
@@ -968,7 +938,6 @@ const CapitalResultScreen = () => {
 							)}
 						</View>
 					)}
-
 
 					{/* 1. 나의 뱃지 목록 (획득한 뱃지만 보여줌) */}
 					<TouchableOpacity style={styles.sectionHeader} onPress={() => setShowBadgeSection(!showBadgeSection)}>

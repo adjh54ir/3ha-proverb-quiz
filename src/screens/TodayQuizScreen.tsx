@@ -1,17 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-    Alert,
-    Linking,
-    StyleSheet,
-    Switch,
-    Text,
-    View,
-    TouchableOpacity,
-    FlatList,
-    ScrollView,
-    Modal,
-} from 'react-native';
+import { Alert, Linking, StyleSheet, Switch, Text, View, TouchableOpacity, FlatList, ScrollView, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import notifee, { TimestampTrigger, TriggerType, AndroidImportance, RepeatFrequency } from '@notifee/react-native';
 import DatePicker from 'react-native-date-picker';
@@ -708,7 +697,7 @@ const TodayQuizScreen = () => {
 
             <View style={styles.rightAlignedRow} />
 
-            {__DEV__ && (
+            {/* {__DEV__ && (
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
                         style={styles.resetButton}
@@ -719,7 +708,7 @@ const TodayQuizScreen = () => {
                         </Text>
                     </TouchableOpacity>
                 </View>
-            )}
+            )} */}
             {!isAlarmEnabled && (
                 <View style={styles.content}>
                     <Text style={styles.title}>🍀 매일 '오늘의 퀴즈'가 도착해요! 🍀</Text>
@@ -743,9 +732,7 @@ const TodayQuizScreen = () => {
                         <View style={{ flexDirection: 'column', marginTop: scaleHeight(8) }}>
                             <View style={styles.alarmRow}>
                                 <Text style={styles.switchLabel}>알림 설정/시간</Text>
-                                <Text style={styles.selectedHourText}>
-                                    {tempSelectedHour.toString().padStart(2, '0')}시
-                                </Text>
+                                <Text style={styles.selectedHourText}>{tempSelectedHour.toString().padStart(2, '0')}시</Text>
                                 <Switch
                                     value={isAlarmEnabled}
                                     onValueChange={handleToggleAlarm}
@@ -754,11 +741,7 @@ const TodayQuizScreen = () => {
                                 />
                             </View>
 
-                            <ScrollView
-                                ref={scrollRef}
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={styles.hourScrollContainer}>
+                            <ScrollView ref={scrollRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hourScrollContainer}>
                                 {Array.from({ length: 24 }).map((_, hour) => {
                                     const isSelected = tempSelectedHour === hour;
                                     return (
@@ -770,17 +753,8 @@ const TodayQuizScreen = () => {
                                                 newDate.setHours(hour, 0, 0, 0);
                                                 setTempAlarmTime(newDate);
                                             }}
-                                            style={[
-                                                styles.hourButton,
-                                                isSelected && styles.hourButtonSelected,
-                                            ]}>
-                                            <Text
-                                                style={[
-                                                    styles.hourText,
-                                                    isSelected && styles.hourTextSelected,
-                                                ]}>
-                                                {hour.toString().padStart(2, '0')}시
-                                            </Text>
+                                            style={[styles.hourButton, isSelected && styles.hourButtonSelected]}>
+                                            <Text style={[styles.hourText, isSelected && styles.hourTextSelected]}>{hour.toString().padStart(2, '0')}시</Text>
                                         </TouchableOpacity>
                                     );
                                 })}
@@ -847,15 +821,13 @@ const TodayQuizScreen = () => {
                                 </TouchableOpacity>
 
                                 {showTodayReview && (
-                                    <View style={styles.todayReviewBox}>
-                                        <FlatList
-                                            style={styles.reviewList}
-                                            data={quizList}
-                                            keyExtractor={(item) => item.id.toString()}
-                                            renderItem={renderItem}
-                                            showsVerticalScrollIndicator={false}
-                                        />
-                                    </View>
+                                    <FlatList
+                                        style={styles.reviewList}
+                                        data={quizList}
+                                        keyExtractor={(item) => item.id.toString()}
+                                        renderItem={renderItem}
+                                        showsVerticalScrollIndicator={false}
+                                    />
                                 )}
                             </>
                         )}
@@ -884,9 +856,7 @@ const TodayQuizScreen = () => {
                                 <View style={{ width: '100%', marginTop: scaleHeight(12) }}>
                                     <View style={styles.timePickerRow}>
                                         <Text style={styles.modalLabel}>알림 시간</Text>
-                                        <Text style={styles.selectedHourText}>
-                                            {tempSelectedHour.toString().padStart(2, '0')}시
-                                        </Text>
+                                        <Text style={styles.selectedHourText}>{tempSelectedHour.toString().padStart(2, '0')}시</Text>
                                     </View>
 
                                     <ScrollView
@@ -908,17 +878,8 @@ const TodayQuizScreen = () => {
                                                         newDate.setHours(hour, 0, 0, 0);
                                                         setTempAlarmTime(newDate);
                                                     }}
-                                                    style={[
-                                                        styles.hourButton,
-                                                        isSelected && styles.hourButtonSelected,
-                                                    ]}>
-                                                    <Text
-                                                        style={[
-                                                            styles.hourText,
-                                                            isSelected && styles.hourTextSelected,
-                                                        ]}>
-                                                        {hour.toString().padStart(2, '0')}시
-                                                    </Text>
+                                                    style={[styles.hourButton, isSelected && styles.hourButtonSelected]}>
+                                                    <Text style={[styles.hourText, isSelected && styles.hourTextSelected]}>{hour.toString().padStart(2, '0')}시</Text>
                                                 </TouchableOpacity>
                                             );
                                         })}
@@ -993,11 +954,7 @@ const TodayQuizScreen = () => {
                 />
             </Modal>
 
-            <Modal
-                visible={showPrevQuizModal}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setShowPrevQuizModal(false)}>
+            <Modal visible={showPrevQuizModal} transparent animationType="fade" onRequestClose={() => setShowPrevQuizModal(false)}>
                 <View style={styles.modalOverlay}>
                     <View style={styles.alarmModalCard}>
                         {/* 닫기 아이콘 */}
@@ -1033,12 +990,13 @@ const TodayQuizScreen = () => {
 
                                                 return (
                                                     <View key={item.id} style={styles.quizCard}>
-                                                        <View style={{
-                                                            flexDirection: 'row',
-                                                            justifyContent: 'space-between',
-                                                            alignItems: 'center',
-                                                            minHeight: scaleHeight(28), // 정중앙 정렬을 위해 높이 고정 (조정 가능)
-                                                        }}>
+                                                        <View
+                                                            style={{
+                                                                flexDirection: 'row',
+                                                                justifyContent: 'space-between',
+                                                                alignItems: 'center',
+                                                                minHeight: scaleHeight(28), // 정중앙 정렬을 위해 높이 고정 (조정 가능)
+                                                            }}>
                                                             <View style={{ flex: 1, justifyContent: 'center' }}>
                                                                 <Text style={styles.quizTitle}>{item.proverb}</Text>
                                                             </View>
@@ -1864,5 +1822,4 @@ const styles = StyleSheet.create({
         marginHorizontal: scaleWidth(16),
         backgroundColor: '#fff',
     },
-
 });

@@ -45,17 +45,15 @@ class DateUtils {
      * 국가 별 날짜를 추출합니다.
      * @returns 
      */
-    getLocalDateString = (): string => {
+    getLocalDateString = (date: Date = new Date()): string => {
         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
         const formatter = new Intl.DateTimeFormat('en-CA', {
             timeZone,
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
         });
-
-        return formatter.format(new Date()); // 'YYYY-MM-DD' 형식으로 반환됨
+        return formatter.format(date); // 'YYYY-MM-DD'
     };
 
     /**

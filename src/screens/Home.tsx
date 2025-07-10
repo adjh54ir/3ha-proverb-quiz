@@ -129,8 +129,7 @@ const Home = () => {
 
 	const [showMascotHint, setShowMascotHint] = useState(true);
 
-	const { getLocalDateString, getLocalParamDateToString } = DateUtils;
-	const todayStr = getLocalDateString();
+	const todayStr = DateUtils.getLocalDateString();
 
 	useFocusEffect(
 		useCallback(() => {
@@ -380,7 +379,10 @@ const Home = () => {
 
 		if (json) {
 			const list: MainDataType.TodayQuizList[] = JSON.parse(json);
-			const exists = list.some((item) => item.quizDate.slice(0, 10) === todayStr);
+			const exists = list.some((item) => {
+				const itemDateStr = DateUtils.getLocalDateString(new Date(item.quizDate));
+				return itemDateStr === todayStr;
+			});
 			if (exists) {
 				console.log('✅ 이미 오늘의 퀴즈 항목이 존재합니다');
 				return;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, Text, Image, StyleSheet, TouchableOpacity, Linking, ScrollView, Platform } from 'react-native';
+import { Modal, View, Text, Image, StyleSheet, TouchableOpacity, Linking, ScrollView } from 'react-native';
 import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import IconComponent from '../atomic/IconComponent';
 
@@ -9,19 +9,19 @@ interface Props {
 }
 
 /**
- * 개발자 팝업
- * Type1
- *
- *
+ * 개발자 팝업 
+ * Type1 
+ * 
+ * 
 		const [showDevInfo, setShowDevInfo] = useState(false);
-
+  
 	  <TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevInfo(true)}>
 		<Text style={styles.devText}>제작자 소개</Text>
 	</TouchableOpacity>
 
 	<Contributor9Modal visible={showDevModal} onClose={() => setShowDevInfo(false)} />
 
-
+	
 	hiddenDevTouchArea: {
 		alignItems: 'center',
 		marginTop: scaleHeight(10),
@@ -67,23 +67,34 @@ interface Props {
 		textAlign: 'center',
 		fontWeight: '500',
 	},
- *
- *
- * @param param0
- * @returns
+ * 
+ * 
+ * @param param0 
+ * @returns 
  */
 
 const Contributor9Modal = ({ visible, onClose }: Props) => {
 	const handleOpenUrl = (url: string) => Linking.openURL(url);
 
 	return (
-		<Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
+		<Modal animationType='slide' transparent visible={visible} onRequestClose={onClose}>
 			<View style={styles.overlay}>
 				<View style={styles.container}>
 					<ScrollView contentContainerStyle={styles.scroll}>
 						<View style={styles.profileSection}>
 							<Image source={require('@/assets/images/developer.png')} style={styles.image} />
-							<Text style={styles.name}>Contributor9</Text>
+							<Text style={styles.name}>EcodeLab</Text>
+							<Text style={styles.subName}>Contributor9</Text>
+						</View>
+						<View style={styles.rowItem}>
+							<Text style={styles.labelText}>🏠 공식 홈페이지</Text>
+							<TouchableOpacity
+								style={styles.rightButton}
+								activeOpacity={0.85}
+								onPress={() => handleOpenUrl('https://www.ecodelab.im')}>
+								<IconComponent type='materialIcons' name='home' size={scaledSize(16)} color='#007AFF' />
+								<Text style={styles.buttonText}>바로가기</Text>
+							</TouchableOpacity>
 						</View>
 						<View style={styles.rowItem}>
 							<Text style={styles.labelText}>📱 개발자가 만든 앱 소개</Text>
@@ -97,24 +108,33 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 						</View>
 						<View style={styles.rowItem}>
 							<Text style={styles.labelText}>📝 개발자 블로그</Text>
-							<TouchableOpacity style={styles.rightButton} activeOpacity={0.85} onPress={() => handleOpenUrl('https://adjh54.tistory.com/')}>
-								<IconComponent type="materialIcons" name="language" size={scaledSize(16)} color="#007AFF" />
+							<TouchableOpacity
+								style={styles.rightButton}
+								activeOpacity={0.85}
+								onPress={() => handleOpenUrl('https://adjh54.tistory.com/')}>
+								<IconComponent type='materialIcons' name='language' size={scaledSize(16)} color='#007AFF' />
 								<Text style={styles.buttonText}>방문하기</Text>
 							</TouchableOpacity>
 						</View>
 
 						<View style={styles.rowItem}>
 							<Text style={styles.labelText}>💻 GitHub</Text>
-							<TouchableOpacity style={styles.rightButton} activeOpacity={0.85} onPress={() => handleOpenUrl('https://github.com/adjh54ir')}>
-								<IconComponent type="materialCommunityIcons" name="github" size={scaledSize(16)} color="#007AFF" />
+							<TouchableOpacity
+								style={styles.rightButton}
+								activeOpacity={0.85}
+								onPress={() => handleOpenUrl('https://github.com/adjh54ir')}>
+								<IconComponent type='materialCommunityIcons' name='github' size={scaledSize(16)} color='#007AFF' />
 								<Text style={styles.buttonText}>둘러보기</Text>
 							</TouchableOpacity>
 						</View>
 
 						<View style={styles.rowItem}>
 							<Text style={styles.labelText}>📩 메일 문의</Text>
-							<TouchableOpacity style={styles.rightButton} activeOpacity={0.85} onPress={() => handleOpenUrl('mailto:adjh54ir@gmail.com')}>
-								<IconComponent type="materialIcons" name="email" size={scaledSize(16)} color="#007AFF" />
+							<TouchableOpacity
+								style={styles.rightButton}
+								activeOpacity={0.85}
+								onPress={() => handleOpenUrl('mailto:adjh54ir@gmail.com')}>
+								<IconComponent type='materialIcons' name='email' size={scaledSize(16)} color='#007AFF' />
 								<Text style={styles.buttonText}>보내기</Text>
 							</TouchableOpacity>
 						</View>
@@ -150,6 +170,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.1,
 		shadowOffset: { width: 0, height: 4 },
 		shadowRadius: 8,
+		elevation: 6,
 	},
 	scroll: {
 		alignItems: 'center',
@@ -287,11 +308,6 @@ const styles = StyleSheet.create({
 		borderColor: '#eee',
 		marginBottom: scaleHeight(8), // 기존보다 살짝 조정
 	},
-	name: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#222',
-	},
 	fixedCloseButton: {
 		marginTop: scaleHeight(12),
 		backgroundColor: '#007AFF',
@@ -307,6 +323,17 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.1,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 4,
+		elevation: 4,
+	},
+	name: {
+		fontSize: scaledSize(18),
+		fontWeight: '700',
+		color: '#2c3e50', // 짙은 네이비 계열
+		marginBottom: scaleHeight(3),
+	},
+	subName: {
+		fontSize: scaledSize(14),
+		color: '#7f8c8d', // 차분한 회색 계열
 	},
 });
 

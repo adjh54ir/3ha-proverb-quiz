@@ -2,10 +2,12 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
 	Alert,
+	Image,
 	Keyboard,
 	Modal,
 	RefreshControl,
 	ScrollView,
+	Share,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
@@ -257,6 +259,31 @@ const SettingScreen = () => {
 		}
 	};
 
+	const handleShareApp = async (platform: 'android' | 'ios') => {
+		try {
+			const storeUrl =
+				platform === 'android'
+					? '📱 Android: https://play.google.com/store/apps/details?id=com.tha.proverbquiz'
+					: '🍏 iOS: https://apps.apple.com/app/id6746687973';
+
+			const message = `
+재미있는 속담 퀴즈 앱을 추천해요!
+
+이 앱은 다양한 대한민국 속담을 쉽고 재미있게 학습할 수 있도록 도와주는 학습 도구입니다.
+퀴즈를 통해 익힌 지식을 점검하고, 틀린 문제는 ‘오답 복습’ 기능으로 반복 학습할 수 있어
+완벽한 속담 마스터에 한 걸음 더 다가갈 수 있어요.
+
+지금 바로 다운로드하고 친구와 함께 즐겨보세요!
+
+${storeUrl}
+		`.trim();
+
+			await Share.share({ message });
+		} catch (error) {
+			Alert.alert('오류', '공유 중 문제가 발생했어요.');
+		}
+	};
+
 	return (
 		<>
 			<SafeAreaView style={styles.container} edges={['top']}>
@@ -341,6 +368,34 @@ const SettingScreen = () => {
 							<TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevModal(true)}>
 								<Text style={styles.devText}>제작자 소개</Text>
 							</TouchableOpacity>
+						</View>
+						<View style={styles.recommendSection}>
+							<Text style={styles.recommendTitle}>📲 앱이 마음에 드셨나요?</Text>
+							<Text style={styles.recommendSubtitle}>친구에게 앱을 추천하고 함께 퀴즈를 즐겨보세요!</Text>
+
+							{/* 앱 아이콘 */}
+							<View style={styles.appIconWrapper}>
+								<Image
+									source={require('@/assets/images/mainIcon.png')} // 앱 아이콘 경로에 맞게 조정
+									style={styles.appIcon}
+									resizeMode="contain"
+								/>
+							</View>
+
+							{/* 스토어 버튼 */}
+							<View style={styles.storeButtons}>
+								<TouchableOpacity
+									style={[styles.storeButton, { backgroundColor: '#1E88E5' }]}
+									onPress={() => handleShareApp('android')}>
+									<Text style={styles.storeButtonText}>📱 안드로이드 공유하기</Text>
+								</TouchableOpacity>
+
+								<TouchableOpacity
+									style={[styles.storeButton, { backgroundColor: '#2ecc71' }]}
+									onPress={() => handleShareApp('ios')}>
+									<Text style={styles.storeButtonText}>🍏 애플 공유하기</Text>
+								</TouchableOpacity>
+							</View>
 						</View>
 					</ScrollView>
 
@@ -585,5 +640,51 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: '#34495e',
 		textAlign: 'center',
+	},
+	recommendSection: {
+		marginHorizontal: scaleWidth(20),
+		marginBottom: scaleHeight(30),
+		padding: scaleWidth(20),
+		backgroundColor: '#ecf0f1',
+		borderRadius: scaleWidth(12),
+		alignItems: 'center',
+	},
+	recommendTitle: {
+		fontSize: scaledSize(18),
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		marginBottom: scaleHeight(4),
+	},
+	recommendSubtitle: {
+		fontSize: scaledSize(13),
+		color: '#7f8c8d',
+		textAlign: 'center',
+		marginBottom: scaleHeight(12),
+	},
+	appIconWrapper: {
+		width: scaleWidth(80),
+		height: scaleWidth(80),
+		marginBottom: scaleHeight(12),
+	},
+	appIcon: {
+		width: '100%',
+		height: '100%',
+		borderRadius: scaleWidth(16),
+	},
+	storeButtons: {
+		marginTop: scaleHeight(6),
+		flexDirection: 'row',
+		gap: scaleWidth(8),
+	},
+	storeButton: {
+		flex: 1,
+		paddingVertical: scaleHeight(12),
+		borderRadius: scaleWidth(8),
+		alignItems: 'center',
+	},
+	storeButtonText: {
+		color: '#fff',
+		fontWeight: 'bold',
+		fontSize: scaledSize(13),
 	},
 });

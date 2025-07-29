@@ -10,6 +10,7 @@ import VersionCheckModal from "./screens/common/modal/VersionCheckModal";
 import { REACT_NATIVE_APP_MODE } from "@env";
 import i18n from '@/translations';
 import { I18nextProvider } from "react-i18next";
+import crashlytics from '@react-native-firebase/crashlytics';
 /**
  * Init App
  */

@@ -10,10 +10,7 @@ export interface UserQuizHistory {
 	bestCombo?: number;
 }
 
-export const QuizBadgeInterceptor = (
-	history: MainDataType.UserQuizHistory,
-	allProverbs: MainDataType.Proverb[],
-): string[] => {
+export const QuizBadgeInterceptor = (history: MainDataType.UserQuizHistory, allProverbs: MainDataType.Proverb[]): string[] => {
 	const newBadges: string[] = [];
 	const correctSet = new Set(history.correctProverbId);
 	const solvedSet = new Set([...(history.correctProverbId ?? []), ...(history.wrongProverbId ?? [])]);

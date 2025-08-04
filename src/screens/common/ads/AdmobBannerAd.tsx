@@ -55,6 +55,7 @@ const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({ paramMarginTop = 0, param
 const styles = StyleSheet.create({
 	container: {
 		alignItems: 'center',
+		backgroundColor: 'transparent'
 	},
 });
 

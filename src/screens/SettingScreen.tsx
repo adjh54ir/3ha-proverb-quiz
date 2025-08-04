@@ -17,7 +17,6 @@ import VersionCheck from 'react-native-version-check';
 import Contributor9Modal from './common/modal/Contributor9Modal';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import IconComponent from './common/atomic/IconComponent';
-import AdmobBannerAd from './common/ads/AdmobBannerAd';
 import ProverbServices from '@/services/ProverbServices';
 import { CONST_BADGES } from '@/const/ConstBadges';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -294,7 +293,6 @@ ${storeUrl}
 						style={styles.scrollArea}
 						contentContainerStyle={{ paddingBottom: scaleHeight(60) }} // 아래 고정 영역 공간 확보
 						refreshControl={<RefreshControl refreshing={false} onRefresh={() => { }} />}>
-						<AdmobBannerAd paramMarginTop={40} />
 						{/* <View style={styles.section} /> */}
 						<View style={styles.section}>
 							<Text style={styles.title}>🎓 학습/퀴즈 다시 풀기 </Text>

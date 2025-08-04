@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Platfor
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils'; // 필요 시 사용자 유틸로 교체
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainDataType } from '@/types/MainDataType';
-import AdmobBannerAd from './common/ads/AdmobBannerAd';
 import IconComponent from './common/atomic/IconComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -200,7 +199,6 @@ const InitTimeChallengeScreen = () => {
 		<SafeAreaView style={styles.container} edges={[]}>
 			<View style={styles.contentWrapper}>
 				<ScrollView contentContainerStyle={styles.scrollContainer}>
-					<AdmobBannerAd />
 
 					{/* ⏱️ 규칙 및 버튼 */}
 					<View style={styles.challengeRuleBox}>

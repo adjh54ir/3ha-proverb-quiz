@@ -1,5 +1,5 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from '@/screens/Home';
 import { Paths } from './conf/Paths';
 import SettingScreen from '@/screens/SettingScreen';
@@ -8,8 +8,9 @@ import ProverbListScreen from '@/screens/ProverbListScreen';
 import MyScoreScreen from '@/screens/MyScoreScreen';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import DeviceInfo from 'react-native-device-info';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import TodayQuizScreen from '@/screens/TodayQuizScreen';
+import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 
 const BottomTabNavigator = () => {
 	const Tab = createBottomTabNavigator();
@@ -74,6 +75,18 @@ const BottomTabNavigator = () => {
 				tabBarLabelPosition: 'below-icon',
 				...getScreenOptions(isTablet, insets),
 			}}
+			tabBar={(props) => {
+				const currentRouteName = props.state.routes[props.state.index].name as Paths;
+				const adVisibleTabs: Paths[] = [Paths.HOME, Paths.TODAY_QUIZ];
+				const showAd = adVisibleTabs.includes(currentRouteName);
+
+				return (
+					<>
+						{showAd && <AdmobBannerAd paramMarginBottom={5} paramMarginTop={10} />}
+						<BottomTabBar {...props} />
+					</>
+				);
+			}}
 		>
 			<Tab.Screen
 				name={Paths.PROVERB_LIST}
@@ -136,6 +149,7 @@ const BottomTabNavigator = () => {
 			/>
 		</Tab.Navigator>
 	);
+
 };
 
 export default BottomTabNavigator;

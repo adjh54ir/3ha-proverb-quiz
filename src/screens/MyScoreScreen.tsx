@@ -21,7 +21,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import FastImage from 'react-native-fast-image';
 import 'moment/locale/ko'; // 한국어 로케일 import
-import AdmobBannerAd from './common/ads/AdmobBannerAd';
 import ProverbServices from '@/services/ProverbServices';
 import { CONST_BADGES } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
@@ -554,9 +553,6 @@ const CapitalResultScreen = () => {
 					contentContainerStyle={{ paddingBottom: scaleHeight(40), flexGrow: 1 }}
 					onScroll={scrollHandler.onScroll}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-					<View style={styles.adContainer}>
-						<AdmobBannerAd />
-					</View>
 					<View style={styles.sectionBox}>
 						<View style={{ alignItems: 'center', marginVertical: scaleHeight(8) }}>
 							<FastImage source={mascot} style={{ width: scaleWidth(120), height: scaleHeight(120) }} resizeMode={FastImage.resizeMode.contain} />

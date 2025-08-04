@@ -9,7 +9,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AdmobBannerAd from './common/ads/AdmobBannerAd';
 import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
@@ -662,7 +661,6 @@ const TodayQuizScreen = () => {
 
     return (
         <SafeAreaView style={styles.main} edges={['top', 'bottom']}>
-            <AdmobBannerAd paramMarginTop={5} paramMarginBottom={4} />
             {/* {__DEV__ && (
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.resetButton} onPress={seedDummyWeeklyQuizzes}>

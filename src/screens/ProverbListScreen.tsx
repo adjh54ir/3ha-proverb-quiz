@@ -21,7 +21,6 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
-import AdmobBannerAd from './common/ads/AdmobBannerAd';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
@@ -275,9 +274,6 @@ const ProverbListScreen = () => {
 						{/* 필터 + 드롭다운 영역 */}
 						<View style={styles.container}>
 							<View style={styles.filterCard}>
-								<View style={styles.bannerContainer}>
-									<AdmobBannerAd paramMarginBottom={8} />
-								</View>
 								<View style={styles.searchRow}>
 									<TextInput
 										ref={searchInputRef}

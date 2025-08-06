@@ -75,18 +75,6 @@ const BottomTabNavigator = () => {
 				tabBarLabelPosition: 'below-icon',
 				...getScreenOptions(isTablet, insets),
 			}}
-			tabBar={(props) => {
-				const currentRouteName = props.state.routes[props.state.index].name as Paths;
-				const adVisibleTabs: Paths[] = [Paths.HOME, Paths.TODAY_QUIZ];
-				const showAd = adVisibleTabs.includes(currentRouteName);
-
-				return (
-					<>
-						{showAd && <AdmobBannerAd paramMarginBottom={5} paramMarginTop={10} />}
-						<BottomTabBar {...props} />
-					</>
-				);
-			}}
 		>
 			<Tab.Screen
 				name={Paths.PROVERB_LIST}

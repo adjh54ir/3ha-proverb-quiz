@@ -8,6 +8,7 @@ import StackNavigator from './StackNavigator';
 import TopNavigator from './TopNavigator';
 import ZTemplateDradwerNavigator from './ZTemplateDradwerNavigator';
 import { scaleHeight } from '@/utils';
+import AppLayout from './AppLayout';
 
 /**
  * 모든 네비게이션에 대해 일괄 메인으로 관리합니다.
@@ -18,14 +19,12 @@ const ApplicationNavigator = () => {
 		<SafeAreaProvider>
 			<StatusBar translucent backgroundColor='transparent' barStyle='dark-content' />
 			{/* <StatusBar backgroundColor='#ffffff' translucent={false} /> */}
-			<NavigationContainer>
-				{/* 아래의 각각 Navigation 내의 Path는 중복이 발생하면 안됩니다. */}
-				{/* <ZTemplateDradwerNavigator /> */}
-				{/* <DrawerNavigator /> */}
-				{/* <BottomTabNavigator /> */}
-				<StackNavigator />
-				{/* <TopNavigator /> */}
-			</NavigationContainer>
+			{/* 아래의 각각 Navigation 내의 Path는 중복이 발생하면 안됩니다. */}
+			{/* <ZTemplateDradwerNavigator /> */}
+			{/* <DrawerNavigator /> */}
+			{/* <BottomTabNavigator /> */}
+			<AppLayout />
+			{/* <TopNavigator /> */}
 		</SafeAreaProvider >
 	);
 };

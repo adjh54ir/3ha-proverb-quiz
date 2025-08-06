@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import StackNavigator from './StackNavigator';
 
 const AD_ALLOWED_ROUTES = [
+    Paths.HOME,
     Paths.PROVERB_LIST,
     Paths.TODAY_QUIZ,
     Paths.MY_SCORE,
@@ -63,11 +64,11 @@ const styles = StyleSheet.create({
         right: 0,
         zIndex: 10,
         alignItems: 'center',
-        backgroundColor: '#transparent',
+        backgroundColor: 'transparent',
     },
     container: {
         flex: 1,
-        backgroundColor: '#transparent',
+        backgroundColor: 'transparent',
     },
     adWrapper: {
         paddingHorizontal: 10,

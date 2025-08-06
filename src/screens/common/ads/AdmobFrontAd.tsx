@@ -3,6 +3,8 @@ import { GOOGLE_ADMOV_ANDROID_FRONT, GOOGLE_ADMOV_IOS_FRONT } from '@env';
 import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { InterstitialAd, TestIds, AdEventType } from 'react-native-google-mobile-ads';
+import analytics from '@react-native-firebase/analytics'; // Firebase Analytics
+import DeviceInfo from 'react-native-device-info';
 
 const AD_UNIT_ID = Platform.select({
   ios: __DEV__ ? TestIds.INTERSTITIAL : GOOGLE_ADMOV_IOS_FRONT!,
@@ -48,37 +50,59 @@ const AD_UNIT_ID = Platform.select({
  */
 const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => {
   const [loaded, setLoaded] = useState(false);
-  const hasClosed = useRef(false); // ✅ 이미 닫힘 처리됐는지 여부
   const adRef = useRef<InterstitialAd | null>(null);
 
   useEffect(() => {
     const ad = InterstitialAd.createForAdRequest(AD_UNIT_ID);
     adRef.current = ad;
-    hasClosed.current = false; // 새 광고 시작 시 초기화
+
+    const logEvent = async (name: string, additionalParams = {}) => {
+
+      const instanceId = await analytics().getAppInstanceId();
+      try {
+        await analytics().logEvent(name, {
+          ad_platform: 'admob', // 📌 광고 플랫폼 이름 (예: admob, facebook 등)
+          ad_format: 'interstitial', // 📌 광고 형식 (전면광고, 배너, 리워드 등)
+          ad_unit_id: AD_UNIT_ID, // 📌 실제 사용 중인 광고 유닛 ID (식별/필터링용)
+          app_name: DeviceInfo.getApplicationName(), // 📱 앱 이름 (예: "MyApp")
+          app_version: DeviceInfo.getVersion(),      // 🏷️ 앱 버전 (예: "1.0.3")
+          build_number: DeviceInfo.getBuildNumber(), // 🏗️ 빌드 번호 (예: "100")
+          device_platform: Platform.OS,              // 💻 디바이스 플랫폼 ('ios' 또는 'android')
+          device_model: DeviceInfo.getModel(),       // 📱 기기 모델명 (예: "iPhone 15 Pro")
+          device_brand: DeviceInfo.getBrand(),       // 🏷️ 제조사 (예: "Apple", "Samsung")
+          system_version: DeviceInfo.getSystemVersion(), // 🧪 OS 버전 (예: "17.5")
+          app_instance_id: instanceId,               // 🆔 Firebase 고유 사용자 식별자 (익명 추적 ID)
+          timestamp: new Date().toISOString(),       // 🕒 이벤트 발생 시각 (ISO 형식, 예: "2025-08-04T06:21:00Z")
+          ...additionalParams,                       // 🧩 기타 추가 파라미터 (사용자 정의 값)
+        });
+      } catch (error) {
+        console.error(`❌ Failed to log ${name}:`, error);
+      }
+    };
 
     const unsubscribeLoaded = ad.addAdEventListener(AdEventType.LOADED, () => {
       console.log('✅ 전면 광고 로딩 완료');
+      logEvent('ad_interstitial_loaded');
       setLoaded(true);
       ad.show();
     });
 
     const unsubscribeClosed = ad.addAdEventListener(AdEventType.CLOSED, () => {
-      if (hasClosed.current) return; // ✅ 중복 방지
-      hasClosed.current = true;
       console.log('✅ 전면 광고 닫힘');
+      logEvent('ad_interstitial_closed');
       setLoaded(false);
       onAdClosed?.();
     });
 
     const unsubscribeFailed = ad.addAdEventListener(AdEventType.ERROR, (error) => {
-      if (hasClosed.current) return;
-      hasClosed.current = true;
       console.warn('❌ 광고 로딩 실패:', error?.message ?? error);
+      logEvent('ad_interstitial_failed', { error_message: error?.message ?? String(error) });
       setLoaded(false);
       onAdClosed?.();
     });
 
     console.log('📦 전면 광고 로드 시작');
+    logEvent('ad_interstitial_request');
     ad.load();
 
     return () => {

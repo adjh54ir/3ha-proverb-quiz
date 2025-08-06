@@ -1,10 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 import BottomTabNavigator from '@/navigation/BottomTabNavigator';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import StackNavigator from './StackNavigator';
 
 const AD_ALLOWED_ROUTES = [
     Paths.PROVERB_LIST,
@@ -18,7 +19,7 @@ const AppLayout = () => {
     const navigationRef = useRef<NavigationContainerRef<any>>(null);
     const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
 
-    const shouldShowAd = AD_ALLOWED_ROUTES.includes(currentRoute);
+    const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute), [currentRoute]);
 
     return (
         <NavigationContainer
@@ -38,12 +39,12 @@ const AppLayout = () => {
                 edges={shouldShowAd ? ['top'] : []}
             >
                 <View style={styles.container}>
-                    <View style={[styles.adWrapperAbsolute, !shouldShowAd && { display: 'none' }]}>
-                        <AdmobBannerAd paramMarginTop={10} paramMarginBottom={5} />
+                    <View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]}>
+                        <AdmobBannerAd visible={shouldShowAd} />
                     </View>
 
                     {/* 하단 콘텐츠 */}
-                    <BottomTabNavigator />
+                    <StackNavigator />
                 </View>
             </SafeAreaView>
         </NavigationContainer>

@@ -1060,7 +1060,10 @@ export default CapitalResultScreen;
 
 const styles = StyleSheet.create({
 	safeArea: { flex: 1, backgroundColor: '#fff' },
-	container: { paddingHorizontal: scaleWidth(16) },
+	container: {
+		paddingHorizontal: scaleWidth(20),
+		paddingTop: scaleHeight(20),
+	},
 	pageTitle: {
 		fontSize: scaledSize(20),
 		fontWeight: 'bold',

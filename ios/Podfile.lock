@@ -1385,6 +1385,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-in-app-review (4.3.5):
+    - React-Core
   - react-native-netinfo (11.4.1):
     - React-Core
   - react-native-safe-area-context (5.5.1):
@@ -2107,6 +2109,7 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
+  - react-native-in-app-review (from `../node_modules/react-native-in-app-review`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-version-check (from `../node_modules/react-native-version-check`)
@@ -2258,6 +2261,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-date-picker"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
+  react-native-in-app-review:
+    :path: "../node_modules/react-native-in-app-review"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-safe-area-context:
@@ -2409,6 +2414,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: 36adde22631838680d1be62776e8ccb83186c06a
   react-native-date-picker: 3b048da884ad001f1a328208478d0771f27edfc7
   react-native-image-picker: 5f9867b6a223594dbfdb456428638daef42e6e6c
+  react-native-in-app-review: 668f4c80d7f95945e0ad7833e98c466cb40d6808
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-safe-area-context: c4a660f9f6e460b19c87c2145e95335d59d578e1
   react-native-version-check: 842a3b0e7221798cbe8c6abaf24aab3ed0b485ce

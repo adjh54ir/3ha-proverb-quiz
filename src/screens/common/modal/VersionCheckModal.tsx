@@ -37,7 +37,9 @@ const VersionCheckModal = () => {
 	const checkVersion = async (): Promise<void> => {
 		try {
 			const platformProvider = Platform.OS === 'android' ? 'playStore' : 'appStore';
-			const latestVersion = await VersionCheck.getLatestVersion({ provider: platformProvider });
+			const latestVersion = await VersionCheck.getLatestVersion({
+				provider: platformProvider,
+			});
 			const currentVersion = VersionCheck.getCurrentVersion();
 
 			// 아직 앱을 출시하지 않은 경우
@@ -87,21 +89,26 @@ const VersionCheckModal = () => {
 	};
 
 	return (
-		<Modal visible={showUpdateModal} transparent={true} animationType='fade' onRequestClose={() => {}}>
-			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-				<View style={styles.modalContainer}>
-					<View style={styles.modalContent}>
-						<Text style={styles.title}>업데이트 알림</Text>
-						<Image source={require('@/assets/images/update.png')} style={styles.image} />
-						<Text style={styles.message}>
-							🎉 새로운 버전이 출시되었습니다 🎉{'\n'}더 편리해진 기능을 만나보세요!{'\n\n'}
-						</Text>
-						<TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
-							<Text style={styles.buttonText}>지금 업데이트</Text>
-						</TouchableOpacity>
-					</View>
+		<Modal
+			visible={showUpdateModal}
+			transparent
+			animationType='fade'
+			statusBarTranslucent // ✅ 안드로이드에서 전체 화면 덮게
+			presentationStyle='overFullScreen' // ✅ iOS에서도 안정적
+			onRequestClose={() => { }}>
+			<View style={styles.modalContainer}>
+				<View style={styles.modalContent}>
+					<Text style={styles.title}>업데이트 알림</Text>
+					<Image source={require('@/assets/images/update.png')} style={styles.image} />
+					<Text style={styles.message}>
+						🎉 새로운 버전이 출시되었습니다 🎉{'\n'}더 편리해진 기능을 만나보세요!
+						{'\n\n'}
+					</Text>
+					<TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
+						<Text style={styles.buttonText}>지금 업데이트</Text>
+					</TouchableOpacity>
 				</View>
-			</KeyboardAvoidingView>
+			</View>
 		</Modal>
 	);
 };
@@ -117,7 +124,9 @@ const styles = StyleSheet.create({
 		backgroundColor: 'white',
 		borderRadius: moderateScale(10),
 		padding: scaleWidth(20),
-		width: scaleWidth(300), // 375 기준 80%
+		width: scaleWidth(300),
+		maxWidth: '90%', // ✅ 작은 기기 대비
+		maxHeight: '85%', // ✅ 텍스트가 길어도 안전
 		alignItems: 'center',
 	},
 	title: {
@@ -128,8 +137,10 @@ const styles = StyleSheet.create({
 	message: {
 		fontSize: scaledSize(16),
 		textAlign: 'center',
-		marginBottom: scaleHeight(6), // ✅ 너무 크지 않게 설정
-		lineHeight: scaleHeight(20), // ✅ 살짝 줄임
+		marginBottom: scaleHeight(6),
+		// lineHeight: scaleHeight(20),  // ❌ 제거
+		lineHeight: Math.round(scaledSize(16) * 1.4), // ✅ 쓰려면 최소 1.3~1.5배
+		includeFontPadding: false, // ✅ 안드로이드 폰트 패딩 이슈 완화
 	},
 	updateButton: {
 		backgroundColor: '#007AFF',

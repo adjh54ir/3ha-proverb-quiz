@@ -95,7 +95,7 @@ const VersionCheckModal = () => {
 			animationType='fade'
 			statusBarTranslucent // ✅ 안드로이드에서 전체 화면 덮게
 			presentationStyle='overFullScreen' // ✅ iOS에서도 안정적
-			onRequestClose={() => { }}>
+			onRequestClose={() => {}}>
 			<View style={styles.modalContainer}>
 				<View style={styles.modalContent}>
 					<Text style={styles.title}>업데이트 알림</Text>

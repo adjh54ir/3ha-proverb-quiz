@@ -1,12 +1,13 @@
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
 	Alert,
 	Image,
-	Keyboard,
+	Linking,
 	Modal,
-	RefreshControl,
+	Platform,
 	ScrollView,
+	SectionList,
 	Share,
 	StyleSheet,
 	Text,
@@ -14,19 +15,27 @@ import {
 	View,
 } from 'react-native';
 import VersionCheck from 'react-native-version-check';
-import Contributor9Modal from './common/modal/Contributor9Modal';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import IconComponent from './common/atomic/IconComponent';
-import ProverbServices from '@/services/ProverbServices';
-import { CONST_BADGES } from '@/const/ConstBadges';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MainDataType } from '@/types/MainDataType';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import DeviceInfo from 'react-native-device-info';
+import InAppReview from 'react-native-in-app-review';
+import IconComponent from './common/atomic/IconComponent';
+import Contributor9Modal from './common/modal/Contributor9Modal';
+import DeveloperAppsModal from './common/modal/DeveloperAppsModal';
+import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModal';
+import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
-import TermsScreen from './setting/TermScreen';
-import OpenSourceScreen from './setting/OpenSourceScreen';
-import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import { MainDataType } from '@/types/MainDataType';
+
+const APP_NAME = '속픽: 속담 퀴즈';
+const ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=com.tha.proverbquiz'; // 예: 'https://play.google.com/store/apps/details?id=your.package'
+const IOS_STORE_URL = 'https://apps.apple.com/app/id6746687973'; // 예: 'https://apps.apple.com/app/idXXXXXXXXXX'
+
+const DESCRIPTION = '속픽: 속담 퀴즈는 대한민국 속담을 쉽고 재미있게 학습하고, 다양한 퀴즈를 통해 기억을 점검하며, 틀린 문제는 반복 학습으로 완전히 익힐 수 있도록 돕는 속담 학습 앱입니다.';
+
+// ✅ 섹션 정의 (개발 모드에서만 관리자/더미 노출)
+const IS_DEV = __DEV__ === true;
 
 const STORAGE_KEYS = {
 	study: MainStorageKeyType.USER_STUDY_HISTORY,
@@ -34,60 +43,38 @@ const STORAGE_KEYS = {
 	todayQuiz: MainStorageKeyType.TODAY_QUIZ_LIST,
 	timeChallenge: MainStorageKeyType.TIME_CHALLENGE_HISTORY,
 };
+
 const SettingScreen = () => {
-	const scrollRef = useRef<ScrollView>(null);
+	// useBlockBackHandler(true); // 뒤로가기 모션 막기
+
+	const sectionRef = useRef<SectionList>(null);
 	const [showDevModal, setShowDevModal] = useState(false);
 	const [appVersion, setAppVersion] = useState('');
-	const [showTerms, setShowTerms] = useState(false);
-	const [showOpenSource, setShowOpenSource] = useState(false);
 	const [showScrollTop, setShowScrollTop] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [resetType, setResetType] = useState<'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'all' | null>(null);
 	const [summary, setSummary] = useState<string>('');
-
-	useBlockBackHandler(true); // 뒤로가기 모션 막기
+	const [showAppsModal, setShowAppsModal] = useState(false);
+	const [showTermsModal, setShowTermsModal] = useState(false);
+	const [showOpenSourceModal, setShowOpenSourceModal] = useState(false);
 
 	useFocusEffect(
 		useCallback(() => {
-			const version = VersionCheck.getCurrentVersion();
-			setAppVersion(version);
-
-			scrollHandler.toTop();
+			loadVersion();
+			scrollToTop();
 		}, []),
 	);
 
-	/**
-	 * 스크롤을 움직일때 동작을 합니다. 하단으로 스크롤을 내릴때 아이콘 생성
-	 * @param event
-	 */
-	const handleScroll = (event: any) => {
-		const offsetY = event.nativeEvent.contentOffset.y;
-		setShowScrollTop(offsetY > 0);
+	const loadVersion = () => {
+		const version = VersionCheck.getCurrentVersion();
+		setAppVersion(version);
 	};
-	const scrollHandler = (() => {
-		return {
-			/**
-			 * 스크롤 최상단으로 이동
-			 * @return {void}
-			 */
-			toTop: (): void => {
-				scrollRef.current?.scrollTo({ y: 0, animated: true });
-			},
 
-			/**
-			 * 스크롤 뷰 최하단으로 이동
-			 * @return {void}
-			 */
-			toBottom: (): void => {
-				scrollRef.current?.scrollToEnd({ animated: true });
-			},
-		};
-	})();
+	const scrollToTop = () => sectionRef.current?.getScrollResponder()?.scrollTo({ x: 0, y: 0, animated: true });
 
 	const confirmReset = async (type: 'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'all') => {
-		console.log(type);
-		setResetType(type);
 		getSummaryMessage(type);
+		setResetType(type);
 		setModalVisible(true);
 	};
 
@@ -116,87 +103,13 @@ const SettingScreen = () => {
 
 		setSummary(msg);
 	};
-	const handleCompleteAllQuiz = async () => {
-		const allProverbs = ProverbServices.selectProverbList();
-		console.log(allProverbs.map((p) => p.id));
-		const parsed: MainDataType.UserQuizHistory = {
-			badges: CONST_BADGES.filter((b) => b.type === 'quiz').map((b) => b.id),
-			correctProverbId: allProverbs.map((p) => p.id),
-			wrongProverbId: [],
-			totalScore: 5500,
-			bestCombo: 20,
-			lastAnsweredAt: new Date(),
-			quizCounts: {}, // 원하면 여기서도 id별로 count 넣을 수 있음
-		};
-		await AsyncStorage.setItem(STORAGE_KEYS.quiz, JSON.stringify(parsed));
-		Alert.alert('처리됨', '모든 퀴즈 완료 + 뱃지 지급!');
-	};
-	const handleCompleteAllStudy = async () => {
-		const allProverbs = ProverbServices.selectProverbList();
-		const parsed: MainDataType.UserStudyHistory = {
-			badges: CONST_BADGES.filter((b) => b.type === 'study').map((b) => b.id),
-			studyProverbs: allProverbs.map((p) => p.id),
-			lastStudyAt: new Date(),
-			studyCounts: {}, // 원하면 각 사자성어 id별 학습 횟수 설정 가능
-		};
-		await AsyncStorage.setItem(STORAGE_KEYS.study, JSON.stringify(parsed));
-		Alert.alert('처리됨', '모든 학습 완료 + 뱃지 지급!');
-	};
 
-	// 모달 타이틀을 타입에 따라 변경
-	const getModalTitle = () => {
-		switch (resetType) {
-			case 'study':
-				return (
-					<View style={styles.modalTitleRow}>
-						<IconComponent type="materialCommunityIcons" name="book-refresh" size={20} color="#34495e" style={styles.iconLeft} />
-						<Text style={styles.modalTitleText}>학습을 다시 해볼까요?</Text>
-					</View>
-				);
-			case 'quiz':
-				return (
-					<View style={styles.modalTitleRow}>
-						<IconComponent type="materialCommunityIcons" name="clipboard-refresh-outline" size={20} color="#34495e" style={styles.iconLeft} />
-						<Text style={styles.modalTitleText}>퀴즈를 다시 풀어볼까요?</Text>
-					</View>
-				);
-			case 'todayQuiz':
-				return (
-					<View style={styles.modalTitleRow}>
-						<IconComponent type="materialIcons" name="today" size={20} color="#34495e" style={styles.iconLeft} />
-						<Text style={styles.modalTitleText}>오늘의 퀴즈를 초기화할까요?</Text>
-					</View>
-				);
-			case 'timeChallenge':
-				return (
-					<View style={styles.modalTitleRow}>
-						<IconComponent type="materialIcons" name="alarm" size={20} color="#34495e" style={styles.iconLeft} />
-						<Text style={styles.modalTitleText}>타임 챌린지를 초기화할까요?</Text>
-					</View>
-				);
-			case 'all':
-				return (
-					<View style={styles.modalTitleRow}>
-						<IconComponent type="materialCommunityIcons" name="delete-alert-outline" size={20} color="#34495e" style={styles.iconLeft} />
-						<Text style={styles.modalTitleText}>모두 다시 해볼까요?</Text>
-					</View>
-				);
-			default:
-				return (
-					<View style={styles.modalTitleRow}>
-						<IconComponent type="materialIcons" name="help-outline" size={20} color="#34495e" style={styles.iconLeft} />
-						<Text style={styles.modalTitleText}>정말 다시 해볼까요?</Text>
-					</View>
-				);
-		}
-	};
-	const handleScrollToTop = () => {
-		scrollRef.current?.scrollTo({ y: 0, animated: true });
-	};
 
 	const resetTodayQuizOnly = async () => {
 		const json = await AsyncStorage.getItem(STORAGE_KEYS.todayQuiz);
-		if (!json) return;
+		if (!json) {
+			return;
+		}
 
 		const list: MainDataType.TodayQuizList[] = JSON.parse(json);
 		const todayStr = new Date().toISOString().slice(0, 10);
@@ -219,10 +132,11 @@ const SettingScreen = () => {
 
 		await AsyncStorage.setItem(STORAGE_KEYS.todayQuiz, JSON.stringify(updated));
 	};
-
 	// handleConfirmDelete 내부 수정
 	const handleConfirmDelete = async () => {
-		if (!resetType) { return; }
+		if (!resetType) {
+			return;
+		}
 
 		try {
 			if (resetType === 'study') {
@@ -246,180 +160,406 @@ const SettingScreen = () => {
 				]);
 				Alert.alert('완료', '모든 데이터가 초기화되었습니다');
 			}
-
 			setModalVisible(false);
 			setResetType(null);
-			handleScrollToTop();
-
-			// 예: 초기화 후 홈으로 이동하고 싶다면 아래 주석 해제
-			// navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME });
+			scrollToTop();
 		} catch (err) {
 			Alert.alert('오류', '초기화 중 오류가 발생했습니다');
 		}
 	};
 
-	const handleShareApp = async (platform: 'android' | 'ios') => {
+	const sections: { title: React.ReactNode; data: string[] }[] = useMemo(
+		() =>
+			[
+				{
+					title: <Text style={[styles.sectionHeaderText, { color: '#E53935' }]}>사용자 정보 초기화 </Text>,
+					data: ['resetStudy', 'resetQuiz', 'resetTodayQuiz', 'resetTimeChallenge', 'resetAll'],
+				},
+				{
+							title: '문의 및 피드백',
+					data: ['rate', 'inquiry', 'developerInfo', 'developerApps'],
+				},
+				{
+					title: '정책 및 라이선스',
+					// ⬇️ 개발 모드에서만 generateDummyData 노출하는 경우 여기에 조건 추가 가능
+					data: ['privacyPolicy', 'openSource'],
+				},
+			].filter((s) => Array.isArray(s.data) && s.data.length > 0),
+			[],
+	);
+
+	const renderItem = ({ item }: { item: string }) => {
+		const settingsMap: Record<
+			string,
+			{ label: string; icon: { type: 'MaterialCommunityIcons' | 'materialIcons'; name: string } }
+		> = {
+			rate: {
+				label: '앱 리뷰 남기기',
+				icon: { type: 'MaterialCommunityIcons', name: 'star-outline' },
+			},
+			inquiry: {
+				label: '문의하기',
+				icon: { type: 'MaterialCommunityIcons', name: 'email-outline' },
+			},
+
+			resetStudy: {
+				label: '학습 다시 풀기',
+				icon: { type: 'MaterialCommunityIcons', name: 'refresh' },
+			},
+			resetQuiz: {
+				label: '퀴즈 다시 풀기',
+				icon: { type: 'MaterialCommunityIcons', name: 'refresh' },
+			},
+			resetAll: {
+				label: '모두 다시 풀기',
+				icon: { type: 'materialIcons', name: 'delete' },
+			},
+			resetTodayQuiz: {
+				label: '오늘의 퀴즈 다시 풀기',
+				icon: { type: 'MaterialCommunityIcons', name: 'refresh' },
+			},
+			resetTimeChallenge: {
+				label: '타임 챌린지 기록 초기화',
+				icon: { type: 'MaterialCommunityIcons', name: 'refresh' },
+			},
+
+			developerInfo: {
+				label: '제작자 소개',
+				icon: { type: 'MaterialCommunityIcons', name: 'account-circle-outline' },
+			},
+			developerApps: {
+				label: '제작자 앱 더보기',
+				icon: { type: 'MaterialCommunityIcons', name: 'apps' },
+			},
+			privacyPolicy: {
+				label: '개인정보 처리방침 및 이용약관',
+				icon: { type: 'MaterialCommunityIcons', name: 'shield-lock-outline' },
+			},
+			openSource: {
+				label: '오픈소스 라이브러리',
+				icon: { type: 'MaterialCommunityIcons', name: 'file-code-outline' },
+			},
+
+			...(IS_DEV && {
+				generateDummyData: {
+					label: '더미데이터 생성',
+					icon: { type: 'MaterialCommunityIcons', name: 'apps' },
+				},
+				completeAllQuiz: {
+					label: '모든 퀴즈 완료 설정',
+					icon: { type: 'materialIcons', name: 'check-circle' },
+				},
+				completeAllStudy: {
+					label: '모든 학습 완료로 설정',
+					icon: { type: 'materialIcons', name: 'school' },
+				},
+			}),
+		};
+		// ===== 설정 아이템 동작 =====
+		const handlePress = async (item: string) => {
+			switch (item) {
+				case 'resetStudy':
+					confirmReset('study');
+					break;
+
+				case 'resetQuiz':
+					confirmReset('quiz');
+					break;
+
+				case 'resetTodayQuiz':
+					confirmReset('todayQuiz');
+					break;
+
+				case 'resetTimeChallenge':
+					confirmReset('timeChallenge');
+					break;
+
+				case 'resetAll':
+					confirmReset('all');
+					break;
+
+				case 'completeAllQuiz':
+					break;
+				case 'completeAllStudy':
+					break;
+
+				case 'rate':
+					if (InAppReview.isAvailable()) {
+						InAppReview.RequestInAppReview();
+					} else {
+						Alert.alert('알림', '현재 환경에서는 리뷰 요청을 지원하지 않습니다.');
+					}
+					break;
+
+				case 'inquiry':
+					const version = await VersionCheck.getCurrentVersion();
+					const os = Platform.OS === 'android' ? 'Android' : 'iOS';
+					const device = await DeviceInfo.getModel(); // 예: "iPhone 14 Pro"
+
+					const body = [
+						'',
+						'',
+						'',
+						'',
+						'아래에 내용을 함께 보내주시면 문의사항을 처리하는데 도움이 됩니다.',
+						'',
+						'--------------',
+						`앱 버전: ${version}`,
+						`운영 체제: ${os}`,
+						`기기: ${device}`,
+						'--------------',
+					].join('\n'); // 줄바꿈은 \n 사용 (이걸 encodeURIComponent가 처리함)
+
+					const encodedBody = encodeURIComponent(body); // ✅ 반드시 인코딩!
+
+					const mailto = `mailto:adjh54ir@gmail.com?subject=${encodeURIComponent(`${APP_NAME} 앱 문의`)}&body=${encodedBody}`;
+
+					Linking.openURL(mailto);
+					break;
+
+				case 'developerInfo':
+					setShowDevModal(true);
+					break;
+				case 'developerApps':
+					setShowAppsModal(true);
+					break;
+
+				case 'privacyPolicy':
+					setShowTermsModal(true);
+					break;
+				case 'openSource':
+					setShowOpenSourceModal(true);
+					break;
+
+				// case 'generateDummyData':
+				// 	break;
+				// Alert.alert(
+				// 	'확인',
+				// 	'30일치 더미 데이터를 생성하시겠습니까?',
+				// 	[
+				// 		{ text: '취소', style: 'cancel' },
+				// 		{
+				// 			text: '확인',
+				// 			onPress: async () => {
+				// 				await generateDummyMonthlyData();
+				// 				Alert.alert('완료', '더미 데이터가 생성되었습니다.');
+				// 			},
+				// 		},
+			}
+		};
+
+		return (
+			<TouchableOpacity style={styles.cardButton} onPress={() => handlePress(item)}>
+				<View style={styles.row}>
+					<IconComponent
+						type={settingsMap[item].icon.type}
+						name={settingsMap[item].icon.name}
+						size={scaledSize(20)}
+						color={
+							['resetStudy', 'resetQuiz', 'resetAll', 'resetTodayQuiz', 'resetTimeChallenge'].includes(item)
+								? '#e74c3c'
+								: '#333'
+						}
+						style={styles.icon}
+					/>
+					<Text style={[styles.cardText]}>{settingsMap[item].label}</Text>
+				</View>
+			</TouchableOpacity>
+		);
+	};
+
+	const shareApp = async () => {
 		try {
-			const storeUrl =
-				platform === 'android'
-					? '📱 Android: https://play.google.com/store/apps/details?id=com.tha.proverbquiz'
-					: '🍏 iOS: https://apps.apple.com/app/id6746687973';
+			// 1) 스토어 링크 확보 (하드코딩 > VersionCheck)
+			const [playRes, appRes] = await Promise.all([
+				ANDROID_STORE_URL
+					? Promise.resolve({ storeUrl: ANDROID_STORE_URL })
+					: VersionCheck.needUpdate({ provider: 'playStore' }).catch(() => null),
+				IOS_STORE_URL
+					? Promise.resolve({ storeUrl: IOS_STORE_URL })
+					: VersionCheck.needUpdate({ provider: 'appStore' }).catch(() => null),
+			]);
 
-			const message = `
-📕 재미있는 속픽: 속담 퀴즈 앱을 추천해요!
+			const androidUrl = playRes?.storeUrl || '';
+			const iosUrl = appRes?.storeUrl || '';
 
-이 앱은 다양한 대한민국 속담을 쉽고 재미있게 학습할 수 있도록 도와주는 학습 도구입니다.
-퀴즈를 통해 익힌 지식을 점검하고, 틀린 문제는 ‘오답 복습’ 기능으로 반복 학습할 수 있어
-완벽한 속담 마스터에 한 걸음 더 다가갈 수 있어요.
+			if (!androidUrl && !iosUrl) {
+				Alert.alert('Coming Soon..!', '아직 안드로이드/iOS 스토어에 출시되지 않았습니다.');
+				return;
+			}
 
-지금 바로 다운로드하고 친구와 함께 즐겨보세요!
+			// 2) 공유 메시지 구성 (두 링크 모두 포함)
+			const messageLines = [
+				`📱 ${APP_NAME}`,
+				'',
+				DESCRIPTION,
+				'',
+				'🔗 다운로드 링크',
+				`• Android: ${androidUrl || '출시 예정'}`,
+				'',
+				`• iOS: ${iosUrl || '출시 예정'}`,
+			];
+			const message = messageLines.join('\n');
 
-${storeUrl}
-		`.trim();
+			// 3) 플랫폼별 Share 호출
+			// - iOS: url 필드가 우선 사용되므로 대표 링크 하나도 넣어줌(있으면 iOS 링크, 없으면 Android 링크)
+			const sharePayload =
+				Platform.OS === 'ios' ? { message, url: iosUrl || androidUrl, title: APP_NAME } : { message, title: APP_NAME };
 
-			await Share.share({ message });
-		} catch (error) {
-			Alert.alert('오류', '공유 중 문제가 발생했어요.');
+			await Share.share(sharePayload);
+		} catch (e) {
+			console.warn('앱 공유 오류:', e);
+			Alert.alert('오류', '앱 정보를 불러오는 중 문제가 발생했습니다.');
+		}
+	};
+
+	// 모달 타이틀을 타입에 따라 변경
+	const getModalTitle = () => {
+		switch (resetType) {
+			case 'study':
+				return (
+					<View style={styles.modalTitleRow}>
+						<IconComponent
+							type="MaterialCommunityIcons"
+							name="refresh"
+							size={20}
+							color="#34495e"
+							style={styles.iconLeft}
+						/>
+						<Text style={styles.modalTitleText}>학습을 다시 해볼까요?</Text>
+					</View>
+				);
+			case 'quiz':
+				return (
+					<View style={styles.modalTitleRow}>
+						<IconComponent
+							type="MaterialCommunityIcons"
+							name="refresh"
+							size={20}
+							color="#34495e"
+							style={styles.iconLeft}
+						/>
+						<Text style={styles.modalTitleText}>퀴즈를 다시 풀어볼까요?</Text>
+					</View>
+				);
+			case 'todayQuiz':
+				return (
+					<View style={styles.modalTitleRow}>
+						<IconComponent type="MaterialCommunityIcons"
+							name="refresh" size={20} color="#34495e" style={styles.iconLeft} />
+						<Text style={styles.modalTitleText}>오늘의 퀴즈를 초기화할까요?</Text>
+					</View>
+				);
+			case 'timeChallenge':
+				return (
+					<View style={styles.modalTitleRow}>
+						<IconComponent type="MaterialCommunityIcons"
+							name="refresh" size={20} color="#34495e" style={styles.iconLeft} />
+						<Text style={styles.modalTitleText}>타임 챌린지를 초기화할까요?</Text>
+					</View>
+				);
+			case 'all':
+				return (
+					<View style={styles.modalTitleRow}>
+						<IconComponent
+							type="materialCommunityIcons"
+							name="delete-alert-outline"
+							size={20}
+							color="#34495e"
+							style={styles.iconLeft}
+						/>
+						<Text style={styles.modalTitleText}>모두 다시 해볼까요?</Text>
+					</View>
+				);
+			default:
+				return (
+					<></>
+				);
 		}
 	};
 
 	return (
 		<>
 			<SafeAreaView style={styles.container} edges={['top']}>
-				<View style={styles.flexWrapper}>
-					<ScrollView
-						ref={scrollRef}
-						onScroll={handleScroll}
-						style={styles.scrollArea}
-						contentContainerStyle={{ paddingBottom: scaleHeight(60) }} // 아래 고정 영역 공간 확보
-						refreshControl={<RefreshControl refreshing={false} onRefresh={() => { }} />}>
-						{/* <View style={styles.section} /> */}
-						<View style={styles.section}>
-							<Text style={styles.title}>🎓 학습/퀴즈 다시 풀기 </Text>
-							<View style={styles.buttonGroup}>
-								<TouchableOpacity style={[styles.button, styles.resetStudy]} onPress={() => confirmReset('study')}>
-									<IconComponent type="materialCommunityIcons" name="refresh" size={18} color="#fff" style={styles.iconLeft} />
-									<Text style={styles.buttonText}>학습 다시 하기</Text>
-								</TouchableOpacity>
-								<TouchableOpacity style={[styles.button, styles.resetQuiz]} onPress={() => confirmReset('quiz')}>
-									<IconComponent type="materialCommunityIcons" name="refresh" size={18} color="#fff" style={styles.iconLeft} />
-									<Text style={styles.buttonText}>퀴즈 다시 풀기</Text>
-								</TouchableOpacity>
+				<SectionList
+					ref={sectionRef}
+					sections={sections}
+					keyExtractor={(item) => item}
+					renderItem={renderItem}
+					stickySectionHeadersEnabled={false}
+					onScroll={(event) => {
+						const offsetY = event.nativeEvent.contentOffset.y;
+						setShowScrollTop(offsetY > 100);
+					}}
+					contentContainerStyle={styles.listContent}
+					ItemSeparatorComponent={() => <View style={styles.itemSpacing} />}
+					renderSectionFooter={() => <View style={styles.sectionSpacing} />}
+					ListHeaderComponent={
+						<View style={styles.headerContainer}>
+							<View style={styles.recommendSection}>
+								<Text style={styles.recommendTitle}>📲 앱이 마음에 드셨나요?</Text>
+								<Text style={styles.recommendSubtitle}>가족이나 친구, 지인에게 유용한 앱을 함께 나눠보세요!</Text>
 
-								<TouchableOpacity style={[styles.button, styles.resetAll]} onPress={() => confirmReset('all')}>
-									<IconComponent type="materialCommunityIcons" name="delete" size={18} color="#fff" style={styles.iconLeft} />
-									<Text style={styles.buttonText}>모두 다시 풀기</Text>
-								</TouchableOpacity>
+								<View style={styles.appIconWrapper}>
+									<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
+								</View>
+
+								<View style={styles.storeButtons}>
+									<TouchableOpacity style={[styles.storeButton, { backgroundColor: '#2ecc71' }]} onPress={shareApp}>
+										<View style={styles.iconRow}>
+											<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color="#fff" />
+											<Text style={styles.storeButtonText}>공유하기</Text>
+										</View>
+									</TouchableOpacity>
+								</View>
 							</View>
 						</View>
-
-						<View style={styles.section}>
-							<Text style={styles.title}>🧹 기타 데이터 초기화</Text>
-							<View style={styles.buttonGroup}>
-								<TouchableOpacity
-									style={[styles.button, { backgroundColor: '#16a085' }]}
-									onPress={() => confirmReset('todayQuiz')}>
-									<IconComponent type="materialCommunityIcons" name="refresh" size={18} color="#fff" style={styles.iconLeft} />
-									<Text style={styles.buttonText}>오늘의 퀴즈 다시 풀기</Text>
-								</TouchableOpacity>
-
-								<TouchableOpacity
-									style={[styles.button, { backgroundColor: '#e67e22' }]}
-									onPress={() => confirmReset('timeChallenge')}>
-									<IconComponent type="materialCommunityIcons" name="refresh" size={18} color="#fff" style={styles.iconLeft} />
-									<Text style={styles.buttonText}>타임 챌린지 기록 초기화</Text>
-								</TouchableOpacity>
+					}
+					ListFooterComponent={
+						<Text style={styles.appVerText}>
+							📱 현재 앱 버전: <Text style={styles.appVerBoldText}>v{appVersion}</Text>
+						</Text>
+					}
+					renderSectionHeader={({ section }) =>
+						section.title ? (
+							<View style={styles.sectionHeader}>
+								<Text style={styles.sectionHeaderText}>{section.title}</Text>
 							</View>
-						</View>
-
-						{/* 기존 설정 UI */}
-						{/* <View style={styles.section}>
-							<Text style={styles.title}>📌 관리자 패널</Text>
-							<View style={styles.buttonGroup}>
-								<TouchableOpacity style={[styles.button, { backgroundColor: '#6a1b9a' }]} onPress={handleCompleteAllQuiz}>
-									<IconComponent type="materialIcons" name="check-circle" size={18} color="#fff" style={styles.iconLeft} />
-									<Text style={styles.buttonText}>모든 퀴즈 완료로 설정</Text>
-								</TouchableOpacity>
-								<TouchableOpacity style={[styles.button, { backgroundColor: '#0d47a1' }]} onPress={handleCompleteAllStudy}>
-									<IconComponent type="materialIcons" name="school" size={18} color="#fff" style={styles.iconLeft} />
-									<Text style={styles.buttonText}>모든 학습 완료로 설정</Text>
-								</TouchableOpacity>
-							</View>
-						</View> */}
-
-						{/* ============== 이용약관 및 개인정보처리방침 ==============*/}
-						<TouchableOpacity style={styles.policyAccordionHeader} onPress={() => setShowTerms((prev) => !prev)}>
-							<Text style={styles.policyAccordionText}>개인정보 처리방침 및 이용약관 {showTerms ? '▲' : '▼'}</Text>
-						</TouchableOpacity>
-						{showTerms && <TermsScreen />}
-
-						{/* ============== 오픈소스 라이브러리 ==============*/}
-						<TouchableOpacity style={styles.policyAccordionHeader} onPress={() => setShowOpenSource((prev) => !prev)}>
-							<Text style={styles.policyAccordionText}>오픈소스 라이브러리 {showOpenSource ? '▲' : '▼'}</Text>
-						</TouchableOpacity>
-						{showOpenSource && <OpenSourceScreen />}
-						{/* ✅ 하단 앱 정보 */}
-						<View style={styles.footer}>
-							<Text style={styles.appVerText}>
-								📱 현재 앱 버전: <Text style={styles.appVerBoldText}>v{appVersion}</Text>
-							</Text>
-							<TouchableOpacity style={styles.hiddenDevTouchArea} onPress={() => setShowDevModal(true)}>
-								<Text style={styles.devText}>제작자 소개</Text>
-							</TouchableOpacity>
-						</View>
-						<View style={styles.recommendSection}>
-							<Text style={styles.recommendTitle}>📲 앱이 마음에 드셨나요?</Text>
-							<Text style={styles.recommendSubtitle}>친구에게 앱을 추천하고 함께 퀴즈를 즐겨보세요!</Text>
-
-							{/* 앱 아이콘 */}
-							<View style={styles.appIconWrapper}>
-								<Image
-									source={require('@/assets/images/mainIcon.png')} // 앱 아이콘 경로에 맞게 조정
-									style={styles.appIcon}
-									resizeMode="contain"
-								/>
-							</View>
-
-							{/* 스토어 버튼 */}
-							<View style={styles.storeButtons}>
-								<TouchableOpacity
-									style={[styles.storeButton, { backgroundColor: '#1E88E5' }]}
-									onPress={() => handleShareApp('android')}>
-									<Text style={styles.storeButtonText}>📱 안드로이드 공유하기</Text>
-								</TouchableOpacity>
-
-								<TouchableOpacity
-									style={[styles.storeButton, { backgroundColor: '#2ecc71' }]}
-									onPress={() => handleShareApp('ios')}>
-									<Text style={styles.storeButtonText}>🍏 애플 공유하기</Text>
-								</TouchableOpacity>
-							</View>
-						</View>
-					</ScrollView>
-
-					{/* ============== 현재 앱버전 명시 ==============*/}
-				</View>
+						) : (
+							<View style={{ height: scaleHeight(10) }} />
+						)
+					}
+				/>
 			</SafeAreaView>
 
 			{/* 제작자 소개 Modal */}
 			<Contributor9Modal visible={showDevModal} onClose={() => setShowDevModal(false)} />
-			<Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>
-				<View style={styles.modalBackdrop}>
-					<View style={styles.modalContainer}>
-						<Text style={styles.modalTitle}>{getModalTitle()}</Text>
-						<Text style={styles.modalSummary}>{summary}</Text>
 
-						<View style={styles.modalButtons}>
-							<TouchableOpacity style={[styles.modalButton, styles.modalCancel]} onPress={() => setModalVisible(false)}>
-								<Text style={styles.modalButtonText}>취소</Text>
-							</TouchableOpacity>
-							<TouchableOpacity style={[styles.modalButton, styles.modalDelete]} onPress={handleConfirmDelete}>
-								<Text style={styles.modalButtonText}>삭제</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				</View>
-			</Modal>
+			{/* 제작자 앱 더보기 팝업 */}
+			<DeveloperAppsModal visible={showAppsModal} onClose={() => setShowAppsModal(false)} />
+
+			{/* 스크롤 최상단 이동 버튼 */}
+			{showScrollTop && (
+				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
+					<IconComponent type="fontawesome6" name="arrow-up" size={20} color="#ffffff" />
+				</TouchableOpacity>
+			)}
+
+			{/* 개인정보처리방침 및 이용약관 팝업 */}
+			{showTermsModal && <TermsOfServiceModal visible={showTermsModal} onClose={() => setShowTermsModal(false)} />}
+			{/* 오픈소스 라이브러리 팝업 */}
+			{showOpenSourceModal && (
+				<OpenSourceModal visible={showOpenSourceModal} onClose={() => setShowOpenSourceModal(false)} />
+			)}
+
+			<CmmDelConfirmModal
+				visible={modalVisible}
+				onCancel={() => setModalVisible(false)}
+				onConfirm={handleConfirmDelete}
+				onRequestClose={() => setModalVisible(false)} // Android 백버튼
+				renderTitle={getModalTitle}                   // 기존 커스텀 타이틀 함수 재사용
+				summary={summary}
+			/>
 		</>
 	);
 };
@@ -428,7 +568,7 @@ export default SettingScreen;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#f9f9f9',
 	},
 	section: {
 		marginHorizontal: scaleWidth(20),
@@ -462,19 +602,10 @@ const styles = StyleSheet.create({
 		fontWeight: '500',
 	},
 	appVerContainer: {
-		marginBottom: 20,
-	},
-	appVerText: {
-		fontSize: 12,
-		color: '#95a5a6',
-		textAlign: 'center',
 		marginBottom: scaleHeight(20),
 	},
-	appVerBoldText: {
-		fontWeight: 'bold',
-	},
 	policyContentBox: {
-		minHeight: 500,
+		minHeight: scaleHeight(500),
 		backgroundColor: '#f9f9f9',
 		paddingHorizontal: scaleWidth(10),
 		marginHorizontal: scaleWidth(20),
@@ -506,7 +637,7 @@ const styles = StyleSheet.create({
 	},
 	scrollArea: {
 		flex: 1,
-		paddingBottom: scaleHeight(100), // ✅ 고정된 하단 영역만큼 패딩 확보
+		paddingBottom: scaleHeight(50), // ✅ 고정된 하단 영역만큼 패딩 확보
 	},
 	policyAccordionHeader: {
 		width: 'auto',
@@ -529,19 +660,20 @@ const styles = StyleSheet.create({
 	},
 	scrollTopButton: {
 		position: 'absolute',
-		right: 16,
-		bottom: 16,
+		right: scaleWidth(16),
+		bottom: scaleHeight(16),
 		backgroundColor: '#007AFF',
-		width: 48,
-		height: 48,
-		borderRadius: 24,
+		width: scaleWidth(48),
+		height: scaleWidth(48), // 보통 width와 height는 같은 비율 유지
+		borderRadius: scaleWidth(24),
 		justifyContent: 'center',
 		alignItems: 'center',
-		elevation: 4,
+
+		// ✅ iOS 그림자
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
+		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.25,
-		shadowRadius: 4,
+		shadowRadius: scaleWidth(4),
 	},
 	footer: {
 		marginTop: scaleHeight(30),
@@ -557,8 +689,10 @@ const styles = StyleSheet.create({
 	},
 	buttonText: {
 		color: '#fff',
-		fontWeight: 'bold',
-		fontSize: scaledSize(14),
+		fontWeight: '600', // 기존 bold보다 살짝 가벼워서 현대적인 느낌
+		fontSize: scaledSize(15), // 기존 14 → 약간 크게
+		letterSpacing: 0.5, // 글자 사이 간격 추가
+		textAlign: 'center', // 아이콘이 없을 때도 중앙정렬
 	},
 	button: {
 		flexDirection: 'row',
@@ -602,7 +736,7 @@ const styles = StyleSheet.create({
 	modalSummary: {
 		fontSize: scaledSize(14), // 기존 12 → 14로 증가
 		color: '#555',
-		textAlign: 'center',        // 중앙정렬에서 왼쪽 정렬로 변경 (더 자연스러운 느낌)
+		textAlign: 'center', // 중앙정렬에서 왼쪽 정렬로 변경 (더 자연스러운 느낌)
 		lineHeight: scaleHeight(24), // 기존 22 → 24로 증가
 		marginBottom: scaleHeight(24),
 	},
@@ -631,6 +765,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
+		marginBottom: scaleHeight(12), // ← 간격 여기로
 	},
 	modalTitleText: {
 		fontSize: scaledSize(18),
@@ -639,19 +774,69 @@ const styles = StyleSheet.create({
 		color: '#34495e',
 		textAlign: 'center',
 	},
-	recommendSection: {
-		marginHorizontal: scaleWidth(20),
-		marginBottom: scaleHeight(30),
-		padding: scaleWidth(20),
-		backgroundColor: '#ecf0f1',
-		borderRadius: scaleWidth(12),
+	listContent: {
+		paddingTop: scaleHeight(24),
+		paddingBottom: scaleHeight(24),
+	},
+	cardButton: {
+		backgroundColor: '#fff',
+		borderRadius: 12,
+		paddingVertical: scaleHeight(16),
+		paddingHorizontal: scaleWidth(16),
+		marginHorizontal: scaleHeight(20),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.06,
+		shadowRadius: 3,
+		flexDirection: 'row',
 		alignItems: 'center',
 	},
+	row: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	icon: {
+		marginRight: scaleWidth(12), // 기존보다 여유
+		color: '#34495e', // 통일된 톤
+	},
+	cardText: {
+		fontSize: scaledSize(15), // 살짝 줄여서 현대적인 느낌
+		color: '#2c3e50', // 조금 더 진한 톤
+		fontWeight: '500', // 중간 두께
+		letterSpacing: 0.3, // 글자 간격 추가
+		flexShrink: 1, // 길어져도 잘림 방지
+	},
+	itemSpacing: {
+		height: scaleHeight(10),
+	},
+	sectionSpacing: {
+		height: scaleHeight(24), // 섹션 사이 간격
+	},
+	versionText: {
+		textAlign: 'center',
+		color: '#999',
+		fontSize: scaledSize(13),
+		paddingVertical: scaleHeight(20),
+	},
+	recommendSection: {
+		marginHorizontal: scaleWidth(20),
+		padding: scaleWidth(20),
+		backgroundColor: '#f2f2f2', // ⬅️ 회색으로 변경
+		borderRadius: scaleWidth(12),
+		borderWidth: 1,
+		borderColor: '#e1e4e8',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.04,
+		shadowRadius: 4,
+		alignItems: 'center',
+		marginTop: scaleHeight(12),
+	},
 	recommendTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(4),
+		fontSize: scaledSize(17),
+		fontWeight: '700',
+		color: '#34495e',
+		marginBottom: scaleHeight(6),
 	},
 	recommendSubtitle: {
 		fontSize: scaledSize(13),
@@ -663,6 +848,10 @@ const styles = StyleSheet.create({
 		width: scaleWidth(80),
 		height: scaleWidth(80),
 		marginBottom: scaleHeight(12),
+		borderWidth: 1,
+		borderColor: '#ddd',
+		borderRadius: scaleWidth(16),
+		overflow: 'hidden', // FastImage일 경우도 고려
 	},
 	appIcon: {
 		width: '100%',
@@ -684,5 +873,64 @@ const styles = StyleSheet.create({
 		color: '#fff',
 		fontWeight: 'bold',
 		fontSize: scaledSize(13),
+	},
+	iconRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		gap: scaleWidth(6), // 아이콘과 텍스트 사이 간격
+	},
+	versionBox: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: '#ecf0f1',
+		paddingVertical: scaleHeight(10),
+		paddingHorizontal: scaleWidth(16),
+		borderRadius: scaleWidth(10),
+		marginBottom: scaleHeight(12),
+		alignSelf: 'flex-start',
+	},
+	versionIcon: {
+		marginRight: scaleWidth(8),
+	},
+	versionLabel: {
+		fontSize: scaledSize(14),
+		color: '#34495e',
+		fontWeight: '600',
+		marginRight: scaleWidth(6),
+	},
+	versionValue: {
+		fontSize: scaledSize(14),
+		color: '#7f8c8d',
+	},
+	appVerText: {
+		fontSize: scaledSize(12),
+		color: '#95a5a6',
+		textAlign: 'center',
+		marginBottom: scaleHeight(20),
+	},
+	appVerBoldText: {
+		fontWeight: 'bold',
+	},
+	headerContainer: {
+		marginBottom: scaleHeight(5),
+	},
+	sectionHeaderText: {
+		fontSize: scaledSize(15), // 살짝 줄여서 더 깔끔하게
+		fontWeight: '600', // 굵기는 중간 정도
+		color: '#34495e', // 톤 다운된 네이비
+		letterSpacing: 0.5, // 글자 간격
+		textTransform: 'uppercase', // 대문자(원하면만)
+	},
+	sectionHeader: {
+		marginVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(20),
+		paddingVertical: scaleHeight(10),
+		marginHorizontal: scaleWidth(16),
+		backgroundColor: '#ecf3f9',
+		borderLeftWidth: scaleWidth(4),
+		borderLeftColor: '#3498db', // 포인트 블루
+		marginBottom: scaleHeight(12),
+		borderRadius: scaleWidth(4),
 	},
 });

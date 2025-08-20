@@ -197,7 +197,7 @@ const Home = () => {
 	}, []);
 
 	/**
-	 * navigation 관리 
+	 * navigation 관리
 	 */
 	useEffect(() => {
 		// 푸시 클릭했을 때
@@ -206,27 +206,26 @@ const Home = () => {
 				const screen = detail.notification?.data?.moveToScreen;
 				if (screen) {
 					// @ts-ignore
-					navigation.navigate(screen)
+					navigation.navigate(screen);
 				}
 			}
 		});
 
 		// 앱 종료 상태에서 푸시 누른 경우
-		notifee.getInitialNotification()
-			.then(initialNotification => {
-				console.log("앱 종료 상태에서 푸시 누른 경우")
-				if (initialNotification) {
-					const screen = initialNotification.notification?.data?.moveToScreen;
-					if (screen) {
-						// @ts-ignore
-						navigate(screen)
-					}
+		notifee.getInitialNotification().then((initialNotification) => {
+			console.log('앱 종료 상태에서 푸시 누른 경우');
+			if (initialNotification) {
+				const screen = initialNotification.notification?.data?.moveToScreen;
+				if (screen) {
+					// @ts-ignore
+					navigate(screen);
 				}
-			});
+			}
+		});
 		return () => {
 			unsubscribe();
 		};
-	}, [])
+	}, []);
 
 	const getPetLevel = (checkedIn: { [date: string]: any }) => {
 		const count = Object.keys(checkedIn).length;
@@ -374,7 +373,6 @@ const Home = () => {
 		return shuffled.slice(0, count);
 	};
 	const ensureTodayQuizExists = async () => {
-
 		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
 
 		if (json) {
@@ -548,9 +546,7 @@ const Home = () => {
 										</View>
 									</TouchableOpacity>
 									{/* ✅ 회색 작게 안내 텍스트 추가 */}
-									{showMascotHint && (
-										<Text style={styles.mascotHintText}>캐릭터를 누르면 빵빠레가 팡팡!</Text>
-									)}
+									{showMascotHint && <Text style={styles.mascotHintText}>캐릭터를 누르면 빵빠레가 팡팡!</Text>}
 
 									{petLevel >= 0 && (
 										<View style={styles.petContent}>

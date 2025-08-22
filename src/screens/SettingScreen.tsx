@@ -775,7 +775,6 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	listContent: {
-		paddingTop: scaleHeight(24),
 		paddingBottom: scaleHeight(24),
 	},
 	cardButton: {

@@ -1,18 +1,17 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
-import BottomTabNavigator from '@/navigation/BottomTabNavigator';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import StackNavigator from './StackNavigator';
+import { scaleHeight } from '@/utils';
+import StackNavigator from '@/navigation/StackNavigator';
 
 const AD_ALLOWED_ROUTES = [
-    Paths.HOME,
-    Paths.PROVERB_LIST,
     Paths.TODAY_QUIZ,
-    Paths.MY_SCORE,
+    Paths.PROVERB_LIST,
     Paths.SETTING,
+    Paths.MY_SCORE,
     // 필요하면 추가
 ];
 
@@ -44,6 +43,7 @@ const AppLayout = () => {
                         <AdmobBannerAd visible={shouldShowAd} />
                     </View>
 
+                    <View style={{marginBottom: Platform.OS === 'android' ? scaleHeight(36) : 0}} />
                     {/* 하단 콘텐츠 */}
                     <StackNavigator />
                 </View>
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     },
     adWrapperAbsolute: {
         position: 'absolute',
-        top: 0,
+        top: Platform.OS === 'android' ? scaleHeight(6) : 0,
         left: 0,
         right: 0,
         zIndex: 10,
@@ -71,10 +71,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     adWrapper: {
-        paddingHorizontal: 10,
+        paddingHorizontal: scaleHeight(10),
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: '#transparent',
     },
     navigatorWrapper: {
         flex: 1,

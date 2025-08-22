@@ -1,12 +1,7 @@
 // components/VersionCheckModal.tsx
 import { RootState } from '@/store/RootReducer';
 import { setCurrentAppVerion } from '@/store/slice/UserDeviceInfoSlice';
-import {
-	moderateScale,
-	scaledSize,
-	scaleHeight,
-	scaleWidth,
-} from '@/utils/DementionUtils';
+import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import React, { useEffect, useState } from 'react';
 import {
 	Modal,
@@ -29,9 +24,7 @@ import { useDispatch, useSelector } from 'react-redux';
 const VersionCheckModal = () => {
 	const dispatch = useDispatch();
 	const [showUpdateModal, setShowUpdateModal] = useState(false);
-	const userDeviceInfoRedux = useSelector(
-		(state: RootState) => state.userDeviceInfo,
-	);
+	const userDeviceInfoRedux = useSelector((state: RootState) => state.userDeviceInfo);
 
 	useEffect(() => {
 		checkVersion();
@@ -43,8 +36,7 @@ const VersionCheckModal = () => {
 	 */
 	const checkVersion = async (): Promise<void> => {
 		try {
-			const platformProvider =
-				Platform.OS === 'android' ? 'playStore' : 'appStore';
+			const platformProvider = Platform.OS === 'android' ? 'playStore' : 'appStore';
 			const latestVersion = await VersionCheck.getLatestVersion({
 				provider: platformProvider,
 			});
@@ -56,10 +48,7 @@ const VersionCheckModal = () => {
 				return;
 			}
 			// 1. Redux에 앱 버전이 없으면 현재 버전을 앱버전으로 지정
-			if (
-				userDeviceInfoRedux.appVer === '' ||
-				userDeviceInfoRedux.appVer === undefined
-			) {
+			if (userDeviceInfoRedux.appVer === '' || userDeviceInfoRedux.appVer === undefined) {
 				dispatch(setCurrentAppVerion(currentVersion));
 			}
 
@@ -103,18 +92,14 @@ const VersionCheckModal = () => {
 		<Modal
 			visible={showUpdateModal}
 			transparent
-			animationType="fade"
+			animationType='fade'
 			statusBarTranslucent // ✅ 안드로이드에서 전체 화면 덮게
-			presentationStyle="overFullScreen" // ✅ iOS에서도 안정적
-			onRequestClose={() => { }}
-		>
+			presentationStyle='overFullScreen' // ✅ iOS에서도 안정적
+			onRequestClose={() => {}}>
 			<View style={styles.modalContainer}>
 				<View style={styles.modalContent}>
 					<Text style={styles.title}>업데이트 알림</Text>
-					<Image
-						source={require('@/assets/images/update.png')}
-						style={styles.image}
-					/>
+					<Image source={require('@/assets/images/update.png')} style={styles.image} />
 					<Text style={styles.message}>
 						🎉 새로운 버전이 출시되었습니다 🎉{'\n'}더 편리해진 기능을 만나보세요!
 						{'\n\n'}
@@ -124,7 +109,7 @@ const VersionCheckModal = () => {
 					</TouchableOpacity>
 				</View>
 			</View>
-		</Modal >
+		</Modal>
 	);
 };
 
@@ -140,8 +125,8 @@ const styles = StyleSheet.create({
 		borderRadius: moderateScale(10),
 		padding: scaleWidth(20),
 		width: scaleWidth(300),
-		maxWidth: '90%',   // ✅ 작은 기기 대비
-		maxHeight: '85%',  // ✅ 텍스트가 길어도 안전
+		maxWidth: '90%', // ✅ 작은 기기 대비
+		maxHeight: '85%', // ✅ 텍스트가 길어도 안전
 		alignItems: 'center',
 	},
 	title: {

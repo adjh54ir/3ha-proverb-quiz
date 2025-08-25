@@ -308,7 +308,6 @@ const ProverbListScreen = () => {
 												...styles.dropdownListLevel,
 												overflow: 'visible', // 🟢 부모와 같이 설정
 												zIndex: 3000,
-												elevation: 10,
 											}}
 											listItemLabelStyle={{ marginLeft: scaleWidth(6), fontSize: scaledSize(14) }}
 											labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
@@ -336,7 +335,6 @@ const ProverbListScreen = () => {
 												overflow: 'visible', // 중요
 												zIndex: 3000,
 												...styles.dropdownListField,
-												elevation: 1000, // Android에서 zIndex처럼 동작
 												maxHeight: scaleHeight(200), // 또는 250~300 등 충분한 높이
 											}}
 											zIndex={5000} // DropDownPicker 자체에 zIndex 주기
@@ -366,7 +364,6 @@ const ProverbListScreen = () => {
 												shadowOpacity: 0.15,
 												shadowOffset: { width: 0, height: 6 },
 												shadowRadius: scaleWidth(8),
-												elevation: 10,
 												position: 'relative',
 											}}
 											listItemLabelStyle={{

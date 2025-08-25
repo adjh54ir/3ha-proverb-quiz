@@ -817,7 +817,6 @@ const ProverbStudyScreen = () => {
 											shadowOpacity: 0.15,
 											shadowOffset: { width: 0, height: 6 },
 											shadowRadius: scaleWidth(8),
-											elevation: 10,
 											alignItems: 'stretch', // ✅ 추가
 											flex: 1, // ✅ 반드시 필요
 											justifyContent: 'center',

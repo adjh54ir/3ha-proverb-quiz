@@ -364,7 +364,6 @@ const modalStyles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
-    elevation: 6,
   },
   scrollContainer: {
     flexGrow: 1,

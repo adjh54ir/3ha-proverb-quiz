@@ -32,7 +32,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
     const appsData: AppItem[] = [
         {
             id: '평수 계산기',
-            icon: require('@/assets/appicons/squaremetercalc.png'),
+            icon: require('@/assets/appicons/squaremetercalc2.png'),
             title: '평수 계산기',
             desc: '㎡(제곱미터)와 평(坪)을 쉽게 변환하고 평당 금액을 계산할 수 있는 계산기 앱입니다.',
             android: 'https://play.google.com/store/apps/details?id=com.tha.squaremetercalc',

@@ -176,7 +176,7 @@ const SettingScreen = () => {
 					data: ['resetStudy', 'resetQuiz', 'resetTodayQuiz', 'resetTimeChallenge', 'resetAll'],
 				},
 				{
-							title: '문의 및 피드백',
+					title: '문의 및 피드백',
 					data: ['rate', 'inquiry', 'developerInfo', 'developerApps'],
 				},
 				{
@@ -185,7 +185,7 @@ const SettingScreen = () => {
 					data: ['privacyPolicy', 'openSource'],
 				},
 			].filter((s) => Array.isArray(s.data) && s.data.length > 0),
-			[],
+		[],
 	);
 
 	const renderItem = ({ item }: { item: string }) => {
@@ -284,10 +284,25 @@ const SettingScreen = () => {
 					break;
 
 				case 'rate':
-					if (InAppReview.isAvailable()) {
-						InAppReview.RequestInAppReview();
-					} else {
-						Alert.alert('알림', '현재 환경에서는 리뷰 요청을 지원하지 않습니다.');
+					try {
+						const storeUrl =
+							Platform.OS === 'android'
+								? ANDROID_STORE_URL
+								: IOS_STORE_URL;
+
+						if (!storeUrl) {
+							Alert.alert('Coming Soon..!', '아직 스토어에 출시되지 않았습니다.');
+							return;
+						}
+
+						const supported = await Linking.canOpenURL(storeUrl);
+						if (supported) {
+							await Linking.openURL(storeUrl);
+						} else {
+							Alert.alert('오류', '스토어 페이지를 열 수 없습니다.');
+						}
+					} catch (err) {
+						Alert.alert('오류', '리뷰 페이지로 이동 중 문제가 발생했습니다.');
 					}
 					break;
 

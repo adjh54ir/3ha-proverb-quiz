@@ -10,6 +10,7 @@ import StackNavigator from '@/navigation/StackNavigator';
 const AD_ALLOWED_ROUTES = [
     Paths.TODAY_QUIZ,
     Paths.PROVERB_LIST,
+    Paths.HOME,
     Paths.SETTING,
     Paths.MY_SCORE,
     // 필요하면 추가
@@ -43,7 +44,7 @@ const AppLayout = () => {
                         <AdmobBannerAd visible={shouldShowAd} />
                     </View>
 
-                    <View style={{marginBottom: Platform.OS === 'android' ? scaleHeight(36) : 0}} />
+                    <View style={{ marginBottom: Platform.OS === 'android' ? scaleHeight(36) : 0 }} />
                     {/* 하단 콘텐츠 */}
                     <StackNavigator />
                 </View>

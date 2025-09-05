@@ -30,6 +30,7 @@ import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { CONST_MAIN_DATA } from '@/const/ConstMainData';
 import DateUtils from '@/utils/DateUtils';
 import notifee, { EventType } from '@notifee/react-native';
+import ProverbServices from '@/services/ProverbServices';
 
 const greetingMessages = [
 	'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
@@ -153,8 +154,16 @@ const Home = () => {
 			};
 		}, []),
 	);
+	useEffect(() => {
+		const result = ProverbServices.getDuplicateProverbs();
+		console.log("중복데이터를 확인합니다 :: ", result)
+
+
+	}, [])
 
 	useEffect(() => {
+
+
 		if (showCheckInModal && !isCheckedIn && !hasAutoCheckedIn.current) {
 			handleCheckIn();
 			hasAutoCheckedIn.current = true; // 중복 호출 방지

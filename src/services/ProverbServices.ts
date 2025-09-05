@@ -4,6 +4,28 @@ import { MainDataType } from '@/types/MainDataType';
 const filterData = CONST_MAIN_DATA.PROVERB;
 class ProverbServices {
 	/**
+	 * 중복된 속담 리스트 반환 (모든 중복 탐지)
+	 */
+	getDuplicateProverbs = (): MainDataType.Proverb[][] => {
+		try {
+			const map = new Map<string, MainDataType.Proverb[]>();
+			filterData.forEach((item) => {
+				const key = item.proverb.trim().toLowerCase();
+				if (!map.has(key)) {
+					map.set(key, []);
+				}
+				map.get(key)!.push(item);
+			});
+
+			// 2개 이상 있는 것만 반환
+			return Array.from(map.values()).filter((arr) => arr.length > 1);
+		} catch (error) {
+			console.error('중복 속담 리스트 추출 실패:', error);
+			return [];
+		}
+	};
+
+	/**
 	 * 전체 속담 리스트 조회
 	 */
 	selectProverbList = (): MainDataType.Proverb[] => {

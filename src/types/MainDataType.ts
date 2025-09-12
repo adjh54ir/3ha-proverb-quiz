@@ -24,7 +24,7 @@ export declare namespace MainDataType {
 		category: '운/우연' | '인간관계' | '세상 이치' | '근면/검소' | '노력/성공' | '경계/조심' | '욕심/탐욕' | '배신/불신'; // 속담이 속하는 카테고리 (ex: 인간관계, 세상 이치 등)
 		level: 1 | 2 | 3 | 4; // 난이도 숫자 (1: 아주 쉬움, 2: 쉬움, 3: 보통, 4: 어려움)
 		levelName: string; // 난이도 이름 (ex: "쉬움", "보통" 등 텍스트)
-		example: string; // 속담을 활용한 예시 문장
+		example: string[]; // 속담을 활용한 실제 예시 문장(2개)
 		origin: string; // 속담의 유래나 배경 설명
 		usageTip: string; // 속담을 사용할 수 있는 팁 또는 상황 설명
 		synonym: string | null; // 비슷한 의미의 다른 속담 (없으면 null)

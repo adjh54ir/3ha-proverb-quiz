@@ -1,4 +1,5 @@
 // IconComponent.tsx
+import { scaledSize, scaleWidth } from '@/utils';
 import React from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -15,7 +16,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import Zocial from 'react-native-vector-icons/Zocial';
-import { Dimensions, StyleProp, TextStyle } from 'react-native';
+import { StyleProp, TextStyle } from 'react-native/types';
 
 export type IconType =
 	| 'antdesign'
@@ -40,12 +41,13 @@ interface IconProps {
 	size?: number;
 	color?: string;
 	style?: StyleProp<TextStyle>;
+	isBottomIcon?: boolean
 }
 /**
  * react-native-vector-icons 를 활용할 수 있는 컴포넌트
  * 아이콘 링크 : https://oblador.github.io/react-native-vector-icons/
- * 
- *  호출 예시 
+ *
+ *  호출 예시
  const MyComponent = () => {
   return (
 	<IconComponent
@@ -56,12 +58,11 @@ interface IconProps {
 	/>
   );
 };
- * @param param0 
- * @returns 
+ * @param param0
+ * @returns
  */
-const IconComponent: React.FC<IconProps> = ({ type, name, size = 24, color = 'black', style }) => {
+const IconComponent: React.FC<IconProps> = ({ type, name, size = 24, color = 'black', style, isBottomIcon = false }) => {
 	const normalizedType = type.toLowerCase(); // 소문자 변환
-	const { width: screenWidth } = Dimensions.get('window');
 
 	const iconMap: Record<IconType, any> = {
 		antdesign: AntDesign,
@@ -87,10 +88,21 @@ const IconComponent: React.FC<IconProps> = ({ type, name, size = 24, color = 'bl
 		console.warn(`[IconComponent] '${type}'는 지원되지 않는 아이콘 타입입니다.`);
 		return null;
 	}
-	// ✅ 375 기준으로 반응형 size 계산 (기본 scale 방식)
-	const scale = screenWidth / 375;
-	const finalSize = size * scale;
-	return <Icon name={name} size={finalSize} color={color} style={style} />;
+
+	return (
+		<>
+
+			{
+				!isBottomIcon ?
+					<Icon name={name} size={scaleWidth(size)} color={color} style={style} />
+					:
+					<Icon name={name} size={scaledSize(size)} color={color} style={style} />
+			}
+		</>
+	)
+
+
+
 };
 
 export default IconComponent;

@@ -1,35 +1,39 @@
-import React, { useState, useRef, useEffect } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react/no-unstable-nested-components */
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import {
 	View,
 	Text,
-	TouchableOpacity,
 	StyleSheet,
 	Dimensions,
-	Animated,
-	ActivityIndicator,
-	Modal,
-	InteractionManager,
-	ScrollView,
-	Platform,
+	TouchableOpacity,
 	Image,
+	ActivityIndicator,
+	Animated,
+	Easing,
+	ScrollView,
+	InteractionManager,
+	Pressable,
+	Modal,
+	Platform,
 } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MainDataType } from '@/types/MainDataType';
-import ProverbServices from '@/services/ProverbServices';
-import FastImage from 'react-native-fast-image';
-import DropDownPicker from 'react-native-dropdown-picker';
 import IconComponent from './common/atomic/IconComponent';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { MainDataType } from '@/types/MainDataType';
+import FastImage from 'react-native-fast-image';
+import ConfettiCannon from 'react-native-confetti-cannon';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
-import ConfettiCannon from 'react-native-confetti-cannon';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
-
-const STORAGE_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
+import ProverbServices from '@/services/ProverbServices';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const COMMON_ALL_OPTION = {
@@ -37,9 +41,6 @@ const COMMON_ALL_OPTION = {
 	value: '전체',
 	icon: () => <IconComponent type='FontAwesome6' name='clipboard-list' size={16} color='#555' />,
 };
-
-
-
 const LEVEL_DROPDOWN_ITEMS = [
 	COMMON_ALL_OPTION,
 	{
@@ -63,153 +64,173 @@ const LEVEL_DROPDOWN_ITEMS = [
 		icon: () => <IconComponent type='FontAwesome6' name='trophy' size={16} color='#E74C3C' />,
 	},
 ];
-const FIELD_DROPDOWN_ITEMS = [
+export const FIELD_DROPDOWN_ITEMS = [
 	COMMON_ALL_OPTION,
 	{
 		label: '운/우연',
 		value: '운/우연',
-		icon: () => <IconComponent type='FontAwesome6' name='dice' size={16} color='#81ecec' />,
+		badgeId: 'category_luck',
+		iconType: 'FontAwesome6',
+		iconName: 'dice',
+		iconColor: '#81ecec',
+		icon: () => <IconComponent type="FontAwesome6" name="dice" size={16} color="#81ecec" />,
 	},
 	{
 		label: '인간관계',
 		value: '인간관계',
-		icon: () => <IconComponent type='FontAwesome6' name='users' size={16} color='#a29bfe' />,
+		badgeId: 'category_relation',
+		iconType: 'FontAwesome6',
+		iconName: 'users',
+		iconColor: '#a29bfe',
+		icon: () => <IconComponent type="FontAwesome6" name="users" size={16} color="#a29bfe" />,
 	},
 	{
 		label: '세상 이치',
 		value: '세상 이치',
-		icon: () => <IconComponent type='fontawesome5' name='globe' size={16} color='#fdcb6e' />,
+		badgeId: 'category_world',
+		iconType: 'FontAwesome5',
+		iconName: 'globe',
+		iconColor: '#fdcb6e',
+		icon: () => <IconComponent type="FontAwesome5" name="globe" size={16} color="#fdcb6e" />,
 	},
 	{
 		label: '근면/검소',
 		value: '근면/검소',
-		icon: () => <IconComponent type='fontawesome5' name='hammer' size={16} color='#fab1a0' />,
+		badgeId: 'category_diligence',
+		iconType: 'FontAwesome5',
+		iconName: 'hammer',
+		iconColor: '#fab1a0',
+		icon: () => <IconComponent type="FontAwesome5" name="hammer" size={16} color="#fab1a0" />,
 	},
 	{
 		label: '노력/성공',
 		value: '노력/성공',
-		icon: () => <IconComponent type='fontawesome5' name='medal' size={16} color='#55efc4' />,
+		badgeId: 'category_success',
+		iconType: 'FontAwesome5',
+		iconName: 'medal',
+		iconColor: '#55efc4',
+		icon: () => <IconComponent type="FontAwesome5" name="medal" size={16} color="#55efc4" />,
 	},
 	{
 		label: '경계/조심',
 		value: '경계/조심',
-		icon: () => <IconComponent type='fontawesome5' name='exclamation-triangle' size={16} color='#ff7675' />,
+		badgeId: 'category_caution',
+		iconType: 'FontAwesome5',
+		iconName: 'exclamation-triangle',
+		iconColor: '#ff7675',
+		icon: () => <IconComponent type="FontAwesome5" name="exclamation-triangle" size={16} color="#ff7675" />,
 	},
 	{
 		label: '욕심/탐욕',
 		value: '욕심/탐욕',
-		icon: () => <IconComponent type='fontawesome5' name='hand-holding-usd' size={16} color='#fd79a8' />,
+		badgeId: 'category_greed',
+		iconType: 'FontAwesome5',
+		iconName: 'hand-holding-usd',
+		iconColor: '#fd79a8',
+		icon: () => <IconComponent type="FontAwesome5" name="hand-holding-usd" size={16} color="#fd79a8" />,
 	},
 	{
 		label: '배신/불신',
 		value: '배신/불신',
-		icon: () => <IconComponent type='fontawesome5' name='user-slash' size={16} color='#b2bec3' />,
+		badgeId: 'category_betrayal',
+		iconType: 'FontAwesome5',
+		iconName: 'user-slash',
+		iconColor: '#b2bec3',
+		icon: () => <IconComponent type="FontAwesome5" name="user-slash" size={16} color="#b2bec3" />,
 	},
 ];
+const mascotImages = [
+	require('@/assets/images/random/random_mascote1.png'),
+	require('@/assets/images/random/random_mascote2.png'),
+	require('@/assets/images/random/random_mascote3.png'),
+	require('@/assets/images/random/random_mascote4.png'),
+	require('@/assets/images/random/random_mascote5.png'),
+	require('@/assets/images/random/random_mascote6.png'),
+	require('@/assets/images/random/random_mascote7.png'),
+	require('@/assets/images/random/random_mascote8.png'),
+	require('@/assets/images/random/random_mascote9.png'),
+	require('@/assets/images/random/random_mascote10.png'),
+	require('@/assets/images/random/random_mascote11.png'),
+	require('@/assets/images/random/random_mascote12.png'),
+	require('@/assets/images/random/random_mascote13.png'),
+];
 
-const ProverbStudyScreen = () => {
+const isTablet = screenWidth > 600;
+// 예시: 카드 높이 다르게 적용
+const isAndroid = Platform.OS === 'android';
+const CARD_HEIGHT = isTablet
+	? scaleHeight(560)
+	: isAndroid
+		? scaleHeight(550) // 📌 iOS 대비 20 높게
+		: scaleHeight(540);
+
+const praiseMessages = [
+	'학문의 길에 한 걸음 더 나아갔어요! 🧠',
+	'지혜가 쌓이고 있어요! 📚',
+	'성실한 배움이 빛을 발하고 있어요! ✨',
+	'오늘도 주경야독의 모범이에요! 🌙',
+	'노력은 결코 배신하지 않아요! 💪',
+	'사자성어 달인이 되어가고 있어요! 🧾',
+	'꾸준한 학습이 인과응보를 만듭니다! 🔁',
+	'어제보다 한층 성장했어요! ⏫',
+	'글자 속 깊은 뜻을 꿰뚫었어요! 🔍',
+	'한자 한 획, 의미 한 줄이 쌓이고 있어요! 🖋️',
+];
+// 이미 학습한 항목을 다시 학습하는 경우
+const reviewPraiseMessages = [
+	'복습도 중요하죠! 👍',
+	'기억을 더 단단하게! 🧱',
+	'멋진 복습이에요! 🔁',
+	'한 번 더 보면 완벽해져요! 🏆',
+	'지속적인 학습, 최고예요! 🌟',
+];
+const DETAIL_FILTER_HEIGHT = 60;
+const IMAGE_HEIGHT = isAndroid ? scaleHeight(220) : scaleHeight(200);
+const QuizStudyScreen = () => {
+	const STORAGE_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
+	const completionImages = require('@/assets/images/cheer-up.png');
+
 	const navigation = useNavigation();
+	const isFocused = useIsFocused();
+	const scrollViewRef = useRef<ScrollView>(null);
 	const carouselRef = useRef<any>(null);
-	const flipAnim = useRef(new Animated.Value(0)).current;
 	const toastAnim = useRef(new Animated.Value(0)).current;
 	const scaleAnim = useRef(new Animated.Value(0)).current;
-	const buttonScaleAnim = useRef(new Animated.Value(1)).current;
-	const [buttonScaleAnimList, setButtonScaleAnimList] = useState<Animated.Value[]>([]);
-	const [flipDegreesList, setFlipDegreesList] = useState<number[]>([]);
-
-	const [flipAnimList, setFlipAnimList] = useState<Animated.Value[]>([]);
-
-	const [proverbs, setProverbs] = useState<MainDataType.Proverb[]>([]);
-	const [filteredProverbs, setFilteredProverbs] = useState<MainDataType.Proverb[]>([]);
-	const [currentIndex, setCurrentIndex] = useState(0);
-	const [isFlipped, setIsFlipped] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);
-	const [showToast, setShowToast] = useState(false);
-	const [praiseText, setPraiseText] = useState('');
-
-	const [showExitModal, setShowExitModal] = useState(false);
-	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
-
-	const [confettiKey, setConfettiKey] = useState(0);
-	const [isDetailFilterOpen, setIsDetailFilterOpen] = useState(false);
-	const [levelFilter, setLevelFilter] = useState('전체');
-	const [themeFilter, setThemeFilter] = useState('전체');
-
-	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
-
-	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-
-	const [levelOpen, setLevelOpen] = useState(false);
-	const [themeOpen, setThemeOpen] = useState(false);
-
-	const DETAIL_FILTER_HEIGHT = 70;
 	const detailFilterHeightAnim = useRef(new Animated.Value(0)).current;
+	const flipAnimRefs = useRef<Record<string, Animated.Value>>({});
+	const pressAnimRefs = useRef<Record<string, Animated.Value>>({});
+	const glowAnimRefs = useRef<Record<string, Animated.Value>>({});
+	const buttonAnimRefs = useRef<Record<string, Animated.Value>>({});
 
+
+	const [mascotImagesQueue, setMascotImagesQueue] = useState<number[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [flippedCard, setFlippedCard] = useState<number | null>(null);
+	const [completedCardId, setCompletedCardId] = useState<number | null>(null);
+	const [proverbList, setProverbList] = useState<MainDataType.Proverb[]>([]);
+	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
 	const [studyHistory, setStudyHistory] = useState<MainDataType.UserStudyHistory>({
 		studyProverbes: [],
 		studyCounts: {},
 		lastStudyAt: new Date(),
-		badges: [],
 	});
-
 	const [filter, setFilter] = useState<'all' | 'learning' | 'learned'>('learning');
+	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
+	const [showGuideModal, setShowGuideModal] = useState(false);
+	const [showToast, setShowToast] = useState(false);
+	const [praiseText, setPraiseText] = useState('');
+	const [levelFilter, setLevelFilter] = useState<'전체' | '초급' | '중급' | '고급' | '특급'>('전체');
+	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+	const [regionFilter, setRegionFilter] = useState<string>('전체');
+	const [isDetailFilterOpen, setIsDetailFilterOpen] = useState(false);
+	const [levelOpen, setLevelOpen] = useState(false);
+	const [regionOpen, setRegionOpen] = useState(false);
+	const [confettiKey, setConfettiKey] = useState(0);
+	const [showExitModal, setShowExitModal] = useState(false);
 
-	const completionImages = require('@/assets/images/cheer-up.png');
+	const progress = proverbList.length > 0 ? (studyHistory.studyProverbes ?? []).length / proverbList.length : 0;
 
 
-	useBlockBackHandler(true); // 뒤로가기 모션 막기
-
-	const praiseMessages = [
-		'속담 박사님 등장! 🎓',
-		'뜻을 꿰뚫었네요! 👀',
-		'속담의 고수예요! 🧙',
-		'이제 말로도 지혜가 느껴져요! 💬✨',
-		'지혜 한 스푼 추가요~ 🍯',
-		'속담도 척척! 천재인가요? 🧠',
-		'할머니도 칭찬하시겠어요! 👵💕',
-		'이 정도면 속담 달인! 🏆',
-		'오늘도 한 수 배웠어요! 📚',
-		'어휘력 +10! 🔠',
-		'세상 이치를 꿰뚫는 눈! 🔍',
-		'속담 공부 완료! 다음 단계로 고고~ 🚀',
-	];
-
-	const mascotImages = [
-		require('@/assets/images/random/random_mascote1.png'),
-		require('@/assets/images/random/random_mascote2.png'),
-		require('@/assets/images/random/random_mascote3.png'),
-		require('@/assets/images/random/random_mascote4.png'),
-		require('@/assets/images/random/random_mascote5.png'),
-		require('@/assets/images/random/random_mascote6.png'),
-		require('@/assets/images/random/random_mascote7.png'),
-	];
-	const [mascotImage, setMascotImage] = useState(mascotImages[Math.floor(Math.random() * mascotImages.length)]);
-	const [mascotImagesQueue, setMascotImagesQueue] = useState<string[]>([]);
-
-	useEffect(() => {
-		// 속담 수만큼 flipAnim 생성
-		const animList = proverbs.map(() => new Animated.Value(0));
-		setFlipAnimList(animList);
-	}, [proverbs]);
-
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const data = ProverbServices.selectProverbList();
-				setProverbs(data);
-
-				const savedData = await AsyncStorage.getItem(STORAGE_KEY);
-				if (savedData) {
-					setStudyHistory(JSON.parse(savedData));
-				}
-			} catch (error) {
-				console.error(error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-		fetchData();
-	}, []);
 
 	useEffect(() => {
 		// 앱 시작할 때 미리 10개 랜덤 뽑기
@@ -217,15 +238,33 @@ const ProverbStudyScreen = () => {
 		setMascotImagesQueue(randomMascots);
 	}, []);
 
-	useEffect(() => {
-		const animList = filteredProverbs.map(() => new Animated.Value(1));
-		setFlipAnimList(animList);
-	}, [filteredProverbs]);
+	/**
+	 * Info 팝업 업데이트
+	 */
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<TouchableOpacity
+					onPress={() => {
+						setShowGuideModal(true);
+						setLevelOpen(false); // ✅ 드롭다운 닫기
+						setRegionOpen(false); // ✅ 드롭다운 닫기
+					}}
+					style={{ marginRight: 16 }}>
+					<IconComponent type="materialIcons" name="info-outline" size={24} color="#3498db" />
+				</TouchableOpacity>
+			),
+		});
+	}, [navigation]);
 
 	useEffect(() => {
-		const scaleList = filteredProverbs.map(() => new Animated.Value(1));
-		setButtonScaleAnimList(scaleList);
-	}, [filteredProverbs]);
+		if (carouselRef.current && getFilteredData().length > 0) {
+			// ✅ Carousel이 업데이트 된 다음에 호출
+			InteractionManager.runAfterInteractions(() => {
+				carouselRef.current?.scrollTo({ index: 0, animated: false });
+			});
+		}
+	}, [proverbList, filter]);
 
 	useEffect(() => {
 		Animated.timing(detailFilterHeightAnim, {
@@ -236,77 +275,252 @@ const ProverbStudyScreen = () => {
 	}, [isDetailFilterOpen]);
 
 	useEffect(() => {
-		const degrees = filteredProverbs.map(() => 0);
-		setFlipDegreesList(degrees);
-	}, [filteredProverbs]);
+		// 뱃지 모달 열릴 때 애니메이션 및 빵빠레 실행
+		if (badgeModalVisible) {
+			setConfettiKey(Math.random());
+			scaleAnim.setValue(0);
+			Animated.spring(scaleAnim, {
+				toValue: 1,
+				bounciness: 12,
+				useNativeDriver: true,
+			}).start();
+		}
+	}, [badgeModalVisible]);
 
 	useEffect(() => {
-		filterData(undefined, undefined, undefined, false); // 🔒 인덱스 유지
-		flipAnim.setValue(0); // 카드만 초기화
-	}, [proverbs, studyHistory, filter]);
-
-	const filterData = (customLevelFilter = levelFilter, customThemeFilter = themeFilter, customFilter = filter, shouldResetIndex = true) => {
-		let filtered = proverbs;
-
-		if (customFilter === 'learned') {
-			filtered = filtered.filter((p) => studyHistory.studyProverbes.includes(p.id));
-		} else if (customFilter === 'learning') {
-			filtered = filtered.filter((p) => !studyHistory.studyProverbes.includes(p.id));
+		if (carouselRef.current && getFilteredData().length > 0) {
+			carouselRef.current?.scrollTo({ index: 0, animated: false });
+			setFlippedCard(null);
+			setCompletedCardId(null); // ✅ 추가
 		}
+	}, [levelFilter, regionFilter]);
 
-		if (customLevelFilter !== '전체') {
-			filtered = filtered.filter((p) => p.levelName === customLevelFilter);
+	useEffect(() => {
+		if (isFocused) {
+			fetchData();
 		}
-		if (customThemeFilter !== '전체') {
-			filtered = filtered.filter((p) => p.category === customThemeFilter);
-		}
+	}, []);
 
-		setFilteredProverbs(filtered);
-
-		if (shouldResetIndex) {
-			setCurrentIndex(0);
-			setTimeout(() => {
-				carouselRef.current?.scrollTo({ index: 0, animated: true });
-			}, 100);
-		}
+	// 레벨 이름/숫자 매핑(재사용용)
+	const LEVEL_NAME_MAP: Record<number, '초급' | '중급' | '고급' | '특급'> = {
+		1: '초급',
+		2: '중급',
+		3: '고급',
+		4: '특급',
+	};
+	const LEVEL_VALUE_MAP: Record<'초급' | '중급' | '고급' | '특급', number> = {
+		초급: 1,
+		중급: 2,
+		고급: 3,
+		특급: 4,
 	};
 
-	const getLevelColor = (levelName: string) => {
-		const levelColorMap: Record<string, string> = {
-			'아주 쉬움': '#dfe6e9',
-			쉬움: '#74b9ff',
-			보통: '#0984e3',
-			어려움: '#2d3436',
+	// 레벨 색상
+	const getLevelColor = (level: number) => {
+		const levelColorMap: Record<number, string> = {
+			1: '#2ecc71', // 초급
+			2: '#F4D03F', // 중급
+			3: '#EB984E', // 고급
+			4: '#E74C3C', // 특급
 		};
-		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
+		return levelColorMap[level] || '#b2bec3';
 	};
 
-	const isCardFlipped = (index: number) => {
-		return flipDegreesList[index] >= 90;
+	// 카테고리 색상
+	const getFieldColor = (field?: string) => {
+		const categoryColorMap: Record<string, string> = {
+			신체: '#ff7675',
+			음식: '#fdcb6e',
+			동물: '#55efc4',
+			'언어/표현': '#74b9ff',
+			'감정/분위기': '#e17055',
+			'행동/태도': '#00cec9',
+			'재물/비유': '#fab1a0',
+			기타: '#b2bec3',
+		};
+		return field ? (categoryColorMap[field] || '#b2bec3') : '#b2bec3';
 	};
 
-	const flipCard = (index: number) => {
-		if (isButtonDisabled) return;
-		setLevelOpen(false);
-		setThemeOpen(false);
+	// 레벨 아이콘
+	const getLevelIcon = (level: number) => {
+		switch (level) {
+			case 1:
+				return <IconComponent type="FontAwesome6" name="seedling" size={14} color="#fff" />;
+			case 2:
+				return <IconComponent type="FontAwesome6" name="leaf" size={14} color="#fff" />;
+			case 3:
+				return <IconComponent type="FontAwesome6" name="tree" size={14} color="#fff" />;
+			case 4:
+				return <IconComponent type="FontAwesome6" name="trophy" size={14} color="#fff" />;
+			default:
+				return null;
+		}
+	};
 
-		const currentAnim = flipAnimList[index];
-		const isFlipped = flipDegreesList[index] >= 90;
+	// 카테고리 아이콘(FIELD_DROPDOWN_ITEMS에서 매칭)
+	const getCategoryIcon = (category?: string) => {
+		if (!category) return null;
+		const matched = FIELD_DROPDOWN_ITEMS.find((i) => i.value === category) as
+			| { iconType: string; iconName: string }
+			| undefined;
+		return matched ? (
+			<IconComponent type={matched.iconType} name={matched.iconName} size={14} color="#fff" />
+		) : null;
+	};
 
-		if (currentAnim) {
-			Animated.timing(currentAnim, {
-				toValue: isFlipped ? 0 : 180,
-				duration: 300,
-				useNativeDriver: true,
-			}).start(() => {
-				setCurrentIndex(index);
-				setFlipDegreesList((prev) => {
-					const newList = [...prev];
-					newList[index] = isFlipped ? 0 : 180;
-					return newList;
-				});
+
+
+	const fetchData = async () => {
+		try {
+			const proverbList2 = ProverbServices.selectProverbList();
+			setProverbList(proverbList2);
+
+			const savedData = await AsyncStorage.getItem(STORAGE_KEY);
+			if (savedData) {
+				const parsed = JSON.parse(savedData);
+				const fixed: MainDataType.UserStudyHistory = {
+					studyProverbes: parsed.studyProverbes ?? [],
+					studyCounts: parsed.studyCounts ?? {},
+					badges: parsed.badges ?? [],
+					lastStudyAt: parsed.lastStudyAt ? new Date(parsed.lastStudyAt) : new Date(),
+				};
+				setStudyHistory(fixed);
+			} else {
+				setStudyHistory({ studyProverbes: [], studyCounts: {}, badges: [], lastStudyAt: new Date() });
+			}
+
+			scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setIsLoading(false);
+
+			// ✅ 카드 맨 앞으로 이동
+			InteractionManager.runAfterInteractions(() => {
+				carouselRef.current?.scrollTo({ index: 0, animated: false });
 			});
 		}
+	};
+
+	const completeStudy = async (id: number) => {
+		const isAlreadyLearned = studyHistory.studyProverbes.includes(id);
+		const prevFiltered = getFilteredData();
+		const prevIndex = prevFiltered.findIndex((c) => c.id === id);
+
+		// 1. 학습 상태 업데이트
+		const updatedCountries = isAlreadyLearned
+			? studyHistory.studyProverbes.filter((code) => code !== id)
+			: [...studyHistory.studyProverbes, id];
+
+		const updatedCounts = {
+			...studyHistory.studyCounts,
+			[id]: (studyHistory.studyCounts?.[id] || 0) + (isAlreadyLearned ? 0 : 1),
+		};
+
+		const updatedHistory: MainDataType.UserStudyHistory = {
+			studyProverbes: updatedCountries,
+			studyCounts: updatedCounts,
+			badges: studyHistory.badges || [],
+			lastStudyAt: new Date(), // ✅ 마지막 학습일자 추가
+		};
+
+		// ✅ 이미지 갱신: 해당 index 위치의 이미지를 새 랜덤 이미지로 교체
+		setMascotImagesQueue((prevQueue) => {
+			const newQueue = [...prevQueue];
+			const filteredData = getFilteredData();
+			const currentIndex = filteredData.findIndex((p) => p.id === id);
+			if (currentIndex !== -1) {
+				newQueue[currentIndex % newQueue.length] = mascotImages[Math.floor(Math.random() * mascotImages.length)];
+			}
+			return newQueue;
+		});
+
+		// 2. UI 상태 먼저 빠르게 업데이트
+		setStudyHistory(updatedHistory);
+
+		if (flipAnimRefs.current[id]) {
+			const anim = flipAnimRefs.current[id];
+			anim.stopAnimation(() => {
+				Animated.timing(anim, {
+					toValue: 0,
+					duration: 100,
+					easing: Easing.ease,
+					useNativeDriver: true,
+				}).start(() => {
+					setFlippedCard(null); // ✅ 애니메이션 후 상태 초기화
+				});
+			});
+		} else {
+			setFlippedCard(null);
+		}
+
+		// 3. AsyncStorage, 뱃지, 토스트 등은 InteractionManager 이후 처리
+		InteractionManager.runAfterInteractions(() => {
+			// 상태 저장
+			AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
+
+			// 뱃지 검사 및 모달
+			checkAndHandleNewStudyBadges(updatedHistory, setStudyHistory, setBadgeModalVisible, setNewlyEarnedBadges);
+		});
+
+		// 4. 학습 완료 상태일 경우만 토스트 및 이동 처리
+		const nextFiltered = getFilteredDataByHistory(updatedCountries);
+		const nextIndex = Math.min(prevIndex, nextFiltered.length - 1);
+
+		setCompletedCardId(id);
+		setPraiseText(
+			isAlreadyLearned
+				? reviewPraiseMessages[Math.floor(Math.random() * reviewPraiseMessages.length)]
+				: praiseMessages[Math.floor(Math.random() * praiseMessages.length)],
+		);
+		showEncourageToast();
+
+		// 👉 자동 넘김을 원하지 않을 경우 주석처리
+		// 또는 조건부 실행
+		const AUTO_SCROLL_ENABLED = false;
+		if (AUTO_SCROLL_ENABLED) {
+			setTimeout(() => {
+				carouselRef.current?.scrollTo({ index: nextIndex, animated: true });
+				InteractionManager.runAfterInteractions(() => {
+					setCompletedCardId(null);
+				});
+			}, 800);
+		}
+	};
+	// 🔹 필터별 재사용 가능한 헬퍼 함수
+	const getFilteredDataByHistory = (customCountries: number[]) => {
+		if (filter === 'learned') {
+			return proverbList.filter((c) => customCountries.includes(c.id));
+		}
+		if (filter === 'learning') {
+			return proverbList.filter((c) => !customCountries.includes(c.id));
+		}
+		return proverbList;
+	};
+	/**
+	 * 새로 획득한 학습 뱃지를 인터셉터로 확인 후 업데이트 및 모달 처리
+	 */
+	const checkAndHandleNewStudyBadges = (
+		updatedHistory: MainDataType.UserStudyHistory,
+		setter: React.Dispatch<React.SetStateAction<MainDataType.UserStudyHistory>>,
+		setBadgeModalVisible: (v: boolean) => void,
+		setNewlyEarnedBadges: (badges: MainDataType.UserBadge[]) => void,
+	) => {
+		const currentBadges = updatedHistory.badges ?? [];
+
+		const newBadgeIds = StudyBadgeInterceptor(updatedHistory);
+		const newBadges = newBadgeIds.filter((id) => !currentBadges.includes(id));
+
+		if (newBadges.length > 0) {
+			const earnedBadges = CONST_BADGES.filter((b) => newBadges.includes(b.id));
+			setNewlyEarnedBadges(earnedBadges);
+			setBadgeModalVisible(true);
+
+			updatedHistory.badges = [...new Set([...currentBadges, ...newBadges])];
+		}
+
+		AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
+		setter(updatedHistory);
 	};
 
 	const showEncourageToast = () => {
@@ -326,815 +540,753 @@ const ProverbStudyScreen = () => {
 		});
 	};
 
-	const handleAgain = async () => {
-		const currentProverb = filteredProverbs[currentIndex];
-		if (!currentProverb) return;
+	const flipCard = (id: number) => {
+		if (isButtonDisabled) {
+			return;
+		} // ✅ 버튼 잠김 시 flip 차단
 
-		// 1. studyProverbs에서 현재 항목 제거
-		const updatedProverbs = studyHistory.studyProverbes.filter((id) => id !== currentProverb.id);
+		if (!flipAnimRefs.current[id]) {
+			flipAnimRefs.current[id] = new Animated.Value(0);
+		}
+		const anim = flipAnimRefs.current[id];
+		const isCurrentlyFlipped = flippedCard === id;
 
-		// 2. 업데이트된 History 만들기
-		const updatedHistory: MainDataType.UserStudyHistory = {
-			studyProverbes: updatedProverbs,
-			studyCounts: studyHistory.studyCounts,
-			badges: studyHistory.badges || [],
-			lastStudyAt: new Date(),
-		};
+		Animated.timing(anim, {
+			toValue: isCurrentlyFlipped ? 0 : 180,
+			duration: 150,
+			easing: Easing.ease,
+			useNativeDriver: true,
+		}).start(() => {
+			setFlippedCard(isCurrentlyFlipped ? null : id);
+		});
+	};
+	// 상단 훅/레퍼런스들 근처에 추가
+	const koCollator =
+		(typeof Intl !== 'undefined' && (Intl as any).Collator
+			? new Intl.Collator('ko-KR', { numeric: true, sensitivity: 'base' })
+			: null) as Intl.Collator | null;
 
-		// 3. AsyncStorage 저장
-		await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
-
-		// 4. 상태 갱신
-		setStudyHistory(updatedHistory);
-
-		// 5. filteredProverbs 다시 갱신
-		const newFiltered = getFilteredProverbs(updatedProverbs);
-		setFilteredProverbs(newFiltered);
-
-		// 6. 카드 리셋
-		setIsFlipped(false);
-		setCurrentIndex((prev) => Math.min(prev, newFiltered.length - 1));
-
-		// 7. carousel 포커스 이동
-		setTimeout(() => {
-			carouselRef.current?.scrollTo({ index: currentIndex, animated: true });
-		}, 300);
+	const compareKr = (a?: string, b?: string) => {
+		const A = a ?? '';
+		const B = b ?? '';
+		return koCollator ? koCollator.compare(A, B) : A.localeCompare(B, 'ko-KR');
 	};
 
-	const handleComplete = async () => {
-		const currentProverb = filteredProverbs[currentIndex];
-		if (!currentProverb) return;
+	const getFilteredData = (): MainDataType.Proverb[] => {
+		let filtered = proverbList;
 
-		if (isButtonDisabled) return; // 🔒 중복 방지
-		setIsButtonDisabled(true);
+		if (filter === 'learned') {
+			filtered = filtered.filter((c) => studyHistory.studyProverbes.includes(c.id));
+		} else if (filter === 'learning') {
+			filtered = filtered.filter((c) => !studyHistory.studyProverbes.includes(c.id));
+		}
 
-		const isLearned = studyHistory.studyProverbes.includes(currentProverb.id);
+		const LEVEL_MAP: Record<string, number> = { 초급: 1, 중급: 2, 고급: 3, 특급: 4 };
+		if (levelFilter !== '전체') {
+			filtered = filtered.filter((item) => item.level === LEVEL_MAP[levelFilter]);
+		}
+		if (regionFilter !== '전체') {
+			filtered = filtered.filter((c) => c.category === regionFilter);
+		}
 
-		if (!isLearned) {
-			const updatedProverbs = [...studyHistory.studyProverbes, currentProverb.id];
-			const updatedCounts = {
-				...studyHistory.studyCounts,
-				[currentProverb.id]: (studyHistory.studyCounts?.[currentProverb.id] || 0) + 1,
-			};
+		// ✅ 여기서 'idiomKr' 기준으로 가나다 정렬
+		return [...filtered].sort((a, b) => compareKr(a.proverb, b.proverb));
+	};
 
-			const updatedHistory: MainDataType.UserStudyHistory = {
-				studyProverbes: updatedProverbs,
-				studyCounts: updatedCounts,
-				badges: studyHistory.badges || [],
-				lastStudyAt: new Date(),
-			};
+	const resetCard = () => {
+		setIsDetailFilterOpen(false); // 상세 필터 닫기
+		setLevelOpen(false); // 드롭다운 강제 닫기
+		setRegionOpen(false);
+		setFilter('learning'); // 학습중으로 기본 필터 변경
+		setLevelFilter('전체'); // 상세 필터 초기화
+		setRegionFilter('전체');
 
-			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
-			setStudyHistory(updatedHistory);
-
-			// 3. AsyncStorage, 뱃지, 토스트 등은 InteractionManager 이후 처리
-			InteractionManager.runAfterInteractions(() => {
-				// 상태 저장
-				AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
-
-				// 뱃지 검사 및 모달
-				checkAndHandleNewStudyBadges(updatedHistory, setStudyHistory, setBadgeModalVisible, setNewlyEarnedBadges);
-			});
-
-			// handleComplete 내부
-			const newFiltered = getFilteredProverbs(updatedProverbs);
-			setFilteredProverbs(newFiltered);
-
-			// 카드 앞면으로 돌리기
-			if (isCardFlipped(currentIndex)) {
-				const currentAnim = flipAnimList[currentIndex];
-				if (currentAnim) {
-					currentAnim.setValue(0);
-				}
+		// ✅ 추가: 캐러셀 첫 번째로 이동
+		setTimeout(() => {
+			const data = getFilteredData();
+			if (carouselRef.current && data.length > 0) {
+				carouselRef.current?.scrollTo({ index: 0, animated: false });
 			}
+		}, 100); // dropDownPicker와 충돌을 피하기 위한 약간의 delay
+	};
 
-			// ✅ 추가: 완료하면 전체보기 모드로 전환
-			setPraiseText(praiseMessages[Math.floor(Math.random() * praiseMessages.length)]);
-			triggerButtonAnimation(currentIndex); // ← index 명시적으로 전달
-
-			showEncourageToast();
-
-			// 포커스 이동 (newFiltered 기준으로 인덱스 조정)
-			// ✅ currentIndex 유지한 채 scroll만
-			setTimeout(() => {
-				if (carouselRef.current && newFiltered.length > 0) {
-					carouselRef.current.scrollTo({
-						index: Math.min(currentIndex, newFiltered.length - 1),
-						animated: true,
-					});
-				}
-			}, 300);
+	const handleAnimatedButtonPress = (proverbId: number, action: () => void) => {
+		if (!buttonAnimRefs.current[proverbId]) {
+			buttonAnimRefs.current[proverbId] = new Animated.Value(1);
 		}
-	};
-
-	const getFilteredProverbs = (customStudyProverbs: number[]) => {
-		if (filter === 'learned') return proverbs.filter((p) => customStudyProverbs.includes(p.id));
-		if (filter === 'learning') return proverbs.filter((p) => !customStudyProverbs.includes(p.id));
-		return proverbs;
-	};
-
-	/**
-	 * 새로 획득한 학습 뱃지를 인터셉터로 확인 후 업데이트 및 모달 처리
-	 */
-	const checkAndHandleNewStudyBadges = (
-		updatedHistory: MainDataType.UserStudyHistory,
-		setter: React.Dispatch<React.SetStateAction<MainDataType.UserStudyHistory>>,
-		setBadgeModalVisible: (v: boolean) => void,
-		setNewlyEarnedBadges: (badges: MainDataType.UserBadge[]) => void,
-	) => {
-		const currentBadges = updatedHistory.badges ?? [];
-
-		const newBadgeIds = StudyBadgeInterceptor(updatedHistory);
-		const newBadges = newBadgeIds.filter((id) => !currentBadges.includes(id));
-		if (newBadges.length > 0) {
-			const earnedBadges = CONST_BADGES.filter((b) => newBadges.includes(b.id));
-			setNewlyEarnedBadges(earnedBadges);
-			setBadgeModalVisible(true);
-
-			// 👇 추가: scale 애니메이션 실행
-			scaleAnim.setValue(0);
-			Animated.spring(scaleAnim, {
-				toValue: 1,
-				useNativeDriver: true,
-			}).start();
-
-			updatedHistory.badges = [...new Set([...currentBadges, ...newBadges])];
-		}
-
-		AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
-		setter(updatedHistory);
-
-		// ✅ handleComplete() 마지막에 아래 라인 추가:
-		setTimeout(() => {
-			setIsButtonDisabled(false); // 🔓 다음 카드에서도 다시 활성화되도록 보장
-		}, 300);
-	};
-
-	const triggerButtonAnimation = (index: number) => {
-		const anim = buttonScaleAnimList[index];
-		if (!anim) return;
+		const buttonAnim = buttonAnimRefs.current[proverbId];
 
 		Animated.sequence([
-			Animated.timing(anim, {
+			Animated.timing(buttonAnim, {
 				toValue: 0.95,
 				duration: 100,
 				useNativeDriver: true,
 			}),
-			Animated.spring(anim, {
+			Animated.timing(buttonAnim, {
 				toValue: 1,
-				friction: 3,
+				duration: 100,
 				useNativeDriver: true,
 			}),
-		]).start();
+		]).start(() => {
+			action(); // ✅ 애니메이션 끝난 후 콜백 실행
+		});
 	};
-
-	const getFilteredProgress = () => {
-		// ✅ level/theme 필터 반영
-		let filtered = proverbs;
-
-		if (levelFilter !== '전체') {
-			filtered = filtered.filter((p) => p.levelName === levelFilter);
-		}
-		if (themeFilter !== '전체') {
-			filtered = filtered.filter((p) => p.category === themeFilter);
-		}
-
-		const total = filtered.length;
-
-		// ✅ 전체 중 학습 완료된 것만 계산
-		const completed = filtered.filter((p) => studyHistory.studyProverbes.includes(p.id)).length;
-
-		const progress = total > 0 ? completed / total : 0;
-
-		return { completed, total, progress };
-	};
-
-	const { completed, total, progress } = getFilteredProgress();
 
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
 		const mascot = mascotImagesQueue[index % mascotImagesQueue.length];
-		const isLearned = studyHistory.studyProverbes.includes(item.id);
 
-		const anim = flipAnimList[index] ?? new Animated.Value(0); // fallback for safety
+		const proverbId = item.id;
+		const isLearned = studyHistory.studyProverbes.includes(proverbId);
 
-		const flipBackFix = {
-			transform: [{ rotateY: '180deg' }],
+		if (!buttonAnimRefs.current[proverbId]) {
+			buttonAnimRefs.current[proverbId] = new Animated.Value(1);
+		}
+		const buttonAnim = buttonAnimRefs.current[proverbId];
+		// flipAnim 및 pressAnim 초기화
+		const flipAnim = flipAnimRefs.current[proverbId] ?? new Animated.Value(0);
+		const pressAnim = pressAnimRefs.current[proverbId] ?? new Animated.Value(1);
+		const glowAnim = glowAnimRefs.current[proverbId] ?? new Animated.Value(0);
+
+		if (!flipAnimRefs.current[proverbId]) {
+			flipAnimRefs.current[proverbId] = flipAnim;
+		}
+		if (!pressAnimRefs.current[proverbId]) {
+			pressAnimRefs.current[proverbId] = pressAnim;
+		}
+		if (!glowAnimRefs.current[proverbId]) {
+			glowAnimRefs.current[proverbId] = glowAnim;
+		}
+
+		const handleCardPress = () => {
+			Animated.parallel([
+				Animated.sequence([
+					Animated.timing(pressAnim, {
+						toValue: 0.95,
+						duration: 80,
+						useNativeDriver: true,
+					}),
+					Animated.timing(pressAnim, {
+						toValue: 1,
+						duration: 80,
+						useNativeDriver: true,
+					}),
+				]),
+				Animated.sequence([
+					Animated.timing(glowAnim, {
+						toValue: 1,
+						duration: 100,
+						useNativeDriver: false, // shadow 관련은 false
+					}),
+					Animated.timing(glowAnim, {
+						toValue: 0,
+						duration: 300,
+						useNativeDriver: false,
+					}),
+				]),
+			]).start(() => {
+				flipCard(proverbId); // 카드 flip 실행
+			});
 		};
-
-		const frontInterpolate = anim.interpolate({
-			inputRange: [0, 180],
-			outputRange: ['0deg', '180deg'],
-		});
-
-		const backInterpolate = anim.interpolate({
-			inputRange: [0, 180],
-			outputRange: ['180deg', '360deg'],
-		});
-
-		const frontAnimatedStyle = {
-			transform: [{ perspective: 1000 }, { rotateY: frontInterpolate }],
-			backfaceVisibility: 'hidden' as any,
-		};
-
-		const backAnimatedStyle = {
-			transform: [{ perspective: 1000 }, { rotateY: backInterpolate }],
-			backfaceVisibility: 'hidden' as any,
-		};
+		const frontInterpolate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['0deg', '180deg'] });
+		const backInterpolate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['180deg', '360deg'] });
 
 		return (
 			<View style={styles.cardWrapper}>
-				<Animated.View style={[styles.cardFront, frontAnimatedStyle, { flex: 1 }]}>
-					<View style={styles.cardInner}>
-						<View style={styles.cardContent}>
-							{item.category && (
-								<View style={styles.categoryBadge}>
-									<Text style={styles.categoryBadgeText}>{item.category}</Text>
-								</View>
-							)}
-							{/* @ts-ignore */}
-							<FastImage source={mascot} style={styles.subMascotImage} resizeMode='contain' />
-
-							<Text style={styles.cardTitle}>📘 속담</Text>
-							<View style={styles.proverbContainer}>
-								<Text style={styles.proverbText}>{item.proverb}</Text>
+				<Pressable onPress={handleCardPress} style={styles.cardFront}>
+					<Animated.View
+						style={[
+							styles.cardFace,
+							{
+								// height: CARD_HEIGHT,
+								transform: [{ rotateY: frontInterpolate }],
+								backfaceVisibility: 'hidden', // 추가
+								// zIndex: flippedCard === proverbId ? 0 : 1, // 앞면 위
+								position: 'absolute',
+							},
+						]}>
+						<View style={styles.flagSection}>
+							<View style={styles.flagContainer}>
+								<FastImage source={mascot} style={styles.flagImageSquare} resizeMode="cover" />
 							</View>
-							{isLearned && (
-								<View style={styles.completedBadge}>
-									<Text style={styles.completedBadgeText}>완료됨 ✅</Text>
-								</View>
-							)}
 						</View>
-						<View style={{ marginBottom: scaleHeight(10) }}>
-							<Text style={styles.hintText}>카드를 탭하면 속담 의미를 볼 수 있어요 👆</Text>
-						</View>
-						<Animated.View style={{ transform: [{ scale: buttonScaleAnimList[index] ?? new Animated.Value(1) }] }}>
-							<TouchableOpacity
-								style={isLearned ? styles.retryButton : styles.cardCompleteButton}
-								onPress={(e) => {
-									e.stopPropagation();
-									if (isButtonDisabled) return;
-									triggerButtonAnimation(index);
-									if (isLearned) {
-										handleAgain();
-									} else {
-										handleComplete();
-									}
-								}}
-								disabled={isButtonDisabled}>
-								<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
-							</TouchableOpacity>
-						</Animated.View>
-					</View>
-				</Animated.View>
+						{flippedCard !== proverbId && (
+							// JSX 내부
+							<View style={styles.cardMiddle}>
+								<Text style={styles.hanjaText} numberOfLines={3} adjustsFontSizeToFit>
+									{item.proverb}
+								</Text>
 
-				<Animated.View
-					style={[
-						styles.cardFront,
-						styles.cardBack,
-						{
-							transform: [{ rotateY: backInterpolate }],
-							position: 'absolute',
-							top: 0,
-							left: 0,
-							zIndex: 2, // 👈 뒷면이 위로 오게
-						},
-					]}>
-					<TouchableOpacity
-						activeOpacity={1}
-						onPress={() => flipCard(index)}
-						style={{ flex: 1 }}
-					>
-						<View style={[styles.cardInner, { flex: 1 }]}>
-							<ScrollView
-								style={{ flex: 1 }} // ✅ 추가
-								contentContainerStyle={{
-									flexGrow: 1,
-									justifyContent: 'flex-start',
-									paddingTop: scaleHeight(15),
-									paddingBottom: scaleHeight(30), // 하단 버튼 여백 유지
-								}}
-								keyboardShouldPersistTaps='handled'
-								showsVerticalScrollIndicator={true}
-								scrollEnabled={true}
-								overScrollMode='always' // Android 전용
-							>
-								<View>
-									<TouchableOpacity activeOpacity={1} onPress={() => flipCard(index)}>
-										<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
-											<Text style={styles.badgeText}>{item.levelName}</Text>
+								<View style={{ alignItems: 'center', justifyContent: "center", marginBottom: scaleHeight(12) }}>
+									{/* 배지 + 태그 한 줄 */}
+									<View style={styles.badgeInlineRow}>
+										{/* 레벨 뱃지 */}
+										<View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.level) }]}>
+											{getLevelIcon(item.level)}
+											<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>
+												{LEVEL_NAME_MAP[item.level] || '알 수 없음'}
+											</Text>
 										</View>
-										<Text style={styles.cardLabel}>🧠 속담 의미</Text>
-										<Text style={styles.meaningHighlight} numberOfLines={undefined} // 무제한 줄바꿈 허용
-											allowFontScaling={false}
-											adjustsFontSizeToFit={false}>{item.longMeaning}</Text>
 
-										{/* 예시 */}
-										{/* {item.example && (
-										<View style={styles.sectionWrapper}>
-											<Text style={styles.sectionTitle}>✏️ 예시</Text>
-											<Text style={styles.sectionText}>{item.example}</Text>
+										{/* 카테고리 뱃지 */}
+										<View style={[styles.categoryBadge, { backgroundColor: getFieldColor(item.category) }]}>
+											{getCategoryIcon(item.category)}
+											<Text style={[styles.badgeText, { marginLeft: scaleWidth(4) }]}>
+												{item.category || '미지정'}
+											</Text>
 										</View>
-									)} */}
 
-										{/* 같은 속담 */}
-										{item.sameProverb && item.sameProverb.filter((sp) => sp.trim() !== '').length > 0 && (
-											<View style={styles.sectionWrapper}>
-												<Text style={styles.sectionTitle}>📚 비슷한 속담</Text>
-												{item.sameProverb
-													.filter((sp) => sp.trim() !== '')
-													.map((sp, idx) => (
-														<Text key={idx} style={styles.sectionText}>
-															- {sp}
-														</Text>
-													))}
+										{/* 태그 */}
+										{/* {Array.isArray(item.tags) && item.tags.length > 0 && (
+											<View style={styles.tagWrap}>
+												{item.tags.map((t, i) => (
+													<View key={i} style={styles.tagChip}>
+														<Text style={styles.tagText}>#{t}</Text>
+													</View>
+												))}
 											</View>
-										)}
-									</TouchableOpacity>
-								</View>
-							</ScrollView>
+										)} */}
+									</View>
 
+								</View>
+
+								{/* <Text style={styles.hangulText}>{item.hangul}</Text> */}
+								<Text style={styles.cardHint}>카드를 탭하면 관용구 정보가 나와요 👆</Text>
+							</View>
+						)}
+
+						<TouchableOpacity
+							style={[
+								styles.button,
+								{ width: '100%', alignSelf: 'center' }, // ✅ 수정된 부분
+								isLearned ? styles.learnedButton : styles.learningButton,
+								{ opacity: isButtonDisabled ? 0.6 : 1 },
+							]}
+							onPress={(e) => {
+								e.stopPropagation(); // ✅ 여기서 이벤트 버블링 차단
+								if (isButtonDisabled) {
+									return;
+								}
+								setIsButtonDisabled(true); // ✅ 중복 방지
+								handleAnimatedButtonPress(proverbId, () => {
+									completeStudy(proverbId);
+									setTimeout(() => setIsButtonDisabled(false), 1000); // 1초 후 재활성화
+								});
+							}}
+							disabled={isButtonDisabled}
+							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // 여유 클릭 범위
+						>
+							<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
+						</TouchableOpacity>
+					</Animated.View>
+
+					<Animated.View
+						style={[
+							styles.cardFace2,
+							{
+								transform: [{ rotateY: backInterpolate }],
+								backfaceVisibility: 'hidden',
+								// zIndex: flippedCard === proverbId ? 1 : 0,
+								position: 'absolute',
+							},
+						]}>
+						<View style={{ flex: 1 }}>
+							<ScrollView
+								ref={scrollViewRef}
+								style={{ flex: 1 }}
+								contentContainerStyle={{
+									paddingVertical: scaleHeight(0),
+									paddingHorizontal: 0,
+									flexGrow: 1,
+									minHeight: scaleHeight(520),
+								}}
+								removeClippedSubviews={false}
+								showsVerticalScrollIndicator={false}>
+								{/* <View style={[styles.badge, { backgroundColor: getLevelColor(item.level) }]}>
+								<Text style={styles.badgeText}>{item.level}</Text>
+							</View> */}
+
+								<View style={styles.cardBackContainer}>
+									{/* 제목 */}
+									<Text style={styles.cardBackTitle}>{item.proverb}</Text>
+
+									{/* 뜻 풀이 강조 박스 */}
+									<View style={styles.meaningQuoteBox}>
+										<IconComponent
+											type="fontAwesome6"
+											name="quote-left"
+											size={28}
+											color="#58D68D"
+											style={{ marginBottom: scaleHeight(8) }}
+										/>
+										<Text style={styles.meaningQuoteText}>{item.longMeaning}</Text>
+									</View>
+									{/* 예문 */}
+									{item.example && (
+										<View style={styles.exampleBox}>
+											<Text style={styles.sectionTitle}>✍️ 예문</Text>
+											{item.example.map((ex, idx) => (
+												<Text key={idx} style={styles.sectionText}>
+													• {ex.trim()}
+												</Text>
+											))}
+										</View>
+									)}
+									{/* 같은 속담 */}
+									{item.sameProverb && item.sameProverb.filter((sp) => sp.trim() !== '').length > 0 && (
+										<View style={styles.sectionBox}>
+											<Text style={styles.sectionTitle}>🔎  비슷한 속담</Text>
+											{item.sameProverb
+												.filter((sp) => sp.trim() !== '')
+												.map((sp, idx) => (
+													<Text key={idx} style={styles.sectionText}>
+														- {sp}
+													</Text>
+												))}
+										</View>
+									)}
+
+
+								</View>
+
+								{/* 뜻 풀이 */}
+								{/* <View style={styles.meaningBox}>
+										<Text style={styles.sectionContent}>💡 {item.meaning}</Text>
+									</View> */}
+								{/* 구성 한자 */}
+								{/* <View style={styles.charList}>
+										{item.characters.map((char, i) => (
+											<View key={i} style={styles.charRow}>
+												<Text style={styles.charMain}>{char.char}</Text>
+												<Text style={styles.charMeaning}>{char.meaning}</Text>
+												<Text style={styles.charSub}>
+													({char.strokes}획, 부수: {char.radical})
+												</Text>
+											</View>
+										))}
+									</View> */}
+
+								{/* 예문 */}
+								{/* <View style={styles.exampleBox}>
+										<Text style={styles.sectionTitle}>📝 예문</Text>
+										<Text style={styles.sectionContent}>{item.example}</Text>
+									</View> */}
+							</ScrollView>
+						</View>
+
+						{/* ✅ 하단 버튼 영역 고정 */}
+						<View style={styles.fixedBottomButton}>
 							<TouchableOpacity
 								style={[
-									isLearned ? styles.retryButton : styles.cardCompleteButton,
+									styles.button,
+									isLearned ? styles.learnedButton : styles.learningButton,
 									{ opacity: isButtonDisabled ? 0.6 : 1 },
 								]}
-								onPress={() => {
-									if (isButtonDisabled) return;
-									if (isLearned) handleAgain();
-									else handleComplete();
+								onPress={(e) => {
+									e.stopPropagation(); // 필수!
+									if (isButtonDisabled) {
+										return;
+									}
+									setIsButtonDisabled(true);
+									handleAnimatedButtonPress(proverbId, () => {
+										completeStudy(proverbId);
+										setTimeout(() => setIsButtonDisabled(false), 1000);
+									});
 								}}
 								disabled={isButtonDisabled}
+								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // 여유 클릭 범위
 							>
-								<Text style={styles.buttonText}>
-									{isLearned ? '다시 학습하기' : '학습 완료'}
-								</Text>
+								<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
 							</TouchableOpacity>
 						</View>
-					</TouchableOpacity>
-				</Animated.View>
+					</Animated.View>
+				</Pressable>
 			</View>
 		);
 	};
 
-	if (isLoading) {
-		return (
-			<View style={styles.loadingContainer}>
-				<ActivityIndicator size='large' color='#4a90e2' />
-			</View>
-		);
-	}
-
+	// ================================================================================================================================================
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }} edges={['top']}>
-			<View style={styles.container}>
-				<View style={styles.progressHeader}>
-					<View style={styles.progressTopRow}>
-						<Text style={styles.progressTitle}>학습 현황</Text>
-						<View style={styles.progressBadge}>
-							<Text style={styles.progressBadgeText}>
-								{completed} / {total}
+		<>
+			<SafeAreaView style={styles.main} edges={['top']}>
+				<View style={styles.container}>
+					<View style={styles.progressHeader}>
+						<View style={styles.progressTopRow}>
+							<Text style={styles.progressTitle}>학습 현황</Text>
+							<View style={styles.progressBadge}>
+								<Text style={styles.progressBadgeText}>
+									{studyHistory.studyProverbes.length} / {proverbList.length}
+								</Text>
+							</View>
+						</View>
+
+						<View style={styles.progressBarWrapper}>
+							<View
+								style={[
+									styles.progressBarFill,
+									{ width: isLoading ? '0%' : `${progress * 100}%`, backgroundColor: isLoading ? '#ccc' : '#4a90e2' },
+								]}
+							/>
+						</View>
+
+						{/* 기본 필터: 전체 / 학습 중 / 학습 완료 */}
+						<View style={styles.filterContainer}>
+							{['전체', '학습 중', '학습 완료'].map((label, i) => {
+								const value = i === 0 ? 'all' : i === 1 ? 'learning' : 'learned';
+								const isActive = filter === value;
+								return (
+									<TouchableOpacity
+										key={label}
+										onPress={() => setFilter(value)}
+										style={[styles.filterButton, isActive && styles.filterButtonActive]}>
+										<Text style={[styles.filterText, isActive && styles.filterTextActive]}>{label}</Text>
+									</TouchableOpacity>
+								);
+							})}
+
+							{/* 상세 열기 버튼 */}
+							<TouchableOpacity
+								onPress={() => {
+									setIsDetailFilterOpen((prev) => {
+										const newState = !prev;
+										// 아코디언 닫히는 순간 드롭다운도 강제 닫기
+										if (!newState) {
+											setLevelOpen(false);
+											setRegionOpen(false);
+										} else {
+											setLevelFilter('전체');
+											setRegionFilter('전체');
+										}
+										return newState;
+									});
+								}}
+								style={styles.detailToggleButton}>
+								<IconComponent type="materialIcons" name={isDetailFilterOpen ? 'expand-less' : 'expand-more'} size={24} />
+							</TouchableOpacity>
+							{/* 🔻 초기화 버튼 추가 */}
+							<TouchableOpacity onPress={resetCard} style={styles.resetButton}>
+								<IconComponent type="materialIcons" name="restart-alt" size={24} color="#e74c3c" />
+							</TouchableOpacity>
+						</View>
+
+						{/* 상세 필터 아코디언 영역 */}
+						{isDetailFilterOpen && (
+							<Animated.View style={[styles.detailFilterWrapper, { height: detailFilterHeightAnim }]}>
+								<View style={styles.subFilterRow}>
+									<View style={{ flex: 1, zIndex: regionOpen ? 1000 : 2000 }}>
+										{' '}
+										{/* zIndex 역전 방지 */}
+										<DropDownPicker
+											open={isDetailFilterOpen && levelOpen}
+											setOpen={setLevelOpen}
+											value={levelFilter}
+											setValue={setLevelFilter}
+											items={LEVEL_DROPDOWN_ITEMS} // ✅ 아이콘이 포함된 항목 사용
+											placeholder="난이도"
+											style={styles.dropdown}
+											textStyle={{
+												fontSize: scaledSize(14), // 더 작게
+												color: '#2c3e50',
+												fontWeight: '500',
+											}}
+											placeholderStyle={{ color: '#95a5a6', fontSize: scaledSize(14) }}
+											dropDownContainerStyle={styles.dropdownList}
+											containerStyle={{ zIndex: 3000 }}
+											zIndex={9999} // 높게 설정
+											zIndexInverse={1000} // 반대 드롭다운일 경우 대비
+											listMode="SCROLLVIEW" /* 스크롤뷰 모드로 변경 */
+										/>
+									</View>
+									<View style={{ width: 8 }} />
+									<View style={{ flex: 1, zIndex: levelOpen ? 1000 : 2000 }}>
+										<DropDownPicker
+											listMode="MODAL"
+											open={isDetailFilterOpen && regionOpen}
+											value={regionFilter}
+											modalTitle="카테고리 선택"
+											items={FIELD_DROPDOWN_ITEMS}
+											setOpen={setRegionOpen}
+											setValue={setRegionFilter}
+											dropDownDirection="BOTTOM"
+											scrollViewProps={{ nestedScrollEnabled: true }}
+											style={styles.dropdownField}
+											dropDownContainerStyle={{
+												overflow: 'visible',
+												zIndex: 3000,
+												...styles.dropdownListField,
+												elevation: 1000,
+												maxHeight: scaleHeight(200),
+											}}
+											zIndex={5000}
+											zIndexInverse={4000}
+											containerStyle={{ zIndex: 5000 }}
+											labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
+											iconContainerStyle={{ marginRight: scaleWidth(8) }}
+											showArrowIcon={true}
+											showTickIcon={false}
+											modalProps={{
+												animationType: 'fade',
+												presentationStyle: 'overFullScreen',
+												transparent: true,
+											}}
+											modalContentContainerStyle={{
+												marginTop: scaleHeight(70),
+												width: '90%',
+												alignSelf: 'center',
+												maxHeight: scaleHeight(500),
+												backgroundColor: '#fff',
+												borderRadius: scaleWidth(20),
+												paddingHorizontal: scaleWidth(16),
+												paddingVertical: scaleHeight(20),
+												shadowColor: '#000',
+												shadowOpacity: 0.15,
+												shadowOffset: { width: 0, height: 6 },
+												shadowRadius: scaleWidth(8),
+												elevation: 10,
+												flex: 1,
+												justifyContent: 'flex-start',
+												position: 'relative', // X 버튼 고정용
+											}}
+											listItemLabelStyle={{
+												flex: 1,
+												fontSize: scaledSize(15),
+												color: '#2c3e50',
+												fontWeight: '500',
+												lineHeight: scaleHeight(22),
+												flexShrink: 1,
+												flexWrap: 'wrap',
+											}}
+											listItemContainerStyle={{
+												paddingVertical: scaleHeight(14),
+												minHeight: scaleHeight(48),
+												alignItems: 'stretch',
+											}}
+										/>
+									</View>
+								</View>
+							</Animated.View>
+						)}
+					</View>
+
+					{isLoading ? (
+						<View style={styles.loadingContainer}>
+							<ActivityIndicator size="large" color="#4a90e2" />
+							<Text style={styles.loadingText}>관용구 정보를 불러오는 중...</Text>
+						</View>
+					) : getFilteredData().length === 0 ? (
+						<View style={styles.emptyWrapper}>
+							<Image source={require('@/assets/images/sorry3.png')} style={styles.emptyImage} />
+							<Text style={styles.emptyText}>
+								{filter === 'learned'
+									? '완료한 관용구가 아직 없어요.\n학습 후 완료 버튼을 눌러보세요!'
+									: filter === 'learning'
+										? '진행 중인 관용구가 없어요.\n다시 학습하기 버튼으로 시작해보세요!'
+										: '등록된 사자성어가 없습니다.'}
 							</Text>
 						</View>
-					</View>
-
-					<View style={styles.progressBarWrapper}>
-						<View style={[styles.progressBarFill, { width: isLoading ? '0%' : `${progress * 100}%`, backgroundColor: isLoading ? '#ccc' : '#4a90e2' }]} />
-					</View>
-
-					<View style={styles.filterContainer}>
-						{['전체', '학습 중', '학습 완료'].map((label, i) => {
-							const value = i === 0 ? 'all' : i === 1 ? 'learning' : 'learned';
-							const isActive = filter === value;
-							return (
-								<TouchableOpacity key={label} onPress={() => setFilter(value)} style={[styles.filterButton, isActive && styles.filterButtonActive]}>
-									<Text style={[styles.filterText, isActive && styles.filterTextActive]}>{label}</Text>
-								</TouchableOpacity>
-							);
-						})}
-
-						{/* 🔽 상세 필터 버튼 */}
-						<TouchableOpacity
-							onPress={() => {
-								setIsDetailFilterOpen((prev) => {
-									const newState = !prev;
-									if (!newState) {
-										setLevelOpen(false);
-										setThemeOpen(false);
-									}
-									return newState;
-								});
-							}}
-							style={styles.detailToggleButton}>
-							<IconComponent type='materialIcons' name={isDetailFilterOpen ? 'expand-less' : 'expand-more'} size={24} />
-						</TouchableOpacity>
-						<TouchableOpacity
-							onPress={() => {
-								setIsDetailFilterOpen(false); // 아코디언 닫기
-								setLevelOpen(false);
-								setThemeOpen(false);
-								setLevelFilter('전체');
-								setThemeFilter('전체');
-								setFilter('learning');
-								filterData(); // 필터링 갱신
-							}}
-							style={styles.resetButton}>
-							<IconComponent type='materialIcons' name='restart-alt' size={24} color='#e74c3c' />
-						</TouchableOpacity>
-					</View>
-
-					{/* 🔻 아코디언 상세 필터 */}
-					{isDetailFilterOpen && (
-						<Animated.View style={[styles.detailFilterWrapper, { height: detailFilterHeightAnim }]}>
-							<View style={styles.subFilterRow}>
-								<View style={{ flex: 1, zIndex: themeOpen ? 1000 : 2000 }}>
-									{/* zIndex 역전 방지 */}
-									<DropDownPicker
-										open={levelOpen}
-										setOpen={setLevelOpen}
-										value={levelFilter}
-										setValue={(callback) => {
-											const newValue = typeof callback === 'function' ? callback(levelFilter) : callback;
-											setLevelFilter(newValue);
-											filterData(newValue, themeFilter); // ✅ level 필터 기준으로 명시적 호출
+					) : (
+						<>
+							<Animated.View style={[styles.carouselContainer, { zIndex: 1, alignSelf: 'center' }]}>
+								{!(Platform.OS === 'android' && (showGuideModal || badgeModalVisible || showExitModal)) && (
+									<Carousel
+										ref={carouselRef}
+										width={scaleWidth(370)}
+										height={screenHeight * 0.65}
+										// @ts-ignore
+										data={getFilteredData()}
+										renderItem={renderItem}
+										mode="parallax"
+										loop={false}
+										windowSize={3}
+										pagingEnabled={true}
+										scrollAnimationDuration={600}
+										modeConfig={{
+											parallaxScrollingScale: 0.92,
+											parallaxScrollingOffset: 30,
+											parallaxAdjacentItemScale: 0.9,
 										}}
-										items={LEVEL_DROPDOWN_ITEMS}
-										style={styles.dropdown}
-										textStyle={{
-											fontSize: scaledSize(12), // 더 작게
-											color: '#2c3e50',
-											fontWeight: '500',
-										}}
-										dropDownContainerStyle={styles.dropdownList}
-										containerStyle={{
-											zIndex: 10000, // ✅ 매우 높게 설정
-										}}
-										zIndex={10000} // ✅ 최상단 유지
-										zIndexInverse={1000}
-										placeholderStyle={styles.dropdownPlaceholder}
-										iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
-										listMode='SCROLLVIEW' /* 스크롤뷰 모드로 변경 */
-									/>
-								</View>
-								<View style={{ width: scaleWidth(8) }} />
-								<View style={{ flex: 1, zIndex: levelOpen ? 1000 : 2000 }}>
-									<DropDownPicker
-										open={themeOpen}
-										setOpen={setThemeOpen}
-										value={themeFilter}
-										setValue={(callback) => {
-											const newValue = typeof callback === 'function' ? callback(themeFilter) : callback;
-											setThemeFilter(newValue);
-											filterData(levelFilter, newValue);
-										}}
-										items={FIELD_DROPDOWN_ITEMS}
-										style={styles.dropdown}
-										textStyle={{
-											fontSize: scaledSize(13),  // ⬅ 작게
-											color: '#2c3e50',
-											fontWeight: '500',
-										}}
-										placeholderStyle={{ color: '#95a5a6', fontSize: scaledSize(14) }}
-										dropDownContainerStyle={styles.dropdownList}
-										containerStyle={{ zIndex: 3000 }}
-										zIndex={9999}
-										iconContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
-										zIndexInverse={1000}
-										listMode='MODAL'
-										modalProps={{
-											animationType: 'fade', // slide → fade로 부드럽게
-											presentationStyle: 'overFullScreen', // 배경 흐림 없이 띄움
-											transparent: true,
-										}}
-										modalContentContainerStyle={{
-											width: '85%',
-											maxHeight: scaleHeight(500), // ✅ 높이 증가로 스크롤 확보
-											backgroundColor: '#fff',
-											borderRadius: scaleWidth(20),
-											alignSelf: 'center',
-											paddingHorizontal: scaleWidth(16),
-											paddingVertical: scaleHeight(20),
-											shadowColor: '#000',
-											shadowOpacity: 0.15,
-											shadowOffset: { width: 0, height: 6 },
-											shadowRadius: scaleWidth(8),
-											alignItems: 'stretch', // ✅ 추가
-											flex: 1, // ✅ 반드시 필요
-											justifyContent: 'center',
-										}}
-										listItemLabelStyle={{
-											flex: 1,
-											fontSize: scaledSize(13), // ⬅ 작게
-											lineHeight: scaleHeight(20), // ⬅ 줄임
-											color: '#2c3e50',
-											fontWeight: '500',
-											flexShrink: 1, // ✅ 텍스트 줄바꿈을 위해
-											flexWrap: 'wrap', // ✅ 줄바꿈 허용
-										}}
-										listItemContainerStyle={{
-											paddingVertical: scaleHeight(10),  // ⬅ 여백 줄임
-											minHeight: scaleHeight(40),        // ⬅ 최소 높이 낮춤
-											alignItems: 'stretch', // ✅ 핵심 추가
-										}}
-										closeOnBackPressed={true}
-										searchable={false}
-									/>
-								</View>
-							</View>
-						</Animated.View>
-					)}
-				</View>
-
-				{filteredProverbs.length === 0 ? (
-					<View style={styles.loadingContainer}>
-						<Image source={require('@/assets/images/sorry3.png')} style={styles.emptyImage} />
-						<Text style={styles.emptyText}>해당 조건에 맞는 속담이 없어요</Text>
-					</View>
-				) : (
-					<>
-						<Animated.View style={[styles.carouselContainer, { zIndex: 1, alignSelf: 'center' }]}>
-							{!(Platform.OS === 'android' && (showExitModal || badgeModalVisible)) && (
-								<Carousel
-									ref={carouselRef}
-									width={screenWidth * 0.85}
-									height={screenHeight * 0.6}
-									data={filteredProverbs}
-									renderItem={renderItem}
-									mode='parallax'
-									loop={false}
-									windowSize={3}
-									pagingEnabled={true}
-									scrollAnimationDuration={600}
-									modeConfig={{
-										parallaxScrollingScale: 0.9,
-										parallaxScrollingOffset: 40,
-									}}
-									onSnapToItem={(index) => {
-										setCurrentIndex(index);
-
-										InteractionManager.runAfterInteractions(() => {
-											// ❗ 해당 카드 외엔 초기화하지 않음
-											flipAnimList.forEach((anim, i) => {
-												if (i !== index) {
-													anim.setValue(0);
-												}
+										onSnapToItem={() => {
+											Object.values(flipAnimRefs.current).forEach((anim) => {
+												Animated.timing(anim, {
+													toValue: 0,
+													duration: 100,
+													useNativeDriver: true,
+												}).start();
 											});
-										});
-									}}
-								/>
-							)}
-						</Animated.View>
-						{showToast && (
-							<View style={styles.toastWrapper}>
-								<Animated.View
-									style={[
-										styles.toastContainer,
-										{
-											opacity: toastAnim,
-											transform: [
-												{
-													translateY: toastAnim.interpolate({
-														inputRange: [0, 1],
-														outputRange: [-50, 0],
-													}),
-												},
-											],
-										},
-									]}>
-									<View style={styles.toastInner}>
-										<FastImage source={completionImages} style={styles.toastImage} />
-										<View style={styles.toastTextBox}>
-											<Text style={styles.toastTitle}>🎉 학습 완료!</Text>
-											<Text style={styles.toastText}>{praiseText}</Text>
-										</View>
-									</View>
-								</Animated.View>
-							</View>
-						)}
-					</>
-				)}
-				<View style={styles.studyEndWrapper}>
-					<TouchableOpacity style={styles.studyEndButton} onPress={() => setShowExitModal(true)}>
-						<Text style={styles.studyEndText}>학습 종료</Text>
-					</TouchableOpacity>
+											setFlippedCard(null);
+										}}
+									/>
+								)}
+							</Animated.View>
+						</>
+					)}
+					<View style={styles.studyEndWrapper}>
+						<TouchableOpacity
+							style={styles.studyEndButton}
+							onPress={() => {
+								setLevelOpen(false);
+								setRegionOpen(false);
+								setTimeout(() => {
+									setShowExitModal(true); // ✅ 약간의 delay를 주면 Modal 정상 출력
+								}, 200);
+							}}>
+							<Text style={styles.studyEndText}>학습 종료</Text>
+						</TouchableOpacity>
+					</View>
 				</View>
+			</SafeAreaView>
 
-				<Modal visible={showExitModal} transparent animationType='fade'>
-					<View style={styles.modalOverlay}>
-						<View style={styles.exitModalBox}>
-							<Text style={styles.exitTitle}>진행중인 학습을 종료하시겠어요?</Text>
-							<Text style={styles.exitSub}>홈 화면으로 이동합니다</Text>
-							<View style={styles.exitButtonRow}>
-								<TouchableOpacity style={[styles.exitButton, { backgroundColor: '#95a5a6' }]} onPress={() => setShowExitModal(false)}>
-									<Text style={styles.exitButtonText}>취소</Text>
-								</TouchableOpacity>
-								<TouchableOpacity
-									style={[styles.exitButton, { backgroundColor: '#e74c3c' }]}
-									onPress={() => {
-										setShowExitModal(false);
-										navigation.goBack();
-									}}>
-									<Text style={styles.exitButtonText}>종료</Text>
-								</TouchableOpacity>
-							</View>
+			<Modal visible={showExitModal} transparent animationType="fade">
+				<View style={styles.modalOverlay}>
+					<View style={styles.exitModalBox}>
+						{/* 헤더 아이콘 + 타이틀 */}
+						<View style={styles.exitHeader}>
+							<IconComponent
+								type="FontAwesome6"
+								name="circle-xmark"
+								size={isTablet ? 42 : 32}
+								color="#e74c3c"
+								style={{ marginBottom: scaleHeight(8) }}
+							/>
+							<Text
+								style={[
+									styles.exitTitle,
+									isTablet && { fontSize: scaledSize(22) },
+								]}>
+								진행 중인 학습을 종료하시겠어요?
+							</Text>
+						</View>
+
+						{/* 본문 */}
+						<Text
+							style={[
+								styles.exitSub,
+								isTablet && { fontSize: scaledSize(16), lineHeight: scaleHeight(24) },
+							]}>
+							학습 기록은 저장되지 않으며, 홈 화면으로 이동합니다.
+						</Text>
+
+						{/* 버튼 */}
+						<View style={styles.exitButtonRow}>
+							<TouchableOpacity
+								style={[styles.exitButton, { backgroundColor: '#95a5a6' }]}
+								onPress={() => setShowExitModal(false)}>
+								<Text style={styles.exitButtonText}>취소</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								style={[styles.exitButton, { backgroundColor: '#e74c3c' }]}
+								onPress={() => {
+									setShowExitModal(false);
+									navigation.goBack();
+								}}>
+								<Text style={styles.exitButtonText}>종료하기</Text>
+							</TouchableOpacity>
 						</View>
 					</View>
-				</Modal>
+				</View>
+			</Modal>
 
-				{/* 뱃지 모달 */}
-				<Modal visible={badgeModalVisible} transparent animationType='fade'>
-					<View style={styles.modalOverlay}>
-						<ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart explosionSpeed={350} />
-						<Animated.View style={[styles.badgeModal, { transform: [{ scale: scaleAnim }] }]}>
-							<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지를 획득했어요!</Text>
-							<ScrollView style={{ maxHeight: scaleHeight(300), width: '100%' }} contentContainerStyle={{ paddingHorizontal: scaleWidth(12) }}>
-								{newlyEarnedBadges.map((badge, index) => (
-									<View
-										key={index}
-										style={[styles.badgeCard, styles.badgeCardActive]} // 액티브 카드 스타일 항상 적용
-									>
-										<View style={[styles.iconBox, styles.iconBoxActive]}>
-											{/* @ts-ignore */}
-											<IconComponent type={badge.iconType} name={badge.icon} size={20} color={'#27ae60'} />
-										</View>
-										<View style={styles.badgeTextWrap}>
-											<Text style={[styles.badgeName, styles.badgeTitleActive]}>{badge.name}</Text>
-											<Text style={[styles.badgeDescription, styles.badgeDescActive]}>{badge.description}</Text>
-										</View>
+			{showToast && (
+				<View style={styles.toastWrapper}>
+					<Animated.View
+						style={[
+							styles.toastContainer,
+							{
+								opacity: toastAnim,
+								transform: [
+									{
+										translateY: toastAnim.interpolate({
+											inputRange: [0, 1],
+											outputRange: [-50, 0],
+										}),
+									},
+								],
+							},
+						]}>
+						<View style={styles.toastInner}>
+							<Image source={completionImages} style={styles.toastImage} />
+							<View style={styles.toastTextBox}>
+								<Text style={styles.toastTitle}>
+									{typeof completedCardId === 'number' && studyHistory.studyProverbes.includes(completedCardId)
+										? '🎉 학습 완료!'
+										: '📚 복습 시작!'}
+								</Text>
+								<Text style={styles.toastText}>{praiseText}</Text>
+							</View>
+						</View>
+					</Animated.View>
+				</View>
+			)}
+
+			<Modal visible={badgeModalVisible} transparent animationType="fade">
+				<View style={styles.modalOverlay}>
+					<ConfettiCannon
+						key={confettiKey}
+						count={100}
+						origin={{ x: screenWidth / 2, y: 0 }}
+						fadeOut
+						autoStart
+						explosionSpeed={350}
+					/>
+					<Animated.View style={[styles.badgeModal, { transform: [{ scale: scaleAnim }] }]}>
+						<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지를 획득했어요!</Text>
+						<ScrollView
+							style={{ maxHeight: scaleHeight(300), width: '100%' }}
+							contentContainerStyle={{ paddingHorizontal: scaleWidth(12) }}>
+							{newlyEarnedBadges.map((badge, index) => (
+								<View
+									key={index}
+									style={[styles.badgeCard, styles.badgeCardActive]} // 액티브 카드 스타일 항상 적용
+								>
+									{/* <View style={[styles.iconBox, styles.iconBoxActive]}>
+										<IconComponent type={badge.iconType} name={badge.icon} size={20} color={'#27ae60'} />
+									</View> */}
+									<View style={styles.badgeTextWrap}>
+										<Text style={[styles.badgeName, styles.badgeTitleActive]}>{badge.name}</Text>
+										<Text style={[styles.badgeDescription, styles.badgeDescActive]}>{badge.description}</Text>
 									</View>
-								))}
-							</ScrollView>
-							<TouchableOpacity onPress={() => setBadgeModalVisible(false)} style={styles.modalConfirmButton2}>
-								<Text style={styles.closeButtonText}>확인</Text>
-							</TouchableOpacity>
-						</Animated.View>
-					</View>
-				</Modal>
-			</View>
-		</SafeAreaView>
+								</View>
+							))}
+						</ScrollView>
+						<TouchableOpacity onPress={() => setBadgeModalVisible(false)} style={styles.modalConfirmButton2}>
+							<Text style={styles.closeButtonText}>확인</Text>
+						</TouchableOpacity>
+					</Animated.View>
+				</View>
+			</Modal>
+		</>
 	);
 };
-
-export default ProverbStudyScreen;
-
 const styles = StyleSheet.create({
+	main: {
+		flex: 1,
+		backgroundColor: '#fff',
+	},
 	container: {
 		flex: 1,
-		backgroundColor: '#f9fafb',
+		backgroundColor: '#fff',
 	},
 	cardWrapper: {
-		left: 0,
-		right: 0,
+		height: scaleHeight(812 * 0.7),
+		width: '100%',
 		alignItems: 'center',
-		zIndex: 1,
-		backfaceVisibility: 'hidden',
+		justifyContent: 'flex-start',
+		paddingTop: scaleHeight(-10), // 위로 땡기기
 	},
 	cardFront: {
-		width: screenWidth * 0.85,
-		height: screenHeight * 0.6,
-		backgroundColor: '#fff',
+		width: scaleWidth(370), // ✅ 내부 카드(cardFace)와 같은 크기로
+		height: scaleHeight(540),
 		borderRadius: scaleWidth(20),
-		justifyContent: 'center',
 		alignItems: 'center',
-		backfaceVisibility: 'hidden',
-		position: 'absolute',
-		zIndex: 1,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(6) },
-		shadowOpacity: 0.15,
-		shadowRadius: scaleWidth(10),
-		alignSelf: 'center',
+		justifyContent: 'center',
+	},
+	flagContainer: {
+		width: isTablet ? scaleWidth(180) : scaleWidth(260),
+		height: isTablet ? scaleWidth(160) : scaleWidth(260),
+		backgroundColor: '#f8f9fa',
+		borderRadius: scaleWidth(12),
+		overflow: 'hidden',
+		borderColor: '#e0e0e0',
 		borderWidth: 1,
-		borderColor: '#ddd',
-	},
-	cardBack: {
-		backgroundColor: '#4a90e2',
-		zIndex: 2,
-	},
-	cardInner: {
-		flex: 1,
-		width: '100%',
-		padding: scaleWidth(20),
-		minHeight: '100%',
-	},
-	hintText: {
-		marginTop: scaleHeight(80),
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		textAlign: 'center',
-	},
-	progressWrapper: {
-		alignItems: 'center',
-		marginVertical: scaleHeight(20),
-	},
-	progressText: {
-		fontSize: scaledSize(16),
-		fontWeight: '600',
-		color: '#2c3e50',
-	},
-	buttonWrapper: {
-		alignItems: 'center',
-		marginVertical: scaleHeight(20),
-	},
-	completeButton: {
-		backgroundColor: '#27ae60',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(30),
-		borderRadius: scaleWidth(30),
-	},
-	buttonText: {
-		color: '#fff',
-		fontSize: scaledSize(17),
-		fontWeight: '600',
-		textAlign: 'center',
-	},
-	loadingContainer: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	filterContainer: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		marginTop: scaleHeight(12),
-	},
-	filterButton: {
-		borderWidth: 1,
-		borderColor: '#4a90e2',
-		borderRadius: scaleWidth(16), // ⬅ 더 작게
-		paddingVertical: scaleHeight(4), // ⬅ 줄임
-		paddingHorizontal: scaleWidth(10), // ⬅ 줄임
-		marginHorizontal: scaleWidth(4), // ⬅ 좁게
-		backgroundColor: '#fff',
-		minHeight: scaleHeight(30), // ⬅ 낮게
-		justifyContent: 'center',
-		marginBottom: scaleHeight(10),
-	},
-	filterText: {
-		fontSize: scaledSize(12), // ⬅ 작게
-		color: '#4a90e2',
-		lineHeight: scaleHeight(16), // ⬅ 줄임
-		textAlign: 'center',
-	},
-	filterButtonActive: {
-		backgroundColor: '#4a90e2',
-	},
-	filterTextActive: {
-		color: '#fff',
-	},
-	carouselContainer: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		zIndex: 1,
-	},
-	studyEndWrapper: {
-		width: '100%',
-		alignItems: 'center',
-		paddingVertical: scaleHeight(12),
-		borderTopWidth: 1,
-		borderColor: '#ecf0f1',
-		marginBottom: scaleHeight(5),
-	},
-	studyEndButton: {
-		backgroundColor: '#7f8c8d',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(24),
-		borderRadius: scaleWidth(24),
-	},
-	studyEndText: {
-		color: '#ffffff',
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-	},
-	detailToggleButton: {
-		marginLeft: scaleWidth(8),
-		padding: scaleWidth(4),
-	},
-
-
-	subFilterRow: {
-		flexDirection: 'row',
-		marginTop: scaleHeight(3),
-		paddingHorizontal: scaleWidth(5),
-	},
-	dropdown: {
-		backgroundColor: '#fff',
-		borderColor: '#dfe6e9',
-		borderWidth: 1,
-		borderRadius: scaleWidth(8),
-		paddingHorizontal: scaleWidth(8), // 여백도 줄임
-	},
-	dropdownList: {
-		backgroundColor: '#fff',
-		borderColor: '#dfe6e9',
-		borderWidth: 1,
-		borderRadius: scaleWidth(10),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowOpacity: 0.06,
-		shadowRadius: scaleWidth(2),
-		paddingBottom: 0,
-		marginBottom: 0,
 	},
 	progressHeader: {
 		paddingTop: scaleHeight(12),
@@ -1144,8 +1296,7 @@ const styles = StyleSheet.create({
 		borderColor: '#dcdde1',
 		borderRadius: scaleWidth(16),
 		paddingBottom: 0,
-		marginHorizontal: scaleWidth(16),
-		marginTop: scaleHeight(12),
+		marginHorizontal: scaleWidth(12),
 	},
 	progressTopRow: {
 		flexDirection: 'row',
@@ -1154,7 +1305,7 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(3),
 	},
 	progressTitle: {
-		fontSize: scaledSize(18),
+		fontSize: scaledSize(17),
 		fontWeight: '600',
 		color: '#2c3e50',
 		marginRight: scaleWidth(10),
@@ -1170,187 +1321,194 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(14),
 		fontWeight: '600',
 	},
+	filterContainer: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginTop: scaleHeight(12),
+	},
+	filterButton: {
+		borderWidth: 1,
+		borderColor: '#4a90e2',
+		borderRadius: scaleWidth(16),
+		paddingVertical: scaleHeight(6), // 기존보다 약간 증가
+		paddingHorizontal: scaleWidth(14), // 기존보다 증가
+		marginHorizontal: scaleWidth(4),
+		backgroundColor: '#fff',
+		minHeight: scaleHeight(24), // 기존보다 높게
+		justifyContent: 'center',
+		marginBottom: scaleHeight(10),
+	},
+
+	filterText: {
+		fontSize: scaledSize(13), // 기존보다 크게
+		color: '#4a90e2',
+		lineHeight: scaleHeight(20),
+		textAlign: 'center',
+	},
+	filterButtonActive: {
+		backgroundColor: '#4a90e2',
+	},
+	filterTextActive: {
+		color: '#fff',
+	},
+	button: {
+		height: scaleHeight(50),
+		marginTop: scaleHeight(16),
+		borderRadius: scaleWidth(30),
+		backgroundColor: '#3b82f6',
+		justifyContent: 'center',
+		alignItems: 'center', // ✅ 변경 (기존 `alignContent` → `alignItems`)
+		width: '100%', // ✅ 항상 100% 사용
+		alignSelf: 'center', // ✅ 중앙 정렬
+	},
+	learnedButton: {
+		backgroundColor: '#f39c12',
+	},
+	learningButton: {
+		backgroundColor: '#2ecc71',
+	},
+	buttonText: {
+		color: 'white',
+		fontSize: scaledSize(18),
+		fontWeight: '600',
+		letterSpacing: 0.5,
+		textAlign: 'center',
+	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingVertical: scaleHeight(40),
+	},
+	loadingText: {
+		marginTop: scaleHeight(10),
+		fontSize: scaledSize(16),
+		color: '#666',
+	},
 	progressBarWrapper: {
 		width: '80%',
 		height: scaleHeight(10),
-		borderRadius: scaleHeight(5),
+		borderRadius: scaleWidth(5),
 		backgroundColor: '#dcdde1',
 		marginTop: scaleHeight(10),
 		overflow: 'hidden',
 	},
 	progressBarFill: {
 		height: '100%',
-		borderRadius: scaleHeight(5),
+		borderRadius: scaleWidth(5),
 		backgroundColor: '#4a90e2',
 	},
-	detailFilterWrapper: {
-		width: '100%',
-		backgroundColor: '#ffffff',
-		paddingTop: 0,
-		paddingHorizontal: scaleWidth(20),
-		zIndex: 9999,
-	},
-	retryButton: {
-		backgroundColor: '#f39c12',
-		height: scaleHeight(48),
-		borderRadius: scaleWidth(24),
-		alignItems: 'center',
+	carouselContainer: {
+		flex: 1,
 		justifyContent: 'center',
-		paddingHorizontal: scaleWidth(30),
-		marginTop: scaleHeight(20),
-		marginBottom: scaleHeight(10),
+		alignItems: 'center',
+	},
+	cardFace: {
+		width: scaleWidth(370),
+		height: CARD_HEIGHT, // ✅ 여기 반영
+		backgroundColor: '#ffffff',
+		borderRadius: scaleWidth(20),
+		padding: scaleWidth(20),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 6 },
+		shadowOpacity: 0.15,
+		shadowRadius: 10,
+		justifyContent: 'space-between',
+		alignSelf: 'center',
+		borderWidth: 1,
+		borderColor: '#ddd', // ✅ 테두리 추가
+	},
+
+	cardFace2: {
+		width: scaleWidth(370),
+		height: CARD_HEIGHT, // ✅ 여기 반영
+		backgroundColor: '#ffffff',
+		borderRadius: scaleWidth(20),
+		padding: scaleWidth(10),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 6 },
+		shadowOpacity: 0.15,
+		shadowRadius: 10,
+		justifyContent: 'space-between',
+		alignSelf: 'center',
 	},
 	modalOverlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		backgroundColor: 'rgba(0,0,0,0.4)', // 어두운 배경 복원
 		justifyContent: 'center',
 		alignItems: 'center',
+		zIndex: 99999,
+		elevation: 10,
 	},
-	exitModalBox: {
-		width: '80%',
-		backgroundColor: '#fff',
-		padding: scaleWidth(24),
-		borderRadius: scaleWidth(16),
-		alignItems: 'center',
-	},
-	exitTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(8),
-	},
-	exitSub: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		marginBottom: scaleHeight(20),
-	},
-	exitButtonRow: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
+	flagSection: {
+		position: 'relative',
 		width: '100%',
-	},
-	exitButton: {
-		flex: 1,
-		marginHorizontal: scaleWidth(4),
-		paddingVertical: scaleHeight(12),
-		borderRadius: scaleWidth(8),
+		height: IMAGE_HEIGHT, // ✅ 조건부 높이 적용
 		alignItems: 'center',
+		marginBottom: scaleHeight(12), // 👈 이미지 아래 공간 확보
 	},
-	exitButtonText: {
-		color: '#fff',
-		fontWeight: 'bold',
-		fontSize: scaledSize(15),
-	},
-	toastWrapper: {
+	flipIconOutside: {
 		position: 'absolute',
-		top: '40%',
-		left: 0,
-		right: 0,
+		top: scaleHeight(-12),
+		right: scaleWidth(20),
+		backgroundColor: '#fff',
+		borderRadius: scaleWidth(20),
+		padding: scaleWidth(6),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.2,
+		shadowRadius: 2,
+	},
+	capitalInfo: {
+		marginBottom: scaleHeight(40),
+	},
+
+	capitalWrapper: {
 		alignItems: 'center',
-		zIndex: 999,
+		marginTop: scaleHeight(40),
+		marginBottom: scaleHeight(20),
+		paddingHorizontal: scaleWidth(30),
+	},
+
+	sectionLabel: {
+		fontSize: scaledSize(18),
+		color: '#ffeaa7',
+		fontWeight: '600',
+		marginBottom: scaleHeight(6),
+		textAlign: 'center',
+	},
+	cardHint: {
+		fontSize: scaledSize(16),
+		color: '#7f8c8d',
+		marginTop: scaleHeight(20),
+	},
+	modalCloseIcon: {
+		position: 'absolute',
+		top: scaleHeight(12),
+		right: scaleWidth(12),
+		padding: scaleWidth(8),
+		zIndex: 10,
+	},
+
+	closeButtonText: {
+		color: 'white',
+		fontWeight: '600',
+		fontSize: scaledSize(15),
 	},
 	toastContainer: {
-		width: screenWidth * 0.9,
-		maxWidth: scaleWidth(500),
-		backgroundColor: 'rgba(255,255,255,0.95)',
-		borderRadius: scaleWidth(24),
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(20),
+		width: scaleWidth(340), // ✅ 기존보다 더 넓게
+		backgroundColor: 'rgba(255,255,255,0.98)',
+		borderRadius: scaleWidth(28), // ✅ 더 둥글게
+		paddingVertical: scaleHeight(20), // ✅ 더 넓은 여백
+		paddingHorizontal: scaleWidth(24),
 		alignItems: 'center',
 		shadowColor: '#000',
+
 		shadowOffset: { width: 0, height: scaleHeight(6) },
-		shadowOpacity: 0.15,
-		shadowRadius: scaleWidth(8),
-		transform: [{ translateY: -70 }],
-	},
-	toastInner: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		flexWrap: 'wrap',
-	},
-	toastImage: {
-		width: scaleWidth(50),
-		height: scaleWidth(50),
-		marginRight: scaleWidth(16),
-		borderRadius: scaleWidth(12),
-	},
-	toastTextBox: {
-		flex: 1,
-	},
-	toastTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2d3436',
-		marginBottom: scaleHeight(4),
-	},
-	toastText: {
-		fontSize: scaledSize(15),
-		color: '#636e72',
-		lineHeight: scaleHeight(22),
-	},
-	completedBadge: {
-		marginTop: scaleHeight(8),
-		backgroundColor: '#2ecc71',
-		paddingVertical: scaleHeight(4),
-		paddingHorizontal: scaleWidth(10),
-		borderRadius: scaleWidth(12),
-	},
-	completedBadgeText: {
-		fontSize: scaledSize(12),
-		color: '#fff',
-		fontWeight: '600',
-	},
-	subMascotImage: {
-		width: scaleWidth(120),
-		height: scaleWidth(120),
-		marginTop: scaleHeight(0),
-		marginBottom: scaleHeight(10),
-	},
-	meaningHighlight: {
-		fontSize: scaledSize(20),
-		color: '#ffffff',
-		fontWeight: 'bold',
-		textAlign: 'left',
-		lineHeight: scaleHeight(30),
-		marginVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(10),
-		flexShrink: 1,
-		flexWrap: 'wrap',
-		overflow: 'visible',
-	},
-	exampleText: {
-		fontSize: scaledSize(15),
-		color: '#dfe6e9',
-		fontStyle: 'italic',
-		textAlign: 'center',
-		lineHeight: scaleHeight(22),
-		marginTop: scaleHeight(20),
-		paddingHorizontal: scaleWidth(10),
-	},
-	cardLabel: {
-		fontSize: scaledSize(17),
-		color: '#ffffff',
-		marginBottom: scaleHeight(3),
-		fontWeight: '600',
-		textAlign: 'left',
-		marginLeft: scaleWidth(10),
-	},
-	cardCompleteButton: {
-		backgroundColor: '#27ae60',
-		height: scaleHeight(48),
-		borderRadius: scaleWidth(24),
-		alignItems: 'center',
-		justifyContent: 'center',
-		paddingHorizontal: scaleWidth(30),
-		marginTop: scaleHeight(20),
-		marginBottom: scaleHeight(10),
-	},
-	cardContent: {
-		flex: 1,
-		alignItems: 'center',
-		paddingTop: scaleHeight(8),
-		paddingBottom: scaleHeight(5),
-		paddingHorizontal: scaleWidth(12),
+		shadowOpacity: 0.2, // ✅ 그림자 강조
+		shadowRadius: scaleWidth(10),
+		transform: [{ translateY: -scaleHeight(70) }],
 	},
 	badgeModal: {
 		backgroundColor: '#fff',
@@ -1380,17 +1538,9 @@ const styles = StyleSheet.create({
 		backgroundColor: '#f9fefc',
 	},
 	badgeIconWrap: {
-		marginRight: scaleWidth(12),
-		width: scaleWidth(40),
-		height: scaleWidth(40),
-		borderRadius: scaleWidth(20),
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: '#ADD8E6',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowOpacity: 0.1,
-		shadowRadius: scaleWidth(2),
+		marginRight: scaleWidth(6),
 	},
 	badgeName: {
 		fontSize: scaledSize(16),
@@ -1409,31 +1559,96 @@ const styles = StyleSheet.create({
 		color: '#7f8c8d',
 		lineHeight: scaleHeight(20),
 	},
-	modalConfirmText2: {
-		color: '#fff',
-		fontSize: scaledSize(16),
-		fontWeight: '600',
-	},
 	modalConfirmButton2: {
 		backgroundColor: '#2980b9',
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(36),
 		borderRadius: scaleWidth(30),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(2) },
+		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.2,
-		shadowRadius: scaleWidth(4),
+		shadowRadius: 4,
 	},
-	badgeCard: {
+	toastInner: {
 		flexDirection: 'row',
-		alignItems: 'flex-start',
-		backgroundColor: '#f9f9f9',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(12),
+		alignItems: 'center',
+	},
+	toastImage: {
+		width: scaleWidth(60), // ✅ 이미지 더 크게
+		height: scaleWidth(60),
+		marginRight: scaleWidth(18),
+		borderRadius: scaleWidth(14),
+	},
+	toastTextBox: {
+		flex: 1,
+	},
+	toastTitle: {
+		fontSize: scaledSize(20), // ✅ 더 큰 글자
+		fontWeight: 'bold',
+		color: '#2d3436',
+		marginBottom: scaleHeight(6),
+	},
+	toastText: {
+		fontSize: scaledSize(15), // ✅ 일반 텍스트도 확대
+		color: '#636e72',
+		lineHeight: scaleHeight(24),
+	},
+	toastWrapper: {
+		position: 'absolute',
+		top: '40%',
+		left: 0,
+		right: 0,
+		alignItems: 'center',
+		zIndex: 999,
+	},
+	emptyWrapper: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: scaleWidth(24),
+		backgroundColor: '#f5f6fa',
+	},
+	emptyImage: {
+		width: scaleWidth(100),
+		height: scaleWidth(100),
+		marginBottom: scaleHeight(20),
+		opacity: 0.6,
+	},
+	emptyText: {
+		fontSize: scaledSize(16),
+		color: '#7f8c8d',
+		textAlign: 'center',
+		lineHeight: scaleHeight(24),
+	},
+	filterSection: {
+		paddingTop: scaleHeight(10),
+		backgroundColor: '#fff',
+	},
+	basicFilterRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	detailToggleButton: {
+		marginLeft: scaleWidth(8),
+		padding: scaleWidth(4),
 		marginBottom: scaleHeight(10),
-		borderWidth: 1,
-		borderColor: '#ddd',
+	},
+	detailFilterWrapper: {
 		width: '100%',
+		backgroundColor: '#ffffff',
+		paddingTop: 0,
+		paddingHorizontal: scaleWidth(20),
+		zIndex: 9999,
+	},
+	subFilterRow: {
+		flexDirection: 'row',
+		paddingHorizontal: scaleWidth(5),
+	},
+	resetButton: {
+		marginLeft: scaleWidth(6),
+		padding: scaleWidth(4),
+		marginBottom: scaleHeight(10),
 	},
 	badgeCardActive: {
 		borderColor: '#27ae60',
@@ -1462,128 +1677,395 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: '#2c3e50',
 	},
-	closeButtonText: {
-		color: 'white',
-		fontWeight: '600',
-		fontSize: scaledSize(15),
+	badgeCard: {
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+		backgroundColor: '#f9f9f9',
+		borderRadius: scaleWidth(12),
+		padding: scaleWidth(12),
+		marginBottom: scaleHeight(10),
+		borderWidth: 1,
+		borderColor: '#ddd',
+		width: '100%',
 	},
-	dropdownWrapper: {
-		flex: 1,
-		marginBottom: scaleHeight(6),
-		marginRight: scaleWidth(6),
-		width: '48%',
+	dropdown: {
+		backgroundColor: '#fff',
+		borderColor: '#dfe6e9',
+		borderWidth: 1,
+		borderRadius: scaleWidth(8),
+		paddingHorizontal: scaleWidth(8), // 여백도 줄임
 	},
-	dropdownWrapperLast: {
-		flex: 1,
-		marginBottom: scaleHeight(6),
-		marginRight: scaleWidth(6),
-		width: '48%',
+	dropdownList: {
+		backgroundColor: '#fff',
+		borderColor: '#dfe6e9',
+		borderWidth: 1,
+		borderRadius: scaleWidth(10),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: scaleHeight(1) },
+		shadowOpacity: 0.06,
+		shadowRadius: scaleWidth(2),
+		paddingBottom: 0,
+		marginBottom: 0,
 	},
-	dropdownPlaceholder: {
-		textAlign: 'center',
-		color: '#999',
-		fontSize: scaledSize(13),  // ⬅ 작게
+	studyEndWrapper: {
+		width: '100%',
+		alignItems: 'center',
+		paddingVertical: scaleHeight(12),
+		paddingBottom: scaleHeight(Platform.OS === 'android' ? 60 : 20), // ← 이 부분을 조정
+		borderTopWidth: 1,
+		borderColor: '#ecf0f1',
 	},
-	emptyImage: {
-		width: scaleWidth(100),
-		height: scaleWidth(100),
-		marginBottom: scaleHeight(20),
-		opacity: 0.6,
+	studyEndButton: {
+		backgroundColor: '#7f8c8d',
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(24),
+		borderRadius: scaleWidth(24),
 	},
-	emptyText: {
-		fontSize: scaleHeight(16),
-		color: '#7f8c8d',
-		textAlign: 'center',
-		lineHeight: scaleHeight(24),
-	},
-	resetButton: {
-		marginLeft: scaleWidth(6),
-		padding: scaleWidth(4),
-	},
-	cardTitle: {
+	studyEndText: {
+		color: '#ffffff',
 		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		fontWeight: '600',
-		textAlign: 'center',
+		fontWeight: 'bold',
+	},
+	exitModalBox: {
+		width: '80%',
+		backgroundColor: '#fff',
+		padding: scaleWidth(24),
+		borderRadius: scaleWidth(16),
+		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.15,
+		shadowRadius: 6,
+	},
+	exitHeader: {
+		alignItems: 'center',
 		marginBottom: scaleHeight(12),
 	},
-	proverbText: {
-		fontSize: scaledSize(23),
+	exitTitle: {
+		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 		textAlign: 'center',
-		lineHeight: scaleHeight(34),
-		marginTop: scaleHeight(0),
-		marginBottom: scaleHeight(0),
 	},
-	proverbContainer: {
-		justifyContent: 'center',
+	exitSub: {
+		fontSize: scaledSize(14),
+		color: '#7f8c8d',
+		marginBottom: scaleHeight(20),
+		textAlign: 'center',
+		lineHeight: scaleHeight(20),
+	},
+	exitButtonRow: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		width: '100%',
+		marginTop: scaleHeight(4),
+	},
+	exitButton: {
+		flex: 1,
+		marginHorizontal: scaleWidth(4),
+		paddingVertical: scaleHeight(12),
+		borderRadius: scaleWidth(8),
 		alignItems: 'center',
-		paddingHorizontal: scaleHeight(3),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.1,
+		shadowRadius: 3,
 	},
-	categoryBadge: {
-		alignSelf: 'center',
-		backgroundColor: '#dfe6e9',
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(4),
+	exitButtonText: {
+		color: '#fff',
+		fontWeight: 'bold',
+		fontSize: scaledSize(15),
+	},
+	flagImage: {
+		width: '100%',
+		aspectRatio: 1.6,
 		borderRadius: scaleWidth(12),
+		backgroundColor: '#f5f5f5',
+		borderColor: '#ddd',
+		borderWidth: 1,
+	},
+	cardMiddle: {
+		flex: 1,
+		marginTop: scaleHeight(70),
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingHorizontal: scaleWidth(10), // ✅ 좌우 여백
+		width: '100%', // ✅ 부모 크기에 맞추기
+	},
+
+	fixedBottomButton: {
+		position: 'absolute',
+		bottom: scaleHeight(20),
+		left: 0,
+		right: 0,
+		alignItems: 'center',
+		paddingHorizontal: scaleWidth(20), // ➕ 여백만큼 padding으로 처리
+	},
+	subMascotImage: {
+		width: '100%',
+		aspectRatio: 1,
+		resizeMode: 'contain',
+		alignSelf: 'center',
+	},
+	flagImageSquare: {
+		// width: '100%',
+		width: '100%',
+		aspectRatio: 1, // 정사각형
+		alignSelf: 'center',
+	},
+	hanjaText: {
+		fontSize: scaledSize(32),
+		fontWeight: 'bold',
+		color: '#2c3e50',
+		textAlign: 'center',
+		marginBottom: scaleHeight(6),
+		letterSpacing: 2, // ✅ 기존보다 줄임
+		flexShrink: 1, // ✅ 넘칠 경우 줄이도록
+		width: '100%', // ✅ 부모 영역 꽉 차게
+	},
+
+	hangulText: {
+		fontSize: scaledSize(18),
+		color: '#7f8c8d',
+		fontWeight: '500',
+		textAlign: 'center',
+		marginBottom: scaleHeight(8),
+	},
+	cardBackContainer: {
+		flex: 1,
+		paddingHorizontal: scaleWidth(12),
+		paddingTop: scaleHeight(12),
+		paddingBottom: scaleHeight(30),
+		backgroundColor: '#ffffff', // 더 깔끔한 흰색 배경
+		borderRadius: scaleWidth(20),
+		width: '100%',
+		height: '100%',
+	},
+
+	cardTitle: {
+		fontSize: scaledSize(20),
+		fontWeight: '700',
+		color: '#2980b9',
+		textAlign: 'center',
+		marginBottom: scaleHeight(14),
+	},
+
+
+	sectionTitle: {
+		fontSize: scaledSize(15),
+		fontWeight: '700',
+		color: '#2c3e50',
 		marginBottom: scaleHeight(12),
 	},
-	categoryBadgeText: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		fontWeight: '500',
+
+	meaningBox: {
+		borderRadius: scaleWidth(14),
+		backgroundColor: '#fff3cd', // 밝은 크림색
+		borderLeftWidth: 4,
+		borderLeftColor: '#f9a825', // 오렌지 강조선
+		padding: scaleWidth(14),
+		marginBottom: scaleHeight(12),
 	},
-	sectionWrapper: {
-		marginTop: scaleHeight(20),
-		alignItems: 'flex-start',
-		paddingHorizontal: scaleWidth(12),
-		width: '100%',
-	},
-	sectionTitle: {
-		fontSize: scaledSize(16),
-		fontWeight: '600',
-		color: '#ffffff',
+
+	exampleBox: {
+		backgroundColor: '#e3f2fd', // 연한 하늘색
+		borderRadius: scaleWidth(14),
+		padding: scaleWidth(14),
 		marginBottom: scaleHeight(6),
+	},
+
+	sectionContent: {
+		fontSize: scaledSize(15),
+		color: '#2c3e50',
+		lineHeight: scaleHeight(22),
 		textAlign: 'left',
-		width: '100%',
+	},
+
+
+	cardBackTitle: {
+		fontSize: scaledSize(24),
+		fontWeight: 'bold',
+		color: '#2980b9',
+		textAlign: 'center',
+		marginBottom: scaleHeight(16),
+	},
+	dropdownField: {
+		backgroundColor: '#fff',
+		borderColor: '#dfe6e9',
+		borderWidth: 1,
+		borderRadius: scaleWidth(8),
+		paddingHorizontal: scaleWidth(8), // 여백도 줄임
+	},
+	dropdownListField: {
+		backgroundColor: '#ffffff',
+		borderColor: '#ccc',
+		borderWidth: 1,
+		borderRadius: scaleWidth(12),
+	},
+	sectionBox: {
+		borderWidth: 1,
+		borderColor: '#E6EEF5',
+		backgroundColor: '#FDFEFE',
+		padding: scaleWidth(12),
+		borderRadius: scaleWidth(12),
+		marginTop: scaleHeight(5),
+		marginBottom: scaleHeight(6),
+		shadowColor: '#000',
+		shadowOpacity: 0.05,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 4,
+		elevation: 2,
 	},
 	sectionText: {
 		fontSize: scaledSize(14),
-		color: '#ecf0f1',
-		lineHeight: scaleHeight(20),
-		textAlign: 'left',
-		width: '100%',
+		color: '#444',
+		lineHeight: 20,
 	},
-	levelLabel: {
-		fontSize: scaledSize(14),
-		color: '#f1c40f',
-		fontWeight: '600',
-		textAlign: 'center',
-		marginBottom: scaleHeight(20),
-	},
-	button: {
-		height: scaleHeight(50),
-		marginTop: scaleHeight(16),
-		borderRadius: scaleWidth(30),
-		backgroundColor: '#3b82f6',
-		justifyContent: 'center',
+	sectionHeader: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
 		alignItems: 'center',
-		width: '100%',
-		alignSelf: 'center',
 	},
-	badge: {
-		maxWidth: '60%',
-		alignSelf: 'center',
-		paddingHorizontal: scaleWidth(10),
+	phraseRow: {
+		marginBottom: scaleHeight(6),
 		paddingVertical: scaleHeight(4),
+		paddingHorizontal: scaleWidth(8),
+		backgroundColor: '#F9FBFF',
+		borderRadius: scaleWidth(8),
+	},
+	inlineLabel: {
+		fontSize: scaledSize(13),
+		marginBottom: scaleHeight(3),
+		fontWeight: '700',
+		color: '#2c3e50',
+	},
+	inlineValue: {
+		fontSize: scaledSize(13),
+		color: '#555',
+		marginTop: scaleHeight(2),
+	},
+	highlightSection: {
+		borderWidth: 1.5,
+		borderColor: '#A5D8FF',
+		backgroundColor: '#EAF4FF',
+		padding: scaleWidth(14),
+		borderRadius: scaleWidth(14),
+		marginBottom: scaleHeight(6),
+		shadowColor: '#000',
+		shadowOpacity: 0.08,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 4,
+		elevation: 3,
+	},
+	highlightHeader: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: scaleHeight(8),
+	},
+	highlightTitle: {
+		fontSize: scaledSize(15),
+		fontWeight: '700',
+		color: '#1E6BB8',
+		marginLeft: scaleWidth(6),
+	},
+	highlightText: {
+		fontSize: scaledSize(15),
+		fontWeight: '600',
+		color: '#2c3e50',
+		lineHeight: 22,
+	},
+	metaWrap: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		gap: scaleWidth(8),
+		marginTop: scaleHeight(16),
+		justifyContent: 'center',
+	},
+	metaChip: {
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(6),
+		borderRadius: scaleWidth(14),
+	},
+	metaText: {
+		fontSize: scaledSize(13),
+		fontWeight: '600',
+	},
+	meaningQuoteBox: {
+		alignItems: 'center', // 중앙 정렬
+		justifyContent: 'center',
+		backgroundColor: '#EAF4FF', // 파란색 계열 배경
 		borderRadius: scaleWidth(12),
-		backgroundColor: '#f1f2f6',
-		marginBottom: scaleHeight(20),
+		paddingVertical: scaleHeight(16),
+		paddingHorizontal: scaleWidth(14),
+		marginBottom: scaleHeight(16),
+	},
+
+	meaningQuoteText: {
+		fontSize: scaledSize(16),
+		fontWeight: '600',
+		color: '#2c3e50',
+		lineHeight: scaleHeight(22),
+		textAlign: 'center', // 텍스트도 중앙 정렬
+	},
+	badgeInlineRow: {
+		flexDirection: 'row',
+		alignItems: 'center',     // 세로 중앙
+		gap: scaleWidth(6),
+		marginTop: scaleHeight(8),
+		marginBottom: scaleHeight(8),
+		width: '100%',
+	},
+	levelBadge: {
+		flexDirection: 'row',
+		alignItems: 'center', // 세로 중앙 고정
+		justifyContent: 'center',
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(6),
+		borderRadius: scaleWidth(14),
+	},
+	categoryBadge: {
+		flexDirection: 'row',
+		alignItems: 'center', // 세로 중앙 고정
+		justifyContent: 'center',
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(6),
+		borderRadius: scaleWidth(14),
 	},
 	badgeText: {
 		color: '#fff',
-		fontSize: scaledSize(12),
+		fontSize: scaledSize(13),
 		fontWeight: '600',
 	},
+	tagWrap: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',          // ✅ 태그도 여러 줄
+		justifyContent: 'center',  // ✅ 중앙 모으기
+	},
+	// 태그 가로 스크롤 영역
+	tagScroll: {
+		flex: 1,                    // 남는 공간을 태그가 차지
+		marginLeft: scaleWidth(6),  // 배지와 간격
+		maxHeight: scaleHeight(30), // 라인 높이 안정화
+	},
+
+	tagScrollContent: {
+		alignItems: 'center',
+		justifyContent: 'center',  // ✅ 태그도 가운데 정렬
+	},
+
+	tagChip: {
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(6),
+		borderRadius: scaleWidth(14),
+		backgroundColor: '#F1F2F6',
+		marginRight: scaleWidth(6),
+	},
+
+	tagText: {
+		fontSize: scaledSize(13),
+		fontWeight: '600',
+		color: '#2c3e50',
+	},
 });
+
+export default QuizStudyScreen;

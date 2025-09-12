@@ -505,10 +505,16 @@ const ProverbListScreen = () => {
 													<Text style={styles.modalText}>- {selectedProverb?.longMeaning}</Text>
 												</View>
 
-												<View style={styles.modalSection}>
-													<Text style={styles.modalLabel}>예시</Text>
-													<Text style={styles.modalText}>- {selectedProverb?.example}</Text>
-												</View>
+												{Array.isArray(selectedProverb?.example) && selectedProverb.example.length > 0 && (
+													<View style={styles.modalSection}>
+														<Text style={styles.modalLabel}>예시</Text>
+														{selectedProverb.example.map((ex, idx) => (
+															<Text key={idx} style={styles.modalText}>
+																- "{ex}"
+															</Text>
+														))}
+													</View>
+												)}
 
 												{Array.isArray(selectedProverb.sameProverb) && selectedProverb.sameProverb.filter((p) => p.trim()).length > 0 && (
 													<View style={styles.modalSection}>

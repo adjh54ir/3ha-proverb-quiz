@@ -48,7 +48,7 @@ const greetingMessages = [
 const LEVEL_DATA = [
 	{
 		score: 0,
-		next: 600,
+		next: 680,
 		label: '속담 초보자',
 		icon: 'seedling',
 		encouragement: '🌱 첫걸음을 뗐어요! 이제 속담의 세계로!',
@@ -56,8 +56,8 @@ const LEVEL_DATA = [
 		mascot: require('@/assets/images/level1_mascote.png'),
 	},
 	{
-		score: 600,
-		next: 1200,
+		score: 680,
+		next: 1360,
 		label: '속담 입문자',
 		icon: 'leaf',
 		encouragement: '🍃 차근차근 익혀가는 중이에요!\n조금씩 자신감이 붙고 있어요!',
@@ -65,8 +65,8 @@ const LEVEL_DATA = [
 		mascot: require('@/assets/images/level2_mascote.png'),
 	},
 	{
-		score: 1200,
-		next: 1800,
+		score: 1360,
+		next: 2040,
 		label: '속담 숙련자',
 		icon: 'tree',
 		encouragement: '🌳 멋져요! 속담 실력이 부쩍 늘었어요!',
@@ -74,13 +74,22 @@ const LEVEL_DATA = [
 		mascot: require('@/assets/images/level3_mascote.png'),
 	},
 	{
-		score: 1800,
-		next: 2461,
+		score: 2040,
+		next: 2720,
+		label: '속담 전사',
+		icon: 'helmet-battle',
+		encouragement: '🪖 속담 전사로 거듭났어요!\n지식을 무기로 도전을 헤쳐나가고 있어요!',
+		description: '속담을 무기 삼아 자신 있게 문제를 정복하는 단계로,\n진정한 전사로서 강한 자신감을 보여주는 시기예요.',
+		mascot: require('@/assets/images/level4_mascote.png'),
+	},
+	{
+		score: 2720,
+		next: 3380,
 		label: '속담 마스터',
 		icon: 'trophy',
 		encouragement: '🏆 속담 마스터에 도달했어요! 정말 대단해요!',
 		description: '속담에 대한 깊은 이해와 활용 능력을 갖춘 최상위 단계로,\n누구에게나 모범이 될 수 있는 수준이에요.',
-		mascot: require('@/assets/images/level4_mascote.png'),
+		mascot: require('@/assets/images/level5_mascote2.png'),
 	},
 ];
 

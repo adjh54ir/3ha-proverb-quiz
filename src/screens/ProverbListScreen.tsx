@@ -26,6 +26,8 @@ import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import DeviceInfo from 'react-native-device-info';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import ProverbDetailModal from './modal/ProverbDetailModal';
+
 
 const PAGE_SIZE = 30;
 
@@ -470,73 +472,13 @@ const ProverbListScreen = () => {
 						)}
 
 						{/* 상세 모달 */}
-						<Modal visible={showDetailModal} animationType="slide" transparent={true} onRequestClose={() => setShowDetailModal(false)}>
-							<View style={styles.modalOverlay}>
-								<View style={styles.modalContainer}>
-									<View style={styles.modalHeader}>
-										<Text style={styles.modalHeaderTitle}>속담 상세</Text>
-										<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowDetailModal(false)}>
-											<Icon name="xmark" size={20} color="#0984e3" />
-										</TouchableOpacity>
-									</View>
-
-									{/* ✅ 스크롤 가능한 영역 */}
-									<ScrollView contentContainerStyle={styles.modalBody}>
-										{/* 속담 본문 크게 강조 */}
-
-										{selectedProverb && (
-											<>
-												<View style={[styles.badgeRow, { marginBottom: scaleHeight(12) }]}>
-													<View style={[styles.badge, { backgroundColor: getLevelColor(selectedProverb.levelName) }]}>
-														<Text style={styles.badgeText}>{selectedProverb.levelName}</Text>
-													</View>
-													<View style={[styles.badge, { backgroundColor: getFieldColor(selectedProverb.category) }]}>
-														<Text style={styles.badgeText}>{selectedProverb.category}</Text>
-													</View>
-												</View>
-												<View style={styles.modalProverbBox}>
-													<Text style={styles.modalProverbText}>{selectedProverb.proverb}</Text>
-												</View>
-
-
-
-												<View style={styles.modalSection}>
-													<Text style={styles.modalLabel}>의미</Text>
-													<Text style={styles.modalText}>- {selectedProverb?.longMeaning}</Text>
-												</View>
-
-												{Array.isArray(selectedProverb?.example) && selectedProverb.example.length > 0 && (
-													<View style={styles.modalSection}>
-														<Text style={styles.modalLabel}>예시</Text>
-														{selectedProverb.example.map((ex, idx) => (
-															<Text key={idx} style={styles.modalText}>
-																- "{ex}"
-															</Text>
-														))}
-													</View>
-												)}
-
-												{Array.isArray(selectedProverb.sameProverb) && selectedProverb.sameProverb.filter((p) => p.trim()).length > 0 && (
-													<View style={styles.modalSection}>
-														<Text style={styles.modalLabel}>비슷한 속담</Text>
-														{selectedProverb.sameProverb.map((p, idx) => (
-															<Text key={idx} style={styles.modalText}>
-																- {p}
-															</Text>
-														))}
-													</View>
-												)}
-											</>
-										)}
-									</ScrollView>
-
-									{/* ✅ 닫기 버튼을 모달 맨 하단에 고정 */}
-									<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowDetailModal(false)}>
-										<Text style={styles.modalCloseButtonText}>닫기</Text>
-									</TouchableOpacity>
-								</View>
-							</View>
-						</Modal>
+						<ProverbDetailModal
+							visible={showDetailModal}
+							proverb={selectedProverb}
+							onClose={() => setShowDetailModal(false)}
+							getFieldColor={getFieldColor}
+							getLevelColor={getLevelColor}
+						/>
 					</View>
 				</TouchableWithoutFeedback>
 			</KeyboardAvoidingView>

@@ -31,9 +31,23 @@ const ProverbQuizModeScreen = () => {
 		setTotalScore(totalScoreFromQuiz);
 	};
 
-	const handleSelectMode = (mode: string) => {
-		// @ts-ignore
-		navigation.navigate(Paths.IDIOM_MODE, { mode }); // mode: 'meaning' | 'proverb' | 'fill-blank'
+	const moveToHandler = (modeKey: string) => {
+		switch (modeKey) {
+			case 'meaning':
+				// @ts-ignore
+				navigation.push(Paths.PROVERB_MEANING_QUIZ, { mode: 'meaning' });
+				break;
+			case 'proverb':
+				// @ts-ignore
+				navigation.push(Paths.PROVERB_FIND_QUIZ, { mode: 'proverb' });
+				break;
+			case 'blank':
+				// @ts-ignore
+				navigation.push(Paths.PROVERB_BLANK_QUIZ, { mode: 'fill-blank' });
+				break;
+			default:
+				break;
+		}
 	};
 
 	const getLevelInfoByScore = (score: number) => {
@@ -68,7 +82,7 @@ const ProverbQuizModeScreen = () => {
 										if (isDisabled) {
 											Alert.alert('새로운 퀴즈 준비 중', '새로운 퀴즈를 준비 중에 있습니다.');
 										} else {
-											handleSelectMode(mode.key);
+											moveToHandler(mode.key);
 										}
 									}}>
 									<View style={isDisabled ? styles.disabledInner : styles.iconTextRow}>

@@ -36,10 +36,19 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import ProverbServices from '@/services/ProverbServices';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
 const COMMON_ALL_OPTION = {
 	label: '전체',
 	value: '전체',
-	icon: () => <IconComponent type='FontAwesome6' name='clipboard-list' size={16} color='#555' />,
+	iconType: 'FontAwesome6',
+	badgeId: '',
+	iconName: 'clipboard-list',
+	iconColor: '#3498db',
+	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={16} color="#555" />,
+	labelStyle: {
+		marginLeft: scaleWidth(6),
+		fontSize: scaledSize(14),
+	},
 };
 const LEVEL_DROPDOWN_ITEMS = [
 	COMMON_ALL_OPTION,

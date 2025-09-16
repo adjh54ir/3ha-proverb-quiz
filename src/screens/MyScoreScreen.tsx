@@ -29,6 +29,7 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import { FIELD_DROPDOWN_ITEMS } from './ProverbStudyScreen';
 
 LocaleConfig.defaultLocale = 'kr';
 moment.locale('ko'); // 로케일 설정
@@ -125,6 +126,13 @@ const CapitalResultScreen = () => {
 	const [selectedQuizData, setSelectedQuizData] = useState<MainDataType.TodayQuizList | null>(null);
 
 	const [timeChallengeResults, setTimeChallengeResults] = useState<MainDataType.TimeChallengeResult[]>([]);
+
+	const [levelStats, setLevelStats] = useState<
+		{ key: string; title: string; subtitle: string; icon: string; totalCount: number; solvedCount: number }[]
+	>([]);
+	const [categoryStats, setCategoryStats] = useState<
+		{ category: string; totalCount: number; solvedCount: number }[]
+	>([]);
 
 	const allCategories = ProverbServices.selectCategoryList(); // 전체 카테고리 (8개)
 
@@ -249,6 +257,37 @@ const CapitalResultScreen = () => {
 
 			setLevelMaster(conqueredLevels);
 
+			// ✅ 여기서 solvedIds 뽑기
+			const solvedIds = [
+				...(quizJson?.correctProverbId ?? []),
+				...(quizJson?.wrongProverbId ?? []),
+			];
+
+			// ✅ 레벨별 문제 묶기 + 푼 개수 세기
+			const levelStats = DIFFICULTIES.map((level, idx) => {
+				const problems = allProverbs.filter(p => p.level === idx + 1);
+				const totalCount = problems.length;
+				const solvedCount = problems.filter(p => solvedIds.includes(p.id)).length;
+				return { ...level, totalCount, solvedCount };
+			});
+
+			// ✅ 상태 저장해서 UI에서 사용
+			setLevelStats(levelStats);
+			// category만 뽑아서 중복 제거
+			const categories = [...new Set(allProverbs.map((p) => p.category))];
+
+			// ✅ 카테고리별 문제 묶기 + 푼 개수 세기
+			const categoryStats = categories.map((category) => {
+				const problems = allProverbs.filter((p) => p.category === category);
+				const totalCount = problems.length;
+				const solvedCount = problems.filter((p) => solvedIds.includes(p.id)).length;
+				return { category, totalCount, solvedCount };
+			});
+
+			setCategoryStats(categoryStats);
+
+
+
 			const todayJson = await AsyncStorage.getItem(STORAGE_KEY_TODAY);
 			const todayData: MainDataType.TodayQuizList[] = todayJson ? JSON.parse(todayJson) : [];
 
@@ -304,6 +343,22 @@ const CapitalResultScreen = () => {
 		} catch (e) {
 			console.error('❌ 데이터 로딩 실패:', e);
 		}
+	};
+
+	const getCategoryMeta = (category: string) => {
+		const item = FIELD_DROPDOWN_ITEMS.find((it) => it.label === category);
+		if (!item) {
+			return {
+				color: '#ccc',
+				icon: { type: 'FontAwesome6', name: 'question' },
+				badgeId: 'category_etc',
+			};
+		}
+		return {
+			color: item.iconColor,
+			icon: { type: item.iconType, name: item.iconName },
+			badgeId: item.badgeId,
+		};
 	};
 
 	const onRefresh = () => {
@@ -692,75 +747,186 @@ const CapitalResultScreen = () => {
 							</View>
 
 							{/* ✅ 정복한 카테고리 출력 */}
+							{/* ✅ 정복한 카테고리 출력 */}
 							<View style={styles.subSectionBox1}>
 								<Text style={styles.sectionSubtitle}>
 									🧠 정복한 카테고리 ({categoryMaster.length} / {allCategories.length})
 								</Text>
-								<Text style={styles.regionHelperText}>- 다양한 분야의 속담을 학습해보세요!</Text>
-								<View style={styles.gridRowNoBottomGap}>
-									{allCategories.map((category) => {
-										const isEarned = categoryMaster.includes(category);
-										const meta = CATEGORY_META[category];
+								<Text style={styles.regionHelperText}>
+									- 특정 분야의 사자성어를 모두 풀었을때 획득할 수 있습니다.
+								</Text>
 
-										// meta가 없으면 기본값 처리
-										if (!meta) {
-											console.warn(`❗ CATEGORY_META에 정의되지 않은 카테고리: ${category}`);
-											return null;
-										}
+								{categoryStats.map((item) => {
+									const meta = getCategoryMeta(item.category);
+									const progressPercent =
+										item.totalCount > 0
+											? Math.round((item.solvedCount / item.totalCount) * 100)
+											: 0;
 
-										return (
-											<View
-												key={category}
+									// ✅ 정복 조건
+									const isEarned = categoryMaster.includes(item.category) || progressPercent === 100;
+
+									return (
+										<View
+											key={item.category}
+											style={[
+												styles.categoryRowCard,
+												isEarned && {
+													backgroundColor: meta.color,
+													borderColor: meta.color,
+													shadowColor: '#000',
+													shadowOpacity: 0.15,
+													shadowRadius: 4,
+													shadowOffset: { width: 0, height: 2 },
+												},
+											]}>
+											<IconComponent
+												type={meta.icon.type}
+												name={meta.icon.name}
+												size={20}
+												color={isEarned ? '#fff' : meta.color} // ✅ 비활성화도 meta.color 적용
+												style={{ marginRight: scaleWidth(8) }}
+											/>
+											<Text
 												style={[
-													styles.regionCard,
+													styles.categoryRowText,
+													{ color: isEarned ? '#fff' : meta.color }, // ✅ 항상 meta.color 사용
 													isEarned && {
-														backgroundColor: meta.color,
-														borderColor: meta.color,
-														shadowColor: '#000',
-														shadowOpacity: 0.2,
-														shadowRadius: 4,
-														shadowOffset: { width: 0, height: 2 },
+														fontWeight: 'bold',
+														textShadowColor: 'rgba(0, 0, 0, 0.15)',
+														textShadowOffset: { width: 1, height: 1 },
+														textShadowRadius: 2,
 													},
 												]}>
-												<IconComponent type={meta.icon.type} name={meta.icon.name} size={22} color={isEarned ? '#fff' : '#bdc3c7'} />
-												<Text style={[styles.regionText, isEarned && { color: '#fff', fontWeight: 'bold' }]}>{category}</Text>
+												{item.category}
+											</Text>
+
+											{/* 프로그래스바 */}
+											<View style={styles.progressBarBackgroundRow}>
+												<View
+													style={[
+														styles.progressBarFill,
+														{ width: `${progressPercent}%`, backgroundColor: isEarned ? '#fff' : '#27ae60' },
+													]}
+												/>
 											</View>
-										);
-									})}
-								</View>
+
+											{/* 개수 */}
+											<Text style={[styles.levelRowCount, isEarned && { color: '#fff' }]}>
+												{item.solvedCount}/{item.totalCount}
+											</Text>
+
+											{isEarned && (
+												<View
+													style={{
+														marginLeft: scaleWidth(6),
+														backgroundColor: '#fff',
+														paddingHorizontal: scaleWidth(6),
+														paddingVertical: scaleHeight(2),
+														borderRadius: scaleWidth(10),
+													}}>
+													<Text
+														style={{
+															fontSize: scaledSize(12),
+															color: meta.color, // ✅ 카테고리 색상 적용
+															fontWeight: 'bold',
+														}}>
+														정복
+													</Text>
+												</View>
+											)}
+										</View>
+									);
+								})}
 							</View>
+							{/* ✅ 정복한 레벨 세로 한 줄씩 + 개수 진행률 */}
 							<View style={styles.subSectionBox2}>
 								<Text style={styles.sectionSubtitle}>
 									🏅 정복한 레벨 ({levelMaster.length} / {DIFFICULTIES.length})
 								</Text>
-								<Text style={styles.levelHelperText}> - 각 레벨을 마스터하며 진정한 속담 퀴즈 고수가 되어보세요! </Text>
-								<View style={{ alignItems: 'center' }}>
-									<FlatList
-										data={DIFFICULTIES}
-										keyExtractor={(item) => item.key}
-										numColumns={2}
-										scrollEnabled={false}
-										columnWrapperStyle={{ justifyContent: 'space-around' }}
-										renderItem={({ item }) => {
-											const isEarned = levelMaster.includes(item.title);
-											const levelStyle = getLevelStyle(item.subtitle);
-											return (
+								<Text style={styles.levelHelperText}>- 각 레벨 퀴즈를 모두 풀면 정복으로 표시됩니다.</Text>
+
+								{levelStats.map((item) => {
+									const progressPercent =
+										item.totalCount > 0
+											? Math.round((item.solvedCount / item.totalCount) * 100)
+											: 0;
+
+									const isConquered = progressPercent === 100;
+									const styleMeta = STYLE_MAP[item.subtitle]; // ✅ 레벨별 색상 가져오기
+
+									return (
+										<View
+											key={item.key}
+											style={[
+												styles.levelRowCard,
+												isConquered && {
+													backgroundColor: styleMeta.color,
+													borderColor: styleMeta.color,
+													shadowColor: '#000',
+													shadowOpacity: 0.15,
+													shadowRadius: 4,
+													shadowOffset: { width: 0, height: 2 },
+												},
+											]}>
+											<IconComponent
+												name={item.icon}
+												type="fontAwesome6"
+												size={20}
+												color={isConquered ? '#fff' : styleMeta.color} // ✅ 항상 styleMeta.color 사용
+												style={{ marginRight: scaleWidth(8) }}
+											/>
+											<Text
+												style={[
+													styles.levelRowTitle,
+													{ color: isConquered ? '#fff' : styleMeta.color }, // ✅ 항상 레벨별 색상 사용
+													isConquered && {
+														fontWeight: 'bold',
+														textShadowColor: 'rgba(0, 0, 0, 0.15)',
+														textShadowOffset: { width: 1, height: 1 },
+														textShadowRadius: 2,
+													},
+												]}>
+												{item.subtitle}
+											</Text>
+
+											{/* 진행률 바 */}
+											<View style={styles.progressBarBackgroundRow}>
 												<View
 													style={[
-														styles.levelCard,
-														isEarned && {
-															backgroundColor: levelStyle.bg,
-															borderColor: levelStyle.border,
-														},
-													]}>
-													<IconComponent name={item.icon} type="fontAwesome6" size={22} color={isEarned ? '#fff' : '#bdc3c7'} style={{ marginBottom: 4 }} />
-													<Text style={[styles.levelText, isEarned && { color: '#fff', fontWeight: 'bold' }]}> {item.title} </Text>
-													<Text style={[styles.levelSubText, isEarned && { color: '#fff' }]}> {item.subtitle} </Text>
+														styles.progressBarFill,
+														{ width: `${progressPercent}%`, backgroundColor: isConquered ? '#fff' : '#27ae60' },
+													]}
+												/>
+											</View>
+
+											{/* 개수 */}
+											<Text style={[styles.levelRowCount, isConquered && { color: '#fff' }]}>
+												{item.solvedCount}/{item.totalCount}
+											</Text>
+
+											{isConquered && (
+												<View
+													style={{
+														marginLeft: scaleWidth(6),
+														backgroundColor: '#fff',
+														paddingHorizontal: scaleWidth(6),
+														paddingVertical: scaleHeight(2),
+														borderRadius: scaleWidth(10),
+													}}>
+													<Text
+														style={{
+															fontSize: scaledSize(12),
+															color: styleMeta.color, // ✅ 레벨별 색상 적용
+															fontWeight: 'bold',
+														}}>
+														정복
+													</Text>
 												</View>
-											);
-										}}
-									/>
-								</View>
+											)}
+										</View>
+									);
+								})}
 							</View>
 						</View>
 					)}
@@ -1691,6 +1857,80 @@ const styles = StyleSheet.create({
 
 	rankDate: {
 		fontSize: scaledSize(12),
+		color: '#7f8c8d',
+	},
+	levelRowCard: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: scaleHeight(10),
+		borderWidth: 1, // ✅ 기본 border
+		borderColor: '#ccc',
+		borderRadius: scaleWidth(12),
+		paddingVertical: scaleHeight(8),
+		paddingHorizontal: scaleWidth(10),
+		backgroundColor: '#fff',
+	},
+
+	levelRowTitle: {
+		fontSize: scaledSize(14),
+		fontWeight: '600',
+		color: '#2c3e50',
+		width: scaleWidth(60),
+	},
+
+	progressBarBackgroundRow: {
+		flex: 1,
+		height: scaleHeight(6),
+		backgroundColor: '#ecf0f1',
+		borderRadius: scaleHeight(3),
+		marginHorizontal: scaleWidth(10),
+	},
+
+	levelRowCount: {
+		fontSize: scaledSize(13),
+		color: '#7f8c8d',
+		fontWeight: '600',
+		minWidth: scaleWidth(50),
+		textAlign: 'right',
+	},
+	levelRowCardConquered: {
+		borderWidth: 2,
+		borderColor: '#27ae60',
+		backgroundColor: '#f0fbf4',
+		shadowColor: '#000',
+		shadowOpacity: 0.1,
+		shadowRadius: 3,
+		shadowOffset: { width: 0, height: 2 },
+	},
+	categoryRowCardConquered: {
+		backgroundColor: '#27ae60', // 전체 초록 강조
+		borderColor: '#27ae60',
+		shadowColor: '#000',
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
+		shadowOffset: { width: 0, height: 2 },
+	},
+	categoryRowTextConquered: {
+		color: '#fff',
+		fontWeight: 'bold',
+		textShadowColor: 'rgba(0, 0, 0, 0.15)',
+		textShadowOffset: { width: 1, height: 1 },
+		textShadowRadius: 2,
+	},
+	categoryRowCard: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(16),
+		borderWidth: 1,
+		borderColor: '#ccc',
+		borderRadius: scaleWidth(12),
+		backgroundColor: '#fff',
+		marginBottom: scaleHeight(10),
+		width: '100%',
+	},
+	categoryRowText: {
+		fontSize: scaledSize(15),
 		color: '#7f8c8d',
 	},
 });

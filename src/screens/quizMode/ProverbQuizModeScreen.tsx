@@ -1,339 +1,325 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import IconComponent from '../common/atomic/IconComponent';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { Paths } from '@/navigation/conf/Paths';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MainStorageKeyType } from '@/types/MainStorageKeyType';
+import FastImage from 'react-native-fast-image';
+import { LEVEL_DATA, QUIZ_MODES } from '@/const/common/CommonMainData';
+import IconComponent from '../common/atomic/IconComponent';
 
-const ProverbQuizModeSelectScreen = () => {
-	const [showGuideModal, setShowGuideModal] = useState(false);
+/**
+ * 퀴즈 모드 선택
+ * @returns
+ */
+const ProverbQuizModeScreen = () => {
 	const navigation = useNavigation();
+	const USER_QUIZ_HISTORY = MainStorageKeyType.USER_QUIZ_HISTORY;
+	const [accordionOpen, setAccordionOpen] = useState(false);
 
-	const MODES = [
-		{
-			key: 'meaning',
-			label: '속담 뜻 퀴즈',
-			icon: 'lightbulb',
-			type: 'fontAwesome6',
-			color: '#5DADE2',
-		},
-		{
-			key: 'proverb',
-			label: '속담 찾기 퀴즈',
-			icon: 'quote-left',
-			type: 'fontAwesome6',
-			color: '#58D68D',
-		},
-		{
-			key: 'blank',
-			label: '빈칸 채우기 퀴즈',
-			icon: 'pen',
-			type: 'fontAwesome6',
-			color: '#F5B041',
-		},
-		{
-			key: 'comingsoon', // 오타(commingsoon) 수정
-			label: '새로운 퀴즈\nComing Soon...',
-			icon: 'hourglass-half',
-			type: 'fontAwesome6',
-			color: '#dfe6e9',
-		},
-	];
+	const [totalScore, setTotalScore] = useState<number>(0);
+	useEffect(() => {
+		loadData();
+	}, []);
 
-	const moveToHandler = (modeKey: string) => {
-		switch (modeKey) {
-			case 'meaning':
-				// @ts-ignore
-				navigation.push(Paths.PROVERB_MEANING_QUIZ, { mode: 'meaning' });
-				break;
-			case 'proverb':
-				// @ts-ignore
-				navigation.push(Paths.PROVERB_FIND_QUIZ, { mode: 'proverb' });
-				break;
-			case 'blank':
-				// @ts-ignore
-				navigation.push(Paths.PROVERB_BLANK_QUIZ, { mode: 'fill-blank' });
-				break;
-			default:
-				break;
-		}
+	const loadData = async () => {
+		const quizRaw = await AsyncStorage.getItem(USER_QUIZ_HISTORY);
+		const quiz = quizRaw ? JSON.parse(quizRaw) : {};
+		const totalScoreFromQuiz = typeof quiz.totalScore === 'number' ? quiz.totalScore : 0;
+		setTotalScore(totalScoreFromQuiz);
 	};
 
+	const handleSelectMode = (mode: string) => {
+		// @ts-ignore
+		navigation.navigate(Paths.IDIOM_MODE, { mode }); // mode: 'meaning' | 'proverb' | 'fill-blank'
+	};
+
+	const getLevelInfoByScore = (score: number) => {
+		return LEVEL_DATA.slice().find((l) => score >= l.score) || LEVEL_DATA[0];
+	};
+	// 이걸 기존 getLevelData 아래에 추가해
+	const levelInfo = useMemo(() => getLevelInfoByScore(totalScore), [totalScore]);
+	const { mascot } = levelInfo;
+
 	return (
-		<>
-			<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-				<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-					<ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps='handled'>
-						<View style={styles.titleRow}>
-							<Text style={styles.title}>🧠오늘은 어떤 퀴즈로 도전해볼까요?</Text>
-							<TouchableOpacity onPress={() => setShowGuideModal(true)} style={styles.inlineInfoIcon}>
-								<IconComponent type='materialIcons' name='info-outline' size={20} color='#3498db' />
-							</TouchableOpacity>
-						</View>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff', paddingTop: scaleHeight(5) }} edges={['bottom']}>
+			<View style={styles.container}>
 
-						<View style={styles.gridWrap}>
-							{MODES.map((mode) => {
-								const isDisabled = mode.key === 'comingsoon';
-								return (
-									<TouchableOpacity
-										key={mode.key}
-										style={[styles.gridButtonHalf, { backgroundColor: mode.color }, isDisabled && styles.disabledButton]}
-										activeOpacity={isDisabled ? 1 : 0.7}
-										onPress={() => !isDisabled && moveToHandler(mode.key)}>
-										<View style={isDisabled ? styles.disabledInner : styles.iconTextRow}>
-											<IconComponent type={mode.type} name={mode.icon} size={isDisabled ? 24 : 28} color={isDisabled ? '#bdc3c7' : '#fff'} />
-											<Text style={[styles.modeLabel, isDisabled && styles.disabledText]}>{mode.label}</Text>
-										</View>
-									</TouchableOpacity>
-								);
-							})}
-						</View>
-					</ScrollView>
-				</KeyboardAvoidingView>
-			</SafeAreaView>
-
-			{showGuideModal && (
-				<View style={styles.modalOverlay}>
-					<View style={styles.modalContent}>
-						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowGuideModal(false)}>
-							<IconComponent type='materialIcons' name='close' size={24} color='#555' />
-						</TouchableOpacity>
-						<ScrollView style={{ maxHeight: '100%' }} showsVerticalScrollIndicator={true}>
-							<Text style={styles.modalTitle}>
-								<IconComponent type='materialCommunityIcons' name='head-question-outline' size={20} /> 퀴즈 모드 안내
-							</Text>
-							<Text style={styles.modalText}>
-								<Text style={styles.boldText}>1️⃣ 속담 뜻 퀴즈{'\n'}</Text>- 제시된 속담에 대한 올바른 의미를 고르는 4지선다형 퀴즈입니다.{'\n'}- 속담의 뜻을
-								이해하는 능력을 키울 수 있어요.{'\n\n'}
-								<Text style={styles.boldText}>2️⃣ 속담 찾기 퀴즈{'\n'}</Text>- 제시된 의미에 해당하는 속담을 고르는 4지선다형 퀴즈입니다.
-								{'\n'}- 유사한 의미의 속담 중 정확한 속담을 찾아내는 연습이 돼요.{'\n\n'}
-								<Text style={styles.boldText}>3️⃣ 빈칸 채우기 퀴즈{'\n'}</Text>- 속담의 일부분이 빈칸으로 제시되고, 알맞은 단어를 고르는 4지선다형 퀴즈입니다.{'\n'}-
-								속담의 문장 구조와 정확한 어휘력을 함께 익힐 수 있어요.{'\n\n'}
-								<Text style={styles.boldText}>📌 공통 안내{'\n'}</Text>- 각 퀴즈는 난이도별, 카테고리별로 문제를 선택해 풀 수 있습니다.{'\n'}- 이미 푼 문제는
-								자동으로 제외되어, 복습 또는 도전이 편리해요.
-							</Text>
-						</ScrollView>
-
-						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowGuideModal(false)}>
-							<Text style={styles.modalCloseText}>닫기</Text>
-						</TouchableOpacity>
+				<ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+					<View style={styles.mascotSection}>
+						<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.contain} />
 					</View>
+					<View style={styles.titleWrap}>
+						<Text style={styles.titleLine}>🧩 퀴즈 준비됐나요?</Text>
+						<Text style={styles.titleLine}>도전하려는 퀴즈 모드를 선택하세요!</Text>
+					</View>
+
+					<View style={styles.gridWrap}>
+						{QUIZ_MODES.map((mode) => {
+							const isDisabled = mode.key === 'comingsoon';
+							return (
+								<TouchableOpacity
+									key={mode.key}
+									style={[styles.gridButtonHalf, { backgroundColor: mode.color }, isDisabled && styles.disabledButton]}
+									activeOpacity={isDisabled ? 1 : 0.7}
+									onPress={() => {
+										if (isDisabled) {
+											Alert.alert('새로운 퀴즈 준비 중', '새로운 퀴즈를 준비 중에 있습니다.');
+										} else {
+											handleSelectMode(mode.key);
+										}
+									}}>
+									<View style={isDisabled ? styles.disabledInner : styles.iconTextRow}>
+										<IconComponent type={mode.type} name={mode.icon} size={28} color={isDisabled ? '#bdc3c7' : '#fff'} />
+										<Text style={[styles.modeLabel, isDisabled && styles.disabledText]}>{mode.label}</Text>
+									</View>
+								</TouchableOpacity>
+							);
+						})}
+					</View>
+					{/* ❓ 아코디언 안내 */}
+					<TouchableOpacity
+						style={styles.accordionHeader}
+						activeOpacity={0.7}
+						onPress={() => setAccordionOpen((prev) => !prev)}>
+						<Text style={styles.accordionHeaderText}>❓ 틀린 문제는 어떻게 다시 풀 수 있나요?</Text>
+						<IconComponent
+							type="MaterialIcons"
+							name={accordionOpen ? 'expand-less' : 'expand-more'}
+							size={20}
+							color="#2c3e50"
+						/>
+					</TouchableOpacity>
+
+					{accordionOpen && (
+						<View style={styles.accordionContent}>
+							<View style={styles.accordionDescBox}>
+								<View style={styles.accordionRow}>
+									<IconComponent type="FontAwesome5" name="book" size={16} color="#e67e22" />
+									<Text style={styles.accordionText}>틀린 문제는 오답 복습에서 다시 확인할 수 있어요.</Text>
+								</View>
+
+								<View style={styles.accordionRow}>
+									<IconComponent type="MaterialCommunityIcons" name="reload" size={18} color="#2980b9" />
+									<Text style={[styles.accordionText, styles.warningText]}>
+										다시 풀기는 설정 탭에서 '퀴즈 다시 풀기'에서 할 수 있지만, 이전 기록이 초기화되니 꼭 참고하세요!
+									</Text>
+								</View>
+							</View>
+							<View style={styles.accordionButtonsRow}>
+								<TouchableOpacity
+									style={[styles.accordionButton, { backgroundColor: '#e67e22' }]}
+									// @ts-ignore
+									onPress={() => navigation.navigate(Paths.QUIZ_WRONG_REVIEW)}>
+									<IconComponent type="FontAwesome5" name="book" size={16} color="#fff" />
+									<Text style={styles.accordionButtonText}>오답 복습</Text>
+								</TouchableOpacity>
+
+								<TouchableOpacity
+									style={[styles.accordionButton, { backgroundColor: '#2980b9' }]}
+									// @ts-ignore
+									onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.SETTING })}>
+									<IconComponent type="MaterialCommunityIcons" name="reload" size={18} color="#fff" />
+									<Text style={styles.accordionButtonText}>다시 풀기</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					)}
+				</ScrollView>
+				<View style={styles.bottomExitWrapper}>
+					<TouchableOpacity
+						style={styles.homeButton}
+						// @ts-ignore
+						onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME })}>
+						<IconComponent type="FontAwesome6" name="house" size={16} color="#fff" style={styles.icon} />
+						<Text style={styles.buttonText}>홈으로 가기</Text>
+					</TouchableOpacity>
 				</View>
-			)}
-		</>
+			</View>
+		</SafeAreaView>
 	);
 };
-
-export default ProverbQuizModeSelectScreen;
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		backgroundColor: '#fefefe',
+		paddingHorizontal: scaleWidth(10),
+	},
+	scrollContent: {
+		flexGrow: 1,
+		paddingHorizontal: scaleWidth(20),
+		paddingVertical: scaleHeight(20),
+		marginBottom: scaleHeight(150),
+	},
+	gridWrap: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		justifyContent: 'space-between',
+		rowGap: scaleHeight(20),
+		columnGap: scaleWidth(16),
+		marginBottom: scaleHeight(16),
+		paddingHorizontal: scaleWidth(16),
+	},
+	gridButtonHalf: {
+		width: '46%',
+		aspectRatio: 1,
+		borderRadius: scaleWidth(16),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.1,
+		shadowRadius: 4,
 		backgroundColor: '#fff',
 	},
-	centerWrapper: {
+	iconTextRow: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(40),
+		gap: scaleHeight(10),
 	},
-	title: {
-		fontSize: scaledSize(20),
-		fontWeight: '700',
-		color: '#2c3e50',
-		textAlign: 'center',
-		marginBottom: scaleHeight(10),
-	},
-	gridWrap: {
-		paddingTop: scaleHeight(30),
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'center',
-		columnGap: scaleWidth(16),
-		rowGap: scaleHeight(20),
-		paddingHorizontal: scaleWidth(12),
-		marginBottom: scaleHeight(30),
-	},
-	gridButtonHalf: {
-		width: '45%',
-		minWidth: scaleWidth(140),
-		maxWidth: scaleWidth(180),
-		height: scaleHeight(120),
-		borderRadius: scaleWidth(16),
+	disabledInner: {
+		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(6),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.15,
-		shadowRadius: scaleWidth(4),
-	},
-	iconTextRow: {
-		flexDirection: 'column',
-		alignItems: 'center',
-		gap: scaleHeight(6),
+		gap: scaleHeight(10),
 	},
 	modeLabel: {
 		color: '#fff',
 		fontSize: scaledSize(18),
-		fontWeight: '600',
+		fontWeight: '700',
 		textAlign: 'center',
-		lineHeight: scaleHeight(22),
+		lineHeight: scaleHeight(24),
 	},
-	disabledInner: {
-		alignItems: 'center',
-		justifyContent: 'center',
-		opacity: 0.6,
-	},
-	subTitle: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		textAlign: 'center',
-		lineHeight: scaleHeight(20),
-		marginTop: scaleHeight(8),
-	},
-	modalOverlay: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-		justifyContent: 'center',
-		alignItems: 'center',
-		zIndex: 99,
-	},
-	modalContent: {
-		width: '85%',
-		backgroundColor: '#fff',
-		padding: scaleWidth(20),
-		borderRadius: scaleWidth(12),
-		maxHeight: '75%',
-	},
-	modalCloseButton: {
-		marginTop: scaleHeight(20),
-		alignSelf: 'center',
-		backgroundColor: '#3498db',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(30),
-		borderRadius: scaleWidth(8),
-	},
-	modalCloseText: {
-		color: '#fff',
-		fontWeight: '600',
+	disabledText: {
+		color: '#95a5a6',
 		fontSize: scaledSize(15),
-	},
-	modalTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(14),
+		fontWeight: '700',
 		textAlign: 'center',
+		lineHeight: scaleHeight(24),
 	},
-	modalText: {
-		fontSize: scaledSize(14),
-		color: '#34495e',
-		lineHeight: scaleHeight(22),
-		textAlign: 'left',
-		marginTop: scaleHeight(10),
+	disabledButton: {
+		opacity: 0.5,
+	},
+	titleWrap: {
 		marginBottom: scaleHeight(20),
-	},
-	boldText: {
-		fontWeight: 'bold',
-	},
-	modalCloseIcon: {
-		position: 'absolute',
-		top: scaleHeight(10),
-		right: scaleWidth(10),
-		zIndex: 2,
-		padding: scaleWidth(5),
-	},
-	homeButtonWrap: {
-		width: '100%',
 		alignItems: 'center',
-		marginTop: scaleHeight(24),
 	},
-	headerSection: {
-		alignItems: 'center',
-		marginBottom: scaleHeight(36),
-	},
-	subtitle: {
-		fontSize: scaledSize(15),
-		color: '#7f8c8d',
+	titleLine: {
+		fontSize: scaledSize(20),
+		fontWeight: '700',
+		color: '#2c3e50',
 		textAlign: 'center',
-		lineHeight: scaleHeight(20),
-		marginTop: scaleHeight(4),
-		paddingHorizontal: scaleWidth(12),
+		marginBottom: scaleHeight(8),
 	},
 	bottomExitWrapper: {
 		width: '100%',
-		paddingVertical: scaleHeight(24),
 		alignItems: 'center',
-		backgroundColor: '#fff',
-		borderTopWidth: 1,
-		borderTopColor: '#eee',
+		paddingVertical: scaleHeight(4),
+		borderColor: '#ecf0f1',
 	},
 	homeButton: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: '#28a745',
-		paddingVertical: scaleHeight(14),
+		paddingVertical: scaleHeight(12),
 		paddingHorizontal: scaleWidth(28),
 		borderRadius: scaleWidth(30),
 	},
 	buttonText: {
-		color: '#fff',
-		fontSize: scaledSize(15),
-		fontWeight: '600',
-		textAlign: 'center',
-		lineHeight: scaleHeight(22),
+		color: '#ffffff',
+		fontSize: scaledSize(14),
+		fontWeight: 'bold',
 	},
-	row: {
+	icon: {
+		marginRight: scaleWidth(6),
+	},
+	accordionHeader: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+		alignItems: 'center',
 		width: '100%',
-		marginBottom: scaleHeight(12),
+		paddingVertical: scaleHeight(14),
+		paddingHorizontal: scaleWidth(16),
+		borderRadius: scaleWidth(12),
+		backgroundColor: '#f8f9fa',
+		borderWidth: 1,
+		borderColor: '#ddd',
+		marginBottom: scaleHeight(10),
 	},
-	disabledButton: {
-		width: '45%',
-		minWidth: scaleWidth(150),
-		maxWidth: scaleWidth(200),
-		height: scaleHeight(120),
-		backgroundColor: '#ecf0f1',
-		borderRadius: scaleWidth(16),
+	accordionHeaderText: {
+		fontSize: scaledSize(15),
+		fontWeight: '700',
+		color: '#2c3e50',
+	},
+	accordionContent: {
+		width: '100%',
+		backgroundColor: '#fff',
+		borderWidth: 1,
+		borderColor: '#eee',
+		borderRadius: scaleWidth(12),
+		padding: scaleWidth(14),
+		marginBottom: scaleHeight(20),
+	},
+	accordionButtonsRow: {
+		flexDirection: 'row',
+		gap: scaleWidth(12),
 		justifyContent: 'center',
 		alignItems: 'center',
-		opacity: 0.6,
 	},
-	disabledText: {
-		color: '#95a5a6',
-		fontSize: scaledSize(16),
-		fontWeight: '600',
-		textAlign: 'center',
-	},
-	comingSoon: {
-		fontSize: scaledSize(12),
-		color: '#bdc3c7',
-		fontWeight: '500',
-		marginTop: scaleHeight(4),
-	},
-	scrollContent: {
-		flexGrow: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		paddingHorizontal: scaleWidth(15),
-		paddingVertical: scaleHeight(40),
-	},
-	titleRow: {
+	accordionButton: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		justifyContent: 'center',
-		flexWrap: 'nowrap',
+		gap: scaleWidth(6),
+		paddingVertical: scaleHeight(10),
+		paddingHorizontal: scaleWidth(16),
+		borderRadius: scaleWidth(20),
 	},
-	inlineInfoIcon: {
-		marginLeft: scaleWidth(6),
-		padding: scaleWidth(4),
+	accordionButtonText: {
+		color: '#fff',
+		fontSize: scaledSize(14),
+		fontWeight: '600',
+	},
+	accordionDescBox: {
+		width: '100%',
+		gap: scaleHeight(8),
 		marginBottom: scaleHeight(12),
 	},
+	accordionRow: {
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+		gap: scaleWidth(8),
+	},
+	accordionText: {
+		flex: 1,
+		fontSize: scaledSize(13),
+		color: '#555',
+		lineHeight: scaleHeight(20),
+	},
+	warningText: {
+		color: '#c0392b',
+		fontWeight: '600',
+	},
+	mascotSection: {
+		width: '100%',
+		alignItems: 'center',
+		marginTop: scaleHeight(10),
+		marginBottom: scaleHeight(20),
+	},
+	mascotImage: {
+		width: scaleWidth(100),
+		height: scaleWidth(100),
+		borderRadius: scaleWidth(70),
+		borderWidth: 3,
+		borderColor: '#f1c40f',
+		backgroundColor: '#fff',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.15,
+		shadowRadius: 6,
+	},
 });
+
+export default ProverbQuizModeScreen;

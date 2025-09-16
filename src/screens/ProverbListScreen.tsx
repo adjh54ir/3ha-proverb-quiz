@@ -233,6 +233,7 @@ const ProverbListScreen = () => {
 	};
 
 
+
 	const handleReset = () => {
 		// 1. 드롭다운을 먼저 닫음
 		setFieldOpen(false);

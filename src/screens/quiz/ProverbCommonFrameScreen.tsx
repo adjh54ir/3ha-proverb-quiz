@@ -517,10 +517,10 @@ const ProverbCommonFrameScreen = () => {
 		isWrongReview && questionPool
 			? questionPool.length // ✅ 오답 복습 모드일 땐 고정
 			: proverbs.filter((p) => {
-					const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-					const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-					return levelMatch && categoryMatch;
-				}).length;
+				const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+				const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+				return levelMatch && categoryMatch;
+			}).length;
 
 	const triggerComboAnimation = () => {
 		comboAnim.setValue(0);
@@ -622,10 +622,8 @@ const ProverbCommonFrameScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-			<KeyboardAvoidingView
+			<View
 				style={{ flex: 1 }}
-				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-				keyboardVerticalOffset={Platform.OS === 'android' ? 80 : 0} // 이 값 조정
 			>
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 					<View style={{ flex: 1 }}>
@@ -700,13 +698,12 @@ const ProverbCommonFrameScreen = () => {
 
 									{question ? (
 										<Text style={styles.questionText}>
-											{`Q. ${
-												mode === 'fill-blank'
-													? questionText || '문제 준비중...'
-													: mode === 'meaning'
-														? question?.proverb
-														: question?.longMeaning || '문제 준비중...'
-											}`}
+											{`Q. ${mode === 'fill-blank'
+												? questionText || '문제 준비중...'
+												: mode === 'meaning'
+													? question?.proverb
+													: question?.longMeaning || '문제 준비중...'
+												}`}
 										</Text>
 									) : (
 										<Text>문제 불러오는 중...</Text>
@@ -914,7 +911,7 @@ const ProverbCommonFrameScreen = () => {
 						</View>
 					</View>
 				</TouchableWithoutFeedback>
-			</KeyboardAvoidingView>
+			</View>
 		</SafeAreaView>
 	);
 };

@@ -2,11 +2,10 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
 	Alert,
+	FlatList,
 	Image,
 	Linking,
-	Modal,
 	Platform,
-	ScrollView,
 	SectionList,
 	Share,
 	StyleSheet,
@@ -19,21 +18,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DeviceInfo from 'react-native-device-info';
-import InAppReview from 'react-native-in-app-review';
 import IconComponent from './common/atomic/IconComponent';
 import Contributor9Modal from './common/modal/Contributor9Modal';
-import DeveloperAppsModal from './common/modal/DeveloperAppsModal';
-import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModal';
-import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
+import { CONST_BADGES } from '@/const/ConstBadges';
+import ProverbServices from '@/services/ProverbServices';
+import { COMMON_APPS_DATA } from '@/const/common/CommonAppsData';
+import DeveloperAppsModal from './modal/DeveloperAppsModal';
+import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModal';
+import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
+
 
 const APP_NAME = '속픽: 속담 퀴즈';
 const ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=com.tha.proverbquiz'; // 예: 'https://play.google.com/store/apps/details?id=your.package'
 const IOS_STORE_URL = 'https://apps.apple.com/app/id6746687973'; // 예: 'https://apps.apple.com/app/idXXXXXXXXXX'
 
 const DESCRIPTION = '속픽: 속담 퀴즈는 대한민국 속담을 쉽고 재미있게 학습하고, 다양한 퀴즈를 통해 기억을 점검하며, 틀린 문제는 반복 학습으로 완전히 익힐 수 있도록 돕는 속담 학습 앱입니다.';
-
 // ✅ 섹션 정의 (개발 모드에서만 관리자/더미 노출)
 const IS_DEV = __DEV__ === true;
 
@@ -104,7 +105,6 @@ const SettingScreen = () => {
 		setSummary(msg);
 	};
 
-
 	const resetTodayQuizOnly = async () => {
 		const json = await AsyncStorage.getItem(STORAGE_KEYS.todayQuiz);
 		if (!json) {
@@ -168,25 +168,57 @@ const SettingScreen = () => {
 		}
 	};
 
-	const sections: { title: React.ReactNode; data: string[] }[] = useMemo(
-		() =>
-			[
-				{
-					title: <Text style={[styles.sectionHeaderText, { color: '#E53935' }]}>사용자 정보 초기화 </Text>,
-					data: ['resetStudy', 'resetQuiz', 'resetTodayQuiz', 'resetTimeChallenge', 'resetAll'],
-				},
-				{
-					title: '문의 및 피드백',
-					data: ['rate', 'inquiry', 'developerInfo', 'developerApps'],
-				},
-				{
-					title: '정책 및 라이선스',
-					// ⬇️ 개발 모드에서만 generateDummyData 노출하는 경우 여기에 조건 추가 가능
-					data: ['privacyPolicy', 'openSource'],
-				},
-			].filter((s) => Array.isArray(s.data) && s.data.length > 0),
-		[],
-	);
+	const handleCompleteAllQuiz = async () => {
+		const allProverbs = ProverbServices.selectProverbList();
+		console.log(allProverbs.map((p) => p.id));
+		const parsed: MainDataType.UserQuizHistory = {
+			badges: CONST_BADGES.filter((b) => b.type === 'quiz').map((b) => b.id),
+			correctProverbId: allProverbs.map((p) => p.id),
+			wrongProverbId: [],
+			totalScore: 4600,
+			bestCombo: 20,
+			lastAnsweredAt: new Date(),
+			quizCounts: {}, // 원하면 여기서도 id별로 count 넣을 수 있음
+		};
+		await AsyncStorage.setItem(STORAGE_KEYS.quiz, JSON.stringify(parsed));
+		Alert.alert('처리됨', '모든 퀴즈 완료 + 뱃지 지급!');
+	};
+	const handleCompleteAllStudy = async () => {
+		const allProverbs = ProverbServices.selectProverbList();
+		const parsed: MainDataType.UserStudyHistory = {
+			badges: CONST_BADGES.filter((b) => b.type === 'study').map((b) => b.id),
+			studyProverbes: allProverbs.map((p) => p.id),
+			lastStudyAt: new Date(),
+			studyCounts: {}, // 원하면 각 사자성어 id별 학습 횟수 설정 가능
+		};
+		await AsyncStorage.setItem(STORAGE_KEYS.study, JSON.stringify(parsed));
+		Alert.alert('처리됨', '모든 학습 완료 + 뱃지 지급!');
+	};
+
+	const sections: { title: React.ReactNode; data: string[] }[] = useMemo(() => {
+		const resetSection = {
+			title: <Text style={[styles.sectionHeaderText, { color: '#E53935' }]}>사용자 정보 초기화</Text>,
+			data: ['resetStudy', 'resetQuiz', 'resetTodayQuiz', 'resetTimeChallenge', 'resetAll'],
+		};
+
+		const feedbackSection = {
+			title: <Text style={styles.sectionHeaderText}>문의 및 피드백</Text>,
+			data: ['rate', 'inquiry', 'developerInfo', 'developerApps'],
+		};
+
+		const policyData = ['privacyPolicy', 'openSource'];
+
+		if (__DEV__) {
+			policyData.push('completeAllQuiz', 'completeAllStudy');
+		}
+
+		const policySection = {
+			title: <Text style={styles.sectionHeaderText}>정책 및 라이선스</Text>,
+			data: policyData,
+		};
+
+		return [resetSection, feedbackSection, policySection].filter((s) => Array.isArray(s.data) && s.data.length > 0);
+	}, []);
 
 	const renderItem = ({ item }: { item: string }) => {
 		const settingsMap: Record<
@@ -278,17 +310,9 @@ const SettingScreen = () => {
 					confirmReset('all');
 					break;
 
-				case 'completeAllQuiz':
-					break;
-				case 'completeAllStudy':
-					break;
-
 				case 'rate':
 					try {
-						const storeUrl =
-							Platform.OS === 'android'
-								? ANDROID_STORE_URL
-								: IOS_STORE_URL;
+						const storeUrl = Platform.OS === 'android' ? ANDROID_STORE_URL : IOS_STORE_URL;
 
 						if (!storeUrl) {
 							Alert.alert('Coming Soon..!', '아직 스토어에 출시되지 않았습니다.');
@@ -346,20 +370,12 @@ const SettingScreen = () => {
 					setShowOpenSourceModal(true);
 					break;
 
-				// case 'generateDummyData':
-				// 	break;
-				// Alert.alert(
-				// 	'확인',
-				// 	'30일치 더미 데이터를 생성하시겠습니까?',
-				// 	[
-				// 		{ text: '취소', style: 'cancel' },
-				// 		{
-				// 			text: '확인',
-				// 			onPress: async () => {
-				// 				await generateDummyMonthlyData();
-				// 				Alert.alert('완료', '더미 데이터가 생성되었습니다.');
-				// 			},
-				// 		},
+				case 'completeAllQuiz':
+					handleCompleteAllQuiz();
+					break;
+				case 'completeAllStudy':
+					handleCompleteAllStudy();
+					break;
 			}
 		};
 
@@ -376,6 +392,7 @@ const SettingScreen = () => {
 								: '#333'
 						}
 						style={styles.icon}
+						isBottomIcon={true}
 					/>
 					<Text style={[styles.cardText]}>{settingsMap[item].label}</Text>
 				</View>
@@ -410,9 +427,9 @@ const SettingScreen = () => {
 				DESCRIPTION,
 				'',
 				'🔗 다운로드 링크',
-				`• Android: ${androidUrl || '출시 예정'}`,
+				`• Android: ${androidUrl || '출시 예정입니다.'}`,
 				'',
-				`• iOS: ${iosUrl || '출시 예정'}`,
+				`• iOS: ${iosUrl || '출시 예정입니다.'}`,
 			];
 			const message = messageLines.join('\n');
 
@@ -434,42 +451,28 @@ const SettingScreen = () => {
 			case 'study':
 				return (
 					<View style={styles.modalTitleRow}>
-						<IconComponent
-							type="MaterialCommunityIcons"
-							name="refresh"
-							size={20}
-							color="#34495e"
-							style={styles.iconLeft}
-						/>
+						<IconComponent type="MaterialCommunityIcons" name="refresh" size={20} color="#34495e" style={styles.iconLeft} />
 						<Text style={styles.modalTitleText}>학습을 다시 해볼까요?</Text>
 					</View>
 				);
 			case 'quiz':
 				return (
 					<View style={styles.modalTitleRow}>
-						<IconComponent
-							type="MaterialCommunityIcons"
-							name="refresh"
-							size={20}
-							color="#34495e"
-							style={styles.iconLeft}
-						/>
+						<IconComponent type="MaterialCommunityIcons" name="refresh" size={20} color="#34495e" style={styles.iconLeft} />
 						<Text style={styles.modalTitleText}>퀴즈를 다시 풀어볼까요?</Text>
 					</View>
 				);
 			case 'todayQuiz':
 				return (
 					<View style={styles.modalTitleRow}>
-						<IconComponent type="MaterialCommunityIcons"
-							name="refresh" size={20} color="#34495e" style={styles.iconLeft} />
+						<IconComponent type="MaterialCommunityIcons" name="refresh" size={20} color="#34495e" style={styles.iconLeft} />
 						<Text style={styles.modalTitleText}>오늘의 퀴즈를 초기화할까요?</Text>
 					</View>
 				);
 			case 'timeChallenge':
 				return (
 					<View style={styles.modalTitleRow}>
-						<IconComponent type="MaterialCommunityIcons"
-							name="refresh" size={20} color="#34495e" style={styles.iconLeft} />
+						<IconComponent type="MaterialCommunityIcons" name="refresh" size={20} color="#34495e" style={styles.iconLeft} />
 						<Text style={styles.modalTitleText}>타임 챌린지를 초기화할까요?</Text>
 					</View>
 				);
@@ -487,9 +490,7 @@ const SettingScreen = () => {
 					</View>
 				);
 			default:
-				return (
-					<></>
-				);
+				return <></>;
 		}
 	};
 
@@ -531,9 +532,44 @@ const SettingScreen = () => {
 						</View>
 					}
 					ListFooterComponent={
-						<Text style={styles.appVerText}>
-							📱 현재 앱 버전: <Text style={styles.appVerBoldText}>v{appVersion}</Text>
-						</Text>
+						<View style={styles.footerAppWrapper}>
+							<Text style={styles.appVerText}>
+								📱 현재 앱 버전: <Text style={styles.appVerBoldText}>v{appVersion}</Text>
+							</Text>
+
+							<FlatList
+								horizontal
+								data={COMMON_APPS_DATA.Apps}
+								keyExtractor={(item) => item.id.toString()}
+								showsHorizontalScrollIndicator={false}
+								contentContainerStyle={styles.footerAppList}
+								renderItem={({ item }) => {
+									const handlePress = async () => {
+										const storeUrl = Platform.OS === 'android' ? item.android : item.ios;
+										if (!storeUrl) {
+											Alert.alert('Coming Soon..!', '아직 이 플랫폼에서는 출시되지 않았습니다.');
+											return;
+										}
+										const supported = await Linking.canOpenURL(storeUrl);
+										if (supported) {
+											Linking.openURL(storeUrl);
+										} else {
+											Alert.alert('오류', '스토어 페이지를 열 수 없습니다.');
+										}
+									};
+
+									return (
+										<TouchableOpacity style={styles.footerAppCard} onPress={handlePress}>
+											<Image source={item.icon} style={styles.footerAppIcon} resizeMode="contain" />
+											<Text style={styles.footerAppTitle}>{item.title}</Text>
+											<Text style={styles.footerAppDesc} numberOfLines={2}>
+												{item.desc}
+											</Text>
+										</TouchableOpacity>
+									);
+								}}
+							/>
+						</View>
 					}
 					renderSectionHeader={({ section }) =>
 						section.title ? (
@@ -572,7 +608,7 @@ const SettingScreen = () => {
 				onCancel={() => setModalVisible(false)}
 				onConfirm={handleConfirmDelete}
 				onRequestClose={() => setModalVisible(false)} // Android 백버튼
-				renderTitle={getModalTitle}                   // 기존 커스텀 타이틀 함수 재사용
+				renderTitle={getModalTitle} // 기존 커스텀 타이틀 함수 재사용
 				summary={summary}
 			/>
 		</>
@@ -946,5 +982,46 @@ const styles = StyleSheet.create({
 		borderLeftColor: '#3498db', // 포인트 블루
 		marginBottom: scaleHeight(12),
 		borderRadius: scaleWidth(4),
+	},
+	footerAppWrapper: {
+		paddingVertical: scaleHeight(12),
+	},
+	footerAppList: {
+		paddingHorizontal: scaleWidth(16),
+		gap: scaleWidth(12),
+	},
+
+	footerAppCard: {
+		width: scaleWidth(120),
+		padding: scaleWidth(12),
+		borderRadius: scaleWidth(12),
+		backgroundColor: '#fff',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 4,
+	},
+
+	footerAppIcon: {
+		width: scaleWidth(64),
+		height: scaleWidth(64),
+		borderRadius: scaleWidth(12),
+		marginBottom: scaleHeight(8),
+	},
+
+	footerAppTitle: {
+		fontSize: scaledSize(13),
+		fontWeight: '600',
+		color: '#2c3e50',
+		textAlign: 'center',
+		marginBottom: scaleHeight(4),
+	},
+
+	footerAppDesc: {
+		fontSize: scaledSize(11),
+		color: '#7f8c8d',
+		textAlign: 'center',
 	},
 });

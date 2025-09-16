@@ -1,13 +1,6 @@
-import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform, StatusBar } from 'react-native';
-import BottomTabNavigator from './BottomTabNavigator';
-import DrawerNavigator from './DrawerNavigator';
-import StackNavigator from './StackNavigator';
-import TopNavigator from './TopNavigator';
-import ZTemplateDradwerNavigator from './ZTemplateDradwerNavigator';
-import { scaleHeight } from '@/utils';
+import { StatusBar } from 'react-native';
 import AppLayout from './AppLayout';
 
 /**

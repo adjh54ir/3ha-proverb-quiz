@@ -1237,9 +1237,9 @@ const QuizStudyScreen = () => {
 									key={index}
 									style={[styles.badgeCard, styles.badgeCardActive]} // 액티브 카드 스타일 항상 적용
 								>
-									{/* <View style={[styles.iconBox, styles.iconBoxActive]}>
+									<View style={[styles.iconBox, styles.iconBoxActive]}>
 										<IconComponent type={badge.iconType} name={badge.icon} size={20} color={'#27ae60'} />
-									</View> */}
+									</View>
 									<View style={styles.badgeTextWrap}>
 										<Text style={[styles.badgeName, styles.badgeTitleActive]}>{badge.name}</Text>
 										<Text style={[styles.badgeDescription, styles.badgeDescActive]}>{badge.description}</Text>

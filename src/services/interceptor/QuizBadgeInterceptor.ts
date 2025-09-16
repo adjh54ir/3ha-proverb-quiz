@@ -51,7 +51,7 @@ export const QuizBadgeInterceptor = (history: MainDataType.UserQuizHistory, allP
 
 	// 퀴즈 누적 횟수 뱃지
 	const totalSolved = (history.correctProverbId?.length ?? 0) + (history.wrongProverbId?.length ?? 0);
-	const quizThresholds = [1, 10, 50, 100, 150, 200];
+	const quizThresholds = [1, 10, 50, 100, 150, 200, 300, 400];
 	quizThresholds.forEach((n) => {
 		const id = `quiz_${n}`;
 		if (!history.badges.includes(id) && totalSolved >= n) newBadges.push(id);

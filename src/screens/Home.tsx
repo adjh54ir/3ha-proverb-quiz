@@ -132,8 +132,11 @@ const Home = () => {
 		}
 	}, [showCheckInModal, isCheckedIn]);
 
-	const reversedLevelGuide = [...LEVEL_DATA].reverse();
-	const currentLevelIndex = reversedLevelGuide.findIndex((item) => totalScore >= item.score && totalScore < item.next);
+	const levelDataForScroll = useMemo(() => [...LEVEL_DATA], []);
+
+	const currentLevelIndex = levelDataForScroll.findIndex(
+		(item) => totalScore >= item.score && totalScore < (item.next ?? Infinity),
+	);
 	useEffect(() => {
 		if (showLevelModal && levelScrollRef.current) {
 			setTimeout(() => {
@@ -146,12 +149,11 @@ const Home = () => {
 	}, [showLevelModal]);
 
 	const getLevelData = (score: number) => {
-		return LEVEL_DATA.find((l) => score >= l.score && score < l.next) || LEVEL_DATA[0];
+		return LEVEL_DATA.slice().find((l) => score >= l.score) || LEVEL_DATA[0];
 	};
 	// 이걸 기존 getLevelData 아래에 추가해
 	const levelData = useMemo(() => getLevelData(totalScore), [totalScore]);
 
-	const reversedLevelData = useMemo(() => [...LEVEL_DATA].reverse(), []);
 
 	const { label, icon, mascot, description } = levelData;
 
@@ -284,35 +286,13 @@ const Home = () => {
 		scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
 	};
 
+
+
 	// getTitleByScore 함수 추가
-	const getTitleByScore = (score: number) => {
-		if (score >= 1800) {
-			return {
-				label: '속담 마스터',
-				icon: 'trophy',
-				mascot: require('@/assets/images/level4_mascote.png'),
-			};
-		}
-		if (score >= 1200) {
-			return {
-				label: '속담 능력자',
-				icon: 'tree',
-				mascot: require('@/assets/images/level3_mascote.png'),
-			};
-		}
-		if (score >= 600) {
-			return {
-				label: '속담 입문자',
-				icon: 'leaf',
-				mascot: require('@/assets/images/level2_mascote.png'),
-			};
-		}
-		return {
-			label: '속담 초보자',
-			icon: 'seedling',
-			mascot: require('@/assets/images/level1_mascote.png'),
-		};
+	const getLevelInfoByScore = (score: number) => {
+		return LEVEL_DATA.slice().find((l) => score >= l.score) || LEVEL_DATA[0];
 	};
+	const currentLevel = getLevelInfoByScore(totalScore);
 
 	const loadData = async () => {
 		const quizData = await AsyncStorage.getItem(USER_QUIZ_HISTORY_KEY);
@@ -529,10 +509,37 @@ const Home = () => {
 							<View style={{ alignItems: 'center' }}>
 								{/* 타이틀 라인 */}
 								<View style={styles.innerTitleContainer}>
-									<IconComponent type="fontAwesome6" name={icon} size={18} color="#27ae60" />
-									<Text style={styles.titleText}>{label}</Text>
-									<TouchableOpacity onPress={() => setShowLevelModal(true)}>
-										<IconComponent type="materialIcons" name="info-outline" size={18} color="#7f8c8d" style={styles.infoIcon} />
+									<TouchableOpacity
+										style={{
+											flexDirection: 'row',
+											alignItems: 'center',
+											justifyContent: 'center',
+											marginBottom: scaleHeight(6),
+										}}
+										activeOpacity={0.7}
+										onPress={() => setShowLevelModal(true)}>
+										<IconComponent
+											type="fontAwesome6"
+											name={icon}
+											size={18}
+											color={label === '속담 마스터' ? '#FFD700' : '#27ae60'} // ✅ 조건 분기
+										/>
+										<Text
+											style={{
+												fontSize: scaledSize(16),
+												color: label === '속담 마스터' ? '#FFD700' : '#27ae60', // ✅ 텍스트 색도 노란색으로
+												fontWeight: '700',
+												marginLeft: scaleWidth(6),
+											}}>
+											{label}
+										</Text>
+										<IconComponent
+											type="materialIcons"
+											name="info-outline"
+											size={18}
+											color="#7f8c8d"
+											style={{ marginLeft: scaleWidth(4) }}
+										/>
 									</TouchableOpacity>
 								</View>
 
@@ -713,8 +720,10 @@ const Home = () => {
 							style={{ width: '100%' }}
 							contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
 							showsVerticalScrollIndicator={false}>
-							{reversedLevelData.map((item) => {
-								const isCurrent = totalScore >= item.score && totalScore < item.next;
+							{[...LEVEL_DATA].map((item) => {
+								const isCurrent = currentLevel.label === item.label; // 레이블 비교
+								const mascotImage = getLevelInfoByScore(item.score).mascot;
+
 								return (
 									<View key={item.label} style={[styles.levelCardBox, isCurrent && styles.levelCardBoxActive]}>
 										{isCurrent && (
@@ -722,8 +731,14 @@ const Home = () => {
 												<Text style={styles.levelBadgeText}>🏆 현재 등급</Text>
 											</View>
 										)}
-										<FastImage source={item.mascot} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
-										<Text style={styles.levelLabel}>{item.label}</Text>
+
+										<View style={styles.levelMascotCircle}>
+											<FastImage source={mascotImage} style={styles.levelMascotImage} resizeMode={FastImage.resizeMode.contain} />
+										</View>ㅣ
+										<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
+											<IconComponent name={item.icon} type="fontAwesome6" size={16} color="#27ae60" />
+											<Text style={[styles.levelLabel, { marginLeft: scaleWidth(6) }]}>{item.label}</Text>
+										</View>
 										<Text style={styles.levelScore}>{item.score}점 이상</Text>
 										{isCurrent && <Text style={styles.levelEncourage}>{item.encouragement}</Text>}
 										<Text style={styles.levelDetailDescription}>{item.description}</Text>
@@ -1487,11 +1502,31 @@ const styles = StyleSheet.create({
 		lineHeight: scaleHeight(18),
 	},
 	mascotHintText: {
-		marginTop: scaleHeight(4),
 		marginBottom: scaleHeight(6),
 		fontSize: scaledSize(11),
 		color: '#7f8c8d',
 		textAlign: 'center',
+	},
+	levelMascotCircle: {
+		width: scaleWidth(80),
+		height: scaleWidth(80),
+		borderRadius: scaleWidth(40),
+		overflow: 'hidden',
+		backgroundColor: '#fff',
+		borderWidth: 2,
+		borderColor: '#27ae60',
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginBottom: scaleHeight(10),
+		shadowColor: '#000',
+		shadowOpacity: 0.08,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 5,
+	},
+	levelMascotImage: {
+		width: '100%',
+		height: '100%',
+		borderRadius: scaleWidth(40),
 	},
 });
 

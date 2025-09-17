@@ -427,9 +427,9 @@ const SettingScreen = () => {
 				DESCRIPTION,
 				'',
 				'🔗 다운로드 링크',
-				`• Android: ${androidUrl || '출시 예정입니다.'}`,
+				`• Android: ${androidUrl || '출시 예정입니다..'}`,
 				'',
-				`• iOS: ${iosUrl || '출시 예정입니다.'}`,
+				`• iOS: ${iosUrl || '출시 예정입니다..'}`,
 			];
 			const message = messageLines.join('\n');
 

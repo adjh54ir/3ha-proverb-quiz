@@ -21,17 +21,21 @@ export const LEVEL_DATA = [
 		next: 4130, // 413문제 = 전체 달성
 		label: '속담 마스터',
 		icon: 'trophy',
-		encouragement: '🏆 속담 마스터에 도달했어요! 정말 대단해요!',
-		description: '속담에 대한 깊은 이해와 활용 능력을 갖춘 최상위 단계로,\n누구에게나 모범이 될 수 있는 수준이에요.',
+		encouragement:
+			'👑 속담의 왕좌에 올랐습니다!\n당신은 이제 속담의 진정한 달인입니다!',
+		description:
+			'속담을 자유자재로 구사하며,\n누구에게나 귀감이 되는 지혜의 경지에 올랐습니다.\n속담의 참뜻을 깨닫고 삶에 녹여내는 최상위 단계예요.',
 		mascot: require('@/assets/images/level5_mascote2.png'),
 	},
 	{
 		score: 2490,
 		next: 3320, // 332문제
-		label: '속담 전사',
-		icon: 'helmet-battle',
-		encouragement: '🪖 속담 전사로 거듭났어요!\n지식을 무기로 도전을 헤쳐나가고 있어요!',
-		description: '속담을 무기 삼아 자신 있게 문제를 정복하는 단계로,\n진정한 전사로서 강한 자신감을 보여주는 시기예요.',
+		label: '속담 고수',
+		icon: 'chess-knight',
+		encouragement:
+			'⚔️ 속담의 전장에서 승리하고 있어요!\n어떤 도전도 당당히 맞설 수 있네요!',
+		description:
+			'속담을 무기처럼 활용하며,\n어려운 문제도 당당히 맞설 수 있는 단계예요.\n탄탄한 자신감으로 진정한 실력을 보여줍니다.',
 		mascot: require('@/assets/images/level4_mascote.png'),
 	},
 	{
@@ -39,8 +43,10 @@ export const LEVEL_DATA = [
 		next: 2490, // 249문제
 		label: '속담 숙련자',
 		icon: 'tree',
-		encouragement: '🌳 멋져요! 속담 실력이 부쩍 늘었어요!',
-		description: '속담의 뜻과 쓰임새를 잘 이해하고 있으며,\n실전 문제에도 능숙하게 대응할 수 있는 단계예요.',
+		encouragement:
+			'🌳 지식이 뿌리내려 점점 자라고 있어요!\n이제 훨씬 더 능숙해졌네요!',
+		description:
+			'속담의 의미와 쓰임새를 제대로 이해하고,\n실전에서도 능숙하게 활용할 수 있는 단계예요.\n기초를 넘어 한층 성숙한 실력을 갖췄습니다.',
 		mascot: require('@/assets/images/level3_mascote.png'),
 	},
 	{
@@ -48,17 +54,21 @@ export const LEVEL_DATA = [
 		next: 1660, // 166문제
 		label: '속담 입문자',
 		icon: 'leaf',
-		encouragement: '🍃 차근차근 익혀가는 중이에요!\n조금씩 자신감이 붙고 있어요!',
-		description: '기초 속담에 익숙해지고,\n다양한 표현을 접하며 감을 잡아가는 단계예요.',
+		encouragement:
+			'🍃 좋은 출발이에요!\n조금씩 자신감이 붙고 있어요!',
+		description:
+			'기초 속담에 차츰 익숙해지고,\n다양한 표현을 접하며 감을 쌓아가는 단계예요.\n이제 막 본격적인 성장의 길에 들어섰습니다.',
 		mascot: require('@/assets/images/level2_mascote.png'),
 	},
 	{
 		score: 0,
 		next: 830, // 83문제
-		label: '속담 초보자',
+		label: '속담 초심자',
 		icon: 'seedling',
-		encouragement: '🌱 첫걸음을 뗐어요! 이제 속담의 세계로!',
-		description: '속담 학습의 출발선에 선 단계로,\n기초적인 표현부터 차근히 익히는 시기예요.',
+		encouragement:
+			'🌱 첫걸음을 내디뎠어요!\n앞으로가 더욱 기대돼요!',
+		description:
+			'속담 학습의 출발선에 선 단계로,\n새싹처럼 작은 배움부터 차근차근 키워가는 시기예요.\n앞으로의 성장이 더욱 기대됩니다.',
 		mascot: require('@/assets/images/level1_mascote.png'),
 	},
 ];

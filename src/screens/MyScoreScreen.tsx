@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
 	View,
 	Text,
@@ -379,8 +379,10 @@ const CapitalResultScreen = () => {
 	const totalSolved = correctCount + wrongCount;
 	const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
 
-	const reversedLevelGuide = [...LEVEL_DATA].reverse();
-	const currentLevelIndex = reversedLevelGuide.findIndex((item) => totalScore >= item.score && totalScore < item.next);
+	const levelDataForScroll = useMemo(() => [...LEVEL_DATA], []);
+	const currentLevelIndex = levelDataForScroll.findIndex(
+		(item) => totalScore >= item.score && totalScore < (item.next ?? Infinity),
+	);
 	useEffect(() => {
 		if (showLevelModal && levelScrollRef.current) {
 			setTimeout(() => {
@@ -591,16 +593,37 @@ const CapitalResultScreen = () => {
 							)}
 						</View>
 						<View style={{ alignItems: 'center' }}>
-							<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(10) }}>
-								<IconComponent type="fontAwesome6" name={icon} size={18} color="#27ae60" />
-								<Text style={{ fontSize: scaledSize(16), color: '#27ae60', fontWeight: '700', marginLeft: scaleWidth(6) }}>{label}</Text>
-								<TouchableOpacity onPress={() => setShowLevelModal(true)}>
+							<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
+								<TouchableOpacity
+									style={{
+										flexDirection: 'row',
+										alignItems: 'center',
+										justifyContent: 'center',
+										marginBottom: scaleHeight(6),
+									}}
+									activeOpacity={0.7}
+									onPress={() => setShowLevelModal(true)}>
+									<IconComponent
+										type="fontAwesome6"
+										name={icon}
+										size={18}
+										color={label === '속담 마스터' ? '#FFD700' : '#27ae60'} // ✅ 조건 분기
+									/>
+									<Text
+										style={{
+											fontSize: scaledSize(16),
+											color: label === '속담 마스터' ? '#FFD700' : '#27ae60', // ✅ 텍스트 색도 노란색으로
+											fontWeight: '700',
+											marginLeft: scaleWidth(6),
+										}}>
+										{label}
+									</Text>
 									<IconComponent
 										type="materialIcons"
 										name="info-outline"
 										size={18}
 										color="#7f8c8d"
-										style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
+										style={{ marginLeft: scaleWidth(4) }}
 									/>
 								</TouchableOpacity>
 							</View>
@@ -708,7 +731,96 @@ const CapitalResultScreen = () => {
 								</View>
 							</View>
 
-							{/* ✅ 정복한 카테고리 출력 */}
+
+							{/* ✅ 정복한 레벨 세로 한 줄씩 + 개수 진행률 */}
+							<View style={styles.subSectionBox2}>
+								<Text style={styles.sectionSubtitle}>
+									🏅 정복한 레벨 ({levelMaster.length} / {DIFFICULTIES.length})
+								</Text>
+								<Text style={styles.levelHelperText}>- 각 레벨 퀴즈를 모두 풀면 정복으로 표시됩니다.</Text>
+
+								{levelStats.map((item) => {
+									const progressPercent =
+										item.totalCount > 0
+											? Math.round((item.solvedCount / item.totalCount) * 100)
+											: 0;
+
+									const isConquered = progressPercent === 100;
+									const styleMeta = STYLE_MAP[item.subtitle]; // ✅ 레벨별 색상 가져오기
+
+									return (
+										<View
+											key={item.key}
+											style={[
+												styles.levelRowCard,
+												isConquered && {
+													backgroundColor: styleMeta.color,
+													borderColor: styleMeta.color,
+													shadowColor: '#000',
+													shadowOpacity: 0.15,
+													shadowRadius: 4,
+													shadowOffset: { width: 0, height: 2 },
+												},
+											]}>
+											<IconComponent
+												name={item.icon}
+												type="fontAwesome6"
+												size={20}
+												color={isConquered ? '#fff' : styleMeta.color} // ✅ 항상 styleMeta.color 사용
+												style={{ marginRight: scaleWidth(8) }}
+											/>
+											<Text
+												style={[
+													styles.levelRowTitle,
+													{ color: isConquered ? '#fff' : styleMeta.color }, // ✅ 항상 레벨별 색상 사용
+													isConquered && {
+														fontWeight: 'bold',
+														textShadowColor: 'rgba(0, 0, 0, 0.15)',
+														textShadowOffset: { width: 1, height: 1 },
+														textShadowRadius: 2,
+													},
+												]}>
+												{item.subtitle}
+											</Text>
+
+											{/* 진행률 바 */}
+											<View style={styles.progressBarBackgroundRow}>
+												<View
+													style={[
+														styles.progressBarFill,
+														{ width: `${progressPercent}%`, backgroundColor: isConquered ? '#fff' : '#27ae60' },
+													]}
+												/>
+											</View>
+
+											{/* 개수 */}
+											<Text style={[styles.levelRowCount, isConquered && { color: '#fff' }]}>
+												{item.solvedCount}/{item.totalCount}
+											</Text>
+
+											{isConquered && (
+												<View
+													style={{
+														marginLeft: scaleWidth(6),
+														backgroundColor: '#fff',
+														paddingHorizontal: scaleWidth(6),
+														paddingVertical: scaleHeight(2),
+														borderRadius: scaleWidth(10),
+													}}>
+													<Text
+														style={{
+															fontSize: scaledSize(12),
+															color: styleMeta.color, // ✅ 레벨별 색상 적용
+															fontWeight: 'bold',
+														}}>
+														정복
+													</Text>
+												</View>
+											)}
+										</View>
+									);
+								})}
+							</View>
 							{/* ✅ 정복한 카테고리 출력 */}
 							<View style={styles.subSectionBox1}>
 								<Text style={styles.sectionSubtitle}>
@@ -791,95 +903,6 @@ const CapitalResultScreen = () => {
 														style={{
 															fontSize: scaledSize(12),
 															color: meta.color, // ✅ 카테고리 색상 적용
-															fontWeight: 'bold',
-														}}>
-														정복
-													</Text>
-												</View>
-											)}
-										</View>
-									);
-								})}
-							</View>
-							{/* ✅ 정복한 레벨 세로 한 줄씩 + 개수 진행률 */}
-							<View style={styles.subSectionBox2}>
-								<Text style={styles.sectionSubtitle}>
-									🏅 정복한 레벨 ({levelMaster.length} / {DIFFICULTIES.length})
-								</Text>
-								<Text style={styles.levelHelperText}>- 각 레벨 퀴즈를 모두 풀면 정복으로 표시됩니다.</Text>
-
-								{levelStats.map((item) => {
-									const progressPercent =
-										item.totalCount > 0
-											? Math.round((item.solvedCount / item.totalCount) * 100)
-											: 0;
-
-									const isConquered = progressPercent === 100;
-									const styleMeta = STYLE_MAP[item.subtitle]; // ✅ 레벨별 색상 가져오기
-
-									return (
-										<View
-											key={item.key}
-											style={[
-												styles.levelRowCard,
-												isConquered && {
-													backgroundColor: styleMeta.color,
-													borderColor: styleMeta.color,
-													shadowColor: '#000',
-													shadowOpacity: 0.15,
-													shadowRadius: 4,
-													shadowOffset: { width: 0, height: 2 },
-												},
-											]}>
-											<IconComponent
-												name={item.icon}
-												type="fontAwesome6"
-												size={20}
-												color={isConquered ? '#fff' : styleMeta.color} // ✅ 항상 styleMeta.color 사용
-												style={{ marginRight: scaleWidth(8) }}
-											/>
-											<Text
-												style={[
-													styles.levelRowTitle,
-													{ color: isConquered ? '#fff' : styleMeta.color }, // ✅ 항상 레벨별 색상 사용
-													isConquered && {
-														fontWeight: 'bold',
-														textShadowColor: 'rgba(0, 0, 0, 0.15)',
-														textShadowOffset: { width: 1, height: 1 },
-														textShadowRadius: 2,
-													},
-												]}>
-												{item.subtitle}
-											</Text>
-
-											{/* 진행률 바 */}
-											<View style={styles.progressBarBackgroundRow}>
-												<View
-													style={[
-														styles.progressBarFill,
-														{ width: `${progressPercent}%`, backgroundColor: isConquered ? '#fff' : '#27ae60' },
-													]}
-												/>
-											</View>
-
-											{/* 개수 */}
-											<Text style={[styles.levelRowCount, isConquered && { color: '#fff' }]}>
-												{item.solvedCount}/{item.totalCount}
-											</Text>
-
-											{isConquered && (
-												<View
-													style={{
-														marginLeft: scaleWidth(6),
-														backgroundColor: '#fff',
-														paddingHorizontal: scaleWidth(6),
-														paddingVertical: scaleHeight(2),
-														borderRadius: scaleWidth(10),
-													}}>
-													<Text
-														style={{
-															fontSize: scaledSize(12),
-															color: styleMeta.color, // ✅ 레벨별 색상 적용
 															fontWeight: 'bold',
 														}}>
 														정복
@@ -1142,7 +1165,7 @@ const CapitalResultScreen = () => {
 								style={{ width: '100%' }}
 								contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
 								showsVerticalScrollIndicator={false}>
-								{[...LEVEL_DATA].reverse().map((item) => {
+								{[...LEVEL_DATA].map((item) => {
 									const isCurrent = totalScore >= item.score && totalScore < item.next;
 									const mascotImage = getTitleByScore(item.score).mascot;
 

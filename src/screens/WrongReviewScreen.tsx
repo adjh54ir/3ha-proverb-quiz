@@ -11,6 +11,7 @@ import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 /**
@@ -126,16 +127,73 @@ const WrongReviewScreen = () => {
 				<Text style={styles.buttonText}>🚀 실력 업! 오답 다시 풀어보기</Text>
 			</TouchableOpacity>
 
-			<TouchableOpacity style={styles.toggleButton} onPress={() => setShowWrongList((prev) => !prev)}>
-				<Text style={styles.toggleButtonText}>{showWrongList ? '⬆️ 나의 오답 목록 접기' : '⬇️ 나의 오답 목록 펼치기'}</Text>
-			</TouchableOpacity>
-
+			<View style={{ alignItems: 'center', justifyContent: "center", flex: 1, }}>
+				<TouchableOpacity style={styles.toggleCard} onPress={() => setShowWrongList((prev) => !prev)}>
+					<IconComponent
+						type="MaterialIcons"
+						name={showWrongList ? 'expand-less' : 'expand-more'}
+						size={22}
+						color="#00b894"
+					/>
+					<Text style={styles.toggleText}>{showWrongList ? '오답 목록 접기' : '오답 목록 펼치기'}</Text>
+				</TouchableOpacity>
+			</View>
 			{showWrongList && (
+
 				<View style={styles.reviewCardList}>
-					{wrongCountries.map((proverb) => (
-						<View key={proverb.id} style={styles.reviewCard}>
-							<Text style={styles.reviewProverbText}>📝 {proverb.proverb}</Text>
-							<Text style={styles.reviewMeaningText}>- {proverb.longMeaning}</Text>
+					{wrongCountries.map((item) => (
+						<View key={item.id} style={styles.historyCard}>
+							{/* 좌측 컬러바 + 헤더 */}
+							<View style={[styles.historyColorBar]} />
+							<View style={styles.historyCardBody}>
+								{/* 타이틀 + 정오답 배지 */}
+								<View style={styles.headerCenter}>
+									<Text style={styles.headerTitle2} >
+										{item.proverb}
+									</Text>
+								</View>
+
+
+								{/* 풀이 */}
+								{Boolean(item.longMeaning) && (
+									<View style={styles.highlightSection}>
+										<View style={styles.meaningQuoteBox}>
+											<IconComponent
+												type="fontAwesome6"
+												name="quote-left"
+												size={28}
+												color="#58D68D"
+												style={{ marginBottom: scaleHeight(8) }}
+											/>
+											<Text style={styles.meaningQuoteText}>{item.longMeaning}</Text>
+										</View>
+									</View>
+								)}
+
+								{/* 상세 풀이 */}
+								{Array.isArray(item.sameProverb) && item.sameProverb.length > 0 && (
+									<View style={styles.sectionBox}>
+										<Text style={styles.sectionTitle}>🔗 비슷한 속담</Text>
+										{item.sameProverb.map((p, i) => (
+											<View key={`same-${i}`} style={styles.phraseRow}>
+												<Text style={styles.inlineValue}>- {p}</Text>
+											</View>
+										))}
+									</View>
+								)}
+
+								{/* 예문 */}
+								{item.example.length > 0 && (
+									<View style={styles.sectionBox}>
+										<Text style={styles.sectionTitle}>✍️ 예문</Text>
+										{item.example.map((ex, i) => (
+											<Text key={i} style={styles.exampleText}>
+												• {ex}
+											</Text>
+										))}
+									</View>
+								)}
+							</View>
 						</View>
 					))}
 				</View>
@@ -246,18 +304,21 @@ const styles = StyleSheet.create({
 		color: '#636e72',
 	},
 	scrollContainer: {
-		paddingVertical: scaleHeight(40),
+		marginTop: scaleHeight(12),
 		paddingHorizontal: scaleWidth(24),
 		alignItems: 'center',
 		backgroundColor: '#f5f6fa',
 	},
 	activityCardBox: {
-		backgroundColor: '#ffffff',
+		backgroundColor: '#f5f6fa',
 		borderRadius: scaleWidth(16),
 		padding: scaleWidth(10),
 		marginBottom: scaleHeight(12),
 		borderWidth: 1,
 		borderColor: '#ecf0f1',
+		// 추가
+		width: '100%',
+		alignItems: 'center', // 내부 요소 정렬용
 	},
 	modalOverlay: {
 		flex: 1,
@@ -414,5 +475,238 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(14),
 		color: '#636e72',
 		lineHeight: scaleHeight(20),
+	},
+	historyCard: {
+		flexDirection: 'row',
+		backgroundColor: '#ffffff',
+		borderWidth: 2, // ✅ 두께를 늘림
+		borderColor: '#b0b0b0', // ✅ 좀 더 진한 회색 (또는 #999, #888)
+		borderRadius: scaledSize(12),
+		overflow: 'hidden',
+		marginBottom: scaleHeight(12),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.08, // ✅ 살짝 강조
+		shadowRadius: 3,
+	},
+	historyColorBar: {
+		width: scaleWidth(5),
+	},
+	historyBarCorrect: {
+		backgroundColor: '#4CAF50',
+	},
+	historyBarWrong: {
+		backgroundColor: '#F44336',
+	},
+	historyCardBody: {
+		flex: 1,
+		padding: scaleHeight(12),
+	},
+
+	historyHeaderRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	},
+	historyIdiom: {
+		flex: 1,
+		fontSize: scaledSize(20),
+		fontWeight: '700',
+		color: '#222',
+		paddingRight: scaleWidth(10),
+	},
+
+	historyMeaningBox: {
+		marginTop: scaleHeight(6),
+		paddingVertical: scaleHeight(6),
+		paddingHorizontal: scaleWidth(10),
+		borderRadius: scaleWidth(8),
+		backgroundColor: '#FAFAFA',
+		borderWidth: 1,
+		borderColor: '#eee',
+	},
+	historyMeaningLabel: {
+		fontSize: scaledSize(12),
+		color: '#777',
+		marginBottom: scaleHeight(4),
+	},
+	historyMeaningValue: {
+		fontSize: scaledSize(16),
+		color: '#2e7d32',
+		fontWeight: 'bold',
+		lineHeight: scaledSize(16),
+	},
+
+	historySubTitleRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	historySubTitle: {
+		fontSize: scaledSize(13),
+		fontWeight: '700',
+		color: '#333',
+	},
+
+	phraseRow: {
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+		marginBottom: scaleHeight(4),
+		flexWrap: 'wrap',
+	},
+	phraseKr: {
+		fontSize: scaledSize(13),
+		color: '#222',
+		fontWeight: '600',
+	},
+	phraseMean: {
+		fontSize: scaledSize(13),
+		color: '#444',
+		flexShrink: 1,
+	},
+
+	exampleList: {
+		marginTop: scaleHeight(4),
+	},
+	bulletItem: {
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+		marginBottom: scaleHeight(4),
+	},
+	bulletDot: {
+		fontSize: scaledSize(14),
+		lineHeight: scaledSize(18),
+		color: '#4CAF50',
+		marginRight: scaleWidth(6),
+	},
+	sectionHeaderIcon: {
+		marginRight: scaleWidth(6),
+	},
+	sectionHeaderRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: scaleHeight(10),
+	},
+	historyBox: {
+		borderWidth: 1,
+		borderColor: '#e0e0e0',
+		borderRadius: scaleWidth(10),
+		padding: scaleWidth(10),
+		backgroundColor: '#fafafa',
+	},
+	headerCenter: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		gap: scaleWidth(8),
+		flex: 1, // 중앙 정렬
+		marginVertical: scaleHeight(12),
+	},
+	headerTitle2: {
+		fontSize: scaledSize(20),
+		fontWeight: '700',
+		color: '#1E6BB8',
+		textAlign: 'center', // ✅ 줄바꿈 시 가운데 정렬
+	},
+	highlightSection: {
+		borderWidth: 1.5,
+		borderColor: '#A5D8FF',
+		backgroundColor: '#EAF4FF',
+		padding: scaleWidth(14),
+		borderRadius: scaleWidth(14),
+		marginVertical: scaleHeight(12),
+		shadowColor: '#000',
+		shadowOpacity: 0.08,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 4,
+	},
+	highlightHeader: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: scaleHeight(8),
+	},
+	highlightTitle: {
+		fontSize: scaledSize(15),
+		fontWeight: '700',
+		color: '#1E6BB8',
+		marginLeft: scaleWidth(6),
+	},
+	highlightText: {
+		fontSize: scaledSize(15),
+		fontWeight: '600',
+		color: '#2c3e50',
+		lineHeight: 22,
+	},
+	meaningQuoteBox: {
+		alignItems: 'center', // 중앙 정렬
+		justifyContent: 'center',
+		backgroundColor: '#EAF4FF', // 파란색 계열 배경
+		borderRadius: scaleWidth(12),
+		marginBottom: scaleHeight(16),
+	},
+
+	meaningQuoteText: {
+		fontSize: scaledSize(16),
+		fontWeight: '600',
+		color: '#2c3e50',
+		lineHeight: scaleHeight(22),
+		textAlign: 'center', // 텍스트도 중앙 정렬
+	},
+	sectionBox: {
+		borderWidth: 1,
+		borderColor: '#E6EEF5',
+		backgroundColor: '#FDFEFE',
+		padding: scaleWidth(12),
+		borderRadius: scaleWidth(12),
+		marginVertical: scaleHeight(10),
+		shadowColor: '#000',
+		shadowOpacity: 0.05,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 4,
+	},
+	sectionTitle: {
+		fontSize: scaledSize(15),
+		fontWeight: '700',
+		color: '#2c3e50',
+		marginBottom: scaleHeight(12),
+	},
+	sectionText: {
+		fontSize: scaledSize(14),
+		color: '#444',
+		lineHeight: 20,
+	},
+	inlineLabel: {
+		fontSize: scaledSize(13),
+		marginBottom: scaleHeight(3),
+		fontWeight: '700',
+		color: '#2c3e50',
+	},
+	inlineValue: {
+		fontSize: scaledSize(13),
+		color: '#555',
+		marginTop: scaleHeight(2),
+	},
+	exampleText: {
+		fontSize: scaledSize(12),
+		color: '#555',
+		lineHeight: scaleHeight(18),
+		marginLeft: scaleWidth(6),
+	},
+	toggleCard: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(24),
+		borderRadius: scaleWidth(25),
+		backgroundColor: '#e8fdfd',
+		shadowColor: '#000',
+		shadowOpacity: 0.08,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 3,
+	},
+	toggleText: {
+		fontSize: scaledSize(15),
+		fontWeight: '600',
+		color: '#00b894',
 	},
 });

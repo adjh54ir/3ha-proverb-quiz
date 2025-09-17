@@ -19,6 +19,49 @@ interface QuizResultModalProps {
 const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, question, onNext }: QuizResultModalProps) => {
 
 	const navigation = useNavigation();
+
+
+	// ✅ QuizResultModal.tsx 내부
+	const ProverbInfoCard = ({
+		question,
+		highlightColor = '#27ae60',
+		backgroundColor = '#eafaf1',
+	}: {
+		question: MainDataType.Proverb | null;
+		highlightColor?: string;
+		backgroundColor?: string;
+	}) => {
+		if (!question) return null;
+
+		return (
+			<View style={[styles.infoCard, { backgroundColor, borderColor: highlightColor }]}>
+				<Text style={[styles.infoSectionTitle, { color: highlightColor }]}>📖 속담 해설</Text>
+
+				<View style={styles.infoSection}>
+					<Text style={[styles.infoLabel, { color: highlightColor }]}>📌 속담</Text>
+					<Text style={styles.infoText}>{question.proverb}</Text>
+				</View>
+
+				<View style={styles.infoSection}>
+					<Text style={[styles.infoLabel, { color: highlightColor }]}>💡 의미</Text>
+					<Text style={styles.infoText}>- {question.longMeaning}</Text>
+				</View>
+
+				{question.example && question.example.length > 0 && (
+					<View style={styles.infoSection}>
+						<Text style={[styles.infoLabel, { color: highlightColor }]}>💡 예시</Text>
+						{question.example.map((ex, idx) => (
+							<Text key={idx} style={styles.exampleText}>
+								- {ex}
+							</Text>
+						))}
+					</View>
+				)}
+			</View>
+		);
+	};
+
+
 	if (!visible) return null;
 
 	return (
@@ -69,13 +112,11 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 						) : resultType === 'correct' ? (
 							<>
 								<Text style={styles.resultMessageBig}>{resultMessage}</Text>
-								<View style={styles.correctInfoCard}>
-									<Text style={styles.correctInfoSubLabelInCard}>📖 속담 해설</Text>
-									<Text style={styles.correctInfoLabel}>📌 속담</Text>
-									<Text style={[styles.correctInfoText, { width: '100%' }]}>- {question?.proverb}</Text>
-									<Text style={[styles.correctInfoLabel, { marginTop: scaleHeight(12) }]}>💡 의미</Text>
-									<Text style={[styles.correctInfoText, { width: '100%' }]}>- {question?.longMeaning}</Text>
-								</View>
+								<ProverbInfoCard
+									question={question}
+									highlightColor="#27ae60"
+									backgroundColor="#eafaf1"
+								/>
 							</>
 						) : (
 							<>
@@ -83,13 +124,11 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 								<Text style={{ fontSize: scaledSize(15), fontWeight: '600', textAlign: 'center', padding: scaleWidth(20) }}>
 									정답은 <Text style={{ color: '#27ae60' }}>"{question?.proverb}"</Text>였어요!
 								</Text>
-								<View style={[styles.correctInfoCard, { backgroundColor: '#fffdf7' }]}>
-									<Text style={styles.correctInfoSubLabelInCard}>📖 속담 해설</Text>
-									<Text style={[styles.correctInfoLabel, { color: '#e67e22' }]}>📌 속담</Text>
-									<Text style={styles.correctInfoText}>- {question?.proverb}</Text>
-									<Text style={[styles.correctInfoLabel, { marginTop: scaleHeight(12), color: '#e67e22' }]}>💡 의미</Text>
-									<Text style={styles.correctInfoText}>- {question?.longMeaning}</Text>
-								</View>
+								<ProverbInfoCard
+									question={question}
+									highlightColor="#e67e22"
+									backgroundColor="#fffdf7"
+								/>
 							</>
 						)}
 					</ScrollView>
@@ -236,7 +275,55 @@ export const styles = StyleSheet.create({
 		maxHeight: scaleHeight(120),
 	},
 	scrollView: { maxHeight: scaleHeight(500), width: '100%' }
-
+	,
+	// ✅ styles.tsx 추가
+	infoCard: {
+		width: '100%',
+		borderRadius: scaleWidth(12),
+		padding: scaleWidth(16),
+		borderWidth: 1.2,
+	},
+	infoSectionTitle: {
+		fontSize: scaledSize(16),
+		fontWeight: '700',
+		marginBottom: scaleHeight(12),
+		textAlign: 'center',
+	},
+	infoSection: {
+		marginVertical: scaleHeight(16),
+	},
+	infoLabel: {
+		fontSize: scaledSize(14),
+		fontWeight: '600',
+		marginBottom: scaleHeight(6),
+	},
+	infoText: {
+		fontSize: scaledSize(15),
+		color: '#2c3e50',
+		lineHeight: scaleHeight(22),
+		fontWeight: '500',
+	},
+	exampleBox: {
+		backgroundColor: '#f9f9f9',
+		borderRadius: scaleWidth(10),
+		padding: scaleWidth(12),
+		marginTop: scaleHeight(14),
+		borderWidth: 1,
+		borderColor: '#eee',
+	},
+	exampleTitle: {
+		fontSize: scaledSize(14),
+		fontWeight: '700',
+		color: '#34495e',
+		marginBottom: scaleHeight(8),
+		textAlign: 'center',
+	},
+	exampleText: {
+		fontSize: scaledSize(14),
+		color: '#34495e',
+		lineHeight: scaleHeight(20),
+		marginBottom: scaleHeight(6),
+	},
 });
 
 export default QuizResultModal;

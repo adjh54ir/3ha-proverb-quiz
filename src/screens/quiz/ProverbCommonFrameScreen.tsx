@@ -10,12 +10,10 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	Modal,
-	KeyboardAvoidingView,
 	TouchableWithoutFeedback,
 	Keyboard,
 	Dimensions,
 	Platform,
-	Alert,
 	Animated,
 	ScrollView,
 	FlatList,
@@ -54,6 +52,8 @@ type QuizRoute = RouteProp<{ ProverbCommonFrame: QuizRouteParams }, 'ProverbComm
 
 const ProverbCommonFrameScreen = () => {
 	const route = useRoute<QuizRoute>();
+	const flatListRef = useRef<FlatList<string>>(null);
+
 	const { mode: routeMode, questionPool, isWrongReview = false, title = '' } = route.params;
 
 	const mode: 'meaning' | 'proverb' | 'fill-blank' = isWrongReview ? 'meaning' : routeMode;
@@ -92,6 +92,7 @@ const ProverbCommonFrameScreen = () => {
 	const [modeStep, setModeStep] = useState(0); // 0 = 난이도, 1 = 카테고리
 	const [showExitModal, setShowExitModal] = useState<boolean>(false);
 	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
+	const [showHintModal, setShowHintModal] = useState(false);
 
 	const hasAnsweredRef = useRef(false);
 	const [totalScore, setTotalScore] = useState(0);
@@ -140,6 +141,21 @@ const ProverbCommonFrameScreen = () => {
 			}
 		})();
 	}, []);
+	// 타이머 제어 useEffect 추가
+	useEffect(() => {
+		if (showHintModal) {
+			// 힌트 모달이 열리면 타이머 멈춤
+			if (timerRef.current) {
+				clearInterval(timerRef.current);
+				timerRef.current = null;
+			}
+		} else {
+			// 힌트 모달이 닫힐 때 다시 타이머 시작
+			if (question && !selected) {
+				startTimer();
+			}
+		}
+	}, [showHintModal]);
 
 	useEffect(() => {
 		if (isWrongReview) {
@@ -465,30 +481,17 @@ const ProverbCommonFrameScreen = () => {
 		setResultMessage(message);
 		setShowResultModal(true);
 	};
-	const getLevelColor = (levelName: string) => {
+	const getLevelColor = (level: number) => {
 		const levelColorMap: Record<string, string> = {
-			'아주 쉬움': '#dfe6e9',
-			쉬움: '#74b9ff',
-			보통: '#0984e3',
-			어려움: '#2d3436',
+			1: '#dfe6e9',
+			2: '#74b9ff',
+			3: '#0984e3',
+			4: '#2d3436',
 		};
 
-		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
+		return levelColorMap[level] || '#b2bec3'; // 기본 회색
 	};
 
-	const getFieldColor = (field: string) => {
-		const categoryColorMap: Record<string, string> = {
-			'운/우연': '#00cec9',
-			인간관계: '#6c5ce7',
-			'세상 이치': '#fdcb6e',
-			'근면/검소': '#e17055',
-			'노력/성공': '#00b894',
-			'경계/조심': '#d63031',
-			'욕심/탐욕': '#e84393',
-			'배신/불신': '#2d3436',
-		};
-		return categoryColorMap[field] || '#b2bec3';
-	};
 
 	const pickBlankWord = (text: string) => {
 		const words = text.split(' ').filter((w) => w.length > 1);
@@ -580,6 +583,11 @@ const ProverbCommonFrameScreen = () => {
 		setBlankWord('');
 		setQuestion(null);
 
+		// ✅ 스크롤 최상단 이동
+		if (flatListRef.current) {
+			flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+		}
+
 		if (isFinal) {
 			safelyGoBack();
 		} else {
@@ -618,6 +626,74 @@ const ProverbCommonFrameScreen = () => {
 		}
 	};
 
+	const getLevelLabel = (level: number) => {
+		switch (level) {
+			case 1:
+				return '아주 쉬움';
+			case 2:
+				return '쉬움';
+			case 3:
+				return '보통';
+			case 4:
+				return '어려움';
+			default:
+				return '알수없음';
+		}
+	};
+
+	const getFieldColor = (field: string) => {
+		const categoryColorMap: Record<string, string> = {
+			'운/우연': '#00cec9', // 청록
+			인간관계: '#6c5ce7', // 보라
+			'세상 이치': '#fdcb6e', // 연노랑
+			'근면/검소': '#e17055', // 주황
+			'노력/성공': '#00b894', // 짙은 청록
+			'경계/조심': '#d63031', // 빨강
+			'욕심/탐욕': '#e84393', // 핫핑크
+			'배신/불신': '#2d3436', // 짙은 회색
+		};
+
+		return categoryColorMap[field] || '#b2bec3'; // 기본 회색
+	};
+
+	const getLevelIcon = (level: number) => {
+		switch (level) {
+			case 1:
+				return <IconComponent type="FontAwesome6" name="seedling" size={14} color="#fff" />;
+			case 2:
+				return <IconComponent type="FontAwesome6" name="leaf" size={14} color="#fff" />;
+			case 3:
+				return <IconComponent type="FontAwesome6" name="tree" size={14} color="#fff" />;
+			case 4:
+				return <IconComponent type="FontAwesome6" name="trophy" size={14} color="#fff" />;
+			default:
+				return null;
+		}
+	};
+
+	const getFieldIcon = (field: string) => {
+		switch (field) {
+			case '운/우연':
+				return <IconComponent type="FontAwesome6" name="dice" size={12} color="#fff" />;
+			case '인간관계':
+				return <IconComponent type="FontAwesome6" name="users" size={12} color="#fff" />;
+			case '세상 이치':
+				return <IconComponent type="fontawesome5" name="globe" size={12} color="#fff" />;
+			case '근면/검소':
+				return <IconComponent type="fontawesome5" name="hammer" size={12} color="#fff" />;
+			case '노력/성공':
+				return <IconComponent type="fontawesome5" name="medal" size={12} color="#fff" />;
+			case '경계/조심':
+				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={12} color="#fff" />;
+			case '욕심/탐욕':
+				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={12} color="#fff" />;
+			case '배신/불신':
+				return <IconComponent type="fontawesome5" name="user-slash" size={12} color="#fff" />;
+			default:
+				return <IconComponent type="FontAwesome6" name="tag" size={12} color="#fff" />;
+		}
+	};
+
 	const progressPercent = totalCount > 0 ? (getSolvedCount() / totalCount) * 100 : 0;
 
 	return (
@@ -630,22 +706,26 @@ const ProverbCommonFrameScreen = () => {
 						<View style={styles.container}>
 							<View style={styles.inner}>
 								<View style={styles.progressStatusWrapper}>
-									<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: scaleHeight(5) }}>
-										<Text style={styles.progressText}>진행중인 퀴즈 : {getModeLabel(mode)}</Text>
-										<Text style={[styles.progressText, { color: '#3498db' }]}>
-											{getSolvedCount()} / {totalCount}
-										</Text>
+									<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+										<Text style={styles.progressText}>{getModeLabel(mode)}</Text>
+										{question?.level && (
+											<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+												{/* 레벨 표시 */}
+												<View style={[styles.badgePill, { backgroundColor: getLevelColor(question.level) }]}>
+													{getLevelIcon(question.level)}
+													<Text style={styles.badgeText}>{getLevelLabel(question.level)}</Text>
+												</View>
+
+												{/* 카테고리 표시 */}
+												{question?.category && (
+													<View style={[styles.badgePill, { backgroundColor: getFieldColor(question.category) }]}>
+														{getFieldIcon(question.category)}
+														<Text style={styles.badgeText}>{question.category}</Text>
+													</View>
+												)}
+											</View>
+										)}
 									</View>
-									{question?.category && (
-										<View style={styles.badgeRow}>
-											<View style={[styles.pillBadge, { borderColor: getLevelColor(question.levelName) }]}>
-												<Text style={[styles.pillBadgeText, { color: getLevelColor(question.levelName) }]}>{question.levelName}</Text>
-											</View>
-											<View style={[styles.pillBadge, { borderColor: getFieldColor(question.category) }]}>
-												<Text style={[styles.pillBadgeText, { color: getFieldColor(question.category) }]}>{question.category}</Text>
-											</View>
-										</View>
-									)}
 
 									<View style={styles.progressBarWrapper}>
 										<View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
@@ -654,7 +734,7 @@ const ProverbCommonFrameScreen = () => {
 									<View style={styles.statusCardRow}>
 										<View style={styles.statusCard}>
 											<Text style={styles.statusCardTitle}>📝 푼 퀴즈 수</Text>
-											<Text style={styles.statusCardValue}>{solvedCount}</Text>
+											<Text style={styles.statusCardValue}>{solvedCount}개</Text>
 										</View>
 										<View style={styles.statusCard}>
 											<Text style={styles.statusCardTitle}>🎯 총점</Text>
@@ -681,6 +761,32 @@ const ProverbCommonFrameScreen = () => {
 										</View>
 									</View>
 								</View>
+								{question && (
+									<View style={{ position: "absolute", width: '100%', alignItems: 'flex-end', marginTop: scaleHeight(6) }}>
+										<TouchableOpacity onPress={() => setShowHintModal(true)}>
+											<View
+												style={{
+													backgroundColor: '#fef3c7',
+													padding: scaleWidth(8),
+													borderRadius: scaleWidth(20),
+													flexDirection: 'row',
+													alignItems: 'center',
+												}}
+											>
+												<IconComponent
+													type="MaterialIcons"
+													name="lightbulb"
+													size={18}
+													color="#f39c12"
+												/>
+												<Text style={{ marginLeft: scaleWidth(6), fontWeight: '600', color: '#f39c12' }}>
+													힌트
+												</Text>
+											</View>
+										</TouchableOpacity>
+									</View>
+								)}
+
 								<View style={styles.quizBox}>
 									<AnimatedCircularProgress
 										size={scaleWidth(70)}
@@ -709,8 +815,10 @@ const ProverbCommonFrameScreen = () => {
 										<Text>문제 불러오는 중...</Text>
 									)}
 
+
 									<View style={[styles.optionsContainer, { flex: 1, width: '100%', marginTop: scaleHeight(5) }]}>
 										<FlatList
+											ref={flatListRef}
 											data={options}
 											keyExtractor={(item, index) => `${item}-${index}`}
 											contentContainerStyle={{ paddingBottom: scaleHeight(20) }}
@@ -906,6 +1014,122 @@ const ProverbCommonFrameScreen = () => {
 									</Animated.View>
 								</View>
 							</Modal>
+
+							{showHintModal && (
+								<Modal visible={showHintModal} transparent animationType="fade">
+									<View style={styles.modalOverlay}>
+										<View style={styles.resultModal}>
+											<Text style={[styles.resultTitle, { color: '#f39c12' }]}>🧭 힌트</Text>
+
+											{/* 카테고리 */}
+											{question?.category && (
+												<View
+													style={{
+														flexDirection: 'row',
+														alignItems: 'center',
+														backgroundColor: getFieldColor(question.category),
+														borderRadius: scaleWidth(8),
+														paddingHorizontal: scaleWidth(8),
+														paddingVertical: scaleHeight(4),
+														marginTop: scaleHeight(10),
+														marginBottom: scaleHeight(12),
+													}}>
+													{getFieldIcon(question.category)}
+													<Text style={{ color: '#fff', fontWeight: 'bold', marginLeft: scaleWidth(6) }}>
+														{question.category}
+													</Text>
+												</View>
+											)}
+											{/* 비슷한 속담 */}
+											{/* 비슷한 속담 */}
+											{question?.sameProverb && question.sameProverb.filter(sp => sp && sp.trim() !== '').length > 0 && (
+												<View
+													style={{
+														backgroundColor: '#eef6ff',
+														borderRadius: scaleWidth(12),
+														padding: scaleWidth(12),
+														marginBottom: scaleHeight(16),
+														borderWidth: 1,
+														borderColor: '#d6e4ff',
+														width: '100%',
+													}}>
+													<Text
+														style={{
+															fontSize: scaledSize(15),
+															fontWeight: '600',
+															color: '#2980b9',
+															marginBottom: scaleHeight(8),
+															textAlign: 'center',
+														}}>
+														🔗 비슷한 속담
+													</Text>
+
+													{question.sameProverb
+														.filter(sp => sp && sp.trim() !== '')
+														.map((sp, idx) => (
+															<Text
+																key={idx}
+																style={{
+																	fontSize: scaledSize(14),
+																	color: '#2c3e50',
+																	lineHeight: scaleHeight(20),
+																	marginBottom: scaleHeight(4),
+																}}>
+																- {sp}
+															</Text>
+														))}
+												</View>
+											)}
+
+											{/* 예시 문장 */}
+											{question?.example && question.example.length > 0 && (
+												<View
+													style={{
+														backgroundColor: '#f9f9f9',
+														borderRadius: scaleWidth(12),
+														padding: scaleWidth(12),
+														marginBottom: scaleHeight(16),
+														borderWidth: 1,
+														borderColor: '#eee',
+														width: '100%',
+													}}>
+													<Text
+														style={{
+															fontSize: scaledSize(15),
+															fontWeight: '600',
+															color: '#2c3e50',
+															marginBottom: scaleHeight(8),
+															textAlign: 'center',
+														}}>
+														💡 사용 예시
+													</Text>
+
+													{question.example.map((ex, idx) => (
+														<Text
+															key={idx}
+															style={{
+																fontSize: scaledSize(14),
+																color: '#2c3e50',
+																lineHeight: scaleHeight(20),
+																marginBottom: scaleHeight(4),
+															}}>
+															- {ex}
+														</Text>
+													))}
+												</View>
+											)}
+
+
+
+											<TouchableOpacity
+												style={styles.modalConfirmButton}
+												onPress={() => setShowHintModal(false)}>
+												<Text style={styles.modalConfirmText}>확인</Text>
+											</TouchableOpacity>
+										</View>
+									</View>
+								</Modal>
+							)}
 
 							{confettiKey > 0 && <ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart />}
 						</View>
@@ -1526,11 +1750,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(10),
 		borderRadius: scaleWidth(12),
 	},
-	badgeText: {
-		color: '#fff',
-		fontSize: scaledSize(13),
-		fontWeight: '600',
-	},
 	pillBadgeText: {
 		fontSize: scaledSize(12),
 		fontWeight: '600',
@@ -1548,5 +1767,24 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(14),
 		marginHorizontal: scaleWidth(4),
 		backgroundColor: 'rgba(0,0,0,0.02)',
+	},
+	badgePill: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		borderRadius: scaleWidth(20),
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(6), // ✅ 기존 2 → 6~8 정도로 늘리면 높이가 확보됨
+		marginLeft: scaleWidth(6),
+		marginBottom: scaleHeight(6),
+	},
+	badgeText: {
+		color: '#fff',
+		marginLeft: scaleWidth(3),
+		fontSize: scaledSize(13), // ✅ 글씨도 조금 키워주면 더 균형 맞음
+		fontWeight: '600',
+	},
+	titleIcon: {
+		marginLeft: scaleWidth(6),
+		marginTop: scaleHeight(2),
 	},
 });

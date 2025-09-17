@@ -9,7 +9,8 @@ type AdUnitIdType = string;
 
 const AD_UNIT_ID: AdUnitIdType = Platform.select({
 	ios: __DEV__ ? TestIds.BANNER : GOOGLE_ADMOV_IOS_BANNER!,
-	android: __DEV__ ? TestIds.BANNER : GOOGLE_ADMOV_ANDROID_BANNER!,
+	// android: __DEV__ ? TestIds.BANNER : GOOGLE_ADMOV_ANDROID_BANNER!,
+	android: TestIds.BANNER,
 }) as AdUnitIdType;
 
 interface AdmobBannerAdProps {
@@ -19,8 +20,8 @@ interface AdmobBannerAdProps {
 }
 
 const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({
-	paramMarginTop = 0,
-	paramMarginBottom = 20,
+	paramMarginTop = 6,
+	paramMarginBottom = 6,
 	visible = true, // 표시 여부
 }) => {
 	const bannerRef = useRef<BannerAd | null>(null);
@@ -33,8 +34,12 @@ const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({
 	});
 
 	const getBannerSize = () => {
-		if (screenWidth >= 600) return BannerAdSize.FULL_BANNER;
-		if (screenWidth >= 480) return BannerAdSize.LARGE_BANNER;
+		if (screenWidth >= 600) {
+			return BannerAdSize.FULL_BANNER;
+		}
+		if (screenWidth >= 480) {
+			return BannerAdSize.LARGE_BANNER;
+		}
 		return BannerAdSize.BANNER;
 	};
 
@@ -67,17 +72,11 @@ const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({
 				{
 					marginTop: paramMarginTop,
 					marginBottom: paramMarginBottom,
-					opacity: visible ? 1 : 0,      // 렌더링 유지 + 가시성만 제어
-					height: visible ? undefined : 0
+					opacity: visible ? 1 : 0, // 렌더링 유지 + 가시성만 제어
+					height: visible ? undefined : 0,
 				},
-			]}
-		>
-			<BannerAd
-				ref={bannerRef}
-				unitId={AD_UNIT_ID}
-				size={getBannerSize()}
-				onAdOpened={handleAdOpened}
-			/>
+			]}>
+			<BannerAd ref={bannerRef} unitId={AD_UNIT_ID} size={getBannerSize()} onAdOpened={handleAdOpened} />
 		</View>
 	);
 };

@@ -1041,7 +1041,6 @@ const ProverbCommonFrameScreen = () => {
 												</View>
 											)}
 											{/* 비슷한 속담 */}
-											{/* 비슷한 속담 */}
 											{question?.sameProverb && question.sameProverb.filter(sp => sp && sp.trim() !== '').length > 0 && (
 												<View
 													style={{
@@ -1100,8 +1099,7 @@ const ProverbCommonFrameScreen = () => {
 															color: '#2c3e50',
 															marginBottom: scaleHeight(8),
 															textAlign: 'center',
-														}}>
-														💡 사용 예시
+														}}>💡 속담 예시
 													</Text>
 
 													{question.example.map((ex, idx) => (
@@ -1204,7 +1202,7 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(22),
 		fontWeight: 'bold',
 		color: '#2c3e50',
-		marginBottom: scaleHeight(12),
+		marginBottom: scaleHeight(6),
 	},
 	resultMessage: {
 		fontSize: scaledSize(16),

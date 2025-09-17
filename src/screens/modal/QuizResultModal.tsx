@@ -2,6 +2,7 @@ import { Paths } from '@/navigation/conf/Paths';
 import { MainDataType } from '@/types/MainDataType';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome6';
 import React from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -21,7 +22,6 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 	const navigation = useNavigation();
 
 
-	// ✅ QuizResultModal.tsx 내부
 	const ProverbInfoCard = ({
 		question,
 		highlightColor = '#27ae60',
@@ -37,23 +37,47 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 			<View style={[styles.infoCard, { backgroundColor, borderColor: highlightColor }]}>
 				<Text style={[styles.infoSectionTitle, { color: highlightColor }]}>📖 속담 해설</Text>
 
-				<View style={styles.infoSection}>
-					<Text style={[styles.infoLabel, { color: highlightColor }]}>📌 속담</Text>
-					<Text style={styles.infoText}>{question.proverb}</Text>
-				</View>
 
-				<View style={styles.infoSection}>
-					<Text style={[styles.infoLabel, { color: highlightColor }]}>💡 의미</Text>
-					<Text style={styles.infoText}>- {question.longMeaning}</Text>
-				</View>
+				{/* 속담 본문 강조 박스 */}
+				<Text style={styles.modalProverbText}>{question.proverb}</Text>
 
-				{question.example && question.example.length > 0 && (
-					<View style={styles.infoSection}>
-						<Text style={[styles.infoLabel, { color: highlightColor }]}>💡 예시</Text>
+				{/* 의미 */}
+				{Boolean(question.longMeaning) && (
+					<View style={styles.meaningHighlight}>
+						<View style={styles.meaningQuoteBox}>
+							<Icon
+								name="quote-left"
+								size={28}
+								color="#58D68D"
+								style={{ marginBottom: scaleHeight(8) }}
+							/>
+							<Text style={styles.meaningQuoteText}>{question.longMeaning}</Text>
+						</View>
+					</View>
+				)}
+
+				{/* 예시 */}
+				{Array.isArray(question.example) && question.example.length > 0 && (
+					<View style={styles.sectionBox}>
+						<Text style={styles.sectionTitle}>✍️ 예시</Text>
 						{question.example.map((ex, idx) => (
-							<Text key={idx} style={styles.exampleText}>
-								- {ex}
-							</Text>
+							<View key={idx} style={styles.sameProverbBox}>
+								<Text key={idx} style={styles.exampleText}>
+									• {ex}
+								</Text>
+							</View>
+						))}
+					</View>
+				)}
+
+				{/* 비슷한 속담 */}
+				{Array.isArray(question.sameProverb) && question.sameProverb.filter((p) => p.trim()).length > 0 && (
+					<View style={styles.sectionBox}>
+						<Text style={styles.sectionTitle}>🔗 비슷한 속담</Text>
+						{question.sameProverb.map((p, idx) => (
+							<View key={idx} style={styles.sameProverbBox}>
+								<Text style={styles.sameProverbText}>• {p}</Text>
+							</View>
 						))}
 					</View>
 				)}
@@ -303,26 +327,130 @@ export const styles = StyleSheet.create({
 		lineHeight: scaleHeight(22),
 		fontWeight: '500',
 	},
+	infoSection: {
+		marginVertical: scaleHeight(12),
+		borderBottomWidth: 0.8,
+		borderBottomColor: '#ecf0f1',
+		paddingBottom: scaleHeight(10),
+	},
 	exampleBox: {
 		backgroundColor: '#f9f9f9',
 		borderRadius: scaleWidth(10),
 		padding: scaleWidth(12),
-		marginTop: scaleHeight(14),
+		marginTop: scaleHeight(8),
 		borderWidth: 1,
 		borderColor: '#eee',
-	},
-	exampleTitle: {
-		fontSize: scaledSize(14),
-		fontWeight: '700',
-		color: '#34495e',
-		marginBottom: scaleHeight(8),
-		textAlign: 'center',
 	},
 	exampleText: {
 		fontSize: scaledSize(14),
 		color: '#34495e',
 		lineHeight: scaleHeight(20),
 		marginBottom: scaleHeight(6),
+	},
+	exampleText: {
+		fontSize: scaledSize(14),
+		color: '#34495e',
+		lineHeight: scaleHeight(20),
+		marginBottom: scaleHeight(6),
+	},
+	modalProverbText: {
+		fontSize: scaledSize(20),
+		fontWeight: '700',
+		color: '#1E6BB8', // 파란색 강조
+		textAlign: 'center',
+		lineHeight: scaleHeight(28),
+		marginBottom: scaleHeight(16), // 아래 요소와 간격만 추가
+	},
+
+	sectionBox: {
+		borderWidth: 1,
+		borderColor: '#E6EEF5',
+		backgroundColor: '#FDFEFE',
+		padding: scaleWidth(12),
+		borderRadius: scaleWidth(12),
+		marginBottom: scaleHeight(12),
+		shadowColor: '#000',
+		shadowOpacity: 0.05,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 4,
+		elevation: 2,
+	},
+	sectionTitle: {
+		fontSize: scaledSize(15),
+		fontWeight: '700',
+		color: '#2c3e50',
+		marginBottom: scaleHeight(12),
+	},
+	sectionText: {
+		fontSize: scaledSize(14),
+		color: '#444',
+		lineHeight: scaleHeight(20),
+	},
+	exampleText: {
+		fontSize: scaledSize(13),
+		color: '#555',
+		lineHeight: 20,
+		marginBottom: scaleHeight(6),
+		backgroundColor: '#FAFAFA',
+		padding: scaleWidth(8),
+		borderRadius: scaleWidth(8),
+	},
+
+	/* ✅ 닫기 버튼 */
+	modalCloseButton: {
+		backgroundColor: '#0984e3',
+		paddingVertical: scaleHeight(14),
+		alignItems: 'center',
+		borderBottomLeftRadius: scaleWidth(20),
+		borderBottomRightRadius: scaleWidth(20),
+	},
+	modalCloseButtonText: {
+		color: '#fff',
+		fontSize: scaledSize(16),
+		fontWeight: 'bold',
+	},
+	meaningHighlight: {
+		borderWidth: 1.5,
+		borderColor: '#A5D8FF',
+		backgroundColor: '#EAF4FF',
+		padding: scaleWidth(14),
+		borderRadius: scaleWidth(14),
+		marginBottom: scaleHeight(16),
+		shadowColor: '#000',
+		shadowOpacity: 0.08,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 4,
+		elevation: 3,
+	},
+	meaningQuoteBox: {
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	meaningQuoteText: {
+		fontSize: scaledSize(15),
+		fontWeight: '600',
+		color: '#2c3e50',
+		lineHeight: scaleHeight(22),
+		textAlign: 'center',
+	},
+	badge2: {
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(4),
+		borderRadius: scaleWidth(12),
+		backgroundColor: '#f1f2f6',
+	},
+	sameProverbBox: {
+		backgroundColor: '#FAFAFA',
+		borderWidth: 1,
+		borderColor: '#E6EEF5',
+		padding: scaleWidth(8),
+		borderRadius: scaleWidth(8),
+		marginBottom: scaleHeight(6),
+	},
+	sameProverbText: {
+		fontSize: scaledSize(13),
+		color: '#444',
+		lineHeight: scaleHeight(20),
 	},
 });
 

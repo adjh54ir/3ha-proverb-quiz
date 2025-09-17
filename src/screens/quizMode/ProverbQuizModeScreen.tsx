@@ -55,18 +55,46 @@ const ProverbQuizModeScreen = () => {
 	};
 	// 이걸 기존 getLevelData 아래에 추가해
 	const levelInfo = useMemo(() => getLevelInfoByScore(totalScore), [totalScore]);
-	const { mascot } = levelInfo;
-
+	// 수정
+	const { mascot, label, next, icon } = levelInfo;
+	const progress = useMemo(() => {
+		if (!next) return 1;
+		const prevScore = LEVEL_DATA.find((l) => l.score === levelInfo.score - 830)?.score || 0;
+		return Math.min((totalScore - prevScore) / (next - prevScore), 1);
+	}, [totalScore, levelInfo]);
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff', paddingTop: scaleHeight(5) }} edges={['bottom']}>
 			<View style={styles.container}>
 
 				<ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-					<View style={styles.mascotSection}>
+					<View style={styles.mascotCard}>
 						<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.contain} />
+
+						{/* 라벨 + 아이콘 한 줄 */}
+						<View style={styles.levelRow}>
+							<IconComponent
+								type="FontAwesome5"
+								name={icon}
+								size={17}
+								color={label === '속담 마스터' ? '#FFD700' : '#27ae60'} // ✅ 조건 분기
+								style={{ marginRight: scaleWidth(6) }}
+							/>
+							<Text style={styles.levelLabel}>{label}</Text>
+						</View>
+
+						<Text style={styles.scoreText}>총 점수: {totalScore}점</Text>
+
+						{/* 진행도 바 */}
+						<View style={styles.progressBarBackground}>
+							<View style={[styles.progressBarFill, { width: `${progress * 100}%` }]} />
+						</View>
+						{next && (
+							<Text style={styles.progressText}>
+								다음 레벨까지 {next - totalScore}점 남음
+							</Text>
+						)}
 					</View>
 					<View style={styles.titleWrap}>
-						<Text style={styles.titleLine}>🧩 퀴즈 준비됐나요?</Text>
 						<Text style={styles.titleLine}>도전하려는 퀴즈 모드를 선택하세요!</Text>
 					</View>
 
@@ -165,7 +193,8 @@ const styles = StyleSheet.create({
 	scrollContent: {
 		flexGrow: 1,
 		paddingHorizontal: scaleWidth(20),
-		paddingVertical: scaleHeight(20),
+		paddingTop: scaleHeight(6),
+		paddingBottom: scaleHeight(20),
 		marginBottom: scaleHeight(150),
 	},
 	gridWrap: {
@@ -325,14 +354,63 @@ const styles = StyleSheet.create({
 	mascotImage: {
 		width: scaleWidth(100),
 		height: scaleWidth(100),
-		borderRadius: scaleWidth(70),
-		borderWidth: 3,
-		borderColor: '#f1c40f',
+		borderRadius: scaleWidth(50),
+		borderWidth: 4,
+		borderColor: '#3498db', // 레벨/앱 테마 컬러
+		backgroundColor: '#fff',
+	},
+	mascotCard: {
+		width: '100%',
+		alignItems: 'center',
+		padding: scaleHeight(16),
+		marginBottom: scaleHeight(20),
+		borderRadius: scaleWidth(16),
 		backgroundColor: '#fff',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.15,
+		shadowOffset: { width: 0, height: 3 },
+		shadowOpacity: 0.1,
 		shadowRadius: 6,
+		elevation: 4,
+	},
+	mascotImage: {
+		width: scaleWidth(100),
+		height: scaleWidth(100),
+		borderRadius: scaleWidth(70),
+		marginBottom: scaleHeight(10),
+	},
+	levelLabel: {
+		fontSize: scaledSize(18),
+		fontWeight: '700',
+		color: '#2c3e50',
+		marginBottom: scaleHeight(6),
+	},
+	scoreText: {
+		fontSize: scaledSize(14),
+		color: '#f39c12',
+		fontWeight: '600',
+		marginBottom: scaleHeight(10),
+	},
+	progressBarBackground: {
+		width: '80%',
+		height: scaleHeight(10),
+		backgroundColor: '#ecf0f1',
+		borderRadius: scaleWidth(6),
+		overflow: 'hidden',
+		marginBottom: scaleHeight(6),
+	},
+	progressBarFill: {
+		height: '100%',
+		backgroundColor: '#27ae60',
+	},
+	progressText: {
+		fontSize: scaledSize(12),
+		color: '#7f8c8d',
+	},
+	levelRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginBottom: scaleHeight(6),
 	},
 });
 

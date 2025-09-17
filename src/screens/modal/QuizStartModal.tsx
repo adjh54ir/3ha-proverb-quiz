@@ -69,10 +69,13 @@ const QuizStartModal = ({
 	onCompleteStart
 }: Props) => {
 	const STORAGE_KEY_QUIZ = 'UserQuizHistory';
+	const scaleAnim = useRef(new Animated.Value(1)).current;
 	const [levelStats, setLevelStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [categoryStats, setCategoryStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [quizHistory, setQuizHistory] = useState<UserQuizHistory | null>(null);
 	const shouldShowAd = Math.random() < GOOGLE_ADMOV_FRONT_PERCENT; // 20% 확률
+	const selectedLevelStats =
+		levelStats[selectedLevel] || levelStats['전체'] || { total: 0, studied: 0 };
 
 	useFocusEffect(
 		useCallback(() => {
@@ -154,6 +157,15 @@ const QuizStartModal = ({
 
 	const STYLE_MAP: StyleMap = {
 		// 레벨
+		// 	{
+		// 	label: '전체',
+		// 	key: 'all',
+		// 	icon: () => <IconComponent type="FontAwesome6" name="list" size={16} color="#555" />,
+		// 	iconColor: '#555',
+		// },
+
+
+		'전체': { color: '#555', icon: { type: 'FontAwesome6', name: 'list' }, type: 'level' },
 		'아주 쉬움': { color: '#85C1E9', icon: { type: 'fontAwesome5', name: 'seedling' }, type: 'level' },
 		쉬움: { color: '#F4D03F', icon: { type: 'fontAwesome5', name: 'leaf' }, type: 'level' },
 		보통: { color: '#EB984E', icon: { type: 'fontAwesome5', name: 'tree' }, type: 'level' },
@@ -186,6 +198,29 @@ const QuizStartModal = ({
 	const getStyleColor = (key: string): string => STYLE_MAP[key]?.color || (STYLE_MAP[key]?.type === 'level' ? '#0A84FF' : '#dfe6e9');
 	const getStyleIcon = (key: string): { type: string; name: string } | null => STYLE_MAP[key]?.icon || null;
 
+
+	const ProgressBar = ({ studied, total, color }: { studied: number; total: number; color: string }) => {
+		const percentage = total > 0 ? (studied / total) * 100 : 0;
+
+		return (
+			<View style={styles.progressWrapper}>
+				<View style={styles.progressBackground}>
+					<View
+						style={[
+							styles.progressFill,
+							{
+								width: `${percentage}%`,
+								backgroundColor: color,
+							},
+						]}
+					/>
+				</View>
+				<Text style={styles.progressText}>
+					{studied}/{total} ({Math.round(percentage)}%)
+				</Text>
+			</View>
+		);
+	};
 
 	const InlineTooltip = ({ marginLeft = 0, marginTop = 0 }: { marginLeft?: number; marginTop?: number }) => {
 		const [showTooltip, setShowTooltip] = useState(false);
@@ -268,6 +303,39 @@ const QuizStartModal = ({
 			</View>
 		);
 	};
+
+
+	const handleStartPress = () => {
+		Animated.sequence([
+			Animated.timing(scaleAnim, {
+				toValue: 0.95, // 살짝 줄어듦
+				duration: 80,
+				useNativeDriver: true,
+			}),
+			Animated.timing(scaleAnim, {
+				toValue: 1.05, // 살짝 커짐
+				duration: 120,
+				useNativeDriver: true,
+			}),
+			Animated.timing(scaleAnim, {
+				toValue: 1, // 원래 크기
+				duration: 80,
+				useNativeDriver: true,
+			}),
+		]).start(() => {
+			// 애니메이션 끝난 뒤 원래 로직 실행
+			if (modeStep === 0) {
+				setModeStep(1);
+			} else {
+				if (shouldShowAd) {
+					onCompleteStart();
+				} else {
+					onStart();
+				}
+			}
+		});
+	};
+
 
 	const SelectGroup = ({ title, options, selected, compact = false, getIcon }: SelectGroupProps) => {
 		const isLevel = title.includes('난이도');
@@ -354,7 +422,7 @@ const QuizStartModal = ({
 					<View style={styles.selectModal}>
 						{/* 최상단 타이틀 */}
 						<View style={styles.modalHeader}>
-							<Text style={styles.modalTitle}>🧠 퀴즈 모드</Text>
+							<Text style={styles.modalTitle}>퀴즈 모드</Text>
 							<TouchableOpacity style={styles.closeButton} onPress={onClose}>
 								<IconComponent type='materialIcons' name='close' size={24} color='#7f8c8d' />
 							</TouchableOpacity>
@@ -370,6 +438,50 @@ const QuizStartModal = ({
 											<Text style={styles.selectTitleText}>나에게 맞는 난이도를 골라보세요!</Text>
 										</View>
 									</View>
+									{/* ✅ 선택된 난이도의 진행도 바 */}
+									{/* ✅ 선택된 난이도 카드 */}
+									{selectedLevel && (
+										<View style={[styles.selectedLevelCard, { borderColor: getStyleColor(selectedLevel) }]}>
+											<View style={styles.selectedLevelHeader}>
+												{STYLE_MAP[selectedLevel] && (
+													<IconComponent
+														type={STYLE_MAP[selectedLevel].icon.type}
+														name={STYLE_MAP[selectedLevel].icon.name}
+														size={20}
+														color={getStyleColor(selectedLevel)}
+														style={{ marginRight: scaleWidth(6) }}
+													/>
+												)}
+												<Text style={[styles.selectedLevelText, { color: getStyleColor(selectedLevel) }]}>
+													{LEVEL_LABEL_MAP[selectedLevel] || selectedLevel}
+												</Text>
+											</View>
+
+											{/* ✅ 진행도 바 개선 */}
+											<View style={styles.progressContainer}>
+												<View style={styles.progressTrack}>
+													<View
+														style={[
+															styles.progressIndicator,
+															{
+																width: `${(selectedLevelStats.studied / selectedLevelStats.total) * 100}%`,
+																backgroundColor: getStyleColor(selectedLevel),
+															},
+														]}
+													/>
+												</View>
+												<View style={styles.progressBadge}>
+													<Text style={styles.progressBadgeText}>
+														{Math.round((selectedLevelStats.studied / selectedLevelStats.total) * 100)}%
+													</Text>
+												</View>
+											</View>
+
+											<Text style={styles.progressDetail}>
+												{selectedLevelStats?.studied ?? 0} / {selectedLevelStats?.total ?? 0} 퀴즈 완료
+											</Text>
+										</View>
+									)}
 									<SelectGroup title='난이도 선택' options={levelOptions} selected={selectedLevel} onSelect={setSelectedLevel} getIcon={getStyleIcon} />
 								</>
 							) : (
@@ -410,44 +522,40 @@ const QuizStartModal = ({
 								style={[
 									styles.modalButton,
 									{
-										backgroundColor: (modeStep === 0 && selectedLevel) || (modeStep === 1 && selectedCategory) ? '#27ae60' : '#ccc',
+										backgroundColor:
+											(modeStep === 0 && selectedLevel) || (modeStep === 1 && selectedCategory)
+												? '#27ae60'
+												: '#ccc',
 									},
 								]}
 								disabled={modeStep === 0 ? !selectedLevel : !selectedCategory}
-								onPress={() => {
-									if (modeStep === 0) {
-										setModeStep(1);
-									} else {
-										const all = ProverbServices.selectProverbList();
-										const filtered = all.filter(
-											(item) =>
-												(selectedLevel === '전체' || item.levelName === selectedLevel) &&
-												(selectedCategory === '전체' || item.category === selectedCategory),
-										);
-
-										const stat = categoryStats[selectedCategory] || categoryStats['전체'];
-										if (stat.total > 0 && stat.total === stat.studied) {
-											Alert.alert('대단해요! 👏', '이 카테고리는 이미 다 풀었어요. 다른 주제를 골라볼까요? 😄');
-											return;
-										}
-										if (filtered.length === 0) {
-											Alert.alert('잠깐만요!', '선택한 난이도와 카테고리에 맞는 속담이 아직 없어요 🥲');
-											return;
-										}
-
-										// 광고 출력시
-										if (shouldShowAd) {
-											onCompleteStart(); // 부모가 광고 처리
-										} else {
-											onStart(); // 바로 시작
-										}
-									}
-								}}>
-								<View style={styles.centeredButtonContent}>
-									{modeStep === 1 && <IconComponent type='fontAwesome5' name='rocket' size={16} color='#fff' style={{ marginRight: 8 }} />}
-									<Text style={styles.modalButtonText}>{modeStep === 0 ? '다음' : '퀴즈 시작'}</Text>
-									{modeStep === 0 && <IconComponent type='fontAwesome5' name='arrow-right' size={16} color='#fff' style={{ marginLeft: 8 }} />}
-								</View>
+								onPress={handleStartPress} // ← 여기!
+							>
+								<Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+									<View style={styles.centeredButtonContent}>
+										{modeStep === 1 && (
+											<IconComponent
+												type="fontAwesome5"
+												name="rocket"
+												size={16}
+												color="#fff"
+												style={{ marginRight: 8 }}
+											/>
+										)}
+										<Text style={styles.modalButtonText}>
+											{modeStep === 0 ? '다음' : '퀴즈 시작'}
+										</Text>
+										{modeStep === 0 && (
+											<IconComponent
+												type="fontAwesome5"
+												name="arrow-right"
+												size={16}
+												color="#fff"
+												style={{ marginLeft: 8 }}
+											/>
+										)}
+									</View>
+								</Animated.View>
 							</TouchableOpacity>
 						</View>
 					</View>
@@ -564,7 +672,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginTop: scaleHeight(16),
-		marginBottom: scaleHeight(8),
+		marginBottom: scaleHeight(12),
 		gap: scaleWidth(6),
 	},
 	selectTitleEmoji: {
@@ -580,6 +688,7 @@ const styles = StyleSheet.create({
 		lineHeight: scaleHeight(24),
 		flexShrink: 1,
 		marginRight: scaleWidth(5),
+
 	},
 	selectButtonText: {
 		fontSize: scaledSize(15),
@@ -675,5 +784,97 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		flexShrink: 1,
+	},
+	progressBarBackground: {
+		width: '100%',
+		height: scaleHeight(6),
+		backgroundColor: 'rgba(255,255,255,0.3)',
+		borderRadius: scaleWidth(4),
+		marginTop: scaleHeight(4),
+		overflow: 'hidden',
+	},
+	progressBarFill: {
+		height: '100%',
+		borderRadius: scaleWidth(4),
+	},
+	progressWrapper: {
+		width: '100%',
+		marginTop: scaleHeight(8),
+	},
+	progressBackground: {
+		width: '100%',
+		height: scaleHeight(10),
+		backgroundColor: '#ecf0f1',
+		borderRadius: scaleWidth(10),
+		overflow: 'hidden',
+	},
+	progressFill: {
+		height: '100%',
+		borderRadius: scaleWidth(10),
+	},
+	progressText: {
+		marginTop: scaleHeight(4),
+		fontSize: scaledSize(12),
+		fontWeight: '600',
+		color: '#2d3436',
+		textAlign: 'right',
+	},
+	selectedLevelCard: {
+		width: '100%',
+		borderWidth: 2,
+		borderRadius: scaleWidth(14),
+		padding: scaleWidth(12),
+		marginBottom: scaleHeight(16),
+		backgroundColor: '#fdfefe',
+		shadowColor: '#000',
+		shadowOpacity: 0.08,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 4,
+	},
+	selectedLevelHeader: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: scaleHeight(6),
+	},
+	selectedLevelText: {
+		fontSize: scaledSize(16),
+		fontWeight: '700',
+	},
+	progressContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginTop: scaleHeight(6),
+	},
+	progressTrack: {
+		flex: 1,
+		height: scaleHeight(10),
+		backgroundColor: '#ecf0f1',
+		borderRadius: scaleWidth(10),
+		overflow: 'hidden',
+		marginRight: scaleWidth(8),
+	},
+	progressIndicator: {
+		height: '100%',
+		borderRadius: scaleWidth(10),
+	},
+	progressBadge: {
+		minWidth: scaleWidth(40),
+		height: scaleHeight(22),
+		borderRadius: scaleWidth(12),
+		backgroundColor: '#2d3436',
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingHorizontal: scaleWidth(6),
+	},
+	progressBadgeText: {
+		fontSize: scaledSize(12),
+		fontWeight: '700',
+		color: '#fff',
+	},
+	progressDetail: {
+		marginTop: scaleHeight(4),
+		fontSize: scaledSize(12),
+		color: '#636e72',
+		textAlign: 'right',
 	},
 });

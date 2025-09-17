@@ -242,7 +242,7 @@ const TodayQuizScreen = () => {
     const sendInstantPush = async () => {
         await notifee.displayNotification({
             title: '✨ 오늘의 퀴즈가 도착했어요!',
-            body: '관용구 퀴즈 풀고 보상도 받아보세요!',
+            body: '속담 퀴즈 풀고 보상도 받아보세요!',
             android: {
                 channelId: await createAndroidChannel(),
                 pressAction: {
@@ -438,8 +438,8 @@ const TodayQuizScreen = () => {
         await notifee.createTriggerNotification(
             {
                 id: NOTIFICATION_ID,
-                title: '관용구 퀴즈가 도착했습니다. 🍀',
-                body: '출석 체크도 하고 문제도 풀어서 관용구 지식을 넓혀보아요!',
+                title: '속담 퀴즈가 도착했습니다. 🍀',
+                body: '출석 체크도 하고 문제도 풀어서 속담 지식을 넓혀보아요!',
                 android: {
                     channelId: await createAndroidChannel(),
                     pressAction: { id: 'default' },
@@ -769,7 +769,7 @@ const TodayQuizScreen = () => {
                                 />
                                 <Text style={styles.sectionHeaderText}>정답</Text>
                             </View>
-                            <Text style={styles.correctMeaningValue}>- {item.meaning}</Text>
+                            <Text style={styles.correctMeaningValue}>- {item.longMeaning}</Text>
                         </View>
 
 
@@ -819,22 +819,26 @@ const TodayQuizScreen = () => {
 
                         {options.map((option, idx) => {
                             const isAnswered = result !== undefined;
-                            const isCorrectOption = option === item.meaning;
+                            const isCorrectOption = option === item.longMeaning;
                             const isUserSelected = selected?.value === option;
                             const shouldHighlight = highlightAnswerId === item.id && isCorrectOption;
 
                             return (
                                 <TouchableOpacity
                                     key={idx}
-                                    onPress={() => handleAnswer(item.id, option, item.meaning)}
+                                    onPress={() => handleAnswer(item.id, option, item.longMeaning)}
                                     disabled={isAnswered}
                                     style={[
                                         styles.optionBase,
                                         isUserSelected && (isCorrectOption ? styles.correctOption : styles.wrongOption),
                                         shouldHighlight && styles.highlightCorrectBorder,
                                     ]}>
-                                    <Text style={styles.optionTextBase}>
-                                        {/* ✅ 레이블만 색상 적용 */}
+                                    <Text
+                                        style={[
+                                            styles.optionTextBase,
+                                            isUserSelected && (isCorrectOption ? styles.correctText : styles.wrongText),
+                                        ]}
+                                    >
                                         <Text style={{ color: labelColors[idx % labelColors.length], fontWeight: 'bold' }}>
                                             {String.fromCharCode(65 + idx)}.
                                         </Text>{' '}
@@ -890,7 +894,7 @@ const TodayQuizScreen = () => {
                         <View style={{ alignSelf: 'flex-start', marginTop: scaleHeight(6) }}>
                             <View style={styles.bulletRow}>
                                 <Text style={styles.bullet}>•</Text>
-                                <Text style={styles.bulletText}>매일 5개의 관용구 퀴즈가 도착해요.</Text>
+                                <Text style={styles.bulletText}>매일 5개의 속담 퀴즈가 도착해요.</Text>
                             </View>
                             <View style={styles.bulletRow}>
                                 <Text style={styles.bullet}>•</Text>
@@ -1255,7 +1259,7 @@ const TodayQuizScreen = () => {
                                                             {/* 의미 */}
                                                             <View style={styles.historyMeaningBox}>
                                                                 <Text style={styles.historyMeaningLabel}>정답</Text>
-                                                                <Text style={styles.historyMeaningValue}>- {item.meaning}</Text>
+                                                                <Text style={styles.historyMeaningValue}>- {item.longMeaning}</Text>
                                                             </View>
 
                                                             {/* 예문(exampleKr 전체) */}
@@ -1303,8 +1307,6 @@ const TodayQuizScreen = () => {
                 visible={detailModalVisible}
                 proverb={detailQuiz}
                 onClose={() => setDetailModalVisible(false)}
-                getFieldColor={getFieldColor}
-                getLevelColor={getLevelColor}
             />
 
             {/* <IdiomDetailModal idiom={detailQuiz} visible={detailModalVisible} onClose={() => setDetailModalVisible(false)} /> */}
@@ -2203,23 +2205,25 @@ const styles = StyleSheet.create({
         textAlign: 'left',
     },
 
-    correctOption: {
-        backgroundColor: '#4CAF50',
-        borderColor: '#388E3C',
-    },
 
+    // 변경 → 테두리만 강조
+    correctOption: {
+        backgroundColor: '#f0f0f0',   // 기본 배경 유지
+        borderColor: '#4CAF50',
+        borderWidth: 3,               // 테두리 두께 강조
+    },
     wrongOption: {
-        backgroundColor: '#F44336',
-        borderColor: '#D32F2F',
+        backgroundColor: '#f0f0f0',   // 기본 배경 유지
+        borderColor: '#F44336',
+        borderWidth: 3,
     },
 
     correctText: {
-        color: '#fff',
+        color: '#4CAF50',
         fontWeight: 'bold',
     },
-
     wrongText: {
-        color: '#fff',
+        color: '#F44336',
         fontWeight: 'bold',
     },
     hintText: {
@@ -2358,7 +2362,7 @@ const styles = StyleSheet.create({
         fontSize: scaledSize(15),
         fontWeight: 'bold',
     },
-    // 해설 헤더: 관용구 + 배지
+    // 해설 헤더: 속담 + 배지
     explainHeaderRow: {
         flexDirection: 'row',
         alignItems: 'center',

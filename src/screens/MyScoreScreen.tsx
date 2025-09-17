@@ -30,6 +30,7 @@ import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { FIELD_DROPDOWN_ITEMS } from './ProverbStudyScreen';
+import { LEVEL_DATA } from '@/const/common/CommonMainData';
 
 LocaleConfig.defaultLocale = 'kr';
 moment.locale('ko'); // 로케일 설정
@@ -377,45 +378,6 @@ const CapitalResultScreen = () => {
 
 	const totalSolved = correctCount + wrongCount;
 	const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
-
-	const LEVEL_DATA = [
-		{
-			score: 0,
-			next: 600,
-			label: '속담 초보자',
-			icon: 'seedling',
-			encouragement: '🌱 첫걸음을 뗐어요! 이제 속담의 세계로!',
-			description: '속담 학습의 출발선에 선 단계로,\n기초적인 표현부터 차근히 익히는 시기예요.',
-			mascot: require('@/assets/images/level1_mascote.png'),
-		},
-		{
-			score: 600,
-			next: 1200,
-			label: '속담 입문자',
-			icon: 'leaf',
-			encouragement: '🍃 차근차근 익혀가는 중이에요!\n조금씩 자신감이 붙고 있어요!',
-			description: '기초 속담에 익숙해지고,\n다양한 표현을 접하며 감을 잡아가는 단계예요.',
-			mascot: require('@/assets/images/level2_mascote.png'),
-		},
-		{
-			score: 1200,
-			next: 1800,
-			label: '속담 숙련자',
-			icon: 'tree',
-			encouragement: '🌳 멋져요! 속담 실력이 부쩍 늘었어요!',
-			description: '속담의 뜻과 쓰임새를 잘 이해하고 있으며,\n실전 문제에도 능숙하게 대응할 수 있는 단계예요.',
-			mascot: require('@/assets/images/level3_mascote.png'),
-		},
-		{
-			score: 1800,
-			next: 2461,
-			label: '속담 마스터',
-			icon: 'trophy',
-			encouragement: '🏆 속담 마스터에 도달했어요! 정말 대단해요!',
-			description: '속담에 대한 깊은 이해와 활용 능력을 갖춘 최상위 단계로,\n누구에게나 모범이 될 수 있는 수준이에요.',
-			mascot: require('@/assets/images/level4_mascote.png'),
-		},
-	];
 
 	const reversedLevelGuide = [...LEVEL_DATA].reverse();
 	const currentLevelIndex = reversedLevelGuide.findIndex((item) => totalScore >= item.score && totalScore < item.next);

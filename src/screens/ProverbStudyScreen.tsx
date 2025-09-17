@@ -228,7 +228,7 @@ const QuizStudyScreen = () => {
 	const [showGuideModal, setShowGuideModal] = useState(false);
 	const [showToast, setShowToast] = useState(false);
 	const [praiseText, setPraiseText] = useState('');
-	const [levelFilter, setLevelFilter] = useState<'전체' | '초급' | '중급' | '고급' | '특급'>('전체');
+	const [levelFilter, setLevelFilter] = useState<'전체' | '아주 쉬움' | '쉬움' | '보통' | '어려움'>('전체');
 	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 	const [regionFilter, setRegionFilter] = useState<string>('전체');
 	const [isDetailFilterOpen, setIsDetailFilterOpen] = useState(false);
@@ -311,26 +311,19 @@ const QuizStudyScreen = () => {
 	}, []);
 
 	// 레벨 이름/숫자 매핑(재사용용)
-	const LEVEL_NAME_MAP: Record<number, '초급' | '중급' | '고급' | '특급'> = {
-		1: '초급',
-		2: '중급',
-		3: '고급',
-		4: '특급',
+	const LEVEL_NAME_MAP: Record<number, '아주 쉬움' | '쉬움' | '보통' | '어려움'> = {
+		1: '아주 쉬움',
+		2: '쉬움',
+		3: '보통',
+		4: '어려움',
 	};
-	const LEVEL_VALUE_MAP: Record<'초급' | '중급' | '고급' | '특급', number> = {
-		초급: 1,
-		중급: 2,
-		고급: 3,
-		특급: 4,
-	};
-
 	// 레벨 색상
 	const getLevelColor = (level: number) => {
 		const levelColorMap: Record<number, string> = {
-			1: '#2ecc71', // 초급
-			2: '#F4D03F', // 중급
-			3: '#EB984E', // 고급
-			4: '#E74C3C', // 특급
+			1: '#2ecc71', // 아주 쉬움
+			2: '#F4D03F', // 쉬움
+			3: '#EB984E', // 보통
+			4: '#E74C3C', // 어려움
 		};
 		return levelColorMap[level] || '#b2bec3';
 	};
@@ -590,7 +583,7 @@ const QuizStudyScreen = () => {
 			filtered = filtered.filter((c) => !studyHistory.studyProverbes.includes(c.id));
 		}
 
-		const LEVEL_MAP: Record<string, number> = { 초급: 1, 중급: 2, 고급: 3, 특급: 4 };
+		const LEVEL_MAP: Record<string, number> = { "아주 쉬움": 1, 쉬움: 2, 보통: 3, 어려움: 4 };
 		if (levelFilter !== '전체') {
 			filtered = filtered.filter((item) => item.level === LEVEL_MAP[levelFilter]);
 		}
@@ -759,7 +752,7 @@ const QuizStudyScreen = () => {
 								</View>
 
 								{/* <Text style={styles.hangulText}>{item.hangul}</Text> */}
-								<Text style={styles.cardHint}>카드를 탭하면 관용구 정보가 나와요 👆</Text>
+								<Text style={styles.cardHint}>카드를 탭하면 속담 정보가 나와요 👆</Text>
 							</View>
 						)}
 
@@ -1079,16 +1072,16 @@ const QuizStudyScreen = () => {
 					{isLoading ? (
 						<View style={styles.loadingContainer}>
 							<ActivityIndicator size="large" color="#4a90e2" />
-							<Text style={styles.loadingText}>관용구 정보를 불러오는 중...</Text>
+							<Text style={styles.loadingText}>속담 정보를 불러오는 중...</Text>
 						</View>
 					) : getFilteredData().length === 0 ? (
 						<View style={styles.emptyWrapper}>
 							<Image source={require('@/assets/images/sorry3.png')} style={styles.emptyImage} />
 							<Text style={styles.emptyText}>
 								{filter === 'learned'
-									? '완료한 관용구가 아직 없어요.\n학습 후 완료 버튼을 눌러보세요!'
+									? '완료한 속담이 아직 없어요.\n학습 후 완료 버튼을 눌러보세요!'
 									: filter === 'learning'
-										? '진행 중인 관용구가 없어요.\n다시 학습하기 버튼으로 시작해보세요!'
+										? '진행 중인 속담이 없어요.\n다시 학습하기 버튼으로 시작해보세요!'
 										: '등록된 사자성어가 없습니다.'}
 							</Text>
 						</View>

@@ -221,12 +221,12 @@ const ProverbListScreen = () => {
 
 		return categoryColorMap[field] || '#b2bec3'; // 기본 회색
 	};
-	const getLevelColor = (levelName: string) => {
+	const getLevelColor = (levelName: number) => {
 		const levelColorMap: Record<string, string> = {
-			'아주 쉬움': '#dfe6e9',
-			쉬움: '#74b9ff',
-			보통: '#0984e3',
-			어려움: '#2d3436',
+			1: '#2ecc71',
+			2: '#F4D03F',
+			3: '#EB984E',
+			4: '#E74C3C',
 		};
 
 		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
@@ -268,6 +268,45 @@ const ProverbListScreen = () => {
 		setFieldOpen(open);
 		if (open) { scrollToTop(); }
 	};
+
+	const getLevelIcon = (level: number) => {
+		switch (level) {
+			case 1:
+				return <IconComponent type="FontAwesome6" name="seedling" size={14} color="#fff" />;
+			case 2:
+				return <IconComponent type="FontAwesome6" name="leaf" size={14} color="#fff" />;
+			case 3:
+				return <IconComponent type="FontAwesome6" name="tree" size={14} color="#fff" />;
+			case 4:
+				return <IconComponent type="FontAwesome6" name="trophy" size={14} color="#fff" />;
+			default:
+				return null;
+		}
+	};
+
+	const getFieldIcon = (field: string) => {
+		switch (field) {
+			case '운/우연':
+				return <IconComponent type="FontAwesome6" name="dice" size={12} color="#fff" />;
+			case '인간관계':
+				return <IconComponent type="FontAwesome6" name="users" size={12} color="#fff" />;
+			case '세상 이치':
+				return <IconComponent type="fontawesome5" name="globe" size={12} color="#fff" />;
+			case '근면/검소':
+				return <IconComponent type="fontawesome5" name="hammer" size={12} color="#fff" />;
+			case '노력/성공':
+				return <IconComponent type="fontawesome5" name="medal" size={12} color="#fff" />;
+			case '경계/조심':
+				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={12} color="#fff" />;
+			case '욕심/탐욕':
+				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={12} color="#fff" />;
+			case '배신/불신':
+				return <IconComponent type="fontawesome5" name="user-slash" size={12} color="#fff" />;
+			default:
+				return <IconComponent type="FontAwesome6" name="tag" size={12} color="#fff" />;
+		}
+	};
+
 
 	return (
 		<SafeAreaView style={styles.main} edges={['top']}>
@@ -317,9 +356,12 @@ const ProverbListScreen = () => {
 											iconContainerStyle={{ marginRight: scaleWidth(8) }}
 											showArrowIcon={true} // 드롭다운 화살표
 											showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
+											onChangeValue={() => scrollToTop()}
+
 										/>
 									</View>
 									<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000, overflow: 'visible' }]}>
+
 										<DropDownPicker
 											listMode="MODAL"
 											modalTitle="카테고리 선택"
@@ -329,6 +371,7 @@ const ProverbListScreen = () => {
 											setOpen={setFieldOpen}
 											setValue={setFieldValue}
 											setItems={setFieldItems}
+											onChangeValue={() => scrollToTop()}
 											dropDownDirection="BOTTOM" // ✅ 추가
 											scrollViewProps={{
 												nestedScrollEnabled: true,
@@ -355,7 +398,7 @@ const ProverbListScreen = () => {
 												transparent: true,
 											}}
 											modalContentContainerStyle={{
-												marginTop: scaleHeight(50),
+												marginTop: "25%",
 												width: '85%',
 												alignSelf: 'center',
 												maxHeight: scaleHeight(500),
@@ -435,11 +478,37 @@ const ProverbListScreen = () => {
 											}}>
 											<View style={styles.proverbBlock}>
 												<View style={styles.badgeInlineRow}>
-													<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
-														<Text style={styles.badgeText}>{item.levelName}</Text>
+
+													<View
+														style={[
+															styles.badge,
+															{
+																backgroundColor: getLevelColor(item.level),
+																flexDirection: 'row',
+																alignItems: 'center',
+																paddingHorizontal: scaleWidth(8),
+																paddingVertical: scaleHeight(4),
+															},
+														]}>
+														{getLevelIcon(item.level)}
+														<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>
+															{{ 1: '아주 쉬움', 2: '쉬움', 3: '보통', 4: '어려움' }[item.level] || '알 수 없음'}
+														</Text>
 													</View>
-													<View style={[styles.badge, { backgroundColor: getFieldColor(item.category) }]}>
-														<Text style={styles.badgeText}>{item.category}</Text>
+													<View
+														style={[
+															styles.badge2,
+															{
+																backgroundColor: getFieldColor(item.category),
+																flexDirection: 'row',
+																alignItems: 'center',
+																paddingHorizontal: scaleWidth(8),
+															},
+														]}>
+														{getFieldIcon(item.category)}
+														<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>
+															{item.category || '미지정'}
+														</Text>
 													</View>
 												</View>
 												<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
@@ -449,7 +518,7 @@ const ProverbListScreen = () => {
 
 											{Array.isArray(item.sameProverb) && item.sameProverb.filter((p) => p.trim()).length > 0 && (
 												<View style={styles.sameProverbBox}>
-													<Text style={styles.sameProverbTitle}>비슷한 속담</Text>
+													<Text style={styles.sameProverbTitle}>🔗 비슷한 속담</Text>
 													{item.sameProverb
 														.filter((p) => p.trim())
 														.map((p, idx) => (
@@ -477,8 +546,6 @@ const ProverbListScreen = () => {
 							visible={showDetailModal}
 							proverb={selectedProverb}
 							onClose={() => setShowDetailModal(false)}
-							getFieldColor={getFieldColor}
-							getLevelColor={getLevelColor}
 						/>
 					</View>
 				</TouchableWithoutFeedback>
@@ -790,7 +857,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(10),
 	},
 	sameProverbTitle: {
-		fontSize: scaledSize(14),
+		fontSize: scaledSize(13),
 		color: '#0984e3',
 		fontWeight: '600',
 		marginBottom: scaleHeight(6),
@@ -883,5 +950,11 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: scaleHeight(10),
+	},
+	badge2: {
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(4),
+		borderRadius: scaleWidth(12),
+		backgroundColor: '#f1f2f6',
 	},
 });

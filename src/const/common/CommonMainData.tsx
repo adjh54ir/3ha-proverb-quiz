@@ -17,35 +17,17 @@ export interface ContinentItem extends CategoryItem {
 
 export const LEVEL_DATA = [
 	{
-		score: 0,
-		next: 680,
-		label: '속담 초보자',
-		icon: 'seedling',
-		encouragement: '🌱 첫걸음을 뗐어요! 이제 속담의 세계로!',
-		description: '속담 학습의 출발선에 선 단계로,\n기초적인 표현부터 차근히 익히는 시기예요.',
-		mascot: require('@/assets/images/level1_mascote.png'),
+		score: 3320,
+		next: 4130, // 413문제 = 전체 달성
+		label: '속담 마스터',
+		icon: 'trophy',
+		encouragement: '🏆 속담 마스터에 도달했어요! 정말 대단해요!',
+		description: '속담에 대한 깊은 이해와 활용 능력을 갖춘 최상위 단계로,\n누구에게나 모범이 될 수 있는 수준이에요.',
+		mascot: require('@/assets/images/level5_mascote2.png'),
 	},
 	{
-		score: 680,
-		next: 1360,
-		label: '속담 입문자',
-		icon: 'leaf',
-		encouragement: '🍃 차근차근 익혀가는 중이에요!\n조금씩 자신감이 붙고 있어요!',
-		description: '기초 속담에 익숙해지고,\n다양한 표현을 접하며 감을 잡아가는 단계예요.',
-		mascot: require('@/assets/images/level2_mascote.png'),
-	},
-	{
-		score: 1360,
-		next: 2040,
-		label: '속담 숙련자',
-		icon: 'tree',
-		encouragement: '🌳 멋져요! 속담 실력이 부쩍 늘었어요!',
-		description: '속담의 뜻과 쓰임새를 잘 이해하고 있으며,\n실전 문제에도 능숙하게 대응할 수 있는 단계예요.',
-		mascot: require('@/assets/images/level3_mascote.png'),
-	},
-	{
-		score: 2040,
-		next: 2720,
+		score: 2490,
+		next: 3320, // 332문제
 		label: '속담 전사',
 		icon: 'helmet-battle',
 		encouragement: '🪖 속담 전사로 거듭났어요!\n지식을 무기로 도전을 헤쳐나가고 있어요!',
@@ -53,13 +35,31 @@ export const LEVEL_DATA = [
 		mascot: require('@/assets/images/level4_mascote.png'),
 	},
 	{
-		score: 2720,
-		next: 3380,
-		label: '속담 마스터',
-		icon: 'trophy',
-		encouragement: '🏆 속담 마스터에 도달했어요! 정말 대단해요!',
-		description: '속담에 대한 깊은 이해와 활용 능력을 갖춘 최상위 단계로,\n누구에게나 모범이 될 수 있는 수준이에요.',
-		mascot: require('@/assets/images/level5_mascote2.png'),
+		score: 1660,
+		next: 2490, // 249문제
+		label: '속담 숙련자',
+		icon: 'tree',
+		encouragement: '🌳 멋져요! 속담 실력이 부쩍 늘었어요!',
+		description: '속담의 뜻과 쓰임새를 잘 이해하고 있으며,\n실전 문제에도 능숙하게 대응할 수 있는 단계예요.',
+		mascot: require('@/assets/images/level3_mascote.png'),
+	},
+	{
+		score: 830,
+		next: 1660, // 166문제
+		label: '속담 입문자',
+		icon: 'leaf',
+		encouragement: '🍃 차근차근 익혀가는 중이에요!\n조금씩 자신감이 붙고 있어요!',
+		description: '기초 속담에 익숙해지고,\n다양한 표현을 접하며 감을 잡아가는 단계예요.',
+		mascot: require('@/assets/images/level2_mascote.png'),
+	},
+	{
+		score: 0,
+		next: 830, // 83문제
+		label: '속담 초보자',
+		icon: 'seedling',
+		encouragement: '🌱 첫걸음을 뗐어요! 이제 속담의 세계로!',
+		description: '속담 학습의 출발선에 선 단계로,\n기초적인 표현부터 차근히 익히는 시기예요.',
+		mascot: require('@/assets/images/level1_mascote.png'),
 	},
 ];
 

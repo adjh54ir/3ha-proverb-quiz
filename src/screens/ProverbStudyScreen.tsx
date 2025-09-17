@@ -1015,7 +1015,6 @@ const QuizStudyScreen = () => {
 												overflow: 'visible',
 												zIndex: 3000,
 												...styles.dropdownListField,
-												elevation: 1000,
 												maxHeight: scaleHeight(200),
 											}}
 											zIndex={5000}
@@ -1043,7 +1042,6 @@ const QuizStudyScreen = () => {
 												shadowOpacity: 0.15,
 												shadowOffset: { width: 0, height: 6 },
 												shadowRadius: scaleWidth(8),
-												elevation: 10,
 												flex: 1,
 												justifyContent: 'flex-start',
 												position: 'relative', // X 버튼 고정용
@@ -1441,7 +1439,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		zIndex: 99999,
-		elevation: 10,
 	},
 	flagSection: {
 		position: 'relative',
@@ -1713,7 +1710,7 @@ const styles = StyleSheet.create({
 		width: '100%',
 		alignItems: 'center',
 		paddingVertical: scaleHeight(12),
-		paddingBottom: scaleHeight(Platform.OS === 'android' ? 60 : 20), // ← 이 부분을 조정
+		paddingBottom: scaleHeight(Platform.OS === 'android' ? 30 : 20), // ← 이 부분을 조정
 		borderTopWidth: 1,
 		borderColor: '#ecf0f1',
 	},
@@ -1916,7 +1913,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.05,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 4,
-		elevation: 2,
 	},
 	sectionText: {
 		fontSize: scaledSize(14),
@@ -1957,7 +1953,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.08,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 4,
-		elevation: 3,
 	},
 	highlightHeader: {
 		flexDirection: 'row',

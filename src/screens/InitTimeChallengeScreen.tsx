@@ -693,7 +693,7 @@ const styles = StyleSheet.create({
 		borderTopColor: '#eee',
 		paddingTop: scaleHeight(6),
 		paddingBottom: Platform.OS === 'android' ? scaleHeight(10) : scaleHeight(14),
-		marginBottom: Platform.OS === 'android' ? scaleHeight(52) : scaleHeight(12),
+		marginBottom: Platform.OS === 'android' ? scaleHeight(20) : scaleHeight(12),
 	},
 	exitButton: {
 		backgroundColor: '#7f8c8d',

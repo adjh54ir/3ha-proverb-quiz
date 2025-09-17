@@ -313,9 +313,6 @@ export const styles = StyleSheet.create({
 		marginBottom: scaleHeight(12),
 		textAlign: 'center',
 	},
-	infoSection: {
-		marginVertical: scaleHeight(16),
-	},
 	infoLabel: {
 		fontSize: scaledSize(14),
 		fontWeight: '600',
@@ -341,18 +338,6 @@ export const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: '#eee',
 	},
-	exampleText: {
-		fontSize: scaledSize(14),
-		color: '#34495e',
-		lineHeight: scaleHeight(20),
-		marginBottom: scaleHeight(6),
-	},
-	exampleText: {
-		fontSize: scaledSize(14),
-		color: '#34495e',
-		lineHeight: scaleHeight(20),
-		marginBottom: scaleHeight(6),
-	},
 	modalProverbText: {
 		fontSize: scaledSize(20),
 		fontWeight: '700',
@@ -373,7 +358,6 @@ export const styles = StyleSheet.create({
 		shadowOpacity: 0.05,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 4,
-		elevation: 2,
 	},
 	sectionTitle: {
 		fontSize: scaledSize(15),
@@ -420,7 +404,6 @@ export const styles = StyleSheet.create({
 		shadowOpacity: 0.08,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 4,
-		elevation: 3,
 	},
 	meaningQuoteBox: {
 		alignItems: 'center',

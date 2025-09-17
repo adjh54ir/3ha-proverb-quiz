@@ -6,14 +6,6 @@ export const COMMON_APPS_DATA: {
 } = {
 	Apps: [
 		{
-			id: 4,
-			icon: require('@/assets/appicons/main_proverb.jpeg'),
-			title: '속픽: 속담 퀴즈',
-			desc: '속담을 학습하고 다양한 퀴즈로 점검하며 반복 복습할 수 있는 교육용 앱입니다.',
-			android: 'https://play.google.com/store/apps/details?id=com.tha.proverbquiz',
-			ios: 'https://apps.apple.com/app/id6746687973',
-		},
-		{
 			id: 8,
 			icon: require('@/assets/appicons/main_idiomquiz.png'),
 			title: '관픽: 관용구 퀴즈',
@@ -79,6 +71,14 @@ export const COMMON_APPS_DATA: {
 			desc: '"작은 기록이 만든 큰 변화, 오늘부터 시작하세요!" 흡연 습관을 정확하게 파악하고, 금연의 첫 걸음을 함께하세요.',
 			android: '',
 			ios: 'https://apps.apple.com/us/app/%EC%98%A4%ED%9D%A1-%EC%98%A4%EB%8A%98-%ED%9D%A1%EC%97%B0-%EA%B8%B0%EB%A1%9D/id6749576206',
+		},
+		{
+			id: 4,
+			icon: require('@/assets/appicons/main_proverb.jpeg'),
+			title: '속픽: 속담 퀴즈',
+			desc: '속담을 학습하고 다양한 퀴즈로 점검하며 반복 복습할 수 있는 교육용 앱입니다.',
+			android: 'https://play.google.com/store/apps/details?id=com.tha.proverbquiz',
+			ios: 'https://apps.apple.com/app/id6746687973',
 		},
 	],
 };

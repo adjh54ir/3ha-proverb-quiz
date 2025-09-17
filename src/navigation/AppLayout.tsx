@@ -68,11 +68,8 @@ const AppLayout = () => {
                     setCurrentRoute(routeName);
                 }
             }}>
-            <StackNavigator></StackNavigator>
+            <SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={shouldShowAd ? ['top'] : []}>
 
-            {/* <SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={shouldShowAd ? ['top'] : []}>
-
-                <StackNavigator />
                 <View style={styles.container}>
                     <View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]}>
                         <AdmobBannerAd visible={shouldShowAd} />
@@ -99,7 +96,7 @@ const AppLayout = () => {
                         <StackNavigator />
                     </View>
                 </View>
-            </SafeAreaView> */}
+            </SafeAreaView>
         </NavigationContainer>
     );
 };

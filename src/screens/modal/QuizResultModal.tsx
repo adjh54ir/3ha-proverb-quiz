@@ -117,10 +117,15 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 									? require('@/assets/images/wrong_mascote.png')
 									: require('@/assets/images/mascote_done.png')
 						}
-						style={styles.resultMascot}
+						style={[
+							styles.resultMascot,
+							resultType === 'done' && {
+								width: scaleWidth(150),
+								height: scaleWidth(150)
+							}, // ✅ 완료 시 이미지 크게
+						]}
 						resizeMode={FastImage.resizeMode.contain}
 					/>
-
 					<ScrollView
 						style={styles.scrollView} // 🔽 모달 높이 제한
 						contentContainerStyle={{ paddingBottom: scaleHeight(10) }}

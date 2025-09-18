@@ -28,6 +28,7 @@ import { COMMON_APPS_DATA } from '@/const/common/CommonAppsData';
 import DeveloperAppsModal from './modal/DeveloperAppsModal';
 import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModal';
 import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
+import CurrentVersionModal from './modal/CurrentVersionModal';
 
 
 const APP_NAME = '속픽: 속담 퀴즈';
@@ -58,6 +59,9 @@ const SettingScreen = () => {
 	const [showAppsModal, setShowAppsModal] = useState(false);
 	const [showTermsModal, setShowTermsModal] = useState(false);
 	const [showOpenSourceModal, setShowOpenSourceModal] = useState(false);
+	// state
+	const [showVersionModal, setShowVersionModal] = useState(false);
+	const [latestVersion, setLatestVersion] = useState<string | null>(null);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -194,6 +198,22 @@ const SettingScreen = () => {
 		await AsyncStorage.setItem(STORAGE_KEYS.study, JSON.stringify(parsed));
 		Alert.alert('처리됨', '모든 학습 완료 + 뱃지 지급!');
 	};
+	const checkIsLatestVersion = async () => {
+		try {
+			const updateNeeded = await VersionCheck.needUpdate();
+			if (updateNeeded?.isNeeded) {
+				// 🔻 최신 버전이 있으면 모달 열기
+				setLatestVersion(updateNeeded.latestVersion);
+				setShowVersionModal(true);
+			} else {
+				// 🔻 최신 버전일 경우 Alert으로만 알림
+				Alert.alert('최신 버전', `현재 v${appVersion}이 최신 버전입니다`);
+			}
+		} catch (err) {
+			Alert.alert('오류', '버전 확인 중 문제가 발생했습니다.');
+		}
+	};
+
 
 	const sections: { title: React.ReactNode; data: string[] }[] = useMemo(() => {
 		const resetSection = {
@@ -206,7 +226,7 @@ const SettingScreen = () => {
 			data: ['rate', 'inquiry', 'developerInfo', 'developerApps'],
 		};
 
-		const policyData = ['privacyPolicy', 'openSource'];
+		const policyData = ['privacyPolicy', 'openSource', 'checkVersion'];
 
 		if (__DEV__) {
 			policyData.push('completeAllQuiz', 'completeAllStudy');
@@ -271,6 +291,11 @@ const SettingScreen = () => {
 				label: '오픈소스 라이브러리',
 				icon: { type: 'MaterialCommunityIcons', name: 'file-code-outline' },
 			},
+			checkVersion: {
+				label: '최신 버전 확인',
+				icon: { type: 'MaterialCommunityIcons', name: 'update' },
+			},
+
 
 			...(IS_DEV && {
 				generateDummyData: {
@@ -308,6 +333,11 @@ const SettingScreen = () => {
 
 				case 'resetAll':
 					confirmReset('all');
+					break;
+
+				// handlePress에 동작 추가
+				case 'checkVersion':
+					checkIsLatestVersion();
 					break;
 
 				case 'rate':
@@ -610,6 +640,17 @@ const SettingScreen = () => {
 				onRequestClose={() => setModalVisible(false)} // Android 백버튼
 				renderTitle={getModalTitle} // 기존 커스텀 타이틀 함수 재사용
 				summary={summary}
+			/>
+			<CurrentVersionModal
+				visible={showVersionModal}
+				currentVersion={appVersion}
+				latestVersion={latestVersion}
+				onClose={() => setShowVersionModal(false)}
+				onUpdatePress={() => {
+					if (latestVersion) {
+						Linking.openURL(Platform.OS === 'android' ? ANDROID_STORE_URL : IOS_STORE_URL);
+					}
+				}}
 			/>
 		</>
 	);

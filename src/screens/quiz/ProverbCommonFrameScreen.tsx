@@ -733,8 +733,12 @@ const ProverbCommonFrameScreen = () => {
 
 									<View style={styles.statusCardRow}>
 										<View style={styles.statusCard}>
-											<Text style={styles.statusCardTitle}>📝 푼 퀴즈 수</Text>
-											<Text style={styles.statusCardValue}>{solvedCount}개</Text>
+											<Text style={styles.statusCardTitle}>📝 문제</Text>
+											<Text style={[styles.statusCardValue]}>
+												<Text style={{ color: '#3498db' }}>{getSolvedCount()}</Text>
+												{' / '}
+												{totalCount}
+											</Text>
 										</View>
 										<View style={styles.statusCard}>
 											<Text style={styles.statusCardTitle}>🎯 총점</Text>
@@ -755,8 +759,19 @@ const ProverbCommonFrameScreen = () => {
 															}),
 														},
 													],
+													opacity: comboAnim.interpolate({
+														inputRange: [0, 1],
+														outputRange: [1, 1],
+													}),
 												}}>
-												<Text style={styles.statusCardValue}>{combo} Combo</Text>
+												<Text
+													style={[
+														styles.statusCardValue,
+														styles.comboValue,
+														{ color: combo > 0 ? '#e74c3c' : '#2c3e50' }, // 🔥 조건부 색상 적용
+													]}>
+													🔥 {combo} Combo
+												</Text>
 											</Animated.View>
 										</View>
 									</View>
@@ -894,6 +909,7 @@ const ProverbCommonFrameScreen = () => {
 									categoryOptions={categoryOptions}
 									setSelectedLevel={setSelectedLevel}
 									setSelectedCategory={setSelectedCategory}
+									quizType={routeMode}
 									onClose={() => {
 										if (timerRef.current) clearInterval(timerRef.current);
 										navigation.goBack();
@@ -1149,12 +1165,13 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'flex-start',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(20),
+		paddingHorizontal: scaleWidth(10),
 		paddingTop: scaleHeight(8),
 	},
 	quizBox: {
 		flex: 1,
 		width: '100%',
+		paddingHorizontal: scaleWidth(12),
 		alignItems: 'center',
 	},
 	timerText: {
@@ -1334,7 +1351,7 @@ const styles = StyleSheet.create({
 	statusCard: {
 		flex: 1,
 		backgroundColor: '#ecf0f1',
-		marginHorizontal: scaleWidth(4),
+		marginHorizontal: scaleWidth(2),
 		paddingVertical: scaleHeight(12),
 		borderRadius: scaleWidth(12),
 		alignItems: 'center',
@@ -1344,12 +1361,13 @@ const styles = StyleSheet.create({
 		shadowRadius: scaleWidth(2),
 	},
 	statusCardTitle: {
-		fontSize: scaledSize(14),
+		fontSize: scaledSize(15),
 		color: '#7f8c8d',
+		fontWeight: 600,
 		marginBottom: scaleHeight(4),
 	},
 	statusCardValue: {
-		fontSize: scaledSize(16),
+		fontSize: scaledSize(15),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 	},
@@ -1486,7 +1504,7 @@ const styles = StyleSheet.create({
 		shadowRadius: scaleWidth(3),
 	},
 	progressText: {
-		fontSize: scaledSize(16),
+		fontSize: scaledSize(17),
 		color: '#2c3e50',
 		fontWeight: '600',
 		marginBottom: scaleHeight(8),
@@ -1784,5 +1802,18 @@ const styles = StyleSheet.create({
 	titleIcon: {
 		marginLeft: scaleWidth(6),
 		marginTop: scaleHeight(2),
+	},
+	comboValue: {
+		fontSize: scaledSize(14),
+		fontWeight: 'bold',
+		color: '#e74c3c', // 🔥 강조된 빨간색
+		textShadowColor: 'rgba(0, 0, 0, 0.2)',
+		textShadowOffset: { width: 1, height: 1 },
+		textShadowRadius: 2,
+		flexShrink: 1,
+		flexWrap: 'nowrap',
+		textAlign: 'center',
+		includeFontPadding: false,
+		maxWidth: '100%',
 	},
 });

@@ -1233,7 +1233,9 @@ const TodayQuizScreen = () => {
                                                     </Text>
                                                 </View>
                                                 <View style={styles.historyDateChip}>
-                                                    <Text style={styles.historyDateChipText}>{group.date}</Text>
+                                                    <Text style={styles.historyDateChipText}>
+                                                        ({Object.values(group.answerResults).filter((v) => v === true).length}/{group.quizList.length})
+                                                    </Text>
                                                 </View>
                                             </View>
 
@@ -1248,7 +1250,7 @@ const TodayQuizScreen = () => {
                                                         <View style={styles.historyCardBody}>
                                                             {/* 타이틀 + 정오답 배지 */}
                                                             <View style={styles.historyHeaderRow}>
-                                                                <Text style={styles.historyIdiom} numberOfLines={1}>
+                                                                <Text style={styles.historyIdiom} >
                                                                     {item.proverb}
                                                                 </Text>
                                                                 <View style={[styles.resultPill, isCorrect ? styles.pillCorrect : styles.pillWrong]}>
@@ -1266,13 +1268,6 @@ const TodayQuizScreen = () => {
                                                             {Array.isArray(item.example) && item.example.length > 0 && (
                                                                 <View style={{ marginTop: scaleHeight(10) }}>
                                                                     <View style={styles.historySubTitleRow}>
-                                                                        <IconComponent
-                                                                            name="quote-left"
-                                                                            type="FontAwesome"
-                                                                            size={14}
-                                                                            color="#555"
-                                                                            style={{ marginRight: scaleWidth(6) }}
-                                                                        />
                                                                         <Text style={styles.historySubTitle}>예문</Text>
                                                                     </View>
                                                                     <View style={styles.exampleList}>
@@ -2530,6 +2525,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     historySubTitle: {
+        marginLeft: scaleWidth(6),
         fontSize: scaledSize(13),
         fontWeight: '700',
         color: '#333',

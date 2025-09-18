@@ -32,6 +32,7 @@ const ProverbQuizModeScreen = () => {
 	};
 
 	const moveToHandler = (modeKey: string) => {
+		console.log("여기로 전달하고 있나")
 		switch (modeKey) {
 			case 'meaning':
 				// @ts-ignore
@@ -352,12 +353,8 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(20),
 	},
 	mascotImage: {
-		width: scaleWidth(100),
-		height: scaleWidth(100),
-		borderRadius: scaleWidth(50),
-		borderWidth: 4,
-		borderColor: '#3498db', // 레벨/앱 테마 컬러
-		backgroundColor: '#fff',
+		width: scaleWidth(120),
+		height: scaleWidth(120),
 	},
 	mascotCard: {
 		width: '100%',
@@ -371,11 +368,10 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.1,
 		shadowRadius: 6,
 	},
-	mascotImage: {
-		width: scaleWidth(100),
-		height: scaleWidth(100),
-		borderRadius: scaleWidth(70),
-		marginBottom: scaleHeight(10),
+	levelMascotImage: {
+		width: '100%',
+		height: '100%',
+		borderRadius: scaleWidth(40),
 	},
 	levelLabel: {
 		fontSize: scaledSize(18),

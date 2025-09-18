@@ -22,6 +22,7 @@ interface Props {
 	onClose: () => void;
 	onStart: () => void;
 	onCompleteStart: () => void; // 광고 포함 여부 관계없이 "퀴즈 시작 버튼 클릭" 콜백
+	quizType: 'meaning' | 'proverb' | 'fill-blank'; // ✅ 추가
 }
 interface SelectGroupProps {
 	title: string;
@@ -48,10 +49,21 @@ export interface UserQuizHistory {
 }
 
 const LEVEL_LABEL_MAP: Record<string, string> = {
-	'아주 쉬움': 'Level 1',
-	쉬움: 'Level 2',
-	보통: 'Level 3',
-	어려움: 'Level 4',
+	'아주 쉬움': '아주 쉬움',
+	'쉬움': '쉬움',
+	'보통': '보통',
+	'어려움': '어려움',
+};
+// 상단에 매핑 정의
+const QUIZ_TYPE_LABELS: Record<'meaning' | 'proverb' | 'fill-blank', string> = {
+	meaning: '속담 뜻 퀴즈',
+	proverb: '속담 찾기 퀴즈',
+	'fill-blank': '빈칸 채우기 퀴즈',
+};
+const QUIZ_TYPE_STYLE: Record<'meaning' | 'proverb' | 'fill-blank', { icon: string; color: string }> = {
+	meaning: { icon: 'book-open', color: '#3498db' },      // 뜻 퀴즈 → 책 아이콘
+	proverb: { icon: 'search', color: '#27ae60' },         // 속담 찾기 → 돋보기
+	'fill-blank': { icon: 'edit', color: '#e67e22' },      // 빈칸 → 연필
 };
 
 const QuizStartModal = ({
@@ -66,7 +78,8 @@ const QuizStartModal = ({
 	setSelectedCategory,
 	onClose,
 	onStart,
-	onCompleteStart
+	onCompleteStart,
+	quizType
 }: Props) => {
 	const STORAGE_KEY_QUIZ = 'UserQuizHistory';
 	const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -165,7 +178,7 @@ const QuizStartModal = ({
 		// },
 
 
-		'전체': { color: '#555', icon: { type: 'FontAwesome6', name: 'list' }, type: 'level' },
+		'전체': { color: '#5DADE2', icon: { type: 'fontAwesome5', name: 'clipboard-list' }, type: 'level' },
 		'아주 쉬움': { color: '#85C1E9', icon: { type: 'fontAwesome5', name: 'seedling' }, type: 'level' },
 		쉬움: { color: '#F4D03F', icon: { type: 'fontAwesome5', name: 'leaf' }, type: 'level' },
 		보통: { color: '#EB984E', icon: { type: 'fontAwesome5', name: 'tree' }, type: 'level' },
@@ -218,6 +231,70 @@ const QuizStartModal = ({
 				<Text style={styles.progressText}>
 					{studied}/{total} ({Math.round(percentage)}%)
 				</Text>
+			</View>
+		);
+	};
+	const HeaderPath = () => {
+		return (
+			<View style={styles.headerPathContainer}>
+				{/* 퀴즈 타입 */}
+				<View style={[styles.pathBadge, { backgroundColor: QUIZ_TYPE_STYLE[quizType].color }]}>
+					<IconComponent
+						type="fontAwesome5"
+						name={QUIZ_TYPE_STYLE[quizType].icon}
+						size={14}
+						color="#fff"
+						style={{ marginRight: scaleWidth(4) }}
+					/>
+					<Text style={styles.pathBadgeText}>{QUIZ_TYPE_LABELS[quizType]}</Text>
+				</View>
+
+				<IconComponent
+					type="fontAwesome5"
+					name="chevron-right"
+					size={14}
+					color="#b2bec3"
+					style={styles.pathChevron}
+				/>
+
+				{/* 난이도 */}
+				<View style={[styles.pathBadge, { backgroundColor: getStyleColor(selectedLevel) }]}>
+					{STYLE_MAP[selectedLevel] && (
+						<IconComponent
+							type={STYLE_MAP[selectedLevel].icon.type}
+							name={STYLE_MAP[selectedLevel].icon.name}
+							size={14}
+							color="#fff"
+							style={{ marginRight: scaleWidth(4) }}
+						/>
+					)}
+					<Text style={styles.pathBadgeText}>{selectedLevel || '난이도 선택'}</Text>
+				</View>
+
+				{/* 카테고리 (modeStep === 1일 때만) */}
+				{modeStep === 1 && (
+					<>
+						<IconComponent
+							type="fontAwesome5"
+							name="chevron-right"
+							size={14}
+							color="#b2bec3"
+							style={styles.pathChevron}
+						/>
+						<View style={[styles.pathBadge, { backgroundColor: getStyleColor(selectedCategory) }]}>
+							{STYLE_MAP[selectedCategory] && (
+								<IconComponent
+									type={STYLE_MAP[selectedCategory].icon.type}
+									name={STYLE_MAP[selectedCategory].icon.name}
+									size={14}
+									color="#fff"
+									style={{ marginRight: scaleWidth(4) }}
+								/>
+							)}
+							<Text style={styles.pathBadgeText}>{selectedCategory || '카테고리 선택'}</Text>
+						</View>
+					</>
+				)}
 			</View>
 		);
 	};
@@ -432,11 +509,15 @@ const QuizStartModal = ({
 						<View style={styles.selectModalContentBox}>
 							{modeStep === 0 ? (
 								<>
+
+
 									<View style={styles.selectTitleBox}>
-										<View style={styles.selectTitleBox}>
-											<Text style={styles.selectTitleEmoji}>🧠</Text>
-											<Text style={styles.selectTitleText}>나에게 맞는 난이도를 골라보세요!</Text>
-										</View>
+										<Text style={styles.selectTitleEmoji}>🧠</Text>
+										<Text style={styles.selectTitleText}>나에게 맞는 난이도를 골라보세요!</Text>
+									</View>
+									{/* ✅ 선택한 모드 전체 경로 표시 */}
+									<View style={styles.subModeTextWrapper}>
+										<HeaderPath />
 									</View>
 									{/* ✅ 선택된 난이도의 진행도 바 */}
 									{/* ✅ 선택된 난이도 카드 */}
@@ -486,18 +567,20 @@ const QuizStartModal = ({
 								</>
 							) : (
 								<>
+
 									<View style={styles.selectTitleBox}>
 										<View style={styles.titleRowCenter}>
 											<Text style={styles.selectTitleEmoji}>🎯 </Text>
 											<Text style={styles.selectTitleText}>관심 있는 주제를 골라볼까요?</Text>
-											<View style={{ justifyContent: "center", alignContent: "center", }}>
-												<InlineTooltip />
-											</View>
-											{/* <TouchableOpacity onPress={() => setIsShowCategoryInfo(true)} style={{ marginLeft: scaleWidth(6) }}>
-												<IconComponent type='materialIcons' name='info-outline' size={18} color='#636e72' />
-											</TouchableOpacity> */}
+											<InlineTooltip />
 										</View>
 									</View>
+
+									{/* ✅ 선택한 모드 표시 */}
+									<View style={styles.subModeTextWrapper}>
+										<HeaderPath />
+									</View>
+
 									<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: scaleHeight(10) }} showsVerticalScrollIndicator={false}>
 										<SelectGroup
 											title='카테고리 선택'
@@ -590,7 +673,7 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(40),
 		borderRadius: scaleWidth(30),
-		marginTop: scaleHeight(20),
+		marginTop: scaleHeight(12),
 	},
 	modalButtonText: {
 		color: '#fff',
@@ -618,9 +701,8 @@ const styles = StyleSheet.create({
 	selectGroupWrapper: {
 		backgroundColor: '#f2f4f5',
 		borderRadius: scaleWidth(12),
-		paddingTop: scaleHeight(16),
+		padding: 16,
 		paddingHorizontal: scaleWidth(16),
-		marginBottom: 0,
 		width: '100%',
 		borderWidth: 1,
 		borderColor: '#dfe6e9',
@@ -671,8 +753,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginTop: scaleHeight(16),
-		marginBottom: scaleHeight(12),
 		gap: scaleWidth(6),
 	},
 	selectTitleEmoji: {
@@ -715,7 +795,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: scaleWidth(12),
 		width: '100%',
-		marginTop: scaleHeight(12),
 	},
 	centeredButtonContent: {
 		flexDirection: 'row',
@@ -876,5 +955,82 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(12),
 		color: '#636e72',
 		textAlign: 'right',
+	},
+	subModeText: {
+		fontSize: scaledSize(14),
+		color: '#636e72',
+		textAlign: 'center',
+		marginBottom: scaleHeight(12),
+		fontWeight: '500',
+	},
+	headerPathContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginVertical: scaleHeight(10),
+		flexWrap: 'wrap', // 길어질 경우 줄바꿈 허용
+	},
+	pathBadge: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(5),
+		borderRadius: scaleWidth(20),
+		shadowColor: '#000',
+		shadowOpacity: 0.1,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 3,
+		marginVertical: scaleHeight(4),
+	},
+
+	pathBadgeText: {
+		color: '#fff',
+		fontSize: scaledSize(13),
+		fontWeight: '600',
+	},
+
+	pathChevron: {
+		marginHorizontal: scaleWidth(6),
+		opacity: 0.6,
+	},
+	subModeTextWrapper: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	subModeTextLabel: {
+		fontSize: scaledSize(14),
+		color: '#636e72',
+		fontWeight: '500',
+		marginRight: scaleWidth(6),
+	},
+	quizTypeWrapper: {
+		alignItems: 'center',
+	},
+	quizTypeText: {
+		fontSize: scaledSize(15),
+		fontWeight: '700',
+		color: '#2c3e50',
+	},
+	quizTypeWrapper: {
+		marginBottom: scaleHeight(10),
+		alignItems: 'center',
+	},
+	quizTypeBadge: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingVertical: scaleHeight(6),
+		paddingHorizontal: scaleWidth(14),
+		borderRadius: scaleWidth(20),
+		shadowColor: '#000',
+		shadowOpacity: 0.1,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 3,
+	},
+	quizTypeText: {
+		fontSize: scaledSize(15),
+		fontWeight: '700',
+		color: '#fff',
 	},
 });

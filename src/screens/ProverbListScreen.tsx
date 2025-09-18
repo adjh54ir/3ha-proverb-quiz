@@ -164,6 +164,10 @@ const ProverbListScreen = () => {
 	);
 	useFocusEffect(
 		useCallback(() => {
+
+			setFieldOpen(false);
+			setLevelOpen(false);
+
 			// ✅ 필터 상태 초기화
 			setKeyword('');
 			setFieldValue('전체');
@@ -339,7 +343,10 @@ const ProverbListScreen = () => {
 											open={levelOpen}
 											value={levelValue}
 											items={LEVEL_DROPDOWN_ITEMS}
-											setOpen={setLevelOpen}
+											setOpen={(open) => {
+												setLevelOpen(open);
+												if (open) setFieldOpen(false); // 👉 레벨 열릴 때 필드 닫음
+											}}
 											setValue={setLevelValue}
 											setItems={setLevelItems}
 											style={styles.dropdownLevel}
@@ -368,7 +375,10 @@ const ProverbListScreen = () => {
 											open={fieldOpen}
 											value={fieldValue}
 											items={FIELD_DROPDOWN_ITEMS}
-											setOpen={setFieldOpen}
+											setOpen={(open) => {
+												setFieldOpen(open);
+												if (open) setLevelOpen(false); // 👉 필드 열릴 때 레벨 닫음
+											}}
 											setValue={setFieldValue}
 											setItems={setFieldItems}
 											onChangeValue={() => scrollToTop()}

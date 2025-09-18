@@ -93,7 +93,17 @@ const WrongReviewScreen = () => {
 				/>
 
 				{/* 텍스트 메시지 */}
-				<Text style={styles.emptyText}>🎉 오답이 없습니다!</Text>
+				<Text style={styles.emptyText}>🎉 오답이 없습니다! 훌륭해요! 🎉</Text>
+				{/* 홈으로 가기 버튼 */}
+				<TouchableOpacity
+					style={styles.homeButton}
+					onPress={() => {
+						// @ts-ignore
+						navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME });
+					}}
+				>
+					<Text style={styles.homeButtonText}>홈으로 가기</Text>
+				</TouchableOpacity>
 			</View>
 		);
 	}
@@ -302,6 +312,7 @@ const styles = StyleSheet.create({
 	emptyText: {
 		fontSize: scaledSize(16),
 		color: '#636e72',
+		fontWeight: 700,
 	},
 	scrollContainer: {
 		marginTop: scaleHeight(12),
@@ -424,8 +435,8 @@ const styles = StyleSheet.create({
 		width: '100%',
 	},
 	mascotImage: {
-		width: scaleWidth(120),
-		height: scaleWidth(120),
+		width: scaleWidth(240),
+		height: scaleWidth(240),
 		marginBottom: scaleHeight(10),
 	},
 	guideCard: {
@@ -709,4 +720,18 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: '#00b894',
 	},
+	homeButton: {
+		marginTop: scaleHeight(20),
+		backgroundColor: '#3498db',
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(28),
+		borderRadius: scaleWidth(25),
+	},
+	homeButtonText: {
+		color: '#fff',
+		fontSize: scaledSize(15),
+		fontWeight: '600',
+		textAlign: 'center',
+	},
+
 });

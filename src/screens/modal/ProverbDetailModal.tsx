@@ -295,9 +295,8 @@ const styles = StyleSheet.create({
         fontSize: scaledSize(13),
         color: '#555',
         lineHeight: 20,
-        marginBottom: scaleHeight(6),
         backgroundColor: '#FAFAFA',
-        padding: scaleWidth(8),
+        padding: scaleWidth(6),
         borderRadius: scaleWidth(8),
     },
 
@@ -353,6 +352,7 @@ const styles = StyleSheet.create({
     },
     sameProverbText: {
         fontSize: scaledSize(13),
+        padding: scaleWidth(6),
         color: '#444',
         lineHeight: scaleHeight(20),
     },

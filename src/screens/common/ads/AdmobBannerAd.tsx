@@ -9,8 +9,8 @@ type AdUnitIdType = string;
 
 const AD_UNIT_ID: AdUnitIdType = Platform.select({
 	ios: __DEV__ ? TestIds.BANNER : GOOGLE_ADMOV_IOS_BANNER!,
-	// android: __DEV__ ? TestIds.BANNER : GOOGLE_ADMOV_ANDROID_BANNER!,
-	android: TestIds.BANNER,
+	android: __DEV__ ? TestIds.BANNER : GOOGLE_ADMOV_ANDROID_BANNER!,
+	// android: TestIds.BANNER,
 }) as AdUnitIdType;
 
 interface AdmobBannerAdProps {

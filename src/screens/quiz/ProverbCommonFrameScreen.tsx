@@ -33,7 +33,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AdmobFrontAd from '../common/ads/AdmobFrontAd';
+import LevelPlayFrontAd from '../common/ads/levelplay/LevelPlayFrontAd';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -932,7 +932,7 @@ const ProverbCommonFrameScreen = () => {
 
 							{/* // 광고 컴포넌트 */}
 							{showAd && (
-								<AdmobFrontAd
+								<LevelPlayFrontAd
 									onAdClosed={() => {
 										setShowAd(false);
 										onStart(true); // ✅ 문제 다시 뽑지 않음

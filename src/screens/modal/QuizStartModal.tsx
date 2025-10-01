@@ -6,7 +6,6 @@ import ProverbServices from '@/services/ProverbServices';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import AdmobFrontAd from '../common/ads/AdmobFrontAd'; // 광고 컴포넌트 import
 import { GOOGLE_ADMOV_FRONT_PERCENT } from '@env';
 
 interface Props {
@@ -86,7 +85,7 @@ const QuizStartModal = ({
 	const [levelStats, setLevelStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [categoryStats, setCategoryStats] = useState<Record<string, { total: number; studied: number }>>({});
 	const [quizHistory, setQuizHistory] = useState<UserQuizHistory | null>(null);
-	const shouldShowAd = Math.random() < GOOGLE_ADMOV_FRONT_PERCENT; // 20% 확률
+	const shouldShowAd = Math.random() < 0.3; // 20% 확률
 	const selectedLevelStats =
 		levelStats[selectedLevel] || levelStats['전체'] || { total: 0, studied: 0 };
 

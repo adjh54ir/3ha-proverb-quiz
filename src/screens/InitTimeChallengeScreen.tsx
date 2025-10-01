@@ -8,8 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
-import { GOOGLE_ADMOV_FRONT_PERCENT } from '@env';
-import AdmobFrontAd from './common/ads/AdmobFrontAd';
+import LevelPlayFrontAd from './common/ads/levelplay/LevelPlayFrontAd';
 
 const InitTimeChallengeScreen = () => {
 	const STORAGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
@@ -23,7 +22,7 @@ const InitTimeChallengeScreen = () => {
 	// 1. 상태 추가
 	const [showAd, setShowAd] = useState(false);
 	const [adWatched, setAdWatched] = useState(false); // 광고 본 후 시작
-	const shouldShowAd = Math.random() < GOOGLE_ADMOV_FRONT_PERCENT; // ✅ 20% 확률
+	const shouldShowAd = Math.random() < 0.3; // ✅ 20% 확률
 
 	useEffect(() => {
 		fetchTopHistory();
@@ -389,7 +388,7 @@ const InitTimeChallengeScreen = () => {
 			)}
 
 			{showAd && (
-				<AdmobFrontAd
+				<LevelPlayFrontAd
 					onAdClosed={() => {
 						setShowAd(false);
 						setAdWatched(true);

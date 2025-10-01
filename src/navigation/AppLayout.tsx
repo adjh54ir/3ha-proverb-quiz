@@ -9,6 +9,7 @@ import BottomTabNavigator from './BottomTabNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 import StackNavigator from './StackNavigator';
 import DeviceInfo from 'react-native-device-info';
+import LevelPlayBannerAd from '@/screens/common/ads/levelplay/LevelPlayBannerAd';
 
 const AD_ALLOWED_ROUTES = [
     Paths.TODAY_QUIZ,
@@ -72,7 +73,7 @@ const AppLayout = () => {
 
                 <View style={styles.container}>
                     <View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]}>
-                        <AdmobBannerAd visible={shouldShowAd} />
+                        <LevelPlayBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} />
                     </View>
                     {shouldShowAd ? (
                         <View

@@ -17,6 +17,15 @@ PODS:
     - GoogleUtilities/Network (~> 8.1)
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
     - nanopb (~> 3.30910.0)
+  - FirebaseAnalytics/IdentitySupport (11.15.0):
+    - FirebaseCore (~> 11.15.0)
+    - FirebaseInstallations (~> 11.0)
+    - GoogleAppMeasurement/IdentitySupport (= 11.15.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
+    - GoogleUtilities/MethodSwizzler (~> 8.1)
+    - GoogleUtilities/Network (~> 8.1)
+    - "GoogleUtilities/NSData+zlib (~> 8.1)"
+    - nanopb (~> 3.30910.0)
   - FirebaseCore (11.15.0):
     - FirebaseCoreInternal (~> 11.15.0)
     - GoogleUtilities/Environment (~> 8.1)
@@ -59,6 +68,13 @@ PODS:
     - GoogleUtilities/Network (~> 8.1)
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
     - nanopb (~> 3.30910.0)
+  - GoogleAppMeasurement/IdentitySupport (11.15.0):
+    - GoogleAppMeasurement/Core (= 11.15.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
+    - GoogleUtilities/MethodSwizzler (~> 8.1)
+    - GoogleUtilities/Network (~> 8.1)
+    - "GoogleUtilities/NSData+zlib (~> 8.1)"
+    - nanopb (~> 3.30910.0)
   - GoogleDataTransport (10.1.0):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
@@ -93,6 +109,16 @@ PODS:
   - hermes-engine (0.78.0):
     - hermes-engine/Pre-built (= 0.78.0)
   - hermes-engine/Pre-built (0.78.0)
+  - ironsource-mediation (3.2.0):
+    - IronSourceSDK (= 8.10.0.0)
+    - React-Core
+  - IronSourceAdQualitySDK (7.25.2)
+  - IronSourceSDK (8.10.0.0):
+    - IronSourceSDK/AdQuality (= 8.10.0.0)
+    - IronSourceSDK/Ads (= 8.10.0.0)
+  - IronSourceSDK/AdQuality (8.10.0.0):
+    - IronSourceAdQualitySDK (~> 7.25.2)
+  - IronSourceSDK/Ads (8.10.0.0)
   - libwebp (1.5.0):
     - libwebp/demux (= 1.5.0)
     - libwebp/mux (= 1.5.0)
@@ -1794,6 +1820,7 @@ PODS:
     - SDWebImageWebPCoder (~> 0.8.4)
   - RNFBAnalytics (22.4.0):
     - FirebaseAnalytics/Core (= 11.15.0)
+    - FirebaseAnalytics/IdentitySupport (= 11.15.0)
     - React-Core
     - RNFBApp
   - RNFBApp (22.4.0):
@@ -2075,6 +2102,7 @@ DEPENDENCIES:
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - ironsource-mediation (from `../node_modules/ironsource-mediation`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
@@ -2173,6 +2201,8 @@ SPEC REPOS:
     - GoogleDataTransport
     - GoogleUserMessagingPlatform
     - GoogleUtilities
+    - IronSourceAdQualitySDK
+    - IronSourceSDK
     - libwebp
     - nanopb
     - PromisesObjC
@@ -2197,6 +2227,8 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2025-01-13-RNv0.78.0-a942ef374897d85da38e9c8904574f8376555388
+  ironsource-mediation:
+    :path: "../node_modules/ironsource-mediation"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -2378,6 +2410,9 @@ SPEC CHECKSUMS:
   GoogleUserMessagingPlatform: a8b56893477f67212fbc8411c139e61d463349f5
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   hermes-engine: b417d2b2aee3b89b58e63e23a51e02be91dc876d
+  ironsource-mediation: 865cd432bdcb867ee73e02c221d16691b0b1134e
+  IronSourceAdQualitySDK: 639d5a93e15e823538f87b75f3809c4905afc30b
+  IronSourceSDK: 41b727888a5853a5489eb00115f26bb07044a76e
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
@@ -2450,7 +2485,7 @@ SPEC CHECKSUMS:
   RNCPicker: 3e07b6e1850d0b06d3ccc6367535f2eb29e6dcd7
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
   RNFastImage: 462a183c4b0b6b26fdfd639e1ed6ba37536c3b87
-  RNFBAnalytics: af5e584d6cf7a22838473185fc6cc32f753a7622
+  RNFBAnalytics: 25e07d23c2009e23c85f24fd2b55de4aa865bdf9
   RNFBApp: 90cf0209fb8f0460ab069a7de857d7ec851c8476
   RNFBCrashlytics: f9c67f58b800bbb713a14286243cd8fa3a3c43f8
   RNGestureHandler: 79e41bd3d49e9231c62120276bc979f855ecabf6
@@ -2465,6 +2500,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: be02ca501b03c79d7027a6bbbd0a8db985034f11
 
-PODFILE CHECKSUM: a287c693334b3bd19a73f95b0f092ccba54f7d84
+PODFILE CHECKSUM: 29d5ef52ad2055bd654ff0c2eb55bac7c8933d7f
 
 COCOAPODS: 1.16.2

@@ -36,11 +36,18 @@
 	<string>사진 저장 및 불러오기를 위해 사진 라이브러리 접근 권한이 필요합니다.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
-	<dict>
-		<key>SKAdNetworkIdentifier</key>
-		<string>su67r6k2v3.skadnetwork</string>
-	</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>su67r6k2v3.skadnetwork</string>
+		</dict>
 	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSAdvertisingAttributionReportEndpoint</key>
+	<string>https://postbacks-is.com</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

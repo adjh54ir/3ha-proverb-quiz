@@ -17,10 +17,6 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
         classpath 'com.google.gms:google-services:4.4.1'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.2'
-        implementation 'com.unity3d.ads-mediation:adquality-sdk:7.24.1'
-        implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
-		implementation 'com.google.android.gms:play-services-basement:18.3.0'
-		implementation 'com.google.android.gms:play-services-appset:16.0.2'
     }
 }
 

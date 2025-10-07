@@ -127,6 +127,11 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom')
 	implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.unity3d.ads-mediation:adquality-sdk'
+    implementation 'com.google.android.gms:play-services-ads-identifier'
+    implementation 'com.google.android.gms:play-services-basement'
+    implementation 'com.google.android.gms:play-services-appset'
+
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

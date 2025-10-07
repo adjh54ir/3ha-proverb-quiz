@@ -36,20 +36,24 @@ const APP_KEY = Platform.select({
 
 const PLACEMENT_NAME = 'BANNER';
 
-const LevelPlayBannerAd: React.FC<AdmobBannerAdProps> = ({
-	paramMarginTop = 6,
-	paramMarginBottom = 6,
-	visible = true,
-	isLoadSdk,
-}) => {
-
-	const adSize = LevelPlayAdSize.BANNER
+const LevelPlayBannerAd: React.FC<AdmobBannerAdProps> = ({ paramMarginTop = 6, paramMarginBottom = 6, visible = true, isLoadSdk }) => {
+	const adSize = LevelPlayAdSize.BANNER;
 	const bannerAdRef = useRef<LevelPlayBannerAdViewMethods>(null);
+	const [isSdkReady, setIsSdkReady] = useState(false);
 
+	useEffect(() => {
+		console.log('🧭 useEffect mount, bannerAdRef.current:', APP_KEY, BANNER_AD_UNIT_ID);
+	}, [bannerAdRef.current]);
 
 	useEffect(() => {
 		initIronSourceSDK();
 	}, []);
+	useEffect(() => {
+		if (isSdkReady && bannerAdRef.current) {
+			console.log('📡 SDK ready + bannerRef OK → loading ad');
+			bannerAdRef.current?.loadAd();
+		}
+	}, [isSdkReady, bannerAdRef.current]);
 
 	const initIronSourceSDK = async () => {
 		if (!APP_KEY) {
@@ -61,7 +65,10 @@ const LevelPlayBannerAd: React.FC<AdmobBannerAdProps> = ({
 			const initListener: LevelPlayInitListener = {
 				onInitSuccess: (config: LevelPlayConfiguration) => {
 					console.log('✅ IronSource Init Success:', config);
+					console.log('🔍 bannerAdRef at init success:', bannerAdRef.current);
 					bannerAdRef.current?.loadAd();
+					// LevelPlay.launchTestSuite();
+					setIsSdkReady(true); // ✅ 여기서 플래그 세움
 				},
 				onInitFailed: (error: LevelPlayInitError) => {
 					console.error('❌ IronSource Init Failed:', error);
@@ -69,14 +76,10 @@ const LevelPlayBannerAd: React.FC<AdmobBannerAdProps> = ({
 			};
 			// 디버깅용
 			// LevelPlay.setAdaptersDebug(true);
+			// LevelPlay.setMetaData('is_test_suite', ['enable']);
 
 			// App mount 안정화 후 실행
-			requestAnimationFrame(() => {
-				LevelPlay.init(initRequest, initListener)
-					.catch((e) => {
-						console.error('🔥 Init Exception:', e);
-					});
-			});
+			LevelPlay.init(initRequest, initListener);
 		} catch (e) {
 			console.error('🔥 JS Exception before init:', e);
 		}
@@ -84,30 +87,43 @@ const LevelPlayBannerAd: React.FC<AdmobBannerAdProps> = ({
 
 	const listener: LevelPlayBannerAdViewListener = {
 		onAdLoaded: (info: LevelPlayAdInfo) => {
-			console.log('✅ Banner loaded:', info)
+			console.log('✅ Banner loaded:', info);
+			console.log('✅ Banner loaded:', info);
 		},
 		onAdLoadFailed: (error) => {
 			console.log('❌ Banner load failed:', error);
 			// setTimeout(() => bannerAdRef.current?.loadAd(), 3000); // 3초 후 재시도
 		},
 		onAdDisplayed: (info: LevelPlayAdInfo) => {
-			console.log('📡 Banner displayed:', info)
+			console.log('📡 Banner displayed:', info);
 		},
 		onAdDisplayFailed: (adInfo: LevelPlayAdInfo, error: LevelPlayAdError) => {
 			// Implement your logic here
+			console.log('✅ Banner onAdDisplayFailed:', adInfo);
 		},
 		onAdClicked: (info: LevelPlayAdInfo) => {
-			console.log('🖱️ Banner clicked:', info)
+			console.log('🖱️ Banner clicked:', info);
 		},
 		onAdExpanded: (adInfo: LevelPlayAdInfo) => {
 			// Implement your logic here
+			console.log('✅ Banner onAdExpanded:', adInfo);
 		},
 		onAdCollapsed: (adInfo: LevelPlayAdInfo) => {
 			// Implement your logic here
+			console.log('✅ Banner onAdCollapsed:', adInfo);
 		},
 		onAdLeftApplication: (adInfo: LevelPlayAdInfo) => {
 			// Implement your logic here
+			console.log('✅ Banner onAdLeftApplication:', adInfo);
 		},
+	};
+
+	const onLayout = (e) => {
+		const { width, height } = e.nativeEvent.layout;
+		console.log('Banner Layout:', width, height);
+		if (width > 0 && height > 0) {
+			bannerAdRef.current?.loadAd();
+		}
 	};
 	return (
 		<View
@@ -120,14 +136,20 @@ const LevelPlayBannerAd: React.FC<AdmobBannerAdProps> = ({
 					height: visible ? undefined : 0,
 				},
 			]}>
-
 			<LevelPlayBannerAdView
 				ref={bannerAdRef}
 				adUnitId={BANNER_AD_UNIT_ID!}
 				adSize={adSize}
 				placementName={PLACEMENT_NAME}
 				listener={listener}
-				style={{ width: adSize.width, height: adSize.height, alignSelf: 'center' }}
+				style={{ width: adSize.width, height: adSize.height, alignSelf: 'center', backgroundColor: '#ff000022' }}
+				onLayout={(e) => {
+					onLayout(e);
+					console.log('onLayout :: ', e);
+					bannerAdRef.current?.loadAd();
+
+					console.log('onLayout :: ', bannerAdRef.current?.loadAd());
+				}}
 			/>
 		</View>
 	);

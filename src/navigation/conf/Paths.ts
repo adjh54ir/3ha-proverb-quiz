@@ -8,6 +8,8 @@ export const enum Paths {
 	TODAY_QUIZ = 'TODAY_QUIZ', //오늘의 퀴즈
 	PROVERB_LIST = 'PROVERB_LIST', // 리스트 페이지
 	PROVERB_STUDY = 'PROVERB_STUDY', // 학습 모드
+	QUIZ = 'QUIZ',
+	QUIZ_MODE = 'QUIZ_MODE', // 오답노트
 	INIT_TIME_CHANLLENGE = 'INIT_TIME_CHANLLENGE', // 타임 챌린지 진입
 	TIME_CHANLLENGE = 'TIME_CHANLLENGE', // 타임 챌린지
 	PROVERB_MEANING_QUIZ = 'PROVERB_MEANING_QUIZ', // 뜻 맞추기

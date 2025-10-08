@@ -7,7 +7,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaleHeight, scaleWidth } from '@/utils';
 import StackNavigator from './StackNavigator';
 import DeviceInfo from 'react-native-device-info';
-import LevelPlayBannerAd from '@/screens/common/ads/levelplay/LevelPlayBannerAd';
 
 const AD_ALLOWED_ROUTES = [
 	Paths.TODAY_QUIZ,
@@ -18,27 +17,13 @@ const AD_ALLOWED_ROUTES = [
 	// 필요하면 추가
 ];
 
-const designHeight = 812;
-
-const { height: screenHeight } = Dimensions.get('window');
-
 const AppLayout = () => {
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);
 	const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
+	const DESIGN_HEIGHT = 812;
+	const { height: screenHeight } = Dimensions.get('window');
 
-	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute), [currentRoute]);
-
-	// useEffect(() => {
-	// 	AppLovinMAX.initialize(SDK_KEY)
-	// 		.then((config: Configuration) => {
-	// 			console.log('✅ AppLovin MAX Initialized', config);
-	// 			// 테스트 모드 ON (테스트 광고 강제 노출)
-	// 			// AppLovinMAX.showMediationDebugger(); // ✅ 강제로 광고 네트워크/테스트 광고 확인
-	// 		})
-	// 		.catch((error) => {
-	// 			console.error('AppLovin MAX 초기화 실패:', error);
-	// 		});
-	// }, []);
+	const shouldShowAd = __DEV__ ? useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute), [currentRoute]) : false;
 
 	// ✅ 라우트별 배경색 지정
 	const backgroundColor = useMemo(() => {
@@ -55,13 +40,64 @@ const AppLayout = () => {
 				return '#ffffff'; // 기본값
 		}
 	}, [currentRoute]);
+	/**
+	 * 배너 높이에 따른 패딩 계산 함수
+	 * @returns
+	 */
+	const getAdPaddingTop = () => {
+		if (!shouldShowAd) {
+			return 0;
+		}
+
+		if (DeviceInfo.isTablet()) {
+			return scaleHeight(60); // 태블릿
+		}
+		if (Platform.OS === 'android') {
+			return scaleHeight(50); // 안드로이드
+		}
+		if (screenHeight < DESIGN_HEIGHT) {
+			return 40; // 작은 화면
+		}
+		return 0; // 기본
+	};
+	/**
+	 * 광고 유무 + 플랫폼별 패딩 계산 함수
+	 * @param shouldShowAd
+	 * @returns
+	 */
+	const getNavigatorPaddingTop = (shouldShowAd: boolean): number => {
+		// [CASE1] 광고가 있는 경우
+		if (shouldShowAd) {
+			switch (Platform.OS) {
+				case 'android':
+					return scaleHeight(50);
+				case 'ios':
+					return scaleHeight(25);
+				default:
+					break;
+			}
+		}
+		// [CASE2] 광고가 없는 경우
+		else {
+			const isAdAllowed = AD_ALLOWED_ROUTES.includes(currentRoute);
+			// 광고가 없고 허용된 경로일 때만 패딩 적용
+			if (isAdAllowed) {
+				switch (Platform.OS) {
+					case 'android':
+						return scaleHeight(40);
+					case 'ios':
+						return scaleHeight(0);
+					default:
+						return 0;
+				}
+			}
+		}
+	};
 
 	return (
 		<NavigationContainer
 			ref={navigationRef}
-			onReady={() => {
-				setCurrentRoute(navigationRef.current?.getCurrentRoute()?.name || '');
-			}}
+			onReady={() => setCurrentRoute(navigationRef.current?.getCurrentRoute()?.name || '')}
 			onStateChange={() => {
 				const routeName = navigationRef.current?.getCurrentRoute()?.name;
 				if (routeName) {
@@ -71,29 +107,11 @@ const AppLayout = () => {
 			<SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={shouldShowAd ? ['top'] : []}>
 				<View style={styles.container}>
 					<View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]}>
-						<LevelPlayBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} />
+						{/* <LevelPlayBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} /> */}
 					</View>
-					{shouldShowAd ? (
-						<View
-							style={{
-								paddingTop: DeviceInfo.isTablet()
-									? scaleHeight(60) // 배너 높이 + 여백
-									: Platform.OS === 'android'
-										? scaleHeight(50)
-										: screenHeight < designHeight
-											? 40 // ✅ 작은 화면일 때 여유 더 줌
-											: 0,
-							}}
-						/>
-					) : (
-						<></>
-					)}
-					<View
-						style={[
-							styles.navigatorWrapper,
-							shouldShowAd && { paddingTop: Platform.OS === 'android' ? scaleHeight(50) : scaleHeight(25) },
-							{ backgroundColor },
-						]}>
+					{shouldShowAd && <View style={{ paddingTop: getAdPaddingTop() }} />}
+
+					<View style={[styles.navigatorWrapper, { paddingTop: getNavigatorPaddingTop(shouldShowAd), backgroundColor }]}>
 						<StackNavigator />
 					</View>
 				</View>

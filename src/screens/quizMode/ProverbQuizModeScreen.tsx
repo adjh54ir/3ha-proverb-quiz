@@ -6,7 +6,6 @@ import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
-import FastImage from 'react-native-fast-image';
 import { LEVEL_DATA, QUIZ_MODES } from '@/const/common/CommonMainData';
 import IconComponent from '../common/atomic/IconComponent';
 
@@ -31,8 +30,13 @@ const ProverbQuizModeScreen = () => {
 		setTotalScore(totalScoreFromQuiz);
 	};
 
+	const handleSelectMode = (mode: string) => {
+		// @ts-ignore
+		navigation.navigate(Paths.QUIZ_MODE, { mode }); // mode: 'meaning' | 'proverb' | 'fill-blank'
+	};
+
 	const moveToHandler = (modeKey: string) => {
-		console.log("여기로 전달하고 있나")
+		console.log('여기로 전달하고 있나');
 		switch (modeKey) {
 			case 'meaning':
 				// @ts-ignore
@@ -59,42 +63,16 @@ const ProverbQuizModeScreen = () => {
 	// 수정
 	const { mascot, label, next, icon } = levelInfo;
 	const progress = useMemo(() => {
-		if (!next) return 1;
+		if (!next) {
+			return 1;
+		}
 		const prevScore = LEVEL_DATA.find((l) => l.score === levelInfo.score - 830)?.score || 0;
 		return Math.min((totalScore - prevScore) / (next - prevScore), 1);
 	}, [totalScore, levelInfo]);
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff', paddingTop: scaleHeight(5) }} edges={['bottom']}>
 			<View style={styles.container}>
-
 				<ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-					<View style={styles.mascotCard}>
-						<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.contain} />
-
-						{/* 라벨 + 아이콘 한 줄 */}
-						<View style={styles.levelRow}>
-							<IconComponent
-								type="FontAwesome5"
-								name={icon}
-								size={17}
-								color={label === '속담 마스터' ? '#FFD700' : '#27ae60'} // ✅ 조건 분기
-								style={{ marginRight: scaleWidth(6) }}
-							/>
-							<Text style={styles.levelLabel}>{label}</Text>
-						</View>
-
-						<Text style={styles.scoreText}>총 점수: {totalScore}점</Text>
-
-						{/* 진행도 바 */}
-						<View style={styles.progressBarBackground}>
-							<View style={[styles.progressBarFill, { width: `${progress * 100}%` }]} />
-						</View>
-						{next && (
-							<Text style={styles.progressText}>
-								다음 레벨까지 {next - totalScore}점 남음
-							</Text>
-						)}
-					</View>
 					<View style={styles.titleWrap}>
 						<Text style={styles.titleLine}>도전하려는 퀴즈 모드를 선택하세요!</Text>
 					</View>
@@ -111,7 +89,7 @@ const ProverbQuizModeScreen = () => {
 										if (isDisabled) {
 											Alert.alert('새로운 퀴즈 준비 중', '새로운 퀴즈를 준비 중에 있습니다.');
 										} else {
-											moveToHandler(mode.key);
+											handleSelectMode(mode.key);
 										}
 									}}>
 									<View style={isDisabled ? styles.disabledInner : styles.iconTextRow}>
@@ -123,17 +101,9 @@ const ProverbQuizModeScreen = () => {
 						})}
 					</View>
 					{/* ❓ 아코디언 안내 */}
-					<TouchableOpacity
-						style={styles.accordionHeader}
-						activeOpacity={0.7}
-						onPress={() => setAccordionOpen((prev) => !prev)}>
+					<TouchableOpacity style={styles.accordionHeader} activeOpacity={0.7} onPress={() => setAccordionOpen((prev) => !prev)}>
 						<Text style={styles.accordionHeaderText}>❓ 틀린 문제는 어떻게 다시 풀 수 있나요?</Text>
-						<IconComponent
-							type="MaterialIcons"
-							name={accordionOpen ? 'expand-less' : 'expand-more'}
-							size={20}
-							color="#2c3e50"
-						/>
+						<IconComponent type="MaterialIcons" name={accordionOpen ? 'expand-less' : 'expand-more'} size={20} color="#2c3e50" />
 					</TouchableOpacity>
 
 					{accordionOpen && (
@@ -190,13 +160,15 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: '#fefefe',
 		paddingHorizontal: scaleWidth(10),
+		alignItems: 'center', // 가로 중앙 정렬
 	},
 	scrollContent: {
 		flexGrow: 1,
+		justifyContent: 'center', // 중앙 정렬 (세로)
+		alignItems: 'center', // 중앙 정렬 (가로)
 		paddingHorizontal: scaleWidth(20),
 		paddingTop: scaleHeight(6),
 		paddingBottom: scaleHeight(20),
-		marginBottom: scaleHeight(150),
 	},
 	gridWrap: {
 		flexDirection: 'row',

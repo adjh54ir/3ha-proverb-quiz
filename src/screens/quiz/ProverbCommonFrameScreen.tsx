@@ -46,6 +46,9 @@ type QuizRouteParams = {
 	questionPool?: MainDataType.Proverb[];
 	isWrongReview?: boolean;
 	title?: string;
+	selectedLevel: string;
+	levelKey: string;
+	selectedCategory?: string;
 };
 
 type QuizRoute = RouteProp<{ ProverbCommonFrame: QuizRouteParams }, 'ProverbCommonFrame'>;
@@ -54,9 +57,15 @@ const ProverbCommonFrameScreen = () => {
 	const route = useRoute<QuizRoute>();
 	const flatListRef = useRef<FlatList<string>>(null);
 
-	const { mode: routeMode, questionPool, isWrongReview = false, title = '' } = route.params;
-
-	const mode: 'meaning' | 'proverb' | 'fill-blank' = isWrongReview ? 'meaning' : routeMode;
+	// 1️⃣ 기존 selectedLevel, selectedCategory 초기값 수정
+	const {
+		mode: routeMode,
+		questionPool,
+		isWrongReview = false,
+		title = '',
+		selectedLevel: routeLevel,
+		selectedCategory: routeCategory,
+	} = route.params;
 
 	const isFocused = useIsFocused();
 	const navigation = useNavigation();
@@ -69,7 +78,6 @@ const ProverbCommonFrameScreen = () => {
 	const [quizHistory, setQuizHistory] = useState<MainDataType.UserQuizHistory | null>(null);
 
 	const [pendingStart, setPendingStart] = useState(false);
-	const [showAd, setShowAd] = useState(false);
 	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
 
 	const [proverbs, setProverbs] = useState<MainDataType.Proverb[]>([]);
@@ -78,7 +86,6 @@ const ProverbCommonFrameScreen = () => {
 	const [selected, setSelected] = useState<string | null>(null);
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 	const [remainingTime, setRemainingTime] = useState(10);
-	const [showStartModal, setShowStartModal] = useState(true);
 	const [showResultModal, setShowResultModal] = useState(false);
 	const [resultTitle, setResultTitle] = useState('');
 	const [resultMessage, setResultMessage] = useState('');
@@ -89,7 +96,6 @@ const ProverbCommonFrameScreen = () => {
 	const [selectedCategory, setSelectedCategory] = useState<string>('전체'); // 기본값 '전체'
 	const [levelOptions, setLevelOptions] = useState<string[]>([]);
 	const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
-	const [modeStep, setModeStep] = useState(0); // 0 = 난이도, 1 = 카테고리
 	const [showExitModal, setShowExitModal] = useState<boolean>(false);
 	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
 	const [showHintModal, setShowHintModal] = useState(false);
@@ -119,6 +125,21 @@ const ProverbCommonFrameScreen = () => {
 		'정말 똑똑하군요! 📚\n퀴즈를 척척 풀어가는 모습이 인상적이에요!',
 	];
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
+
+	useEffect(() => {
+		console.log('route.params :: ', route.params);
+		const all = questionPool && questionPool.length > 0 ? questionPool : ProverbServices.selectProverbList();
+
+		const filtered = all.filter((p) => {
+			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+			return levelMatch && categoryMatch;
+		});
+
+		setProverbs(filtered);
+		if (filtered.length > 0) loadQuestion();
+	}, []); // ✅ 최초 렌더링 시에도 한 번 실행
+
 	useEffect(() => {
 		(async () => {
 			const stored = await AsyncStorage.getItem(STORAGE_KEY);
@@ -157,19 +178,22 @@ const ProverbCommonFrameScreen = () => {
 		}
 	}, [showHintModal]);
 
-	useEffect(() => {
-		if (isWrongReview) {
-			setShowStartModal(false); // 시작 모달 안 보이게 강제 설정
-		}
-	}, []);
+	// 3️⃣ 퀴즈 데이터 로드 useEffect 수정
 	useEffect(() => {
 		if (questionPool && questionPool.length > 0) {
-			setProverbs(questionPool); // 오답 복습용 문제
+			setProverbs(questionPool); // 오답 복습용
+			loadQuestion();
 		} else {
-			const all = ProverbServices.selectProverbList(); // 일반 모드용
-			setProverbs(all);
+			const all = ProverbServices.selectProverbList();
+			const filtered = all.filter((p) => {
+				const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+				const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+				return levelMatch && categoryMatch;
+			});
+			setProverbs(filtered);
+			if (filtered.length > 0) loadQuestion();
 		}
-	}, [questionPool]);
+	}, [selectedLevel, selectedCategory]);
 
 	useEffect(() => {
 		if (showExitModal && timerRef.current) {
@@ -185,25 +209,6 @@ const ProverbCommonFrameScreen = () => {
 		setLevelOptions(['전체', ...levels]);
 		setCategoryOptions(['전체', ...categories]);
 	}, []);
-
-	useEffect(() => {
-		if (!showStartModal) {
-			(async () => {
-				const stored = await AsyncStorage.getItem(STORAGE_KEY);
-				if (stored) {
-					const parsed: MainDataType.UserQuizHistory = JSON.parse(stored);
-					setQuizHistory(parsed);
-					setTotalScore(parsed.totalScore || 0);
-				}
-			})();
-		}
-	}, [showStartModal]);
-
-	useEffect(() => {
-		if (!showStartModal && proverbs.length > 0 && !showAd) {
-			loadQuestion(); // 광고가 아닌 경우에만 문제를 로드
-		}
-	}, [showStartModal, proverbs, showAd]);
 
 	useEffect(() => {
 		if (options.length) {
@@ -262,13 +267,13 @@ const ProverbCommonFrameScreen = () => {
 			let allOptions: string[] = [];
 			let displayText = '';
 
-			if (mode === 'meaning') {
+			if (routeMode === 'meaning') {
 				allOptions = [...shuffledDistractors.map((p) => p.longMeaning!), newQuestion.longMeaning!];
 				displayText = newQuestion.proverb;
-			} else if (mode === 'proverb') {
+			} else if (routeMode === 'proverb') {
 				allOptions = [...shuffledDistractors.map((p) => p.proverb), newQuestion.proverb];
 				displayText = newQuestion.longMeaning!;
-			} else if (mode === 'fill-blank') {
+			} else if (routeMode === 'fill-blank') {
 				const blank = pickBlankWord(newQuestion.proverb);
 				allOptions = [...shuffledDistractors.map((p) => pickBlankWord(p.proverb)), blank];
 				displayText = newQuestion.proverb.replace(blank, '(____)');
@@ -320,13 +325,13 @@ const ProverbCommonFrameScreen = () => {
 		let allOptions: string[] = [];
 		let displayText: string = '';
 
-		if (mode === 'meaning') {
+		if (routeMode === 'meaning') {
 			allOptions = [...shuffledDistractors.map((item) => item.longMeaning), newQuestion.longMeaning!];
 			displayText = newQuestion.proverb;
-		} else if (mode === 'proverb') {
+		} else if (routeMode === 'proverb') {
 			allOptions = [...shuffledDistractors.map((item) => item.proverb), newQuestion.proverb];
 			displayText = newQuestion.longMeaning!;
-		} else if (mode === 'fill-blank') {
+		} else if (routeMode === 'fill-blank') {
 			const blank = pickBlankWord(newQuestion.proverb);
 			displayText = newQuestion.proverb.replace(blank, '(____)');
 			allOptions = [...shuffledDistractors.map((item) => pickBlankWord(item.proverb)), blank];
@@ -390,9 +395,9 @@ const ProverbCommonFrameScreen = () => {
 		let acquiredBadges: string[] = [];
 
 		let correctAnswer = '';
-		if (mode === 'meaning') correctAnswer = question.longMeaning!;
-		else if (mode === 'proverb') correctAnswer = question.proverb;
-		else if (mode === 'fill-blank') correctAnswer = blankWord;
+		if (routeMode === 'meaning') correctAnswer = question.longMeaning!;
+		else if (routeMode === 'proverb') correctAnswer = question.proverb;
+		else if (routeMode === 'fill-blank') correctAnswer = blankWord;
 
 		const isTimeout = answer === '';
 		const correct = answer === correctAnswer;
@@ -492,7 +497,6 @@ const ProverbCommonFrameScreen = () => {
 		return levelColorMap[level] || '#b2bec3'; // 기본 회색
 	};
 
-
 	const pickBlankWord = (text: string) => {
 		const words = text.split(' ').filter((w) => w.length > 1);
 		const randomWord = words[Math.floor(Math.random() * words.length)];
@@ -520,10 +524,10 @@ const ProverbCommonFrameScreen = () => {
 		isWrongReview && questionPool
 			? questionPool.length // ✅ 오답 복습 모드일 땐 고정
 			: proverbs.filter((p) => {
-				const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-				const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-				return levelMatch && categoryMatch;
-			}).length;
+					const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+					const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+					return levelMatch && categoryMatch;
+				}).length;
 
 	const triggerComboAnimation = () => {
 		comboAnim.setValue(0);
@@ -572,7 +576,6 @@ const ProverbCommonFrameScreen = () => {
 
 	const handleNextQuestion = () => {
 		const isFinal = resultType === 'done';
-		setShowStartModal(false); // ✅ 이전 모달 깜빡임 방지
 		setResultTitle('');
 		setResultMessage('');
 		setShowResultModal(false);
@@ -612,8 +615,6 @@ const ProverbCommonFrameScreen = () => {
 		}
 	};
 	const onStart = (skipLoad?: boolean) => {
-		setShowStartModal(false);
-
 		const filtered = ProverbServices.selectProverbList().filter((p) => {
 			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
 			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
@@ -659,13 +660,13 @@ const ProverbCommonFrameScreen = () => {
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type="FontAwesome6" name="seedling" size={14} color="#fff" />;
+				return <IconComponent type='FontAwesome6' name='seedling' size={14} color='#fff' />;
 			case 2:
-				return <IconComponent type="FontAwesome6" name="leaf" size={14} color="#fff" />;
+				return <IconComponent type='FontAwesome6' name='leaf' size={14} color='#fff' />;
 			case 3:
-				return <IconComponent type="FontAwesome6" name="tree" size={14} color="#fff" />;
+				return <IconComponent type='FontAwesome6' name='tree' size={14} color='#fff' />;
 			case 4:
-				return <IconComponent type="FontAwesome6" name="trophy" size={14} color="#fff" />;
+				return <IconComponent type='FontAwesome6' name='trophy' size={14} color='#fff' />;
 			default:
 				return null;
 		}
@@ -674,23 +675,23 @@ const ProverbCommonFrameScreen = () => {
 	const getFieldIcon = (field: string) => {
 		switch (field) {
 			case '운/우연':
-				return <IconComponent type="FontAwesome6" name="dice" size={12} color="#fff" />;
+				return <IconComponent type='FontAwesome6' name='dice' size={12} color='#fff' />;
 			case '인간관계':
-				return <IconComponent type="FontAwesome6" name="users" size={12} color="#fff" />;
+				return <IconComponent type='FontAwesome6' name='users' size={12} color='#fff' />;
 			case '세상 이치':
-				return <IconComponent type="fontawesome5" name="globe" size={12} color="#fff" />;
+				return <IconComponent type='fontawesome5' name='globe' size={12} color='#fff' />;
 			case '근면/검소':
-				return <IconComponent type="fontawesome5" name="hammer" size={12} color="#fff" />;
+				return <IconComponent type='fontawesome5' name='hammer' size={12} color='#fff' />;
 			case '노력/성공':
-				return <IconComponent type="fontawesome5" name="medal" size={12} color="#fff" />;
+				return <IconComponent type='fontawesome5' name='medal' size={12} color='#fff' />;
 			case '경계/조심':
-				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={12} color="#fff" />;
+				return <IconComponent type='fontawesome5' name='exclamation-triangle' size={12} color='#fff' />;
 			case '욕심/탐욕':
-				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={12} color="#fff" />;
+				return <IconComponent type='fontawesome5' name='hand-holding-usd' size={12} color='#fff' />;
 			case '배신/불신':
-				return <IconComponent type="fontawesome5" name="user-slash" size={12} color="#fff" />;
+				return <IconComponent type='fontawesome5' name='user-slash' size={12} color='#fff' />;
 			default:
-				return <IconComponent type="FontAwesome6" name="tag" size={12} color="#fff" />;
+				return <IconComponent type='FontAwesome6' name='tag' size={12} color='#fff' />;
 		}
 	};
 
@@ -698,16 +699,14 @@ const ProverbCommonFrameScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-			<View
-				style={{ flex: 1 }}
-			>
+			<View style={{ flex: 1 }}>
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 					<View style={{ flex: 1 }}>
 						<View style={styles.container}>
 							<View style={styles.inner}>
 								<View style={styles.progressStatusWrapper}>
 									<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-										<Text style={styles.progressText}>{getModeLabel(mode)}</Text>
+										<Text style={styles.progressText}>{getModeLabel(routeMode)}</Text>
 										{question?.level && (
 											<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 												{/* 레벨 표시 */}
@@ -777,7 +776,7 @@ const ProverbCommonFrameScreen = () => {
 									</View>
 								</View>
 								{question && (
-									<View style={{ position: "absolute", width: '100%', alignItems: 'flex-end', marginTop: scaleHeight(6) }}>
+									<View style={{ position: 'absolute', width: '100%', alignItems: 'flex-end', marginTop: scaleHeight(6) }}>
 										<TouchableOpacity onPress={() => setShowHintModal(true)}>
 											<View
 												style={{
@@ -786,17 +785,9 @@ const ProverbCommonFrameScreen = () => {
 													borderRadius: scaleWidth(20),
 													flexDirection: 'row',
 													alignItems: 'center',
-												}}
-											>
-												<IconComponent
-													type="MaterialIcons"
-													name="lightbulb"
-													size={18}
-													color="#f39c12"
-												/>
-												<Text style={{ marginLeft: scaleWidth(6), fontWeight: '600', color: '#f39c12' }}>
-													힌트
-												</Text>
+												}}>
+												<IconComponent type='MaterialIcons' name='lightbulb' size={18} color='#f39c12' />
+												<Text style={{ marginLeft: scaleWidth(6), fontWeight: '600', color: '#f39c12' }}>힌트</Text>
 											</View>
 										</TouchableOpacity>
 									</View>
@@ -819,17 +810,17 @@ const ProverbCommonFrameScreen = () => {
 
 									{question ? (
 										<Text style={styles.questionText}>
-											{`Q. ${mode === 'fill-blank'
-												? questionText || '문제 준비중...'
-												: mode === 'meaning'
-													? question?.proverb
-													: question?.longMeaning || '문제 준비중...'
-												}`}
+											{`Q. ${
+												routeMode === 'fill-blank'
+													? questionText || '문제 준비중...'
+													: routeMode === 'meaning'
+														? question?.proverb
+														: question?.longMeaning || '문제 준비중...'
+											}`}
 										</Text>
 									) : (
 										<Text>문제 불러오는 중...</Text>
 									)}
-
 
 									<View style={[styles.optionsContainer, { flex: 1, width: '100%', marginTop: scaleHeight(5) }]}>
 										<FlatList
@@ -898,7 +889,7 @@ const ProverbCommonFrameScreen = () => {
 							</View>
 
 							{/* ======================= 퀴즈 시작 팝업 ============================ */}
-							{showStartModal && !isWrongReview && (
+							{/* {showStartModal && !isWrongReview && (
 								<QuizStartModal
 									visible={showStartModal}
 									modeStep={modeStep}
@@ -928,18 +919,7 @@ const ProverbCommonFrameScreen = () => {
 										setShowAd(true); // 광고 표시
 									}}
 								/>
-							)}
-
-							{/* // 광고 컴포넌트 */}
-							{showAd && (
-								<LevelPlayFrontAd
-									onAdClosed={() => {
-										setShowAd(false);
-										onStart(true); // ✅ 문제 다시 뽑지 않음
-										startTimer(); // ✅ 타이머 재시작
-									}}
-								/>
-							)}
+							)} */}
 
 							{/* ======================= 퀴즈 종료 ============================ */}
 							<Modal visible={showExitModal} transparent animationType='fade'>
@@ -1032,7 +1012,7 @@ const ProverbCommonFrameScreen = () => {
 							</Modal>
 
 							{showHintModal && (
-								<Modal visible={showHintModal} transparent animationType="fade">
+								<Modal visible={showHintModal} transparent animationType='fade'>
 									<View style={styles.modalOverlay}>
 										<View style={styles.resultModal}>
 											<Text style={[styles.resultTitle, { color: '#f39c12' }]}>🧭 힌트</Text>
@@ -1051,13 +1031,11 @@ const ProverbCommonFrameScreen = () => {
 														marginBottom: scaleHeight(12),
 													}}>
 													{getFieldIcon(question.category)}
-													<Text style={{ color: '#fff', fontWeight: 'bold', marginLeft: scaleWidth(6) }}>
-														{question.category}
-													</Text>
+													<Text style={{ color: '#fff', fontWeight: 'bold', marginLeft: scaleWidth(6) }}>{question.category}</Text>
 												</View>
 											)}
 											{/* 비슷한 속담 */}
-											{question?.sameProverb && question.sameProverb.filter(sp => sp && sp.trim() !== '').length > 0 && (
+											{question?.sameProverb && question.sameProverb.filter((sp) => sp && sp.trim() !== '').length > 0 && (
 												<View
 													style={{
 														backgroundColor: '#eef6ff',
@@ -1080,7 +1058,7 @@ const ProverbCommonFrameScreen = () => {
 													</Text>
 
 													{question.sameProverb
-														.filter(sp => sp && sp.trim() !== '')
+														.filter((sp) => sp && sp.trim() !== '')
 														.map((sp, idx) => (
 															<Text
 																key={idx}
@@ -1115,7 +1093,8 @@ const ProverbCommonFrameScreen = () => {
 															color: '#2c3e50',
 															marginBottom: scaleHeight(8),
 															textAlign: 'center',
-														}}>💡 속담 예시
+														}}>
+														💡 속담 예시
 													</Text>
 
 													{question.example.map((ex, idx) => (
@@ -1133,11 +1112,7 @@ const ProverbCommonFrameScreen = () => {
 												</View>
 											)}
 
-
-
-											<TouchableOpacity
-												style={styles.modalConfirmButton}
-												onPress={() => setShowHintModal(false)}>
+											<TouchableOpacity style={styles.modalConfirmButton} onPress={() => setShowHintModal(false)}>
 												<Text style={styles.modalConfirmText}>확인</Text>
 											</TouchableOpacity>
 										</View>

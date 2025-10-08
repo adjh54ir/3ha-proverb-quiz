@@ -1,17 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-	View,
-	Text,
-	StyleSheet,
-	TouchableOpacity,
-	ScrollView,
-	Platform,
-	Modal,
-	Keyboard,
-	Animated,
-	Easing,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Modal, Keyboard, Animated, Easing } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FastImage from 'react-native-fast-image';
@@ -43,8 +32,6 @@ const greetingMessages = [
 	'🧩 맞히는 재미, 배우는 즐거움! 속담 퀴즈 GO!',
 	'🐣 하루 한 속담! 작지만 큰 지혜가 자라나요!',
 ];
-
-
 
 LocaleConfig.locales.kr = {
 	monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '11월'],
@@ -118,14 +105,10 @@ const Home = () => {
 	);
 	useEffect(() => {
 		const result = ProverbServices.getDuplicateProverbs();
-		console.log("중복데이터를 확인합니다 :: ", result)
-
-
-	}, [])
+		console.log('중복데이터를 확인합니다 :: ', result);
+	}, []);
 
 	useEffect(() => {
-
-
 		if (showCheckInModal && !isCheckedIn && !hasAutoCheckedIn.current) {
 			handleCheckIn();
 			hasAutoCheckedIn.current = true; // 중복 호출 방지
@@ -133,10 +116,14 @@ const Home = () => {
 	}, [showCheckInModal, isCheckedIn]);
 
 	const levelDataForScroll = useMemo(() => [...LEVEL_DATA], []);
+	// 오름차순 정렬된 데이터
+	const levelDataAsc = [...LEVEL_DATA].sort((a, b) => a.score - b.score);
 
-	const currentLevelIndex = levelDataForScroll.findIndex(
-		(item) => totalScore >= item.score && totalScore < (item.next ?? Infinity),
-	);
+	const currentLevel = levelDataAsc.find((l) => totalScore >= l.score && totalScore < (l.next ?? Infinity));
+
+	const nextLevel = levelDataAsc.find((l) => totalScore < l.score);
+
+	const currentLevelIndex = levelDataForScroll.findIndex((item) => totalScore >= item.score && totalScore < (item.next ?? Infinity));
 	useEffect(() => {
 		if (showLevelModal && levelScrollRef.current) {
 			setTimeout(() => {
@@ -153,7 +140,6 @@ const Home = () => {
 	};
 	// 이걸 기존 getLevelData 아래에 추가해
 	const levelData = useMemo(() => getLevelData(totalScore), [totalScore]);
-
 
 	const { label, icon, mascot, description } = levelData;
 
@@ -286,13 +272,37 @@ const Home = () => {
 		scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
 	};
 
-
-
 	// getTitleByScore 함수 추가
 	const getLevelInfoByScore = (score: number) => {
 		return LEVEL_DATA.slice().find((l) => score >= l.score) || LEVEL_DATA[0];
 	};
-	const currentLevel = getLevelInfoByScore(totalScore);
+
+	// 진행도 계산 함수
+	const getProgressPercent = () => {
+		const currentLevel = LEVEL_DATA.find((l) => totalScore >= l.score && totalScore < (l.next ?? Infinity));
+		if (!currentLevel || !currentLevel.next) {
+			return 100;
+		} // 마지막 레벨이면 꽉 찬 상태
+
+		const progress = ((totalScore - currentLevel.score) / (currentLevel.next - currentLevel.score)) * 100;
+		return Math.min(Math.max(progress, 0), 100);
+	};
+
+	const progressPercent = getProgressPercent();
+	let progressColor = '#82c91e'; // 연두빛 초록 (0~59%)
+
+	if (progressPercent >= 60 && progressPercent < 90) {
+		progressColor = '#f9ca24'; // 밝은 노랑 (60~89%)
+	}
+
+	if (progressPercent >= 90) {
+		progressColor = '#ff6b6b'; // 부드러운 빨강 (90~100%)
+	}
+
+	// 예: 문제당 10점 (필요시 상수화)
+	const SCORE_PER_QUESTION = 10;
+
+	const questionsToNext = nextLevel && nextLevel.score ? Math.max(Math.ceil((nextLevel.score - totalScore) / SCORE_PER_QUESTION), 0) : 0;
 
 	const loadData = async () => {
 		const quizData = await AsyncStorage.getItem(USER_QUIZ_HISTORY_KEY);
@@ -495,8 +505,6 @@ const Home = () => {
 										<FastImage key={totalScore} source={mascot} style={styles.image} resizeMode="contain" />
 									</View>
 								</TouchableOpacity>
-								{/* ✅ 회색 작게 안내 텍스트 추가 */}
-								{showMascotHint && <Text style={styles.mascotHintText}>캐릭터를 누르면 빵빠레가 팡팡!</Text>}
 
 								{petLevel >= 0 && (
 									<View style={styles.petContent}>
@@ -504,6 +512,24 @@ const Home = () => {
 									</View>
 								)}
 							</View>
+						</View>
+						{/* ✅ 회색 작게 안내 텍스트 추가 */}
+						{showMascotHint && <Text style={styles.mascotHintText}>캐릭터를 누르면 빵빠레가 팡팡!</Text>}
+						{/* 레벨업 게이지바 */}
+						<View style={styles.progressBarWrapper}>
+							<View
+								style={[
+									styles.progressBarBackground,
+									{
+										borderColor: progressPercent < 60 ? '#a9dfbf' : progressPercent < 90 ? '#fde3a7' : '#f5b7b1',
+									},
+								]}>
+								<Animated.View style={[styles.progressBarFill, { width: `${progressPercent}%`, backgroundColor: progressColor }]} />
+								<Text style={styles.progressBarTextInside}>{Math.floor(progressPercent)}%</Text>
+							</View>
+
+							{/* ✅ 문제 개수 안내 텍스트 추가 */}
+							{questionsToNext > 0 && <Text style={styles.progressBarTextBelow}>다음 레벨까지 {questionsToNext}문제 남음</Text>}
 						</View>
 						<View style={styles.titleContainer}>
 							<View style={{ alignItems: 'center' }}>
@@ -533,13 +559,7 @@ const Home = () => {
 											}}>
 											{label}
 										</Text>
-										<IconComponent
-											type="materialIcons"
-											name="info-outline"
-											size={18}
-											color="#7f8c8d"
-											style={{ marginLeft: scaleWidth(4) }}
-										/>
+										<IconComponent type="materialIcons" name="info-outline" size={18} color="#7f8c8d" style={{ marginLeft: scaleWidth(4) }} />
 									</TouchableOpacity>
 								</View>
 
@@ -731,10 +751,10 @@ const Home = () => {
 												<Text style={styles.levelBadgeText}>🏆 현재 등급</Text>
 											</View>
 										)}
-
 										<View style={styles.levelMascotCircle}>
 											<FastImage source={mascotImage} style={styles.levelMascotImage} resizeMode={FastImage.resizeMode.contain} />
-										</View>ㅣ
+										</View>
+										ㅣ
 										<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
 											<IconComponent name={item.icon} type="fontAwesome6" size={16} color="#27ae60" />
 											<Text style={[styles.levelLabel, { marginLeft: scaleWidth(6) }]}>{item.label}</Text>
@@ -1527,6 +1547,50 @@ const styles = StyleSheet.create({
 		width: '100%',
 		height: '100%',
 		borderRadius: scaleWidth(40),
+	},
+	progressBarWrapper: {
+		width: '100%',
+		alignItems: 'center',
+		marginBottom: scaleHeight(3),
+	},
+
+	progressBarTextBelow: {
+		marginVertical: scaleHeight(6), // 위 여백도 줄여서 붙여줌
+		fontSize: scaledSize(10), // ✅ 아주 작게
+		color: '#95a5a6', // ✅ 흐릿한 회색 (밝은 그레이톤)
+		fontWeight: '400', // ✅ 굵기 줄여서 덜 강조
+		textAlign: 'center',
+		opacity: 0.7, // ✅ 살짝 흐릿하게
+	},
+	progressBarBackground: {
+		width: '85%',
+		height: scaleHeight(20),
+		borderRadius: scaleHeight(7),
+		borderWidth: 1.5,
+		borderColor: '#27ae60',
+		backgroundColor: '#fff',
+		overflow: 'hidden',
+		alignSelf: 'center',
+	},
+	progressBarFill: {
+		height: '100%',
+		marginBottom: scaleHeight(6),
+		backgroundColor: '#27ae60',
+		borderRadius: scaleHeight(7),
+		position: 'absolute', // ✅ 항상 왼쪽에서부터 차도록
+		left: 0, // ✅ 시작 위치 고정
+	},
+	progressBarTextInside: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		bottom: 0,
+		textAlign: 'center',
+		textAlignVertical: 'center', // Android 전용
+		justifyContent: 'center',
+		fontSize: scaledSize(11),
+		fontWeight: '700',
+		color: '#2c3e50',
 	},
 });
 

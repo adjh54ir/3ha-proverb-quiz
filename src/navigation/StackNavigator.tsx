@@ -17,6 +17,8 @@ import WrongReviewScreen from '@/screens/WrongReviewScreen';
 import { scaledSize, scaleWidth } from '@/utils';
 import InitTimeChallengeScreen from '@/screens/InitTimeChallengeScreen';
 import TimeChanllengeScreen from '@/screens/TimeChanllengeScreen';
+import QuizModeScreen from '@/screens/quizMode/QuizModeScreen';
+import ProverbCommonFrameScreen from '@/screens/quiz/ProverbCommonFrameScreen';
 
 /**
  * Stack Navigator : 일반적인 화면만 출력을 하는 경우
@@ -69,12 +71,22 @@ const StackNavigator = () => {
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '타임 챌린지',
-					headerLeft: () => <></>
+					headerLeft: () => <></>,
 					// headerLeft: () => (
 					// 	<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
 					// 		<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
 					// 	</TouchableOpacity>
 					// ),
+				})}
+			/>
+
+			<Stack.Screen
+				name={Paths.QUIZ}
+				component={ProverbCommonFrameScreen}
+				options={({ navigation }) => ({
+					headerShown: false,
+					title: '속담 찾기',
+					headerLeft: () => <></>,
 				})}
 			/>
 
@@ -106,16 +118,27 @@ const StackNavigator = () => {
 					title: '퀴즈 모드 선택',
 					headerLeft: () => (
 						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
-							<Icon name='arrow-back' size={24} color='#2c3e50' />
+							<Icon name="arrow-back" size={24} color="#2c3e50" />
 						</TouchableOpacity>
 					),
-					headerRight: () => (<></>)
+					headerRight: () => <></>,
 					// headerRight: () => (
 					// 	//@ts-ignore
 					// 	<TouchableOpacity onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })} style={{ marginRight: 16 }}>
 					// 		<IconComponent type='materialIcons' name='info-outline' size={24} color='#3498db' />
 					// 	</TouchableOpacity>
 					// ),
+				})}
+			/>
+
+			<Stack.Screen
+				name={Paths.QUIZ_MODE}
+				component={QuizModeScreen}
+				options={({ navigation }) => ({
+					headerShown: false,
+					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
+					title: '카테고리 선택',
+					headerLeft: () => <></>,
 				})}
 			/>
 			<Stack.Screen
@@ -140,7 +163,7 @@ const StackNavigator = () => {
 					title: '오답 복습',
 					headerLeft: () => (
 						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
-							<Icon name='arrow-back' size={24} color='#2c3e50' />
+							<Icon name="arrow-back" size={24} color="#2c3e50" />
 						</TouchableOpacity>
 					),
 				})}

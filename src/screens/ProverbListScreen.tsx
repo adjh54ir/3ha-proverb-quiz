@@ -28,7 +28,6 @@ import DeviceInfo from 'react-native-device-info';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 
-
 const PAGE_SIZE = 30;
 
 const COMMON_ALL_OPTION = {
@@ -36,7 +35,8 @@ const COMMON_ALL_OPTION = {
 	value: '전체',
 	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={16} color="#555" />,
 	labelStyle: {
-		marginLeft: scaleWidth(6), fontSize: scaledSize(14),
+		marginLeft: scaleWidth(6),
+		fontSize: scaledSize(14),
 	},
 };
 
@@ -164,7 +164,6 @@ const ProverbListScreen = () => {
 	);
 	useFocusEffect(
 		useCallback(() => {
-
 			setFieldOpen(false);
 			setLevelOpen(false);
 
@@ -236,8 +235,6 @@ const ProverbListScreen = () => {
 		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
 	};
 
-
-
 	const handleReset = () => {
 		// 1. 드롭다운을 먼저 닫음
 		setFieldOpen(false);
@@ -265,12 +262,16 @@ const ProverbListScreen = () => {
 
 	const handleSetLevelOpen = (open: boolean) => {
 		setLevelOpen(open);
-		if (open) { scrollToTop(); }
+		if (open) {
+			scrollToTop();
+		}
 	};
 
 	const handleSetFieldOpen = (open: boolean) => {
 		setFieldOpen(open);
-		if (open) { scrollToTop(); }
+		if (open) {
+			scrollToTop();
+		}
 	};
 
 	const getLevelIcon = (level: number) => {
@@ -311,7 +312,6 @@ const ProverbListScreen = () => {
 		}
 	};
 
-
 	return (
 		<SafeAreaView style={styles.main} edges={['top']}>
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
@@ -345,7 +345,9 @@ const ProverbListScreen = () => {
 											items={LEVEL_DROPDOWN_ITEMS}
 											setOpen={(open) => {
 												setLevelOpen(open);
-												if (open) setFieldOpen(false); // 👉 레벨 열릴 때 필드 닫음
+												if (open) {
+													setFieldOpen(false);
+												} // 👉 레벨 열릴 때 필드 닫음
 											}}
 											setValue={setLevelValue}
 											setItems={setLevelItems}
@@ -364,11 +366,9 @@ const ProverbListScreen = () => {
 											showArrowIcon={true} // 드롭다운 화살표
 											showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
 											onChangeValue={() => scrollToTop()}
-
 										/>
 									</View>
 									<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000, overflow: 'visible' }]}>
-
 										<DropDownPicker
 											listMode="MODAL"
 											modalTitle="카테고리 선택"
@@ -377,7 +377,9 @@ const ProverbListScreen = () => {
 											items={FIELD_DROPDOWN_ITEMS}
 											setOpen={(open) => {
 												setFieldOpen(open);
-												if (open) setLevelOpen(false); // 👉 필드 열릴 때 레벨 닫음
+												if (open) {
+													setLevelOpen(false);
+												} // 👉 필드 열릴 때 레벨 닫음
 											}}
 											setValue={setFieldValue}
 											setItems={setFieldItems}
@@ -408,7 +410,7 @@ const ProverbListScreen = () => {
 												transparent: true,
 											}}
 											modalContentContainerStyle={{
-												marginTop: "25%",
+												marginTop: '25%',
 												width: '85%',
 												alignSelf: 'center',
 												maxHeight: scaleHeight(500),
@@ -433,7 +435,7 @@ const ProverbListScreen = () => {
 											}}
 											listItemContainerStyle={{
 												paddingVertical: scaleHeight(14), // 충분한 위아래 여백
-												minHeight: scaleHeight(48),       // iOS에서 텍스트 짤림 방지
+												minHeight: scaleHeight(48), // iOS에서 텍스트 짤림 방지
 												alignItems: 'stretch', // ✅ 핵심 추가
 											}}
 										/>
@@ -488,7 +490,6 @@ const ProverbListScreen = () => {
 											}}>
 											<View style={styles.proverbBlock}>
 												<View style={styles.badgeInlineRow}>
-
 													<View
 														style={[
 															styles.badge,
@@ -516,9 +517,7 @@ const ProverbListScreen = () => {
 															},
 														]}>
 														{getFieldIcon(item.category)}
-														<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>
-															{item.category || '미지정'}
-														</Text>
+														<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>{item.category || '미지정'}</Text>
 													</View>
 												</View>
 												<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
@@ -552,11 +551,7 @@ const ProverbListScreen = () => {
 						)}
 
 						{/* 상세 모달 */}
-						<ProverbDetailModal
-							visible={showDetailModal}
-							proverb={selectedProverb}
-							onClose={() => setShowDetailModal(false)}
-						/>
+						<ProverbDetailModal visible={showDetailModal} proverb={selectedProverb} onClose={() => setShowDetailModal(false)} />
 					</View>
 				</TouchableWithoutFeedback>
 			</KeyboardAvoidingView>
@@ -725,7 +720,6 @@ const styles = StyleSheet.create({
 	},
 	filterDropdownRow: {
 		flexDirection: 'row',
-		marginBottom: scaleHeight(8),
 	},
 	dropdownWrapper: {
 		flex: 1,
@@ -748,14 +742,14 @@ const styles = StyleSheet.create({
 		marginRight: scaleWidth(6),
 	},
 	listCountWrapper: {
-		marginTop: scaleHeight(3),
+		marginTop: scaleHeight(6),
 		alignItems: 'flex-end',
 		paddingHorizontal: scaleWidth(16),
-		marginBottom: scaleHeight(3),
 	},
 	listCountText: {
 		fontSize: scaledSize(14),
 		color: '#666',
+		marginTop: scaleHeight(12),
 	},
 	resetButton: {
 		justifyContent: 'center',

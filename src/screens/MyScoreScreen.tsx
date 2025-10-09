@@ -131,9 +131,7 @@ const CapitalResultScreen = () => {
 	const [levelStats, setLevelStats] = useState<
 		{ key: string; title: string; subtitle: string; icon: string; totalCount: number; solvedCount: number }[]
 	>([]);
-	const [categoryStats, setCategoryStats] = useState<
-		{ category: string; totalCount: number; solvedCount: number }[]
-	>([]);
+	const [categoryStats, setCategoryStats] = useState<{ category: string; totalCount: number; solvedCount: number }[]>([]);
 
 	const allCategories = ProverbServices.selectCategoryList(); // 전체 카테고리 (8개)
 
@@ -259,16 +257,13 @@ const CapitalResultScreen = () => {
 			setLevelMaster(conqueredLevels);
 
 			// ✅ 여기서 solvedIds 뽑기
-			const solvedIds = [
-				...(quizJson?.correctProverbId ?? []),
-				...(quizJson?.wrongProverbId ?? []),
-			];
+			const solvedIds = [...(quizJson?.correctProverbId ?? []), ...(quizJson?.wrongProverbId ?? [])];
 
 			// ✅ 레벨별 문제 묶기 + 푼 개수 세기
 			const levelStats = DIFFICULTIES.map((level, idx) => {
-				const problems = allProverbs.filter(p => p.level === idx + 1);
+				const problems = allProverbs.filter((p) => p.level === idx + 1);
 				const totalCount = problems.length;
-				const solvedCount = problems.filter(p => solvedIds.includes(p.id)).length;
+				const solvedCount = problems.filter((p) => solvedIds.includes(p.id)).length;
 				return { ...level, totalCount, solvedCount };
 			});
 
@@ -286,8 +281,6 @@ const CapitalResultScreen = () => {
 			});
 
 			setCategoryStats(categoryStats);
-
-
 
 			const todayJson = await AsyncStorage.getItem(STORAGE_KEY_TODAY);
 			const todayData: MainDataType.TodayQuizList[] = todayJson ? JSON.parse(todayJson) : [];
@@ -380,9 +373,7 @@ const CapitalResultScreen = () => {
 	const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
 
 	const levelDataForScroll = useMemo(() => [...LEVEL_DATA], []);
-	const currentLevelIndex = levelDataForScroll.findIndex(
-		(item) => totalScore >= item.score && totalScore < (item.next ?? Infinity),
-	);
+	const currentLevelIndex = levelDataForScroll.findIndex((item) => totalScore >= item.score && totalScore < (item.next ?? Infinity));
 	useEffect(() => {
 		if (showLevelModal && levelScrollRef.current) {
 			setTimeout(() => {
@@ -593,13 +584,12 @@ const CapitalResultScreen = () => {
 							)}
 						</View>
 						<View style={{ alignItems: 'center' }}>
-							<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
+							<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(8) }}>
 								<TouchableOpacity
 									style={{
 										flexDirection: 'row',
 										alignItems: 'center',
 										justifyContent: 'center',
-										marginBottom: scaleHeight(6),
 									}}
 									activeOpacity={0.7}
 									onPress={() => setShowLevelModal(true)}>
@@ -618,13 +608,7 @@ const CapitalResultScreen = () => {
 										}}>
 										{label}
 									</Text>
-									<IconComponent
-										type="materialIcons"
-										name="info-outline"
-										size={18}
-										color="#7f8c8d"
-										style={{ marginLeft: scaleWidth(4) }}
-									/>
+									<IconComponent type="materialIcons" name="info-outline" size={18} color="#7f8c8d" style={{ marginLeft: scaleWidth(4) }} />
 								</TouchableOpacity>
 							</View>
 
@@ -633,13 +617,25 @@ const CapitalResultScreen = () => {
 								<Text style={styles.scoreBadgeText}>{totalScore.toLocaleString()}점</Text>
 							</View>
 						</View>
-						{/* 👇 간단한 설명으로 변경 */}
-						<Text style={styles.levelDescription}>
-							모든 퀴즈를 풀면<Text style={{ fontWeight: 'bold' }}> 속담 마스터</Text> 등급을 획득할 수 있습니다.
-						</Text>
-						<Text style={styles.levelDescription}>
-							틀린 퀴즈는 <Text style={{ fontWeight: 'bold' }}>오답 복습</Text>으로 다시 점수를 얻을 수 있습니다.
-						</Text>
+						<View style={styles.levelDescriptionCard}>
+							<IconComponent type="fontAwesome6" name="trophy" size={16} color="#f39c12" style={{ marginRight: scaleWidth(6) }} />
+							<Text style={styles.levelDescriptionText}>
+								모든 퀴즈를 풀면 <Text style={styles.levelHighlight}>'속담 마스터'</Text> 등급을 획득할 수 있습니다.
+							</Text>
+						</View>
+
+						<View style={styles.levelDescriptionCard}>
+							<IconComponent
+								type="fontAwesome6"
+								name="arrow-rotate-right" // ✅ 'redo' 대신 사용
+								size={16}
+								color="#2980b9"
+								style={{ marginRight: scaleWidth(6) }}
+							/>
+							<Text style={styles.levelDescriptionText}>
+								틀린 문제는 <Text style={styles.levelHighlight}>오답 복습</Text>에서 다시 도전할 수 있어요 🚀
+							</Text>
+						</View>
 					</View>
 					<TouchableOpacity
 						onPress={toggleAllSections}
@@ -731,7 +727,6 @@ const CapitalResultScreen = () => {
 								</View>
 							</View>
 
-
 							{/* ✅ 정복한 레벨 세로 한 줄씩 + 개수 진행률 */}
 							<View style={styles.subSectionBox2}>
 								<Text style={styles.sectionSubtitle}>
@@ -740,10 +735,7 @@ const CapitalResultScreen = () => {
 								<Text style={styles.levelHelperText}>- 각 레벨 퀴즈를 모두 풀면 정복으로 표시됩니다.</Text>
 
 								{levelStats.map((item) => {
-									const progressPercent =
-										item.totalCount > 0
-											? Math.round((item.solvedCount / item.totalCount) * 100)
-											: 0;
+									const progressPercent = item.totalCount > 0 ? Math.round((item.solvedCount / item.totalCount) * 100) : 0;
 
 									const isConquered = progressPercent === 100;
 									const styleMeta = STYLE_MAP[item.subtitle]; // ✅ 레벨별 색상 가져오기
@@ -785,12 +777,7 @@ const CapitalResultScreen = () => {
 
 											{/* 진행률 바 */}
 											<View style={styles.progressBarBackgroundRow}>
-												<View
-													style={[
-														styles.progressBarFill,
-														{ width: `${progressPercent}%`, backgroundColor: isConquered ? '#fff' : '#27ae60' },
-													]}
-												/>
+												<View style={[styles.progressBarFill, { width: `${progressPercent}%`, backgroundColor: isConquered ? '#fff' : '#27ae60' }]} />
 											</View>
 
 											{/* 개수 */}
@@ -826,16 +813,11 @@ const CapitalResultScreen = () => {
 								<Text style={styles.sectionSubtitle}>
 									🧠 정복한 카테고리 ({categoryMaster.length} / {allCategories.length})
 								</Text>
-								<Text style={styles.regionHelperText}>
-									- 특정 분야의 사자성어를 모두 풀었을때 획득할 수 있습니다.
-								</Text>
+								<Text style={styles.regionHelperText}>- 특정 분야의 속담을 모두 풀었을때 획득할 수 있습니다.</Text>
 
 								{categoryStats.map((item) => {
 									const meta = getCategoryMeta(item.category);
-									const progressPercent =
-										item.totalCount > 0
-											? Math.round((item.solvedCount / item.totalCount) * 100)
-											: 0;
+									const progressPercent = item.totalCount > 0 ? Math.round((item.solvedCount / item.totalCount) * 100) : 0;
 
 									// ✅ 정복 조건
 									const isEarned = categoryMaster.includes(item.category) || progressPercent === 100;
@@ -877,12 +859,7 @@ const CapitalResultScreen = () => {
 
 											{/* 프로그래스바 */}
 											<View style={styles.progressBarBackgroundRow}>
-												<View
-													style={[
-														styles.progressBarFill,
-														{ width: `${progressPercent}%`, backgroundColor: isEarned ? '#fff' : '#27ae60' },
-													]}
-												/>
+												<View style={[styles.progressBarFill, { width: `${progressPercent}%`, backgroundColor: isEarned ? '#fff' : '#27ae60' }]} />
 											</View>
 
 											{/* 개수 */}
@@ -1661,7 +1638,7 @@ const styles = StyleSheet.create({
 	regionHelperText: {
 		fontSize: scaledSize(12),
 		color: '#7f8c8d',
-		marginBottom: scaleHeight(10),
+		marginBottom: scaleHeight(12),
 	},
 	levelHelperText: {
 		fontSize: scaledSize(12),
@@ -1917,5 +1894,26 @@ const styles = StyleSheet.create({
 	categoryRowText: {
 		fontSize: scaledSize(15),
 		color: '#7f8c8d',
+	},
+	levelDescriptionCard: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: '#f9f9f9',
+		borderRadius: scaleWidth(10),
+		paddingVertical: scaleHeight(8),
+		paddingHorizontal: scaleWidth(12),
+		marginBottom: scaleHeight(8),
+		borderWidth: 1,
+		borderColor: '#e0e0e0',
+	},
+	levelDescriptionText: {
+		flex: 1,
+		fontSize: scaledSize(13),
+		color: '#2c3e50',
+		lineHeight: scaleHeight(18),
+	},
+	levelHighlight: {
+		fontWeight: 'bold',
+		color: '#27ae60',
 	},
 });

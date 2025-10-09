@@ -1,11 +1,13 @@
+/* eslint-disable react/no-unstable-nested-components */
 import { Paths } from '@/navigation/conf/Paths';
 import { MainDataType } from '@/types/MainDataType';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import * as Animatable from 'react-native-animatable';
 
 // ✅ QuizResultModal.tsx
 interface QuizResultModalProps {
@@ -13,14 +15,34 @@ interface QuizResultModalProps {
 	resultType: 'correct' | 'wrong' | 'timeout' | 'done' | '';
 	resultTitle: string;
 	resultMessage: string;
+	quizMode: 'meaning' | 'proverb' | 'blank';
 	question: MainDataType.Proverb | null;
 	onNext: () => void;
 }
 
-const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, question, onNext }: QuizResultModalProps) => {
-
+const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quizMode, question, onNext }: QuizResultModalProps) => {
 	const navigation = useNavigation();
 
+	const [shouldAnimate, setShouldAnimate] = useState(false);
+	const [closing, setClosing] = useState(false);
+
+	const hasAnimated = useRef(false);
+
+	useEffect(() => {
+		if (visible && !hasAnimated.current) {
+			setShouldAnimate(true);
+			hasAnimated.current = true;
+		}
+	}, [visible]);
+
+	useEffect(() => {
+		if (!visible) {
+			// 모달이 닫힐 때 초기화
+			hasAnimated.current = false;
+			setShouldAnimate(false);
+			setClosing(false);
+		}
+	}, [visible]);
 
 	const ProverbInfoCard = ({
 		question,
@@ -31,28 +53,51 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 		highlightColor?: string;
 		backgroundColor?: string;
 	}) => {
-		if (!question) return null;
+		if (!question) {
+			return null;
+		}
 
 		return (
 			<View style={[styles.infoCard, { backgroundColor, borderColor: highlightColor }]}>
 				<Text style={[styles.infoSectionTitle, { color: highlightColor }]}>📖 속담 해설</Text>
 
-
-				{/* 속담 본문 강조 박스 */}
-				<Text style={styles.modalProverbText}>{question.proverb}</Text>
+				{/* ✅ quizMode별 애니메이션 분기 */}
+				{quizMode === 'proverb' || quizMode === 'blank' ? (
+					shouldAnimate && !closing ? (
+						<Animatable.View animation="fadeInUp" duration={800} delay={300} onAnimationEnd={() => setShouldAnimate(false)}>
+							<Text style={styles.modalProverbText}>{question.proverb}</Text>
+						</Animatable.View>
+					) : (
+						<Text style={styles.modalProverbText}>{question.proverb}</Text>
+					)
+				) : (
+					<Text style={styles.modalProverbText}>{question.proverb}</Text>
+				)}
 
 				{/* 의미 */}
 				{Boolean(question.longMeaning) && (
 					<View style={styles.meaningHighlight}>
-						<View style={styles.meaningQuoteBox}>
-							<Icon
-								name="quote-left"
-								size={28}
-								color="#58D68D"
-								style={{ marginBottom: scaleHeight(8) }}
-							/>
-							<Text style={styles.meaningQuoteText}>{question.longMeaning}</Text>
-						</View>
+						{quizMode === 'meaning' && shouldAnimate && !closing ? (
+							<Animatable.View
+								animation="fadeInUp"
+								duration={800}
+								delay={300}
+								onAnimationEnd={() => {
+									setShouldAnimate(false);
+									setClosing(true);
+									setTimeout(() => setClosing(false), 100);
+								}}>
+								<View style={styles.meaningQuoteBox}>
+									<Icon name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
+									<Text style={styles.meaningQuoteText}>{question.longMeaning}</Text>
+								</View>
+							</Animatable.View>
+						) : (
+							<View style={styles.meaningQuoteBox}>
+								<Icon name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
+								<Text style={styles.meaningQuoteText}>{question.longMeaning}</Text>
+							</View>
+						)}
 					</View>
 				)}
 
@@ -85,11 +130,12 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 		);
 	};
 
-
-	if (!visible) return null;
+	if (!visible) {
+		return null;
+	}
 
 	return (
-		<Modal visible={visible} transparent animationType='fade'>
+		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.modalOverlay}>
 				<View
 					style={[
@@ -121,7 +167,7 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 							styles.resultMascot,
 							resultType === 'done' && {
 								width: scaleWidth(150),
-								height: scaleWidth(150)
+								height: scaleWidth(150),
 							}, // ✅ 완료 시 이미지 크게
 						]}
 						resizeMode={FastImage.resizeMode.contain}
@@ -129,8 +175,7 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 					<ScrollView
 						style={styles.scrollView} // 🔽 모달 높이 제한
 						contentContainerStyle={{ paddingBottom: scaleHeight(10) }}
-						showsVerticalScrollIndicator={true}
-					>
+						showsVerticalScrollIndicator={true}>
 						{resultType === 'done' ? (
 							<>
 								<Text style={styles.resultMessage}>{resultMessage}</Text>
@@ -140,12 +185,8 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 							</>
 						) : resultType === 'correct' ? (
 							<>
-								<Text style={styles.resultMessageBig}>{resultMessage}</Text>
-								<ProverbInfoCard
-									question={question}
-									highlightColor="#27ae60"
-									backgroundColor="#eafaf1"
-								/>
+								<Text style={[styles.resultMessageBig, { marginBottom: scaleHeight(12) }]}>{resultMessage}</Text>
+								<ProverbInfoCard question={question} highlightColor="#27ae60" backgroundColor="#eafaf1" />
 							</>
 						) : (
 							<>
@@ -153,27 +194,25 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, ques
 								<Text style={{ fontSize: scaledSize(15), fontWeight: '600', textAlign: 'center', padding: scaleWidth(20) }}>
 									정답은 <Text style={{ color: '#27ae60' }}>"{question?.proverb}"</Text>였어요!
 								</Text>
-								<ProverbInfoCard
-									question={question}
-									highlightColor="#e67e22"
-									backgroundColor="#fffdf7"
-								/>
+								<ProverbInfoCard question={question} highlightColor="#e67e22" backgroundColor="#fffdf7" />
 							</>
 						)}
 					</ScrollView>
 
-					<TouchableOpacity style={styles.modalConfirmButton} onPress={() => {
-						if (resultType === 'done') {
-							navigation.goBack(); // ✅ 뒤로 가기 수행
-						} else {
-							onNext(); // ✅ 다음 문제 로직 실행
-						}
-					}}>
+					<TouchableOpacity
+						style={styles.modalConfirmButton}
+						onPress={() => {
+							if (resultType === 'done') {
+								navigation.goBack(); // ✅ 뒤로 가기 수행
+							} else {
+								onNext(); // ✅ 다음 문제 로직 실행
+							}
+						}}>
 						<Text style={styles.modalConfirmText}>{resultType === 'done' ? '뒤로 가기' : '다음 퀴즈'}</Text>
 					</TouchableOpacity>
 				</View>
 			</View>
-		</Modal >
+		</Modal>
 	);
 };
 
@@ -199,8 +238,9 @@ export const styles = StyleSheet.create({
 		marginBottom: scaleHeight(12),
 	},
 	resultMascot: {
-		width: scaleWidth(100),
-		height: scaleWidth(100),
+		width: scaleWidth(120),
+		height: scaleHeight(120),
+		borderRadius: 60,
 	},
 	resultMessageContainer: {
 		alignItems: 'center',
@@ -213,7 +253,6 @@ export const styles = StyleSheet.create({
 		color: '#2ecc71',
 		textAlign: 'center',
 		lineHeight: scaleHeight(24),
-		marginBottom: scaleHeight(16),
 	},
 	correctInfoCard: {
 		width: '100%',
@@ -303,8 +342,7 @@ export const styles = StyleSheet.create({
 		minHeight: scaleHeight(66),
 		maxHeight: scaleHeight(120),
 	},
-	scrollView: { maxHeight: scaleHeight(500), width: '100%' }
-	,
+	scrollView: { maxHeight: scaleHeight(500), width: '100%' },
 	// ✅ styles.tsx 추가
 	infoCard: {
 		width: '100%',
@@ -379,7 +417,6 @@ export const styles = StyleSheet.create({
 		fontSize: scaledSize(13),
 		color: '#555',
 		lineHeight: 20,
-		marginBottom: scaleHeight(6),
 		backgroundColor: '#FAFAFA',
 		padding: scaleWidth(8),
 		borderRadius: scaleWidth(8),

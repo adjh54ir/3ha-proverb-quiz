@@ -55,22 +55,22 @@ const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '아주 쉬움',
 		value: '아주 쉬움',
-		icon: () => <IconComponent type='FontAwesome6' name='seedling' size={16} color='#85C1E9' />,
+		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={16} color="#85C1E9" />,
 	},
 	{
 		label: '쉬움',
 		value: '쉬움',
-		icon: () => <IconComponent type='FontAwesome6' name='leaf' size={16} color='#F4D03F' />,
+		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={16} color="#F4D03F" />,
 	},
 	{
 		label: '보통',
 		value: '보통',
-		icon: () => <IconComponent type='FontAwesome6' name='tree' size={16} color='#EB984E' />,
+		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#EB984E" />,
 	},
 	{
 		label: '어려움',
 		value: '어려움',
-		icon: () => <IconComponent type='FontAwesome6' name='trophy' size={16} color='#E74C3C' />,
+		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={16} color="#E74C3C" />,
 	},
 ];
 export const FIELD_DROPDOWN_ITEMS = [
@@ -179,7 +179,7 @@ const praiseMessages = [
 	'성실한 배움이 빛을 발하고 있어요! ✨',
 	'오늘도 주경야독의 모범이에요! 🌙',
 	'노력은 결코 배신하지 않아요! 💪',
-	'사자성어 달인이 되어가고 있어요! 🧾',
+	'속담 달인이 되어가고 있어요! 🧾',
 	'꾸준한 학습이 인과응보를 만듭니다! 🔁',
 	'어제보다 한층 성장했어요! ⏫',
 	'글자 속 깊은 뜻을 꿰뚫었어요! 🔍',
@@ -361,7 +361,7 @@ const QuizStudyScreen = () => {
 
 	// 카테고리 아이콘(FIELD_DROPDOWN_ITEMS에서 매칭)
 	const getCategoryIcon = (category?: string) => {
-		if (!category) return null;
+		if (!category) {return null;}
 		const matched = FIELD_DROPDOWN_ITEMS.find((i) => i.value === category) as
 			| { iconType: string; iconName: string }
 			| undefined;
@@ -583,7 +583,7 @@ const QuizStudyScreen = () => {
 			filtered = filtered.filter((c) => !studyHistory.studyProverbes.includes(c.id));
 		}
 
-		const LEVEL_MAP: Record<string, number> = { "아주 쉬움": 1, 쉬움: 2, 보통: 3, 어려움: 4 };
+		const LEVEL_MAP: Record<string, number> = { '아주 쉬움': 1, 쉬움: 2, 보통: 3, 어려움: 4 };
 		if (levelFilter !== '전체') {
 			filtered = filtered.filter((item) => item.level === LEVEL_MAP[levelFilter]);
 		}
@@ -718,7 +718,7 @@ const QuizStudyScreen = () => {
 									{item.proverb}
 								</Text>
 
-								<View style={{ alignItems: 'center', justifyContent: "center", marginBottom: scaleHeight(12) }}>
+								<View style={{ alignItems: 'center', justifyContent: 'center', marginBottom: scaleHeight(12) }}>
 									{/* 배지 + 태그 한 줄 */}
 									<View style={styles.badgeInlineRow}>
 										{/* 레벨 뱃지 */}
@@ -1080,7 +1080,7 @@ const QuizStudyScreen = () => {
 									? '완료한 속담이 아직 없어요.\n학습 후 완료 버튼을 눌러보세요!'
 									: filter === 'learning'
 										? '진행 중인 속담이 없어요.\n다시 학습하기 버튼으로 시작해보세요!'
-										: '등록된 사자성어가 없습니다.'}
+										: '등록된 속담이 없습니다.'}
 							</Text>
 						</View>
 					) : (

@@ -8,90 +8,20 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainDataType } from '@/types/MainDataType';
-export type QuizLevelKey = 'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert';
+
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
-import { FIELD_DROPDOWN_ITEMS, QUIZ_MODES } from '@/const/common/CommonMainData';
+import { FIELD_DROPDOWN_ITEMS, LEVELS, QUIZ_MODES, QuizLevelKey } from '@/const/common/CommonMainData';
 import ProverbServices from '@/services/ProverbServices';
-import IconComponent from '../common/atomic/IconComponent';
-import LevelPlayFrontAd from '../common/ads/levelplay/LevelPlayFrontAd';
+import IconComponent from './common/atomic/IconComponent';
+import LevelPlayFrontAd from './common/ads/levelplay/LevelPlayFrontAd';
 
 type QuizModeScreenRouteParams = {
-	QuizModeScreen: { mode: string }; // 전달되는 mode는 string 타입 (예: 'meaning' | 'proverb' | 'blank')
+	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'comingsoon' }; // 전달되는 mode는 string 타입 (예: 'meaning' | 'proverb' | 'blank')
 };
-
-interface QuizLevel {
-	key: QuizLevelKey;
-	label: string;
-	icon: string;
-	type: string;
-	color: string;
-	desc: string;
-}
-
-const titleMap = {
-	all: '전체 퀴즈',
-	beginner: '초급 퀴즈',
-	intermediate: '중급 퀴즈',
-	advanced: '고급 퀴즈',
-	expert: '특급 퀴즈',
-};
-
-const LEVELS: QuizLevel[] = [
-	{
-		key: 'beginner',
-		label: '초급 문제',
-		icon: 'seedling',
-		type: 'FontAwesome6',
-		color: '#58D68D',
-		desc: '',
-	},
-	{
-		key: 'intermediate',
-		label: '중급 문제',
-		icon: 'leaf',
-		type: 'FontAwesome6',
-		color: '#F5B041',
-		desc: '',
-	},
-	{
-		key: 'advanced',
-		label: '고급 문제',
-		icon: 'tree',
-		type: 'FontAwesome6',
-		color: '#E67E22',
-		desc: '',
-	},
-	{
-		key: 'expert',
-		label: '특급 문제',
-		icon: 'trophy',
-		type: 'FontAwesome6',
-		color: '#AF7AC5',
-		desc: '',
-	},
-	{
-		key: 'all',
-		label: '전체 문제',
-		icon: 'clipboard-list',
-		type: 'fontAwesome5',
-		color: '#5DADE2',
-		desc: '',
-	},
-	{
-		//@ts-ignore
-		key: 'comingsoon',
-		label: '새로운 문제',
-		icon: 'hourglass-half',
-		type: 'fontAwesome6',
-		color: '#dfe6e9',
-		desc: '',
-	},
-];
 
 const QuizModeScreen = () => {
-	const isFocused = useIsFocused();
 	const navigation = useNavigation();
 
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
@@ -106,6 +36,7 @@ const QuizModeScreen = () => {
 
 	const [showAd, setShowAd] = useState(false);
 	const [showInfoModal, setShowInfoModal] = useState(false);
+	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 	const [selectedLevelKey, setSelectedLevelKey] = useState<QuizLevelKey | null>(null);
 	const [tab, setTab] = useState<'level' | 'category'>('level');
 
@@ -140,7 +71,24 @@ const QuizModeScreen = () => {
 		}
 	};
 
-	const moveToQuiz = (level: QuizLevelKey) => {
+	const convertKeyToLevel = (key: QuizLevelKey): number | 'all' | null => {
+		switch (key) {
+			case 'all':
+				return 'all';
+			case 'beginner':
+				return 1;
+			case 'intermediate':
+				return 2;
+			case 'advanced':
+				return 3;
+			case 'expert':
+				return 4;
+			default:
+				return null;
+		}
+	};
+
+	const moveToLevelQuiz = (level: QuizLevelKey) => {
 		const titleMap = {
 			all: '전체 퀴즈',
 			beginner: '초급 퀴즈',
@@ -160,8 +108,6 @@ const QuizModeScreen = () => {
 			// 난이도별 문제 필터링
 			filteredQuestions = proverbList.filter((item) => item.level === selectedLevel);
 		}
-
-		console.log('filteredQuestions :: ', filteredQuestions);
 		//@ts-ignore
 		navigation.push(Paths.QUIZ, {
 			questionPool: filteredQuestions,
@@ -173,22 +119,19 @@ const QuizModeScreen = () => {
 		});
 	};
 
-	const convertKeyToLevel = (key: QuizLevelKey): number | 'all' | null => {
-		switch (key) {
-			case 'all':
-				return 'all';
-			case 'beginner':
-				return 1;
-			case 'intermediate':
-				return 2;
-			case 'advanced':
-				return 3;
-			case 'expert':
-				return 4;
-			default:
-				return null;
-		}
+	const moveToCategoryQuiz = (categoryLabel: string) => {
+		const filteredQuestions = categoryLabel === '전체' ? proverbList : proverbList.filter((p) => p.category === categoryLabel);
+
+		//@ts-ignore
+		navigation.push(Paths.QUIZ, {
+			questionPool: filteredQuestions,
+			isWrongReview: false,
+			title: categoryLabel + ' 퀴즈',
+			mode: passedMode,
+			selectedCategory: categoryLabel,
+		});
 	};
+
 	const selectedMode = QUIZ_MODES.find((mode) => mode.key === passedMode);
 
 	return (
@@ -272,7 +215,7 @@ const QuizModeScreen = () => {
 													setSelectedLevelKey(item.key as QuizLevelKey);
 													setShowAd(true);
 												} else {
-													moveToQuiz(item.key as QuizLevelKey);
+													moveToLevelQuiz(item.key as QuizLevelKey);
 												}
 											}}>
 											<View style={styles.iconTextRow}>
@@ -288,7 +231,7 @@ const QuizModeScreen = () => {
 							{tab === 'category' && (
 								<View style={{ flex: 1, width: '100%', paddingHorizontal: scaleWidth(12) }}>
 									{CATEGORIES.map((item) => {
-										const filteredProverbs = item.label === '전체' ? proverbList : proverbList.filter((p) => p.type === item.label);
+										const filteredProverbs = item.label === '전체' ? proverbList : proverbList.filter((p) => p.category === item.label);
 										const total = filteredProverbs.length;
 
 										const correctSet = new Set(quizHistory?.correctProverbId ?? []);
@@ -302,21 +245,11 @@ const QuizModeScreen = () => {
 												key={item.key}
 												style={[styles.categoryRowButton, { backgroundColor: item.color }]}
 												onPress={() => {
-													//@ts-ignore
-
 													if (shouldShowAd) {
-														//@ts-ignore
-														setSelectedLevelKey(item.key);
+														setSelectedCategory(item.label);
 														setShowAd(true);
 													} else {
-														//@ts-ignore
-														navigation.push(Paths.QUIZ, {
-															questionPool: filteredProverbs,
-															isWrongReview: false,
-															title: item.label + ' 퀴즈',
-															mode: passedMode,
-															selectedCategory: item.label,
-														});
+														moveToCategoryQuiz(item.label);
 													}
 												}}>
 												{/* 왼쪽 아이콘 + 라벨 */}
@@ -366,12 +299,17 @@ const QuizModeScreen = () => {
 				</View>
 			)}
 
-			{showAd && selectedLevelKey && (
+			{showAd && (
 				<LevelPlayFrontAd
 					onAdClosed={() => {
 						setShowAd(false);
-						moveToQuiz(selectedLevelKey); // ✅ 저장된 난이도로 이동
-						setSelectedLevelKey(null); // ✅ 초기화
+						if (selectedLevelKey) {
+							moveToLevelQuiz(selectedLevelKey);
+							setSelectedLevelKey(null);
+						} else if (selectedCategory) {
+							moveToCategoryQuiz(selectedCategory);
+							setSelectedCategory(null);
+						}
 					}}
 				/>
 			)}
@@ -391,7 +329,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(20),
 	},
 	titleRow: {
-		marginBottom: scaleHeight(6),
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -553,7 +490,6 @@ const styles = StyleSheet.create({
 		marginVertical: scaleHeight(12),
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(16),
-		marginBottom: scaleHeight(12),
 		borderWidth: 1,
 		borderColor: '#dcdde1',
 	},
@@ -592,7 +528,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingVertical: scaleHeight(20),
+		paddingVertical: scaleHeight(16),
 		paddingHorizontal: scaleWidth(18),
 		borderRadius: scaleWidth(14),
 		width: '100%',

@@ -7,18 +7,15 @@ import BottomTabNavigator from './BottomTabNavigator';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
-import ProverbQuizModeSelectScreen from '@/screens/quizMode/ProverbQuizModeScreen';
-import ProverbMeaningQuizScreen from '@/screens/quiz/ProverbMeaningQuizScreen';
-import ProverbFindQuizScreen from '@/screens/quiz/ProverbFindQuizScreen';
-import ProverbFillBlankQuizScreen from '@/screens/quiz/ProverbFillBlankQuizScreen';
 import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
-import IconComponent from '@/screens/common/atomic/IconComponent';
 import WrongReviewScreen from '@/screens/WrongReviewScreen';
 import { scaledSize, scaleWidth } from '@/utils';
 import InitTimeChallengeScreen from '@/screens/InitTimeChallengeScreen';
 import TimeChanllengeScreen from '@/screens/TimeChanllengeScreen';
-import QuizModeScreen from '@/screens/quizMode/QuizModeScreen';
-import ProverbCommonFrameScreen from '@/screens/quiz/ProverbCommonFrameScreen';
+import QuizModeScreen from '@/screens/QuizModeScreen';
+import ProverbCommonFrameScreen from '@/screens/QuizScreen';
+import InitQuizModeScreen from '@/screens/InitQuizModeScreen';
+import QuizScreen from '@/screens/QuizScreen';
 
 /**
  * Stack Navigator : 일반적인 화면만 출력을 하는 경우
@@ -48,15 +45,6 @@ const StackNavigator = () => {
 				options={{ headerShown: false }} // 탭 화면은 헤더 숨김
 			/>
 			<Stack.Screen
-				name={Paths.PROVERB_MEANING_QUIZ}
-				component={ProverbMeaningQuizScreen}
-				options={({ navigation }) => ({
-					headerShown: false,
-					title: '뜻 맞추기',
-					headerLeft: () => <></>,
-				})}
-			/>
-			<Stack.Screen
 				name={Paths.TIME_CHANLLENGE}
 				component={TimeChanllengeScreen}
 				options={({ navigation }) => ({
@@ -82,37 +70,17 @@ const StackNavigator = () => {
 
 			<Stack.Screen
 				name={Paths.QUIZ}
-				component={ProverbCommonFrameScreen}
+				component={QuizScreen}
 				options={({ navigation }) => ({
 					headerShown: false,
 					title: '속담 찾기',
-					headerLeft: () => <></>,
-				})}
-			/>
-
-			<Stack.Screen
-				name={Paths.PROVERB_FIND_QUIZ}
-				component={ProverbFindQuizScreen}
-				options={({ navigation }) => ({
-					headerShown: false,
-					title: '속담 찾기',
-					headerLeft: () => <></>,
-				})}
-			/>
-
-			<Stack.Screen
-				name={Paths.PROVERB_BLANK_QUIZ}
-				component={ProverbFillBlankQuizScreen}
-				options={({ navigation }) => ({
-					headerShown: false,
-					title: '빈칸 채우기',
 					headerLeft: () => <></>,
 				})}
 			/>
 
 			<Stack.Screen
 				name={Paths.PROVERB_QUIZ_MODE_SELECT}
-				component={ProverbQuizModeSelectScreen}
+				component={InitQuizModeScreen}
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '퀴즈 모드 선택',

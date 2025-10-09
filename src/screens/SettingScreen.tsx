@@ -1,18 +1,6 @@
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import {
-	Alert,
-	FlatList,
-	Image,
-	Linking,
-	Platform,
-	SectionList,
-	Share,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import { Alert, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -30,12 +18,12 @@ import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModa
 import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import CurrentVersionModal from './modal/CurrentVersionModal';
 
-
 const APP_NAME = '속픽: 속담 퀴즈';
 const ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=com.tha.proverbquiz'; // 예: 'https://play.google.com/store/apps/details?id=your.package'
 const IOS_STORE_URL = 'https://apps.apple.com/app/id6746687973'; // 예: 'https://apps.apple.com/app/idXXXXXXXXXX'
 
-const DESCRIPTION = '속픽: 속담 퀴즈는 대한민국 속담을 쉽고 재미있게 학습하고, 다양한 퀴즈를 통해 기억을 점검하며, 틀린 문제는 반복 학습으로 완전히 익힐 수 있도록 돕는 속담 학습 앱입니다.';
+const DESCRIPTION =
+	'속픽: 속담 퀴즈는 대한민국 속담을 쉽고 재미있게 학습하고, 다양한 퀴즈를 통해 기억을 점검하며, 틀린 문제는 반복 학습으로 완전히 익힐 수 있도록 돕는 속담 학습 앱입니다.';
 // ✅ 섹션 정의 (개발 모드에서만 관리자/더미 노출)
 const IS_DEV = __DEV__ === true;
 
@@ -156,12 +144,7 @@ const SettingScreen = () => {
 				resetTodayQuizOnly();
 				Alert.alert('완료', '오늘의 퀴즈 데이터가 초기화되었습니다');
 			} else if (resetType === 'all') {
-				await AsyncStorage.multiRemove([
-					STORAGE_KEYS.study,
-					STORAGE_KEYS.quiz,
-					STORAGE_KEYS.timeChallenge,
-					STORAGE_KEYS.todayQuiz,
-				]);
+				await AsyncStorage.multiRemove([STORAGE_KEYS.study, STORAGE_KEYS.quiz, STORAGE_KEYS.timeChallenge, STORAGE_KEYS.todayQuiz]);
 				Alert.alert('완료', '모든 데이터가 초기화되었습니다');
 			}
 			setModalVisible(false);
@@ -214,7 +197,6 @@ const SettingScreen = () => {
 		}
 	};
 
-
 	const sections: { title: React.ReactNode; data: string[] }[] = useMemo(() => {
 		const resetSection = {
 			title: <Text style={[styles.sectionHeaderText, { color: '#E53935' }]}>사용자 정보 초기화</Text>,
@@ -241,10 +223,7 @@ const SettingScreen = () => {
 	}, []);
 
 	const renderItem = ({ item }: { item: string }) => {
-		const settingsMap: Record<
-			string,
-			{ label: string; icon: { type: 'MaterialCommunityIcons' | 'materialIcons'; name: string } }
-		> = {
+		const settingsMap: Record<string, { label: string; icon: { type: 'MaterialCommunityIcons' | 'materialIcons'; name: string } }> = {
 			rate: {
 				label: '앱 리뷰 남기기',
 				icon: { type: 'MaterialCommunityIcons', name: 'star-outline' },
@@ -295,7 +274,6 @@ const SettingScreen = () => {
 				label: '최신 버전 확인',
 				icon: { type: 'MaterialCommunityIcons', name: 'update' },
 			},
-
 
 			...(IS_DEV && {
 				generateDummyData: {
@@ -416,11 +394,7 @@ const SettingScreen = () => {
 						type={settingsMap[item].icon.type}
 						name={settingsMap[item].icon.name}
 						size={scaledSize(20)}
-						color={
-							['resetStudy', 'resetQuiz', 'resetAll', 'resetTodayQuiz', 'resetTimeChallenge'].includes(item)
-								? '#e74c3c'
-								: '#333'
-						}
+						color={['resetStudy', 'resetQuiz', 'resetAll', 'resetTodayQuiz', 'resetTimeChallenge'].includes(item) ? '#e74c3c' : '#333'}
 						style={styles.icon}
 						isBottomIcon={true}
 					/>
@@ -434,12 +408,8 @@ const SettingScreen = () => {
 		try {
 			// 1) 스토어 링크 확보 (하드코딩 > VersionCheck)
 			const [playRes, appRes] = await Promise.all([
-				ANDROID_STORE_URL
-					? Promise.resolve({ storeUrl: ANDROID_STORE_URL })
-					: VersionCheck.needUpdate({ provider: 'playStore' }).catch(() => null),
-				IOS_STORE_URL
-					? Promise.resolve({ storeUrl: IOS_STORE_URL })
-					: VersionCheck.needUpdate({ provider: 'appStore' }).catch(() => null),
+				ANDROID_STORE_URL ? Promise.resolve({ storeUrl: ANDROID_STORE_URL }) : VersionCheck.needUpdate({ provider: 'playStore' }).catch(() => null),
+				IOS_STORE_URL ? Promise.resolve({ storeUrl: IOS_STORE_URL }) : VersionCheck.needUpdate({ provider: 'appStore' }).catch(() => null),
 			]);
 
 			const androidUrl = playRes?.storeUrl || '';
@@ -465,8 +435,7 @@ const SettingScreen = () => {
 
 			// 3) 플랫폼별 Share 호출
 			// - iOS: url 필드가 우선 사용되므로 대표 링크 하나도 넣어줌(있으면 iOS 링크, 없으면 Android 링크)
-			const sharePayload =
-				Platform.OS === 'ios' ? { message, url: iosUrl || androidUrl, title: APP_NAME } : { message, title: APP_NAME };
+			const sharePayload = Platform.OS === 'ios' ? { message, url: iosUrl || androidUrl, title: APP_NAME } : { message, title: APP_NAME };
 
 			await Share.share(sharePayload);
 		} catch (e) {
@@ -509,13 +478,7 @@ const SettingScreen = () => {
 			case 'all':
 				return (
 					<View style={styles.modalTitleRow}>
-						<IconComponent
-							type="materialCommunityIcons"
-							name="delete-alert-outline"
-							size={20}
-							color="#34495e"
-							style={styles.iconLeft}
-						/>
+						<IconComponent type="materialCommunityIcons" name="delete-alert-outline" size={20} color="#34495e" style={styles.iconLeft} />
 						<Text style={styles.modalTitleText}>모두 다시 해볼까요?</Text>
 					</View>
 				);
@@ -629,9 +592,7 @@ const SettingScreen = () => {
 			{/* 개인정보처리방침 및 이용약관 팝업 */}
 			{showTermsModal && <TermsOfServiceModal visible={showTermsModal} onClose={() => setShowTermsModal(false)} />}
 			{/* 오픈소스 라이브러리 팝업 */}
-			{showOpenSourceModal && (
-				<OpenSourceModal visible={showOpenSourceModal} onClose={() => setShowOpenSourceModal(false)} />
-			)}
+			{showOpenSourceModal && <OpenSourceModal visible={showOpenSourceModal} onClose={() => setShowOpenSourceModal(false)} />}
 
 			<CmmDelConfirmModal
 				visible={modalVisible}
@@ -755,8 +716,8 @@ const styles = StyleSheet.create({
 		right: scaleWidth(16),
 		bottom: scaleHeight(16),
 		backgroundColor: '#007AFF',
-		width: scaleWidth(48),
-		height: scaleWidth(48), // 보통 width와 height는 같은 비율 유지
+		width: scaleWidth(36),
+		height: scaleWidth(36), // 보통 width와 height는 같은 비율 유지
 		borderRadius: scaleWidth(24),
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -767,6 +728,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.25,
 		shadowRadius: scaleWidth(4),
 	},
+
 	footer: {
 		marginTop: scaleHeight(30),
 		alignItems: 'center',
@@ -1030,6 +992,7 @@ const styles = StyleSheet.create({
 	footerAppList: {
 		paddingHorizontal: scaleWidth(16),
 		gap: scaleWidth(12),
+		marginBottom: scaleHeight(12),
 	},
 
 	footerAppCard: {

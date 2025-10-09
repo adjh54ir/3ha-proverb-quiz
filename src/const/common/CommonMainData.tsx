@@ -1,4 +1,5 @@
 import IconComponent from '@/screens/common/atomic/IconComponent';
+import { QuizLevelKey } from '@/screens/QuizModeScreen';
 import { scaledSize, scaleWidth } from '@/utils/DementionUtils';
 import React, { JSX } from 'react';
 // 공통 타입 정의
@@ -15,6 +16,68 @@ export interface ContinentItem extends CategoryItem {
 	key: string;
 }
 
+interface QuizLevel {
+	key: QuizLevelKey;
+	label: string;
+	icon: string;
+	type: string;
+	color: string;
+	desc: string;
+}
+
+export type QuizLevelKey = 'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert';
+
+export const LEVELS: QuizLevel[] = [
+	{
+		key: 'beginner',
+		label: '초급 문제',
+		icon: 'seedling',
+		type: 'FontAwesome6',
+		color: '#58D68D',
+		desc: '',
+	},
+	{
+		key: 'intermediate',
+		label: '중급 문제',
+		icon: 'leaf',
+		type: 'FontAwesome6',
+		color: '#F5B041',
+		desc: '',
+	},
+	{
+		key: 'advanced',
+		label: '고급 문제',
+		icon: 'tree',
+		type: 'FontAwesome6',
+		color: '#E67E22',
+		desc: '',
+	},
+	{
+		key: 'expert',
+		label: '특급 문제',
+		icon: 'trophy',
+		type: 'FontAwesome6',
+		color: '#AF7AC5',
+		desc: '',
+	},
+	{
+		key: 'all',
+		label: '전체 문제',
+		icon: 'clipboard-list',
+		type: 'fontAwesome5',
+		color: '#5DADE2',
+		desc: '',
+	},
+	{
+		//@ts-ignore
+		key: 'comingsoon',
+		label: '새로운 문제',
+		icon: 'hourglass-half',
+		type: 'fontAwesome6',
+		color: '#dfe6e9',
+		desc: '',
+	},
+];
 export const LEVEL_DATA = [
 	{
 		score: 3320,
@@ -60,205 +123,6 @@ export const LEVEL_DATA = [
 		encouragement: '🌱 첫걸음을 내디뎠어요!\n앞으로가 더욱 기대돼요!',
 		description: '속담 학습의 출발선에 선 단계로,\n새싹처럼 작은 배움부터 차근차근 키워가는 시기예요.\n앞으로의 성장이 더욱 기대됩니다.',
 		mascot: require('@/assets/images/level1_mascote.png'),
-	},
-];
-
-export const IDIOM_SYMBOLS = [
-	{
-		icon: '🧠',
-		title: '머리',
-		meaning: '지혜·생각·판단의 상징',
-		examples: [
-			{ idiom: '머리가 좋다', meaning: '영리하다' },
-			{ idiom: '머리를 굴리다', meaning: '꾀를 내다' },
-			{ idiom: '머리를 숙이다', meaning: '복종하다, 존경하다' },
-		],
-	},
-	{
-		icon: '👀',
-		title: '눈',
-		meaning: '지각·판단·감정의 상징',
-		examples: [
-			{ idiom: '눈이 높다', meaning: '안목이 높다' },
-			{ idiom: '눈 밖에 나다', meaning: '미움을 사다' },
-			{ idiom: '눈이 어둡다', meaning: '욕심에 사로잡히다' },
-		],
-	},
-	{
-		icon: '👂',
-		title: '귀',
-		meaning: '소문·수용·이해의 상징',
-		examples: [
-			{ idiom: '귀가 얇다', meaning: '남의 말에 쉽게 휘둘린다' },
-			{ idiom: '귀에 못이 박히다', meaning: '같은 말을 너무 많이 듣다' },
-			{ idiom: '귀가 솔깃하다', meaning: '혹하다, 관심이 생기다' },
-		],
-	},
-	{
-		icon: '👃',
-		title: '코',
-		meaning: '자존심·체면의 상징',
-		examples: [
-			{ idiom: '코가 높다', meaning: '잘난 체하다' },
-			{ idiom: '코가 납작해지다', meaning: '체면이 구겨지다' },
-			{ idiom: '코앞에 닥치다', meaning: '임박하다' },
-		],
-	},
-	{
-		icon: '👄',
-		title: '입/혀',
-		meaning: '말·표현·욕망의 상징',
-		examples: [
-			{ idiom: '입이 무겁다', meaning: '비밀을 잘 지킨다' },
-			{ idiom: '입이 가볍다', meaning: '쉽게 떠벌린다' },
-			{ idiom: '혀가 길다', meaning: '말이 많다, 잘 지껄인다' },
-		],
-	},
-	{
-		icon: '💖',
-		title: '가슴/심장',
-		meaning: '감정·마음·용기의 상징',
-		examples: [
-			{ idiom: '가슴이 벅차다', meaning: '감격스럽다' },
-			{ idiom: '가슴이 철렁하다', meaning: '불안·놀람' },
-			{ idiom: '심장이 크다', meaning: '대담하다, 용감하다' },
-		],
-	},
-	{
-		icon: '✋',
-		title: '손',
-		meaning: '행동·능력·관계의 상징',
-		examples: [
-			{ idiom: '손이 크다', meaning: '씀씀이가 후하다' },
-			{ idiom: '손발이 맞다', meaning: '협력이 잘 된다' },
-			{ idiom: '손을 잡다', meaning: '협력하다' },
-		],
-	},
-	{
-		icon: '🦶',
-		title: '발',
-		meaning: '움직임·관계망의 상징',
-		examples: [
-			{ idiom: '발이 넓다', meaning: '인맥이 넓다' },
-			{ idiom: '발 벗고 나서다', meaning: '적극적으로 나서다' },
-			{ idiom: '발 디딜 틈이 없다', meaning: '매우 혼잡하다' },
-		],
-	},
-	{
-		icon: '🩸',
-		title: '피/간/쓸개 등 내부 기관',
-		meaning: '정신적·육체적 본질, 고통, 희생의 상징',
-		examples: [
-			{ idiom: '간이 크다', meaning: '담력이 세다' },
-			{ idiom: '간이 콩알만 해지다', meaning: '겁에 질리다' },
-			{ idiom: '쓸개까지 다 내주다', meaning: '진심으로 헌신하다' },
-			{ idiom: '피땀 흘리다', meaning: '고생하다' },
-		],
-	},
-];
-
-// 체중 분류 데이터
-export const WEIGHT_CATEGORIES = [
-	{
-		label: '전체',
-		key: 'all',
-		icon: () => <IconComponent type="FontAwesome6" name="list" size={16} color="#555" />,
-		iconColor: '#555',
-	},
-	{
-		label: '소형 (≤ 4kg)',
-		key: 'Small',
-		range: [0, 4],
-		icon: () => <IconComponent type="FontAwesome6" name="cat" size={16} color="#27ae60" />,
-		iconColor: '#27ae60',
-	},
-	{
-		label: '중형 (4~6kg)',
-		key: 'Medium',
-		range: [4, 6],
-		icon: () => <IconComponent type="FontAwesome6" name="cat" size={16} color="#2980b9" />,
-		iconColor: '#2980b9',
-	},
-	{
-		label: '대형 (6~8kg)',
-		key: 'Large',
-		range: [6, 8],
-		icon: () => <IconComponent type="FontAwesome6" name="cat" size={16} color="#e67e22" />,
-		iconColor: '#e67e22',
-	},
-	{
-		label: '초대형 (8kg 이상)',
-		key: 'Giant',
-		range: [8, 99],
-		icon: () => <IconComponent type="FontAwesome6" name="cat" size={16} color="#c0392b" />,
-		iconColor: '#8e44ad',
-	},
-];
-
-// 대륙 분류 데이터
-export const CONTINENTS = [
-	{
-		key: 'all',
-		value: 'all',
-		label: '전체',
-		color: '#7f8c8d',
-		iconType: 'public',
-		type: 'materialIcons',
-		icon: () => <IconComponent type="materialIcons" name="public" size={16} color="#7f8c8d" />,
-	},
-	{
-		key: 'Asia',
-		value: 'Asia',
-		label: '아시아',
-		color: '#27ae60',
-		iconType: 'account-balance',
-		type: 'materialIcons',
-		icon: () => <IconComponent type="materialIcons" name="account-balance" size={18} color="#27ae60" />,
-	},
-	{
-		key: 'Europe',
-		value: 'Europe',
-		label: '유럽',
-		color: '#3498db',
-		iconType: 'landmark-dome',
-		type: 'fontAwesome6',
-		icon: () => <IconComponent type="fontAwesome6" name="landmark-dome" size={18} color="#3498db" />,
-	},
-	{
-		key: 'Americas',
-		value: 'Americas',
-		label: '아메리카',
-		color: '#e67e22',
-		iconType: 'public',
-		type: 'materialIcons',
-		icon: () => <IconComponent type="materialIcons" name="public" size={18} color="#e67e22" />,
-	},
-	{
-		key: 'Africa',
-		value: 'Africa',
-		label: '아프리카',
-		color: '#8e44ad',
-		iconType: 'elephant',
-		type: 'materialCommunityIcons',
-		icon: () => <IconComponent type="materialCommunityIcons" name="elephant" size={18} color="#8e44ad" />,
-	},
-	{
-		key: 'Oceania',
-		value: 'Oceania',
-		label: '오세아니아',
-		color: '#00bcd4',
-		iconType: 'waves',
-		type: 'materialIcons',
-		icon: () => <IconComponent type="materialIcons" name="waves" size={18} color="#00bcd4" />,
-	},
-	{
-		key: 'Antarctica',
-		value: 'Antarctica',
-		label: '남극',
-		color: '#95a5a6',
-		iconType: 'ac-unit',
-		type: 'materialIcons',
-		icon: () => <IconComponent type="materialIcons" name="ac-unit" size={18} color="#95a5a6" />,
 	},
 ];
 

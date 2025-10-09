@@ -24,25 +24,22 @@ import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
-import QuizStartModal from '../modal/QuizStartModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import QuizResultModal from '../modal/QuizResultModal';
+import QuizResultModal from './modal/QuizResultModal';
 import { QuizBadgeInterceptor } from '@/services/interceptor/QuizBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
-import IconComponent from '../common/atomic/IconComponent';
+import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LevelPlayFrontAd from '../common/ads/levelplay/LevelPlayFrontAd';
-
-const { width: screenWidth } = Dimensions.get('window');
+import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 
 const labelColors = ['#1abc9c', '#3498db', '#9b59b6', '#e67e22'];
 
-const STORAGE_KEY = 'UserQuizHistory';
+const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
 type QuizRouteParams = {
-	mode: 'meaning' | 'proverb' | 'fill-blank';
+	mode: 'meaning' | 'proverb' | 'blank';
 	questionPool?: MainDataType.Proverb[];
 	isWrongReview?: boolean;
 	title?: string;
@@ -51,21 +48,15 @@ type QuizRouteParams = {
 	selectedCategory?: string;
 };
 
-type QuizRoute = RouteProp<{ ProverbCommonFrame: QuizRouteParams }, 'ProverbCommonFrame'>;
+type QuizRoute = RouteProp<{ QUIZ: QuizRouteParams }, 'QUIZ'>;
 
-const ProverbCommonFrameScreen = () => {
+const QuizScreen = () => {
 	const route = useRoute<QuizRoute>();
+	const { width: screenWidth } = Dimensions.get('window');
 	const flatListRef = useRef<FlatList<string>>(null);
 
 	// 1️⃣ 기존 selectedLevel, selectedCategory 초기값 수정
-	const {
-		mode: routeMode,
-		questionPool,
-		isWrongReview = false,
-		title = '',
-		selectedLevel: routeLevel,
-		selectedCategory: routeCategory,
-	} = route.params;
+	const { mode: routeMode, questionPool, isWrongReview = false, title, selectedLevel: routeLevel, selectedCategory: routeCategory } = route.params;
 
 	const isFocused = useIsFocused();
 	const navigation = useNavigation();
@@ -77,7 +68,6 @@ const ProverbCommonFrameScreen = () => {
 
 	const [quizHistory, setQuizHistory] = useState<MainDataType.UserQuizHistory | null>(null);
 
-	const [pendingStart, setPendingStart] = useState(false);
 	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
 
 	const [proverbs, setProverbs] = useState<MainDataType.Proverb[]>([]);
@@ -85,7 +75,7 @@ const ProverbCommonFrameScreen = () => {
 	const [options, setOptions] = useState<string[]>([]);
 	const [selected, setSelected] = useState<string | null>(null);
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-	const [remainingTime, setRemainingTime] = useState(10);
+	const [remainingTime, setRemainingTime] = useState(30);
 	const [showResultModal, setShowResultModal] = useState(false);
 	const [resultTitle, setResultTitle] = useState('');
 	const [resultMessage, setResultMessage] = useState('');
@@ -109,11 +99,6 @@ const ProverbCommonFrameScreen = () => {
 	const [showScoreBonus, setShowScoreBonus] = useState(false);
 
 	const [reviewIndex, setReviewIndex] = useState(0);
-	const [questionData, setQuestionData] = useState<{
-		question: MainDataType.Proverb | null;
-		options: string[];
-		displayText: string;
-	}>({ question: null, options: [], displayText: '' });
 
 	const praiseMessages = [
 		'정답이에요! 정말 똑똑하네요! 🎉\n이번 퀴즈를 정확히 짚어냈어요!',
@@ -126,19 +111,26 @@ const ProverbCommonFrameScreen = () => {
 	];
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
+	// ✅ 기존 selectedLevel/selectedCategory 의존 useEffect 삭제하고, 아래로 교체
 	useEffect(() => {
-		console.log('route.params :: ', route.params);
-		const all = questionPool && questionPool.length > 0 ? questionPool : ProverbServices.selectProverbList();
+		if (!quizHistory) return; // 🧩 quizHistory 로드 완료 후에만 작동
+		if (filteredProverbs.length === 0) return;
 
-		const filtered = all.filter((p) => {
-			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-			return levelMatch && categoryMatch;
-		});
-
-		setProverbs(filtered);
-		if (filtered.length > 0) loadQuestion();
-	}, []); // ✅ 최초 렌더링 시에도 한 번 실행
+		if (questionPool && questionPool.length > 0) {
+			setProverbs(questionPool);
+			loadQuestion();
+		} else {
+			const all = ProverbServices.selectProverbList();
+			const filtered = all.filter((p) => {
+				const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+				const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+				return levelMatch && categoryMatch;
+			});
+			setProverbs(filtered);
+			if (filtered.length > 0) loadQuestion();
+		}
+	}, [quizHistory, selectedLevel, selectedCategory]);
+	useEffect;
 
 	useEffect(() => {
 		(async () => {
@@ -232,7 +224,6 @@ const ProverbCommonFrameScreen = () => {
 		}
 	}, [badgeModalVisible]);
 
-	const solvedCount = quizHistory ? new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]).size : 0;
 	const filteredProverbs = useMemo(() => {
 		return proverbs.filter((p) => {
 			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
@@ -248,68 +239,38 @@ const ProverbCommonFrameScreen = () => {
 	}, [filteredProverbs, quizHistory, question]);
 
 	/**
-	 * 퀴즈 불러오기
-	 * @returns
+	 * 문제 1: 오답 복습 모드에서 모두 다 풀었다고 나오는 문제 해결 버전
+	 * - 일반 모드: 기존 로직 유지 (이미 푼 문제 제외하고 랜덤 출제)
+	 * - 오답 복습 모드: reviewIndex 기반 순차 출제
 	 */
 	const loadQuestion = () => {
-		if (isWrongReview && questionPool) {
+		if (!quizHistory) return;
+
+		// ✅ 오답 복습 모드일 경우
+		if (isWrongReview && questionPool && questionPool.length > 0) {
 			if (reviewIndex >= questionPool.length) {
 				setResultType('done');
-				setResultTitle('모든 퀴즈 완료!');
-				setResultMessage('오답 복습을 모두 마쳤어요! 🎉');
+				setResultTitle('오답 복습 완료!');
+				setResultMessage('모든 오답을 다시 풀었어요 🎉');
 				setShowResultModal(true);
 				return;
 			}
+
 			const newQuestion = questionPool[reviewIndex];
-			const distractors = questionPool.filter((p) => p.id !== newQuestion.id);
-			const shuffledDistractors = [...distractors].sort(() => Math.random() - 0.5).slice(0, 3);
-
-			let allOptions: string[] = [];
-			let displayText = '';
-
-			if (routeMode === 'meaning') {
-				allOptions = [...shuffledDistractors.map((p) => p.longMeaning!), newQuestion.longMeaning!];
-				displayText = newQuestion.proverb;
-			} else if (routeMode === 'proverb') {
-				allOptions = [...shuffledDistractors.map((p) => p.proverb), newQuestion.proverb];
-				displayText = newQuestion.longMeaning!;
-			} else if (routeMode === 'fill-blank') {
-				const blank = pickBlankWord(newQuestion.proverb);
-				allOptions = [...shuffledDistractors.map((p) => pickBlankWord(p.proverb)), blank];
-				displayText = newQuestion.proverb.replace(blank, '(____)');
-				setBlankWord(blank);
-			}
-
-			setQuestion(newQuestion);
-			setOptions(allOptions.sort(() => Math.random() - 0.5));
-			setQuestionText(displayText);
-			setSelected(null);
-			setIsCorrect(null);
-			setRemainingTime(20);
-
-			if (timerRef.current) clearInterval(timerRef.current);
-			timerRef.current = setInterval(() => {
-				setRemainingTime((prev) => {
-					if (prev <= 1) {
-						clearInterval(timerRef.current!);
-						handleSelect('');
-						return 0;
-					}
-					return prev - 1;
-				});
-			}, 1000);
-
+			setupQuestion(newQuestion);
 			return;
 		}
 
-		const solvedSet = new Set([...(quizHistory?.correctProverbId ?? []), ...(quizHistory?.wrongProverbId ?? [])]);
+		// ✅ 일반 모드일 경우
+		if (!filteredProverbs || filteredProverbs.length === 0) return;
 
-		// 현재 문제도 중복 방지에 포함되도록 처리 (백업)
-		if (question) {
-			solvedSet.add(question.id);
-		}
+		const solvedSet = new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]);
 
-		if (remainingProverbs.length === 0) {
+		if (question) solvedSet.add(question.id);
+
+		const unSolved = filteredProverbs.filter((p) => !solvedSet.has(p.id));
+
+		if (unSolved.length === 0) {
 			setResultType('done');
 			setResultTitle('모든 퀴즈 완료!');
 			setResultMessage('훌륭해요! 모든 문제를 마쳤어요 🎉');
@@ -317,34 +278,41 @@ const ProverbCommonFrameScreen = () => {
 			return;
 		}
 
-		const shuffled = [...remainingProverbs].sort(() => Math.random() - 0.5);
-		const newQuestion = shuffled[0];
-		const distractorPool = filteredProverbs.filter((p) => p.id !== newQuestion.id);
-		const shuffledDistractors = [...distractorPool].sort(() => Math.random() - 0.5).slice(0, 3);
+		const newQuestion = unSolved[Math.floor(Math.random() * unSolved.length)];
+		setupQuestion(newQuestion);
+	};
+	/**
+	 * 문제 2: 문제 세팅 로직을 별도로 분리하여 재사용 가능하게
+	 */
+	const setupQuestion = (newQuestion: MainDataType.Proverb) => {
+		const distractors = filteredProverbs.filter((p) => p.id !== newQuestion.id);
+		const shuffledDistractors = [...distractors].sort(() => Math.random() - 0.5).slice(0, 3);
 
 		let allOptions: string[] = [];
-		let displayText: string = '';
+		let displayText = '';
 
 		if (routeMode === 'meaning') {
-			allOptions = [...shuffledDistractors.map((item) => item.longMeaning), newQuestion.longMeaning!];
+			allOptions = [...shuffledDistractors.map((p) => p.longMeaning!), newQuestion.longMeaning!];
 			displayText = newQuestion.proverb;
 		} else if (routeMode === 'proverb') {
-			allOptions = [...shuffledDistractors.map((item) => item.proverb), newQuestion.proverb];
+			allOptions = [...shuffledDistractors.map((p) => p.proverb), newQuestion.proverb];
 			displayText = newQuestion.longMeaning!;
-		} else if (routeMode === 'fill-blank') {
+		} else if (routeMode === 'blank') {
 			const blank = pickBlankWord(newQuestion.proverb);
+			allOptions = [...shuffledDistractors.map((p) => pickBlankWord(p.proverb)), blank];
 			displayText = newQuestion.proverb.replace(blank, '(____)');
-			allOptions = [...shuffledDistractors.map((item) => pickBlankWord(item.proverb)), blank];
 			setBlankWord(blank);
 		}
 
+		// 상태 갱신
 		setQuestion(newQuestion);
 		setOptions(allOptions.sort(() => Math.random() - 0.5));
 		setQuestionText(displayText);
 		setSelected(null);
 		setIsCorrect(null);
-		setRemainingTime(20);
+		setRemainingTime(30);
 
+		// 타이머 새로 시작
 		if (timerRef.current) clearInterval(timerRef.current);
 		timerRef.current = setInterval(() => {
 			setRemainingTime((prev) => {
@@ -356,15 +324,6 @@ const ProverbCommonFrameScreen = () => {
 				return prev - 1;
 			});
 		}, 1000);
-
-		if (remainingProverbs.length === 0) {
-			// 마지막 문제를 풀고 나면 종료
-			setResultType('done');
-			setResultTitle('모든 퀴즈 완료!');
-			setResultMessage('훌륭해요! 모든 문제를 마쳤어요 🎉');
-			setShowResultModal(true);
-			return;
-		}
 	};
 
 	const startTimer = () => {
@@ -397,7 +356,7 @@ const ProverbCommonFrameScreen = () => {
 		let correctAnswer = '';
 		if (routeMode === 'meaning') correctAnswer = question.longMeaning!;
 		else if (routeMode === 'proverb') correctAnswer = question.proverb;
-		else if (routeMode === 'fill-blank') correctAnswer = blankWord;
+		else if (routeMode === 'blank') correctAnswer = blankWord;
 
 		const isTimeout = answer === '';
 		const correct = answer === correctAnswer;
@@ -602,13 +561,13 @@ const ProverbCommonFrameScreen = () => {
 		}
 	};
 
-	const getModeLabel = (mode: 'meaning' | 'proverb' | 'fill-blank') => {
+	const getModeLabel = (mode: 'meaning' | 'proverb' | 'blank') => {
 		switch (mode) {
 			case 'meaning':
 				return '뜻 맞추기';
 			case 'proverb':
 				return '속담 맞추기';
-			case 'fill-blank':
+			case 'blank':
 				return '빈칸 채우기';
 			default:
 				return '';
@@ -719,7 +678,7 @@ const ProverbCommonFrameScreen = () => {
 												{question?.category && (
 													<View style={[styles.badgePill, { backgroundColor: getFieldColor(question.category) }]}>
 														{getFieldIcon(question.category)}
-														<Text style={styles.badgeText}>{question.category}</Text>
+														<Text style={styles.badgeText}> {question.category}</Text>
 													</View>
 												)}
 											</View>
@@ -797,7 +756,7 @@ const ProverbCommonFrameScreen = () => {
 									<AnimatedCircularProgress
 										size={scaleWidth(70)}
 										width={scaleWidth(6)} // ✅ 기존 8 → 6
-										fill={(20 - remainingTime) * 5}
+										fill={((30 - remainingTime) / 30) * 100} // ✅ 수정된 부분
 										duration={500}
 										tintColor='#3498db'
 										backgroundColor='#ecf0f1'>
@@ -811,7 +770,7 @@ const ProverbCommonFrameScreen = () => {
 									{question ? (
 										<Text style={styles.questionText}>
 											{`Q. ${
-												routeMode === 'fill-blank'
+												routeMode === 'blank'
 													? questionText || '문제 준비중...'
 													: routeMode === 'meaning'
 														? question?.proverb
@@ -959,6 +918,7 @@ const ProverbCommonFrameScreen = () => {
 								visible={showResultModal && !badgeModalVisible} // ✅ 동시에 보이지 않도록 수정
 								resultType={resultType}
 								resultTitle={resultTitle}
+								quizMode={routeMode}
 								resultMessage={resultMessage}
 								question={question}
 								onNext={() => {
@@ -1129,7 +1089,7 @@ const ProverbCommonFrameScreen = () => {
 	);
 };
 
-export default ProverbCommonFrameScreen;
+export default QuizScreen;
 
 const styles = StyleSheet.create({
 	container: {

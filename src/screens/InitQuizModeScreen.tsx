@@ -4,21 +4,23 @@ import { useNavigation } from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LEVEL_DATA, QUIZ_MODES } from '@/const/common/CommonMainData';
+import IconComponent from './common/atomic/IconComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
-import { LEVEL_DATA, QUIZ_MODES } from '@/const/common/CommonMainData';
-import IconComponent from '../common/atomic/IconComponent';
+import FastImage from 'react-native-fast-image';
 
 /**
  * 퀴즈 모드 선택
  * @returns
  */
-const ProverbQuizModeScreen = () => {
+const InitQuizModeScreen = () => {
 	const navigation = useNavigation();
 	const USER_QUIZ_HISTORY = MainStorageKeyType.USER_QUIZ_HISTORY;
-	const [accordionOpen, setAccordionOpen] = useState(false);
 
+	const [accordionOpen, setAccordionOpen] = useState(false);
 	const [totalScore, setTotalScore] = useState<number>(0);
+
 	useEffect(() => {
 		loadData();
 	}, []);
@@ -30,29 +32,13 @@ const ProverbQuizModeScreen = () => {
 		setTotalScore(totalScoreFromQuiz);
 	};
 
-	const handleSelectMode = (mode: string) => {
+	/**
+	 * 퀴즈 모드를 전달하여서 다음페이지로 이동
+	 * @param mode 'meaning' | 'proverb' | 'blank' | 'comingsoon'
+	 */
+	const handleSelectMode = (mode: 'meaning' | 'proverb' | 'blank' | 'comingsoon') => {
 		// @ts-ignore
-		navigation.navigate(Paths.QUIZ_MODE, { mode }); // mode: 'meaning' | 'proverb' | 'fill-blank'
-	};
-
-	const moveToHandler = (modeKey: string) => {
-		console.log('여기로 전달하고 있나');
-		switch (modeKey) {
-			case 'meaning':
-				// @ts-ignore
-				navigation.push(Paths.PROVERB_MEANING_QUIZ, { mode: 'meaning' });
-				break;
-			case 'proverb':
-				// @ts-ignore
-				navigation.push(Paths.PROVERB_FIND_QUIZ, { mode: 'proverb' });
-				break;
-			case 'blank':
-				// @ts-ignore
-				navigation.push(Paths.PROVERB_BLANK_QUIZ, { mode: 'fill-blank' });
-				break;
-			default:
-				break;
-		}
+		navigation.navigate(Paths.QUIZ_MODE, { mode });
 	};
 
 	const getLevelInfoByScore = (score: number) => {
@@ -60,20 +46,18 @@ const ProverbQuizModeScreen = () => {
 	};
 	// 이걸 기존 getLevelData 아래에 추가해
 	const levelInfo = useMemo(() => getLevelInfoByScore(totalScore), [totalScore]);
+	const { mascot } = levelInfo;
+
 	// 수정
-	const { mascot, label, next, icon } = levelInfo;
-	const progress = useMemo(() => {
-		if (!next) {
-			return 1;
-		}
-		const prevScore = LEVEL_DATA.find((l) => l.score === levelInfo.score - 830)?.score || 0;
-		return Math.min((totalScore - prevScore) / (next - prevScore), 1);
-	}, [totalScore, levelInfo]);
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff', paddingTop: scaleHeight(5) }} edges={['bottom']}>
+		<SafeAreaView style={styles.main} edges={['bottom']}>
 			<View style={styles.container}>
 				<ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+					<View style={styles.mascotSection}>
+						<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.contain} />
+					</View>
 					<View style={styles.titleWrap}>
+						<Text style={styles.titleLine}>🧩 퀴즈 준비됐나요?</Text>
 						<Text style={styles.titleLine}>도전하려는 퀴즈 모드를 선택하세요!</Text>
 					</View>
 
@@ -89,6 +73,7 @@ const ProverbQuizModeScreen = () => {
 										if (isDisabled) {
 											Alert.alert('새로운 퀴즈 준비 중', '새로운 퀴즈를 준비 중에 있습니다.');
 										} else {
+											//@ts-ignore
 											handleSelectMode(mode.key);
 										}
 									}}>
@@ -156,6 +141,11 @@ const ProverbQuizModeScreen = () => {
 };
 
 const styles = StyleSheet.create({
+	main: {
+		flex: 1,
+		backgroundColor: '#fff',
+		paddingTop: scaleHeight(5),
+	},
 	container: {
 		flex: 1,
 		backgroundColor: '#fefefe',
@@ -166,7 +156,7 @@ const styles = StyleSheet.create({
 		flexGrow: 1,
 		justifyContent: 'center', // 중앙 정렬 (세로)
 		alignItems: 'center', // 중앙 정렬 (가로)
-		paddingHorizontal: scaleWidth(20),
+		paddingHorizontal: scaleWidth(16),
 		paddingTop: scaleHeight(6),
 		paddingBottom: scaleHeight(20),
 	},
@@ -327,6 +317,14 @@ const styles = StyleSheet.create({
 	mascotImage: {
 		width: scaleWidth(120),
 		height: scaleWidth(120),
+		borderRadius: scaleWidth(60),
+		borderWidth: 1,
+		borderColor: '#f1c40f',
+		backgroundColor: '#fff',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.15,
+		shadowRadius: 6,
 	},
 	mascotCard: {
 		width: '100%',
@@ -381,4 +379,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default ProverbQuizModeScreen;
+export default InitQuizModeScreen;

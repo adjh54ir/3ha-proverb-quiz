@@ -3,17 +3,7 @@ import { RootState } from '@/store/RootReducer';
 import { setCurrentAppVerion } from '@/store/slice/UserDeviceInfoSlice';
 import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import React, { useEffect, useState } from 'react';
-import {
-	Modal,
-	View,
-	Text,
-	StyleSheet,
-	TouchableOpacity,
-	Linking,
-	KeyboardAvoidingView,
-	Platform,
-	Image,
-} from 'react-native';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, Linking, Platform, Image } from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -92,9 +82,9 @@ const VersionCheckModal = () => {
 		<Modal
 			visible={showUpdateModal}
 			transparent
-			animationType='fade'
+			animationType="fade"
 			statusBarTranslucent // ✅ 안드로이드에서 전체 화면 덮게
-			presentationStyle='overFullScreen' // ✅ iOS에서도 안정적
+			presentationStyle="overFullScreen" // ✅ iOS에서도 안정적
 			onRequestClose={() => {}}>
 			<View style={styles.modalContainer}>
 				<View style={styles.modalContent}>

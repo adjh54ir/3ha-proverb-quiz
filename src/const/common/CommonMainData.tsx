@@ -81,7 +81,7 @@ export const LEVELS: QuizLevel[] = [
 export const LEVEL_DATA = [
 	{
 		score: 3320,
-		next: 4130, // 413문제 = 전체 달성
+		next: 5000, // 413문제 = 전체 달성
 		label: '속담 마스터',
 		icon: 'trophy',
 		encouragement: '👑 속담의 왕좌에 올랐습니다!\n당신은 이제 속담의 진정한 달인입니다!',

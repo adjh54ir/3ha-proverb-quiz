@@ -540,7 +540,7 @@ const Home = () => {
 											flexDirection: 'row',
 											alignItems: 'center',
 											justifyContent: 'center',
-											marginBottom: scaleHeight(6),
+											marginBottom: scaleHeight(3),
 										}}
 										activeOpacity={0.7}
 										onPress={() => setShowLevelModal(true)}>
@@ -741,7 +741,7 @@ const Home = () => {
 							contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
 							showsVerticalScrollIndicator={false}>
 							{[...LEVEL_DATA].map((item) => {
-								const isCurrent = currentLevel.label === item.label; // 레이블 비교
+								const isCurrent = currentLevel?.label === item.label; // 레이블 비교
 								const mascotImage = getLevelInfoByScore(item.score).mascot;
 
 								return (
@@ -755,7 +755,7 @@ const Home = () => {
 											<FastImage source={mascotImage} style={styles.levelMascotImage} resizeMode={FastImage.resizeMode.contain} />
 										</View>
 										ㅣ
-										<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
+										<View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: scaleHeight(6) }}>
 											<IconComponent name={item.icon} type="fontAwesome6" size={16} color="#27ae60" />
 											<Text style={[styles.levelLabel, { marginLeft: scaleWidth(6) }]}>{item.label}</Text>
 										</View>
@@ -1551,15 +1551,17 @@ const styles = StyleSheet.create({
 	progressBarWrapper: {
 		width: '100%',
 		alignItems: 'center',
-		marginBottom: scaleHeight(3),
+		marginBottom: scaleHeight(8),
 	},
 
 	progressBarTextBelow: {
-		marginVertical: scaleHeight(6), // 위 여백도 줄여서 붙여줌
+		marginVertical: scaleHeight(3), // 위 여백도 줄여서 붙여줌
 		fontSize: scaledSize(10), // ✅ 아주 작게
 		color: '#95a5a6', // ✅ 흐릿한 회색 (밝은 그레이톤)
 		fontWeight: '400', // ✅ 굵기 줄여서 덜 강조
 		textAlign: 'center',
+		justifyContent: 'center',
+		alignContent: 'center',
 		opacity: 0.7, // ✅ 살짝 흐릿하게
 	},
 	progressBarBackground: {
@@ -1582,9 +1584,9 @@ const styles = StyleSheet.create({
 	},
 	progressBarTextInside: {
 		position: 'absolute',
+		top: scaleHeight(2),
 		left: 0,
 		right: 0,
-		bottom: 0,
 		textAlign: 'center',
 		textAlignVertical: 'center', // Android 전용
 		justifyContent: 'center',

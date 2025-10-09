@@ -10,7 +10,6 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import DeviceInfo from 'react-native-device-info';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import TodayQuizScreen from '@/screens/TodayQuizScreen';
-import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 
 const BottomTabNavigator = () => {
 	const Tab = createBottomTabNavigator();
@@ -33,11 +32,11 @@ const BottomTabNavigator = () => {
 	// materialicons
 
 	/**
-   * 반응형 태블릿 처리에 대한 Helper
-   * @param iconName 
-   * @param isTablet 
-   * @returns 
-   */
+	 * 반응형 태블릿 처리에 대한 Helper
+	 * @param iconName
+	 * @param isTablet
+	 * @returns
+	 */
 	const getTabBarIcon = (iconType: Parameters<typeof IconComponent>[0]['type'], iconName: string, isTablet: boolean) => {
 		return ({ color }: { color: string; size: number }) => (
 			<IconComponent
@@ -50,9 +49,9 @@ const BottomTabNavigator = () => {
 	};
 	/**
 	 * 현재 탭을 다시 눌렀을 때 Stack을 초기화하는 리스너 반환 함수
-	 * @param navigation 
-	 * @param routeName 
-	 * @returns 
+	 * @param navigation
+	 * @param routeName
+	 * @returns
 	 */
 	const getTabPressResetListener = (navigation: any, routeName: string) => ({
 		tabPress: (e: any) => {
@@ -74,8 +73,7 @@ const BottomTabNavigator = () => {
 				headerTitleAlign: 'center',
 				tabBarLabelPosition: 'below-icon',
 				...getScreenOptions(isTablet, insets),
-			}}
-		>
+			}}>
 			<Tab.Screen
 				name={Paths.PROVERB_LIST}
 				component={ProverbListScreen}
@@ -137,7 +135,6 @@ const BottomTabNavigator = () => {
 			/>
 		</Tab.Navigator>
 	);
-
 };
 
 export default BottomTabNavigator;

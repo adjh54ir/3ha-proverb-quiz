@@ -162,7 +162,7 @@ const SettingScreen = () => {
 			badges: CONST_BADGES.filter((b) => b.type === 'quiz').map((b) => b.id),
 			correctProverbId: allProverbs.map((p) => p.id),
 			wrongProverbId: [],
-			totalScore: 4600,
+			totalScore: 5000,
 			bestCombo: 20,
 			lastAnsweredAt: new Date(),
 			quizCounts: {}, // 원하면 여기서도 id별로 count 넣을 수 있음

@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaleHeight, scaleWidth } from '@/utils';
 import StackNavigator from './StackNavigator';
 import DeviceInfo from 'react-native-device-info';
+import LevelPlayBannerAd from '@/screens/common/ads/levelplay/LevelPlayBannerAd';
 
 const AD_ALLOWED_ROUTES = [
 	Paths.TODAY_QUIZ,
@@ -70,7 +71,7 @@ const AppLayout = () => {
 		if (shouldShowAd) {
 			switch (Platform.OS) {
 				case 'android':
-					return scaleHeight(50);
+					return scaleHeight(20);
 				case 'ios':
 					return scaleHeight(25);
 				default:
@@ -107,7 +108,7 @@ const AppLayout = () => {
 			<SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={shouldShowAd ? ['top'] : []}>
 				<View style={styles.container}>
 					<View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]}>
-						{/* <LevelPlayBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} /> */}
+						<LevelPlayBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} />
 					</View>
 					{shouldShowAd && <View style={{ paddingTop: getAdPaddingTop() }} />}
 

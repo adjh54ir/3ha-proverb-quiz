@@ -4,20 +4,7 @@
 /* eslint-disable curly */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import {
-	View,
-	Text,
-	StyleSheet,
-	TouchableOpacity,
-	Modal,
-	TouchableWithoutFeedback,
-	Keyboard,
-	Dimensions,
-	Platform,
-	Animated,
-	ScrollView,
-	FlatList,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Keyboard, Dimensions, Platform, Animated, ScrollView, FlatList } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import ProverbServices from '@/services/ProverbServices';
@@ -65,7 +52,10 @@ const QuizScreen = () => {
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	const scaleAnims = useRef<Animated.Value[]>([]);
 	const scaleAnim = useRef(new Animated.Value(0)).current;
+	const comboEffectAnim = useRef(new Animated.Value(0)).current;
+	const comboShake = useRef(new Animated.Value(0)).current;
 
+	const [isAnswerLocked, setIsAnswerLocked] = useState(false);
 	const [quizHistory, setQuizHistory] = useState<MainDataType.UserQuizHistory | null>(null);
 
 	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
@@ -75,7 +65,7 @@ const QuizScreen = () => {
 	const [options, setOptions] = useState<string[]>([]);
 	const [selected, setSelected] = useState<string | null>(null);
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-	const [remainingTime, setRemainingTime] = useState(30);
+	const [remainingTime, setRemainingTime] = useState(40);
 	const [showResultModal, setShowResultModal] = useState(false);
 	const [resultTitle, setResultTitle] = useState('');
 	const [resultMessage, setResultMessage] = useState('');
@@ -97,6 +87,7 @@ const QuizScreen = () => {
 
 	const scoreBonusAnim = useRef(new Animated.Value(0)).current;
 	const [showScoreBonus, setShowScoreBonus] = useState(false);
+	const [comboEffectText, setComboEffectText] = useState('');
 
 	const [reviewIndex, setReviewIndex] = useState(0);
 
@@ -115,6 +106,7 @@ const QuizScreen = () => {
 	useEffect(() => {
 		if (!quizHistory) return; // 🧩 quizHistory 로드 완료 후에만 작동
 		if (filteredProverbs.length === 0) return;
+		if (isAnswerLocked) return; // ✅ 정답 처리 중일 땐 새 문제 로드 금지
 
 		if (questionPool && questionPool.length > 0) {
 			setProverbs(questionPool);
@@ -215,6 +207,12 @@ const QuizScreen = () => {
 	}, [reviewIndex]);
 
 	useEffect(() => {
+		if (combo > 0) {
+			triggerComboAnimation();
+		}
+	}, [combo]);
+
+	useEffect(() => {
 		if (badgeModalVisible) {
 			scaleAnim.setValue(0.8);
 			Animated.spring(scaleAnim, {
@@ -245,6 +243,17 @@ const QuizScreen = () => {
 	 */
 	const loadQuestion = () => {
 		if (!quizHistory) return;
+
+		// ✅ 모든 선택/정답 상태 초기화 (이게 핵심)
+		setSelected(null);
+		setIsCorrect(null);
+		setIsAnswerLocked(false);
+
+		// ✅ FlatList 강제 리렌더 유도용 (질문 ID 초기화)
+		setOptions([]);
+		setQuestionText('');
+		setBlankWord('');
+		setQuestion(null);
 
 		// ✅ 오답 복습 모드일 경우
 		if (isWrongReview && questionPool && questionPool.length > 0) {
@@ -310,7 +319,7 @@ const QuizScreen = () => {
 		setQuestionText(displayText);
 		setSelected(null);
 		setIsCorrect(null);
-		setRemainingTime(30);
+		setRemainingTime(40);
 
 		// 타이머 새로 시작
 		if (timerRef.current) clearInterval(timerRef.current);
@@ -350,6 +359,7 @@ const QuizScreen = () => {
 	const handleSelect = async (answer: string) => {
 		if (!question) return;
 		if (timerRef.current) clearInterval(timerRef.current);
+		setIsAnswerLocked(true); // 🔒 잠금: 아이콘 유지용
 
 		let acquiredBadges: string[] = [];
 
@@ -365,24 +375,30 @@ const QuizScreen = () => {
 		setIsCorrect(correct);
 		setResultType(isTimeout ? 'timeout' : correct ? 'correct' : 'wrong');
 
+		const newCombo = correct ? combo + 1 : 0;
+
+		// 점수 보너스 애니메이션
 		if (correct) {
+			const newComboValue = combo + 1;
 			setShowScoreBonus(true);
-			scoreBonusAnim.setValue(0); // 초기화
+			scoreBonusAnim.setValue(0);
+			setCombo(newCombo); // 콤보 업데이트
+			triggerComboAnimation(); // 콤보 애니메이션 즉시 실행
+			if (newComboValue >= 2) {
+				triggerComboAnim();
+				triggerComboShake();
+				triggerComboEffect(newComboValue); // ✅ 항상 실행
+			}
 			Animated.timing(scoreBonusAnim, {
 				toValue: 1,
 				duration: 1000,
 				useNativeDriver: true,
-			}).start(() => setShowScoreBonus(false));
-			setTotalScore((prev) => prev + 10);
-			setCombo((prev) => {
-				const newCombo = prev + 1;
-				triggerComboAnimation();
-				return newCombo;
+			}).start(() => {
+				setShowScoreBonus(false);
 			});
 		} else {
 			setCombo(0);
 		}
-
 		// ✅ 🔽 여기에 퀴즈 기록 업데이트 추가
 		if (quizHistory && question) {
 			// 기존 업데이트 로직 유지
@@ -441,9 +457,12 @@ const QuizScreen = () => {
 				? praiseMessages[Math.floor(Math.random() * praiseMessages.length)]
 				: '앗, 다음엔 맞힐 수 있어요!';
 
-		setResultTitle(title);
-		setResultMessage(message);
-		setShowResultModal(true);
+		setTimeout(() => {
+			setResultTitle(title);
+			setResultMessage(message);
+			setShowResultModal(true);
+			setIsAnswerLocked(false); // 🔓 다시 풀기 (다음 문제로 넘어갈 때)
+		}, 1800); // 약간
 	};
 	const getLevelColor = (level: number) => {
 		const levelColorMap: Record<string, string> = {
@@ -454,6 +473,31 @@ const QuizScreen = () => {
 		};
 
 		return levelColorMap[level] || '#b2bec3'; // 기본 회색
+	};
+
+	const triggerComboEffect = (comboValue: number) => {
+		let bonus = 0;
+		if (comboValue === 3) {
+			bonus = 5;
+		} else if (comboValue === 4) {
+			bonus = 10;
+		} else if (comboValue === 5) {
+			bonus = 20;
+		} else if (comboValue >= 6) {
+			bonus = 30;
+		}
+
+		if (comboValue >= 2) {
+			setComboEffectText(`🔥 ${comboValue} Combo!`);
+			comboEffectAnim.setValue(0);
+			Animated.timing(comboEffectAnim, {
+				toValue: 1,
+				duration: 1000,
+				useNativeDriver: true,
+			}).start(() => {
+				setComboEffectText('');
+			});
+		}
 	};
 
 	const pickBlankWord = (text: string) => {
@@ -503,6 +547,35 @@ const QuizScreen = () => {
 			}),
 		]).start();
 	};
+	const triggerComboAnim = () => {
+		comboAnim.setValue(1.4);
+		Animated.spring(comboAnim, {
+			toValue: 1,
+			friction: 4,
+			useNativeDriver: true,
+		}).start();
+	};
+
+	const triggerComboShake = () => {
+		comboShake.setValue(0);
+		Animated.sequence([
+			Animated.timing(comboShake, {
+				toValue: 1,
+				duration: 50,
+				useNativeDriver: true,
+			}),
+			Animated.timing(comboShake, {
+				toValue: -1,
+				duration: 50,
+				useNativeDriver: true,
+			}),
+			Animated.timing(comboShake, {
+				toValue: 0,
+				duration: 50,
+				useNativeDriver: true,
+			}),
+		]).start();
+	};
 
 	const scoreBonusStyle = {
 		opacity: scoreBonusAnim.interpolate({
@@ -535,11 +608,11 @@ const QuizScreen = () => {
 
 	const handleNextQuestion = () => {
 		const isFinal = resultType === 'done';
-		setResultTitle('');
-		setResultMessage('');
-		setShowResultModal(false);
+
+		// ✅ 상태 먼저 완전히 초기화
 		setSelected(null);
 		setIsCorrect(null);
+		setIsAnswerLocked(false);
 		setOptions([]);
 		setQuestionText('');
 		setBlankWord('');
@@ -547,18 +620,21 @@ const QuizScreen = () => {
 
 		// ✅ 스크롤 최상단 이동
 		if (flatListRef.current) {
-			flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+			flatListRef.current.scrollToOffset({ offset: 0, animated: false });
 		}
 
-		if (isFinal) {
-			safelyGoBack();
-		} else {
-			if (isWrongReview) {
-				setReviewIndex((prev) => prev + 1); // ✅ 이것만
+		// ✅ 100ms 정도 딜레이 후 다음 문제 로드
+		setTimeout(() => {
+			if (isFinal) {
+				safelyGoBack();
 			} else {
-				loadQuestion(); // 일반 퀴즈는 직접 호출
+				if (isWrongReview) {
+					setReviewIndex((prev) => prev + 1);
+				} else {
+					loadQuestion();
+				}
 			}
-		}
+		}, 100); // 🔸 딜레이로 이전 상태가 반영된 뒤 새로운 문제 로드
 	};
 
 	const getModeLabel = (mode: 'meaning' | 'proverb' | 'blank') => {
@@ -659,196 +735,205 @@ const QuizScreen = () => {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
 			<View style={{ flex: 1 }}>
-				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-					<View style={{ flex: 1 }}>
-						<View style={styles.container}>
-							<View style={styles.inner}>
-								<View style={styles.progressStatusWrapper}>
-									<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-										<Text style={styles.progressText}>{getModeLabel(routeMode)}</Text>
-										{question?.level && (
-											<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-												{/* 레벨 표시 */}
-												<View style={[styles.badgePill, { backgroundColor: getLevelColor(question.level) }]}>
-													{getLevelIcon(question.level)}
-													<Text style={styles.badgeText}>{getLevelLabel(question.level)}</Text>
+				<View style={{ flex: 1 }}>
+					<View style={styles.container}>
+						<View style={styles.inner}>
+							<View style={styles.progressStatusWrapper}>
+								<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+									<Text style={styles.progressText}>{getModeLabel(routeMode)}</Text>
+									{question?.level && (
+										<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+											{/* 레벨 표시 */}
+											<View style={[styles.badgePill, { backgroundColor: getLevelColor(question.level) }]}>
+												{getLevelIcon(question.level)}
+												<Text style={styles.badgeText}>{getLevelLabel(question.level)}</Text>
+											</View>
+
+											{/* 카테고리 표시 */}
+											{question?.category && (
+												<View style={[styles.badgePill, { backgroundColor: getFieldColor(question.category) }]}>
+													{getFieldIcon(question.category)}
+													<Text style={styles.badgeText}> {question.category}</Text>
 												</View>
+											)}
+										</View>
+									)}
+								</View>
 
-												{/* 카테고리 표시 */}
-												{question?.category && (
-													<View style={[styles.badgePill, { backgroundColor: getFieldColor(question.category) }]}>
-														{getFieldIcon(question.category)}
-														<Text style={styles.badgeText}> {question.category}</Text>
-													</View>
-												)}
-											</View>
-										)}
+								<View style={styles.progressBarWrapper}>
+									<View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
+								</View>
+
+								<View style={styles.statusCardRow}>
+									<View style={styles.statusCard}>
+										<Text style={styles.statusCardTitle}>📝 문제</Text>
+										<Text style={[styles.statusCardValue]}>
+											<Text style={{ color: '#3498db' }}>{getSolvedCount()}</Text>
+											{' / '}
+											{totalCount}
+										</Text>
 									</View>
-
-									<View style={styles.progressBarWrapper}>
-										<View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
+									<View style={styles.statusCard}>
+										<Text style={styles.statusCardTitle}>🎯 총점</Text>
+										<View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
+											<Text style={styles.statusCardValue}>{totalScore}점</Text>
+											{showScoreBonus && <Animated.Text style={[styles.scoreBonusText, scoreBonusStyle]}>+10점!</Animated.Text>}
+										</View>
 									</View>
-
-									<View style={styles.statusCardRow}>
-										<View style={styles.statusCard}>
-											<Text style={styles.statusCardTitle}>📝 문제</Text>
-											<Text style={[styles.statusCardValue]}>
-												<Text style={{ color: '#3498db' }}>{getSolvedCount()}</Text>
-												{' / '}
-												{totalCount}
+									<View style={styles.statusCard}>
+										<Text style={[styles.statusCardTitle, { color: '#e67e22' }]}>🔥 콤보</Text>
+										<Animated.View
+											style={{
+												transform: [
+													{
+														scale: comboAnim.interpolate({
+															inputRange: [0, 1],
+															outputRange: [1, 1.5],
+														}),
+													},
+												],
+												opacity: comboAnim.interpolate({
+													inputRange: [0, 1],
+													outputRange: [1, 1],
+												}),
+											}}>
+											<Text
+												style={[
+													styles.statusCardValue,
+													styles.comboValue,
+													{ color: combo > 0 ? '#e74c3c' : '#2c3e50' }, // 🔥 조건부 색상 적용
+												]}>
+												🔥 {combo} Combo
 											</Text>
-										</View>
-										<View style={styles.statusCard}>
-											<Text style={styles.statusCardTitle}>🎯 총점</Text>
-											<View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
-												<Text style={styles.statusCardValue}>{totalScore}점</Text>
-												{showScoreBonus && <Animated.Text style={[styles.scoreBonusText, scoreBonusStyle]}>+10점!</Animated.Text>}
-											</View>
-										</View>
-										<View style={styles.statusCard}>
-											<Text style={[styles.statusCardTitle, { color: '#e67e22' }]}>🔥 콤보</Text>
-											<Animated.View
-												style={{
-													transform: [
-														{
-															scale: comboAnim.interpolate({
-																inputRange: [0, 1],
-																outputRange: [1, 1.5],
-															}),
-														},
-													],
-													opacity: comboAnim.interpolate({
-														inputRange: [0, 1],
-														outputRange: [1, 1],
-													}),
-												}}>
-												<Text
-													style={[
-														styles.statusCardValue,
-														styles.comboValue,
-														{ color: combo > 0 ? '#e74c3c' : '#2c3e50' }, // 🔥 조건부 색상 적용
-													]}>
-													🔥 {combo} Combo
-												</Text>
-											</Animated.View>
-										</View>
+										</Animated.View>
 									</View>
 								</View>
-								{question && (
-									<View style={{ position: 'absolute', width: '100%', alignItems: 'flex-end', marginTop: scaleHeight(6) }}>
-										<TouchableOpacity onPress={() => setShowHintModal(true)}>
-											<View
-												style={{
-													backgroundColor: '#fef3c7',
-													padding: scaleWidth(8),
-													borderRadius: scaleWidth(20),
-													flexDirection: 'row',
-													alignItems: 'center',
-												}}>
-												<IconComponent type='MaterialIcons' name='lightbulb' size={18} color='#f39c12' />
-												<Text style={{ marginLeft: scaleWidth(6), fontWeight: '600', color: '#f39c12' }}>힌트</Text>
-											</View>
-										</TouchableOpacity>
-									</View>
+							</View>
+							{question && (
+								<View style={{ position: 'absolute', width: '100%', alignItems: 'flex-end', marginTop: scaleHeight(6) }}>
+									<TouchableOpacity onPress={() => setShowHintModal(true)}>
+										<View
+											style={{
+												backgroundColor: '#fef3c7',
+												padding: scaleWidth(8),
+												borderRadius: scaleWidth(20),
+												flexDirection: 'row',
+												alignItems: 'center',
+											}}>
+											<IconComponent type='MaterialIcons' name='lightbulb' size={18} color='#f39c12' />
+											<Text style={{ marginLeft: scaleWidth(6), fontWeight: '600', color: '#f39c12' }}>힌트</Text>
+										</View>
+									</TouchableOpacity>
+								</View>
+							)}
+
+							<View style={styles.quizBox}>
+								<AnimatedCircularProgress
+									size={scaleWidth(70)}
+									width={scaleWidth(6)} // ✅ 기존 8 → 6
+									fill={((40 - remainingTime) / 40) * 100} // ✅ 수정된 부분
+									duration={500}
+									tintColor='#3498db'
+									backgroundColor='#ecf0f1'>
+									{() => (
+										<View style={styles.timerInner}>
+											<Text style={styles.timerText}>{remainingTime}s</Text>
+										</View>
+									)}
+								</AnimatedCircularProgress>
+
+								{question ? (
+									<Text style={styles.questionText}>
+										{`Q. ${
+											routeMode === 'blank'
+												? questionText || '문제 준비중...'
+												: routeMode === 'meaning'
+													? question?.proverb
+													: question?.longMeaning || '문제 준비중...'
+										}`}
+									</Text>
+								) : (
+									<Text>문제 불러오는 중...</Text>
 								)}
 
-								<View style={styles.quizBox}>
-									<AnimatedCircularProgress
-										size={scaleWidth(70)}
-										width={scaleWidth(6)} // ✅ 기존 8 → 6
-										fill={((30 - remainingTime) / 30) * 100} // ✅ 수정된 부분
-										duration={500}
-										tintColor='#3498db'
-										backgroundColor='#ecf0f1'>
-										{() => (
-											<View style={styles.timerInner}>
-												<Text style={styles.timerText}>{remainingTime}s</Text>
-											</View>
-										)}
-									</AnimatedCircularProgress>
+								<View style={[styles.optionsContainer, { flex: 1, width: '100%', marginTop: scaleHeight(5) }]}>
+									<FlatList
+										key={question?.id} // ✅ 질문이 바뀔 때마다 강제 리렌더
+										ref={flatListRef}
+										data={options}
+										scrollEnabled={true} // ✅ 항상 스크롤 가능
+										keyExtractor={(item, index) => `${item}-${index}`}
+										contentContainerStyle={{ paddingBottom: scaleHeight(20) }}
+										showsVerticalScrollIndicator
+										renderItem={({ item, index }) => {
+											const scaleAnim = scaleAnims.current[index] ?? new Animated.Value(1);
+											const isSelected = selected === item;
+											const correctAnswer = routeMode === 'meaning' ? question?.longMeaning : routeMode === 'proverb' ? question?.proverb : blankWord;
 
-									{question ? (
-										<Text style={styles.questionText}>
-											{`Q. ${
-												routeMode === 'blank'
-													? questionText || '문제 준비중...'
-													: routeMode === 'meaning'
-														? question?.proverb
-														: question?.longMeaning || '문제 준비중...'
-											}`}
-										</Text>
-									) : (
-										<Text>문제 불러오는 중...</Text>
-									)}
+											const isCorrectAnswer = correctAnswer === item; // 실제 정답
+											const isSelectedWrong = isSelected && !isCorrectAnswer; // 내가 고른 오답
 
-									<View style={[styles.optionsContainer, { flex: 1, width: '100%', marginTop: scaleHeight(5) }]}>
-										<FlatList
-											ref={flatListRef}
-											data={options}
-											keyExtractor={(item, index) => `${item}-${index}`}
-											contentContainerStyle={{ paddingBottom: scaleHeight(20) }}
-											showsVerticalScrollIndicator
-											renderItem={({ item, index }) => {
-												const scaleAnim = scaleAnims.current[index] ?? new Animated.Value(1);
-												const isSelected = selected === item;
-												const isAnswerCorrect = isCorrect && isSelected;
-												const isAnswerWrong = !isCorrect && isSelected;
+											const handlePressIn = () => {
+												Animated.spring(scaleAnim, {
+													toValue: 0.97,
+													useNativeDriver: true,
+												}).start();
+											};
 
-												const handlePressIn = () => {
-													Animated.spring(scaleAnim, {
-														toValue: 0.97,
-														useNativeDriver: true,
-													}).start();
-												};
+											const handlePressOut = () => {
+												Animated.spring(scaleAnim, {
+													toValue: 1,
+													useNativeDriver: true,
+												}).start();
+											};
 
-												const handlePressOut = () => {
-													Animated.spring(scaleAnim, {
-														toValue: 1,
-														useNativeDriver: true,
-													}).start();
-												};
+											return (
+												<Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+													<TouchableOpacity
+														onPressIn={handlePressIn}
+														onPressOut={handlePressOut}
+														style={[
+															styles.optionCard,
+															isSelected && styles.optionSelectedCard, // ✅ 내가 선택한 보기 (파란색 배경)
+															selected && isSelectedWrong && styles.optionWrongCard, // ❌ 오답이면 빨강 배경
+														]}
+														onPress={() => handleSelect(item)}
+														disabled={isAnswerLocked}>
+														<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+															<Text style={[styles.optionLabel, { color: labelColors[index], marginRight: scaleWidth(6) }]}>{['A.', 'B.', 'C.', 'D.'][index]}</Text>
 
-												return (
-													<Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-														<TouchableOpacity
-															onPressIn={handlePressIn}
-															onPressOut={handlePressOut}
-															style={[styles.optionCard, isAnswerCorrect && styles.optionCorrectCard, isAnswerWrong && styles.optionWrongCard]}
-															onPress={() => handleSelect(item)}
-															disabled={!!selected}>
-															<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-																<Text style={[styles.optionLabel, { color: labelColors[index], marginRight: scaleWidth(6) }]}>{['A.', 'B.', 'C.', 'D.'][index]}</Text>
-
-																<View style={{ flex: 1 }}>
-																	<Text style={styles.optionContent}>{item}</Text>
-																</View>
-
-																{isSelected && (
-																	<IconComponent
-																		type='MaterialIcons'
-																		name={isAnswerCorrect ? 'check-circle' : 'cancel'}
-																		size={28}
-																		color={isAnswerCorrect ? '#2ecc71' : '#e74c3c'}
-																	/>
-																)}
+															<View style={{ flex: 1 }}>
+																<Text style={styles.optionContent}>{item}</Text>
 															</View>
-														</TouchableOpacity>
-													</Animated.View>
-												);
-											}}
-										/>
-									</View>
+
+															{/* ✅ 선택 이후에만 아이콘 표시 */}
+															{selected && (
+																<>
+																	{/* 정답이면 O 아이콘 (내가 안 눌러도 보임) */}
+																	{isCorrectAnswer && <IconComponent type='MaterialIcons' name='check-circle' size={28} color='#2ecc71' />}
+
+																	{/* 내가 고른 게 오답이면 X 아이콘 */}
+																	{isSelectedWrong && <IconComponent type='MaterialIcons' name='cancel' size={28} color='#e74c3c' />}
+																</>
+															)}
+														</View>
+													</TouchableOpacity>
+												</Animated.View>
+											);
+										}}
+									/>
 								</View>
 							</View>
+						</View>
 
-							<View style={styles.bottomExitWrapper}>
-								<TouchableOpacity style={styles.exitButton} onPress={() => setShowExitModal(true)}>
-									<Text style={styles.exitButtonText}>퀴즈 종료</Text>
-								</TouchableOpacity>
-							</View>
+						<View style={styles.bottomExitWrapper}>
+							<TouchableOpacity style={styles.exitButton} onPress={() => setShowExitModal(true)}>
+								<Text style={styles.exitButtonText}>퀴즈 종료</Text>
+							</TouchableOpacity>
+						</View>
 
-							{/* ======================= 퀴즈 시작 팝업 ============================ */}
-							{/* {showStartModal && !isWrongReview && (
+						{/* ======================= 퀴즈 시작 팝업 ============================ */}
+						{/* {showStartModal && !isWrongReview && (
 								<QuizStartModal
 									visible={showStartModal}
 									modeStep={modeStep}
@@ -880,184 +965,182 @@ const QuizScreen = () => {
 								/>
 							)} */}
 
-							{/* ======================= 퀴즈 종료 ============================ */}
-							<Modal visible={showExitModal} transparent animationType='fade'>
-								<View style={styles.modalOverlay}>
-									<View style={styles.exitModal}>
-										<Text style={styles.exitModalTitle}>퀴즈를 종료하시겠어요?</Text>
-										<Text style={styles.exitModalMessage}>진행 중인 퀴즈가 저장되지 않습니다.</Text>
-										<View style={styles.modalButtonRow}>
-											<TouchableOpacity
-												style={[styles.modalBackButton, { backgroundColor: '#bdc3c7' }]}
-												onPress={() => {
-													setShowExitModal(false);
-													startTimer(); // ⏱ 타이머 재시작
-												}}>
-												<Text style={styles.modalButtonText}>취소</Text>
-											</TouchableOpacity>
-											<TouchableOpacity
-												style={styles.exitModalConfirmButton}
-												onPress={() => {
-													// setShowExitModal(false);
-													// if (isWrongReview) {
-													//     //@ts-ignore
-													//     navigation.replace(Paths.MAIN_TAB, { screen: Paths.HOME });
-													// } else {
-													//     safelyGoBack();
-													// }
-													safelyGoBack();
-												}}>
-												<Text style={styles.modalButtonText}>종료하기</Text>
-											</TouchableOpacity>
-										</View>
+						{/* ======================= 퀴즈 종료 ============================ */}
+						<Modal visible={showExitModal} transparent animationType='fade'>
+							<View style={styles.modalOverlay}>
+								<View style={styles.exitModal}>
+									<Text style={styles.exitModalTitle}>퀴즈를 종료하시겠어요?</Text>
+									<Text style={styles.exitModalMessage}>진행 중인 퀴즈가 저장되지 않습니다.</Text>
+									<View style={styles.modalButtonRow}>
+										<TouchableOpacity
+											style={[styles.modalBackButton, { backgroundColor: '#bdc3c7' }]}
+											onPress={() => {
+												setShowExitModal(false);
+												startTimer(); // ⏱ 타이머 재시작
+											}}>
+											<Text style={styles.modalButtonText}>취소</Text>
+										</TouchableOpacity>
+										<TouchableOpacity
+											style={styles.exitModalConfirmButton}
+											onPress={() => {
+												// setShowExitModal(false);
+												// if (isWrongReview) {
+												//     //@ts-ignore
+												//     navigation.replace(Paths.MAIN_TAB, { screen: Paths.HOME });
+												// } else {
+												//     safelyGoBack();
+												// }
+												safelyGoBack();
+											}}>
+											<Text style={styles.modalButtonText}>종료하기</Text>
+										</TouchableOpacity>
 									</View>
 								</View>
-							</Modal>
+							</View>
+						</Modal>
 
-							<QuizResultModal
-								visible={showResultModal && !badgeModalVisible} // ✅ 동시에 보이지 않도록 수정
-								resultType={resultType}
-								resultTitle={resultTitle}
-								quizMode={routeMode}
-								resultMessage={resultMessage}
-								question={question}
-								onNext={() => {
-									setShowResultModal(false);
-									if (badgeModalVisible) return; // ✅ 뱃지 모달이 있으면 대기
+						<QuizResultModal
+							visible={showResultModal && !badgeModalVisible} // ✅ 동시에 보이지 않도록 수정
+							resultType={resultType}
+							resultTitle={resultTitle}
+							quizMode={routeMode}
+							resultMessage={resultMessage}
+							question={question}
+							onNext={() => {
+								setShowResultModal(false);
+								if (badgeModalVisible) return; // ✅ 뱃지 모달이 있으면 대기
 
-									if (resultType === 'done') {
-										setTimeout(() => {
-											//@ts-ignore
-											navigation.navigate(Paths.MAIN_TAB, { screen: Paths.SETTING });
-										}, 300);
-									} else {
-										handleNextQuestion();
-									}
-								}}
-							/>
+								if (resultType === 'done') {
+									setTimeout(() => {
+										//@ts-ignore
+										navigation.navigate(Paths.MAIN_TAB, { screen: Paths.SETTING });
+									}, 300);
+								} else {
+									handleNextQuestion();
+								}
+							}}
+						/>
 
-							{/* 뱃지 모달 */}
-							<Modal visible={badgeModalVisible} transparent animationType='fade'>
+						{comboEffectText !== '' && (
+							<Animated.View
+								pointerEvents='none'
+								style={{
+									position: 'absolute',
+									top: '40%', // 필요 시 위치 조정 가능
+									left: 0,
+									right: 0,
+									alignItems: 'center',
+									opacity: comboEffectAnim.interpolate({
+										inputRange: [0, 1],
+										outputRange: [1, 0],
+									}),
+									transform: [
+										{
+											translateY: comboEffectAnim.interpolate({
+												inputRange: [0, 1],
+												outputRange: [0, -30],
+											}),
+										},
+									],
+								}}>
+								<Text
+									style={{
+										fontSize: scaledSize(36),
+										fontWeight: 'bold',
+										color: '#e74c3c',
+										textShadowColor: '#000',
+										textShadowOffset: { width: 1, height: 1 },
+										textShadowRadius: 2,
+									}}>
+									{comboEffectText}
+								</Text>
+							</Animated.View>
+						)}
+
+						{/* 뱃지 모달 */}
+						<Modal visible={badgeModalVisible} transparent animationType='fade'>
+							<View style={styles.modalOverlay}>
+								<ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart explosionSpeed={350} />
+								<Animated.View style={[styles.badgeModal, { transform: [{ scale: scaleAnim }] }]}>
+									<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지를 획득했어요!</Text>
+									<ScrollView style={{ maxHeight: scaleHeight(300), width: '100%' }} contentContainerStyle={{ paddingHorizontal: scaleWidth(12) }}>
+										{newlyEarnedBadges.map((badge, index) => (
+											<View
+												key={index}
+												style={[styles.badgeCard, styles.badgeCardActive]} // 액티브 카드 스타일 항상 적용
+											>
+												<View style={[styles.iconBox, styles.iconBoxActive]}>
+													{/* @ts-ignore */}
+													<IconComponent type={badge.iconType} name={badge.icon} size={20} color={'#27ae60'} />
+												</View>
+												<View style={styles.badgeTextWrap}>
+													<Text style={[styles.badgeName, styles.badgeTitleActive]}>{badge.name}</Text>
+													<Text style={[styles.badgeDescription, styles.badgeDescActive]}>{badge.description}</Text>
+												</View>
+											</View>
+										))}
+									</ScrollView>
+									<TouchableOpacity
+										onPress={() => {
+											setBadgeModalVisible(false); // 모달 닫기
+											handleNextQuestion(); // 다음 문제로 이동
+										}}
+										style={styles.modalConfirmButton}>
+										<Text style={styles.closeButtonText2}>확인</Text>
+									</TouchableOpacity>
+								</Animated.View>
+							</View>
+						</Modal>
+
+						{showHintModal && (
+							<Modal visible={showHintModal} transparent animationType='fade'>
 								<View style={styles.modalOverlay}>
-									<ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart explosionSpeed={350} />
-									<Animated.View style={[styles.badgeModal, { transform: [{ scale: scaleAnim }] }]}>
-										<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지를 획득했어요!</Text>
-										<ScrollView style={{ maxHeight: scaleHeight(300), width: '100%' }} contentContainerStyle={{ paddingHorizontal: scaleWidth(12) }}>
-											{newlyEarnedBadges.map((badge, index) => (
-												<View
-													key={index}
-													style={[styles.badgeCard, styles.badgeCardActive]} // 액티브 카드 스타일 항상 적용
-												>
-													<View style={[styles.iconBox, styles.iconBoxActive]}>
-														{/* @ts-ignore */}
-														<IconComponent type={badge.iconType} name={badge.icon} size={20} color={'#27ae60'} />
-													</View>
-													<View style={styles.badgeTextWrap}>
-														<Text style={[styles.badgeName, styles.badgeTitleActive]}>{badge.name}</Text>
-														<Text style={[styles.badgeDescription, styles.badgeDescActive]}>{badge.description}</Text>
-													</View>
-												</View>
-											))}
-										</ScrollView>
-										<TouchableOpacity
-											onPress={() => {
-												setBadgeModalVisible(false); // 모달 닫기
-												handleNextQuestion(); // 다음 문제로 이동
-											}}
-											style={styles.modalConfirmButton}>
-											<Text style={styles.closeButtonText2}>확인</Text>
-										</TouchableOpacity>
-									</Animated.View>
-								</View>
-							</Modal>
+									<View style={styles.resultModal}>
+										<Text style={[styles.resultTitle, { color: '#f39c12' }]}>🧭 힌트</Text>
 
-							{showHintModal && (
-								<Modal visible={showHintModal} transparent animationType='fade'>
-									<View style={styles.modalOverlay}>
-										<View style={styles.resultModal}>
-											<Text style={[styles.resultTitle, { color: '#f39c12' }]}>🧭 힌트</Text>
-
-											{/* 카테고리 */}
-											{question?.category && (
-												<View
+										{/* 카테고리 */}
+										{question?.category && (
+											<View
+												style={{
+													flexDirection: 'row',
+													alignItems: 'center',
+													backgroundColor: getFieldColor(question.category),
+													borderRadius: scaleWidth(8),
+													paddingHorizontal: scaleWidth(8),
+													paddingVertical: scaleHeight(4),
+													marginTop: scaleHeight(10),
+													marginBottom: scaleHeight(12),
+												}}>
+												{getFieldIcon(question.category)}
+												<Text style={{ color: '#fff', fontWeight: 'bold', marginLeft: scaleWidth(6) }}>{question.category}</Text>
+											</View>
+										)}
+										{/* 비슷한 속담 */}
+										{question?.sameProverb && question.sameProverb.filter((sp) => sp && sp.trim() !== '').length > 0 && (
+											<View
+												style={{
+													backgroundColor: '#eef6ff',
+													borderRadius: scaleWidth(12),
+													padding: scaleWidth(12),
+													marginBottom: scaleHeight(16),
+													borderWidth: 1,
+													borderColor: '#d6e4ff',
+													width: '100%',
+												}}>
+												<Text
 													style={{
-														flexDirection: 'row',
-														alignItems: 'center',
-														backgroundColor: getFieldColor(question.category),
-														borderRadius: scaleWidth(8),
-														paddingHorizontal: scaleWidth(8),
-														paddingVertical: scaleHeight(4),
-														marginTop: scaleHeight(10),
-														marginBottom: scaleHeight(12),
+														fontSize: scaledSize(15),
+														fontWeight: '600',
+														color: '#2980b9',
+														marginBottom: scaleHeight(8),
+														textAlign: 'center',
 													}}>
-													{getFieldIcon(question.category)}
-													<Text style={{ color: '#fff', fontWeight: 'bold', marginLeft: scaleWidth(6) }}>{question.category}</Text>
-												</View>
-											)}
-											{/* 비슷한 속담 */}
-											{question?.sameProverb && question.sameProverb.filter((sp) => sp && sp.trim() !== '').length > 0 && (
-												<View
-													style={{
-														backgroundColor: '#eef6ff',
-														borderRadius: scaleWidth(12),
-														padding: scaleWidth(12),
-														marginBottom: scaleHeight(16),
-														borderWidth: 1,
-														borderColor: '#d6e4ff',
-														width: '100%',
-													}}>
-													<Text
-														style={{
-															fontSize: scaledSize(15),
-															fontWeight: '600',
-															color: '#2980b9',
-															marginBottom: scaleHeight(8),
-															textAlign: 'center',
-														}}>
-														🔗 비슷한 속담
-													</Text>
+													🔗 비슷한 속담
+												</Text>
 
-													{question.sameProverb
-														.filter((sp) => sp && sp.trim() !== '')
-														.map((sp, idx) => (
-															<Text
-																key={idx}
-																style={{
-																	fontSize: scaledSize(14),
-																	color: '#2c3e50',
-																	lineHeight: scaleHeight(20),
-																	marginBottom: scaleHeight(4),
-																}}>
-																- {sp}
-															</Text>
-														))}
-												</View>
-											)}
-
-											{/* 예시 문장 */}
-											{question?.example && question.example.length > 0 && (
-												<View
-													style={{
-														backgroundColor: '#f9f9f9',
-														borderRadius: scaleWidth(12),
-														padding: scaleWidth(12),
-														marginBottom: scaleHeight(16),
-														borderWidth: 1,
-														borderColor: '#eee',
-														width: '100%',
-													}}>
-													<Text
-														style={{
-															fontSize: scaledSize(15),
-															fontWeight: '600',
-															color: '#2c3e50',
-															marginBottom: scaleHeight(8),
-															textAlign: 'center',
-														}}>
-														💡 속담 예시
-													</Text>
-
-													{question.example.map((ex, idx) => (
+												{question.sameProverb
+													.filter((sp) => sp && sp.trim() !== '')
+													.map((sp, idx) => (
 														<Text
 															key={idx}
 															style={{
@@ -1066,24 +1149,61 @@ const QuizScreen = () => {
 																lineHeight: scaleHeight(20),
 																marginBottom: scaleHeight(4),
 															}}>
-															- {ex}
+															- {sp}
 														</Text>
 													))}
-												</View>
-											)}
+											</View>
+										)}
 
-											<TouchableOpacity style={styles.modalConfirmButton} onPress={() => setShowHintModal(false)}>
-												<Text style={styles.modalConfirmText}>확인</Text>
-											</TouchableOpacity>
-										</View>
+										{/* 예시 문장 */}
+										{question?.example && question.example.length > 0 && (
+											<View
+												style={{
+													backgroundColor: '#f9f9f9',
+													borderRadius: scaleWidth(12),
+													padding: scaleWidth(12),
+													marginBottom: scaleHeight(16),
+													borderWidth: 1,
+													borderColor: '#eee',
+													width: '100%',
+												}}>
+												<Text
+													style={{
+														fontSize: scaledSize(15),
+														fontWeight: '600',
+														color: '#2c3e50',
+														marginBottom: scaleHeight(8),
+														textAlign: 'center',
+													}}>
+													💡 속담 예시
+												</Text>
+
+												{question.example.map((ex, idx) => (
+													<Text
+														key={idx}
+														style={{
+															fontSize: scaledSize(14),
+															color: '#2c3e50',
+															lineHeight: scaleHeight(20),
+															marginBottom: scaleHeight(4),
+														}}>
+														- {ex}
+													</Text>
+												))}
+											</View>
+										)}
+
+										<TouchableOpacity style={styles.modalConfirmButton} onPress={() => setShowHintModal(false)}>
+											<Text style={styles.modalConfirmText}>확인</Text>
+										</TouchableOpacity>
 									</View>
-								</Modal>
-							)}
+								</View>
+							</Modal>
+						)}
 
-							{confettiKey > 0 && <ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart />}
-						</View>
+						{confettiKey > 0 && <ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart />}
 					</View>
-				</TouchableWithoutFeedback>
+				</View>
 			</View>
 		</SafeAreaView>
 	);
@@ -1750,5 +1870,14 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		includeFontPadding: false,
 		maxWidth: '100%',
+	},
+	optionSelectedBorder: {
+		borderWidth: 2,
+		borderColor: '#3498db', // 선택한 보기 파란 테두리
+	},
+	optionSelectedCard: {
+		backgroundColor: '#eaf2fb', // 💙 선택시 파란 배경
+		borderColor: '#3498db',
+		borderWidth: 2,
 	},
 });

@@ -211,7 +211,6 @@ const QuizStudyScreen = () => {
 	const glowAnimRefs = useRef<Record<string, Animated.Value>>({});
 	const buttonAnimRefs = useRef<Record<string, Animated.Value>>({});
 
-
 	const [mascotImagesQueue, setMascotImagesQueue] = useState<number[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [flippedCard, setFlippedCard] = useState<number | null>(null);
@@ -238,8 +237,6 @@ const QuizStudyScreen = () => {
 	const [showExitModal, setShowExitModal] = useState(false);
 
 	const progress = proverbList.length > 0 ? (studyHistory.studyProverbes ?? []).length / proverbList.length : 0;
-
-
 
 	useEffect(() => {
 		// 앱 시작할 때 미리 10개 랜덤 뽑기
@@ -340,7 +337,7 @@ const QuizStudyScreen = () => {
 			'재물/비유': '#fab1a0',
 			기타: '#b2bec3',
 		};
-		return field ? (categoryColorMap[field] || '#b2bec3') : '#b2bec3';
+		return field ? categoryColorMap[field] || '#b2bec3' : '#b2bec3';
 	};
 
 	// 레벨 아이콘
@@ -361,16 +358,12 @@ const QuizStudyScreen = () => {
 
 	// 카테고리 아이콘(FIELD_DROPDOWN_ITEMS에서 매칭)
 	const getCategoryIcon = (category?: string) => {
-		if (!category) {return null;}
-		const matched = FIELD_DROPDOWN_ITEMS.find((i) => i.value === category) as
-			| { iconType: string; iconName: string }
-			| undefined;
-		return matched ? (
-			<IconComponent type={matched.iconType} name={matched.iconName} size={14} color="#fff" />
-		) : null;
+		if (!category) {
+			return null;
+		}
+		const matched = FIELD_DROPDOWN_ITEMS.find((i) => i.value === category) as { iconType: string; iconName: string } | undefined;
+		return matched ? <IconComponent type={matched.iconType} name={matched.iconName} size={14} color="#fff" /> : null;
 	};
-
-
 
 	const fetchData = async () => {
 		try {
@@ -410,9 +403,7 @@ const QuizStudyScreen = () => {
 		const prevIndex = prevFiltered.findIndex((c) => c.id === id);
 
 		// 1. 학습 상태 업데이트
-		const updatedCountries = isAlreadyLearned
-			? studyHistory.studyProverbes.filter((code) => code !== id)
-			: [...studyHistory.studyProverbes, id];
+		const updatedCountries = isAlreadyLearned ? studyHistory.studyProverbes.filter((code) => code !== id) : [...studyHistory.studyProverbes, id];
 
 		const updatedCounts = {
 			...studyHistory.studyCounts,
@@ -563,10 +554,9 @@ const QuizStudyScreen = () => {
 		});
 	};
 	// 상단 훅/레퍼런스들 근처에 추가
-	const koCollator =
-		(typeof Intl !== 'undefined' && (Intl as any).Collator
-			? new Intl.Collator('ko-KR', { numeric: true, sensitivity: 'base' })
-			: null) as Intl.Collator | null;
+	const koCollator = (
+		typeof Intl !== 'undefined' && (Intl as any).Collator ? new Intl.Collator('ko-KR', { numeric: true, sensitivity: 'base' }) : null
+	) as Intl.Collator | null;
 
 	const compareKr = (a?: string, b?: string) => {
 		const A = a ?? '';
@@ -724,17 +714,13 @@ const QuizStudyScreen = () => {
 										{/* 레벨 뱃지 */}
 										<View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.level) }]}>
 											{getLevelIcon(item.level)}
-											<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>
-												{LEVEL_NAME_MAP[item.level] || '알 수 없음'}
-											</Text>
+											<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>{LEVEL_NAME_MAP[item.level] || '알 수 없음'}</Text>
 										</View>
 
 										{/* 카테고리 뱃지 */}
 										<View style={[styles.categoryBadge, { backgroundColor: getFieldColor(item.category) }]}>
 											{getCategoryIcon(item.category)}
-											<Text style={[styles.badgeText, { marginLeft: scaleWidth(4) }]}>
-												{item.category || '미지정'}
-											</Text>
+											<Text style={[styles.badgeText, { marginLeft: scaleWidth(4) }]}>{item.category || '미지정'}</Text>
 										</View>
 
 										{/* 태그 */}
@@ -748,7 +734,6 @@ const QuizStudyScreen = () => {
 											</View>
 										)} */}
 									</View>
-
 								</View>
 
 								{/* <Text style={styles.hangulText}>{item.hangul}</Text> */}
@@ -787,7 +772,8 @@ const QuizStudyScreen = () => {
 							{
 								transform: [{ rotateY: backInterpolate }],
 								backfaceVisibility: 'hidden',
-								// zIndex: flippedCard === proverbId ? 1 : 0,
+								borderWidth: 1, // 👈 추가
+								borderColor: '#ddd', // 👈 추가
 								position: 'absolute',
 							},
 						]}>
@@ -813,13 +799,7 @@ const QuizStudyScreen = () => {
 
 									{/* 뜻 풀이 강조 박스 */}
 									<View style={styles.meaningQuoteBox}>
-										<IconComponent
-											type="fontAwesome6"
-											name="quote-left"
-											size={28}
-											color="#58D68D"
-											style={{ marginBottom: scaleHeight(8) }}
-										/>
+										<IconComponent type="fontAwesome6" name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
 										<Text style={styles.meaningQuoteText}>{item.longMeaning}</Text>
 									</View>
 									{/* 예문 */}
@@ -836,7 +816,7 @@ const QuizStudyScreen = () => {
 									{/* 같은 속담 */}
 									{item.sameProverb && item.sameProverb.filter((sp) => sp.trim() !== '').length > 0 && (
 										<View style={styles.sectionBox}>
-											<Text style={styles.sectionTitle}>🔎  비슷한 속담</Text>
+											<Text style={styles.sectionTitle}>🔎 비슷한 속담</Text>
 											{item.sameProverb
 												.filter((sp) => sp.trim() !== '')
 												.map((sp, idx) => (
@@ -846,8 +826,6 @@ const QuizStudyScreen = () => {
 												))}
 										</View>
 									)}
-
-
 								</View>
 
 								{/* 뜻 풀이 */}
@@ -878,11 +856,7 @@ const QuizStudyScreen = () => {
 						{/* ✅ 하단 버튼 영역 고정 */}
 						<View style={styles.fixedBottomButton}>
 							<TouchableOpacity
-								style={[
-									styles.button,
-									isLearned ? styles.learnedButton : styles.learningButton,
-									{ opacity: isButtonDisabled ? 0.6 : 1 },
-								]}
+								style={[styles.button, isLearned ? styles.learnedButton : styles.learningButton, { opacity: isButtonDisabled ? 0.6 : 1 }]}
 								onPress={(e) => {
 									e.stopPropagation(); // 필수!
 									if (isButtonDisabled) {
@@ -922,12 +896,7 @@ const QuizStudyScreen = () => {
 						</View>
 
 						<View style={styles.progressBarWrapper}>
-							<View
-								style={[
-									styles.progressBarFill,
-									{ width: isLoading ? '0%' : `${progress * 100}%`, backgroundColor: isLoading ? '#ccc' : '#4a90e2' },
-								]}
-							/>
+							<View style={[styles.progressBarFill, { width: isLoading ? '0%' : `${progress * 100}%`, backgroundColor: isLoading ? '#ccc' : '#4a90e2' }]} />
 						</View>
 
 						{/* 기본 필터: 전체 / 학습 중 / 학습 완료 */}
@@ -936,10 +905,7 @@ const QuizStudyScreen = () => {
 								const value = i === 0 ? 'all' : i === 1 ? 'learning' : 'learned';
 								const isActive = filter === value;
 								return (
-									<TouchableOpacity
-										key={label}
-										onPress={() => setFilter(value)}
-										style={[styles.filterButton, isActive && styles.filterButtonActive]}>
+									<TouchableOpacity key={label} onPress={() => setFilter(value)} style={[styles.filterButton, isActive && styles.filterButtonActive]}>
 										<Text style={[styles.filterText, isActive && styles.filterTextActive]}>{label}</Text>
 									</TouchableOpacity>
 								);
@@ -1074,7 +1040,7 @@ const QuizStudyScreen = () => {
 						</View>
 					) : getFilteredData().length === 0 ? (
 						<View style={styles.emptyWrapper}>
-							<Image source={require('@/assets/images/sorry3.png')} style={styles.emptyImage} />
+							<Image source={require('@/assets/images/no-data.png')} style={styles.emptyImage} />
 							<Text style={styles.emptyText}>
 								{filter === 'learned'
 									? '완료한 속담이 아직 없어요.\n학습 후 완료 버튼을 눌러보세요!'
@@ -1140,36 +1106,18 @@ const QuizStudyScreen = () => {
 					<View style={styles.exitModalBox}>
 						{/* 헤더 아이콘 + 타이틀 */}
 						<View style={styles.exitHeader}>
-							<IconComponent
-								type="FontAwesome6"
-								name="circle-xmark"
-								size={isTablet ? 42 : 32}
-								color="#e74c3c"
-								style={{ marginBottom: scaleHeight(8) }}
-							/>
-							<Text
-								style={[
-									styles.exitTitle,
-									isTablet && { fontSize: scaledSize(22) },
-								]}>
-								진행 중인 학습을 종료하시겠어요?
-							</Text>
+							<IconComponent type="FontAwesome6" name="circle-xmark" size={isTablet ? 42 : 32} color="#e74c3c" style={{ marginBottom: scaleHeight(8) }} />
+							<Text style={[styles.exitTitle, isTablet && { fontSize: scaledSize(22) }]}>진행 중인 학습을 종료하시겠어요?</Text>
 						</View>
 
 						{/* 본문 */}
-						<Text
-							style={[
-								styles.exitSub,
-								isTablet && { fontSize: scaledSize(16), lineHeight: scaleHeight(24) },
-							]}>
+						<Text style={[styles.exitSub, isTablet && { fontSize: scaledSize(16), lineHeight: scaleHeight(24) }]}>
 							학습 기록은 저장되지 않으며, 홈 화면으로 이동합니다.
 						</Text>
 
 						{/* 버튼 */}
 						<View style={styles.exitButtonRow}>
-							<TouchableOpacity
-								style={[styles.exitButton, { backgroundColor: '#95a5a6' }]}
-								onPress={() => setShowExitModal(false)}>
+							<TouchableOpacity style={[styles.exitButton, { backgroundColor: '#95a5a6' }]} onPress={() => setShowExitModal(false)}>
 								<Text style={styles.exitButtonText}>취소</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
@@ -1206,9 +1154,7 @@ const QuizStudyScreen = () => {
 							<Image source={completionImages} style={styles.toastImage} />
 							<View style={styles.toastTextBox}>
 								<Text style={styles.toastTitle}>
-									{typeof completedCardId === 'number' && studyHistory.studyProverbes.includes(completedCardId)
-										? '🎉 학습 완료!'
-										: '📚 복습 시작!'}
+									{typeof completedCardId === 'number' && studyHistory.studyProverbes.includes(completedCardId) ? '🎉 학습 완료!' : '📚 복습 시작!'}
 								</Text>
 								<Text style={styles.toastText}>{praiseText}</Text>
 							</View>
@@ -1219,19 +1165,10 @@ const QuizStudyScreen = () => {
 
 			<Modal visible={badgeModalVisible} transparent animationType="fade">
 				<View style={styles.modalOverlay}>
-					<ConfettiCannon
-						key={confettiKey}
-						count={100}
-						origin={{ x: screenWidth / 2, y: 0 }}
-						fadeOut
-						autoStart
-						explosionSpeed={350}
-					/>
+					<ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart explosionSpeed={350} />
 					<Animated.View style={[styles.badgeModal, { transform: [{ scale: scaleAnim }] }]}>
 						<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지를 획득했어요!</Text>
-						<ScrollView
-							style={{ maxHeight: scaleHeight(300), width: '100%' }}
-							contentContainerStyle={{ paddingHorizontal: scaleWidth(12) }}>
+						<ScrollView style={{ maxHeight: scaleHeight(300), width: '100%' }} contentContainerStyle={{ paddingHorizontal: scaleWidth(12) }}>
 							{newlyEarnedBadges.map((badge, index) => (
 								<View
 									key={index}
@@ -1608,8 +1545,8 @@ const styles = StyleSheet.create({
 		backgroundColor: '#f5f6fa',
 	},
 	emptyImage: {
-		width: scaleWidth(100),
-		height: scaleWidth(100),
+		width: scaleWidth(140),
+		height: scaleWidth(140),
 		marginBottom: scaleHeight(20),
 		opacity: 0.6,
 	},
@@ -1813,11 +1750,11 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 	},
 	hanjaText: {
-		fontSize: scaledSize(32),
+		fontSize: scaledSize(28),
 		fontWeight: 'bold',
 		color: '#2c3e50',
 		textAlign: 'center',
-		marginBottom: scaleHeight(6),
+		marginBottom: scaleHeight(12),
 		letterSpacing: 2, // ✅ 기존보다 줄임
 		flexShrink: 1, // ✅ 넘칠 경우 줄이도록
 		width: '100%', // ✅ 부모 영역 꽉 차게
@@ -1849,7 +1786,6 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(14),
 	},
 
-
 	sectionTitle: {
 		fontSize: scaledSize(15),
 		fontWeight: '700',
@@ -1879,7 +1815,6 @@ const styles = StyleSheet.create({
 		lineHeight: scaleHeight(22),
 		textAlign: 'left',
 	},
-
 
 	cardBackTitle: {
 		fontSize: scaledSize(24),
@@ -2006,7 +1941,7 @@ const styles = StyleSheet.create({
 	},
 	badgeInlineRow: {
 		flexDirection: 'row',
-		alignItems: 'center',     // 세로 중앙
+		alignItems: 'center', // 세로 중앙
 		gap: scaleWidth(6),
 		marginTop: scaleHeight(8),
 		marginBottom: scaleHeight(8),
@@ -2035,19 +1970,19 @@ const styles = StyleSheet.create({
 	},
 	tagWrap: {
 		flexDirection: 'row',
-		flexWrap: 'wrap',          // ✅ 태그도 여러 줄
-		justifyContent: 'center',  // ✅ 중앙 모으기
+		flexWrap: 'wrap', // ✅ 태그도 여러 줄
+		justifyContent: 'center', // ✅ 중앙 모으기
 	},
 	// 태그 가로 스크롤 영역
 	tagScroll: {
-		flex: 1,                    // 남는 공간을 태그가 차지
-		marginLeft: scaleWidth(6),  // 배지와 간격
+		flex: 1, // 남는 공간을 태그가 차지
+		marginLeft: scaleWidth(6), // 배지와 간격
 		maxHeight: scaleHeight(30), // 라인 높이 안정화
 	},
 
 	tagScrollContent: {
 		alignItems: 'center',
-		justifyContent: 'center',  // ✅ 태그도 가운데 정렬
+		justifyContent: 'center', // ✅ 태그도 가운데 정렬
 	},
 
 	tagChip: {

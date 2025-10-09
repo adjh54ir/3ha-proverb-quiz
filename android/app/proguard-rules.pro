@@ -1,14 +1,13 @@
-# ----------------------------
-# Default project rules
-# ----------------------------
+# Add project specific ProGuard rules here.
 # By default, the flags in this file are appended to flags specified
 # in /usr/local/Cellar/android-sdk/24.3.3/tools/proguard/proguard-android.txt
-# For more details, see:
+# You can edit the include path and order by changing the proguardFiles
+# directive in build.gradle.
+#
+# For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# ----------------------------
-# FastImage / Glide
-# ----------------------------
+# Add any project specific keep options here:
 -keep public class com.dylanvann.fastimage.* {*;}
 -keep public class com.dylanvann.fastimage.** {*;}
 -keep public class * implements com.bumptech.glide.module.GlideModule
@@ -18,30 +17,21 @@
   public *;
 }
 
-# ----------------------------
-# IronSource & Google Ads
-# ----------------------------
 -keepclassmembers class com.ironsource.sdk.controller.IronSourceWebView$JSInterface {
     public *;
 }
-
 -keepclassmembers class * implements android.os.Parcelable {
     public static final android.os.Parcelable$Creator *;
 }
-
 -keep public class com.google.android.gms.ads.** {
    public *;
 }
-
--keep class com.ironsource.adapters.** { *; }
--keep class com.ironsource.unity.androidbridge.** { *; }
-
+-keep class com.ironsource.adapters.** { *;
+}
+-keep class com.ironsource.unity.androidbridge.** { *;
+}
 -dontwarn com.ironsource.mediationsdk.**
 -dontwarn com.ironsource.adapters.**
-
-# ----------------------------
-# JS Interface
-# ----------------------------
 -keepattributes JavascriptInterface
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;

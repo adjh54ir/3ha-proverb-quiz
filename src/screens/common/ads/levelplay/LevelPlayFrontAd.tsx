@@ -18,7 +18,7 @@ type Props = {
 };
 
 const BANNER_FRONT_UNIT_ID = Platform.select({
-	android: 'b2nribimhuo2qbhe',
+	android: 'jgvjyvwbxp9i0gsy',
 	ios: '9m14ek8489c4k23q',
 });
 

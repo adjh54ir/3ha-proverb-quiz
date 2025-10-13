@@ -161,6 +161,9 @@ const QuizScreen = () => {
 			}
 		}
 	}, [showHintModal]);
+	useEffect(() => {
+		if (quizHistory) setTotalScore(quizHistory.totalScore);
+	}, [quizHistory]);
 
 	// 3️⃣ 퀴즈 데이터 로드 useEffect 수정
 	useEffect(() => {
@@ -439,6 +442,7 @@ const QuizScreen = () => {
 			};
 			setQuizHistory(finalUpdated);
 			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(finalUpdated));
+			setTotalScore(finalUpdated.totalScore); // ← 총점 상태 갱신 추가
 
 			if (acquiredBadges.length > 0) {
 				const earnedBadgeObjects = CONST_BADGES.filter((b) => acquiredBadges.includes(b.id));

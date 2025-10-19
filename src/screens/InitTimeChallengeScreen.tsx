@@ -22,7 +22,7 @@ const InitTimeChallengeScreen = () => {
 	// 1. 상태 추가
 	const [showAd, setShowAd] = useState(false);
 	const [adWatched, setAdWatched] = useState(false); // 광고 본 후 시작
-	const shouldShowAd = Math.random() < 0.3; // ✅ 20% 확률
+	const shouldShowAd = Math.random() < 0.5; // ✅ 20% 확률
 
 	useEffect(() => {
 		fetchTopHistory();

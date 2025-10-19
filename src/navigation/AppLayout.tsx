@@ -1,13 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, Platform, Dimensions } from 'react-native';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaleHeight, scaleWidth } from '@/utils';
-import StackNavigator from './StackNavigator';
 import DeviceInfo from 'react-native-device-info';
+import BottomTabNavigator from './BottomTabNavigator';
 import LevelPlayBannerAd from '@/screens/common/ads/levelplay/LevelPlayBannerAd';
+import StackNavigator from './StackNavigator';
 
 const AD_ALLOWED_ROUTES = [
 	Paths.TODAY_QUIZ,
@@ -18,13 +19,13 @@ const AD_ALLOWED_ROUTES = [
 	// 필요하면 추가
 ];
 
+const DESIGN_HEIGHT = 812;
 const AppLayout = () => {
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);
 	const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
-	const DESIGN_HEIGHT = 812;
 	const { height: screenHeight } = Dimensions.get('window');
 
-	const shouldShowAd = !__DEV__ ? useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute), [currentRoute]) : false;
+	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute), [currentRoute]);
 
 	// ✅ 라우트별 배경색 지정
 	const backgroundColor = useMemo(() => {
@@ -41,6 +42,7 @@ const AppLayout = () => {
 				return '#ffffff'; // 기본값
 		}
 	}, [currentRoute]);
+
 	/**
 	 * 배너 높이에 따른 패딩 계산 함수
 	 * @returns
@@ -50,6 +52,7 @@ const AppLayout = () => {
 			return 0;
 		}
 
+		// 테블릿인 경우
 		if (DeviceInfo.isTablet()) {
 			return scaleHeight(60); // 태블릿
 		}
@@ -61,11 +64,8 @@ const AppLayout = () => {
 		}
 		return 0; // 기본
 	};
-	/**
-	 * 광고 유무 + 플랫폼별 패딩 계산 함수
-	 * @param shouldShowAd
-	 * @returns
-	 */
+
+	// 👇 광고 유무 + 플랫폼별 패딩 계산 함수
 	const getNavigatorPaddingTop = (shouldShowAd: boolean): number => {
 		// [CASE1] 광고가 있는 경우
 		if (shouldShowAd) {
@@ -75,7 +75,7 @@ const AppLayout = () => {
 				case 'ios':
 					return scaleHeight(25);
 				default:
-					break;
+					return 0;
 			}
 		}
 		// [CASE2] 광고가 없는 경우
@@ -93,12 +93,15 @@ const AppLayout = () => {
 				}
 			}
 		}
+		return 0;
 	};
 
 	return (
 		<NavigationContainer
 			ref={navigationRef}
-			onReady={() => setCurrentRoute(navigationRef.current?.getCurrentRoute()?.name || '')}
+			onReady={() => {
+				setCurrentRoute(navigationRef.current?.getCurrentRoute()?.name || '');
+			}}
 			onStateChange={() => {
 				const routeName = navigationRef.current?.getCurrentRoute()?.name;
 				if (routeName) {
@@ -111,7 +114,6 @@ const AppLayout = () => {
 						<LevelPlayBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} />
 					</View>
 					{shouldShowAd && <View style={{ paddingTop: getAdPaddingTop() }} />}
-
 					<View style={[styles.navigatorWrapper, { paddingTop: getNavigatorPaddingTop(shouldShowAd), backgroundColor }]}>
 						<StackNavigator />
 					</View>
@@ -135,9 +137,9 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(4),
 		marginHorizontal: scaleWidth(16),
 		alignItems: 'center',
-		borderWidth: 1,
-		borderColor: '#ccc',
-		borderRadius: 6,
+		// borderWidth: 1,
+		// borderColor: '#ccc',
+		// borderRadius: 6,
 	},
 	container: {
 		flex: 1,

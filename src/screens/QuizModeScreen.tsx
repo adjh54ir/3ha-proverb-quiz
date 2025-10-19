@@ -27,7 +27,7 @@ const QuizModeScreen = () => {
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
 	const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
-	const shouldShowAd = Math.random() < 0.3; // 20% 확률
+	const shouldShowAd = Math.random() < 0.5; // 20% 확률
 	const route = useRoute<RouteProp<QuizModeScreenRouteParams, 'QuizModeScreen'>>();
 	const passedMode = route.params?.mode; // 예: 'meaning'
 
@@ -227,7 +227,7 @@ const QuizModeScreen = () => {
 									);
 								})}
 						</View>
-						<View style={{marginTop: scaleHeight(-10)}}>
+						<View style={{ marginTop: scaleHeight(-10) }}>
 							{tab === 'category' && (
 								<View style={{ flex: 1, width: '100%', paddingHorizontal: scaleWidth(12) }}>
 									{CATEGORIES.map((item) => {

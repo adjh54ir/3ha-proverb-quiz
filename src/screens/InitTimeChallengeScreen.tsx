@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
-import LevelPlayFrontAd from './common/ads/levelplay/LevelPlayFrontAd';
+import AdmobFrontAd from './common/ads/AdmobFrontAd';
 
 const InitTimeChallengeScreen = () => {
 	const STORAGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
@@ -388,7 +388,7 @@ const InitTimeChallengeScreen = () => {
 			)}
 
 			{showAd && (
-				<LevelPlayFrontAd
+				<AdmobFrontAd
 					onAdClosed={() => {
 						setShowAd(false);
 						setAdWatched(true);

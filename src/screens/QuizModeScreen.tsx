@@ -15,7 +15,7 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { FIELD_DROPDOWN_ITEMS, LEVELS, QUIZ_MODES, QuizLevelKey } from '@/const/common/CommonMainData';
 import ProverbServices from '@/services/ProverbServices';
 import IconComponent from './common/atomic/IconComponent';
-import LevelPlayFrontAd from './common/ads/levelplay/LevelPlayFrontAd';
+import AdmobFrontAd from './common/ads/AdmobFrontAd';
 
 type QuizModeScreenRouteParams = {
 	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'comingsoon' }; // 전달되는 mode는 string 타입 (예: 'meaning' | 'proverb' | 'blank')
@@ -300,7 +300,7 @@ const QuizModeScreen = () => {
 			)}
 
 			{showAd && (
-				<LevelPlayFrontAd
+				<AdmobFrontAd
 					onAdClosed={() => {
 						setShowAd(false);
 						if (selectedLevelKey) {

@@ -7,8 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaleHeight, scaleWidth } from '@/utils';
 import DeviceInfo from 'react-native-device-info';
 import BottomTabNavigator from './BottomTabNavigator';
-import LevelPlayBannerAd from '@/screens/common/ads/levelplay/LevelPlayBannerAd';
 import StackNavigator from './StackNavigator';
+import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 
 const AD_ALLOWED_ROUTES = [
 	Paths.TODAY_QUIZ,
@@ -111,7 +111,7 @@ const AppLayout = () => {
 			<SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={shouldShowAd ? ['top'] : []}>
 				<View style={styles.container}>
 					<View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]}>
-						<LevelPlayBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} />
+						<AdmobBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} />
 					</View>
 					{shouldShowAd && <View style={{ paddingTop: getAdPaddingTop() }} />}
 					<View style={[styles.navigatorWrapper, { paddingTop: getNavigatorPaddingTop(shouldShowAd), backgroundColor }]}>

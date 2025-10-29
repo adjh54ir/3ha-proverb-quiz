@@ -6,7 +6,6 @@ import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaleHeight, scaleWidth } from '@/utils';
 import DeviceInfo from 'react-native-device-info';
-import BottomTabNavigator from './BottomTabNavigator';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 

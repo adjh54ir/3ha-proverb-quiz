@@ -127,6 +127,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom')
 	implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics'
+    
     implementation 'com.unity3d.ads-mediation:adquality-sdk:9.0.1'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
     implementation 'com.google.android.gms:play-services-basement:18.3.0'

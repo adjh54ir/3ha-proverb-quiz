@@ -19,6 +19,7 @@ import DateUtils from '@/utils/DateUtils';
 import notifee, { EventType } from '@notifee/react-native';
 import ProverbServices from '@/services/ProverbServices';
 import { LEVEL_DATA } from '@/const/common/CommonMainData';
+import moment from 'moment';
 
 const greetingMessages = [
 	'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
@@ -41,6 +42,9 @@ LocaleConfig.locales.kr = {
 };
 
 LocaleConfig.defaultLocale = 'kr';
+moment.locale('ko'); // 로케일 설정
+
+
 
 const Home = () => {
 	const navigation = useNavigation();

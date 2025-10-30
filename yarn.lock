@@ -9560,7 +9560,7 @@ __metadata:
     react-native-fast-image: "npm:^8.6.3"
     react-native-flip-card: "npm:^3.5.7"
     react-native-gesture-handler: "npm:^2.24.0"
-    react-native-google-mobile-ads: "npm:^14.10.1"
+    react-native-google-mobile-ads: "npm:14.10.1"
     react-native-image-picker: "npm:^8.2.0"
     react-native-in-app-review: "npm:^4.3.5"
     react-native-markdown-display: "npm:^7.0.2"
@@ -9861,9 +9861,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-google-mobile-ads@npm:^14.10.1":
-  version: 14.11.0
-  resolution: "react-native-google-mobile-ads@npm:14.11.0"
+"react-native-google-mobile-ads@npm:14.10.1":
+  version: 14.10.1
+  resolution: "react-native-google-mobile-ads@npm:14.10.1"
   dependencies:
     "@iabtcf/core": "npm:^1.5.3"
     use-deep-compare-effect: "npm:^1.8.1"
@@ -9872,7 +9872,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 10c0/5d424081fc14f1da9d495cdf26109fb0d55c5d1599fb651d5117f36357eab0334e61701557046e1f58b84e4cafa480dcf6ac13071641188950fcdcf10f00e2c4
+  checksum: 10c0/45460a63b40295f362c0b495d8b8939ad471f323cf92df6cbdb7210d344ee4245c611d2c02d1abc6f012c97adfe97dbe38bee933ca40e43ae3aa2aea24e6ef40
   languageName: node
   linkType: hard
 

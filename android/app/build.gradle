@@ -85,8 +85,8 @@ android {
         applicationId "com.tha.proverbquiz"     // TODO 변경 필요
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 27
-        versionName "1.6.1"
+        versionCode 29
+        versionName "1.6.3"
     }
     signingConfigs {
         debug {
@@ -124,11 +124,12 @@ apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    implementation platform('com.google.firebase:firebase-bom')
-	implementation 'com.google.firebase:firebase-analytics'
+    // dependencies 내에 포함시킴
+	implementation platform('com.google.firebase:firebase-bom')
+    implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics'
     
-    implementation 'com.unity3d.ads-mediation:adquality-sdk:9.0.1'
+    implementation 'com.unity3d.ads-mediation:adquality-sdk:7.24.1'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
     implementation 'com.google.android.gms:play-services-basement:18.3.0'
     implementation 'com.google.android.gms:play-services-appset:16.0.2'

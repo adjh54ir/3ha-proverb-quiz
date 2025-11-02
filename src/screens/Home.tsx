@@ -13,12 +13,13 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
-import { Calendar, } from 'react-native-calendars';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { CONST_MAIN_DATA } from '@/const/ConstMainData';
 import DateUtils from '@/utils/DateUtils';
 import notifee, { EventType } from '@notifee/react-native';
 import ProverbServices from '@/services/ProverbServices';
 import { LEVEL_DATA } from '@/const/common/CommonMainData';
+import moment from 'moment';
 
 const greetingMessages = [
 	'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
@@ -33,8 +34,15 @@ const greetingMessages = [
 	'🐣 하루 한 속담! 작지만 큰 지혜가 자라나요!',
 ];
 
+LocaleConfig.locales.kr = {
+	monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '11월'],
+	monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '11월'],
+	dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+	dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+};
 
-
+LocaleConfig.defaultLocale = 'kr';
+moment.locale('ko'); // 로케일 설정
 
 const Home = () => {
 	const navigation = useNavigation();
@@ -476,7 +484,7 @@ const Home = () => {
 	);
 
 	return (
-		<SafeAreaView style={styles.main} edges={['top']}>
+		<SafeAreaView style={styles.main} edges={['bottom']}>
 			{showConfetti && (
 				<View style={styles.globalConfettiWrapper}>
 					<ConfettiCannon count={60} origin={{ x: scaleWidth(180), y: 0 }} fadeOut explosionSpeed={500} fallSpeed={2500} />

@@ -71,6 +71,7 @@
 		"react-native-flip-card": "^3.5.7",
 		"react-native-gesture-handler": "^2.24.0",
 		"react-native-google-mobile-ads": "^14.10.1",
+		"react-native-iap": "13.0.4",
 		"react-native-image-picker": "^8.2.0",
 		"react-native-in-app-review": "^4.3.5",
 		"react-native-markdown-display": "^7.0.2",

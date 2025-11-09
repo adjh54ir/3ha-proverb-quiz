@@ -1,5 +1,4 @@
 import IconComponent from '@/screens/common/atomic/IconComponent';
-import { QuizLevelKey } from '@/screens/QuizModeScreen';
 import { scaledSize, scaleWidth } from '@/utils/DementionUtils';
 import React, { JSX } from 'react';
 // 공통 타입 정의

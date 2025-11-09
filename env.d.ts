@@ -47,6 +47,8 @@ declare module '@env' {
 	// 앱 모드
 	export const REACT_NATIVE_APP_MODE: string;
 
+	export const IAP_REMOVE_AD_KEY: string;
+
 	// 광고 단위의 아이디 : 배너 광고
 	export const GOOGLE_ADMOV_ANDROID_BANNER: string;
 	export const GOOGLE_ADMOV_IOS_BANNER: string;

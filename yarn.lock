@@ -9561,6 +9561,7 @@ __metadata:
     react-native-flip-card: "npm:^3.5.7"
     react-native-gesture-handler: "npm:^2.24.0"
     react-native-google-mobile-ads: "npm:^14.10.1"
+    react-native-iap: "npm:13.0.4"
     react-native-image-picker: "npm:^8.2.0"
     react-native-in-app-review: "npm:^4.3.5"
     react-native-markdown-display: "npm:^7.0.2"
@@ -9873,6 +9874,20 @@ __metadata:
     expo:
       optional: true
   checksum: 10c0/5d424081fc14f1da9d495cdf26109fb0d55c5d1599fb651d5117f36357eab0334e61701557046e1f58b84e4cafa480dcf6ac13071641188950fcdcf10f00e2c4
+  languageName: node
+  linkType: hard
+
+"react-native-iap@npm:13.0.4":
+  version: 13.0.4
+  resolution: "react-native-iap@npm:13.0.4"
+  peerDependencies:
+    expo: ">=47.0.0"
+    react: ">=16.13.1"
+    react-native: ">=0.65.1"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: 10c0/a1acbd59a1f9920c7b4c6d4d4d58a5502ed0e2a20297f9d611332dd140e800aeab6b96b11ff11ed26cd9ebb890f6ff5041ebeb960594f098e69e75c9443c5734
   languageName: node
   linkType: hard
 

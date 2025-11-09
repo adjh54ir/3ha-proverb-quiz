@@ -17,6 +17,8 @@ import DeveloperAppsModal from './modal/DeveloperAppsModal';
 import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModal';
 import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import CurrentVersionModal from './modal/CurrentVersionModal';
+import * as RNIap from 'react-native-iap';
+import { IAP_REMOVE_AD_KEY } from '@env';
 
 const APP_NAME = '속픽: 속담 퀴즈';
 const ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=com.tha.proverbquiz'; // 예: 'https://play.google.com/store/apps/details?id=your.package'
@@ -487,13 +489,24 @@ const SettingScreen = () => {
 		}
 	};
 
+	// 📌 광고 제거 구매 함수
+	const handlePurchaseRemoveAds = async () => {
+		try {
+			const sku = IAP_REMOVE_AD_KEY;
+			await RNIap.requestPurchase({ sku });
+		} catch (err) {
+			Alert.alert('오류', '결제 중 문제가 발생했습니다.');
+			console.log('error :: ', err);
+		}
+	};
+
 	return (
 		<>
 			<SafeAreaView style={styles.container} edges={['top']}>
 				<SectionList
 					ref={sectionRef}
 					sections={sections}
-					keyExtractor={(item) => item}
+					keyExtractor={(item, index) => item + '_' + index}
 					renderItem={renderItem}
 					stickySectionHeadersEnabled={false}
 					onScroll={(event) => {
@@ -504,25 +517,42 @@ const SettingScreen = () => {
 					ItemSeparatorComponent={() => <View style={styles.itemSpacing} />}
 					renderSectionFooter={() => <View style={styles.sectionSpacing} />}
 					ListHeaderComponent={
-						<View style={styles.headerContainer}>
-							<View style={styles.recommendSection}>
-								<Text style={styles.recommendTitle}>📲 앱이 마음에 드셨나요?</Text>
-								<Text style={styles.recommendSubtitle}>가족이나 친구, 지인에게 유용한 앱을 함께 나눠보세요!</Text>
+						<>
+							<View style={styles.headerContainer}>
+								<View style={styles.recommendSection}>
+									<Text style={styles.recommendTitle}>📲 앱이 마음에 드셨나요?</Text>
+									<Text style={styles.recommendSubtitle}>가족이나 친구, 지인에게 유용한 앱을 함께 나눠보세요!</Text>
 
-								<View style={styles.appIconWrapper}>
-									<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
-								</View>
+									<View style={styles.appIconWrapper}>
+										<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
+									</View>
 
-								<View style={styles.storeButtons}>
-									<TouchableOpacity style={[styles.storeButton, { backgroundColor: '#2ecc71' }]} onPress={shareApp}>
-										<View style={styles.iconRow}>
-											<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color="#fff" />
-											<Text style={styles.storeButtonText}>공유하기</Text>
-										</View>
-									</TouchableOpacity>
+									<View style={styles.storeButtons}>
+										<TouchableOpacity style={[styles.storeButton, { backgroundColor: '#2ecc71' }]} onPress={shareApp}>
+											<View style={styles.iconRow}>
+												<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color="#fff" />
+												<Text style={styles.storeButtonText}>공유하기</Text>
+											</View>
+										</TouchableOpacity>
+									</View>
 								</View>
 							</View>
-						</View>
+							<View style={styles.purchaseContainer}>
+								<Text style={styles.purchaseTitle}>광고 제거</Text>
+								<Text style={styles.purchaseDesc}>광고 없이 쾌적하게 속담을 학습하고 퀴즈를 즐겨보세요!</Text>
+
+								<TouchableOpacity style={styles.purchaseButton} onPress={handlePurchaseRemoveAds}>
+									<IconComponent
+										type="MaterialCommunityIcons"
+										name="checkbox-marked-circle-outline"
+										size={scaledSize(18)}
+										color="#fff"
+										style={{ marginRight: scaleWidth(6) }}
+									/>
+									<Text style={styles.purchaseButtonText}>광고 제거 구매하기</Text>
+								</TouchableOpacity>
+							</View>
+						</>
 					}
 					ListFooterComponent={
 						<View style={styles.footerAppWrapper}>
@@ -1027,5 +1057,46 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(11),
 		color: '#7f8c8d',
 		textAlign: 'center',
+	},
+	purchaseContainer: {
+		backgroundColor: '#ffffff',
+		padding: scaleWidth(20),
+		marginHorizontal: scaleWidth(20),
+		marginTop: scaleHeight(12),
+		marginBottom: scaleHeight(8),
+		borderRadius: scaleWidth(12),
+		shadowColor: '#000',
+		shadowOpacity: 0.06,
+		shadowRadius: 3,
+		shadowOffset: { width: 0, height: 2 },
+	},
+
+	purchaseTitle: {
+		fontSize: scaledSize(16),
+		fontWeight: '700',
+		color: '#2c3e50',
+		marginBottom: scaleHeight(4),
+	},
+
+	purchaseDesc: {
+		fontSize: scaledSize(13),
+		color: '#7f8c8d',
+		marginBottom: scaleHeight(12),
+		lineHeight: scaleHeight(20),
+	},
+
+	purchaseButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#2ecc71',
+		paddingVertical: scaleHeight(12),
+		borderRadius: scaleWidth(8),
+	},
+
+	purchaseButtonText: {
+		color: '#fff',
+		fontWeight: '700',
+		fontSize: scaledSize(14),
 	},
 });

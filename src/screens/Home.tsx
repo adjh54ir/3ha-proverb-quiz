@@ -867,7 +867,7 @@ const styles = StyleSheet.create({
 		width: scaleWidth(150),
 		height: scaleWidth(150),
 	},
-	speechWrapper: { alignItems: 'center', marginBottom: scaleHeight(-20) },
+	speechWrapper: { alignItems: 'center', marginBottom: scaleHeight(-10) },
 	speechBubble: {
 		backgroundColor: '#fef9e7',
 		paddingVertical: scaleHeight(12),

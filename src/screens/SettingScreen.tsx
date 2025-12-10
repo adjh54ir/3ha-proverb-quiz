@@ -17,7 +17,6 @@ import DeveloperAppsModal from './modal/DeveloperAppsModal';
 import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModal';
 import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import CurrentVersionModal from './modal/CurrentVersionModal';
-import * as RNIap from 'react-native-iap';
 import { IAP_REMOVE_AD_KEY } from '@env';
 
 const APP_NAME = '속픽: 속담 퀴즈';

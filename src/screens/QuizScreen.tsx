@@ -466,7 +466,7 @@ const QuizScreen = () => {
 			setResultMessage(message);
 			setShowResultModal(true);
 			setIsAnswerLocked(false); // 🔓 다시 풀기 (다음 문제로 넘어갈 때)
-		}, 1800); // 약간
+		}, 800); // 약간
 	};
 	const getLevelColor = (level: number) => {
 		const levelColorMap: Record<string, string> = {

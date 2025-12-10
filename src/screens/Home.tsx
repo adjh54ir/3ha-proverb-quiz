@@ -484,7 +484,7 @@ const Home = () => {
 	);
 
 	return (
-		<SafeAreaView style={styles.main} edges={['bottom']}>
+		<SafeAreaView style={styles.main} edges={['top']}>
 			{showConfetti && (
 				<View style={styles.globalConfettiWrapper}>
 					<ConfettiCannon count={60} origin={{ x: scaleWidth(180), y: 0 }} fadeOut explosionSpeed={500} fallSpeed={2500} />
@@ -1293,7 +1293,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		lineHeight: scaleHeight(20),
 	},
-	main: { flex: 1, backgroundColor: '#fff' },
+	main: { flex: 1, backgroundColor: '#fff', },
 	mascoteView: {
 		width: scaleWidth(180),
 		height: scaleWidth(180),

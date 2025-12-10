@@ -72,7 +72,7 @@ const AppLayout = () => {
 				case 'android':
 					return scaleHeight(20);
 				case 'ios':
-					return scaleHeight(25);
+					return scaleHeight(12);
 				default:
 					return 0;
 			}

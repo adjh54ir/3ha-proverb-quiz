@@ -1,5 +1,11 @@
+
+
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react-native/no-inline-styles */
+
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -48,9 +54,13 @@ const SettingScreen = () => {
 	const [showAppsModal, setShowAppsModal] = useState(false);
 	const [showTermsModal, setShowTermsModal] = useState(false);
 	const [showOpenSourceModal, setShowOpenSourceModal] = useState(false);
+
 	// state
 	const [showVersionModal, setShowVersionModal] = useState(false);
 	const [latestVersion, setLatestVersion] = useState<string | null>(null);
+	const [iapPrice, setIapPrice] = useState<string | null>(null);
+
+	const [isAdRemoved, setIsAdRemoved] = useState(false);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -58,6 +68,46 @@ const SettingScreen = () => {
 			scrollToTop();
 		}, []),
 	);
+
+	useEffect(() => {
+		const loadState = async () => {
+			const val = await AsyncStorage.getItem('IS_AD_REMOVED');
+			setIsAdRemoved(val === 'true');
+		};
+		loadState();
+	}, []);
+
+	const loadProducts = async () => {
+		try {
+			const products = await RNIap.getProducts([IAP_REMOVE_AD_KEY]);
+			if (products && products.length > 0) {
+				setIapPrice(products[0].localizedPrice);
+			}
+		} catch (err) {
+			console.log('IAP load error: ', err);
+		}
+	};
+
+	// 📌 광고 제거 구매 함수
+	const checkRemoveAdsPurchased = async () => {
+		try {
+			const purchases = await RNIap.getAvailablePurchases();
+
+			const isPurchased = purchases.some((p) => p.productId === IAP_REMOVE_AD_KEY);
+
+			if (isPurchased) {
+				await AsyncStorage.setItem('IS_AD_REMOVED', 'true');
+			} else {
+				await AsyncStorage.setItem('IS_AD_REMOVED', 'false');
+			}
+		} catch (err) {
+			console.log('구매 이력 조회 오류:', err);
+		}
+	};
+	useEffect(() => {
+		checkRemoveAdsPurchased();
+		loadProducts();
+	}, []);
 
 	const loadVersion = () => {
 		const version = VersionCheck.getCurrentVersion();
@@ -488,14 +538,18 @@ const SettingScreen = () => {
 		}
 	};
 
-	// 📌 광고 제거 구매 함수
 	const handlePurchaseRemoveAds = async () => {
 		try {
-			const sku = IAP_REMOVE_AD_KEY;
-			await RNIap.requestPurchase({ sku });
+			const purchase = await RNIap.requestPurchase({ sku: IAP_REMOVE_AD_KEY });
+
+			// 검증까지 필요하지만 테스트용은 간단 저장
+			await AsyncStorage.setItem('IS_AD_REMOVED', 'true');
+			setIsAdRemoved(true);
+
+			Alert.alert('완료', '광고 제거가 활성화되었습니다!');
 		} catch (err) {
+			console.log(err);
 			Alert.alert('오류', '결제 중 문제가 발생했습니다.');
-			console.log('error :: ', err);
 		}
 	};
 
@@ -536,21 +590,51 @@ const SettingScreen = () => {
 									</View>
 								</View>
 							</View>
-							<View style={styles.purchaseContainer}>
-								<Text style={styles.purchaseTitle}>광고 제거</Text>
-								<Text style={styles.purchaseDesc}>광고 없이 쾌적하게 속담을 학습하고 퀴즈를 즐겨보세요!</Text>
+							{!isAdRemoved && (
+								<View style={styles.premiumContainer}>
+									{/* 상단 PREMIUM 아이콘 */}
+									<View style={styles.premiumHeader}>
+										<IconComponent
+											type="MaterialCommunityIcons"
+											name="diamond-stone"
+											size={scaledSize(32)}
+											color="#2c82f5"
+											style={{ marginBottom: scaleHeight(6) }}
+										/>
+										<Text style={styles.premiumTitle}>광고 없이 깔끔하게!</Text>
+										<Text style={styles.premiumSubtitle}>PREMIUM UPGRADE</Text>
+									</View>
 
-								<TouchableOpacity style={styles.purchaseButton} onPress={handlePurchaseRemoveAds}>
-									<IconComponent
-										type="MaterialCommunityIcons"
-										name="checkbox-marked-circle-outline"
-										size={scaledSize(18)}
-										color="#fff"
-										style={{ marginRight: scaleWidth(6) }}
-									/>
-									<Text style={styles.purchaseButtonText}>광고 제거 구매하기</Text>
-								</TouchableOpacity>
-							</View>
+									{/* 프리미엄 혜택 배지 */}
+									<View style={styles.premiumBadge}>
+										<Text style={styles.premiumBadgeText}>💎 평생 광고 제거</Text>
+									</View>
+
+									{/* 혜택 목록 */}
+									<View style={styles.benefitList}>
+										<View style={styles.benefitItem}>
+											<IconComponent type="MaterialCommunityIcons" name="check-circle" size={18} color="#2c82f5" />
+											<Text style={styles.benefitText}>앱 내 모든 광고 완전 제거</Text>
+										</View>
+
+										<View style={styles.benefitItem}>
+											<IconComponent type="MaterialCommunityIcons" name="check-circle" size={18} color="#2c82f5" />
+											<Text style={styles.benefitText}>홈 · 퀴즈 · 챌린지 화면 광고 차단</Text>
+										</View>
+
+										<View style={styles.benefitItem}>
+											<IconComponent type="MaterialCommunityIcons" name="check-circle" size={18} color="#2c82f5" />
+											<Text style={styles.benefitText}>1회 결제로 평생 유지</Text>
+										</View>
+									</View>
+
+									{/* 구매 버튼 */}
+									<TouchableOpacity style={styles.premiumButton} onPress={handlePurchaseRemoveAds}>
+										<IconComponent type="MaterialCommunityIcons" name="crown" size={18} color="#fff" style={{ marginRight: 8 }} />
+										<Text style={styles.premiumButtonText}>{iapPrice ?? '₩3,900'} 평생 광고 제거하기</Text>
+									</TouchableOpacity>
+								</View>
+							)}
 						</>
 					}
 					ListFooterComponent={
@@ -558,7 +642,7 @@ const SettingScreen = () => {
 							<Text style={styles.appVerText}>
 								📱 현재 앱 버전: <Text style={styles.appVerBoldText}>v{appVersion}</Text>
 							</Text>
-
+							메
 							<FlatList
 								horizontal
 								data={COMMON_APPS_DATA.Apps}
@@ -1088,7 +1172,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#2ecc71',
+		backgroundColor: '#3498db',
 		paddingVertical: scaleHeight(12),
 		borderRadius: scaleWidth(8),
 	},
@@ -1097,5 +1181,142 @@ const styles = StyleSheet.create({
 		color: '#fff',
 		fontWeight: '700',
 		fontSize: scaledSize(14),
+	},
+
+	premiumDesc: {
+		fontSize: scaledSize(13),
+		color: '#7f8c8d',
+		lineHeight: scaleHeight(20),
+		marginTop: scaleHeight(6),
+		marginBottom: scaleHeight(10),
+		textAlign: 'center',
+	},
+
+	premiumPrice: {
+		fontSize: scaledSize(14),
+		color: '#34495e',
+		fontWeight: '600',
+		textAlign: 'center',
+		marginBottom: scaleHeight(14),
+	},
+
+	freeBadge: {
+		backgroundColor: '#eaf7ff',
+		borderColor: '#3498db',
+		borderWidth: 1,
+		paddingVertical: scaleHeight(6),
+		paddingHorizontal: scaleWidth(10),
+		borderRadius: scaleWidth(8),
+		alignSelf: 'center',
+		marginBottom: scaleHeight(10),
+	},
+
+	freeBadgeText: {
+		fontSize: scaledSize(13),
+		color: '#1b73c8',
+		fontWeight: '700',
+	},
+	premiumDescBox: {
+		borderWidth: 1,
+		borderColor: '#d5e4f3', // 연한 블루감 (너무 진하지 않게)
+		backgroundColor: '#f7fbff', // 살짝 푸른 배경으로 Premium 느낌
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(14),
+		borderRadius: scaleWidth(10),
+		marginBottom: scaleHeight(12),
+	},
+	premiumContainer: {
+		backgroundColor: '#ffffff',
+		padding: scaleWidth(20),
+		marginHorizontal: scaleWidth(20),
+		marginTop: scaleHeight(16),
+		marginBottom: scaleHeight(12),
+		borderRadius: scaleWidth(14),
+		borderWidth: 1,
+		borderColor: '#e2e6ea',
+
+		// 은은한 카드 그림자
+		shadowColor: '#000',
+		shadowOpacity: 0.06,
+		shadowRadius: 6,
+		shadowOffset: { width: 0, height: 3 },
+	},
+
+	premiumHeader: {
+		alignItems: 'center',
+		marginBottom: scaleHeight(10),
+	},
+
+	premiumTitle: {
+		fontSize: scaledSize(18),
+		fontWeight: '700',
+		color: '#2c3e50',
+	},
+
+	premiumSubtitle: {
+		fontSize: scaledSize(11),
+		color: '#8395a7',
+		letterSpacing: 1.2,
+		marginTop: scaleHeight(2),
+	},
+
+	premiumBadge: {
+		backgroundColor: '#eaf4ff',
+		borderColor: '#2c82f5',
+		borderWidth: 1,
+		paddingVertical: scaleHeight(6),
+		paddingHorizontal: scaleWidth(12),
+		borderRadius: scaleWidth(30),
+		alignSelf: 'center',
+		marginBottom: scaleHeight(14),
+	},
+
+	premiumBadgeText: {
+		fontSize: scaledSize(13),
+		color: '#2c82f5',
+		fontWeight: '700',
+	},
+
+	benefitList: {
+		marginBottom: scaleHeight(12),
+	},
+
+	benefitItem: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(8),
+		marginBottom: scaleHeight(6),
+	},
+
+	benefitText: {
+		fontSize: scaledSize(13),
+		color: '#546e7a',
+	},
+
+	premiumButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#2c82f5',
+		paddingVertical: scaleHeight(12),
+		borderRadius: scaleWidth(10),
+		marginBottom: scaleHeight(8),
+	},
+
+	premiumButtonText: {
+		color: '#fff',
+		fontSize: scaledSize(14),
+		fontWeight: '700',
+	},
+
+	restoreButton: {
+		paddingVertical: scaleHeight(6),
+		alignSelf: 'center',
+	},
+
+	restoreText: {
+		fontSize: scaledSize(12),
+		color: '#7f8c8d',
+		textDecorationLine: 'underline',
 	},
 });

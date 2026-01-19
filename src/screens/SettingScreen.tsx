@@ -547,9 +547,9 @@ const SettingScreen = () => {
 									</View>
 								</View>
 							</View>
-							{!isAdRemoved && (
+							{/* {!isAdRemoved && (
 								<InAppRemoveAdsSection />
-							)}
+							)} */}
 						</>
 					}
 					ListFooterComponent={

@@ -30,12 +30,12 @@ const App = () => {
 		console.log('Now env mode : [', REACT_NATIVE_APP_MODE, ']');
 
 		checkTodayQuiz();
-		initIAP();
+		// initIAP();
 
-		initPurchaseInfo(); // ✅ 구매정보 초기 세팅
-		return () => {
-			RNIap.endConnection();
-		};
+		// initPurchaseInfo(); // ✅ 구매정보 초기 세팅
+		// return () => {
+		// 	RNIap.endConnection();
+		// };
 	}, []);
 
 	/** ✅ 로컬 기본값 + 구매 복구까지 */
@@ -81,7 +81,7 @@ const App = () => {
 					purchaseDate: new Date().toISOString(),
 					platform: Platform.OS === 'ios' ? 'ios' : 'android',
 				};
-				await AsyncStorage.setItem(PURCHASE_KEY, JSON.stringify(newData));
+				await AsyncStorage.setItem(PURCHASE_INFO_KEY, JSON.stringify(newData));
 				console.log('✅ 광고 제거 자동 복원 완료');
 			}
 

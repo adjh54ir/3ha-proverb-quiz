@@ -204,6 +204,12 @@
 			<key>SKAdNetworkIdentifier</key>
 			<string>3qcr597p9d.skadnetwork</string>
 		</dict>
+
+		<!-- IAP 설정 적용 -->
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+		<string>f38h382jlk.skadnetwork</string>
+  </dict>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>

@@ -24,6 +24,7 @@ import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModa
 import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import CurrentVersionModal from './modal/CurrentVersionModal';
 import { IAP_REMOVE_AD_KEY } from '@env';
+import InAppRemoveAdsSection from './setting/InAppRemoveAdsSection';
 
 const APP_NAME = '속픽: 속담 퀴즈';
 const ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=com.tha.proverbquiz'; // 예: 'https://play.google.com/store/apps/details?id=your.package'
@@ -77,37 +78,6 @@ const SettingScreen = () => {
 		loadState();
 	}, []);
 
-	const loadProducts = async () => {
-		try {
-			const products = await RNIap.getProducts([IAP_REMOVE_AD_KEY]);
-			if (products && products.length > 0) {
-				setIapPrice(products[0].localizedPrice);
-			}
-		} catch (err) {
-			console.log('IAP load error: ', err);
-		}
-	};
-
-	// 📌 광고 제거 구매 함수
-	const checkRemoveAdsPurchased = async () => {
-		try {
-			const purchases = await RNIap.getAvailablePurchases();
-
-			const isPurchased = purchases.some((p) => p.productId === IAP_REMOVE_AD_KEY);
-
-			if (isPurchased) {
-				await AsyncStorage.setItem('IS_AD_REMOVED', 'true');
-			} else {
-				await AsyncStorage.setItem('IS_AD_REMOVED', 'false');
-			}
-		} catch (err) {
-			console.log('구매 이력 조회 오류:', err);
-		}
-	};
-	useEffect(() => {
-		checkRemoveAdsPurchased();
-		loadProducts();
-	}, []);
 
 	const loadVersion = () => {
 		const version = VersionCheck.getCurrentVersion();
@@ -538,30 +508,17 @@ const SettingScreen = () => {
 		}
 	};
 
-	const handlePurchaseRemoveAds = async () => {
-		try {
-			const purchase = await RNIap.requestPurchase({ sku: IAP_REMOVE_AD_KEY });
-
-			// 검증까지 필요하지만 테스트용은 간단 저장
-			await AsyncStorage.setItem('IS_AD_REMOVED', 'true');
-			setIsAdRemoved(true);
-
-			Alert.alert('완료', '광고 제거가 활성화되었습니다!');
-		} catch (err) {
-			console.log(err);
-			Alert.alert('오류', '결제 중 문제가 발생했습니다.');
-		}
-	};
-
 	return (
 		<>
 			<SafeAreaView style={styles.container} edges={['top']}>
 				<SectionList
 					ref={sectionRef}
-					sections={sections}
-					keyExtractor={(item, index) => item + '_' + index}
+					keyExtractor={(item, index) => `${item}-${index}`}
 					renderItem={renderItem}
-					stickySectionHeadersEnabled={false}
+					sections={sections.map((section, sectionIndex) => ({
+						...section,
+						key: `section-${sectionIndex}`,
+					}))}
 					onScroll={(event) => {
 						const offsetY = event.nativeEvent.contentOffset.y;
 						setShowScrollTop(offsetY > 100);
@@ -591,49 +548,7 @@ const SettingScreen = () => {
 								</View>
 							</View>
 							{!isAdRemoved && (
-								<View style={styles.premiumContainer}>
-									{/* 상단 PREMIUM 아이콘 */}
-									<View style={styles.premiumHeader}>
-										<IconComponent
-											type="MaterialCommunityIcons"
-											name="diamond-stone"
-											size={scaledSize(32)}
-											color="#2c82f5"
-											style={{ marginBottom: scaleHeight(6) }}
-										/>
-										<Text style={styles.premiumTitle}>광고 없이 깔끔하게!</Text>
-										<Text style={styles.premiumSubtitle}>PREMIUM UPGRADE</Text>
-									</View>
-
-									{/* 프리미엄 혜택 배지 */}
-									<View style={styles.premiumBadge}>
-										<Text style={styles.premiumBadgeText}>💎 평생 광고 제거</Text>
-									</View>
-
-									{/* 혜택 목록 */}
-									<View style={styles.benefitList}>
-										<View style={styles.benefitItem}>
-											<IconComponent type="MaterialCommunityIcons" name="check-circle" size={18} color="#2c82f5" />
-											<Text style={styles.benefitText}>앱 내 모든 광고 완전 제거</Text>
-										</View>
-
-										<View style={styles.benefitItem}>
-											<IconComponent type="MaterialCommunityIcons" name="check-circle" size={18} color="#2c82f5" />
-											<Text style={styles.benefitText}>홈 · 퀴즈 · 챌린지 화면 광고 차단</Text>
-										</View>
-
-										<View style={styles.benefitItem}>
-											<IconComponent type="MaterialCommunityIcons" name="check-circle" size={18} color="#2c82f5" />
-											<Text style={styles.benefitText}>1회 결제로 평생 유지</Text>
-										</View>
-									</View>
-
-									{/* 구매 버튼 */}
-									<TouchableOpacity style={styles.premiumButton} onPress={handlePurchaseRemoveAds}>
-										<IconComponent type="MaterialCommunityIcons" name="crown" size={18} color="#fff" style={{ marginRight: 8 }} />
-										<Text style={styles.premiumButtonText}>{iapPrice ?? '₩3,900'} 평생 광고 제거하기</Text>
-									</TouchableOpacity>
-								</View>
+								<InAppRemoveAdsSection />
 							)}
 						</>
 					}
@@ -642,11 +557,10 @@ const SettingScreen = () => {
 							<Text style={styles.appVerText}>
 								📱 현재 앱 버전: <Text style={styles.appVerBoldText}>v{appVersion}</Text>
 							</Text>
-							메
 							<FlatList
 								horizontal
 								data={COMMON_APPS_DATA.Apps}
-								keyExtractor={(item) => item.id.toString()}
+								keyExtractor={(item, index) => `${item.id}-${index}`}
 								showsHorizontalScrollIndicator={false}
 								contentContainerStyle={styles.footerAppList}
 								renderItem={({ item }) => {

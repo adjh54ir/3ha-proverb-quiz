@@ -8,6 +8,11 @@ import { MainDataType } from '@/types/MainDataType';
 - 50개 학습: 📖 속담 50개 달성! 지식이 쌓이고 있어요!
 - 100개 학습: 🎓 속담 100개 학습! 당신은 진정한 학자!
 - 200개 학습: 🧠 무려 200개! 속담 마스터의 길에 들어섰어요!
+- 300개 학습: 📚 벌써 300개! 끝을 향해 달려가고 있어요!
+- 400개 학습: ✨ 와! 400개나 학습했어요! 정복의 끝이 보이네요!
+- 500개 학습: 🚀 500개 돌파! 절반을 훌쩍 넘었어요!
+- 600개 학습: 🌟 600개 달성! 이제 진짜 고수예요!
+- 700개 학습: 🏆 700개! 거의 다 왔어요!
 - 학습 완료: 🌟 모든 속담을 학습 완료! 완벽한 정복이에요!
 
 =========================================
@@ -17,8 +22,13 @@ import { MainDataType } from '@/types/MainDataType';
 - 10개 퀴즈 완료: ✍️ 10문제 돌파! 꾸준함이 빛나요!
 - 50개 퀴즈 완료: 🏅 50문제 클리어! 퀴즈 고수의 기운이!
 - 100개 퀴즈 완료: 🧭 100문제 완주! 대단한 집중력이에요!
-- 150개 퀴즈 완료: 🎖️ 벌써 150개? 이건 거의 대륙 탐험이죠!
+- 150개 퀴즈 완료: 🎖️ 벌써 150개? 이건 거의 속담 탐험가죠!
 - 200개 퀴즈 완료: 🌍 200문제! 당신은 퀴즈의 전설!
+- 300개 퀴즈 완료: 🏅 300문제 돌파! 이제 전설의 반열에 올랐어요!
+- 400개 퀴즈 완료: 🎖️ 무려 400문제 돌파! 당신은 퀴즈의 전설이에요!
+- 500개 퀴즈 완료: 🚀 500문제 돌파! 절반을 훌쩍 넘었어요!
+- 600개 퀴즈 완료: 🌟 600문제 달성! 이제 진짜 고수예요!
+- 700개 퀴즈 완료: 🏆 700문제! 거의 다 왔어요!
 - 퀴즈 완료: 🌈 모든 문제 완료! 세계 정복 완료예요!
 
 =========================================
@@ -57,10 +67,10 @@ import { MainDataType } from '@/types/MainDataType';
 🏆 점수 달성 뱃지
 (누적 점수로 보는 성장)
 =========================================
-- 600점: ✈️ 퀴즈 여행을 시작했어요! 첫 발걸음 축하해요!
-- 1200점: 🏞️ 대륙을 넘나드는 정복자!
-- 1800점: 🧳 국가 탐험가! 이제 세계가 무대예요!
-- 2460점: 👑 속담 마스터! 전 세계 속담을 정복했어요!
+- 1000점: ✈️ 퀴즈 여행을 시작했어요! 첫 발걸음 축하해요!
+- 2500점: 🏞️ 속담 숙련자가 되었어요!
+- 5000점: 🧳 속담 마스터 등극! 이제 세계가 무대예요!
+- 7900점: 👑 속담 문제 완결! 모든 속담을 정복했어요!
 */
 export const CONST_BADGES: MainDataType.UserBadge[] = [
 	// 학습 뱃지
@@ -121,9 +131,33 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		type: 'study',
 	},
 	{
+		id: 'study_500',
+		name: '500개 학습 완료',
+		description: '500개 돌파! 절반을 훌쩍 넘었어요!',
+		iconType: 'materialIcons',
+		icon: 'rocket-launch',
+		type: 'study',
+	},
+	{
+		id: 'study_600',
+		name: '600개 학습 완료',
+		description: '600개 달성! 이제 진짜 고수예요!',
+		iconType: 'materialIcons',
+		icon: 'stars',
+		type: 'study',
+	},
+	{
+		id: 'study_700',
+		name: '700개 학습 완료',
+		description: '700개! 거의 다 왔어요!',
+		iconType: 'materialIcons',
+		icon: 'emoji-events',
+		type: 'study',
+	},
+	{
 		id: 'study_all',
 		name: '학습 완전 정복',
-		description: '속담 413개 전체 학습 완료! 완벽한 정복이에요!',
+		description: '속담 790개 전체 학습 완료! 완벽한 정복이에요!',
 		iconType: 'materialIcons',
 		icon: 'verified',
 		type: 'study',
@@ -195,9 +229,33 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		type: 'quiz',
 	},
 	{
+		id: 'quiz_500',
+		name: '500문제 퀴즈 완료',
+		description: '500문제 돌파! 절반을 훌쩍 넘었어요!',
+		iconType: 'materialIcons',
+		icon: 'rocket-launch',
+		type: 'quiz',
+	},
+	{
+		id: 'quiz_600',
+		name: '600문제 퀴즈 완료',
+		description: '600문제 달성! 이제 진짜 고수예요!',
+		iconType: 'materialIcons',
+		icon: 'stars',
+		type: 'quiz',
+	},
+	{
+		id: 'quiz_700',
+		name: '700문제 퀴즈 완료',
+		description: '700문제! 거의 다 왔어요!',
+		iconType: 'materialIcons',
+		icon: 'military-tech',
+		type: 'quiz',
+	},
+	{
 		id: 'quiz_all',
 		name: '퀴즈 정복자',
-		description: '속담 퀴즈 413개 전부 완료! 세계 정복 완료예요!',
+		description: '속담 퀴즈 790개 전부 완료! 세계 정복 완료예요!',
 		iconType: 'materialIcons',
 		icon: 'verified',
 		type: 'quiz',
@@ -345,36 +403,53 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		type: 'quiz',
 	},
 
+	// 점수 달성 (790개 × 10점 = 7,900점 기준)
 	{
-		id: 'score_600',
-		name: '600점 돌파',
-		description: '속담 입문자로서 퀴즈 여행을 시작했어요! 첫 발걸음 축하해요!',
+		id: 'score_1000',
+		name: '1000점 돌파',
+		description: '첫 발걸음을 내디뎠어요! 속담 초심자에서 입문자로!',
 		iconType: 'fontAwesome6',
 		icon: 'seedling',
 		type: 'quiz',
 	},
 	{
-		id: 'score_1200',
-		name: '1200점 달성',
-		description: '속담 숙련자가 되었어요! 이제 속담의 흐름을 완전히 꿰뚫고 있어요!',
+		id: 'score_2000',
+		name: '2000점 달성',
+		description: '속담 입문자 완성! 기초를 탄탄히 다졌어요!',
 		iconType: 'fontAwesome6',
 		icon: 'leaf',
 		type: 'quiz',
 	},
 	{
-		id: 'score_1800',
-		name: '1800점 달성',
-		description: '속담 마스터 등극! 속담 탐험가로서 이제 세계가 무대예요!',
+		id: 'score_3000',
+		name: '3000점 달성',
+		description: '속담 숙련자 달성! 이제 속담의 흐름을 꿰뚫고 있어요!',
 		iconType: 'fontAwesome6',
 		icon: 'tree',
 		type: 'quiz',
 	},
 	{
-		id: 'score_2160',
-		name: '2160점 달성',
-		description: '속담 문제 완결! 모든 속담을 정복했어요!',
+		id: 'score_5000',
+		name: '5000점 달성',
+		description: '속담 고수 등극! 어떤 도전도 당당히 맞설 수 있어요!',
+		iconType: 'fontAwesome6',
+		icon: 'chess-knight',
+		type: 'quiz',
+	},
+	{
+		id: 'score_7000',
+		name: '7000점 달성',
+		description: '속담 마스터! 속담을 자유자재로 구사하는 진정한 달인이에요!',
 		iconType: 'fontAwesome6',
 		icon: 'trophy',
+		type: 'quiz',
+	},
+	{
+		id: 'score_7900',
+		name: '7900점 달성',
+		description: '속담 전설 탄생! 790개 속담을 모두 정복했어요!',
+		iconType: 'fontAwesome6',
+		icon: 'crown',
 		type: 'quiz',
 	},
 ];

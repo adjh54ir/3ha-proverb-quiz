@@ -4,11 +4,11 @@ import { useNavigation } from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LEVEL_DATA, QUIZ_MODES } from '@/const/common/CommonMainData';
 import IconComponent from './common/atomic/IconComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import FastImage from 'react-native-fast-image';
+import { LEVEL_DATA, QUIZ_MODES } from '@/const/ConstInfoData';
 
 /**
  * 퀴즈 모드 선택
@@ -55,6 +55,10 @@ const InitQuizModeScreen = () => {
 				<ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
 					<View style={styles.mascotSection}>
 						<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.contain} />
+						<View style={styles.levelBadgeRow}>
+							<IconComponent type="FontAwesome5" name={levelInfo.icon} size={16} color="#f39c12" />
+							<Text style={styles.levelBadgeText}>{levelInfo.label}</Text>
+						</View>
 					</View>
 					<View style={styles.titleWrap}>
 						<Text style={styles.titleLine}>🧩 퀴즈 준비됐나요?</Text>
@@ -376,6 +380,23 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginBottom: scaleHeight(6),
+	},
+	levelBadgeRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(6),
+		marginTop: scaleHeight(8),
+		backgroundColor: '#fff8e1',
+		paddingVertical: scaleHeight(4),
+		paddingHorizontal: scaleWidth(12),
+		borderRadius: scaleWidth(20),
+		borderWidth: 1,
+		borderColor: '#f1c40f',
+	},
+	levelBadgeText: {
+		fontSize: scaledSize(14),
+		fontWeight: '700',
+		color: '#e67e22',
 	},
 });
 

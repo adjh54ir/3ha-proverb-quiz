@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable curly */
-/* eslint-disable react-hooks/exhaustive-deps */
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Keyboard, Dimensions, Platform, Animated, ScrollView, FlatList } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
@@ -20,6 +20,10 @@ import { Paths } from '@/navigation/conf/Paths';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
+import StartModal from './modal/QuizStartModal';
+import NewBadgeModal from './modal/NewBadgeModal';
+import AdmobFrontAd from './common/ads/AdmobFrontAd';
+import QuizHintModal from './modal/QuizHintModal';
 
 const labelColors = ['#1abc9c', '#3498db', '#9b59b6', '#e67e22'];
 
@@ -41,6 +45,7 @@ const QuizScreen = () => {
 	const route = useRoute<QuizRoute>();
 	const { width: screenWidth } = Dimensions.get('window');
 	const flatListRef = useRef<FlatList<string>>(null);
+	const [showAdForHint, setShowAdForHint] = useState(false);
 
 	// 1️⃣ 기존 selectedLevel, selectedCategory 초기값 수정
 	const { mode: routeMode, questionPool, isWrongReview = false, title, selectedLevel: routeLevel, selectedCategory: routeCategory } = route.params;
@@ -59,6 +64,7 @@ const QuizScreen = () => {
 	const [quizHistory, setQuizHistory] = useState<MainDataType.UserQuizHistory | null>(null);
 
 	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
+	const [showStartModal, setShowStartModal] = useState(true); // 시작 모달 상태
 
 	const [proverbs, setProverbs] = useState<MainDataType.Proverb[]>([]);
 	const [question, setQuestion] = useState<MainDataType.Proverb | null>(null);
@@ -104,9 +110,10 @@ const QuizScreen = () => {
 
 	// ✅ 기존 selectedLevel/selectedCategory 의존 useEffect 삭제하고, 아래로 교체
 	useEffect(() => {
-		if (!quizHistory) return; // 🧩 quizHistory 로드 완료 후에만 작동
+		if (!quizHistory) return;
+		if (showStartModal) return; // ✅ 시작 모달이 열려있으면 문제 로드 금지
 		if (filteredProverbs.length === 0) return;
-		if (isAnswerLocked) return; // ✅ 정답 처리 중일 땐 새 문제 로드 금지
+		if (isAnswerLocked) return;
 
 		if (questionPool && questionPool.length > 0) {
 			setProverbs(questionPool);
@@ -121,8 +128,7 @@ const QuizScreen = () => {
 			setProverbs(filtered);
 			if (filtered.length > 0) loadQuestion();
 		}
-	}, [quizHistory, selectedLevel, selectedCategory]);
-	useEffect;
+	}, [quizHistory, selectedLevel, selectedCategory, showStartModal]); // ✅ showStartModal 의존성 추가
 
 	useEffect(() => {
 		(async () => {
@@ -815,7 +821,7 @@ const QuizScreen = () => {
 							</View>
 							{question && (
 								<View style={{ position: 'absolute', width: '100%', alignItems: 'flex-end', marginTop: scaleHeight(6) }}>
-									<TouchableOpacity onPress={() => setShowHintModal(true)}>
+									<TouchableOpacity onPress={() => setShowAdForHint(true)}>
 										<View
 											style={{
 												backgroundColor: '#fef3c7',
@@ -929,101 +935,11 @@ const QuizScreen = () => {
 								</View>
 							</View>
 						</View>
-
 						<View style={styles.bottomExitWrapper}>
 							<TouchableOpacity style={styles.exitButton} onPress={() => setShowExitModal(true)}>
 								<Text style={styles.exitButtonText}>퀴즈 종료</Text>
 							</TouchableOpacity>
 						</View>
-
-						{/* ======================= 퀴즈 시작 팝업 ============================ */}
-						{/* {showStartModal && !isWrongReview && (
-								<QuizStartModal
-									visible={showStartModal}
-									modeStep={modeStep}
-									setModeStep={setModeStep}
-									selectedLevel={selectedLevel}
-									selectedCategory={selectedCategory}
-									levelOptions={levelOptions}
-									categoryOptions={categoryOptions}
-									setSelectedLevel={setSelectedLevel}
-									setSelectedCategory={setSelectedCategory}
-									quizType={routeMode}
-									onClose={() => {
-										if (timerRef.current) clearInterval(timerRef.current);
-										navigation.goBack();
-									}}
-									onStart={() => {
-										setShowStartModal(false);
-										console.log('선택된 난이도:', selectedLevel);
-										console.log('선택된 카테고리:', selectedCategory);
-									}}
-									onCompleteStart={() => {
-										setShowStartModal(false); // 모달 닫기
-										if (timerRef.current) {
-											clearInterval(timerRef.current); // ✅ 타이머 중단
-											timerRef.current = null;
-										}
-										setShowAd(true); // 광고 표시
-									}}
-								/>
-							)} */}
-
-						{/* ======================= 퀴즈 종료 ============================ */}
-						<Modal visible={showExitModal} transparent animationType='fade'>
-							<View style={styles.modalOverlay}>
-								<View style={styles.exitModal}>
-									<Text style={styles.exitModalTitle}>퀴즈를 종료하시겠어요?</Text>
-									<Text style={styles.exitModalMessage}>진행 중인 퀴즈가 저장되지 않습니다.</Text>
-									<View style={styles.modalButtonRow}>
-										<TouchableOpacity
-											style={[styles.modalBackButton, { backgroundColor: '#bdc3c7' }]}
-											onPress={() => {
-												setShowExitModal(false);
-												startTimer(); // ⏱ 타이머 재시작
-											}}>
-											<Text style={styles.modalButtonText}>취소</Text>
-										</TouchableOpacity>
-										<TouchableOpacity
-											style={styles.exitModalConfirmButton}
-											onPress={() => {
-												// setShowExitModal(false);
-												// if (isWrongReview) {
-												//     //@ts-ignore
-												//     navigation.replace(Paths.MAIN_TAB, { screen: Paths.HOME });
-												// } else {
-												//     safelyGoBack();
-												// }
-												safelyGoBack();
-											}}>
-											<Text style={styles.modalButtonText}>종료하기</Text>
-										</TouchableOpacity>
-									</View>
-								</View>
-							</View>
-						</Modal>
-
-						<QuizResultModal
-							visible={showResultModal && !badgeModalVisible} // ✅ 동시에 보이지 않도록 수정
-							resultType={resultType}
-							resultTitle={resultTitle}
-							quizMode={routeMode}
-							resultMessage={resultMessage}
-							question={question}
-							onNext={() => {
-								setShowResultModal(false);
-								if (badgeModalVisible) return; // ✅ 뱃지 모달이 있으면 대기
-
-								if (resultType === 'done') {
-									setTimeout(() => {
-										//@ts-ignore
-										navigation.navigate(Paths.MAIN_TAB, { screen: Paths.SETTING });
-									}, 300);
-								} else {
-									handleNextQuestion();
-								}
-							}}
-						/>
 
 						{comboEffectText !== '' && (
 							<Animated.View
@@ -1061,154 +977,93 @@ const QuizScreen = () => {
 							</Animated.View>
 						)}
 
-						{/* 뱃지 모달 */}
-						<Modal visible={badgeModalVisible} transparent animationType='fade'>
-							<View style={styles.modalOverlay}>
-								<ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart explosionSpeed={350} />
-								<Animated.View style={[styles.badgeModal, { transform: [{ scale: scaleAnim }] }]}>
-									<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지를 획득했어요!</Text>
-									<ScrollView style={{ maxHeight: scaleHeight(300), width: '100%' }} contentContainerStyle={{ paddingHorizontal: scaleWidth(12) }}>
-										{newlyEarnedBadges.map((badge, index) => (
-											<View
-												key={index}
-												style={[styles.badgeCard, styles.badgeCardActive]} // 액티브 카드 스타일 항상 적용
-											>
-												<View style={[styles.iconBox, styles.iconBoxActive]}>
-													{/* @ts-ignore */}
-													<IconComponent type={badge.iconType} name={badge.icon} size={20} color={'#27ae60'} />
-												</View>
-												<View style={styles.badgeTextWrap}>
-													<Text style={[styles.badgeName, styles.badgeTitleActive]}>{badge.name}</Text>
-													<Text style={[styles.badgeDescription, styles.badgeDescActive]}>{badge.description}</Text>
-												</View>
-											</View>
-										))}
-									</ScrollView>
-									<TouchableOpacity
-										onPress={() => {
-											setBadgeModalVisible(false); // 모달 닫기
-											handleNextQuestion(); // 다음 문제로 이동
-										}}
-										style={styles.modalConfirmButton}>
-										<Text style={styles.closeButtonText2}>확인</Text>
-									</TouchableOpacity>
-								</Animated.View>
-							</View>
-						</Modal>
-
-						{showHintModal && (
-							<Modal visible={showHintModal} transparent animationType='fade'>
-								<View style={styles.modalOverlay}>
-									<View style={styles.resultModal}>
-										<Text style={[styles.resultTitle, { color: '#f39c12' }]}>🧭 힌트</Text>
-
-										{/* 카테고리 */}
-										{question?.category && (
-											<View
-												style={{
-													flexDirection: 'row',
-													alignItems: 'center',
-													backgroundColor: getFieldColor(question.category),
-													borderRadius: scaleWidth(8),
-													paddingHorizontal: scaleWidth(8),
-													paddingVertical: scaleHeight(4),
-													marginTop: scaleHeight(10),
-													marginBottom: scaleHeight(12),
-												}}>
-												{getFieldIcon(question.category)}
-												<Text style={{ color: '#fff', fontWeight: 'bold', marginLeft: scaleWidth(6) }}>{question.category}</Text>
-											</View>
-										)}
-										{/* 비슷한 속담 */}
-										{question?.sameProverb && question.sameProverb.filter((sp) => sp && sp.trim() !== '').length > 0 && (
-											<View
-												style={{
-													backgroundColor: '#eef6ff',
-													borderRadius: scaleWidth(12),
-													padding: scaleWidth(12),
-													marginBottom: scaleHeight(16),
-													borderWidth: 1,
-													borderColor: '#d6e4ff',
-													width: '100%',
-												}}>
-												<Text
-													style={{
-														fontSize: scaledSize(15),
-														fontWeight: '600',
-														color: '#2980b9',
-														marginBottom: scaleHeight(8),
-														textAlign: 'center',
-													}}>
-													🔗 비슷한 속담
-												</Text>
-
-												{question.sameProverb
-													.filter((sp) => sp && sp.trim() !== '')
-													.map((sp, idx) => (
-														<Text
-															key={idx}
-															style={{
-																fontSize: scaledSize(14),
-																color: '#2c3e50',
-																lineHeight: scaleHeight(20),
-																marginBottom: scaleHeight(4),
-															}}>
-															- {sp}
-														</Text>
-													))}
-											</View>
-										)}
-
-										{/* 예시 문장 */}
-										{question?.example && question.example.length > 0 && (
-											<View
-												style={{
-													backgroundColor: '#f9f9f9',
-													borderRadius: scaleWidth(12),
-													padding: scaleWidth(12),
-													marginBottom: scaleHeight(16),
-													borderWidth: 1,
-													borderColor: '#eee',
-													width: '100%',
-												}}>
-												<Text
-													style={{
-														fontSize: scaledSize(15),
-														fontWeight: '600',
-														color: '#2c3e50',
-														marginBottom: scaleHeight(8),
-														textAlign: 'center',
-													}}>
-													💡 속담 예시
-												</Text>
-
-												{question.example.map((ex, idx) => (
-													<Text
-														key={idx}
-														style={{
-															fontSize: scaledSize(14),
-															color: '#2c3e50',
-															lineHeight: scaleHeight(20),
-															marginBottom: scaleHeight(4),
-														}}>
-														- {ex}
-													</Text>
-												))}
-											</View>
-										)}
-
-										<TouchableOpacity style={styles.modalConfirmButton} onPress={() => setShowHintModal(false)}>
-											<Text style={styles.modalConfirmText}>확인</Text>
-										</TouchableOpacity>
-									</View>
-								</View>
-							</Modal>
-						)}
-
 						{confettiKey > 0 && <ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart />}
 					</View>
 				</View>
 			</View>
+			{/* 뱃지 모달 */}
+			<NewBadgeModal
+				visible={badgeModalVisible}
+				badges={newlyEarnedBadges}
+				onConfirm={() => {
+					setBadgeModalVisible(false);
+					setNewlyEarnedBadges([]);
+
+					// 결과 모달 표시 (정답/오답/타임아웃)
+					const isTimeout = selected === '';
+					const correct = isCorrect === true;
+					const titleText = isTimeout ? '⏰ 시간 초과!' : correct ? '🎉 정답입니다!' : '😢 오답입니다';
+					const message = isTimeout
+						? '시간 초과로 오답 처리됐어요!'
+						: correct
+							? praiseMessages[Math.floor(Math.random() * praiseMessages.length)]
+							: '앗, 다음엔 맞힐 수 있어요!';
+
+					setTimeout(() => {
+						setResultTitle(titleText);
+						setResultMessage(message);
+						setShowResultModal(true);
+						setIsAnswerLocked(false);
+					}, 300);
+				}}
+			/>
+			<StartModal visible={showStartModal} onStart={() => setShowStartModal(false)} onBack={() => safelyGoBack()} />
+			<QuizHintModal visible={showHintModal} question={question} onClose={() => setShowHintModal(false)} />
+			{/* ======================= 퀴즈 종료 ============================ */}
+			<Modal visible={showExitModal} transparent animationType='fade'>
+				<View style={styles.modalOverlay}>
+					<View style={styles.exitModal}>
+						<Text style={styles.exitModalTitle}>퀴즈를 종료하시겠어요?</Text>
+						<Text style={styles.exitModalMessage}>진행 중인 퀴즈가 저장되지 않습니다.</Text>
+						<View style={styles.modalButtonRow}>
+							<TouchableOpacity
+								style={[styles.modalBackButton, { backgroundColor: '#bdc3c7' }]}
+								onPress={() => {
+									setShowExitModal(false);
+									startTimer(); // ⏱ 타이머 재시작
+								}}>
+								<Text style={styles.modalButtonText}>취소</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								style={styles.exitModalConfirmButton}
+								onPress={() => {
+									safelyGoBack();
+								}}>
+								<Text style={styles.modalButtonText}>종료하기</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</View>
+			</Modal>
+			<QuizResultModal
+				visible={showResultModal && !badgeModalVisible} // ✅ 동시에 보이지 않도록 수정
+				resultType={resultType}
+				resultTitle={resultTitle}
+				quizMode={routeMode}
+				resultMessage={resultMessage}
+				question={question}
+				onNext={() => {
+					setShowResultModal(false);
+					if (badgeModalVisible) return; // ✅ 뱃지 모달이 있으면 대기
+
+					if (resultType === 'done') {
+						setTimeout(() => {
+							//@ts-ignore
+							navigation.navigate(Paths.MAIN_TAB, { screen: Paths.SETTING });
+						}, 300);
+					} else {
+						handleNextQuestion();
+					}
+				}}
+			/>
+			{showAdForHint && (
+				<AdmobFrontAd
+					onAdClosed={() => {
+						setShowAdForHint(false);
+						setShowHintModal(true);
+					}}
+				/>
+			)}
 		</SafeAreaView>
 	);
 };

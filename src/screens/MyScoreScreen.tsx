@@ -30,7 +30,8 @@ import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { FIELD_DROPDOWN_ITEMS } from './ProverbStudyScreen';
-import { LEVEL_DATA } from '@/const/common/CommonMainData';
+import LevelModal from './modal/LevelModal';
+import { LEVEL_DATA, PET_REWARDS } from '@/const/ConstInfoData';
 
 LocaleConfig.defaultLocale = 'kr';
 moment.locale('ko'); // 로케일 설정
@@ -40,11 +41,6 @@ const STORAGE_KEY_STUDY = MainStorageKeyType.USER_STUDY_HISTORY;
 const STORAGE_KEY_TIME = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 const STORAGE_KEY_TODAY = MainStorageKeyType.TODAY_QUIZ_LIST;
 
-const PET_REWARDS = [
-	{ day: 7, image: require('@/assets/images/pet_level1_org.png') },
-	{ day: 14, image: require('@/assets/images/pet_level2_org.png') },
-	{ day: 21, image: require('@/assets/images/pet_level3_org.png') },
-];
 const DIFFICULTIES = [
 	{ key: 'Level 1', title: 'Level 1', subtitle: '아주 쉬움', icon: 'seedling' },
 	{ key: 'Level 2', title: 'Level 2', subtitle: '쉬움', icon: 'leaf' },
@@ -485,12 +481,6 @@ const CapitalResultScreen = () => {
 		});
 	};
 
-	const levelGuide = [
-		{ score: 0, next: 600, label: '속담 초보자', icon: 'seedling' },
-		{ score: 600, next: 1200, label: '속담 입문자', icon: 'leaf' },
-		{ score: 1200, next: 1800, label: '여행 능력자', icon: 'tree' },
-		{ score: 1800, next: 2461, label: '속담 마스터', icon: 'trophy' },
-	];
 	// ISO 형식 대응 버전
 	const getRelativeDateLabel = (isoString: string): string => {
 		try {
@@ -597,12 +587,12 @@ const CapitalResultScreen = () => {
 										type="fontAwesome6"
 										name={icon}
 										size={18}
-										color={label === '속담 마스터' ? '#FFD700' : '#27ae60'} // ✅ 조건 분기
+										color={label === '속담 전설' ? '#FFD700' : '#27ae60'} // ✅ 조건 분기
 									/>
 									<Text
 										style={{
 											fontSize: scaledSize(16),
-											color: label === '속담 마스터' ? '#FFD700' : '#27ae60', // ✅ 텍스트 색도 노란색으로
+											color: label === '속담 전설' ? '#FFD700' : '#27ae60', // ✅ 텍스트 색도 노란색으로
 											fontWeight: '700',
 											marginLeft: scaleWidth(6),
 										}}>
@@ -1132,46 +1122,7 @@ const CapitalResultScreen = () => {
 					)}
 				</ScrollView>
 
-				<Modal visible={showLevelModal} transparent animationType="fade">
-					<View style={styles.modalOverlay}>
-						<View style={[styles.levelModal, { maxHeight: scaleHeight(600) }]}>
-							<Text style={styles.levelModalTitle}>등급 안내</Text>
-
-							<ScrollView
-								ref={levelScrollRef}
-								style={{ width: '100%' }}
-								contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
-								showsVerticalScrollIndicator={false}>
-								{[...LEVEL_DATA].map((item) => {
-									const isCurrent = totalScore >= item.score && totalScore < item.next;
-									const mascotImage = getTitleByScore(item.score).mascot;
-
-									return (
-										<View key={item.label} style={[styles.levelCardBox, isCurrent && styles.levelCardBoxActive]}>
-											{isCurrent && (
-												<View style={styles.levelBadge}>
-													<Text style={styles.levelBadgeText}>🏆 현재 등급</Text>
-												</View>
-											)}
-											<FastImage source={mascotImage} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
-											<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
-												<IconComponent name={item.icon} type="fontAwesome6" size={16} color="#27ae60" />
-												<Text style={[styles.levelLabel, { marginLeft: scaleWidth(6) }]}>{item.label}</Text>
-											</View>
-											<Text style={styles.levelScore}>{item.score}점 이상</Text>
-											{isCurrent && <Text style={styles.levelEncourage}>{item.encouragement}</Text>}
-											<Text style={styles.levelDetailDescription}>{item.description}</Text>
-										</View>
-									);
-								})}
-							</ScrollView>
-
-							<TouchableOpacity onPress={() => setShowLevelModal(false)} style={styles.modalConfirmButton}>
-								<Text style={styles.modalConfirmText}>닫기</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				</Modal>
+				<LevelModal visible={showLevelModal} totalScore={totalScore} onClose={() => setShowLevelModal(false)} />
 			</SafeAreaView>
 
 			{/* 최하단에 위치할것!! */}

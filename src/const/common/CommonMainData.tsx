@@ -280,9 +280,3 @@ export const QUIZ_MODES = [
 		color: '#dfe6e9',
 	},
 ];
-
-export const PET_REWARDS = [
-	{ day: 7, image: require('@/assets/images/pet_level1_org.png') },
-	{ day: 14, image: require('@/assets/images/pet_level2_org.png') },
-	{ day: 21, image: require('@/assets/images/pet_level3_org.png') },
-];

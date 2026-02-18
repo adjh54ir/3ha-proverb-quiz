@@ -20,14 +20,21 @@ export const BadgeInterceptor = (history: MainDataType.UserQuizHistory, allProve
 	isEligible('quiz_100', correctCount >= 100);
 	isEligible('quiz_150', correctCount >= 150);
 	isEligible('quiz_200', correctCount >= 200);
+	isEligible('quiz_300', correctCount >= 300);
+	isEligible('quiz_400', correctCount >= 400);
+	isEligible('quiz_500', correctCount >= 500);
+	isEligible('quiz_600', correctCount >= 600);
+	isEligible('quiz_700', correctCount >= 700);
 
 	// 2. 점수 기반 마스터
 	const score = history.totalScore ?? 0;
 	const scoreBadges = [
-		{ id: 'score_600', threshold: 600 },
-		{ id: 'score_1200', threshold: 1200 },
-		{ id: 'score_1800', threshold: 1800 },
-		{ id: 'score_2460', threshold: 2460 },
+		{ id: 'score_1000', threshold: 1000 },
+		{ id: 'score_2000', threshold: 2000 },
+		{ id: 'score_3000', threshold: 3000 },
+		{ id: 'score_5000', threshold: 5000 },
+		{ id: 'score_7000', threshold: 7000 },
+		{ id: 'score_7900', threshold: 7900 },
 	];
 	scoreBadges.forEach(({ id, threshold }) => {
 		isEligible(id, score >= threshold);

@@ -37,7 +37,6 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 
 	useEffect(() => {
 		if (!visible) {
-			// 모달이 닫힐 때 초기화
 			hasAnimated.current = false;
 			setShouldAnimate(false);
 			setClosing(false);
@@ -61,7 +60,6 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 			<View style={[styles.infoCard, { backgroundColor, borderColor: highlightColor }]}>
 				<Text style={[styles.infoSectionTitle, { color: highlightColor }]}>📖 속담 해설</Text>
 
-				{/* ✅ quizMode별 애니메이션 분기 */}
 				{quizMode === 'proverb' || quizMode === 'blank' ? (
 					shouldAnimate && !closing ? (
 						<Animatable.View animation="fadeInUp" duration={800} delay={300} onAnimationEnd={() => setShouldAnimate(false)}>
@@ -74,7 +72,6 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 					<Text style={styles.modalProverbText}>{question.proverb}</Text>
 				)}
 
-				{/* 의미 */}
 				{Boolean(question.longMeaning) && (
 					<View style={styles.meaningHighlight}>
 						{quizMode === 'meaning' && shouldAnimate && !closing ? (
@@ -101,7 +98,6 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 					</View>
 				)}
 
-				{/* 예시 */}
 				{Array.isArray(question.example) && question.example.length > 0 && (
 					<View style={styles.sectionBox}>
 						<Text style={styles.sectionTitle}>✍️ 예시</Text>
@@ -115,7 +111,6 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 					</View>
 				)}
 
-				{/* 비슷한 속담 */}
 				{Array.isArray(question.sameProverb) && question.sameProverb.filter((p) => p.trim()).length > 0 && (
 					<View style={styles.sectionBox}>
 						<Text style={styles.sectionTitle}>🔗 비슷한 속담</Text>
@@ -143,44 +138,55 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 						resultType === 'correct' && { backgroundColor: '#f0fdf4', borderColor: '#2ecc71', borderWidth: 1 },
 						resultType === 'wrong' && { backgroundColor: '#fff1f2', borderColor: '#e74c3c', borderWidth: 1 },
 						resultType === 'timeout' && { backgroundColor: '#fffaf0', borderColor: '#f39c12', borderWidth: 1 },
+						resultType === 'done' && styles.resultModalDone,
 					]}>
-					<Text
-						style={[
-							styles.resultTitle,
-							resultType === 'correct' && { color: '#2ecc71' },
-							resultType === 'wrong' && { color: '#e74c3c' },
-							resultType === 'timeout' && { color: '#f39c12' },
-							resultType === 'done' && { color: '#2c3e50' },
-						]}>
-						{resultTitle}
-					</Text>
+					{/* ✅ done일 때는 상단 title, 마스코트 숨김 */}
+					{resultType !== 'done' && (
+						<Text
+							style={[
+								styles.resultTitle,
+								resultType === 'correct' && { color: '#2ecc71' },
+								resultType === 'wrong' && { color: '#e74c3c' },
+								resultType === 'timeout' && { color: '#f39c12' },
+							]}>
+							{resultTitle}
+						</Text>
+					)}
 
-					<FastImage
-						source={
-							resultType === 'correct'
-								? require('@/assets/images/correct_mascote.png')
-								: resultType === 'wrong' || resultType === 'timeout'
-									? require('@/assets/images/wrong_mascote.png')
-									: require('@/assets/images/mascote_done.png')
-						}
-						style={[
-							styles.resultMascot,
-							resultType === 'done' && {
-								width: scaleWidth(150),
-								height: scaleWidth(150),
-							}, // ✅ 완료 시 이미지 크게
-						]}
-						resizeMode={FastImage.resizeMode.contain}
-					/>
+					{resultType !== 'done' && (
+						<FastImage
+							source={resultType === 'correct' ? require('@/assets/images/correct_mascote.png') : require('@/assets/images/wrong_mascote.png')}
+							style={styles.resultMascot}
+							resizeMode={FastImage.resizeMode.contain}
+						/>
+					)}
+
 					<ScrollView
-						style={styles.scrollView} // 🔽 모달 높이 제한
-						contentContainerStyle={{ paddingBottom: scaleHeight(10) }}
-						showsVerticalScrollIndicator={true}>
+						style={styles.scrollView}
+						contentContainerStyle={{
+							paddingBottom: scaleHeight(10),
+							alignItems: resultType === 'done' ? 'center' : undefined,
+						}}
+						showsVerticalScrollIndicator={resultType !== 'done'}>
 						{resultType === 'done' ? (
 							<>
-								<Text style={styles.resultMessage}>{resultMessage}</Text>
-								<TouchableOpacity onPress={onNext}>
-									<Text style={styles.replayText}>👉 처음부터 다시 시작하려면 여기를 눌러주세요!</Text>
+								<FastImage
+									source={require('@/assets/images/mascote_done.png')}
+									style={{ width: scaleWidth(150), height: scaleWidth(150) }}
+									resizeMode={FastImage.resizeMode.contain}
+								/>
+								<Text style={styles.doneTitle}>모든 퀴즈 완료!</Text>
+								<Text style={styles.doneSubtitle}>수고했어요 👏</Text>
+								<View style={styles.doneStatsCard}>
+									<Text style={styles.doneStatsLabel}>이번 세션</Text>
+									<Text style={styles.doneStatsValue}>{resultMessage}</Text>
+								</View>
+								<Text style={styles.doneMessage}>완벽한 속담 퀴즈 마스터!{'\n'}정말 대단해요 🌟</Text>
+								<TouchableOpacity style={styles.donePrimaryButton} onPress={() => navigation.goBack()}>
+									<Text style={styles.donePrimaryButtonText}>홈으로 가기</Text>
+								</TouchableOpacity>
+								<TouchableOpacity onPress={onNext} style={styles.doneSecondaryTouch}>
+									<Text style={styles.doneSecondaryText}>다시 풀기</Text>
 								</TouchableOpacity>
 							</>
 						) : resultType === 'correct' ? (
@@ -199,17 +205,11 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 						)}
 					</ScrollView>
 
-					<TouchableOpacity
-						style={styles.modalConfirmButton}
-						onPress={() => {
-							if (resultType === 'done') {
-								navigation.goBack(); // ✅ 뒤로 가기 수행
-							} else {
-								onNext(); // ✅ 다음 문제 로직 실행
-							}
-						}}>
-						<Text style={styles.modalConfirmText}>{resultType === 'done' ? '뒤로 가기' : '다음 퀴즈'}</Text>
-					</TouchableOpacity>
+					{resultType !== 'done' && (
+						<TouchableOpacity style={styles.modalConfirmButton} onPress={onNext}>
+							<Text style={styles.modalConfirmText}>다음 퀴즈</Text>
+						</TouchableOpacity>
+					)}
 				</View>
 			</View>
 		</Modal>
@@ -222,6 +222,87 @@ export const styles = StyleSheet.create({
 		backgroundColor: 'rgba(0,0,0,0.4)',
 		justifyContent: 'center',
 		alignItems: 'center',
+	},
+	doneTitle: {
+		fontSize: scaledSize(24),
+		fontWeight: '800',
+		color: '#1f2937',
+		marginTop: scaleHeight(8),
+		marginBottom: scaleHeight(4),
+	},
+	doneSubtitle: {
+		fontSize: scaledSize(16),
+		color: '#6b7280',
+		marginBottom: scaleHeight(16),
+	},
+	doneStatsCard: {
+		backgroundColor: 'rgba(255,255,255,0.8)',
+		borderRadius: scaleWidth(12),
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(20),
+		marginBottom: scaleHeight(16),
+		borderWidth: 1,
+		borderColor: 'rgba(245,158,11,0.3)',
+		alignItems: 'center' as const,
+		minWidth: '70%',
+	},
+	doneStatsLabel: {
+		fontSize: scaledSize(12),
+		color: '#9ca3af',
+		marginBottom: scaleHeight(4),
+		fontWeight: '600',
+	},
+	doneStatsValue: {
+		fontSize: scaledSize(16),
+		fontWeight: '800',
+		color: '#1f2937',
+		textAlign: 'center' as const,
+	},
+	doneMessage: {
+		fontSize: scaledSize(15),
+		color: '#4b5563',
+		textAlign: 'center' as const,
+		lineHeight: scaleHeight(24),
+		marginBottom: scaleHeight(20),
+	},
+	donePrimaryButton: {
+		backgroundColor: '#f59e0b',
+		paddingVertical: scaleHeight(14),
+		paddingHorizontal: scaleWidth(32),
+		borderRadius: scaleWidth(28),
+		width: '100%',
+		alignItems: 'center' as const,
+		shadowColor: '#f59e0b',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.35,
+		shadowRadius: 6,
+	},
+	donePrimaryButtonText: {
+		color: '#fff',
+		fontSize: scaledSize(16),
+		fontWeight: '700' as const,
+	},
+	doneSecondaryTouch: {
+		marginTop: scaleHeight(14),
+		paddingVertical: scaleHeight(8),
+		paddingHorizontal: scaleWidth(16),
+	},
+	doneSecondaryText: {
+		fontSize: scaledSize(14),
+		color: '#6b7280',
+		fontWeight: '600',
+		textDecorationLine: 'underline' as const,
+	},
+	resultModalDone: {
+		backgroundColor: '#fffbeb',
+		borderWidth: 2,
+		borderColor: '#f59e0b',
+		paddingVertical: scaleHeight(28),
+		paddingHorizontal: scaleWidth(28),
+		shadowColor: '#f59e0b',
+		shadowOffset: { width: 0, height: 6 },
+		shadowOpacity: 0.2,
+		shadowRadius: 12,
 	},
 	resultModal: {
 		backgroundColor: '#fff',
@@ -343,7 +424,6 @@ export const styles = StyleSheet.create({
 		maxHeight: scaleHeight(120),
 	},
 	scrollView: { maxHeight: scaleHeight(500), width: '100%' },
-	// ✅ styles.tsx 추가
 	infoCard: {
 		width: '100%',
 		borderRadius: scaleWidth(12),
@@ -384,12 +464,11 @@ export const styles = StyleSheet.create({
 	modalProverbText: {
 		fontSize: scaledSize(20),
 		fontWeight: '700',
-		color: '#1E6BB8', // 파란색 강조
+		color: '#1E6BB8',
 		textAlign: 'center',
 		lineHeight: scaleHeight(28),
-		marginBottom: scaleHeight(16), // 아래 요소와 간격만 추가
+		marginBottom: scaleHeight(16),
 	},
-
 	sectionBox: {
 		borderWidth: 1,
 		borderColor: '#E6EEF5',
@@ -421,8 +500,6 @@ export const styles = StyleSheet.create({
 		padding: scaleWidth(8),
 		borderRadius: scaleWidth(8),
 	},
-
-	/* ✅ 닫기 버튼 */
 	modalCloseButton: {
 		backgroundColor: '#0984e3',
 		paddingVertical: scaleHeight(14),

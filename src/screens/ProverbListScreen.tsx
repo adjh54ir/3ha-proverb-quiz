@@ -325,7 +325,7 @@ const ProverbListScreen = () => {
 										ref={searchInputRef}
 										style={styles.input}
 										placeholder="속담이나 의미를 입력해주세요"
-										placeholderTextColor="#666"
+										placeholderTextColor="#9CA3AF"
 										onChangeText={(text) => {
 											setKeyword(text);
 											setFieldOpen(false);
@@ -390,23 +390,42 @@ const ProverbListScreen = () => {
 											}}
 											style={styles.dropdownField}
 											dropDownContainerStyle={{
-												overflow: 'visible', // 중요
+												overflow: 'visible',
 												zIndex: 3000,
 												...styles.dropdownListField,
-												maxHeight: scaleHeight(200), // 또는 250~300 등 충분한 높이
+												maxHeight: scaleHeight(200),
 											}}
-											zIndex={5000} // DropDownPicker 자체에 zIndex 주기
-											zIndexInverse={4000} // 다른 Picker와 겹치지 않게
-											containerStyle={{
-												zIndex: 5000,
+											onChangeValue={(value) => {
+												scrollToTop();
 											}}
+											zIndex={5000}
+											zIndexInverse={4000}
+											containerStyle={{ zIndex: 5000 }}
 											labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
 											iconContainerStyle={{ marginRight: scaleWidth(8) }}
 											showArrowIcon={true}
 											showTickIcon={false}
+											renderListItem={({ item, onPress }) => (
+												<TouchableOpacity
+													//@ts-ignore
+													onPress={() => onPress(item)}
+													style={{
+														flexDirection: 'row',
+														alignItems: 'center',
+														paddingVertical: scaleHeight(14),
+														paddingHorizontal: scaleWidth(16),
+														borderBottomWidth: 1,
+														borderBottomColor: '#f0f0f0',
+													}}>
+													<View style={{ width: scaleWidth(28), alignItems: 'center', marginRight: scaleWidth(12) }}>
+														{typeof item.icon === 'function' ? item.icon() : item.icon}
+													</View>
+													<Text style={{ fontSize: scaledSize(15), color: '#2c3e50', flex: 1 }}>{item.label}</Text>
+												</TouchableOpacity>
+											)}
 											modalProps={{
-												animationType: 'fade', // slide → fade로 부드럽게
-												presentationStyle: 'overFullScreen', // 배경 흐림 없이 띄움
+												animationType: 'fade',
+												presentationStyle: 'overFullScreen',
 												transparent: true,
 											}}
 											modalContentContainerStyle={{
@@ -415,8 +434,10 @@ const ProverbListScreen = () => {
 												alignSelf: 'center',
 												maxHeight: scaleHeight(500),
 												backgroundColor: '#fff',
+												borderWidth: 1,
+												borderColor: '#ccc',
 												borderRadius: scaleWidth(20),
-												paddingHorizontal: scaleWidth(16),
+												paddingHorizontal: 0,
 												paddingVertical: scaleHeight(20),
 												shadowColor: '#000',
 												shadowOpacity: 0.15,
@@ -424,19 +445,26 @@ const ProverbListScreen = () => {
 												shadowRadius: scaleWidth(8),
 												position: 'relative',
 											}}
-											listItemLabelStyle={{
-												flex: 1,
-												fontSize: scaledSize(15),
-												color: '#2c3e50',
-												fontWeight: '500',
-												lineHeight: scaleHeight(22),
-												flexShrink: 1, // ✅ 텍스트 줄바꿈을 위해
-												flexWrap: 'wrap', // ✅ 줄바꿈 허용
+											modalTitleStyle={{
+												fontSize: scaledSize(16),
+												fontWeight: 'bold',
+												color: '#2d3436',
+												textAlign: 'center',
+												paddingVertical: scaleHeight(12),
+												paddingHorizontal: scaleWidth(16),
+												paddingRight: scaleWidth(40),
 											}}
-											listItemContainerStyle={{
-												paddingVertical: scaleHeight(14), // 충분한 위아래 여백
-												minHeight: scaleHeight(48), // iOS에서 텍스트 짤림 방지
-												alignItems: 'stretch', // ✅ 핵심 추가
+											closeIconStyle={{
+												marginTop: scaleHeight(3),
+												width: scaleWidth(24),
+												height: scaleWidth(24),
+											}}
+											closeIconContainerStyle={{
+												position: 'absolute',
+												right: scaleWidth(12),
+												top: scaleHeight(12),
+												padding: scaleWidth(4),
+												zIndex: 1,
 											}}
 										/>
 									</View>
@@ -463,12 +491,13 @@ const ProverbListScreen = () => {
 								refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 								onEndReached={loadMoreData}
 								onEndReachedThreshold={0.5}
+								keyboardShouldPersistTaps="handled"
+								keyboardDismissMode="on-drag"
 								onScroll={(event) => {
 									const offsetY = event.nativeEvent.contentOffset.y;
 									setShowScrollTop(offsetY > 100);
 								}}
 								scrollEventThrottle={16}
-								keyboardShouldPersistTaps="handled"
 								ListEmptyComponent={() => (
 									<View style={[styles.emptyWrapper, { height: '100%', marginTop: scaleHeight(40) }]}>
 										<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />

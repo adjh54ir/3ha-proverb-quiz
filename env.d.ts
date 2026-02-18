@@ -75,4 +75,8 @@ declare module '@env' {
 	// 광고 단위의 아이디 : 앱 열기
 	export const GOOGLE_ADMOV_ANDROID_OPEN_APP: string;
 	export const GOOGLE_ADMOV_IOS_OPEN_APP: string;
+
+	export const GOOGLE_PLAY_STORE_URL: string;
+	export const APP_STORE_URL: string;
+}
 }

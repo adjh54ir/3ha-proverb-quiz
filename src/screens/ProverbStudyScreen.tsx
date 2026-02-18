@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
@@ -990,41 +989,66 @@ const QuizStudyScreen = () => {
 											iconContainerStyle={{ marginRight: scaleWidth(8) }}
 											showArrowIcon={true}
 											showTickIcon={false}
+											renderListItem={({ item, onPress }) => (
+												<TouchableOpacity
+													//@ts-ignore
+													onPress={() => onPress(item)}
+													style={{
+														flexDirection: 'row',
+														alignItems: 'center',
+														paddingVertical: scaleHeight(14),
+														paddingHorizontal: scaleWidth(16),
+														borderBottomWidth: 1,
+														borderBottomColor: '#f0f0f0',
+													}}>
+													<View style={{ width: scaleWidth(28), alignItems: 'center', marginRight: scaleWidth(12) }}>
+														{typeof item.icon === 'function' ? item.icon() : item.icon}
+													</View>
+													<Text style={{ fontSize: scaledSize(15), color: '#2c3e50', flex: 1 }}>{item.label}</Text>
+												</TouchableOpacity>
+											)}
 											modalProps={{
 												animationType: 'fade',
 												presentationStyle: 'overFullScreen',
 												transparent: true,
 											}}
 											modalContentContainerStyle={{
-												marginTop: scaleHeight(70),
-												width: '90%',
+												marginTop: '25%',
+												width: '85%',
 												alignSelf: 'center',
 												maxHeight: scaleHeight(500),
 												backgroundColor: '#fff',
+												borderWidth: 1,
+												borderColor: '#ccc',
 												borderRadius: scaleWidth(20),
-												paddingHorizontal: scaleWidth(16),
+												paddingHorizontal: 0,
 												paddingVertical: scaleHeight(20),
 												shadowColor: '#000',
 												shadowOpacity: 0.15,
 												shadowOffset: { width: 0, height: 6 },
 												shadowRadius: scaleWidth(8),
-												flex: 1,
-												justifyContent: 'flex-start',
-												position: 'relative', // X 버튼 고정용
+												position: 'relative',
 											}}
-											listItemLabelStyle={{
-												flex: 1,
-												fontSize: scaledSize(15),
-												color: '#2c3e50',
-												fontWeight: '500',
-												lineHeight: scaleHeight(22),
-												flexShrink: 1,
-												flexWrap: 'wrap',
+											modalTitleStyle={{
+												fontSize: scaledSize(16),
+												fontWeight: 'bold',
+												color: '#2d3436',
+												textAlign: 'center',
+												paddingVertical: scaleHeight(12),
+												paddingHorizontal: scaleWidth(16),
+												paddingRight: scaleWidth(40),
 											}}
-											listItemContainerStyle={{
-												paddingVertical: scaleHeight(14),
-												minHeight: scaleHeight(48),
-												alignItems: 'stretch',
+											closeIconStyle={{
+												marginTop: scaleHeight(3),
+												width: scaleWidth(24),
+												height: scaleWidth(24),
+											}}
+											closeIconContainerStyle={{
+												position: 'absolute',
+												right: scaleWidth(12),
+												top: scaleHeight(12),
+												padding: scaleWidth(4),
+												zIndex: 1,
 											}}
 										/>
 									</View>

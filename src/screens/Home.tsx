@@ -18,8 +18,10 @@ import { CONST_MAIN_DATA } from '@/const/ConstMainData';
 import DateUtils from '@/utils/DateUtils';
 import notifee, { EventType } from '@notifee/react-native';
 import ProverbServices from '@/services/ProverbServices';
-import { LEVEL_DATA } from '@/const/common/CommonMainData';
 import moment from 'moment';
+import CheckInModal from './modal/CheckInModal';
+import LevelModal from './modal/LevelModal';
+import { LEVEL_DATA, PET_REWARDS } from '@/const/ConstInfoData';
 
 const greetingMessages = [
 	'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
@@ -73,11 +75,6 @@ const Home = () => {
 	const [showStamp, setShowStamp] = useState(false);
 	const [checkedInDates, setCheckedInDates] = useState<{ [date: string]: any }>({});
 	const [showCheckInModal, setShowCheckInModal] = useState(false); // 초기값 false
-	const PET_REWARDS = [
-		{ day: 7, image: require('@/assets/images/pet_level1_org.png') },
-		{ day: 14, image: require('@/assets/images/pet_level2_org.png') },
-		{ day: 21, image: require('@/assets/images/pet_level3_org.png') },
-	];
 
 	const [showMascotHint, setShowMascotHint] = useState(true);
 
@@ -190,16 +187,19 @@ const Home = () => {
 
 	const getPetLevel = (checkedIn: { [date: string]: any }) => {
 		const count = Object.keys(checkedIn).length;
-		if (count >= 30) {
-			return 2;
+		if (count >= 28) {
+			return 3; // ✅ 28일차 이미지 (pet_level4_org.png)
+		}
+		if (count >= 21) {
+			return 2; // ✅ 21일차 이미지 (pet_level3_org.png)
 		}
 		if (count >= 14) {
-			return 1;
+			return 1; // ✅ 14일차 이미지 (pet_level2_org.png)
 		}
 		if (count >= 7) {
-			return 0;
+			return 0; // ✅ 7일차 이미지 (pet_level1_org.png)
 		}
-		return -1;
+		return -1; // 7일 미만은 펫 없음
 	};
 	const stampStyle = {
 		position: 'absolute',
@@ -731,125 +731,20 @@ const Home = () => {
 				</View>
 			</Modal>
 
-			<Modal visible={showLevelModal} transparent animationType="fade">
-				<View style={styles.modalOverlay}>
-					<View style={[styles.levelModal, { maxHeight: scaleHeight(600) }]}>
-						<Text style={styles.levelModalTitle}>등급 안내</Text>
-						{/* ✅ 내 점수 출력 */}
-
-						<ScrollView
-							ref={levelScrollRef}
-							style={{ width: '100%' }}
-							contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
-							showsVerticalScrollIndicator={false}>
-							{[...LEVEL_DATA].map((item) => {
-								const isCurrent = currentLevel?.label === item.label; // 레이블 비교
-								const mascotImage = getLevelInfoByScore(item.score).mascot;
-
-								return (
-									<View key={item.label} style={[styles.levelCardBox, isCurrent && styles.levelCardBoxActive]}>
-										{isCurrent && (
-											<View style={styles.levelBadge}>
-												<Text style={styles.levelBadgeText}>🏆 현재 등급</Text>
-											</View>
-										)}
-										<View style={styles.levelMascotCircle}>
-											<FastImage source={mascotImage} style={styles.levelMascotImage} resizeMode={FastImage.resizeMode.contain} />
-										</View>
-										ㅣ
-										<View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: scaleHeight(6) }}>
-											<IconComponent name={item.icon} type="fontAwesome6" size={16} color="#27ae60" />
-											<Text style={[styles.levelLabel, { marginLeft: scaleWidth(6) }]}>{item.label}</Text>
-										</View>
-										<Text style={styles.levelScore}>{item.score}점 이상</Text>
-										{isCurrent && <Text style={styles.levelEncourage}>{item.encouragement}</Text>}
-										<Text style={styles.levelDetailDescription}>{item.description}</Text>
-									</View>
-								);
-							})}
-						</ScrollView>
-
-						<TouchableOpacity onPress={() => setShowLevelModal(false)} style={styles.modalConfirmButton}>
-							<Text style={styles.modalConfirmText}>닫기</Text>
-						</TouchableOpacity>
-					</View>
-				</View>
-			</Modal>
-			<Modal visible={showCheckInModal} transparent animationType="fade">
-				<View style={styles.modalOverlay}>
-					<View style={[styles.modalContent]}>
-						<TouchableOpacity
-							style={styles.modalCloseIcon}
-							onPress={() => {
-								setShowCheckInModal(false);
-								loadCheckedInDates(); // 출석 기록 다시 불러오기
-								loadData(); // 점수/뱃지 등 다시 로드
-							}}>
-							<IconComponent type="materialIcons" name="close" size={24} color="#555" />
-						</TouchableOpacity>
-
-						<Text style={styles.modalTitle}>오늘의 출석</Text>
-
-						<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: scaleHeight(20) }} showsVerticalScrollIndicator={false}>
-							<View style={styles.rowCentered}>
-								<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.cover} />
-								<Text style={[styles.modalText2, { flex: 1 }]}>매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어줘요!{'\n'}</Text>
-							</View>
-
-							<View style={styles.highlightBox}>
-								<Text style={styles.highlightText}>
-									연속 출석을 통해 3단계로 진화하는 귀여운 펫도 함께 얻을 수 있답니다 🐾{'\n'}
-									획득한 펫은 캐릭터 옆에 항상 따라다녀요!
-								</Text>
-							</View>
-
-							<View style={styles.petScrollContainer}>
-								<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.petScrollContent}>
-									{[
-										{ label: '7일 출석', image: require('@/assets/images/pet_level1_org.png') },
-										{ label: '14일 출석', image: require('@/assets/images/pet_level2_org.png') },
-										{ label: '21일 출석', image: require('@/assets/images/pet_level3_org.png') },
-									].map((item, index, arr) => (
-										<View key={index} style={[styles.petItemBox, { marginRight: index !== arr.length - 1 ? scaleWidth(10) : 0 }]}>
-											<FastImage source={item.image} style={styles.petImage2} resizeMode="contain" />
-											<Text style={styles.petLabelText}>{item.label}</Text>
-											<Text style={styles.petStageText}>{['새싹 친구', '잎사귀 친구', '꽃잎 친구'][index]}</Text>
-
-											{index < arr.length - 1 && <IconComponent name="chevron-right" type="fontAwesome" size={12} color="#7f8c8d" style={styles.arrowIcon} />}
-										</View>
-									))}
-								</ScrollView>
-							</View>
-							<Calendar
-								markingType="custom"
-								markedDates={checkedInDates}
-								disableAllTouchEventsForDisabledDays={true}
-								theme={{
-									todayTextColor: '#e74c3c',
-									arrowColor: '#2ecc71',
-									textDayFontSize: scaledSize(13),
-									textMonthFontSize: scaledSize(14),
-									textDayHeaderFontSize: scaledSize(15),
-								}}
-								renderHeader={(date) => {
-									const year = date.getFullYear();
-									const month = (date.getMonth() + 1).toString().padStart(2, '0');
-									return <Text style={styles.calendarHeaderText}>{`${year}년 ${month}월`} 출석</Text>;
-								}}
-								hideArrows
-								style={styles.calendarContainer}
-							/>
-							{showStamp && (
-								<Animated.View style={[stampStyle, styles.stampContainer]}>
-									<FastImage source={mascot} style={styles.stampImage} resizeMode="contain" />
-									<Text style={styles.stampText}>오늘 출석 완료!</Text>
-								</Animated.View>
-							)}
-							{isCheckedIn && <Text style={styles.checkInCompleteText}>🎉 오늘도 출석 완료! 🎉</Text>}
-						</ScrollView>
-					</View>
-				</View>
-			</Modal>
+			<LevelModal visible={showLevelModal} totalScore={totalScore} onClose={() => setShowLevelModal(false)} />
+			<CheckInModal
+				visible={showCheckInModal}
+				isCheckedIn={isCheckedIn}
+				checkedInDates={checkedInDates}
+				mascot={mascot}
+				showStamp={showStamp}
+				stampStyle={stampStyle}
+				onClose={() => {
+					setShowCheckInModal(false);
+					loadCheckedInDates();
+					loadData();
+				}}
+			/>
 		</SafeAreaView>
 	);
 };
@@ -1293,7 +1188,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		lineHeight: scaleHeight(20),
 	},
-	main: { flex: 1, backgroundColor: '#fff', },
+	main: { flex: 1, backgroundColor: '#fff' },
 	mascoteView: {
 		width: scaleWidth(180),
 		height: scaleWidth(180),

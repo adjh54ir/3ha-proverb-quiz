@@ -1,5 +1,3 @@
-
-
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
@@ -23,12 +21,10 @@ import DeveloperAppsModal from './modal/DeveloperAppsModal';
 import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModal';
 import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import CurrentVersionModal from './modal/CurrentVersionModal';
-import { IAP_REMOVE_AD_KEY } from '@env';
+import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL, IAP_REMOVE_AD_KEY } from '@env';
 import InAppRemoveAdsSection from './setting/InAppRemoveAdsSection';
 
 const APP_NAME = '속픽: 속담 퀴즈';
-const ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=com.tha.proverbquiz'; // 예: 'https://play.google.com/store/apps/details?id=your.package'
-const IOS_STORE_URL = 'https://apps.apple.com/app/id6746687973'; // 예: 'https://apps.apple.com/app/idXXXXXXXXXX'
 
 const DESCRIPTION =
 	'속픽: 속담 퀴즈는 대한민국 속담을 쉽고 재미있게 학습하고, 다양한 퀴즈를 통해 기억을 점검하며, 틀린 문제는 반복 학습으로 완전히 익힐 수 있도록 돕는 속담 학습 앱입니다.';
@@ -77,7 +73,6 @@ const SettingScreen = () => {
 		};
 		loadState();
 	}, []);
-
 
 	const loadVersion = () => {
 		const version = VersionCheck.getCurrentVersion();
@@ -183,7 +178,7 @@ const SettingScreen = () => {
 			badges: CONST_BADGES.filter((b) => b.type === 'quiz').map((b) => b.id),
 			correctProverbId: allProverbs.map((p) => p.id),
 			wrongProverbId: [],
-			totalScore: 5000,
+			totalScore: 7900,
 			bestCombo: 20,
 			lastAnsweredAt: new Date(),
 			quizCounts: {}, // 원하면 여기서도 id별로 count 넣을 수 있음
@@ -341,7 +336,7 @@ const SettingScreen = () => {
 
 				case 'rate':
 					try {
-						const storeUrl = Platform.OS === 'android' ? ANDROID_STORE_URL : IOS_STORE_URL;
+						const storeUrl = Platform.OS === 'android' ? GOOGLE_PLAY_STORE_URL : APP_STORE_URL;
 
 						if (!storeUrl) {
 							Alert.alert('Coming Soon..!', '아직 스토어에 출시되지 않았습니다.');
@@ -429,8 +424,10 @@ const SettingScreen = () => {
 		try {
 			// 1) 스토어 링크 확보 (하드코딩 > VersionCheck)
 			const [playRes, appRes] = await Promise.all([
-				ANDROID_STORE_URL ? Promise.resolve({ storeUrl: ANDROID_STORE_URL }) : VersionCheck.needUpdate({ provider: 'playStore' }).catch(() => null),
-				IOS_STORE_URL ? Promise.resolve({ storeUrl: IOS_STORE_URL }) : VersionCheck.needUpdate({ provider: 'appStore' }).catch(() => null),
+				GOOGLE_PLAY_STORE_URL
+					? Promise.resolve({ storeUrl: GOOGLE_PLAY_STORE_URL })
+					: VersionCheck.needUpdate({ provider: 'playStore' }).catch(() => null),
+				APP_STORE_URL ? Promise.resolve({ storeUrl: APP_STORE_URL }) : VersionCheck.needUpdate({ provider: 'appStore' }).catch(() => null),
 			]);
 
 			const androidUrl = playRes?.storeUrl || '';
@@ -636,7 +633,7 @@ const SettingScreen = () => {
 				onClose={() => setShowVersionModal(false)}
 				onUpdatePress={() => {
 					if (latestVersion) {
-						Linking.openURL(Platform.OS === 'android' ? ANDROID_STORE_URL : IOS_STORE_URL);
+						Linking.openURL(Platform.OS === 'android' ? GOOGLE_PLAY_STORE_URL : APP_STORE_URL);
 					}
 				}}
 			/>

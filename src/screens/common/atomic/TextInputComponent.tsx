@@ -28,11 +28,11 @@ const TextInputComponent = () => {
 							name: text,
 						});
 					}}
-					placeholder='텍스트를 입력해주세요'
-					placeholderTextColor='#666'
+					placeholder="텍스트를 입력해주세요"
+					placeholderTextColor="#9CA3AF"
 				/>
 				{/* Text 활용예시 */}
-				<Text ref={textRef} style={styles.text} numberOfLines={1} ellipsizeMode='tail'></Text>
+				<Text ref={textRef} style={styles.text} numberOfLines={1} ellipsizeMode="tail" />
 			</View>
 		</View>
 	);

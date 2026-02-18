@@ -70,7 +70,7 @@ const ScrollViewComponent = () => {
 					value={inputValue}
 					onChangeText={setInputValue}
 					onPress={scrollHandler.toBottom}
-					placeholderTextColor='#666'
+					placeholderTextColor='#9CA3AF'
 				/>
 			</View>
 

@@ -51,7 +51,7 @@ export const QuizBadgeInterceptor = (history: MainDataType.UserQuizHistory, allP
 
 	// 퀴즈 누적 횟수 뱃지
 	const totalSolved = (history.correctProverbId?.length ?? 0) + (history.wrongProverbId?.length ?? 0);
-	const quizThresholds = [1, 10, 50, 100, 150, 200, 300, 400];
+	const quizThresholds = [1, 10, 50, 100, 150, 200, 300, 400, 500, 600, 700];
 	quizThresholds.forEach((n) => {
 		const id = `quiz_${n}`;
 		if (!history.badges.includes(id) && totalSolved >= n) newBadges.push(id);
@@ -64,8 +64,7 @@ export const QuizBadgeInterceptor = (history: MainDataType.UserQuizHistory, allP
 		if (!history.badges.includes(id) && (history.bestCombo ?? 0) >= n) newBadges.push(id);
 	});
 
-	// 점수 기준 뱃지
-	const scoreThresholds = [600, 1200, 1800, 2460];
+	const scoreThresholds = [1000, 2000, 3000, 5000, 7000, 7900];
 	scoreThresholds.forEach((score) => {
 		const id = `score_${score}`;
 		if (!history.badges.includes(id) && (history.totalScore ?? 0) >= score) newBadges.push(id);

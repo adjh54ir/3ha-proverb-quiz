@@ -546,18 +546,15 @@ const TodayQuizScreen = () => {
 		} else {
 			await cancelScheduledNotification();
 
-			// 🔁 알림 시간 기본값으로 초기화 (15:00)
 			const defaultTime = new Date();
-			// 🔁 알림 시간 기본값으로 초기화 (15:00)
 			defaultTime.setHours(15, 0, 0, 0);
 
 			setAlarmTime(defaultTime);
-			setTempAlarmTime(defaultTime); // ✅ DatePicker용 값도 초기화
-			setShowTodayReview(false); // ✅ 문제 다시 보기 닫기
-			setTempSelectedHour(15); // ✅ 텍스트용 시간도 15시로 설정
-
+			setTempAlarmTime(defaultTime);
+			setShowTodayReview(false);
+			setTempSelectedHour(15);
 			setIsAlarmEnabled(false);
-			// ✅ 끈 상태도 저장
+
 			await saveSettingInfo({
 				isUseAlarm: false,
 				alarmTime: defaultTime.toISOString(),
@@ -1119,10 +1116,16 @@ const TodayQuizScreen = () => {
 									let finalAlarmTime = tempAlarmTime;
 
 									if (!tempIsAlarmEnabled) {
-										// 알림 끈 경우 15:00으로 고정
 										finalAlarmTime = new Date();
 										finalAlarmTime.setHours(15, 0, 0, 0);
-										setTempSelectedHour(15); // ✅ 여기 추가
+										setTempSelectedHour(15);
+										await cancelScheduledNotification();
+										// ✅ 알림 끈 경우엔 별도 메시지 없이 저장만
+									} else {
+										await cancelScheduledNotification();
+										await scheduleDailyQuizNotification(finalAlarmTime);
+										const hour = finalAlarmTime.getHours().toString().padStart(2, '0');
+										Alert.alert('⏰ 알림 저장 완료!', `${hour}시에 오늘의 퀴즈 알람이 지정되었습니다.`);
 									}
 
 									await saveSettingInfo({
@@ -1130,23 +1133,12 @@ const TodayQuizScreen = () => {
 										alarmTime: finalAlarmTime.toISOString(),
 									});
 
-									const hour = finalAlarmTime.getHours().toString().padStart(2, '0');
-									Alert.alert('⏰ 알림 저장 완료!', `${hour}시에 오늘의 퀴즈 알람이 지정되었습니다.`);
-
-									if (tempIsAlarmEnabled) {
-										await cancelScheduledNotification();
-										await scheduleDailyQuizNotification(finalAlarmTime);
-									} else {
-										await cancelScheduledNotification();
-									}
-
-									setAlarmTime(finalAlarmTime); // ✅ 여기서 반영
-									setTempAlarmTime(finalAlarmTime); // ✅ 임시 값도 갱신
+									setAlarmTime(finalAlarmTime);
+									setTempAlarmTime(finalAlarmTime);
 									setIsAlarmEnabled(tempIsAlarmEnabled);
 									setShowTodayReview(false);
 
 									await getScheduledAlarmTime();
-									// ✅ 저장 완료 알림 추가
 								}}>
 								<Text style={styles.saveButtonText}>저장</Text>
 							</TouchableOpacity>
@@ -1175,7 +1167,7 @@ const TodayQuizScreen = () => {
 							<IconComponent name="close" type="AntDesign" size={20} color="#333" />
 						</TouchableOpacity>
 
-						<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(12) }}>
+						<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(4) }}>
 							<IconComponent name="book" type="FontAwesome" size={20} color="#888" style={{ marginRight: scaleWidth(7) }} />
 							<Text style={styles.modalTitle}>지난 오늘의 퀴즈</Text>
 						</View>
@@ -1190,6 +1182,7 @@ const TodayQuizScreen = () => {
 							) : (
 								groupedPrevQuizzes.map((group) => {
 									const { formattedDate, dayOfWeek } = formatQuizDate(group.date);
+									const correctCount = Object.values(group.answerResults).filter((v) => v === true).length;
 									return (
 										<View key={group.date} style={styles.quizGroup}>
 											{/* 섹션 헤더 */}
@@ -1202,51 +1195,67 @@ const TodayQuizScreen = () => {
 												</View>
 												<View style={styles.historyDateChip}>
 													<Text style={styles.historyDateChipText}>
-														({Object.values(group.answerResults).filter((v) => v === true).length}/{group.quizList.length})
+														{correctCount}/{group.quizList.length} 정답
 													</Text>
 												</View>
 											</View>
 
+											{/* ✅ 해설 스타일로 통일된 카드 */}
 											{group.quizList.map((item) => {
 												const isCorrect = group.answerResults?.[item.id] === true;
-												const isWrong = group.answerResults?.[item.id] === false;
 
 												return (
-													<View key={item.id} style={styles.historyCard}>
-														{/* 좌측 컬러바 + 헤더 */}
-														<View style={[styles.historyColorBar, isCorrect ? styles.historyBarCorrect : styles.historyBarWrong]} />
-														<View style={styles.historyCardBody}>
-															{/* 타이틀 + 정오답 배지 */}
-															<View style={styles.historyHeaderRow}>
-																<Text style={styles.historyIdiom}>{item.proverb}</Text>
-																<View style={[styles.resultPill, isCorrect ? styles.pillCorrect : styles.pillWrong]}>
-																	<Text style={styles.resultPillText}>{isCorrect ? '정답' : '오답'}</Text>
-																</View>
+													<View
+														key={item.id}
+														style={[
+															styles.answerExplainBox,
+															{ marginBottom: scaleHeight(12) },
+															isCorrect ? styles.answerExplainCorrect : styles.answerExplainWrong,
+														]}>
+														{/* 헤더: 속담 + 정오답 배지 */}
+														<View style={styles.explainHeaderRow}>
+															<Text style={styles.explainIdiom} numberOfLines={2}>{item.proverb}</Text>
+															<View style={[styles.resultPill, isCorrect ? styles.pillCorrect : styles.pillWrong]}>
+																<Text style={styles.resultPillText}>{isCorrect ? '정답' : '오답'}</Text>
 															</View>
-
-															{/* 의미 */}
-															<View style={styles.historyMeaningBox}>
-																<Text style={styles.historyMeaningLabel}>정답</Text>
-																<Text style={styles.historyMeaningValue}>- {item.longMeaning}</Text>
-															</View>
-
-															{/* 예문(exampleKr 전체) */}
-															{Array.isArray(item.example) && item.example.length > 0 && (
-																<View style={{ marginTop: scaleHeight(10) }}>
-																	<View style={styles.historySubTitleRow}>
-																		<Text style={styles.historySubTitle}>예문</Text>
-																	</View>
-																	<View style={styles.exampleList}>
-																		{item.example.map((ex, idx) => (
-																			<View key={`${item.id}-ex-${idx}`} style={styles.bulletItem}>
-																				<Text style={styles.bulletDot}>•</Text>
-																				<Text style={styles.exampleText}>{ex}</Text>
-																			</View>
-																		))}
-																	</View>
-																</View>
-															)}
 														</View>
+
+														{/* 정답 의미 */}
+														<View style={styles.sectionCard}>
+															<View style={styles.sectionHeaderRow}>
+																<IconComponent name="check-circle" type="FontAwesome" size={14} color="#2e7d32" style={styles.sectionHeaderIcon} />
+																<Text style={styles.sectionHeaderText}>정답</Text>
+															</View>
+															<Text style={styles.correctMeaningValue}>- {item.longMeaning}</Text>
+														</View>
+
+														{/* 예문 */}
+														{Array.isArray(item.example) && item.example.length > 0 && (
+															<View style={styles.sectionCard}>
+																<View style={styles.sectionHeaderRow}>
+																	<Text style={styles.sectionHeaderText}>✍️ 예문</Text>
+																</View>
+																<View style={{ marginTop: scaleHeight(4) }}>
+																	{item.example.map((ex, idx) => (
+																		<View key={`${item.id}-ex-${idx}`} style={styles.sectionBulletRow}>
+																			<Text style={styles.sectionBulletDot}>•</Text>
+																			<Text style={styles.sectionBulletText}>{ex}</Text>
+																		</View>
+																	))}
+																</View>
+															</View>
+														)}
+
+														{/* 자세히 보기 */}
+														<TouchableOpacity
+															style={styles.detailButton}
+															onPress={() => {
+																setDetailQuiz(item);
+																setDetailModalVisible(true);
+															}}>
+															<IconComponent name="search" type="FontAwesome" size={14} color="#333" style={{ marginRight: 6 }} />
+															<Text style={styles.detailButtonText}>자세히 보기</Text>
+														</TouchableOpacity>
 													</View>
 												);
 											})}

@@ -16,6 +16,7 @@ import QuizModeScreen from '@/screens/QuizModeScreen';
 import ProverbCommonFrameScreen from '@/screens/QuizScreen';
 import InitQuizModeScreen from '@/screens/InitQuizModeScreen';
 import QuizScreen from '@/screens/QuizScreen';
+import IconComponent from '@/screens/common/atomic/IconComponent';
 
 /**
  * Stack Navigator : 일반적인 화면만 출력을 하는 경우
@@ -136,6 +137,34 @@ const StackNavigator = () => {
 					),
 				})}
 			/>
+			{/* <Stack.Screen
+				name={Paths.TOWER_CHANLLENGE}
+				component={TowerChallengeScreen}
+				options={({ navigation }) => ({
+					headerShown: false,
+					title: '타워 챌린지',
+					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
+					headerLeft: () => (
+						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
+							<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
+						</TouchableOpacity>
+					),
+				})}
+			/>
+			<Stack.Screen
+				name={Paths.TOWER_QUIZ}
+				component={TowerQuizScreen}
+				options={({ navigation }) => ({
+					headerShown: false,
+					title: '타워퀴즈',
+					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
+					headerLeft: () => (
+						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
+							<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
+						</TouchableOpacity>
+					),
+				})}
+			/> */}
 			<Stack.Screen name={Paths.HOME} component={Home} />
 			<Stack.Screen name={Paths.SETTING} component={SettingScreen} />
 		</Stack.Navigator>

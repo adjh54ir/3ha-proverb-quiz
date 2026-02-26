@@ -395,9 +395,6 @@ const ProverbListScreen = () => {
 												...styles.dropdownListField,
 												maxHeight: scaleHeight(200),
 											}}
-											onChangeValue={(value) => {
-												scrollToTop();
-											}}
 											zIndex={5000}
 											zIndexInverse={4000}
 											containerStyle={{ zIndex: 5000 }}
@@ -511,47 +508,52 @@ const ProverbListScreen = () => {
 										<TouchableOpacity
 											style={[
 												styles.itemBox,
-												{ marginBottom: isLast ? scaleHeight(24) : scaleHeight(12) }, // 마지막은 좀 더 크게, 그 외는 일정
+												{ marginBottom: isLast ? scaleHeight(24) : scaleHeight(12) },
 											]}
 											onPress={() => {
 												setSelectedProverb(item);
 												setShowDetailModal(true);
 											}}>
-											<View style={styles.proverbBlock}>
-												<View style={styles.badgeInlineRow}>
-													<View
-														style={[
-															styles.badge,
-															{
-																backgroundColor: getLevelColor(item.level),
-																flexDirection: 'row',
-																alignItems: 'center',
-																paddingHorizontal: scaleWidth(8),
-																paddingVertical: scaleHeight(4),
-															},
-														]}>
-														{getLevelIcon(item.level)}
-														<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>
-															{{ 1: '아주 쉬움', 2: '쉬움', 3: '보통', 4: '어려움' }[item.level] || '알 수 없음'}
-														</Text>
-													</View>
-													<View
-														style={[
-															styles.badge2,
-															{
-																backgroundColor: getFieldColor(item.category),
-																flexDirection: 'row',
-																alignItems: 'center',
-																paddingHorizontal: scaleWidth(8),
-															},
-														]}>
-														{getFieldIcon(item.category)}
-														<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>{item.category || '미지정'}</Text>
-													</View>
+
+											{/* 배지 + 화살표 한 줄 */}
+											<View style={styles.badgeInlineRow}>
+												<View
+													style={[
+														styles.badge,
+														{
+															backgroundColor: getLevelColor(item.level),
+															flexDirection: 'row',
+															alignItems: 'center',
+															paddingHorizontal: scaleWidth(8),
+															paddingVertical: scaleHeight(4),
+														},
+													]}>
+													{getLevelIcon(item.level)}
+													<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>
+														{{ 1: '아주 쉬움', 2: '쉬움', 3: '보통', 4: '어려움' }[item.level] || '알 수 없음'}
+													</Text>
 												</View>
-												<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
+												<View
+													style={[
+														styles.badge2,
+														{
+															backgroundColor: getFieldColor(item.category),
+															flexDirection: 'row',
+															alignItems: 'center',
+															paddingHorizontal: scaleWidth(8),
+														},
+													]}>
+													{getFieldIcon(item.category)}
+													<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>{item.category || '미지정'}</Text>
+												</View>
+
+												{/* ✅ 화살표 — 오른쪽 끝 */}
+												<View style={{ flex: 1, alignItems: 'flex-end' }}>
+													<IconComponent type="FontAwesome6" name="chevron-right" size={13} color="#c0c0c0" />
+												</View>
 											</View>
 
+											<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
 											<Text style={styles.meaningText}>- {item.longMeaning}</Text>
 
 											{Array.isArray(item.sameProverb) && item.sameProverb.filter((p) => p.trim()).length > 0 && (

@@ -9564,6 +9564,7 @@ __metadata:
     react-native-iap: "npm:13.0.4"
     react-native-image-picker: "npm:^8.2.0"
     react-native-in-app-review: "npm:^4.3.5"
+    react-native-linear-gradient: "npm:^2.8.3"
     react-native-markdown-display: "npm:^7.0.2"
     react-native-permissions: "npm:^5.3.0"
     react-native-reanimated: "npm:^3.16.3"
@@ -9915,6 +9916,16 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/b7a37437f439b1e27a4d980de01994aa71b9091dc3ed00c21172d5505fb11978cd5ed3a43f97c89d502a3a08cf26e5cea6435b8d6e93d3557a92dd43563f7021
+  languageName: node
+  linkType: hard
+
+"react-native-linear-gradient@npm:^2.8.3":
+  version: 2.8.3
+  resolution: "react-native-linear-gradient@npm:2.8.3"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/cd41bf28e9f468173f1e5e768685128ebf8bbf9077710e43b63482c1a76f37bff8ab3d1d6adfd7b4d54e648672356c02bea46c47cdbdb1844ebe5c5caf720114
   languageName: node
   linkType: hard
 

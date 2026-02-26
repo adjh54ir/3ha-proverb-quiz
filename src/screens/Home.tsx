@@ -22,6 +22,8 @@ import moment from 'moment';
 import CheckInModal from './modal/CheckInModal';
 import LevelModal from './modal/LevelModal';
 import { LEVEL_DATA, PET_REWARDS } from '@/const/ConstInfoData';
+// import TowerRewardSection from '@/components/TowerRewardSection';
+// import { TowerProgress } from '@/const/ConstTowerData';
 
 const greetingMessages = [
 	'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
@@ -58,6 +60,7 @@ const Home = () => {
 	const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
 	const [showBadgeModal, setShowBadgeModal] = useState(false);
 	const [selectedBadge, setSelectedBadge] = useState<(typeof CONST_BADGES)[number] | null>(null);
+	const [unlockedRewards, setUnlockedRewards] = useState<number[]>([]);
 
 	const earnedBadges = CONST_BADGES.filter((b) => earnedBadgeIds.includes(b.id));
 	const visibleBadges = earnedBadges; // 제한 없이 모두 보여줌
@@ -67,6 +70,7 @@ const Home = () => {
 	const USER_QUIZ_HISTORY_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 	const USER_STUDY_HISTORY_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
 	const TODAY_QUIZ_LIST_KEY = MainStorageKeyType.TODAY_QUIZ_LIST;
+	const TOWER_CHALLENGE_PROGRESS = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS
 
 	const hasAutoCheckedIn = useRef(false); // ✅ 중복 방지용
 	const [stampAnim] = useState(new Animated.Value(0));
@@ -310,6 +314,7 @@ const Home = () => {
 		const quizData = await AsyncStorage.getItem(USER_QUIZ_HISTORY_KEY);
 		const studyData = await AsyncStorage.getItem(USER_STUDY_HISTORY_KEY);
 		const todayQuiz = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
+		const towerData = await AsyncStorage.getItem(TOWER_CHALLENGE_PROGRESS); // ← 추가
 
 		let realScore = 0;
 		if (quizData) {
@@ -328,6 +333,10 @@ const Home = () => {
 		const quizBadges = quizData ? JSON.parse(quizData).badges || [] : [];
 		const studyBadges = studyData ? JSON.parse(studyData).badges || [] : [];
 		setEarnedBadgeIds([...new Set([...quizBadges, ...studyBadges])]);
+		// if (towerData) {
+		// 	const parsed: TowerProgress = JSON.parse(towerData);
+		// 	setUnlockedRewards(parsed.unlockedRewards ?? []);
+		// }
 	};
 	// 필요 시 랜덤 퀴즈 생성기 로직
 	const generateTodayQuizIds = (count: number): number[] => {
@@ -456,6 +465,8 @@ const Home = () => {
 		wrongReview: () => navigation.navigate(Paths.QUIZ_WRONG_REVIEW),
 		//@ts-ignore
 		timechalleng: () => navigation.navigate(Paths.INIT_TIME_CHANLLENGE),
+		//@ts-ignore
+		towerchalleng: () => navigation.navigate(Paths.TOWER_CHANLLENGE), // ✅ 추가
 	};
 	const ActionCard = ({
 		iconName,
@@ -572,6 +583,7 @@ const Home = () => {
 								</View>
 								{/* 설명 */}
 								<Text style={[styles.levelDescription]}>{description}</Text>
+								{/* <TowerRewardSection unlockedRewards={unlockedRewards} /> */}
 							</View>
 							{earnedBadges.length > 0 && (
 								<View style={styles.badgeView}>
@@ -623,6 +635,14 @@ const Home = () => {
 						description="180초 제한 시간 안에 5개의 하트로 문제를 최대한 많이 풀어보세요!"
 						color="#e67e22"
 						onPress={moveToHandler.timechalleng}
+					/>
+					<ActionCard
+						iconName="castle"
+						iconType="materialCommunityIcons"
+						label="타워 챌린지"
+						description="레벨별 보스를 차례로 도전하고 특별한 보상을 획득하세요!"
+						color="#9b59b6"
+						onPress={moveToHandler.towerchalleng}
 					/>
 
 					<TouchableOpacity style={styles.curiousButton} onPress={() => setShowBadgeModal(true)}>

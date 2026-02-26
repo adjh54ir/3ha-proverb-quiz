@@ -88,8 +88,9 @@ const WrongReviewScreen = () => {
 		return (
 			<View style={styles.center}>
 				{/* 마스코트 이미지 */}
+				{/* no-data */}
 				<FastImage
-					source={require('@/assets/images/no_wrong.png')} // 예시: 해피한 마스코트
+					source={require('@/assets/images/no-data.png')} // 예시: 해피한 마스코트
 					style={styles.mascotImage}
 					resizeMode="contain"
 				/>

@@ -916,27 +916,27 @@ ${sameProverb ? sameProverb : '-'}
 									style={[
 										styles.choiceBtn,
 										feedback &&
-											(() => {
-												if (feedback === 'correct' && isCorrectAnswer) {
+										(() => {
+											if (feedback === 'correct' && isCorrectAnswer) {
+												return {
+													backgroundColor: '#d4edda',
+													borderColor: '#2ecc71', // ✅ 초록 테두리
+												};
+											} else if (feedback === 'wrong') {
+												if (isUserSelected && !isCorrectAnswer) {
+													return {
+														backgroundColor: '#f8d7da',
+														borderColor: '#e74c3c', // ✅ 빨간 테두리 (오답)
+													};
+												} else if (isCorrectAnswer) {
 													return {
 														backgroundColor: '#d4edda',
-														borderColor: '#2ecc71', // ✅ 초록 테두리
+														borderColor: '#2ecc71', // ✅ 정답
 													};
-												} else if (feedback === 'wrong') {
-													if (isUserSelected && !isCorrectAnswer) {
-														return {
-															backgroundColor: '#f8d7da',
-															borderColor: '#e74c3c', // ✅ 빨간 테두리 (오답)
-														};
-													} else if (isCorrectAnswer) {
-														return {
-															backgroundColor: '#d4edda',
-															borderColor: '#2ecc71', // ✅ 정답
-														};
-													}
 												}
-												return {};
-											})(),
+											}
+											return {};
+										})(),
 									]}
 									onPress={() => handleAnswer(choice)}
 									disabled={feedback !== null}>

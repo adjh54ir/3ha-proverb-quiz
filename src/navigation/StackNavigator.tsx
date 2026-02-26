@@ -13,10 +13,11 @@ import { scaledSize, scaleWidth } from '@/utils';
 import InitTimeChallengeScreen from '@/screens/InitTimeChallengeScreen';
 import TimeChanllengeScreen from '@/screens/TimeChanllengeScreen';
 import QuizModeScreen from '@/screens/QuizModeScreen';
-import ProverbCommonFrameScreen from '@/screens/QuizScreen';
 import InitQuizModeScreen from '@/screens/InitQuizModeScreen';
 import QuizScreen from '@/screens/QuizScreen';
 import IconComponent from '@/screens/common/atomic/IconComponent';
+import TowerChallengeScreen from '@/screens/TowerChallengeScreen';
+import TowerQuizScreen from '@/screens/TowerQuizScreen';
 
 /**
  * Stack Navigator : 일반적인 화면만 출력을 하는 경우
@@ -137,7 +138,7 @@ const StackNavigator = () => {
 					),
 				})}
 			/>
-			{/* <Stack.Screen
+			<Stack.Screen
 				name={Paths.TOWER_CHANLLENGE}
 				component={TowerChallengeScreen}
 				options={({ navigation }) => ({
@@ -164,7 +165,7 @@ const StackNavigator = () => {
 						</TouchableOpacity>
 					),
 				})}
-			/> */}
+			/>
 			<Stack.Screen name={Paths.HOME} component={Home} />
 			<Stack.Screen name={Paths.SETTING} component={SettingScreen} />
 		</Stack.Navigator>

@@ -1125,7 +1125,7 @@ const CapitalResultScreen = () => {
 							)}
 						</View>
 					)}
-					{/* {showTowerSection && (
+					{showTowerSection && (
 						<View style={styles.sectionBox}>
 							{unlockedRewards.length === 0 ? (
 								<Text style={styles.noRecordText}>아직 클리어한 타워가 없습니다. 도전해보세요!</Text>
@@ -1146,6 +1146,7 @@ const CapitalResultScreen = () => {
 												borderColor: tower.color,
 												backgroundColor: '#fff',
 											}}>
+											{/* 왼쪽: 보스 이미지 + 레벨 배지 */}
 											<View style={{ width: scaleWidth(80), backgroundColor: tower.backgroundColor, alignItems: 'center', justifyContent: 'center', padding: scaleWidth(8) }}>
 												<FastImage
 													source={tower.bossImage}
@@ -1186,7 +1187,7 @@ const CapitalResultScreen = () => {
 								</>
 							)}
 						</View>
-					)} */}
+					)}
 				</ScrollView>
 
 				<LevelModal visible={showLevelModal} totalScore={totalScore} onClose={() => setShowLevelModal(false)} />

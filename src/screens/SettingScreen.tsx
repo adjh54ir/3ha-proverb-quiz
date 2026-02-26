@@ -21,8 +21,7 @@ import DeveloperAppsModal from './modal/DeveloperAppsModal';
 import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModal';
 import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import CurrentVersionModal from './modal/CurrentVersionModal';
-import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL, IAP_REMOVE_AD_KEY } from '@env';
-import InAppRemoveAdsSection from './setting/InAppRemoveAdsSection';
+import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL } from '@env';
 
 const APP_NAME = '속픽: 속담 퀴즈';
 
@@ -36,6 +35,7 @@ const STORAGE_KEYS = {
 	quiz: MainStorageKeyType.USER_QUIZ_HISTORY,
 	todayQuiz: MainStorageKeyType.TODAY_QUIZ_LIST,
 	timeChallenge: MainStorageKeyType.TIME_CHALLENGE_HISTORY,
+	towerChallenge: MainStorageKeyType.TOWER_CHALLENGE_PROGRESS, // ✅ 추가
 };
 
 const SettingScreen = () => {
@@ -46,7 +46,8 @@ const SettingScreen = () => {
 	const [appVersion, setAppVersion] = useState('');
 	const [showScrollTop, setShowScrollTop] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [resetType, setResetType] = useState<'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'all' | null>(null);
+	// resetType state
+	const [resetType, setResetType] = useState<'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'towerChallenge' | 'all' | null>(null);
 	const [summary, setSummary] = useState<string>('');
 	const [showAppsModal, setShowAppsModal] = useState(false);
 	const [showTermsModal, setShowTermsModal] = useState(false);
@@ -81,13 +82,13 @@ const SettingScreen = () => {
 
 	const scrollToTop = () => sectionRef.current?.getScrollResponder()?.scrollTo({ x: 0, y: 0, animated: true });
 
-	const confirmReset = async (type: 'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'all') => {
+	const confirmReset = async (type: 'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'towerChallenge' | 'all') => {
 		getSummaryMessage(type);
 		setResetType(type);
 		setModalVisible(true);
 	};
 
-	const getSummaryMessage = (type: 'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'all') => {
+	const getSummaryMessage = (type: 'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'towerChallenge' | 'all') => {
 		let msg = '';
 
 		switch (type) {
@@ -103,9 +104,14 @@ const SettingScreen = () => {
 			case 'todayQuiz':
 				msg = '오늘의 퀴즈 기록이 사라져요. \n다시 새로 시작할까요?';
 				break;
+			case 'towerChallenge':
+				msg = '타워 챌린지의 모든 진행 상황이 초기화돼요.\n 처음부터 다시 도전하시겠어요?';
+				break;
 			case 'all':
 				msg = '지금까지 학습하고 풀었던 모든 기록이 사라져요. 정말 전부 다시 시작할까요?';
 				break;
+
+
 			default:
 				msg = '정말 초기화하시겠어요?';
 		}
@@ -160,8 +166,19 @@ const SettingScreen = () => {
 				resetTodayQuizOnly();
 				Alert.alert('완료', '오늘의 퀴즈 데이터가 초기화되었습니다');
 			} else if (resetType === 'all') {
-				await AsyncStorage.multiRemove([STORAGE_KEYS.study, STORAGE_KEYS.quiz, STORAGE_KEYS.timeChallenge, STORAGE_KEYS.todayQuiz]);
+				// resetType === 'all' 케이스의 multiRemove 배열
+				await AsyncStorage.multiRemove([
+					STORAGE_KEYS.study,
+					STORAGE_KEYS.quiz,
+					STORAGE_KEYS.timeChallenge,
+					STORAGE_KEYS.todayQuiz,
+					STORAGE_KEYS.towerChallenge, // ✅ 추가
+				]);
 				Alert.alert('완료', '모든 데이터가 초기화되었습니다');
+				// handleConfirmDelete - else if 추가 (resetType === 'all' 앞에)
+			} else if (resetType === 'towerChallenge') {
+				await AsyncStorage.removeItem(STORAGE_KEYS.towerChallenge);
+				Alert.alert('완료', '타워 챌린지 데이터가 초기화되었습니다');
 			}
 			setModalVisible(false);
 			setResetType(null);
@@ -216,7 +233,7 @@ const SettingScreen = () => {
 	const sections: { title: React.ReactNode; data: string[] }[] = useMemo(() => {
 		const resetSection = {
 			title: <Text style={[styles.sectionHeaderText, { color: '#E53935' }]}>사용자 정보 초기화</Text>,
-			data: ['resetStudy', 'resetQuiz', 'resetTodayQuiz', 'resetTimeChallenge', 'resetAll'],
+			data: ['resetStudy', 'resetQuiz', 'resetTodayQuiz', 'resetTimeChallenge', 'resetTowerChallenge', 'resetAll'], // ✅ resetTowerChallenge 추가
 		};
 
 		const feedbackSection = {
@@ -267,6 +284,11 @@ const SettingScreen = () => {
 			},
 			resetTimeChallenge: {
 				label: '타임 챌린지 기록 초기화',
+				icon: { type: 'MaterialCommunityIcons', name: 'refresh' },
+			},
+			// settingsMap에 추가
+			resetTowerChallenge: {
+				label: '타워 챌린지 초기화',
 				icon: { type: 'MaterialCommunityIcons', name: 'refresh' },
 			},
 
@@ -334,6 +356,10 @@ const SettingScreen = () => {
 					checkIsLatestVersion();
 					break;
 
+				// handlePress - case 추가
+				case 'resetTowerChallenge':
+					confirmReset('towerChallenge');
+					break;
 				case 'rate':
 					try {
 						const storeUrl = Platform.OS === 'android' ? GOOGLE_PLAY_STORE_URL : APP_STORE_URL;
@@ -410,7 +436,8 @@ const SettingScreen = () => {
 						type={settingsMap[item].icon.type}
 						name={settingsMap[item].icon.name}
 						size={scaledSize(20)}
-						color={['resetStudy', 'resetQuiz', 'resetAll', 'resetTodayQuiz', 'resetTimeChallenge'].includes(item) ? '#e74c3c' : '#333'}
+						// renderItem - 빨간 아이콘 배열
+						color={['resetStudy', 'resetQuiz', 'resetAll', 'resetTodayQuiz', 'resetTimeChallenge', 'resetTowerChallenge'].includes(item) ? '#e74c3c' : '#333'}
 						style={styles.icon}
 						isBottomIcon={true}
 					/>
@@ -491,6 +518,14 @@ const SettingScreen = () => {
 					<View style={styles.modalTitleRow}>
 						<IconComponent type="MaterialCommunityIcons" name="refresh" size={20} color="#34495e" style={styles.iconLeft} />
 						<Text style={styles.modalTitleText}>타임 챌린지를 초기화할까요?</Text>
+					</View>
+				);
+			// getModalTitle - case 추가 (case 'all': 앞에)
+			case 'towerChallenge':
+				return (
+					<View style={styles.modalTitleRow}>
+						<IconComponent type="MaterialCommunityIcons" name="refresh" size={20} color="#34495e" style={styles.iconLeft} />
+						<Text style={styles.modalTitleText}>타워 챌린지를 초기화할까요?</Text>
 					</View>
 				);
 			case 'all':

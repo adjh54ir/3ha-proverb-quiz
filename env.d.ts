@@ -79,4 +79,3 @@ declare module '@env' {
 	export const GOOGLE_PLAY_STORE_URL: string;
 	export const APP_STORE_URL: string;
 }
-}

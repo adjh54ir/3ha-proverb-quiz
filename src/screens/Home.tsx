@@ -22,8 +22,8 @@ import moment from 'moment';
 import CheckInModal from './modal/CheckInModal';
 import LevelModal from './modal/LevelModal';
 import { LEVEL_DATA, PET_REWARDS } from '@/const/ConstInfoData';
-// import TowerRewardSection from '@/components/TowerRewardSection';
-// import { TowerProgress } from '@/const/ConstTowerData';
+import TowerRewardSection from '@/components/TowerRewardSection';
+import { TowerProgress } from '@/const/ConstTowerData';
 
 const greetingMessages = [
 	'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
@@ -333,10 +333,10 @@ const Home = () => {
 		const quizBadges = quizData ? JSON.parse(quizData).badges || [] : [];
 		const studyBadges = studyData ? JSON.parse(studyData).badges || [] : [];
 		setEarnedBadgeIds([...new Set([...quizBadges, ...studyBadges])]);
-		// if (towerData) {
-		// 	const parsed: TowerProgress = JSON.parse(towerData);
-		// 	setUnlockedRewards(parsed.unlockedRewards ?? []);
-		// }
+		if (towerData) {
+			const parsed: TowerProgress = JSON.parse(towerData);
+			setUnlockedRewards(parsed.unlockedRewards ?? []);
+		}
 	};
 	// 필요 시 랜덤 퀴즈 생성기 로직
 	const generateTodayQuizIds = (count: number): number[] => {
@@ -583,7 +583,7 @@ const Home = () => {
 								</View>
 								{/* 설명 */}
 								<Text style={[styles.levelDescription]}>{description}</Text>
-								{/* <TowerRewardSection unlockedRewards={unlockedRewards} /> */}
+								<TowerRewardSection unlockedRewards={unlockedRewards} />
 							</View>
 							{earnedBadges.length > 0 && (
 								<View style={styles.badgeView}>

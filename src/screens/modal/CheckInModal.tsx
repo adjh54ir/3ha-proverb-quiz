@@ -16,7 +16,15 @@ interface CheckInModalProps {
 	onClose: () => void;
 }
 
-const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, checkedInDates, mascot, showStamp, stampStyle, onClose }) => {
+const CheckInModal: React.FC<CheckInModalProps> = ({
+	visible,
+	isCheckedIn,
+	checkedInDates,
+	mascot,
+	showStamp,
+	stampStyle,
+	onClose,
+}) => {
 	return (
 		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.modalOverlay}>
@@ -27,15 +35,20 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 
 					<Text style={styles.modalTitle}>오늘의 출석</Text>
 
-					<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: scaleHeight(20) }} showsVerticalScrollIndicator={false}>
+					<ScrollView
+						style={{ width: '100%' }}
+						contentContainerStyle={{ paddingBottom: scaleHeight(20) }}
+						showsVerticalScrollIndicator={false}>
 						<View style={styles.rowCentered}>
 							<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.cover} />
-							<Text style={[styles.modalText, { flex: 1 }]}>매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어줘요!{'\n'}</Text>
+							<Text style={[styles.modalText, { flex: 1 }]}>
+								매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어줘요!{'\n'}
+							</Text>
 						</View>
 
 						<View style={styles.highlightBox}>
 							<Text style={styles.highlightText}>
-								연속 출석을 통해 4단계로 진화하는 귀여운 펫도 함께 얻을 수 있답니다 🐾{'\n'}
+								연속 출석을 통해 5단계로 진화하는 귀여운 펫도 함께 얻을 수 있답니다 🐾{'\n'}
 								획득한 펫은 캐릭터 옆에 항상 따라다녀요!
 							</Text>
 						</View>
@@ -43,17 +56,22 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 						<View style={styles.petScrollContainer}>
 							<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.petScrollContent}>
 								{[
-									{ label: '7일 출석', image: require('@/assets/images/pet_level1_org.png') },
-									{ label: '14일 출석', image: require('@/assets/images/pet_level2_org.png') },
-									{ label: '21일 출석', image: require('@/assets/images/pet_level3_org.png') },
-									{ label: '28일 출석', image: require('@/assets/images/pet_level4_org.png'), stage: '열매 친구' },
+									{ label: '1일 출석', image: require('@/assets/images/pet_level0.jpg') },
+									{ label: '7일 출석', image: require('@/assets/images/pet_level1.png') },
+									{ label: '14일 출석', image: require('@/assets/images/pet_level2.png') },
+									{ label: '21일 출석', image: require('@/assets/images/pet_level3.png') },
+									{ label: '28일 출석', image: require('@/assets/images/pet_level4.png'), stage: '열매 친구' },
 								].map((item, index, arr) => (
 									<View key={index} style={[styles.petItemBox, { marginRight: index !== arr.length - 1 ? scaleWidth(10) : 0 }]}>
 										<FastImage source={item.image} style={styles.petImage} resizeMode="contain" />
 										<Text style={styles.petLabelText}>{item.label}</Text>
-										<Text style={styles.petStageText}>{['새싹 친구', '잎사귀 친구', '꽃잎 친구', '만개 친구'][index]}</Text>
+										<Text style={styles.petStageText}>
+											{['멍뭉 견습생', '멍뭉 훈련생', '멍뭉 수련생', '멍뭉 졸업생', '멍뭉 마스터'][index]}
+										</Text>
 
-										{index < arr.length - 1 && <IconComponent name="chevron-right" type="fontAwesome" size={12} color="#7f8c8d" style={styles.arrowIcon} />}
+										{index < arr.length - 1 && (
+											<IconComponent name="chevron-right" type="fontAwesome" size={12} color="#7f8c8d" style={styles.arrowIcon} />
+										)}
 									</View>
 								))}
 							</ScrollView>

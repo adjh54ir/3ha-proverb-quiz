@@ -191,19 +191,12 @@ const Home = () => {
 
 	const getPetLevel = (checkedIn: { [date: string]: any }) => {
 		const count = Object.keys(checkedIn).length;
-		if (count >= 28) {
-			return 3; // ✅ 28일차 이미지 (pet_level4_org.png)
-		}
-		if (count >= 21) {
-			return 2; // ✅ 21일차 이미지 (pet_level3_org.png)
-		}
-		if (count >= 14) {
-			return 1; // ✅ 14일차 이미지 (pet_level2_org.png)
-		}
-		if (count >= 7) {
-			return 0; // ✅ 7일차 이미지 (pet_level1_org.png)
-		}
-		return -1; // 7일 미만은 펫 없음
+		if (count >= 28) { return 3; }
+		if (count >= 21) { return 2; }
+		if (count >= 14) { return 1; }
+		if (count >= 7) { return 0; }
+		if (count >= 1) { return 0; } // ✅ 1일 이상이면 첫 번째 펫 표시
+		return -1;
 	};
 	const stampStyle = {
 		position: 'absolute',

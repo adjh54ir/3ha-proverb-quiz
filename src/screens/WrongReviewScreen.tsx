@@ -87,25 +87,24 @@ const WrongReviewScreen = () => {
 	if (wrongCountries.length === 0) {
 		return (
 			<View style={styles.center}>
-				{/* 마스코트 이미지 */}
-				{/* no-data */}
-				<FastImage
-					source={require('@/assets/images/no-data.png')} // 예시: 해피한 마스코트
-					style={styles.mascotImage}
-					resizeMode="contain"
-				/>
-
-				{/* 텍스트 메시지 */}
-				<Text style={styles.emptyText}>🎉 오답이 없습니다! 훌륭해요! 🎉</Text>
-				{/* 홈으로 가기 버튼 */}
-				<TouchableOpacity
-					style={styles.homeButton}
-					onPress={() => {
-						// @ts-ignore
-						navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME });
-					}}>
-					<Text style={styles.homeButtonText}>홈으로 가기</Text>
-				</TouchableOpacity>
+				<View style={styles.emptyCard}>
+					<View style={styles.mascotImageWrapper}>
+						<FastImage source={require('@/assets/images/no-data-worng.jpg')} style={styles.mascotImage} resizeMode="contain" />
+					</View>
+					<View style={styles.emptyBadge}>
+						<Text style={styles.emptyBadgeText}>🏆 완벽해요!</Text>
+					</View>
+					<Text style={styles.emptyTitle}>오답이 없어요</Text>
+					<Text style={styles.emptyDesc}>틀린 문제가 하나도 없네요.{'\n'}정말 대단한 실력이에요! 🎉</Text>
+					<TouchableOpacity
+						style={styles.homeButton}
+						onPress={() => {
+							// @ts-ignore
+							navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME });
+						}}>
+						<Text style={styles.homeButtonText}>홈으로 돌아가기</Text>
+					</TouchableOpacity>
+				</View>
 			</View>
 		);
 	}
@@ -419,11 +418,6 @@ const styles = StyleSheet.create({
 		padding: scaleWidth(16),
 		width: '100%',
 	},
-	mascotImage: {
-		width: scaleWidth(240),
-		height: scaleWidth(240),
-		marginBottom: scaleHeight(10),
-	},
 	guideCard: {
 		backgroundColor: '#ffffff',
 		borderWidth: 1,
@@ -717,5 +711,54 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(15),
 		fontWeight: '600',
 		textAlign: 'center',
+	},
+	emptyCard: {
+		alignItems: 'center',
+		backgroundColor: '#ffffff',
+		borderRadius: scaleWidth(24),
+		paddingVertical: scaleHeight(36),
+		paddingHorizontal: scaleWidth(16), // 32 → 16
+		width: '85%', // 추가
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.08,
+		shadowRadius: 12,
+		elevation: 4,
+	},
+	emptyBadge: {
+		backgroundColor: '#FFF9E6',
+		borderRadius: scaleWidth(20),
+		paddingVertical: scaleHeight(5),
+		paddingHorizontal: scaleWidth(14),
+		marginBottom: scaleHeight(12),
+	},
+	emptyBadgeText: {
+		fontSize: scaledSize(13),
+		fontWeight: '700',
+		color: '#f39c12',
+	},
+	emptyTitle: {
+		fontSize: scaledSize(22),
+		fontWeight: '800',
+		color: '#1a1a2e',
+		marginBottom: scaleHeight(10),
+	},
+	emptyDesc: {
+		fontSize: scaledSize(14),
+		color: '#7f8c8d',
+		textAlign: 'center',
+		lineHeight: scaleHeight(22),
+		marginBottom: scaleHeight(28),
+	},
+	mascotImageWrapper: {
+		width: scaleWidth(200),
+		height: scaleWidth(200),
+		borderRadius: scaleWidth(100),
+		overflow: 'hidden',
+		marginBottom: scaleHeight(16),
+	},
+	mascotImage: {
+		width: '100%',
+		height: '100%',
 	},
 });

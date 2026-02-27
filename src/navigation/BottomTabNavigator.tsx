@@ -78,8 +78,8 @@ const BottomTabNavigator = () => {
 				name={Paths.PROVERB_LIST}
 				component={ProverbListScreen}
 				options={{
-					title: '속담 정보',
-					tabBarLabel: '속담 정보',
+					title: '속담 사전',
+					tabBarLabel: '속담 사전',
 					tabBarIcon: getTabBarIcon('materialicons', 'menu-book', isTablet),
 					headerShown: false, // 헤더 숨김
 				}}

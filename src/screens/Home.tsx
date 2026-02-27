@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Modal, Keyboard, Animated, Easing } from 'react-native';
@@ -70,7 +72,7 @@ const Home = () => {
 	const USER_QUIZ_HISTORY_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 	const USER_STUDY_HISTORY_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
 	const TODAY_QUIZ_LIST_KEY = MainStorageKeyType.TODAY_QUIZ_LIST;
-	const TOWER_CHALLENGE_PROGRESS = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS
+	const TOWER_CHALLENGE_PROGRESS = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
 
 	const hasAutoCheckedIn = useRef(false); // ✅ 중복 방지용
 	const [stampAnim] = useState(new Animated.Value(0));
@@ -86,12 +88,17 @@ const Home = () => {
 
 	useFocusEffect(
 		useCallback(() => {
+			// ✅ 진입 시 먼저 초기화
+			setEarnedBadgeIds([]);
+			setTotalScore(0);
+			setUnlockedRewards([]);
+
 			setShowConfetti(true);
 			scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
 			hasAutoCheckedIn.current = false;
 
 			(async () => {
-				await ensureTodayQuizExists(); // ✅ 오늘 퀴즈 항목 생성 먼저
+				await ensureTodayQuizExists();
 				await loadData();
 				await checkTodayCheckIn();
 				await loadCheckedInDates();
@@ -191,11 +198,21 @@ const Home = () => {
 
 	const getPetLevel = (checkedIn: { [date: string]: any }) => {
 		const count = Object.keys(checkedIn).length;
-		if (count >= 28) { return 3; }
-		if (count >= 21) { return 2; }
-		if (count >= 14) { return 1; }
-		if (count >= 7) { return 0; }
-		if (count >= 1) { return 0; } // ✅ 1일 이상이면 첫 번째 펫 표시
+		if (count >= 28) {
+			return 3;
+		}
+		if (count >= 21) {
+			return 2;
+		}
+		if (count >= 14) {
+			return 1;
+		}
+		if (count >= 7) {
+			return 0;
+		}
+		if (count >= 1) {
+			return 0;
+		} // ✅ 1일 이상이면 첫 번째 펫 표시
 		return -1;
 	};
 	const stampStyle = {
@@ -307,14 +324,13 @@ const Home = () => {
 		const quizData = await AsyncStorage.getItem(USER_QUIZ_HISTORY_KEY);
 		const studyData = await AsyncStorage.getItem(USER_STUDY_HISTORY_KEY);
 		const todayQuiz = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
-		const towerData = await AsyncStorage.getItem(TOWER_CHALLENGE_PROGRESS); // ← 추가
+		const towerData = await AsyncStorage.getItem(TOWER_CHALLENGE_PROGRESS);
 
 		let realScore = 0;
 		if (quizData) {
 			realScore = JSON.parse(quizData).totalScore || 0;
 			if (todayQuiz) {
 				const parsed = JSON.parse(todayQuiz);
-				console.log('parsed : ', todayQuiz);
 				const todayItem = parsed.find((q: any) => q.quizDate.slice(0, 10) === todayStr);
 				if (todayItem) {
 					setIsCheckedIn(todayItem.isCheckedIn || false);
@@ -323,13 +339,19 @@ const Home = () => {
 		}
 
 		setTotalScore(realScore);
+
 		const quizBadges = quizData ? JSON.parse(quizData).badges || [] : [];
 		const studyBadges = studyData ? JSON.parse(studyData).badges || [] : [];
-		setEarnedBadgeIds([...new Set([...quizBadges, ...studyBadges])]);
+
+		// ✅ 타워 뱃지도 포함
+		let towerBadges: string[] = [];
 		if (towerData) {
 			const parsed: TowerProgress = JSON.parse(towerData);
 			setUnlockedRewards(parsed.unlockedRewards ?? []);
+			towerBadges = parsed.badges || []; // TowerProgress에 badges 필드가 없으면 [] 유지
 		}
+
+		setEarnedBadgeIds([...new Set([...quizBadges, ...studyBadges, ...towerBadges])]);
 	};
 	// 필요 시 랜덤 퀴즈 생성기 로직
 	const generateTodayQuizIds = (count: number): number[] => {
@@ -468,6 +490,7 @@ const Home = () => {
 		description,
 		color,
 		onPress,
+		isNew,
 	}: {
 		iconName: string;
 		iconType: string;
@@ -475,6 +498,7 @@ const Home = () => {
 		description: string;
 		color: string;
 		onPress: () => void;
+		isNew?: boolean;
 	}) => (
 		<TouchableOpacity style={[styles.actionCard, { borderColor: color }]} onPress={onPress}>
 			<View style={[styles.iconCircle, { backgroundColor: color }]}>
@@ -484,6 +508,15 @@ const Home = () => {
 				<Text style={styles.cardTitle}>{label}</Text>
 				<Text style={styles.cardDescription}>{description}</Text>
 			</View>
+
+			{/* ✅ NEW 대각선 배지 */}
+			{isNew && (
+				<View style={styles.newBadgeWrapper}>
+					<View style={styles.newBadge}>
+						<Text style={styles.newBadgeText}>NEW</Text>
+					</View>
+				</View>
+			)}
 		</TouchableOpacity>
 	);
 
@@ -636,6 +669,7 @@ const Home = () => {
 						description="레벨별 보스를 차례로 도전하고 특별한 보상을 획득하세요!"
 						color="#9b59b6"
 						onPress={moveToHandler.towerchalleng}
+						isNew
 					/>
 
 					<TouchableOpacity style={styles.curiousButton} onPress={() => setShowBadgeModal(true)}>
@@ -1503,6 +1537,35 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(11),
 		fontWeight: '700',
 		color: '#2c3e50',
+	},
+	newBadgeWrapper: {
+		position: 'absolute',
+		top: 0,
+		right: 0,
+		width: scaleWidth(56),
+		height: scaleWidth(56),
+		overflow: 'hidden',
+		borderTopRightRadius: scaleWidth(16), // actionCard borderRadius와 동일
+	},
+	newBadge: {
+		position: 'absolute',
+		top: scaleWidth(10),
+		right: -scaleWidth(14),
+		width: scaleWidth(64),
+		backgroundColor: '#ff4757',
+		paddingVertical: scaleHeight(3),
+		transform: [{ rotate: '45deg' }],
+		alignItems: 'center',
+		shadowColor: '#ff4757',
+		shadowOpacity: 0.4,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 4,
+	},
+	newBadgeText: {
+		color: '#fff',
+		fontSize: scaledSize(9),
+		fontWeight: '800',
+		letterSpacing: 0.8,
 	},
 });
 

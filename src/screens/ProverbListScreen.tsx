@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
 	View,
@@ -9,9 +11,6 @@ import {
 	Keyboard,
 	TouchableWithoutFeedback,
 	FlatList,
-	Modal,
-	ScrollView,
-	Alert,
 	KeyboardAvoidingView,
 	Platform,
 } from 'react-native';
@@ -24,9 +23,10 @@ import FastImage from 'react-native-fast-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import DeviceInfo from 'react-native-device-info';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import ProverbDetailModal from './modal/ProverbDetailModal';
+import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
+import SuccessToast from './SuccessToast';
 
 const PAGE_SIZE = 30;
 
@@ -129,11 +129,22 @@ const ProverbListScreen = () => {
 	const [fieldItems, setFieldItems] = useState([{ label: '', value: '' }]);
 	const [levelItems, setLevelItems] = useState([{ label: '', value: '' }]);
 
-	useBlockBackHandler(true); // 뒤로가기 모션 막기
+	// ✅ 즐겨찾기 관련 state
+	const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+	const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+	const [showToast, setShowToast] = useState(false);
+	const [toastMessage, setToastMessage] = useState('');
+
+	useBlockBackHandler(true);
 
 	const fetchData = () => {
-		const allData = ProverbServices.selectProverbList(); // 이미 필드에 있음
+		const allData = ProverbServices.selectProverbList();
 		let filtered = [...allData];
+
+		// ✅ 즐겨찾기 필터링 (최우선)
+		if (showFavoritesOnly) {
+			filtered = filtered.filter((item) => favoriteIds.includes(item.id));
+		}
 
 		if (keyword.trim()) {
 			const lowerKeyword = keyword.trim().toLowerCase();
@@ -154,36 +165,30 @@ const ProverbListScreen = () => {
 	// 🔄 필터 변경 시 데이터만 다시 가져오기
 	useEffect(() => {
 		fetchData();
-	}, [keyword, fieldValue, levelValue]);
+	}, [keyword, fieldValue, levelValue, showFavoritesOnly, favoriteIds]); // ✅ 즐겨찾기 의존성 추가
 
-	// 🔄 화면 포커스 시 최초 1회 초기화 (필터 상태도 리셋)
-	useFocusEffect(
-		useCallback(() => {
-			handleReset(); // keyword, fieldValue 등 초기화
-		}, []),
-	);
+	// 🔄 화면 포커스 시 최초 1회 초기화
 	useFocusEffect(
 		useCallback(() => {
 			setFieldOpen(false);
 			setLevelOpen(false);
 
-			// ✅ 필터 상태 초기화
 			setKeyword('');
 			setFieldValue('전체');
 			setLevelValue('전체');
+			setShowFavoritesOnly(false); // ✅ 즐겨찾기 필터 초기화
 
-			// ✅ 리스트 상태 초기화
 			setPage(1);
 			setVisibleList([]);
 			setProverbList([]);
 
-			// ✅ 드롭다운 항목 새로 세팅
 			const fieldList = ProverbServices.selectCategoryList();
 			setFieldItems([{ label: '전체', value: '전체' }, ...fieldList.map((field) => ({ label: field, value: field }))]);
 
 			const levelList = ProverbServices.selectLevelNameList();
 			setLevelItems([{ label: '전체', value: '전체' }, ...levelList.map((level) => ({ label: level, value: level }))]);
-			// ✅ 데이터 새로 불러오기
+
+			loadFavorites(); // ✅ 즐겨찾기 로드
 			fetchData();
 		}, []),
 	);
@@ -206,24 +211,41 @@ const ProverbListScreen = () => {
 		}
 	};
 
+	// ✅ 즐겨찾기 로드
+	const loadFavorites = async () => {
+		const favorites = await getFavorites();
+		setFavoriteIds(favorites);
+	};
+
+	// ✅ 즐겨찾기 토글
+	const handleToggleFavorite = async (id: number) => {
+		const isNowFavorite = await toggleFavorite(id);
+		await loadFavorites();
+
+		if (isNowFavorite) {
+			setToastMessage('즐겨찾기 추가');
+			setShowToast(true);
+		}
+	};
+
 	const scrollToTop = () => {
 		scrollRef.current?.scrollToOffset({ animated: true, offset: 0 });
 	};
 
 	const getFieldColor = (field: string) => {
 		const categoryColorMap: Record<string, string> = {
-			'운/우연': '#00cec9', // 청록
-			인간관계: '#6c5ce7', // 보라
-			'세상 이치': '#fdcb6e', // 연노랑
-			'근면/검소': '#e17055', // 주황
-			'노력/성공': '#00b894', // 짙은 청록
-			'경계/조심': '#d63031', // 빨강
-			'욕심/탐욕': '#e84393', // 핫핑크
-			'배신/불신': '#2d3436', // 짙은 회색
+			'운/우연': '#00cec9',
+			인간관계: '#6c5ce7',
+			'세상 이치': '#fdcb6e',
+			'근면/검소': '#e17055',
+			'노력/성공': '#00b894',
+			'경계/조심': '#d63031',
+			'욕심/탐욕': '#e84393',
+			'배신/불신': '#2d3436',
 		};
-
-		return categoryColorMap[field] || '#b2bec3'; // 기본 회색
+		return categoryColorMap[field] || '#b2bec3';
 	};
+
 	const getLevelColor = (levelName: number) => {
 		const levelColorMap: Record<string, string> = {
 			1: '#2ecc71',
@@ -231,47 +253,28 @@ const ProverbListScreen = () => {
 			3: '#EB984E',
 			4: '#E74C3C',
 		};
-
-		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
+		return levelColorMap[levelName] || '#b2bec3';
 	};
 
 	const handleReset = () => {
-		// 1. 드롭다운을 먼저 닫음
 		setFieldOpen(false);
 		setLevelOpen(false);
-
-		// 2. 키보드 닫기
 		Keyboard.dismiss();
 
-		// 3. 약간의 지연 후 값 초기화 (포커싱 이슈 방지)
 		setTimeout(() => {
 			setKeyword('');
 			setFieldValue('전체');
 			setLevelValue('전체');
+			setShowFavoritesOnly(false); // ✅ 즐겨찾기 필터도 초기화
 
-			// 필터 목록 초기화
 			const fieldList = ProverbServices.selectCategoryList();
 			setFieldItems([{ label: '전체', value: '전체' }, ...fieldList.map((field) => ({ label: field, value: field }))]);
 
 			const levelList = ProverbServices.selectLevelNameList();
 			setLevelItems([{ label: '전체', value: '전체' }, ...levelList.map((level) => ({ label: level, value: level }))]);
 
-			scrollToTop(); // 스크롤 이동은 마지막에
+			scrollToTop();
 		}, 50);
-	};
-
-	const handleSetLevelOpen = (open: boolean) => {
-		setLevelOpen(open);
-		if (open) {
-			scrollToTop();
-		}
-	};
-
-	const handleSetFieldOpen = (open: boolean) => {
-		setFieldOpen(open);
-		if (open) {
-			scrollToTop();
-		}
 	};
 
 	const getLevelIcon = (level: number) => {
@@ -347,24 +350,22 @@ const ProverbListScreen = () => {
 												setLevelOpen(open);
 												if (open) {
 													setFieldOpen(false);
-												} // 👉 레벨 열릴 때 필드 닫음
+												}
 											}}
 											setValue={setLevelValue}
 											setItems={setLevelItems}
 											style={styles.dropdownLevel}
-											scrollViewProps={{
-												nestedScrollEnabled: true,
-											}}
+											scrollViewProps={{ nestedScrollEnabled: true }}
 											dropDownContainerStyle={{
 												...styles.dropdownListLevel,
-												overflow: 'visible', // 🟢 부모와 같이 설정
+												overflow: 'visible',
 												zIndex: 3000,
 											}}
 											listItemLabelStyle={{ marginLeft: scaleWidth(6), fontSize: scaledSize(14) }}
 											labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
 											iconContainerStyle={{ marginRight: scaleWidth(8) }}
-											showArrowIcon={true} // 드롭다운 화살표
-											showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
+											showArrowIcon={true}
+											showTickIcon={false}
 											onChangeValue={() => scrollToTop()}
 										/>
 									</View>
@@ -379,15 +380,13 @@ const ProverbListScreen = () => {
 												setFieldOpen(open);
 												if (open) {
 													setLevelOpen(false);
-												} // 👉 필드 열릴 때 레벨 닫음
+												}
 											}}
 											setValue={setFieldValue}
 											setItems={setFieldItems}
 											onChangeValue={() => scrollToTop()}
-											dropDownDirection="BOTTOM" // ✅ 추가
-											scrollViewProps={{
-												nestedScrollEnabled: true,
-											}}
+											dropDownDirection="BOTTOM"
+											scrollViewProps={{ nestedScrollEnabled: true }}
 											style={styles.dropdownField}
 											dropDownContainerStyle={{
 												overflow: 'visible',
@@ -465,25 +464,29 @@ const ProverbListScreen = () => {
 											}}
 										/>
 									</View>
-
-									{/* 초기화 버튼 */}
-									{/* <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-									<Icon name='rotate-right' size={20} color='#555' />
-								</TouchableOpacity> */}
 								</View>
-								{/* 리스트 개수 표시 */}
+
+								{/* ✅ 즐겨찾기 버튼 + 리스트 개수 */}
 								<View style={styles.listCountWrapper}>
-									<Text style={styles.listCountText}>🔍 총 {proverbList.length}개 속담이 검색되었어요!</Text>
+									<TouchableOpacity
+										style={[styles.favoriteFilterButton, showFavoritesOnly && styles.favoriteFilterButtonActive]}
+										onPress={() => {
+											setShowFavoritesOnly(!showFavoritesOnly);
+											scrollToTop();
+										}}>
+										<Icon name="star" solid={showFavoritesOnly} size={14} color={showFavoritesOnly ? '#FFD700' : '#999'} />
+										<Text style={[styles.favoriteFilterText, showFavoritesOnly && styles.favoriteFilterTextActive]}>즐겨찾기</Text>
+									</TouchableOpacity>
+									<Text style={styles.listCountText}>총 {proverbList.length}개가 검색되었어요!</Text>
 								</View>
 							</View>
 						</View>
-
 						{/* 리스트 영역 */}
 						<View style={{ flex: 1, zIndex: 0 }}>
 							<FlatList
 								ref={scrollRef}
 								data={visibleList}
-								scrollEnabled={!fieldOpen && !levelOpen} // ⛔ 드롭다운 열려 있으면 스크롤 막기
+								scrollEnabled={!fieldOpen && !levelOpen}
 								keyExtractor={(item) => item.id.toString()}
 								refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 								onEndReached={loadMoreData}
@@ -506,53 +509,58 @@ const ProverbListScreen = () => {
 									const isLast = index === visibleList.length - 1;
 									return (
 										<TouchableOpacity
-											style={[
-												styles.itemBox,
-												{ marginBottom: isLast ? scaleHeight(24) : scaleHeight(12) },
-											]}
+											style={[styles.itemBox, { marginBottom: isLast ? scaleHeight(24) : scaleHeight(12) }]}
 											onPress={() => {
 												setSelectedProverb(item);
 												setShowDetailModal(true);
 											}}>
+											{/* ✅ 배지 + 즐겨찾기 한 줄 */}
+											<View style={styles.badgeAndFavoriteRow}>
+												<View style={styles.badgeInlineRow}>
+													<View
+														style={[
+															styles.badge,
+															{
+																backgroundColor: getLevelColor(item.level),
+																flexDirection: 'row',
+																alignItems: 'center',
+																paddingHorizontal: scaleWidth(8),
+																paddingVertical: scaleHeight(4),
+															},
+														]}>
+														{getLevelIcon(item.level)}
+														<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>
+															{{ 1: '아주 쉬움', 2: '쉬움', 3: '보통', 4: '어려움' }[item.level] || '알 수 없음'}
+														</Text>
+													</View>
+													<View
+														style={[
+															styles.badge2,
+															{
+																backgroundColor: getFieldColor(item.category),
+																flexDirection: 'row',
+																alignItems: 'center',
+																paddingHorizontal: scaleWidth(8),
+															},
+														]}>
+														{getFieldIcon(item.category)}
+														<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>{item.category || '미지정'}</Text>
+													</View>
+												</View>
 
-											{/* 배지 + 화살표 한 줄 */}
-											<View style={styles.badgeInlineRow}>
-												<View
-													style={[
-														styles.badge,
-														{
-															backgroundColor: getLevelColor(item.level),
-															flexDirection: 'row',
-															alignItems: 'center',
-															paddingHorizontal: scaleWidth(8),
-															paddingVertical: scaleHeight(4),
-														},
-													]}>
-													{getLevelIcon(item.level)}
-													<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>
-														{{ 1: '아주 쉬움', 2: '쉬움', 3: '보통', 4: '어려움' }[item.level] || '알 수 없음'}
-													</Text>
-												</View>
-												<View
-													style={[
-														styles.badge2,
-														{
-															backgroundColor: getFieldColor(item.category),
-															flexDirection: 'row',
-															alignItems: 'center',
-															paddingHorizontal: scaleWidth(8),
-														},
-													]}>
-													{getFieldIcon(item.category)}
-													<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>{item.category || '미지정'}</Text>
-												</View>
-
-												{/* ✅ 화살표 — 오른쪽 끝 */}
-												<View style={{ flex: 1, alignItems: 'flex-end' }}>
-													<IconComponent type="FontAwesome6" name="chevron-right" size={13} color="#c0c0c0" />
-												</View>
+												{/* ✅ 즐겨찾기 아이콘 - 오른쪽 끝 */}
+												<TouchableOpacity
+													onPress={(e) => {
+														e.stopPropagation();
+														handleToggleFavorite(item.id);
+													}}
+													style={styles.favoriteIconWrapper}
+													hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+													<Icon name="star" solid={favoriteIds.includes(item.id)} size={20} color={favoriteIds.includes(item.id) ? '#FFD700' : '#ccc'} />
+												</TouchableOpacity>
 											</View>
 
+											{/* 텍스트 */}
 											<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
 											<Text style={styles.meaningText}>- {item.longMeaning}</Text>
 
@@ -573,7 +581,8 @@ const ProverbListScreen = () => {
 								}}
 							/>
 						</View>
-
+						{/* ✅ 토스트 */}
+						<SuccessToast visible={showToast} message={toastMessage} onHide={() => setShowToast(false)} />
 						{/* 스크롤 최상단 이동 버튼 */}
 						{showScrollTop && (
 							<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
@@ -581,8 +590,15 @@ const ProverbListScreen = () => {
 							</TouchableOpacity>
 						)}
 
-						{/* 상세 모달 */}
-						<ProverbDetailModal visible={showDetailModal} proverb={selectedProverb} onClose={() => setShowDetailModal(false)} />
+						<ProverbDetailModal
+							visible={showDetailModal}
+							proverb={selectedProverb}
+							onClose={() => setShowDetailModal(false)}
+							onFavoriteChange={() => {
+								// ✅ 모달에서 즐겨찾기 변경 시 리스트 갱신
+								loadFavorites(); // ✅ 즐겨찾기 로드
+							}}
+						/>
 					</View>
 				</TouchableWithoutFeedback>
 			</KeyboardAvoidingView>
@@ -607,7 +623,7 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.05,
 		shadowRadius: scaleWidth(8),
-		overflow: 'visible', // ✅ 추가
+		overflow: 'visible',
 	},
 	input: {
 		width: '80%',
@@ -621,9 +637,7 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(12),
 		textAlignVertical: 'center',
 	},
-	filterRow: {
-		flexDirection: 'row',
-	},
+	filterRow: { flexDirection: 'row' },
 	dropdown: {
 		backgroundColor: '#fff',
 		borderColor: '#ccc',
@@ -659,20 +673,17 @@ const styles = StyleSheet.create({
 		overflow: 'hidden',
 		maxHeight: '85%',
 	},
-
 	modalTitle: {
 		fontSize: scaledSize(20),
 		fontWeight: 'bold',
 		color: '#2d3436',
 		flexShrink: 1,
 	},
-
 	modalBody: {
 		paddingHorizontal: scaleWidth(20),
 		paddingTop: scaleHeight(8),
 		paddingBottom: scaleHeight(16),
 	},
-
 	modalSection: {
 		marginBottom: scaleHeight(16),
 		backgroundColor: '#f9f9f9',
@@ -683,7 +694,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.05,
 		shadowRadius: scaleWidth(4),
 	},
-
 	modalLabel: {
 		fontSize: scaledSize(17),
 		fontWeight: 'bold',
@@ -695,7 +705,6 @@ const styles = StyleSheet.create({
 		color: '#2d3436',
 		lineHeight: scaleHeight(24),
 	},
-
 	modalHighlightTitle: {
 		fontSize: scaledSize(14),
 		fontWeight: 'bold',
@@ -707,7 +716,6 @@ const styles = StyleSheet.create({
 		color: '#2d3436',
 		lineHeight: scaleHeight(22),
 	},
-
 	modalCloseButton: {
 		backgroundColor: '#0984e3',
 		paddingVertical: scaleHeight(14),
@@ -744,6 +752,12 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(12),
 		backgroundColor: '#f1f2f6',
 	},
+	badge2: {
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(4),
+		borderRadius: scaleWidth(12),
+		backgroundColor: '#f1f2f6',
+	},
 	badgeText: {
 		color: '#fff',
 		fontSize: scaledSize(12),
@@ -751,6 +765,7 @@ const styles = StyleSheet.create({
 	},
 	filterDropdownRow: {
 		flexDirection: 'row',
+		marginBottom: scaleHeight(8),
 	},
 	dropdownWrapper: {
 		flex: 1,
@@ -772,15 +787,57 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(6),
 		marginRight: scaleWidth(6),
 	},
+	// ✅ 즐겨찾기 + 카운트 한 줄
 	listCountWrapper: {
-		marginTop: scaleHeight(6),
-		alignItems: 'flex-end',
-		paddingHorizontal: scaleWidth(16),
+		marginTop: scaleHeight(4),
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		marginBottom: scaleHeight(3),
 	},
 	listCountText: {
 		fontSize: scaledSize(14),
 		color: '#666',
-		marginTop: scaleHeight(12),
+	},
+	favoriteFilterButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: scaleWidth(12),
+		paddingVertical: scaleHeight(6),
+		borderRadius: scaleWidth(20),
+		borderWidth: 1,
+		borderColor: '#ddd',
+		backgroundColor: '#fff',
+		gap: scaleWidth(6),
+	},
+	favoriteFilterButtonActive: {
+		backgroundColor: '#FFF9E6',
+		borderColor: '#FFD700',
+	},
+	favoriteFilterText: {
+		fontSize: scaledSize(13),
+		color: '#999',
+		fontWeight: '600',
+	},
+	favoriteFilterTextActive: {
+		color: '#FF8C00',
+	},
+	favoriteIconWrapper: {
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingLeft: scaleWidth(8),
+	},
+	// ✅ 배지 + 즐겨찾기 한 줄
+	badgeAndFavoriteRow: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		marginBottom: scaleHeight(10),
+	},
+	badgeInlineRow: {
+		flexDirection: 'row',
+		flexShrink: 0,
+		gap: scaleWidth(6),
 	},
 	resetButton: {
 		justifyContent: 'center',
@@ -925,15 +982,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		marginRight: scaleWidth(8),
 	},
-	badgeInlineRow: {
-		flexDirection: 'row',
-		flexShrink: 0,
-		gap: scaleWidth(6),
-		marginBottom: scaleHeight(10),
-	},
-	proverbBlock: {
-		marginBottom: scaleHeight(6),
-	},
+	proverbBlock: { marginBottom: scaleHeight(6) },
 	proverbTextMulti: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
@@ -965,7 +1014,7 @@ const styles = StyleSheet.create({
 		zIndex: 10,
 		paddingHorizontal: scaleWidth(16),
 		paddingTop: scaleHeight(16),
-		overflow: 'visible', // ✅ 추가
+		overflow: 'visible',
 	},
 	flatListCotent: {
 		paddingTop: scaleHeight(12),
@@ -985,11 +1034,5 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: scaleHeight(10),
-	},
-	badge2: {
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(4),
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#f1f2f6',
 	},
 });

@@ -22,6 +22,7 @@ import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModa
 import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import CurrentVersionModal from './modal/CurrentVersionModal';
 import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL } from '@env';
+import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 
 const APP_NAME = '속픽: 속담 퀴즈';
 
@@ -110,7 +111,6 @@ const SettingScreen = () => {
 			case 'all':
 				msg = '지금까지 학습하고 풀었던 모든 기록이 사라져요. 정말 전부 다시 시작할까요?';
 				break;
-
 
 			default:
 				msg = '정말 초기화하시겠어요?';
@@ -214,6 +214,23 @@ const SettingScreen = () => {
 		await AsyncStorage.setItem(STORAGE_KEYS.study, JSON.stringify(parsed));
 		Alert.alert('처리됨', '모든 학습 완료 + 뱃지 지급!');
 	};
+
+	// 5. handleCompleteAllTower 함수 추가 (handleCompleteAllStudy 아래에)
+	const handleCompleteAllTower = async () => {
+		const allLevels = TOWER_LEVELS.map((t) => t.level);
+		const towerProgress: TowerProgress = {
+			level: TOWER_LEVELS[TOWER_LEVELS.length - 1].level,
+			attempts: 0,
+			adRewardUsed: 0,
+			completedLevels: allLevels,
+			currentQuestion: 0,
+			correctAnswers: 0,
+			lastAttemptDate: new Date().toISOString(),
+			unlockedRewards: allLevels,
+		};
+		await AsyncStorage.setItem(STORAGE_KEYS.towerChallenge, JSON.stringify(towerProgress));
+		Alert.alert('처리됨', '모든 타워 클리어 완료!');
+	};
 	const checkIsLatestVersion = async () => {
 		try {
 			const updateNeeded = await VersionCheck.needUpdate();
@@ -244,7 +261,7 @@ const SettingScreen = () => {
 		const policyData = ['privacyPolicy', 'openSource', 'checkVersion'];
 
 		if (__DEV__) {
-			policyData.push('completeAllQuiz', 'completeAllStudy');
+			policyData.push('completeAllQuiz', 'completeAllStudy', 'completeAllTower');
 		}
 
 		const policySection = {
@@ -325,6 +342,10 @@ const SettingScreen = () => {
 				completeAllStudy: {
 					label: '모든 학습 완료로 설정',
 					icon: { type: 'materialIcons', name: 'school' },
+				},
+				completeAllTower: {
+					label: '모든 타워 클리어 설정',
+					icon: { type: 'materialIcons', name: 'tower' }, // 없으면 'flag' 사용
 				},
 			}),
 		};
@@ -426,6 +447,9 @@ const SettingScreen = () => {
 				case 'completeAllStudy':
 					handleCompleteAllStudy();
 					break;
+				case 'completeAllTower':
+					handleCompleteAllTower();
+					break;
 			}
 		};
 
@@ -437,7 +461,9 @@ const SettingScreen = () => {
 						name={settingsMap[item].icon.name}
 						size={scaledSize(20)}
 						// renderItem - 빨간 아이콘 배열
-						color={['resetStudy', 'resetQuiz', 'resetAll', 'resetTodayQuiz', 'resetTimeChallenge', 'resetTowerChallenge'].includes(item) ? '#e74c3c' : '#333'}
+						color={
+							['resetStudy', 'resetQuiz', 'resetAll', 'resetTodayQuiz', 'resetTimeChallenge', 'resetTowerChallenge'].includes(item) ? '#e74c3c' : '#333'
+						}
 						style={styles.icon}
 						isBottomIcon={true}
 					/>

@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
 	View,
@@ -32,6 +33,7 @@ import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { FIELD_DROPDOWN_ITEMS } from './ProverbStudyScreen';
 import LevelModal from './modal/LevelModal';
 import { LEVEL_DATA, PET_REWARDS } from '@/const/ConstInfoData';
+import { TOWER_LEVELS } from '@/const/ConstTowerData';
 // import { TOWER_LEVELS } from '@/const/ConstTowerData';
 
 LocaleConfig.defaultLocale = 'kr';
@@ -1125,67 +1127,107 @@ const CapitalResultScreen = () => {
 							)}
 						</View>
 					)}
+					{/* 나의 타워 챌린지 내역 */}
+					<TouchableOpacity style={styles.sectionHeader} onPress={() => setShowTowerSection(!showTowerSection)}>
+						<View style={[styles.iconCircle3, { backgroundColor: '#8e44ad' }]}>
+							<IconComponent type="fontAwesome6" name="tower-observation" size={scaledSize(14)} color="#ffffff" />
+						</View>
+						<Text style={styles.sectionTitle}>나의 타워 챌린지</Text>
+						<IconComponent
+							type="materialIcons"
+							name={showTowerSection ? 'expand-less' : 'expand-more'}
+							size={20}
+							color="#27ae60"
+							style={{ marginLeft: 'auto' }}
+						/>
+					</TouchableOpacity>
+
 					{showTowerSection && (
 						<View style={styles.sectionBox}>
-							{unlockedRewards.length === 0 ? (
-								<Text style={styles.noRecordText}>아직 클리어한 타워가 없습니다. 도전해보세요!</Text>
-							) : (
-								<>
-									<Text style={styles.topRankingTitle}>
-										🗼 클리어한 타워 ({unlockedRewards.length} / {TOWER_LEVELS.length})
-									</Text>
-									{TOWER_LEVELS.filter(t => unlockedRewards.includes(t.level)).map(tower => (
+							<Text style={styles.topRankingTitle}>
+								🗼 클리어한 타워 ({unlockedRewards.length} / {TOWER_LEVELS.length})
+							</Text>
+							{TOWER_LEVELS.map((tower) => {
+								const isCleared = unlockedRewards.includes(tower.level);
+								return (
+									<View
+										key={tower.level}
+										style={{
+											flexDirection: 'row',
+											borderRadius: scaleWidth(12),
+											overflow: 'hidden',
+											marginBottom: scaleHeight(12),
+											borderWidth: 1,
+											borderColor: isCleared ? tower.color : '#ddd',
+											backgroundColor: '#fff',
+											opacity: isCleared ? 1 : 0.4,
+										}}>
+										{/* 왼쪽: 보스 이미지 + 레벨 배지 */}
 										<View
-											key={tower.level}
 											style={{
-												flexDirection: 'row',
-												borderRadius: scaleWidth(12),
-												overflow: 'hidden',
-												marginBottom: scaleHeight(12),
-												borderWidth: 1,
-												borderColor: tower.color,
-												backgroundColor: '#fff',
+												width: scaleWidth(80),
+												backgroundColor: isCleared ? tower.backgroundColor : '#f0f0f0',
+												alignItems: 'center',
+												justifyContent: 'center',
+												padding: scaleWidth(8),
 											}}>
-											{/* 왼쪽: 보스 이미지 + 레벨 배지 */}
-											<View style={{ width: scaleWidth(80), backgroundColor: tower.backgroundColor, alignItems: 'center', justifyContent: 'center', padding: scaleWidth(8) }}>
-												<FastImage
-													source={tower.bossImage}
-													style={{ width: scaleWidth(56), height: scaleWidth(56), borderRadius: scaleWidth(8) }}
-													resizeMode="contain"
-												/>
-												<View style={{ marginTop: scaleHeight(4), backgroundColor: tower.color, borderRadius: scaleWidth(8), paddingHorizontal: scaleWidth(6), paddingVertical: scaleHeight(2) }}>
-													<Text style={{ color: '#fff', fontSize: scaledSize(10), fontWeight: 'bold' }}>LV.{tower.level}</Text>
-												</View>
+											<FastImage
+												source={tower.bossImage}
+												style={{ width: scaleWidth(56), height: scaleWidth(56), borderRadius: scaleWidth(8) }}
+												resizeMode="contain"
+											/>
+											<View
+												style={{
+													marginTop: scaleHeight(4),
+													backgroundColor: isCleared ? tower.color : '#bbb',
+													borderRadius: scaleWidth(8),
+													paddingHorizontal: scaleWidth(6),
+													paddingVertical: scaleHeight(2),
+												}}>
+												<Text style={{ color: '#fff', fontSize: scaledSize(10), fontWeight: 'bold' }}>LV.{tower.level}</Text>
 											</View>
+										</View>
 
-											<View style={{ flex: 1, padding: scaleWidth(12), justifyContent: 'center' }}>
-												<Text style={{ fontSize: scaledSize(10), color: '#999', marginBottom: scaleHeight(2) }}>{tower.bossTitle}</Text>
-												<Text style={{ fontSize: scaledSize(14), fontWeight: 'bold', color: '#2c3e50', marginBottom: scaleHeight(6) }}>{tower.bossName}</Text>
+										{/* 오른쪽: 보스 정보 + 보상 */}
+										<View style={{ flex: 1, padding: scaleWidth(12), justifyContent: 'center' }}>
+											<Text style={{ fontSize: scaledSize(10), color: '#999', marginBottom: scaleHeight(2) }}>{tower.bossTitle}</Text>
+											<Text style={{ fontSize: scaledSize(14), fontWeight: 'bold', color: '#2c3e50', marginBottom: scaleHeight(6) }}>{tower.bossName}</Text>
 
-												<View style={{ height: 1, backgroundColor: '#eee', marginBottom: scaleHeight(6) }} />
+											<View style={{ height: 1, backgroundColor: '#eee', marginBottom: scaleHeight(6) }} />
 
-												<View style={{ flexDirection: 'row', alignItems: 'center', gap: scaleWidth(8) }}>
-													<FastImage
-														source={tower.reward.image}
-														style={{ width: scaleWidth(36), height: scaleWidth(36), borderRadius: scaleWidth(6), borderWidth: 1, borderColor: '#ddd' }}
-														resizeMode="cover"
-													/>
-													<View>
-														<Text style={{ fontSize: scaledSize(10), color: '#888' }}>
-															{tower.reward.type === 'costume' ? '👕 코스튬' : '🌟 캐릭터'}
-														</Text>
-														<Text style={{ fontSize: scaledSize(12), fontWeight: 'bold', color: '#2c3e50' }}>{tower.reward.name}</Text>
-													</View>
+											<View style={{ flexDirection: 'row', alignItems: 'center', gap: scaleWidth(8) }}>
+												<FastImage
+													source={tower.reward.image}
+													style={{
+														width: scaleWidth(36),
+														height: scaleWidth(36),
+														borderRadius: scaleWidth(6),
+														borderWidth: 1,
+														borderColor: '#ddd',
+													}}
+													resizeMode="cover"
+												/>
+												<View>
+													<Text style={{ fontSize: scaledSize(10), color: '#888' }}>{tower.reward.type === 'costume' ? '👕 코스튬' : '🌟 캐릭터'}</Text>
+													<Text style={{ fontSize: scaledSize(12), fontWeight: 'bold', color: '#2c3e50' }}>{tower.reward.name}</Text>
+												</View>
 
-													<View style={{ marginLeft: 'auto', backgroundColor: tower.color, borderRadius: scaleWidth(10), paddingHorizontal: scaleWidth(8), paddingVertical: scaleHeight(3) }}>
-														<Text style={{ color: '#fff', fontSize: scaledSize(10), fontWeight: 'bold' }}>클리어 ✓</Text>
-													</View>
+												{/* 클리어 / 미클리어 배지 */}
+												<View
+													style={{
+														marginLeft: 'auto',
+														backgroundColor: isCleared ? tower.color : '#bbb',
+														borderRadius: scaleWidth(10),
+														paddingHorizontal: scaleWidth(8),
+														paddingVertical: scaleHeight(3),
+													}}>
+													<Text style={{ color: '#fff', fontSize: scaledSize(10), fontWeight: 'bold' }}>{isCleared ? '클리어 ✓' : '미클리어 🔒'}</Text>
 												</View>
 											</View>
 										</View>
-									))}
-								</>
-							)}
+									</View>
+								);
+							})}
 						</View>
 					)}
 				</ScrollView>

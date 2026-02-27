@@ -1,15 +1,14 @@
-/* eslint-disable react/no-unstable-nested-components */
 import { Paths } from '@/navigation/conf/Paths';
 import { MainDataType } from '@/types/MainDataType';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import React, { useEffect, useRef, useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import * as Animatable from 'react-native-animatable';
+import SuccessToast from '../SuccessToast';
 
-// ✅ QuizResultModal.tsx
 interface QuizResultModalProps {
 	visible: boolean;
 	resultType: 'correct' | 'wrong' | 'timeout' | 'done' | '';
@@ -17,14 +16,147 @@ interface QuizResultModalProps {
 	resultMessage: string;
 	quizMode: 'meaning' | 'proverb' | 'blank';
 	question: MainDataType.Proverb | null;
+	favoriteIds: number[];
+	onToggleFavorite: () => Promise<void>;
 	onNext: () => void;
 }
 
-const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quizMode, question, onNext }: QuizResultModalProps) => {
+const toastStyles = StyleSheet.create({
+	container: {
+		position: 'absolute',
+		bottom: scaleHeight(72),
+		alignSelf: 'center',
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: '#2ecc71',
+		paddingVertical: scaleHeight(8),
+		paddingHorizontal: scaleWidth(16),
+		borderRadius: scaleWidth(20),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.15,
+		shadowRadius: 4,
+		zIndex: 999,
+	},
+	text: {
+		color: '#fff',
+		fontSize: scaledSize(13),
+		fontWeight: '600',
+	},
+});
+
+// ✅ ProverbInfoCard를 외부 컴포넌트로 분리 (클로저 문제 해결)
+interface ProverbInfoCardProps {
+	question: MainDataType.Proverb | null;
+	highlightColor?: string;
+	backgroundColor?: string;
+	quizMode: 'meaning' | 'proverb' | 'blank';
+	favoriteIds: number[];
+	shouldAnimate: boolean;
+	closing: boolean;
+	onToggleFavorite: () => void;
+	onAnimationEnd: () => void;
+}
+
+const ProverbInfoCard = ({
+	question,
+	highlightColor = '#27ae60',
+	backgroundColor = '#eafaf1',
+	quizMode,
+	favoriteIds,
+	shouldAnimate,
+	closing,
+	onToggleFavorite,
+	onAnimationEnd,
+}: ProverbInfoCardProps) => {
+	if (!question) {
+		return null;
+	}
+
+	const isFavorited = question.id !== undefined && favoriteIds.includes(question.id);
+
+	return (
+		<View style={[styles.infoCard, { backgroundColor, borderColor: highlightColor }]}>
+			<Text style={[styles.infoSectionTitle, { color: highlightColor }]}>📖 속담 해설</Text>
+
+			{quizMode === 'proverb' || quizMode === 'blank' ? (
+				shouldAnimate && !closing ? (
+					<Animatable.View animation="fadeInUp" duration={800} delay={300} onAnimationEnd={onAnimationEnd}>
+						<Text style={styles.modalProverbText}>{question.proverb}</Text>
+					</Animatable.View>
+				) : (
+					<Text style={styles.modalProverbText}>{question.proverb}</Text>
+				)
+			) : (
+				<Text style={styles.modalProverbText}>{question.proverb}</Text>
+			)}
+			<TouchableOpacity style={styles.favoriteIconButton} onPress={onToggleFavorite} activeOpacity={0.7}>
+				<Icon name={isFavorited ? 'star' : 'star'} solid={isFavorited} size={20} color={isFavorited ? '#FFD700' : '#ccc'} />
+			</TouchableOpacity>
+
+			{Boolean(question.longMeaning) && (
+				<View style={styles.meaningHighlight}>
+					{quizMode === 'meaning' && shouldAnimate && !closing ? (
+						<Animatable.View animation="fadeInUp" duration={800} delay={300} onAnimationEnd={onAnimationEnd}>
+							<View style={styles.meaningQuoteBox}>
+								<Icon name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
+								<Text style={styles.meaningQuoteText}>{question.longMeaning}</Text>
+							</View>
+						</Animatable.View>
+					) : (
+						<View style={styles.meaningQuoteBox}>
+							<Icon name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
+							<Text style={styles.meaningQuoteText}>{question.longMeaning}</Text>
+						</View>
+					)}
+				</View>
+			)}
+
+			{Array.isArray(question.example) && question.example.length > 0 && (
+				<View style={styles.sectionBox}>
+					<Text style={styles.sectionTitle}>✍️ 예시</Text>
+					{question.example.map((ex, idx) => (
+						<View key={idx} style={styles.sameProverbBox}>
+							<Text style={styles.exampleText}>• {ex}</Text>
+						</View>
+					))}
+				</View>
+			)}
+
+			{Array.isArray(question.sameProverb) && question.sameProverb.filter((p) => p.trim()).length > 0 && (
+				<View style={styles.sectionBox}>
+					<Text style={styles.sectionTitle}>🔗 비슷한 속담</Text>
+					{question.sameProverb.map((p, idx) => (
+						<View key={idx} style={styles.sameProverbBox}>
+							<Text style={styles.sameProverbText}>• {p}</Text>
+						</View>
+					))}
+				</View>
+			)}
+		</View>
+	);
+};
+
+const QuizResultModal = ({
+	visible,
+	resultType,
+	resultTitle,
+	resultMessage,
+	quizMode,
+	favoriteIds,
+	onToggleFavorite,
+	question,
+	onNext,
+}: QuizResultModalProps) => {
 	const navigation = useNavigation();
 
 	const [shouldAnimate, setShouldAnimate] = useState(false);
 	const [closing, setClosing] = useState(false);
+
+	// ✅ Toast 상태
+	const [toastVisible, setToastVisible] = useState(false);
+	const [toastMessage, setToastMessage] = useState('');
+	const toastTimer = useRef<NodeJS.Timeout | null>(null);
 
 	const hasAnimated = useRef(false);
 
@@ -40,89 +172,35 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 			hasAnimated.current = false;
 			setShouldAnimate(false);
 			setClosing(false);
+			setToastVisible(false);
+			if (toastTimer.current) {
+				clearTimeout(toastTimer.current);
+			}
 		}
 	}, [visible]);
 
-	const ProverbInfoCard = ({
-		question,
-		highlightColor = '#27ae60',
-		backgroundColor = '#eafaf1',
-	}: {
-		question: MainDataType.Proverb | null;
-		highlightColor?: string;
-		backgroundColor?: string;
-	}) => {
-		if (!question) {
-			return null;
+	// ✅ 즐겨찾기 토글 + Toast (타이머로 자동 숨김 추가)
+	const handleToggleFavoriteWithToast = async () => {
+		const wasFavorited = question?.id !== undefined && favoriteIds.includes(question.id);
+		await onToggleFavorite();
+
+		const msg = wasFavorited ? '즐겨찾기 제거' : '즐겨찾기 추가';
+		setToastMessage(msg);
+		setToastVisible(true);
+
+		// ✅ 핵심: 2초 후 toast 숨기기
+		if (toastTimer.current) {
+			clearTimeout(toastTimer.current);
 		}
+		toastTimer.current = setTimeout(() => {
+			setToastVisible(false);
+		}, 2000);
+	};
 
-		return (
-			<View style={[styles.infoCard, { backgroundColor, borderColor: highlightColor }]}>
-				<Text style={[styles.infoSectionTitle, { color: highlightColor }]}>📖 속담 해설</Text>
-
-				{quizMode === 'proverb' || quizMode === 'blank' ? (
-					shouldAnimate && !closing ? (
-						<Animatable.View animation="fadeInUp" duration={800} delay={300} onAnimationEnd={() => setShouldAnimate(false)}>
-							<Text style={styles.modalProverbText}>{question.proverb}</Text>
-						</Animatable.View>
-					) : (
-						<Text style={styles.modalProverbText}>{question.proverb}</Text>
-					)
-				) : (
-					<Text style={styles.modalProverbText}>{question.proverb}</Text>
-				)}
-
-				{Boolean(question.longMeaning) && (
-					<View style={styles.meaningHighlight}>
-						{quizMode === 'meaning' && shouldAnimate && !closing ? (
-							<Animatable.View
-								animation="fadeInUp"
-								duration={800}
-								delay={300}
-								onAnimationEnd={() => {
-									setShouldAnimate(false);
-									setClosing(true);
-									setTimeout(() => setClosing(false), 100);
-								}}>
-								<View style={styles.meaningQuoteBox}>
-									<Icon name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
-									<Text style={styles.meaningQuoteText}>{question.longMeaning}</Text>
-								</View>
-							</Animatable.View>
-						) : (
-							<View style={styles.meaningQuoteBox}>
-								<Icon name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
-								<Text style={styles.meaningQuoteText}>{question.longMeaning}</Text>
-							</View>
-						)}
-					</View>
-				)}
-
-				{Array.isArray(question.example) && question.example.length > 0 && (
-					<View style={styles.sectionBox}>
-						<Text style={styles.sectionTitle}>✍️ 예시</Text>
-						{question.example.map((ex, idx) => (
-							<View key={idx} style={styles.sameProverbBox}>
-								<Text key={idx} style={styles.exampleText}>
-									• {ex}
-								</Text>
-							</View>
-						))}
-					</View>
-				)}
-
-				{Array.isArray(question.sameProverb) && question.sameProverb.filter((p) => p.trim()).length > 0 && (
-					<View style={styles.sectionBox}>
-						<Text style={styles.sectionTitle}>🔗 비슷한 속담</Text>
-						{question.sameProverb.map((p, idx) => (
-							<View key={idx} style={styles.sameProverbBox}>
-								<Text style={styles.sameProverbText}>• {p}</Text>
-							</View>
-						))}
-					</View>
-				)}
-			</View>
-		);
+	const handleAnimationEnd = () => {
+		setShouldAnimate(false);
+		setClosing(true);
+		setTimeout(() => setClosing(false), 100);
 	};
 
 	if (!visible) {
@@ -132,6 +210,8 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 	return (
 		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.modalOverlay}>
+				{/* ✅ Toast */}
+
 				<View
 					style={[
 						styles.resultModal,
@@ -140,7 +220,6 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 						resultType === 'timeout' && { backgroundColor: '#fffaf0', borderColor: '#f39c12', borderWidth: 1 },
 						resultType === 'done' && styles.resultModalDone,
 					]}>
-					{/* ✅ done일 때는 상단 title, 마스코트 숨김 */}
 					{resultType !== 'done' && (
 						<Text
 							style={[
@@ -160,6 +239,7 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 							resizeMode={FastImage.resizeMode.contain}
 						/>
 					)}
+					<SuccessToast visible={toastVisible} message={toastMessage} onHide={() => setToastVisible(false)} />
 
 					<ScrollView
 						style={styles.scrollView}
@@ -192,7 +272,17 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 						) : resultType === 'correct' ? (
 							<>
 								<Text style={[styles.resultMessageBig, { marginBottom: scaleHeight(12) }]}>{resultMessage}</Text>
-								<ProverbInfoCard question={question} highlightColor="#27ae60" backgroundColor="#eafaf1" />
+								<ProverbInfoCard
+									question={question}
+									highlightColor="#27ae60"
+									backgroundColor="#eafaf1"
+									quizMode={quizMode}
+									favoriteIds={favoriteIds}
+									shouldAnimate={shouldAnimate}
+									closing={closing}
+									onToggleFavorite={handleToggleFavoriteWithToast}
+									onAnimationEnd={handleAnimationEnd}
+								/>
 							</>
 						) : (
 							<>
@@ -200,7 +290,17 @@ const QuizResultModal = ({ visible, resultType, resultTitle, resultMessage, quiz
 								<Text style={{ fontSize: scaledSize(15), fontWeight: '600', textAlign: 'center', padding: scaleWidth(20) }}>
 									정답은 <Text style={{ color: '#27ae60' }}>"{question?.proverb}"</Text>였어요!
 								</Text>
-								<ProverbInfoCard question={question} highlightColor="#e67e22" backgroundColor="#fffdf7" />
+								<ProverbInfoCard
+									question={question}
+									highlightColor="#e67e22"
+									backgroundColor="#fffdf7"
+									quizMode={quizMode}
+									favoriteIds={favoriteIds}
+									shouldAnimate={shouldAnimate}
+									closing={closing}
+									onToggleFavorite={handleToggleFavoriteWithToast}
+									onAnimationEnd={handleAnimationEnd}
+								/>
 							</>
 						)}
 					</ScrollView>
@@ -467,7 +567,7 @@ export const styles = StyleSheet.create({
 		color: '#1E6BB8',
 		textAlign: 'center',
 		lineHeight: scaleHeight(28),
-		marginBottom: scaleHeight(16),
+		marginBottom: scaleHeight(4),
 	},
 	sectionBox: {
 		borderWidth: 1,
@@ -553,6 +653,11 @@ export const styles = StyleSheet.create({
 		fontSize: scaledSize(13),
 		color: '#444',
 		lineHeight: scaleHeight(20),
+	},
+	favoriteIconButton: {
+		alignSelf: 'center',
+		padding: scaleWidth(10),
+		marginBottom: scaleHeight(8),
 	},
 });
 

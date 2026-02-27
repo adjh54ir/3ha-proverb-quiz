@@ -87,4 +87,5 @@ export interface TowerProgress {
 	correctAnswers: number;
 	lastAttemptDate: string;
 	unlockedRewards: number[]; // 획득한 보상 ID
+	badges?: string[]; // ✅ 추가
 }

@@ -24,6 +24,7 @@ import StartModal from './modal/QuizStartModal';
 import NewBadgeModal from './modal/NewBadgeModal';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import QuizHintModal from './modal/QuizHintModal';
+import { toggleFavorite } from '@/utils/favoriteUtils';
 
 const labelColors = ['#1abc9c', '#3498db', '#9b59b6', '#e67e22'];
 
@@ -85,6 +86,7 @@ const QuizScreen = () => {
 	const [showExitModal, setShowExitModal] = useState<boolean>(false);
 	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
 	const [showHintModal, setShowHintModal] = useState(false);
+	const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
 
 	const hasAnsweredRef = useRef(false);
 	const [totalScore, setTotalScore] = useState(0);
@@ -128,7 +130,7 @@ const QuizScreen = () => {
 			setProverbs(filtered);
 			if (filtered.length > 0) loadQuestion();
 		}
-	}, [quizHistory, selectedLevel, selectedCategory, showStartModal]); // ✅ showStartModal 의존성 추가
+	}, [quizHistory, selectedLevel]); // ✅ showStartModal 의존성 추가
 
 	useEffect(() => {
 		(async () => {
@@ -250,21 +252,17 @@ const QuizScreen = () => {
 	 * - 일반 모드: 기존 로직 유지 (이미 푼 문제 제외하고 랜덤 출제)
 	 * - 오답 복습 모드: reviewIndex 기반 순차 출제
 	 */
-	const loadQuestion = () => {
+	const loadQuestion = (pool?: MainDataType.Proverb[]) => {
 		if (!quizHistory) return;
 
-		// ✅ 모든 선택/정답 상태 초기화 (이게 핵심)
 		setSelected(null);
 		setIsCorrect(null);
 		setIsAnswerLocked(false);
-
-		// ✅ FlatList 강제 리렌더 유도용 (질문 ID 초기화)
 		setOptions([]);
 		setQuestionText('');
 		setBlankWord('');
 		setQuestion(null);
 
-		// ✅ 오답 복습 모드일 경우
 		if (isWrongReview && questionPool && questionPool.length > 0) {
 			if (reviewIndex >= questionPool.length) {
 				setResultType('done');
@@ -273,20 +271,18 @@ const QuizScreen = () => {
 				setShowResultModal(true);
 				return;
 			}
-
-			const newQuestion = questionPool[reviewIndex];
-			setupQuestion(newQuestion);
+			setupQuestion(questionPool[reviewIndex]);
 			return;
 		}
 
-		// ✅ 일반 모드일 경우
-		if (!filteredProverbs || filteredProverbs.length === 0) return;
+		// ✅ pool 파라미터 우선 사용 (stale closure 방지)
+		const source = pool ?? filteredProverbs;
+		if (!source || source.length === 0) return;
 
 		const solvedSet = new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]);
-
 		if (question) solvedSet.add(question.id);
 
-		const unSolved = filteredProverbs.filter((p) => !solvedSet.has(p.id));
+		const unSolved = source.filter((p) => !solvedSet.has(p.id));
 
 		if (unSolved.length === 0) {
 			setResultType('done');
@@ -296,8 +292,7 @@ const QuizScreen = () => {
 			return;
 		}
 
-		const newQuestion = unSolved[Math.floor(Math.random() * unSolved.length)];
-		setupQuestion(newQuestion);
+		setupQuestion(unSolved[Math.floor(Math.random() * unSolved.length)]);
 	};
 	/**
 	 * 문제 2: 문제 세팅 로직을 별도로 분리하여 재사용 가능하게
@@ -668,7 +663,7 @@ const QuizScreen = () => {
 		setProverbs(filtered);
 
 		if (!skipLoad && filtered.length > 0) {
-			loadQuestion();
+			loadQuestion(filtered); // ✅ filtered 직접 전달
 		}
 	};
 
@@ -741,6 +736,32 @@ const QuizScreen = () => {
 	};
 
 	const progressPercent = totalCount > 0 ? (getSolvedCount() / totalCount) * 100 : 0;
+
+	// ====================================================
+	// 1. favoriteIds 상태 로드 함수 추가 (throw 제거)
+	// ====================================================
+
+	// 기존의 throw Error 함수들 완전 제거 후 아래로 교체
+
+	const loadFavorites = async () => {
+		try {
+			const stored = await AsyncStorage.getItem(MainStorageKeyType.FAVORITES_STORAGE_KEY);
+			if (stored) {
+				// ✅ FavoriteItem[] 파싱 후 id만 추출
+				const favorites: { id: number; addedAt: number }[] = JSON.parse(stored);
+				setFavoriteIds(favorites.map((item) => item.id));
+			} else {
+				setFavoriteIds([]);
+			}
+		} catch (e) {
+			console.error('즐겨찾기 로드 실패', e);
+		}
+	};
+
+	// 앱 진입 시 즐겨찾기 로드
+	useEffect(() => {
+		loadFavorites();
+	}, []);
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -1007,7 +1028,14 @@ const QuizScreen = () => {
 					}, 300);
 				}}
 			/>
-			<StartModal visible={showStartModal} onStart={() => setShowStartModal(false)} onBack={() => safelyGoBack()} />
+			<StartModal
+				visible={showStartModal}
+				onStart={() => {
+					setShowStartModal(false);
+					setTimeout(() => onStart(), 100); // ✅ onStart 호출 추가
+				}}
+				onBack={() => safelyGoBack()}
+			/>
 			<QuizHintModal visible={showHintModal} question={question} onClose={() => setShowHintModal(false)} />
 			{/* ======================= 퀴즈 종료 ============================ */}
 			<Modal visible={showExitModal} transparent animationType='fade'>
@@ -1036,16 +1064,22 @@ const QuizScreen = () => {
 				</View>
 			</Modal>
 			<QuizResultModal
-				visible={showResultModal && !badgeModalVisible} // ✅ 동시에 보이지 않도록 수정
+				visible={showResultModal && !badgeModalVisible}
 				resultType={resultType}
 				resultTitle={resultTitle}
 				quizMode={routeMode}
 				resultMessage={resultMessage}
 				question={question}
+				favoriteIds={favoriteIds} // ✅ 추가
+				onToggleFavorite={async () => {
+					if (question?.id) {
+						await toggleFavorite(question.id);
+						await loadFavorites(); // ← 정상 함수로 교체됨
+					}
+				}}
 				onNext={() => {
 					setShowResultModal(false);
-					if (badgeModalVisible) return; // ✅ 뱃지 모달이 있으면 대기
-
+					if (badgeModalVisible) return;
 					if (resultType === 'done') {
 						setTimeout(() => {
 							//@ts-ignore

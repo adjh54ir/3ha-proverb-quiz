@@ -1,6 +1,7 @@
+
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Platform } from 'react-native';
-import { scaleHeight, scaleWidth, scaledSize } from '@/utils'; // 필요 시 사용자 유틸로 교체
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Platform, Image, Alert } from 'react-native';
+import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
@@ -9,31 +10,43 @@ import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
+import BottomHomeButton from '@/components/BottomHomeButton';
+
+const RANK_CONFIG = [
+	{ trophy: '#F59E0B', label: (styles) => styles.firstRankLabel, score: (styles) => styles.firstRankScore, trophySize: 22 },
+	{ trophy: '#9CA3AF', label: (styles) => styles.secondRankLabel, score: (styles) => styles.secondRankScore, trophySize: 19 },
+	{ trophy: '#CD7F32', label: (styles) => styles.thirdRankLabel, score: (styles) => styles.thirdRankScore, trophySize: 17 },
+];
 
 const InitTimeChallengeScreen = () => {
 	const STORAGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 	const navigation = useNavigation();
 	const scaleAnim = useRef(new Animated.Value(1)).current;
+	const fadeAnim = useRef(new Animated.Value(0)).current;
 
 	const [count, setCount] = useState(3);
 	const [showAllRules, setShowAllRules] = useState(false);
 	const [isCountingDown, setIsCountingDown] = useState(false);
 	const [top5History, setTop5History] = useState<MainDataType.TimeChallengeResult[]>([]);
-	// 1. 상태 추가
 	const [showAd, setShowAd] = useState(false);
-	const [adWatched, setAdWatched] = useState(false); // 광고 본 후 시작
-	const shouldShowAd = Math.random() < 0.5; // ✅ 20% 확률
+	const [adWatched, setAdWatched] = useState(false);
+
+	const isDev = __DEV__;
+	const shouldShowAd = !isDev && Math.random() < 0.5;
 
 	useEffect(() => {
 		fetchTopHistory();
+		Animated.timing(fadeAnim, {
+			toValue: 1,
+			duration: 500,
+			useNativeDriver: true,
+		}).start();
 	}, []);
 
-	// useEffect 바깥에 함수 이동
 	const fetchTopHistory = async () => {
 		try {
 			const raw = await AsyncStorage.getItem(STORAGE_KEY);
 			const history: MainDataType.TimeChallengeResult[] = raw ? JSON.parse(raw) : [];
-
 			const sorted = history.sort((a, b) => b.finalScore - a.finalScore);
 			setTop5History(sorted.slice(0, 5));
 		} catch (e) {
@@ -41,68 +54,49 @@ const InitTimeChallengeScreen = () => {
 		}
 	};
 
-	// ISO 형식 대응 버전
 	const getRelativeDateLabel = (isoString: string): string => {
 		try {
 			const inputDate = new Date(isoString);
 			const now = new Date();
-
 			const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 			const startOfInput = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate());
-
 			const diffMs = startOfToday.getTime() - startOfInput.getTime();
 			const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
 			const hour = inputDate.getHours();
 			const minute = inputDate.getMinutes();
 			const timeStr = `${hour}:${String(minute).padStart(2, '0')}`;
 
-			if (diffDays === 0) {
-				return `오늘, ${timeStr}`;
-			}
-			if (diffDays === 1) {
-				return `어제, ${timeStr}`;
-			}
-			if (diffDays === 2) {
-				return `그제, ${timeStr}`;
-			}
-			if (diffDays < 7) {
-				return `${diffDays}일 전`;
-			}
-			if (diffDays < 30) {
-				return `${Math.floor(diffDays / 7)}주 전`;
-			}
+			if (diffDays === 0) {return `오늘 ${timeStr}`;}
+			if (diffDays === 1) {return `어제 ${timeStr}`;}
+			if (diffDays === 2) {return `그제 ${timeStr}`;}
+			if (diffDays < 7) {return `${diffDays}일 전`;}
+			if (diffDays < 30) {return `${Math.floor(diffDays / 7)}주 전`;}
 
 			const y = inputDate.getFullYear();
 			const m = String(inputDate.getMonth() + 1).padStart(2, '0');
 			const d = String(inputDate.getDate()).padStart(2, '0');
-			return `${y}. ${m}. ${d}. ${timeStr}`;
+			return `${y}.${m}.${d}`;
 		} catch {
 			return isoString;
 		}
 	};
 
-
 	const handleStartChallenge = () => {
-
 		if (!adWatched && shouldShowAd) {
-			setShowAd(true); // ✅ 먼저 광고를 보여줌
+			setShowAd(true);
 			return;
 		}
-
 		setIsCountingDown(true);
 		setShowAllRules(false);
 
 		let countdown = 3;
-		setCount(countdown); // 시작 시 3 한 번만 세팅
-		animateScale(); // 첫 애니메이션도 같이 실행
+		setCount(countdown);
+		animateScale();
 
 		const timer = setInterval(() => {
 			countdown--;
-
 			if (countdown < 0) {
 				clearInterval(timer);
-
 				setTimeout(() => {
 					setIsCountingDown(false);
 					// @ts-ignore
@@ -110,14 +104,13 @@ const InitTimeChallengeScreen = () => {
 				}, 800);
 				return;
 			}
-
 			setCount(countdown);
 			animateScale();
 		}, 1000);
 	};
 
 	const animateScale = () => {
-		scaleAnim.setValue(1.5);
+		scaleAnim.setValue(1.6);
 		Animated.spring(scaleAnim, {
 			toValue: 1,
 			useNativeDriver: true,
@@ -125,265 +118,136 @@ const InitTimeChallengeScreen = () => {
 		}).start();
 	};
 
-	const clearDummyHistory = async () => {
-		try {
-			await AsyncStorage.removeItem(STORAGE_KEY);
-			setTop5History([]);
-			alert('기록이 삭제되었습니다!');
-		} catch (e) {
-			console.error('기록 삭제 실패', e);
-		}
-	};
-
-	// const createDummyTimeChallengeResult = (): MainDataType.TimeChallengeResult => {
-	// 	const now = new Date();
-	// 	const isoDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
-	// 	const time = now.toTimeString().split(':').slice(0, 2).join(':'); // HH:mm
-	// 	const formattedDate = `${isoDate} ${time}`;
-
-	// 	return {
-	// 		quizDate: formattedDate,
-	// 		finalScore: Math.floor(Math.random() * 200) + 50,
-	// 		totalQuestions: 20,
-	// 		solvedQuestions: 18,
-	// 		correctCount: 15,
-	// 		wrongCount: 3,
-	// 		maxCombo: 7,
-	// 		timeUsedMs: Math.floor(Math.random() * 180000),
-	// 		hasUsedSkip: Math.random() < 0.5,
-	// 		quizIdList: [1, 2, 3, 4, 5],
-	// 		correctQuizIdList: [1, 2, 3],
-	// 		wrongQuizIdList: [4, 5],
-	// 	};
-	// };
-
-	const saveDummyToStorage = async () => {
-		try {
-			const raw = await AsyncStorage.getItem(STORAGE_KEY);
-			const history: MainDataType.TimeChallengeResult[] = raw ? JSON.parse(raw) : [];
-
-			// 10개의 서로 다른 시간으로 더미 생성
-			const now = new Date();
-			const dummyList: MainDataType.TimeChallengeResult[] = Array.from({ length: 10 }, (_, i) => {
-				const offsetDate = new Date(now.getTime() - i * 60000); // 1분씩 이전으로 오프셋
-				const isoDate = offsetDate.toISOString().split('T')[0];
-				const time = offsetDate.toTimeString().split(':').slice(0, 2).join(':');
-				const formattedDate = `${isoDate} ${time}`;
-
-				return {
-					quizDate: formattedDate,
-					finalScore: Math.floor(Math.random() * 200) + 50,
-					totalQuestions: 20,
-					solvedQuestions: 18,
-					correctCount: 15,
-					wrongCount: 3,
-					maxCombo: 7,
-					timeUsedMs: Math.floor(Math.random() * 180000),
-					hasUsedSkip: Math.random() < 0.5,
-					quizIdList: [1, 2, 3, 4, 5],
-					correctQuizIdList: [1, 2, 3],
-					wrongQuizIdList: [4, 5],
-				};
-			});
-
-			const updated = [...dummyList, ...history];
-			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-			alert('10건의 더미 데이터가 저장되었습니다!');
-		} catch (e) {
-			console.error('더미 저장 실패', e);
-		}
+	const COUNTDOWN_MESSAGES: Record<number, string> = {
+		3: '심호흡하고 준비하세요 🌬️',
+		2: '집중! 곧 시작됩니다 👀',
+		1: '손가락을 올려두세요 ☝️',
+		0: '지금 시작! 🔥',
 	};
 
 	return (
 		<SafeAreaView style={styles.container} edges={[]}>
-			<View style={styles.contentWrapper}>
-				<ScrollView contentContainerStyle={styles.scrollContainer}>
+			<Animated.View style={[styles.contentWrapper, { opacity: fadeAnim }]}>
+				<ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+					{/* 헤더 이미지 */}
+					<View style={styles.imageContainer}>
+						<View style={styles.imageGlow}>
+							<Image source={require('@/assets/images/timeChanllenge.jpg')} style={styles.challengeImage} resizeMode="cover" />
+						</View>
+						<Text style={styles.heroTitle}>타임 챌린지</Text>
+						<Text style={styles.heroSubtitle}>180초 안에 속담을 최대한 많이 맞혀보세요!</Text>
+					</View>
 
-					{/* ⏱️ 규칙 및 버튼 */}
-					<View style={styles.challengeRuleBox}>
-						<Text style={styles.title}>⏱️ 타임 챌린지 규칙</Text>
+					{/* 규칙 카드 */}
+					<View style={styles.sectionCard}>
+						<View style={styles.sectionHeader}>
+							<Text style={styles.sectionIcon}>📋</Text>
+							<Text style={styles.sectionTitle}>게임 규칙</Text>
+						</View>
+
+						<View style={styles.ruleItem}>
+							<Text style={styles.ruleDot}>•</Text>
+							<Text style={styles.ruleText}>
+								<Text style={styles.ruleBold}>제한 시간 180초</Text> 동안 속담의 의미를 최대한 많이 맞혀보세요.
+							</Text>
+						</View>
+						<View style={styles.ruleItem}>
+							<Text style={styles.ruleDot}>•</Text>
+							<Text style={styles.ruleText}>오답 시 하트(❤️ 최대 5개)가 1개 차감됩니다. 하트가 모두 소진되면 게임이 종료됩니다.</Text>
+						</View>
 
 						{showAllRules ? (
 							<>
-								<Text style={styles.rule}>
-									•{' '}
-									<Text style={{ fontWeight: 'bold', color: '#34495e', fontSize: scaledSize(14) }}>
-										주어진 180초 안에 속담의 의미를 최대한 많이 맞히는 게임입니다.
+								<View style={styles.ruleItem}>
+									<Text style={styles.ruleDot}>•</Text>
+									<Text style={styles.ruleText}>
+										어려운 문제는 <Text style={styles.ruleBold}>스킵(1회)</Text>으로 건너뛸 수 있습니다.
 									</Text>
-								</Text>
-								<Text style={styles.rule}>• 문제를 틀릴 경우 하트(❤️ 총 5개)가 1개씩 줄어듭니다.</Text>
-								<Text style={styles.rule}>• 1회 스킵 기능이 주어지며, 어려운 문제를 건너뛸 수 있습니다.</Text>
-								<Text style={styles.rule}>
-									• 1회 찬스 기능이 주어지며, 잠시 동안 해당 문제의 각 한자 뜻과 예문이 제공됩니다.
-								</Text>
-								<Text style={styles.rule}>• 중간에 종료할 경우 기록은 저장되지 않습니다.</Text>
+								</View>
+								<View style={styles.ruleItem}>
+									<Text style={styles.ruleDot}>•</Text>
+									<Text style={styles.ruleText}>
+										<Text style={styles.ruleBold}>찬스(1회)</Text>를 사용하면 잠시 동안 한자 뜻과 예문이 공개됩니다.
+									</Text>
+								</View>
+								<View style={styles.ruleItem}>
+									<Text style={styles.ruleDot}>•</Text>
+									<Text style={styles.ruleText}>게임 중 종료 시 해당 회차 기록은 저장되지 않습니다.</Text>
+								</View>
 
-								<Text
-									style={[
-										styles.rule,
-										{ marginVertical: scaleHeight(8), fontWeight: 'bold', color: '#2c3e50', fontSize: scaledSize(15) },
-									]}>
-									💡 점수별 보너스
-								</Text>
-								<Text style={styles.rule}>
-									• 100점 도달 시 <Text style={{ color: '#2980b9', fontWeight: 'bold' }}>⏱ 10초 추가</Text>
-								</Text>
-								<Text style={styles.rule}>
-									• 200점 도달 시 <Text style={{ color: '#2980b9', fontWeight: 'bold' }}>⏱ 10초</Text> +{' '}
-									<Text style={{ color: '#e74c3c', fontWeight: 'bold' }}>❤️ 하트 1개 추가</Text>
-								</Text>
-								<Text style={styles.rule}>
-									• 300점 도달 시 <Text style={{ color: '#2980b9', fontWeight: 'bold' }}>⏱ 10초 추가</Text>
-								</Text>
-								<Text style={styles.rule}>
-									• 400점 도달 시 <Text style={{ color: '#2980b9', fontWeight: 'bold' }}>⏱ 10초 추가</Text>
-								</Text>
+								<View style={styles.bonusDivider} />
+								<Text style={styles.bonusTitle}>🎁 점수 달성 보너스</Text>
 
-								<Text style={styles.rule}>
-									• 500점 도달 시 <Text style={{ color: '#2980b9', fontWeight: 'bold' }}>⏱ 10초</Text> +{' '}
-									<Text style={{ color: '#e74c3c', fontWeight: 'bold' }}>❤️ 하트 1개 추가</Text>
-								</Text>
+								<View style={styles.bonusRow}>
+									<Text style={styles.bonusPoints}>100 / 300 / 400점</Text>
+									<View style={styles.bonusBadge}>
+										<Text style={styles.bonusBadgeText}>⏱ +10초</Text>
+									</View>
+								</View>
+								<View style={styles.bonusRow}>
+									<Text style={styles.bonusPoints}>200 / 500점</Text>
+									<View style={[styles.bonusBadge, styles.bonusBadgeSpecial]}>
+										<Text style={styles.bonusBadgeText}>⏱ +10초 ❤️ +1</Text>
+									</View>
+								</View>
 
-								<Text
-									style={[
-										styles.rule,
-										{ marginVertical: scaleHeight(8), fontWeight: 'bold', color: '#2c3e50', fontSize: scaledSize(15) },
-									]}>
-									🔥 콤보 보너스
-								</Text>
-								<Text style={styles.rule}>
-									• 3콤보 달성 시 <Text style={{ color: '#f39c12', fontWeight: 'bold' }}>+5점</Text>
-								</Text>
-								<Text style={styles.rule}>
-									• 4콤보 달성 시 <Text style={{ color: '#f39c12', fontWeight: 'bold' }}>+10점</Text>
-								</Text>
-								<Text style={styles.rule}>
-									• 5콤보 달성 시 <Text style={{ color: '#f39c12', fontWeight: 'bold' }}>+20점</Text>
-								</Text>
-								<Text style={styles.rule}>
-									• 6콤보 이상 시 <Text style={{ color: '#f39c12', fontWeight: 'bold' }}>+30점</Text>
-								</Text>
-
-								<Text style={[styles.rule, { color: '#e74c3c', fontWeight: 'bold', marginTop: scaleHeight(3) }]}>
-									• 시작 버튼을 누르면 3초 뒤에 퀴즈가 시작됩니다!
-								</Text>
-
-								<TouchableOpacity onPress={() => setShowAllRules(false)}>
+								<TouchableOpacity style={styles.toggleBtn} onPress={() => setShowAllRules(false)}>
 									<Text style={styles.toggleText}>간단히 보기 ▲</Text>
 								</TouchableOpacity>
 							</>
 						) : (
-							<>
-								<Text style={styles.rule}>
-									•{' '}
-									<Text style={{ fontWeight: 'bold', color: '#34495e', fontSize: scaledSize(14) }}>
-										주어진 180초 안에 속담의 의미를 최대한 많이 맞히는 게임입니다.
-									</Text>
-								</Text>
-								<Text style={styles.rule}>• 문제를 틀릴 경우 하트(❤️ 총 5개)가 1개씩 줄어듭니다.</Text>
-								<Text style={[styles.rule, { color: '#e74c3c', fontWeight: 'bold', marginTop: scaleHeight(3) }]}>
-									• 시작 버튼을 누르면 3초 뒤에 퀴즈가 시작됩니다!
-								</Text>
-								<TouchableOpacity onPress={() => setShowAllRules(true)}>
-									<Text style={styles.toggleText}>자세히 보기 ▼</Text>
-								</TouchableOpacity>
-							</>
+							<TouchableOpacity style={styles.toggleBtn} onPress={() => setShowAllRules(true)}>
+								<Text style={styles.toggleText}>전체 규칙 보기 ▼</Text>
+							</TouchableOpacity>
 						)}
+
+						<View style={styles.startNotice}>
+							<Text style={styles.startNoticeText}>🚀 시작 버튼을 누르면 3초 카운트다운 후 게임이 시작됩니다!</Text>
+						</View>
 					</View>
 
-					{/* 🥇🥈🥉 TOP 5 리스트 */}
-					<View style={styles.myTopRankingBox}>
-						<Text style={styles.topRankingTitle}>📋 나의 랭킹 TOP 3</Text>
+					{/* 내 기록 */}
+					<View style={styles.sectionCard}>
+						<View style={styles.sectionHeader}>
+							<Text style={styles.sectionIcon}>🏆</Text>
+							<Text style={styles.sectionTitle}>나의 베스트 기록</Text>
+						</View>
 
 						{top5History.length === 0 ? (
-							<Text style={styles.noRecordText}>아직 기록이 없습니다. 챌린지를 시작해보세요!</Text>
+							<View style={styles.emptyBox}>
+								<Text style={styles.emptyIcon}>📭</Text>
+								<Text style={styles.emptyText}>아직 기록이 없어요</Text>
+								<Text style={styles.emptySubText}>첫 번째 챌린지에 도전해보세요!</Text>
+							</View>
 						) : (
 							top5History.slice(0, 3).map((item, index) => (
-								<View key={index} style={styles.recordCard}>
-									<View style={styles.rankRow}>
-										{index === 0 && (
-											<>
-												<IconComponent
-													name="trophy"
-													type="FontAwesome"
-													size={24}
-													color="#f1c40f"
-													style={{ marginRight: scaleWidth(8) }}
-												/>
-												<Text style={styles.firstRankLabel}>1등</Text>
-												<Text style={styles.firstRankScore}>
-													{item.finalScore}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
-												</Text>
-											</>
-										)}
-										{index === 1 && (
-											<>
-												<IconComponent
-													name="trophy"
-													type="FontAwesome"
-													size={20}
-													color="#bdc3c7"
-													style={{ marginRight: scaleWidth(13) }}
-												/>
-												<Text style={styles.secondRankLabel}>2등</Text>
-												<Text style={styles.secondRankScore}>
-													{item.finalScore}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
-												</Text>
-											</>
-										)}
-										{index === 2 && (
-											<>
-												<IconComponent
-													name="trophy"
-													type="FontAwesome"
-													size={18}
-													color="#cd7f32"
-													style={{ marginRight: scaleWidth(16) }}
-												/>
-												<Text style={styles.thirdRankLabel}>3등</Text>
-												<Text style={styles.thirdRankScore}>
-													{item.finalScore}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
-												</Text>
-											</>
-										)}
+								<View key={index} style={[styles.recordCard, index === 0 && styles.recordCardFirst]}>
+									<View style={styles.recordLeft}>
+										<IconComponent name="trophy" type="FontAwesome" size={RANK_CONFIG[index].trophySize} color={RANK_CONFIG[index].trophy} />
+										<Text style={[styles.rankLabel, index === 0 && styles.rankLabelFirst]}>{index + 1}등</Text>
+									</View>
+									<View style={styles.recordRight}>
+										<Text style={[styles.rankScore, index === 0 && styles.rankScoreFirst]}>{item.finalScore}점</Text>
+										<Text style={styles.rankDate}>{getRelativeDateLabel(item.quizDate)}</Text>
 									</View>
 								</View>
 							))
 						)}
 					</View>
 
-					<TouchableOpacity style={styles.startButton} onPress={handleStartChallenge}>
-						<Text style={styles.startButtonText}>시작하기</Text>
+					{/* 시작 버튼 */}
+					<TouchableOpacity style={styles.startButton} onPress={handleStartChallenge} activeOpacity={0.85}>
+						<Text style={styles.startButtonText}>⚡ 챌린지 시작</Text>
 					</TouchableOpacity>
-					{/* <TouchableOpacity style={styles.dummyButton} onPress={saveDummyToStorage}>
-						<Text style={styles.dummyButtonText}>더미 기록 추가</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity style={[styles.dummyButton, { backgroundColor: "#c0392b" }]} onPress={clearDummyHistory}>
-						<Text style={styles.dummyButtonText}>더미 기록 삭제</Text>
-					</TouchableOpacity> */}
 				</ScrollView>
-			</View>
-			<View style={styles.bottomExitWrapper}>
-				<TouchableOpacity
-					style={styles.exitButton}
-					onPress={() =>
-						//@ts-ignore
-						navigation.replace(Paths.MAIN_TAB, { screen: Paths.HOME })
-					}>
-					<Text style={styles.exitButtonText}>홈으로</Text>
-				</TouchableOpacity>
-			</View>
+				<BottomHomeButton marginBottom={scaleHeight(12)} />
+			</Animated.View>
+
+			{/* 카운트다운 오버레이 */}
 			{isCountingDown && (
-				<View style={StyleSheet.absoluteFillObject}>
-					<View style={styles.countdownOverlay}>
-						<Animated.Text style={[styles.countdownText, { transform: [{ scale: scaleAnim }] }]}>
-							{count === 0 ? '시작!' : count}
-						</Animated.Text>
-						<Text style={styles.countdownMessage}>
-							{count === 3 ? '심호흡 하세요…' : count === 2 ? '준비하세요!' : count === 1 ? '곧 시작됩니다!' : ''}
-						</Text>
-					</View>
+				<View style={styles.countdownOverlay}>
+					<Animated.Text style={[styles.countdownText, { transform: [{ scale: scaleAnim }] }]}>{count === 0 ? '🔥' : count}</Animated.Text>
+					<Text style={styles.countdownMessage}>{COUNTDOWN_MESSAGES[count] ?? ''}</Text>
 				</View>
 			)}
 
@@ -392,11 +256,10 @@ const InitTimeChallengeScreen = () => {
 					onAdClosed={() => {
 						setShowAd(false);
 						setAdWatched(true);
-						handleStartChallenge(); // 광고 시청 후 카운트다운 재호출
+						handleStartChallenge();
 					}}
 				/>
 			)}
-
 		</SafeAreaView>
 	);
 };
@@ -404,309 +267,267 @@ const InitTimeChallengeScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		padding: 24,
-		backgroundColor: '#ffffff',
-	},
-	contentContainer: {
-		backgroundColor: '#f9f9f9',
-		borderRadius: 12,
-		padding: scaleWidth(20),
-	},
-	title: {
-		fontSize: scaledSize(17), // ✅ 기존 20 → 17
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(10), // 여백도 살짝 줄임
-		color: '#2c3e50', // 더 안정적인 색상
-	},
-	rule: {
-		fontSize: scaledSize(13), // 기존 16 → 15
-		color: '#555',
-		marginBottom: scaleHeight(3), // 더 타이트하게
-		lineHeight: scaleHeight(22), // 줄 간격도 살짝 줄임
-	},
-	startButton: {
-		marginTop: scaleHeight(24),
-		backgroundColor: '#4A90E2',
-		paddingVertical: scaleHeight(12),
-		borderRadius: 8,
-		alignItems: 'center',
-		marginBottom: scaleHeight(12),
-	},
-	startButtonText: {
-		color: '#fff',
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-	},
-	rankingText: {
-		fontSize: scaledSize(14),
-		color: '#555',
-		marginBottom: scaleHeight(2),
-	},
-	dummyButton: {
-		marginBottom: scaleHeight(20),
-		backgroundColor: '#7f8c8d',
-		paddingVertical: scaleHeight(10),
-		borderRadius: 8,
-		alignItems: 'center',
-	},
-	dummyButtonText: {
-		color: '#fff',
-		fontSize: scaledSize(14),
-		fontWeight: '600',
-	},
-	myRankingBox: {
-		marginBottom: scaleHeight(20),
-		padding: scaleWidth(16),
-		backgroundColor: '#fef9e7',
-		borderRadius: 12,
-		borderWidth: 1,
-		borderColor: '#f1c40f',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-	},
-	rankingHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: scaleHeight(12),
-	},
-	rankingTitle: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginLeft: scaleWidth(8),
-	},
-	rankingRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: scaleHeight(6),
-	},
-	rankingLabel: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		marginLeft: scaleWidth(6),
-		marginRight: scaleWidth(4),
-	},
-	rankingValue: {
-		fontSize: scaledSize(14),
-		fontWeight: '600',
-		color: '#2c3e50',
-	},
-	myTopRankingBox: {
-		marginBottom: scaleHeight(12),
-		padding: scaleWidth(18),
-		backgroundColor: '#f9f9f9',
-		borderRadius: 10,
-		borderWidth: 1,
-		borderColor: '#ddd',
-	},
-	topRankingTitle: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(12),
-	},
-	rankingItemRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		paddingVertical: scaleHeight(4), // 👈 각 row 간 여백
-	},
-	rankNumber: {
-		width: scaleWidth(20),
-		fontSize: scaledSize(14),
-		fontWeight: 'bold',
-		color: '#555',
-		marginRight: scaleWidth(6),
-		textAlign: 'center',
-	},
-	headerBox: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: scaleHeight(20),
-		padding: scaleWidth(12),
-		backgroundColor: '#fef9e7',
-		borderRadius: 10,
-		borderWidth: 1,
-		borderColor: '#f1c40f',
-	},
-	headerText: {
-		fontSize: scaledSize(15),
-		marginLeft: scaleWidth(8),
-		color: '#2c3e50',
-		fontWeight: '600',
-	},
-	highlightText: {
-		color: '#e67e22',
-		fontWeight: 'bold',
-	},
-	scrollContainer: {
-		paddingBottom: scaleHeight(10), // 하단 여백
-	},
-	recordCard: {
-		borderWidth: 1,
-		borderColor: '#ccc',
-		borderRadius: 10,
-		padding: scaleWidth(12),
-		marginBottom: scaleHeight(6),
-		backgroundColor: '#fff',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.05,
-		shadowRadius: 4,
-	},
-	recordHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: scaleHeight(6),
-	},
-	recordScore: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#34495e',
-		marginBottom: scaleHeight(4),
-	},
-	recordDate: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-	},
-
-	firstRankDate: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-	},
-	rankRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		flexWrap: 'wrap', // 긴 날짜가 잘리지 않게
-		marginBottom: scaleHeight(2),
-	},
-	rankLabel: {
-		fontSize: scaledSize(15),
-		fontWeight: '600',
-		color: '#2c3e50',
-		marginRight: scaleWidth(6),
-	},
-
-	rankScore: {
-		fontSize: scaledSize(15),
-		fontWeight: '600',
-		color: '#2c3e50',
-	},
-
-	rankDate: {
-		fontSize: scaledSize(12),
-		color: '#7f8c8d',
-	},
-	challengeRuleBox: {
-		backgroundColor: '#fdfdfd',
-		borderRadius: 12,
-		padding: scaleWidth(18),
-		marginBottom: scaleHeight(12),
-		borderWidth: 1,
-		borderColor: '#ddd',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.05,
-		shadowRadius: 4,
+		backgroundColor: '#F8F9FB',
 	},
 	contentWrapper: {
 		flex: 1,
-		justifyContent: 'space-between',
+	},
+	scrollContainer: {
+		paddingHorizontal: scaleWidth(20),
+		paddingBottom: scaleHeight(20),
 	},
 
-	noRecordText: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		textAlign: 'center',
+	// ── 헤더 이미지 ──────────────────────────
+	imageContainer: {
+		alignItems: 'center',
+		paddingTop: scaleHeight(32),
+		marginBottom: scaleHeight(20),
+	},
+	imageGlow: {
+		shadowColor: '#4A90E2',
+		shadowOffset: { width: 0, height: 6 },
+		shadowOpacity: 0.25,
+		shadowRadius: 16,
+		elevation: 8,
+		borderRadius: scaleWidth(72),
+		marginBottom: scaleHeight(16),
+	},
+	challengeImage: {
+		width: scaleWidth(144),
+		height: scaleWidth(144),
+		borderRadius: scaleWidth(72),
+		borderWidth: 3,
+		borderColor: '#fff',
+	},
+	heroTitle: {
+		fontSize: scaledSize(24),
+		fontWeight: '800',
+		color: '#1A1D23',
+		letterSpacing: -0.5,
+	},
+	heroSubtitle: {
+		fontSize: scaledSize(13),
+		color: '#6B7280',
+		marginTop: scaleHeight(4),
+	},
+
+	// ── 공통 섹션 카드 ──────────────────────────
+	sectionCard: {
+		backgroundColor: '#FFFFFF',
+		borderRadius: 16,
+		padding: scaleWidth(18),
+		marginBottom: scaleHeight(14),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+		elevation: 2,
+	},
+	sectionHeader: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: scaleHeight(14),
+	},
+	sectionIcon: {
+		fontSize: scaledSize(17),
+		marginRight: scaleWidth(6),
+	},
+	sectionTitle: {
+		fontSize: scaledSize(15),
+		fontWeight: '700',
+		color: '#1A1D23',
+	},
+
+	// ── 규칙 ──────────────────────────
+	ruleItem: {
+		flexDirection: 'row',
+		marginBottom: scaleHeight(8),
+	},
+	ruleDot: {
+		fontSize: scaledSize(13),
+		color: '#9CA3AF',
+		marginRight: scaleWidth(6),
+		marginTop: 1,
+	},
+	ruleText: {
+		flex: 1,
+		fontSize: scaledSize(13),
+		color: '#4B5563',
+		lineHeight: scaleHeight(21),
+	},
+	ruleBold: {
+		fontWeight: '700',
+		color: '#1A1D23',
+	},
+	bonusDivider: {
+		height: 1,
+		backgroundColor: '#F3F4F6',
 		marginVertical: scaleHeight(12),
 	},
-	firstRankLabel: {
-		fontSize: scaledSize(17),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginRight: scaleWidth(8),
+	bonusTitle: {
+		fontSize: scaledSize(13),
+		fontWeight: '700',
+		color: '#374151',
+		marginBottom: scaleHeight(8),
 	},
-	firstRankScore: {
-		fontSize: scaledSize(17),
-		fontWeight: 'bold',
-		color: '#e67e22', // 주황
+	bonusRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: scaleHeight(6),
 	},
-	secondRankLabel: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#7f8c8d',
-		marginRight: scaleWidth(6),
+	bonusPoints: {
+		fontSize: scaledSize(13),
+		color: '#6B7280',
+		width: scaleWidth(120),
 	},
-	secondRankScore: {
-		fontSize: scaledSize(16),
+	bonusBadge: {
+		backgroundColor: '#EFF6FF',
+		borderRadius: 6,
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(3),
+	},
+	bonusBadgeSpecial: {
+		backgroundColor: '#FEF3C7',
+	},
+	bonusBadgeText: {
+		fontSize: scaledSize(12),
 		fontWeight: '600',
-		color: '#95a5a6', // 은색 계열
+		color: '#1D4ED8',
 	},
-	thirdRankLabel: {
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-		color: '#795548',
-		marginRight: scaleWidth(6),
+	toggleBtn: {
+		marginTop: scaleHeight(10),
+		alignItems: 'center',
 	},
-	thirdRankScore: {
-		fontSize: scaledSize(15),
+	toggleText: {
+		fontSize: scaledSize(13),
+		color: '#4A90E2',
 		fontWeight: '600',
-		color: '#a1887f', // 청동색 계열
 	},
+	startNotice: {
+		marginTop: scaleHeight(14),
+		backgroundColor: '#FFF7ED',
+		borderRadius: 8,
+		paddingHorizontal: scaleWidth(12),
+		paddingVertical: scaleHeight(8),
+	},
+	startNoticeText: {
+		fontSize: scaledSize(12),
+		color: '#D97706',
+		fontWeight: '600',
+		lineHeight: scaleHeight(18),
+	},
+
+	// ── 기록 카드 ──────────────────────────
+	emptyBox: {
+		alignItems: 'center',
+		paddingVertical: scaleHeight(20),
+	},
+	emptyIcon: {
+		fontSize: scaledSize(28),
+		marginBottom: scaleHeight(8),
+	},
+	emptyText: {
+		fontSize: scaledSize(14),
+		fontWeight: '600',
+		color: '#374151',
+	},
+	emptySubText: {
+		fontSize: scaledSize(13),
+		color: '#9CA3AF',
+		marginTop: scaleHeight(4),
+	},
+	recordCard: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		backgroundColor: '#F9FAFB',
+		borderRadius: 12,
+		paddingHorizontal: scaleWidth(14),
+		paddingVertical: scaleHeight(10),
+		marginBottom: scaleHeight(8),
+		borderWidth: 1,
+		borderColor: '#F3F4F6',
+	},
+	recordCardFirst: {
+		backgroundColor: '#FFFBEB',
+		borderColor: '#FDE68A',
+	},
+	recordLeft: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(8),
+	},
+	rankLabel: {
+		fontSize: scaledSize(14),
+		fontWeight: '700',
+		color: '#6B7280',
+		marginLeft: scaleWidth(8),
+	},
+	rankLabelFirst: {
+		color: '#1A1D23',
+	},
+	recordRight: {
+		alignItems: 'flex-end',
+	},
+	rankScore: {
+		fontSize: scaledSize(15),
+		fontWeight: '700',
+		color: '#374151',
+	},
+	rankScoreFirst: {
+		color: '#D97706',
+		fontSize: scaledSize(17),
+	},
+	rankDate: {
+		fontSize: scaledSize(11),
+		color: '#9CA3AF',
+		marginTop: scaleHeight(2),
+	},
+
+	// ── 시작 버튼 ──────────────────────────
+	startButton: {
+		marginTop: scaleHeight(6),
+		marginBottom: scaleHeight(16),
+		backgroundColor: '#4A90E2',
+		paddingVertical: scaleHeight(15),
+		borderRadius: 14,
+		alignItems: 'center',
+		shadowColor: '#4A90E2',
+		shadowOffset: { width: 0, height: 6 },
+		shadowOpacity: 0.35,
+		shadowRadius: 12,
+		elevation: 5,
+	},
+	startButtonText: {
+		color: '#FFFFFF',
+		fontSize: scaledSize(16),
+		fontWeight: '800',
+		letterSpacing: 0.3,
+	},
+
+	// ── 카운트다운 ──────────────────────────
 	countdownOverlay: {
 		position: 'absolute',
 		top: 0,
 		left: 0,
 		right: 0,
 		bottom: 0,
-		backgroundColor: 'rgba(0,0,0,0.6)',
+		backgroundColor: 'rgba(10, 12, 20, 0.75)',
 		justifyContent: 'center',
 		alignItems: 'center',
 		zIndex: 999,
 	},
 	countdownText: {
-		fontSize: 72,
-		fontWeight: 'bold',
-		color: '#ffffff',
+		fontSize: scaledSize(90),
+		fontWeight: '900',
+		color: '#FFFFFF',
+		letterSpacing: -2,
 	},
 	countdownMessage: {
-		fontSize: 20,
-		marginTop: 12,
-		color: '#fff',
+		fontSize: scaledSize(16),
+		marginTop: scaleHeight(16),
+		color: 'rgba(255,255,255,0.75)',
 		fontWeight: '500',
-	},
-	toggleText: {
-		color: '#3498db',
-		fontSize: scaledSize(13),
-		marginTop: scaleHeight(6),
-		textAlign: 'center',
-		fontWeight: '600',
-	},
-	bottomExitWrapper: {
-		width: '100%',
-		height: scaleHeight(30), // ✅ 명시적 높이 추가
-		alignItems: 'center',
-		backgroundColor: '#fff',
-		borderTopWidth: 1,
-		borderTopColor: '#eee',
-		paddingTop: scaleHeight(6),
-		paddingBottom: Platform.OS === 'android' ? scaleHeight(10) : scaleHeight(14),
-		marginBottom: Platform.OS === 'android' ? scaleHeight(20) : scaleHeight(12),
-	},
-	exitButton: {
-		backgroundColor: '#7f8c8d',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(32),
-		borderRadius: scaleWidth(20),
-		height: scaleHeight(40), // ✅ 버튼 높이 보장
-		justifyContent: 'center', // 수직 정렬 보장
-		alignItems: 'center',
-	},
-	exitButtonText: {
-		color: '#fff',
-		fontSize: scaledSize(14), // 🔽 기존보다 작게
-		fontWeight: '600',
 	},
 });
 

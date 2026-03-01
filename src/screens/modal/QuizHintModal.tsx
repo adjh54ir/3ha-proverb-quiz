@@ -52,7 +52,6 @@ const QuizHintModal: React.FC<Props> = ({ visible, question, onClose }) => {
 		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.overlay}>
 				<View style={styles.modal}>
-
 					{/* 헤더 */}
 					<View style={styles.header}>
 						<View style={styles.headerIconWrap}>
@@ -74,14 +73,13 @@ const QuizHintModal: React.FC<Props> = ({ visible, question, onClose }) => {
 						</View>
 					)}
 
-					{/* 비슷한 속담 */}
 					{question?.sameProverb && question.sameProverb.filter((sp) => sp?.trim() !== '').length > 0 && (
 						<View style={styles.section}>
 							<View style={styles.sectionHeader}>
 								<View style={[styles.sectionIconWrap, { backgroundColor: '#e8f4fd' }]}>
 									<IconComponent type="FontAwesome6" name="link" size={12} color="#3498db" />
 								</View>
-								<Text style={styles.sectionTitle}>비슷한 속담</Text>
+								<Text style={styles.sectionTitle}>💬 동의 속담</Text>
 							</View>
 							{question.sameProverb
 								.filter((sp) => sp?.trim() !== '')

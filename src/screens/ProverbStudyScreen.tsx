@@ -815,7 +815,7 @@ const QuizStudyScreen = () => {
 									{/* 같은 속담 */}
 									{item.sameProverb && item.sameProverb.filter((sp) => sp.trim() !== '').length > 0 && (
 										<View style={styles.sectionBox}>
-											<Text style={styles.sectionTitle}>🔎 비슷한 속담</Text>
+											<Text style={styles.sectionTitle}>💬 동의 속담</Text>
 											{item.sameProverb
 												.filter((sp) => sp.trim() !== '')
 												.map((sp, idx) => (

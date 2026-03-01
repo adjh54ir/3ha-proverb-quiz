@@ -128,7 +128,9 @@ const InfinityQuizScreen = () => {
 	}, []);
 
 	useEffect(() => {
-		if (gameResult) {setTimeout(() => setAnimatedScore(gameResult.finalScore), 100);}
+		if (gameResult) {
+			setTimeout(() => setAnimatedScore(gameResult.finalScore), 100);
+		}
 	}, [gameResult]);
 
 	useEffect(() => {
@@ -148,7 +150,9 @@ const InfinityQuizScreen = () => {
 	}, [isGameOver, gameResult]);
 
 	useEffect(() => {
-		if (isGameOver || isPaused) {return;}
+		if (isGameOver || isPaused) {
+			return;
+		}
 		const interval = setInterval(() => {
 			setTimeLeftMs((prev) => {
 				if (prev <= 100) {
@@ -259,28 +263,44 @@ const InfinityQuizScreen = () => {
 						const baseScore = 10;
 						let bonusScore = 0;
 						const newCombo = combo + 1;
-						if (newCombo === 3) {bonusScore = 5;}
-						else if (newCombo === 4) {bonusScore = 10;}
-						else if (newCombo === 5) {bonusScore = 20;}
-						else if (newCombo >= 6) {bonusScore = 30;}
+						if (newCombo === 3) {
+							bonusScore = 5;
+						} else if (newCombo === 4) {
+							bonusScore = 10;
+						} else if (newCombo === 5) {
+							bonusScore = 20;
+						} else if (newCombo >= 6) {
+							bonusScore = 30;
+						}
 						const totalScore = prev + baseScore + bonusScore;
 						const bonus = TimeChallengeInterceptor(totalScore, bonusHistory);
-						if (bonus.addedTime > 0) {setTimeLeftMs((prevTime) => prevTime + bonus.addedTime);}
-						if (bonus.addedHeart) {setLives((prevLives) => (prevLives < MAX_LIVES ? prevLives + 1 : prevLives));}
-						if (bonus.message) {showToast(bonus.message);}
-						if (bonus.updatedHistory) {setBonusHistory(bonus.updatedHistory);}
+						if (bonus.addedTime > 0) {
+							setTimeLeftMs((prevTime) => prevTime + bonus.addedTime);
+						}
+						if (bonus.addedHeart) {
+							setLives((prevLives) => (prevLives < MAX_LIVES ? prevLives + 1 : prevLives));
+						}
+						if (bonus.message) {
+							showToast(bonus.message);
+						}
+						if (bonus.updatedHistory) {
+							setBonusHistory(bonus.updatedHistory);
+						}
 						return totalScore;
 					});
 					triggerScoreAnim();
 					setCombo((prev) => {
 						const newCombo = prev + 1;
-						if (newCombo >= 2)
-							{setTimeout(() => {
+						if (newCombo >= 2) {
+							setTimeout(() => {
 								triggerComboAnim();
 								triggerComboShake();
 								triggerComboEffect(newCombo);
-							}, 0);}
-						if (newCombo > maxCombo) {setMaxCombo(newCombo);}
+							}, 0);
+						}
+						if (newCombo > maxCombo) {
+							setMaxCombo(newCombo);
+						}
 						return newCombo;
 					});
 				} else {
@@ -295,7 +315,9 @@ const InfinityQuizScreen = () => {
 					if (newLives <= 0) {
 						handleGameOver();
 						setIsGameOver(true);
-					} else {setCurrentIndex((prev) => prev + 1);}
+					} else {
+						setCurrentIndex((prev) => prev + 1);
+					}
 				}, 500);
 			}, 150);
 		},
@@ -333,10 +355,15 @@ const InfinityQuizScreen = () => {
 
 	const triggerComboEffect = (comboValue: number) => {
 		let bonus = 0;
-		if (comboValue === 3) {bonus = 5;}
-		else if (comboValue === 4) {bonus = 10;}
-		else if (comboValue === 5) {bonus = 20;}
-		else if (comboValue >= 6) {bonus = 30;}
+		if (comboValue === 3) {
+			bonus = 5;
+		} else if (comboValue === 4) {
+			bonus = 10;
+		} else if (comboValue === 5) {
+			bonus = 20;
+		} else if (comboValue >= 6) {
+			bonus = 30;
+		}
 		if (comboValue >= 2) {
 			setComboEffectText(`🔥 ${comboValue} Combo! ${bonus > 0 ? `+${bonus}점` : ''}`);
 			comboEffectAnim.setValue(0);
@@ -345,10 +372,12 @@ const InfinityQuizScreen = () => {
 	};
 
 	const handleChance = () => {
-		if (hasUsedChance) {return;}
+		if (hasUsedChance) {
+			return;
+		}
 		const current = questionList[currentIndex];
 		showLongToast(
-			`📂 카테고리 \n${current.category || '카테고리 없음'}\n\n📘 예문\n${current.example || '예문 없음'}\n\n🔍 비슷한 속담들\n${current.sameProverb || '-'}`,
+			`📂 카테고리 \n${current.category || '카테고리 없음'}\n\n📘 예문\n${current.example || '예문 없음'}\n\n💬 동의 속담들\n${current.sameProverb || '-'}`,
 		);
 		setHasUsedChance(true);
 	};
@@ -369,7 +398,9 @@ const InfinityQuizScreen = () => {
 				clearInterval(toastTimerRef.current!);
 				toastTimerRef.current = null;
 				setToastRemainingSec(null);
-			} else {setToastRemainingSec(count);}
+			} else {
+				setToastRemainingSec(count);
+			}
 		}, 1000);
 		Animated.sequence([
 			Animated.timing(toastOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),

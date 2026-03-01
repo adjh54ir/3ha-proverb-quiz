@@ -125,7 +125,7 @@ const ProverbInfoCard = ({
 
 			{Array.isArray(question.sameProverb) && question.sameProverb.filter((p) => p.trim()).length > 0 && (
 				<View style={styles.sectionBox}>
-					<Text style={styles.sectionTitle}>🔗 비슷한 속담</Text>
+					<Text style={styles.sectionTitle}>💬 동의 속담</Text>
 					{question.sameProverb.map((p, idx) => (
 						<View key={idx} style={styles.sameProverbBox}>
 							<Text style={styles.sameProverbText}>• {p}</Text>

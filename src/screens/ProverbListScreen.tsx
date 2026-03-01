@@ -566,7 +566,7 @@ const ProverbListScreen = () => {
 
 											{Array.isArray(item.sameProverb) && item.sameProverb.filter((p) => p.trim()).length > 0 && (
 												<View style={styles.sameProverbBox}>
-													<Text style={styles.sameProverbTitle}>🔗 비슷한 속담</Text>
+													<Text style={styles.sameProverbTitle}>💬 동의 속담</Text>
 													{item.sameProverb
 														.filter((p) => p.trim())
 														.map((p, idx) => (

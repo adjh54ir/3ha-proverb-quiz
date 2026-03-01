@@ -167,7 +167,7 @@ const WrongReviewScreen = () => {
 								{/* 상세 풀이 */}
 								{Array.isArray(item.sameProverb) && item.sameProverb.length > 0 && (
 									<View style={styles.sectionBox}>
-										<Text style={styles.sectionTitle}>🔗 비슷한 속담</Text>
+										<Text style={styles.sectionTitle}>💬 동의 속담</Text>
 										{item.sameProverb.map((p, i) => (
 											<View key={`same-${i}`} style={styles.phraseRow}>
 												<Text style={styles.inlineValue}>- {p}</Text>

@@ -205,10 +205,9 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 								</View>
 							)}
 
-							{/* 비슷한 속담 */}
 							{Array.isArray(proverb.sameProverb) && proverb.sameProverb.filter((p) => p.trim()).length > 0 && (
 								<View style={styles.sectionBox}>
-									<Text style={styles.sectionTitle}>🔗 비슷한 속담</Text>
+									<Text style={styles.sectionTitle}>💬 동의 속담</Text>
 									{proverb.sameProverb.map((p, idx) => (
 										<View key={idx} style={styles.sameProverbBox}>
 											<Text style={styles.sameProverbText}>• {p}</Text>

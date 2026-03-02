@@ -761,4 +761,17 @@ const styles = StyleSheet.create({
 		width: '100%',
 		height: '100%',
 	},
+	petView: { alignItems: 'center', justifyContent: 'center', marginTop: scaleHeight(8), position: 'relative' },
+	petContent: {
+		position: 'absolute',
+		right: scaleWidth(-35), // ✅ 너무 멀리 떨어져 있음
+		top: scaleHeight(10),
+		width: scaleWidth(60),
+		height: scaleWidth(60),
+		borderRadius: scaleWidth(30),
+		borderWidth: 2,
+		borderColor: '#27ae60',
+		overflow: 'hidden',
+	},
+	petImage: { width: '100%', height: '100%' },
 });

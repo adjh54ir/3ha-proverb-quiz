@@ -116,10 +116,11 @@ export const LEVEL_DATA = [
 ];
 
 export const PET_REWARDS = [
-	{ day: 7, image: require('@/assets/images/pet_level1_org.png') },
-	{ day: 14, image: require('@/assets/images/pet_level2_org.png') },
-	{ day: 21, image: require('@/assets/images/pet_level3_org.png') },
-	{ day: 28, image: require('@/assets/images/pet_level4_org.png') },
+	{ day: 1, label: '1일 출석', name: '멍뭉 견습생', image: require('@/assets/images/pet_level0.jpg') },
+	{ day: 7, label: '7일 출석', name: '멍뭉 훈련생', image: require('@/assets/images/pet_level1.png') },
+	{ day: 14, label: '14일 출석', name: '멍뭉 수련생', image: require('@/assets/images/pet_level2.png') },
+	{ day: 21, label: '21일 출석', name: '멍뭉 졸업생', image: require('@/assets/images/pet_level3.png') },
+	{ day: 28, label: '28일 출석', name: '멍뭉 마스터', image: require('@/assets/images/pet_level4.png') },
 ];
 
 /**

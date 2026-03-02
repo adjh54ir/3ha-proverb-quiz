@@ -33,7 +33,7 @@ import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { FIELD_DROPDOWN_ITEMS } from './ProverbStudyScreen';
 import LevelModal from './modal/LevelModal';
 import { LEVEL_DATA, PET_REWARDS } from '@/const/ConstInfoData';
-import { TOWER_LEVELS } from '@/const/ConstTowerData';
+import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 // import { TOWER_LEVELS } from '@/const/ConstTowerData';
 
 LocaleConfig.defaultLocale = 'kr';
@@ -184,6 +184,10 @@ const CapitalResultScreen = () => {
 			const studiedIds: number[] = studyJson?.studyProverbes ?? [];
 			const studyCounts = studyJson?.studyCounts ?? {};
 			const lastDate = studyJson?.lastStudyAt ?? '';
+			// ✅ 수정 - 올바른 키 사용
+			const towerRaw = await AsyncStorage.getItem(MainStorageKeyType.TOWER_CHALLENGE_PROGRESS);
+			const towerParsed: TowerProgress = towerRaw ? JSON.parse(towerRaw) : {};
+			setUnlockedRewards(towerParsed.unlockedRewards ?? []);
 
 			const allProverbs = ProverbServices.selectProverbList();
 			setTotalCountryCount(allProverbs.length);
@@ -396,6 +400,7 @@ const CapitalResultScreen = () => {
 		setShowBadgeSection(nextState);
 		setShowTodayQuizSection(nextState); // ✅ 추가됨
 		setShowTowerSection(nextState); // ✅ 추가
+		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 	};
 
 	/**

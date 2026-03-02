@@ -76,6 +76,7 @@ declare module '@env' {
 	export const GOOGLE_ADMOV_ANDROID_OPEN_APP: string;
 	export const GOOGLE_ADMOV_IOS_OPEN_APP: string;
 
+	// 출시 URL
 	export const GOOGLE_PLAY_STORE_URL: string;
 	export const APP_STORE_URL: string;
 }

@@ -5,6 +5,7 @@ import FastImage from 'react-native-fast-image';
 import { Calendar } from 'react-native-calendars';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import IconComponent from '../common/atomic/IconComponent';
+import { PET_REWARDS } from '@/const/ConstInfoData';
 
 interface CheckInModalProps {
 	visible: boolean;
@@ -16,15 +17,7 @@ interface CheckInModalProps {
 	onClose: () => void;
 }
 
-const CheckInModal: React.FC<CheckInModalProps> = ({
-	visible,
-	isCheckedIn,
-	checkedInDates,
-	mascot,
-	showStamp,
-	stampStyle,
-	onClose,
-}) => {
+const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, checkedInDates, mascot, showStamp, stampStyle, onClose }) => {
 	return (
 		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.modalOverlay}>
@@ -35,15 +28,10 @@ const CheckInModal: React.FC<CheckInModalProps> = ({
 
 					<Text style={styles.modalTitle}>오늘의 출석</Text>
 
-					<ScrollView
-						style={{ width: '100%' }}
-						contentContainerStyle={{ paddingBottom: scaleHeight(20) }}
-						showsVerticalScrollIndicator={false}>
+					<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: scaleHeight(20) }} showsVerticalScrollIndicator={false}>
 						<View style={styles.rowCentered}>
 							<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.cover} />
-							<Text style={[styles.modalText, { flex: 1 }]}>
-								매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어줘요!{'\n'}
-							</Text>
+							<Text style={[styles.modalText, { flex: 1 }]}>매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어줘요!{'\n'}</Text>
 						</View>
 
 						<View style={styles.highlightBox}>
@@ -55,23 +43,13 @@ const CheckInModal: React.FC<CheckInModalProps> = ({
 
 						<View style={styles.petScrollContainer}>
 							<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.petScrollContent}>
-								{[
-									{ label: '1일 출석', image: require('@/assets/images/pet_level0.jpg') },
-									{ label: '7일 출석', image: require('@/assets/images/pet_level1.png') },
-									{ label: '14일 출석', image: require('@/assets/images/pet_level2.png') },
-									{ label: '21일 출석', image: require('@/assets/images/pet_level3.png') },
-									{ label: '28일 출석', image: require('@/assets/images/pet_level4.png'), stage: '열매 친구' },
-								].map((item, index, arr) => (
+								{PET_REWARDS.map((item, index, arr) => (
 									<View key={index} style={[styles.petItemBox, { marginRight: index !== arr.length - 1 ? scaleWidth(10) : 0 }]}>
 										<FastImage source={item.image} style={styles.petImage} resizeMode="contain" />
 										<Text style={styles.petLabelText}>{item.label}</Text>
-										<Text style={styles.petStageText}>
-											{['멍뭉 견습생', '멍뭉 훈련생', '멍뭉 수련생', '멍뭉 졸업생', '멍뭉 마스터'][index]}
-										</Text>
+										<Text style={styles.petStageText}>{item.name}</Text>
 
-										{index < arr.length - 1 && (
-											<IconComponent name="chevron-right" type="fontAwesome" size={12} color="#7f8c8d" style={styles.arrowIcon} />
-										)}
+										{index < arr.length - 1 && <IconComponent name="chevron-right" type="fontAwesome" size={12} color="#7f8c8d" style={styles.arrowIcon} />}
 									</View>
 								))}
 							</ScrollView>

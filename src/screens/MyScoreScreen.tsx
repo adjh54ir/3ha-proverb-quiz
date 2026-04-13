@@ -155,6 +155,7 @@ const CapitalResultScreen = () => {
 	useFocusEffect(
 		useCallback(() => {
 			loadData();
+			loadCheckedInDates();
 		}, []),
 	);
 	useFocusEffect(
@@ -345,6 +346,40 @@ const CapitalResultScreen = () => {
 		}
 	};
 
+	const loadCheckedInDates = async () => {
+		const json = await AsyncStorage.getItem(STORAGE_KEY_TODAY);
+		if (!json) {
+			return;
+		}
+
+		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
+		const todayStr = new Date().toISOString().slice(0, 10);
+
+		console.log('arr : ', arr);
+		console.log('todayStr : ', todayStr);
+
+		const marked: { [date: string]: any } = {};
+		arr.forEach((item) => {
+			if (item.isCheckedIn) {
+				const date = item.quizDate.slice(0, 10);
+				const isToday = date === todayStr;
+
+				marked[date] = {
+					customStyles: {
+						container: {
+							backgroundColor: isToday ? '#27ae60' : '#2980b9', // ✅ 초록: 오늘, 파랑: 이전 출석
+							borderRadius: scaleWidth(6),
+						},
+						text: {
+							color: '#ffffff',
+							fontWeight: 'bold',
+						},
+					},
+				};
+			}
+		});
+		setPetLevel(getPetLevel(marked)); // ✅ 추가
+	};
 	const getCategoryMeta = (category: string) => {
 		const item = FIELD_DROPDOWN_ITEMS.find((it) => it.label === category);
 		if (!item) {

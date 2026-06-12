@@ -4,6 +4,7 @@ import { View, Modal, Text, ScrollView, TouchableOpacity, StyleSheet } from 'rea
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { LEVEL_DATA } from '@/const/ConstInfoData';
+import PopInView from '@/components/animation/PopInView';
 
 interface LevelModalProps {
 	visible: boolean;
@@ -45,7 +46,7 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 	return (
 		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.modalOverlay}>
-				<View style={[styles.levelModal, { maxHeight: scaleHeight(600) }]}>
+				<PopInView visible={visible} style={[styles.levelModal, { maxHeight: scaleHeight(600) }]}>
 					<Text style={styles.levelModalTitle}>등급 안내</Text>
 
 					<ScrollView
@@ -82,7 +83,7 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 					<TouchableOpacity onPress={onClose} style={styles.modalConfirmButton}>
 						<Text style={styles.modalConfirmText}>닫기</Text>
 					</TouchableOpacity>
-				</View>
+				</PopInView>
 			</View>
 		</Modal>
 	);
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	levelModal: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		paddingHorizontal: scaleWidth(20),
 		paddingTop: scaleHeight(20),
 		paddingBottom: scaleHeight(12),
@@ -113,14 +114,14 @@ const styles = StyleSheet.create({
 		color: '#2c3e50',
 	},
 	levelCardBox: {
-		backgroundColor: '#fdfdfd',
-		borderRadius: scaleWidth(14),
+		backgroundColor: '#ffffff',
+		borderRadius: scaleWidth(12),
 		padding: scaleWidth(16),
 		alignItems: 'center',
 		marginBottom: scaleHeight(14),
 		width: '100%',
 		borderWidth: 1,
-		borderColor: '#ececec',
+		borderColor: '#ecf0f1',
 	},
 	levelCardBoxActive: {
 		backgroundColor: '#eafaf1',
@@ -135,7 +136,7 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(8),
 	},
 	levelBadgeText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(12),
 		fontWeight: 'bold',
 	},

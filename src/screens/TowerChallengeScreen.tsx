@@ -168,9 +168,9 @@ const TowerChallengeScreen = () => {
 					<View style={[styles.levelBadge, { backgroundColor: tower.color }]}>
 						<Text style={styles.levelText}>LV.{tower.level}</Text>
 						{isCompleted && (
-							<IconComponent type="materialIcons" name="check-circle" size={18} color="#fff" style={styles.badgeIcon} />
+							<IconComponent type="materialIcons" name="check-circle" size={18} color="#ffffff" style={styles.badgeIcon} />
 						)}
-						{isLocked && <IconComponent type="materialIcons" name="lock" size={18} color="#fff" style={styles.badgeIcon} />}
+						{isLocked && <IconComponent type="materialIcons" name="lock" size={18} color="#ffffff" style={styles.badgeIcon} />}
 					</View>
 					<Text style={styles.towerName}>{tower.name}</Text>
 					{/* 보스 섹션 */}
@@ -222,12 +222,12 @@ const TowerChallengeScreen = () => {
 								<>
 									{progress.attempts > 0 ? (
 										<>
-											<IconComponent type="materialIcons" name="favorite" size={18} color="#fff" />
+											<IconComponent type="materialIcons" name="favorite" size={18} color="#ffffff" />
 											<Text style={styles.challengeButtonText}>도전하기 (하트 -1)</Text>
 										</>
 									) : (
 										<>
-											<IconComponent type="materialIcons" name="play-circle-filled" size={18} color="#fff" />
+											<IconComponent type="materialIcons" name="play-circle-filled" size={18} color="#ffffff" />
 											<Text style={styles.challengeButtonText}>광고 보고 도전하기</Text>
 										</>
 									)}
@@ -307,7 +307,7 @@ const TowerChallengeScreen = () => {
 							onPress={handleWatchAd}
 							activeOpacity={0.8}
 						>
-							<IconComponent type="materialIcons" name="play-circle-filled" size={22} color="#fff" />
+							<IconComponent type="materialIcons" name="play-circle-filled" size={22} color="#ffffff" />
 							<View style={styles.adTextContainer}>
 								<Text style={styles.adButtonTitle}>광고 보고 +1회</Text>
 								<Text style={styles.adButtonSub}>
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
 	mainTitle: {
 		fontSize: scaledSize(24),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 		marginTop: scaleHeight(6),
 		textShadowColor: 'rgba(0, 0, 0, 0.3)',
 		textShadowOffset: { width: 0, height: 2 },
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: 'rgba(231, 76, 60, 0.1)',
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		paddingHorizontal: scaleWidth(10),
 		borderWidth: 1.5,
 		borderColor: 'rgba(231, 76, 60, 0.35)',
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		gap: scaleWidth(10),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		borderWidth: 1.5,
 		borderColor: 'rgba(52, 152, 219, 0.5)',
 		backgroundColor: '#2980b9',  // LinearGradient 대신 단색
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
 	adButtonTitle: {
 		fontSize: scaledSize(14),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	adButtonSub: {
 		fontSize: scaledSize(10),
@@ -472,9 +472,9 @@ const styles = StyleSheet.create({
 		fontWeight: '500',
 	},
 	attemptCount: {
-		fontSize: scaledSize(26),
+		fontSize: scaledSize(24),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 		lineHeight: scaledSize(30),
 	},
 	attemptUnit: {
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
 	},
 	cardValue: {
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	adValue: {
 		color: '#3498db',
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
 	cardIconWrapper: {
 		width: scaleWidth(44),
 		height: scaleWidth(44),
-		borderRadius: scaleWidth(22),
+		borderRadius: scaleWidth(20),
 		backgroundColor: 'rgba(231, 76, 60, 0.15)',
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -534,14 +534,14 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: scaleWidth(14),
 		paddingVertical: scaleHeight(12), // 10에서 12로 증가
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		gap: scaleWidth(6),
 		minWidth: scaleWidth(100),
 		height: scaleHeight(44), // 고정 높이 추가
 	},
 	adCompactButton: {
 		flex: 1,
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		overflow: 'hidden',
 		minWidth: scaleWidth(140),
 		height: scaleHeight(44), // 고정 높이 추가
@@ -562,10 +562,10 @@ const styles = StyleSheet.create({
 	attemptCompactCount: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	adCompactText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(12),
 		fontWeight: '600',
 		flexShrink: 0,
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: 'rgba(255, 255, 255, 0.15)',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 4 },
+		shadowOffset: { width: 0, height: scaleHeight(4) },
 		shadowOpacity: 0.3,
 		shadowRadius: 8,
 		overflow: 'hidden', // ← 추가
@@ -618,7 +618,7 @@ const styles = StyleSheet.create({
 	levelText: {
 		fontSize: scaledSize(12),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	badgeIcon: {
 		marginLeft: scaleWidth(6),
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
 	towerName: {
 		fontSize: scaledSize(20),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 		marginBottom: scaleHeight(8),
 		textAlign: 'center',
 	},
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
 	bossName: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	rewardSection: {
 		alignItems: 'center',
@@ -708,18 +708,18 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(255, 255, 255, 0.1)',
 		paddingHorizontal: scaleWidth(12),
 		paddingVertical: scaleHeight(6),
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 	},
 	rewardImage: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		marginRight: scaleWidth(6),
 	},
 	rewardName: {
 		fontSize: scaledSize(13),
 		fontWeight: '600',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	rewardLocked: {
 		backgroundColor: 'rgba(255, 255, 255, 0.05)',
@@ -742,12 +742,12 @@ const styles = StyleSheet.create({
 
 	challengeButton: {
 		paddingVertical: scaleHeight(14),
-		minHeight: 48,
+		minHeight: scaleHeight(48),
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderRadius: scaleWidth(12),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 3 },
+		shadowOffset: { width: 0, height: scaleHeight(3) },
 		shadowOpacity: 0.3,
 		shadowRadius: 5,
 	},
@@ -758,7 +758,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#7f8c8d',
 	},
 	challengeButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(15),
 		fontWeight: 'bold',
 		letterSpacing: 0.5,
@@ -782,7 +782,7 @@ const styles = StyleSheet.create({
 	},
 	descriptionTitle: {
 		fontSize: scaledSize(15),
-		color: '#fff',
+		color: '#ffffff',
 		fontWeight: 'bold',
 		marginBottom: scaleHeight(8),
 		textAlign: 'center',

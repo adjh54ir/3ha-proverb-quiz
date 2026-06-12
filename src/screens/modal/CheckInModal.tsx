@@ -23,7 +23,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 			<View style={styles.modalOverlay}>
 				<View style={styles.modalContent}>
 					<TouchableOpacity style={styles.modalCloseIcon} onPress={onClose}>
-						<IconComponent type="materialIcons" name="close" size={24} color="#555" />
+						<IconComponent type="materialIcons" name="close" size={24} color="#7f8c8d" />
 					</TouchableOpacity>
 
 					<Text style={styles.modalTitle}>오늘의 출석</Text>
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
 	},
 	modalContent: {
 		width: '85%',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(20),
 		borderRadius: scaleWidth(12),
 		maxHeight: scaleHeight(700),
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
 	highlightBox: {
 		padding: scaleHeight(10),
 		backgroundColor: '#fef9e7',
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		borderWidth: 1,
 		borderColor: '#f1c40f',
 	},

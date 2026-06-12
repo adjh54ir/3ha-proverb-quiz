@@ -34,6 +34,7 @@ import { FIELD_DROPDOWN_ITEMS } from './ProverbStudyScreen';
 import LevelModal from './modal/LevelModal';
 import { LEVEL_DATA, PET_REWARDS } from '@/const/ConstInfoData';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
+import FadeInView from '@/components/animation/FadeInView';
 // import { TOWER_LEVELS } from '@/const/ConstTowerData';
 
 LocaleConfig.defaultLocale = 'kr';
@@ -52,14 +53,14 @@ const DIFFICULTIES = [
 ];
 
 const CATEGORY_META: Record<string, { color: string; icon: { type: string; name: string } }> = {
-	'운/우연': { color: '#81ecec', icon: { type: 'fontAwesome5', name: 'dice' } },
-	인간관계: { color: '#a29bfe', icon: { type: 'fontAwesome5', name: 'users' } },
+	'운/우연': { color: '#76d7c4', icon: { type: 'fontAwesome5', name: 'dice' } },
+	인간관계: { color: '#76d7c4', icon: { type: 'fontAwesome5', name: 'users' } },
 	'세상 이치': { color: '#ffeaa7', icon: { type: 'fontAwesome5', name: 'globe' } },
 	'근면/검소': { color: '#fab1a0', icon: { type: 'fontAwesome5', name: 'hammer' } },
-	'노력/성공': { color: '#55efc4', icon: { type: 'fontAwesome5', name: 'medal' } },
-	'경계/조심': { color: '#ff7675', icon: { type: 'fontAwesome5', name: 'exclamation-triangle' } },
+	'노력/성공': { color: '#76d7c4', icon: { type: 'fontAwesome5', name: 'medal' } },
+	'경계/조심': { color: '#e74c3c', icon: { type: 'fontAwesome5', name: 'exclamation-triangle' } },
 	'욕심/탐욕': { color: '#fd79a8', icon: { type: 'fontAwesome5', name: 'hand-holding-usd' } },
-	'배신/불신': { color: '#b2bec3', icon: { type: 'fontAwesome5', name: 'user-slash' } },
+	'배신/불신': { color: '#bdc3c7', icon: { type: 'fontAwesome5', name: 'user-slash' } },
 };
 
 const STYLE_MAP = {
@@ -76,7 +77,7 @@ const STYLE_MAP = {
 		type: 'level',
 	},
 	보통: {
-		color: '#EB984E',
+		color: '#e67e22',
 		icon: { type: 'fontAwesome5', name: 'tree' },
 		badgeId: 'level_medium',
 		type: 'level',
@@ -141,7 +142,7 @@ const CapitalResultScreen = () => {
 	const getLevelStyle = (subtitle: string) => {
 		const entry = STYLE_MAP[subtitle];
 		if (!entry) {
-			return { bg: '#fff', border: '#ccc' };
+			return { bg: '#ffffff', border: '#bdc3c7' };
 		}
 		return { bg: entry.color, border: entry.color };
 	};
@@ -297,13 +298,13 @@ const CapitalResultScreen = () => {
 					const dateKey = item.quizDate.slice(0, 10);
 					acc[dateKey] = {
 						marked: true,
-						dotColor: '#4CAF50',
+						dotColor: '#27ae60',
 						customStyles: {
 							container: {
-								backgroundColor: '#e8f5e9',
+								backgroundColor: '#eafaf1',
 							},
 							text: {
-								color: '#2e7d32',
+								color: '#1e8449',
 								fontWeight: 'bold',
 							},
 						},
@@ -346,6 +347,26 @@ const CapitalResultScreen = () => {
 		}
 	};
 
+	/**
+	 * 출석 일수 기반 펫 레벨 계산 (Home.tsx와 동일 기준)
+	 */
+	const getPetLevel = (checkedIn: { [date: string]: any }) => {
+		const count = Object.keys(checkedIn).length;
+		if (count >= 28) {
+			return 3;
+		}
+		if (count >= 21) {
+			return 2;
+		}
+		if (count >= 14) {
+			return 1;
+		}
+		if (count >= 1) {
+			return 0;
+		}
+		return -1;
+	};
+
 	const loadCheckedInDates = async () => {
 		const json = await AsyncStorage.getItem(STORAGE_KEY_TODAY);
 		if (!json) {
@@ -384,7 +405,7 @@ const CapitalResultScreen = () => {
 		const item = FIELD_DROPDOWN_ITEMS.find((it) => it.label === category);
 		if (!item) {
 			return {
-				color: '#ccc',
+				color: '#bdc3c7',
 				icon: { type: 'FontAwesome6', name: 'question' },
 				badgeId: 'category_etc',
 			};
@@ -494,13 +515,13 @@ const CapitalResultScreen = () => {
 				if (wasChecked) {
 					updated[prevDate] = {
 						marked: true,
-						dotColor: '#4CAF50',
+						dotColor: '#27ae60',
 						customStyles: {
 							container: {
-								backgroundColor: '#e8f5e9',
+								backgroundColor: '#eafaf1',
 							},
 							text: {
-								color: '#2e7d32',
+								color: '#1e8449',
 								fontWeight: 'bold',
 							},
 						},
@@ -515,7 +536,7 @@ const CapitalResultScreen = () => {
 				...(updated[date] || {}),
 				customStyles: {
 					container: {
-						backgroundColor: '#dfe6e9',
+						backgroundColor: '#ecf0f1',
 					},
 					text: {
 						color: '#2c3e50',
@@ -594,6 +615,7 @@ const CapitalResultScreen = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.safeArea} edges={['top']}>
+				<FadeInView style={{ flex: 1 }}>
 				<ScrollView
 					ref={scrollRef}
 					style={styles.container}
@@ -634,12 +656,12 @@ const CapitalResultScreen = () => {
 										type="fontAwesome6"
 										name={icon}
 										size={18}
-										color={label === '속담 전설' ? '#FFD700' : '#27ae60'} // ✅ 조건 분기
+										color={label === '속담 전설' ? '#f1c40f' : '#27ae60'} // ✅ 조건 분기
 									/>
 									<Text
 										style={{
 											fontSize: scaledSize(16),
-											color: label === '속담 전설' ? '#FFD700' : '#27ae60', // ✅ 텍스트 색도 노란색으로
+											color: label === '속담 전설' ? '#f1c40f' : '#27ae60', // ✅ 텍스트 색도 노란색으로
 											fontWeight: '700',
 											marginLeft: scaleWidth(6),
 										}}>
@@ -650,7 +672,7 @@ const CapitalResultScreen = () => {
 							</View>
 
 							<View style={styles.scoreBadge}>
-								<IconComponent name="leaderboard" type="materialIcons" size={14} color="#fff" />
+								<IconComponent name="leaderboard" type="materialIcons" size={14} color="#ffffff" />
 								<Text style={styles.scoreBadgeText}>{totalScore.toLocaleString()}점</Text>
 							</View>
 						</View>
@@ -795,13 +817,13 @@ const CapitalResultScreen = () => {
 												name={item.icon}
 												type="fontAwesome6"
 												size={20}
-												color={isConquered ? '#fff' : styleMeta.color} // ✅ 항상 styleMeta.color 사용
+												color={isConquered ? '#ffffff' : styleMeta.color} // ✅ 항상 styleMeta.color 사용
 												style={{ marginRight: scaleWidth(8) }}
 											/>
 											<Text
 												style={[
 													styles.levelRowTitle,
-													{ color: isConquered ? '#fff' : styleMeta.color }, // ✅ 항상 레벨별 색상 사용
+													{ color: isConquered ? '#ffffff' : styleMeta.color }, // ✅ 항상 레벨별 색상 사용
 													isConquered && {
 														fontWeight: 'bold',
 														textShadowColor: 'rgba(0, 0, 0, 0.15)',
@@ -814,11 +836,11 @@ const CapitalResultScreen = () => {
 
 											{/* 진행률 바 */}
 											<View style={styles.progressBarBackgroundRow}>
-												<View style={[styles.progressBarFill, { width: `${progressPercent}%`, backgroundColor: isConquered ? '#fff' : '#27ae60' }]} />
+												<View style={[styles.progressBarFill, { width: `${progressPercent}%`, backgroundColor: isConquered ? '#ffffff' : '#27ae60' }]} />
 											</View>
 
 											{/* 개수 */}
-											<Text style={[styles.levelRowCount, isConquered && { color: '#fff' }]}>
+											<Text style={[styles.levelRowCount, isConquered && { color: '#ffffff' }]}>
 												{item.solvedCount}/{item.totalCount}
 											</Text>
 
@@ -826,10 +848,10 @@ const CapitalResultScreen = () => {
 												<View
 													style={{
 														marginLeft: scaleWidth(6),
-														backgroundColor: '#fff',
+														backgroundColor: '#ffffff',
 														paddingHorizontal: scaleWidth(6),
 														paddingVertical: scaleHeight(2),
-														borderRadius: scaleWidth(10),
+														borderRadius: scaleWidth(12),
 													}}>
 													<Text
 														style={{
@@ -877,13 +899,13 @@ const CapitalResultScreen = () => {
 												type={meta.icon.type}
 												name={meta.icon.name}
 												size={20}
-												color={isEarned ? '#fff' : meta.color} // ✅ 비활성화도 meta.color 적용
+												color={isEarned ? '#ffffff' : meta.color} // ✅ 비활성화도 meta.color 적용
 												style={{ marginRight: scaleWidth(8) }}
 											/>
 											<Text
 												style={[
 													styles.categoryRowText,
-													{ color: isEarned ? '#fff' : meta.color }, // ✅ 항상 meta.color 사용
+													{ color: isEarned ? '#ffffff' : meta.color }, // ✅ 항상 meta.color 사용
 													isEarned && {
 														fontWeight: 'bold',
 														textShadowColor: 'rgba(0, 0, 0, 0.15)',
@@ -896,11 +918,11 @@ const CapitalResultScreen = () => {
 
 											{/* 프로그래스바 */}
 											<View style={styles.progressBarBackgroundRow}>
-												<View style={[styles.progressBarFill, { width: `${progressPercent}%`, backgroundColor: isEarned ? '#fff' : '#27ae60' }]} />
+												<View style={[styles.progressBarFill, { width: `${progressPercent}%`, backgroundColor: isEarned ? '#ffffff' : '#27ae60' }]} />
 											</View>
 
 											{/* 개수 */}
-											<Text style={[styles.levelRowCount, isEarned && { color: '#fff' }]}>
+											<Text style={[styles.levelRowCount, isEarned && { color: '#ffffff' }]}>
 												{item.solvedCount}/{item.totalCount}
 											</Text>
 
@@ -908,10 +930,10 @@ const CapitalResultScreen = () => {
 												<View
 													style={{
 														marginLeft: scaleWidth(6),
-														backgroundColor: '#fff',
+														backgroundColor: '#ffffff',
 														paddingHorizontal: scaleWidth(6),
 														paddingVertical: scaleHeight(2),
-														borderRadius: scaleWidth(10),
+														borderRadius: scaleWidth(12),
 													}}>
 													<Text
 														style={{
@@ -958,7 +980,7 @@ const CapitalResultScreen = () => {
 									updateMarkedQuizDatesOnSelect(date, selectedDate, setMarkedQuizDates, todayQuizDataList);
 								}}
 								theme={{
-									calendarBackground: '#fff',
+									calendarBackground: '#ffffff',
 									todayTextColor: '#27ae60',
 									textDayFontSize: 14,
 									textMonthFontSize: 16,
@@ -973,9 +995,9 @@ const CapitalResultScreen = () => {
 								<View
 									style={{
 										borderWidth: 1,
-										borderColor: '#ddd',
-										backgroundColor: '#fdfdfd',
-										borderRadius: scaleWidth(10),
+										borderColor: '#e0e0e0',
+										backgroundColor: '#ffffff',
+										borderRadius: scaleWidth(12),
 										padding: scaleWidth(14),
 										marginTop: scaleHeight(10),
 										alignSelf: 'stretch',
@@ -1001,7 +1023,7 @@ const CapitalResultScreen = () => {
 													borderRadius: scaleWidth(12),
 													padding: scaleWidth(14),
 													borderWidth: 1,
-													borderColor: '#dfe6e9',
+													borderColor: '#ecf0f1',
 													marginBottom: scaleHeight(12),
 													shadowColor: '#000',
 													shadowOffset: { width: 0, height: 1 },
@@ -1169,7 +1191,7 @@ const CapitalResultScreen = () => {
 					)}
 					{/* 나의 타워 챌린지 내역 */}
 					<TouchableOpacity style={styles.sectionHeader} onPress={() => setShowTowerSection(!showTowerSection)}>
-						<View style={[styles.iconCircle3, { backgroundColor: '#8e44ad' }]}>
+						<View style={[styles.iconCircle3, { backgroundColor: '#16a085' }]}>
 							<IconComponent type="fontAwesome6" name="tower-observation" size={scaledSize(14)} color="#ffffff" />
 						</View>
 						<Text style={styles.sectionTitle}>나의 타워 챌린지</Text>
@@ -1198,15 +1220,15 @@ const CapitalResultScreen = () => {
 											overflow: 'hidden',
 											marginBottom: scaleHeight(12),
 											borderWidth: 1,
-											borderColor: isCleared ? tower.color : '#ddd',
-											backgroundColor: '#fff',
+											borderColor: isCleared ? tower.color : '#e0e0e0',
+											backgroundColor: '#ffffff',
 											opacity: isCleared ? 1 : 0.4,
 										}}>
 										{/* 왼쪽: 보스 이미지 + 레벨 배지 */}
 										<View
 											style={{
 												width: scaleWidth(80),
-												backgroundColor: isCleared ? tower.backgroundColor : '#f0f0f0',
+												backgroundColor: isCleared ? tower.backgroundColor : '#ecf0f1',
 												alignItems: 'center',
 												justifyContent: 'center',
 												padding: scaleWidth(8),
@@ -1219,21 +1241,21 @@ const CapitalResultScreen = () => {
 											<View
 												style={{
 													marginTop: scaleHeight(4),
-													backgroundColor: isCleared ? tower.color : '#bbb',
+													backgroundColor: isCleared ? tower.color : '#bdc3c7',
 													borderRadius: scaleWidth(8),
 													paddingHorizontal: scaleWidth(6),
 													paddingVertical: scaleHeight(2),
 												}}>
-												<Text style={{ color: '#fff', fontSize: scaledSize(10), fontWeight: 'bold' }}>LV.{tower.level}</Text>
+												<Text style={{ color: '#ffffff', fontSize: scaledSize(10), fontWeight: 'bold' }}>LV.{tower.level}</Text>
 											</View>
 										</View>
 
 										{/* 오른쪽: 보스 정보 + 보상 */}
 										<View style={{ flex: 1, padding: scaleWidth(12), justifyContent: 'center' }}>
-											<Text style={{ fontSize: scaledSize(10), color: '#999', marginBottom: scaleHeight(2) }}>{tower.bossTitle}</Text>
+											<Text style={{ fontSize: scaledSize(10), color: '#95a5a6', marginBottom: scaleHeight(2) }}>{tower.bossTitle}</Text>
 											<Text style={{ fontSize: scaledSize(14), fontWeight: 'bold', color: '#2c3e50', marginBottom: scaleHeight(6) }}>{tower.bossName}</Text>
 
-											<View style={{ height: 1, backgroundColor: '#eee', marginBottom: scaleHeight(6) }} />
+											<View style={{ height: 1, backgroundColor: '#ecf0f1', marginBottom: scaleHeight(6) }} />
 
 											<View style={{ flexDirection: 'row', alignItems: 'center', gap: scaleWidth(8) }}>
 												<FastImage
@@ -1243,12 +1265,12 @@ const CapitalResultScreen = () => {
 														height: scaleWidth(36),
 														borderRadius: scaleWidth(6),
 														borderWidth: 1,
-														borderColor: '#ddd',
+														borderColor: '#e0e0e0',
 													}}
 													resizeMode="cover"
 												/>
 												<View>
-													<Text style={{ fontSize: scaledSize(10), color: '#888' }}>{tower.reward.type === 'costume' ? '👕 코스튬' : '🌟 캐릭터'}</Text>
+													<Text style={{ fontSize: scaledSize(10), color: '#95a5a6' }}>{tower.reward.type === 'costume' ? '👕 코스튬' : '🌟 캐릭터'}</Text>
 													<Text style={{ fontSize: scaledSize(12), fontWeight: 'bold', color: '#2c3e50' }}>{tower.reward.name}</Text>
 												</View>
 
@@ -1256,12 +1278,12 @@ const CapitalResultScreen = () => {
 												<View
 													style={{
 														marginLeft: 'auto',
-														backgroundColor: isCleared ? tower.color : '#bbb',
-														borderRadius: scaleWidth(10),
+														backgroundColor: isCleared ? tower.color : '#bdc3c7',
+														borderRadius: scaleWidth(12),
 														paddingHorizontal: scaleWidth(8),
 														paddingVertical: scaleHeight(3),
 													}}>
-													<Text style={{ color: '#fff', fontSize: scaledSize(10), fontWeight: 'bold' }}>{isCleared ? '클리어 ✓' : '미클리어 🔒'}</Text>
+													<Text style={{ color: '#ffffff', fontSize: scaledSize(10), fontWeight: 'bold' }}>{isCleared ? '클리어 ✓' : '미클리어 🔒'}</Text>
 												</View>
 											</View>
 										</View>
@@ -1271,6 +1293,7 @@ const CapitalResultScreen = () => {
 						</View>
 					)}
 				</ScrollView>
+				</FadeInView>
 
 				<LevelModal visible={showLevelModal} totalScore={totalScore} onClose={() => setShowLevelModal(false)} />
 			</SafeAreaView>
@@ -1288,7 +1311,7 @@ const CapitalResultScreen = () => {
 export default CapitalResultScreen;
 
 const styles = StyleSheet.create({
-	safeArea: { flex: 1, backgroundColor: '#fff' },
+	safeArea: { flex: 1, backgroundColor: '#ffffff' },
 	container: {
 		paddingHorizontal: scaleWidth(20),
 		paddingTop: scaleHeight(20),
@@ -1307,11 +1330,11 @@ const styles = StyleSheet.create({
 		padding: scaleWidth(12),
 		marginBottom: scaleHeight(10),
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 	},
 	badgeCardActive: {
 		borderColor: '#27ae60',
-		backgroundColor: '#f0fbf4',
+		backgroundColor: '#eafaf1',
 	},
 	iconBox: {
 		width: scaleWidth(32),
@@ -1340,16 +1363,16 @@ const styles = StyleSheet.create({
 		lineHeight: scaleHeight(18),
 	},
 	badgeDescActive: {
-		color: '#2d8659',
+		color: '#1e8449',
 	},
 	sectionBox: {
-		backgroundColor: '#f9f9f9',
+		backgroundColor: '#f8f9fa',
 		padding: scaleWidth(16),
 		paddingHorizontal: scaleWidth(20),
 		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(24),
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 	},
 	subSectionBox1: {
 		backgroundColor: '#ffffff',
@@ -1357,7 +1380,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(24),
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 	},
 	subSectionBox2: {
 		backgroundColor: '#ffffff',
@@ -1365,7 +1388,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(24),
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 	},
 	sectionTitle: {
 		fontSize: scaledSize(18),
@@ -1374,7 +1397,7 @@ const styles = StyleSheet.create({
 	},
 	statItem: {
 		fontSize: scaledSize(14),
-		color: '#34495e',
+		color: '#2c3e50',
 		marginBottom: scaleHeight(6),
 	},
 	subTitle: {
@@ -1414,7 +1437,7 @@ const styles = StyleSheet.create({
 	levelIconWrap: {
 		width: scaleWidth(36),
 		height: scaleWidth(36),
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(16),
 		borderWidth: 2,
 		borderColor: '#27ae60',
 		backgroundColor: '#eafaf1',
@@ -1427,7 +1450,7 @@ const styles = StyleSheet.create({
 		shadowRadius: 2,
 	},
 	levelModal: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		paddingHorizontal: scaleWidth(20),
 		paddingTop: scaleHeight(20),
 		paddingBottom: scaleHeight(12),
@@ -1447,21 +1470,21 @@ const styles = StyleSheet.create({
 		width: '100%',
 		paddingVertical: scaleHeight(8),
 		borderBottomWidth: 1,
-		borderColor: '#eee',
+		borderColor: '#ecf0f1',
 	},
 	levelRowItemActive: {
 		backgroundColor: '#eafaf1',
 		borderColor: '#27ae60',
 	},
 	levelCardBox: {
-		backgroundColor: '#fdfdfd',
-		borderRadius: scaleWidth(14),
+		backgroundColor: '#ffffff',
+		borderRadius: scaleWidth(12),
 		padding: scaleWidth(16),
 		alignItems: 'center',
 		marginBottom: scaleHeight(14),
 		width: '100%',
 		borderWidth: 1,
-		borderColor: '#ececec',
+		borderColor: '#ecf0f1',
 	},
 	levelCardBoxActive: {
 		backgroundColor: '#eafaf1',
@@ -1476,7 +1499,7 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(8),
 	},
 	levelBadgeText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(12),
 		fontWeight: 'bold',
 	},
@@ -1505,7 +1528,7 @@ const styles = StyleSheet.create({
 	levelIconWrapSmall: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		backgroundColor: '#d0f0dc',
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -1540,7 +1563,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(8),
 	},
 	modalConfirmText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontWeight: '600',
 		fontSize: scaledSize(14),
 	},
@@ -1590,10 +1613,10 @@ const styles = StyleSheet.create({
 	activityValue: {
 		fontSize: scaledSize(14),
 		fontWeight: 'bold',
-		color: '#34495e',
+		color: '#2c3e50',
 	},
 	summaryCard: {
-		backgroundColor: '#fff8e1',
+		backgroundColor: '#fef9e7',
 		padding: scaleWidth(16),
 		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(16),
@@ -1638,13 +1661,13 @@ const styles = StyleSheet.create({
 		width: '28%',
 		height: scaleHeight(100),
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 		justifyContent: 'center',
 		paddingHorizontal: scaleWidth(6),
 		paddingVertical: scaleHeight(8),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		marginBottom: scaleHeight(12),
 		marginHorizontal: scaleWidth(5),
 	},
@@ -1652,11 +1675,11 @@ const styles = StyleSheet.create({
 		width: '40%',
 		aspectRatio: 1,
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		borderRadius: scaleWidth(12),
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		marginHorizontal: scaleWidth(8),
 		marginBottom: scaleHeight(12),
 	},
@@ -1671,7 +1694,7 @@ const styles = StyleSheet.create({
 		color: '#7f8c8d',
 	},
 	cardActive: {
-		backgroundColor: '#f0fbf4',
+		backgroundColor: '#eafaf1',
 	},
 	summaryStatGrid: {
 		flexDirection: 'row',
@@ -1748,7 +1771,7 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(15),
 	},
 	adContainer: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginTop: scaleHeight(10),
@@ -1766,7 +1789,7 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		right: scaleWidth(16),
 		bottom: scaleHeight(16),
-		backgroundColor: '#2196F3',
+		backgroundColor: '#3498db',
 		width: scaleWidth(40),
 		height: scaleWidth(40),
 		borderRadius: scaleWidth(20),
@@ -1783,7 +1806,7 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(12),
 	},
 	scoreBadgeText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(13),
 		fontWeight: '700',
 		marginLeft: scaleWidth(6),
@@ -1813,7 +1836,7 @@ const styles = StyleSheet.create({
 	iconCircle2: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: scaleWidth(6),
@@ -1822,7 +1845,7 @@ const styles = StyleSheet.create({
 	iconCircle3: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: scaleWidth(6),
@@ -1832,7 +1855,7 @@ const styles = StyleSheet.create({
 	iconCircle4: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: scaleWidth(6),
@@ -1841,11 +1864,11 @@ const styles = StyleSheet.create({
 	iconCircle5: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: scaleWidth(6),
-		backgroundColor: '#9b59b6', // 🟠 추천 색상: 진한 주황색 (희망, 성취 느낌)
+		backgroundColor: '#16a085', // 🟠 추천 색상: 진한 주황색 (희망, 성취 느낌)
 	},
 	calendarStyle: {
 		alignSelf: 'stretch', // 또는 width: '100%'
@@ -1870,10 +1893,10 @@ const styles = StyleSheet.create({
 	recordCard: {
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(14),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderRadius: scaleWidth(12),
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 		marginBottom: scaleHeight(10),
 	},
 
@@ -1927,11 +1950,11 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginBottom: scaleHeight(10),
 		borderWidth: 1, // ✅ 기본 border
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		borderRadius: scaleWidth(12),
 		paddingVertical: scaleHeight(8),
 		paddingHorizontal: scaleWidth(10),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 
 	levelRowTitle: {
@@ -1959,7 +1982,7 @@ const styles = StyleSheet.create({
 	levelRowCardConquered: {
 		borderWidth: 2,
 		borderColor: '#27ae60',
-		backgroundColor: '#f0fbf4',
+		backgroundColor: '#eafaf1',
 		shadowColor: '#000',
 		shadowOpacity: 0.1,
 		shadowRadius: 3,
@@ -1974,7 +1997,7 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 2 },
 	},
 	categoryRowTextConquered: {
-		color: '#fff',
+		color: '#ffffff',
 		fontWeight: 'bold',
 		textShadowColor: 'rgba(0, 0, 0, 0.15)',
 		textShadowOffset: { width: 1, height: 1 },
@@ -1986,9 +2009,9 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(12),
 		paddingHorizontal: scaleWidth(16),
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		borderRadius: scaleWidth(12),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		marginBottom: scaleHeight(10),
 		width: '100%',
 	},
@@ -1999,8 +2022,8 @@ const styles = StyleSheet.create({
 	levelDescriptionCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#f9f9f9',
-		borderRadius: scaleWidth(10),
+		backgroundColor: '#f8f9fa',
+		borderRadius: scaleWidth(12),
 		paddingVertical: scaleHeight(8),
 		paddingHorizontal: scaleWidth(12),
 		marginBottom: scaleHeight(8),

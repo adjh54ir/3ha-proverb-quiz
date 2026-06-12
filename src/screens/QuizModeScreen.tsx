@@ -45,7 +45,7 @@ const QuizModeScreen = () => {
 		label: item.label,
 		icon: item.iconName ?? '', // 혹은 기본값
 		type: item.iconType ?? 'FontAwesome6',
-		color: item.iconColor ?? '#ccc',
+		color: item.iconColor ?? '#bdc3c7',
 	}));
 
 	useEffect(() => {
@@ -135,7 +135,7 @@ const QuizModeScreen = () => {
 	const selectedMode = QUIZ_MODES.find((mode) => mode.key === passedMode);
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }} edges={['top', 'bottom']}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }} edges={['top', 'bottom']}>
 			<View style={styles.container}>
 				<View style={styles.centerWrapper}>
 					<View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: scaleHeight(20) }}>
@@ -219,7 +219,7 @@ const QuizModeScreen = () => {
 												}
 											}}>
 											<View style={styles.iconTextRow}>
-												<IconComponent type={item.type} name={item.icon} size={28} color="#fff" />
+												<IconComponent type={item.type} name={item.icon} size={28} color="#ffffff" />
 												<Text style={styles.modeLabel}>{item.label}</Text>
 												<Text style={styles.progressInlineText}>{`(${solved}/${total})`}</Text>
 											</View>
@@ -254,7 +254,7 @@ const QuizModeScreen = () => {
 												}}>
 												{/* 왼쪽 아이콘 + 라벨 */}
 												<View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-													<IconComponent type={item.type} name={item.icon} size={22} color="#fff" />
+													<IconComponent type={item.type} name={item.icon} size={22} color="#ffffff" />
 													<Text style={styles.categoryRowText}>{item.label}</Text>
 												</View>
 
@@ -279,7 +279,7 @@ const QuizModeScreen = () => {
 					style={styles.homeButton}
 					// @ts-ignore
 					onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME })}>
-					<IconComponent type="FontAwesome6" name="house" size={16} color="#fff" style={styles.icon} />
+					<IconComponent type="FontAwesome6" name="house" size={16} color="#ffffff" style={styles.icon} />
 					<Text style={styles.buttonText}>홈으로 가기</Text>
 				</TouchableOpacity>
 			</View>
@@ -288,7 +288,7 @@ const QuizModeScreen = () => {
 				<View style={styles.modalOverlay}>
 					<View style={styles.modalContent}>
 						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowInfoModal(false)}>
-							<IconComponent type="materialIcons" name="close" size={24} color="#555" />
+							<IconComponent type="materialIcons" name="close" size={24} color="#7f8c8d" />
 						</TouchableOpacity>
 						<Text style={styles.modalTitle}>난이도별 퀴즈 안내</Text>
 						<Text style={styles.modalText}>전체, 초급, 중급, 고급, 특급으로 나뉘며 난이도에 따라 퀴즈 문제가 달라집니다.</Text>
@@ -320,7 +320,7 @@ const QuizModeScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 	centerWrapper: {
 		flex: 1,
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
 	gridButtonHalf: {
 		width: '46%',
 		height: scaleHeight(130),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: scaleHeight(10),
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
 		shadowRadius: 3,
 	},
 	modeLabel: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: '600',
 		marginLeft: scaleWidth(5),
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
 	},
 	modalContent: {
 		width: '85%',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(20),
 		borderRadius: scaleWidth(12),
 	},
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(8),
 	},
 	modalCloseText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontWeight: '600',
 		fontSize: scaledSize(15),
 	},
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
 	},
 	modalText: {
 		fontSize: scaledSize(14),
-		color: '#34495e',
+		color: '#2c3e50',
 		lineHeight: scaleHeight(22),
 		textAlign: 'left',
 		marginTop: scaleHeight(10),
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
 		gap: scaleHeight(6),
 	},
 	progressInlineText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(14),
 		marginLeft: scaleWidth(6),
 		fontWeight: '700',
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(16),
 		borderWidth: 1,
-		borderColor: '#dcdde1',
+		borderColor: '#e0e0e0',
 	},
 	selectedModeRow: {
 		flexDirection: 'row',
@@ -532,18 +532,18 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		paddingVertical: scaleHeight(16),
 		paddingHorizontal: scaleWidth(18),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		width: '100%',
 		marginBottom: scaleHeight(14),
-		backgroundColor: '#6c5ce7',
+		backgroundColor: '#16a085',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 3 },
+		shadowOffset: { width: 0, height: scaleHeight(3) },
 		shadowOpacity: 0.1,
 		shadowRadius: 4,
 	},
 	categoryRowText: {
 		flex: 1,
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: '700',
 		marginLeft: scaleWidth(12),
@@ -564,10 +564,10 @@ const styles = StyleSheet.create({
 	progressBarFill: {
 		height: '100%',
 		borderRadius: scaleHeight(5),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 	categoryRowProgress: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(12),
 		fontWeight: '600',
 	},

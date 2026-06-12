@@ -42,6 +42,7 @@ export declare namespace MainDataType {
 		iconType: string; // 아이콘 타입(FontAwesome6)
 		icon: string; // 아이콘 이름(earth-asia)
 		type: 'quiz' | 'study';
+		mascotImage?: any; // 뱃지 마스코트 이미지 (선택)
 	}
 	/**
 	 * 사용자 퀴즈 데이터 정의

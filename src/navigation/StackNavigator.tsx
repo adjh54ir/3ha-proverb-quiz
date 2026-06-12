@@ -10,6 +10,7 @@ import { TouchableOpacity } from 'react-native';
 import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
 import WrongReviewScreen from '@/screens/WrongReviewScreen';
 import { scaledSize, scaleWidth } from '@/utils';
+import { COLORS } from '@/const/common/Theme';
 import InitTimeChallengeScreen from '@/screens/InitTimeChallengeScreen';
 import TimeChanllengeScreen from '@/screens/TimeChanllengeScreen';
 import QuizModeScreen from '@/screens/QuizModeScreen';
@@ -31,13 +32,14 @@ const StackNavigator = () => {
 			screenOptions={{
 				headerTitleAlign: 'center', // 타이틀 가운데 정렬
 				headerStyle: {
-					backgroundColor: '#f9f9f9',
+					backgroundColor: COLORS.background,
 				},
 				headerTitleStyle: {
 					fontSize: scaledSize(18),
 					fontWeight: 'bold',
-					color: '#2c3e50',
+					color: COLORS.text,
 				},
+				headerShadowVisible: false,
 			}}
 			initialRouteName={Paths.MAIN_TAB}
 			detachInactiveScreens={true}>
@@ -63,7 +65,7 @@ const StackNavigator = () => {
 					title: '타임 챌린지',
 					headerLeft: () => <></>,
 					// headerLeft: () => (
-					// 	<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
+					// 	<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
 					// 		<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
 					// 	</TouchableOpacity>
 					// ),
@@ -94,7 +96,7 @@ const StackNavigator = () => {
 					headerRight: () => <></>,
 					// headerRight: () => (
 					// 	//@ts-ignore
-					// 	<TouchableOpacity onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })} style={{ marginRight: 16 }}>
+					// 	<TouchableOpacity onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })} style={{ marginRight: scaleWidth(16) }}>
 					// 		<IconComponent type='materialIcons' name='info-outline' size={24} color='#3498db' />
 					// 	</TouchableOpacity>
 					// ),
@@ -119,7 +121,7 @@ const StackNavigator = () => {
 					title: '속담 학습',
 					headerLeft: () => (
 						<></>
-						// <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
+						// <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
 						// 	<Icon name='arrow-back' size={24} color='#2c3e50' />
 						// </TouchableOpacity>
 					),
@@ -146,7 +148,7 @@ const StackNavigator = () => {
 					title: '타워 챌린지',
 					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
 					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
+						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
 							<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
 						</TouchableOpacity>
 					),
@@ -160,7 +162,7 @@ const StackNavigator = () => {
 					title: '타워퀴즈',
 					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
 					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
+						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
 							<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
 						</TouchableOpacity>
 					),

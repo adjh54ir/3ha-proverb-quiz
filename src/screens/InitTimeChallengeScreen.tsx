@@ -13,8 +13,8 @@ import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import BottomHomeButton from '@/components/BottomHomeButton';
 
 const RANK_CONFIG = [
-	{ trophy: '#F59E0B', label: (styles) => styles.firstRankLabel, score: (styles) => styles.firstRankScore, trophySize: 22 },
-	{ trophy: '#9CA3AF', label: (styles) => styles.secondRankLabel, score: (styles) => styles.secondRankScore, trophySize: 19 },
+	{ trophy: '#f39c12', label: (styles) => styles.firstRankLabel, score: (styles) => styles.firstRankScore, trophySize: 22 },
+	{ trophy: '#95a5a6', label: (styles) => styles.secondRankLabel, score: (styles) => styles.secondRankScore, trophySize: 19 },
 	{ trophy: '#CD7F32', label: (styles) => styles.thirdRankLabel, score: (styles) => styles.thirdRankScore, trophySize: 17 },
 ];
 
@@ -267,7 +267,7 @@ const InitTimeChallengeScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#F8F9FB',
+		backgroundColor: '#f8f9fa',
 	},
 	contentWrapper: {
 		flex: 1,
@@ -285,10 +285,9 @@ const styles = StyleSheet.create({
 	},
 	imageGlow: {
 		shadowColor: '#4A90E2',
-		shadowOffset: { width: 0, height: 6 },
+		shadowOffset: { width: 0, height: scaleHeight(6) },
 		shadowOpacity: 0.25,
 		shadowRadius: 16,
-		elevation: 8,
 		borderRadius: scaleWidth(72),
 		marginBottom: scaleHeight(16),
 	},
@@ -297,31 +296,30 @@ const styles = StyleSheet.create({
 		height: scaleWidth(144),
 		borderRadius: scaleWidth(72),
 		borderWidth: 3,
-		borderColor: '#fff',
+		borderColor: '#ffffff',
 	},
 	heroTitle: {
 		fontSize: scaledSize(24),
 		fontWeight: '800',
-		color: '#1A1D23',
+		color: '#2c3e50',
 		letterSpacing: -0.5,
 	},
 	heroSubtitle: {
 		fontSize: scaledSize(13),
-		color: '#6B7280',
+		color: '#7f8c8d',
 		marginTop: scaleHeight(4),
 	},
 
 	// ── 공통 섹션 카드 ──────────────────────────
 	sectionCard: {
 		backgroundColor: '#FFFFFF',
-		borderRadius: 16,
+		borderRadius: scaleWidth(16),
 		padding: scaleWidth(18),
 		marginBottom: scaleHeight(14),
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.06,
 		shadowRadius: 8,
-		elevation: 2,
 	},
 	sectionHeader: {
 		flexDirection: 'row',
@@ -329,13 +327,13 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(14),
 	},
 	sectionIcon: {
-		fontSize: scaledSize(17),
+		fontSize: scaledSize(16),
 		marginRight: scaleWidth(6),
 	},
 	sectionTitle: {
 		fontSize: scaledSize(15),
 		fontWeight: '700',
-		color: '#1A1D23',
+		color: '#2c3e50',
 	},
 
 	// ── 규칙 ──────────────────────────
@@ -345,7 +343,7 @@ const styles = StyleSheet.create({
 	},
 	ruleDot: {
 		fontSize: scaledSize(13),
-		color: '#9CA3AF',
+		color: '#95a5a6',
 		marginRight: scaleWidth(6),
 		marginTop: 1,
 	},
@@ -357,7 +355,7 @@ const styles = StyleSheet.create({
 	},
 	ruleBold: {
 		fontWeight: '700',
-		color: '#1A1D23',
+		color: '#2c3e50',
 	},
 	bonusDivider: {
 		height: 1,
@@ -367,7 +365,7 @@ const styles = StyleSheet.create({
 	bonusTitle: {
 		fontSize: scaledSize(13),
 		fontWeight: '700',
-		color: '#374151',
+		color: '#2c3e50',
 		marginBottom: scaleHeight(8),
 	},
 	bonusRow: {
@@ -377,17 +375,17 @@ const styles = StyleSheet.create({
 	},
 	bonusPoints: {
 		fontSize: scaledSize(13),
-		color: '#6B7280',
+		color: '#7f8c8d',
 		width: scaleWidth(120),
 	},
 	bonusBadge: {
 		backgroundColor: '#EFF6FF',
-		borderRadius: 6,
+		borderRadius: scaleWidth(6),
 		paddingHorizontal: scaleWidth(10),
 		paddingVertical: scaleHeight(3),
 	},
 	bonusBadgeSpecial: {
-		backgroundColor: '#FEF3C7',
+		backgroundColor: '#fef9e7',
 	},
 	bonusBadgeText: {
 		fontSize: scaledSize(12),
@@ -406,7 +404,7 @@ const styles = StyleSheet.create({
 	startNotice: {
 		marginTop: scaleHeight(14),
 		backgroundColor: '#FFF7ED',
-		borderRadius: 8,
+		borderRadius: scaleWidth(8),
 		paddingHorizontal: scaleWidth(12),
 		paddingVertical: scaleHeight(8),
 	},
@@ -429,11 +427,11 @@ const styles = StyleSheet.create({
 	emptyText: {
 		fontSize: scaledSize(14),
 		fontWeight: '600',
-		color: '#374151',
+		color: '#2c3e50',
 	},
 	emptySubText: {
 		fontSize: scaledSize(13),
-		color: '#9CA3AF',
+		color: '#95a5a6',
 		marginTop: scaleHeight(4),
 	},
 	recordCard: {
@@ -441,7 +439,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		backgroundColor: '#F9FAFB',
-		borderRadius: 12,
+		borderRadius: scaleWidth(12),
 		paddingHorizontal: scaleWidth(14),
 		paddingVertical: scaleHeight(10),
 		marginBottom: scaleHeight(8),
@@ -460,11 +458,11 @@ const styles = StyleSheet.create({
 	rankLabel: {
 		fontSize: scaledSize(14),
 		fontWeight: '700',
-		color: '#6B7280',
+		color: '#7f8c8d',
 		marginLeft: scaleWidth(8),
 	},
 	rankLabelFirst: {
-		color: '#1A1D23',
+		color: '#2c3e50',
 	},
 	recordRight: {
 		alignItems: 'flex-end',
@@ -472,15 +470,15 @@ const styles = StyleSheet.create({
 	rankScore: {
 		fontSize: scaledSize(15),
 		fontWeight: '700',
-		color: '#374151',
+		color: '#2c3e50',
 	},
 	rankScoreFirst: {
 		color: '#D97706',
-		fontSize: scaledSize(17),
+		fontSize: scaledSize(16),
 	},
 	rankDate: {
 		fontSize: scaledSize(11),
-		color: '#9CA3AF',
+		color: '#95a5a6',
 		marginTop: scaleHeight(2),
 	},
 
@@ -490,13 +488,12 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(16),
 		backgroundColor: '#4A90E2',
 		paddingVertical: scaleHeight(15),
-		borderRadius: 14,
+		borderRadius: scaleWidth(12),
 		alignItems: 'center',
 		shadowColor: '#4A90E2',
-		shadowOffset: { width: 0, height: 6 },
+		shadowOffset: { width: 0, height: scaleHeight(6) },
 		shadowOpacity: 0.35,
 		shadowRadius: 12,
-		elevation: 5,
 	},
 	startButtonText: {
 		color: '#FFFFFF',

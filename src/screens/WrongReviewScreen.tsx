@@ -11,6 +11,7 @@ import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import FadeInView from '@/components/animation/FadeInView';
 
 /**
  * 사용자 퀴즈 데이터 정의
@@ -111,6 +112,7 @@ const WrongReviewScreen = () => {
 
 	return (
 		<ScrollView contentContainerStyle={styles.scrollContainer}>
+			<FadeInView>
 			<View style={styles.card}>
 				<Text style={styles.title}>
 					지금까지 <Text style={styles.highlight}>{totalSolvedCount}</Text>문제를 직접 풀었어요!{'\n'}그 중{' '}
@@ -138,7 +140,7 @@ const WrongReviewScreen = () => {
 
 			<View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
 				<TouchableOpacity style={styles.toggleCard} onPress={() => setShowWrongList((prev) => !prev)}>
-					<IconComponent type="MaterialIcons" name={showWrongList ? 'expand-less' : 'expand-more'} size={22} color="#00b894" />
+					<IconComponent type="MaterialIcons" name={showWrongList ? 'expand-less' : 'expand-more'} size={22} color="#27ae60" />
 					<Text style={styles.toggleText}>{showWrongList ? '오답 목록 접기' : '오답 목록 펼치기'}</Text>
 				</TouchableOpacity>
 			</View>
@@ -146,8 +148,6 @@ const WrongReviewScreen = () => {
 				<View style={styles.reviewCardList}>
 					{wrongCountries.map((item) => (
 						<View key={item.id} style={styles.historyCard}>
-							{/* 좌측 컬러바 + 헤더 */}
-							<View style={[styles.historyColorBar]} />
 							<View style={styles.historyCardBody}>
 								{/* 타이틀 + 정오답 배지 */}
 								<View style={styles.headerCenter}>
@@ -158,7 +158,7 @@ const WrongReviewScreen = () => {
 								{Boolean(item.longMeaning) && (
 									<View style={styles.highlightSection}>
 										<View style={styles.meaningQuoteBox}>
-											<IconComponent type="fontAwesome6" name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
+											<IconComponent type="fontAwesome6" name="quote-left" size={28} color="#2ecc71" style={{ marginBottom: scaleHeight(8) }} />
 											<Text style={styles.meaningQuoteText}>{item.longMeaning}</Text>
 										</View>
 									</View>
@@ -192,6 +192,7 @@ const WrongReviewScreen = () => {
 					))}
 				</View>
 			)}
+			</FadeInView>
 		</ScrollView>
 	);
 };
@@ -205,7 +206,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(10),
 		borderRadius: scaleWidth(16),
 		borderWidth: 1,
-		borderColor: '#dfe6e9',
+		borderColor: '#ecf0f1',
 		marginBottom: scaleHeight(10),
 		width: '100%',
 		alignItems: 'center',
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
 	},
 	subText: {
 		fontSize: scaledSize(15),
-		color: '#636e72',
+		color: '#7f8c8d',
 		textAlign: 'center',
 	},
 	startButton: {
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(20),
 	},
 	buttonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: '600',
 		textAlign: 'center',
@@ -248,11 +249,11 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(24),
 		borderRadius: scaleWidth(20),
 		borderWidth: 1,
-		borderColor: '#00cec9',
+		borderColor: '#16a085',
 		backgroundColor: '#e0f7fa',
 	},
 	toggleButtonText: {
-		color: '#00b894',
+		color: '#27ae60',
 		fontSize: scaledSize(15),
 		fontWeight: '600',
 	},
@@ -260,9 +261,9 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(24),
 		width: '100%',
 		borderWidth: 1,
-		borderColor: '#dcdde1',
+		borderColor: '#e0e0e0',
 		borderRadius: scaleWidth(12),
-		backgroundColor: '#fefefe',
+		backgroundColor: '#f8f9fa',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
@@ -285,17 +286,17 @@ const styles = StyleSheet.create({
 	},
 	headerCell: {
 		fontWeight: 'bold',
-		color: '#0984e3',
+		color: '#3498db',
 	},
 	center: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 	emptyText: {
 		fontSize: scaledSize(16),
-		color: '#636e72',
+		color: '#7f8c8d',
 		fontWeight: 700,
 	},
 	scrollContainer: {
@@ -323,7 +324,7 @@ const styles = StyleSheet.create({
 		padding: scaleWidth(20),
 	},
 	modalContent: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(24),
 		borderRadius: scaleWidth(16),
 		width: '100%',
@@ -338,7 +339,7 @@ const styles = StyleSheet.create({
 	},
 	modalText: {
 		fontSize: scaledSize(15),
-		color: '#636e72',
+		color: '#7f8c8d',
 		textAlign: 'left',
 	},
 	modalButton: {
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(8),
 	},
 	modalButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontWeight: 'bold',
 		fontSize: scaledSize(15),
 	},
@@ -367,7 +368,7 @@ const styles = StyleSheet.create({
 		marginRight: scaleWidth(5),
 	},
 	guideModal: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		paddingHorizontal: scaleWidth(20),
 		paddingTop: scaleHeight(20),
 		paddingBottom: scaleHeight(12),
@@ -389,7 +390,7 @@ const styles = StyleSheet.create({
 	},
 	guideDescription: {
 		fontSize: scaledSize(14),
-		color: '#34495e',
+		color: '#2c3e50',
 		textAlign: 'left',
 		lineHeight: scaleHeight(22),
 		marginBottom: scaleHeight(20),
@@ -406,12 +407,12 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(8),
 	},
 	guideConfirmText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontWeight: '600',
 		fontSize: scaledSize(14),
 	},
 	guideDescriptionBox: {
-		backgroundColor: '#f9f9f9',
+		backgroundColor: '#f8f9fa',
 		borderWidth: 1,
 		borderColor: '#ecf0f1',
 		borderRadius: scaleWidth(12),
@@ -421,8 +422,8 @@ const styles = StyleSheet.create({
 	guideCard: {
 		backgroundColor: '#ffffff',
 		borderWidth: 1,
-		borderColor: '#dfe6e9',
-		borderRadius: scaleWidth(14),
+		borderColor: '#ecf0f1',
+		borderRadius: scaleWidth(12),
 		padding: scaleWidth(16),
 		marginBottom: scaleHeight(20),
 		width: '100%',
@@ -435,7 +436,7 @@ const styles = StyleSheet.create({
 	},
 	guideCardContent: {
 		fontSize: scaledSize(13),
-		color: '#34495e',
+		color: '#2c3e50',
 		lineHeight: scaleHeight(20),
 	},
 	reviewCardList: {
@@ -444,7 +445,7 @@ const styles = StyleSheet.create({
 	},
 	reviewCard: {
 		backgroundColor: '#ffffff',
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(16),
 		marginBottom: scaleHeight(12),
@@ -463,14 +464,14 @@ const styles = StyleSheet.create({
 	},
 	reviewMeaningText: {
 		fontSize: scaledSize(14),
-		color: '#636e72',
+		color: '#7f8c8d',
 		lineHeight: scaleHeight(20),
 	},
 	historyCard: {
 		flexDirection: 'row',
 		backgroundColor: '#ffffff',
 		borderWidth: 2, // ✅ 두께를 늘림
-		borderColor: '#b0b0b0', // ✅ 좀 더 진한 회색 (또는 #999, #888)
+		borderColor: '#b0b0b0', // ✅ 좀 더 진한 회색 (또는 #95a5a6, #95a5a6)
 		borderRadius: scaledSize(12),
 		overflow: 'hidden',
 		marginBottom: scaleHeight(12),
@@ -478,15 +479,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.08, // ✅ 살짝 강조
 		shadowRadius: 3,
-	},
-	historyColorBar: {
-		width: scaleWidth(5),
-	},
-	historyBarCorrect: {
-		backgroundColor: '#4CAF50',
-	},
-	historyBarWrong: {
-		backgroundColor: '#F44336',
 	},
 	historyCardBody: {
 		flex: 1,
@@ -502,7 +494,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		fontSize: scaledSize(20),
 		fontWeight: '700',
-		color: '#222',
+		color: '#2c3e50',
 		paddingRight: scaleWidth(10),
 	},
 
@@ -511,18 +503,18 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(6),
 		paddingHorizontal: scaleWidth(10),
 		borderRadius: scaleWidth(8),
-		backgroundColor: '#FAFAFA',
+		backgroundColor: '#f8f9fa',
 		borderWidth: 1,
-		borderColor: '#eee',
+		borderColor: '#ecf0f1',
 	},
 	historyMeaningLabel: {
 		fontSize: scaledSize(12),
-		color: '#777',
+		color: '#7f8c8d',
 		marginBottom: scaleHeight(4),
 	},
 	historyMeaningValue: {
 		fontSize: scaledSize(16),
-		color: '#2e7d32',
+		color: '#1e8449',
 		fontWeight: 'bold',
 		lineHeight: scaledSize(16),
 	},
@@ -534,7 +526,7 @@ const styles = StyleSheet.create({
 	historySubTitle: {
 		fontSize: scaledSize(13),
 		fontWeight: '700',
-		color: '#333',
+		color: '#2c3e50',
 	},
 
 	phraseRow: {
@@ -545,12 +537,12 @@ const styles = StyleSheet.create({
 	},
 	phraseKr: {
 		fontSize: scaledSize(13),
-		color: '#222',
+		color: '#2c3e50',
 		fontWeight: '600',
 	},
 	phraseMean: {
 		fontSize: scaledSize(13),
-		color: '#444',
+		color: '#2c3e50',
 		flexShrink: 1,
 	},
 
@@ -565,7 +557,7 @@ const styles = StyleSheet.create({
 	bulletDot: {
 		fontSize: scaledSize(14),
 		lineHeight: scaledSize(18),
-		color: '#4CAF50',
+		color: '#27ae60',
 		marginRight: scaleWidth(6),
 	},
 	sectionHeaderIcon: {
@@ -579,9 +571,9 @@ const styles = StyleSheet.create({
 	historyBox: {
 		borderWidth: 1,
 		borderColor: '#e0e0e0',
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		padding: scaleWidth(10),
-		backgroundColor: '#fafafa',
+		backgroundColor: '#f8f9fa',
 	},
 	headerCenter: {
 		flexDirection: 'row',
@@ -594,7 +586,7 @@ const styles = StyleSheet.create({
 	headerTitle2: {
 		fontSize: scaledSize(20),
 		fontWeight: '700',
-		color: '#1E6BB8',
+		color: '#2980b9',
 		textAlign: 'center', // ✅ 줄바꿈 시 가운데 정렬
 	},
 	highlightSection: {
@@ -602,7 +594,7 @@ const styles = StyleSheet.create({
 		borderColor: '#A5D8FF',
 		backgroundColor: '#EAF4FF',
 		padding: scaleWidth(14),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		marginVertical: scaleHeight(12),
 		shadowColor: '#000',
 		shadowOpacity: 0.08,
@@ -617,14 +609,14 @@ const styles = StyleSheet.create({
 	highlightTitle: {
 		fontSize: scaledSize(15),
 		fontWeight: '700',
-		color: '#1E6BB8',
+		color: '#2980b9',
 		marginLeft: scaleWidth(6),
 	},
 	highlightText: {
 		fontSize: scaledSize(15),
 		fontWeight: '600',
 		color: '#2c3e50',
-		lineHeight: 22,
+		lineHeight: scaleHeight(22),
 	},
 	meaningQuoteBox: {
 		alignItems: 'center', // 중앙 정렬
@@ -644,7 +636,7 @@ const styles = StyleSheet.create({
 	sectionBox: {
 		borderWidth: 1,
 		borderColor: '#E6EEF5',
-		backgroundColor: '#FDFEFE',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(12),
 		borderRadius: scaleWidth(12),
 		marginVertical: scaleHeight(10),
@@ -661,8 +653,8 @@ const styles = StyleSheet.create({
 	},
 	sectionText: {
 		fontSize: scaledSize(14),
-		color: '#444',
-		lineHeight: 20,
+		color: '#2c3e50',
+		lineHeight: scaleHeight(20),
 	},
 	inlineLabel: {
 		fontSize: scaledSize(13),
@@ -672,12 +664,12 @@ const styles = StyleSheet.create({
 	},
 	inlineValue: {
 		fontSize: scaledSize(13),
-		color: '#555',
+		color: '#7f8c8d',
 		marginTop: scaleHeight(2),
 	},
 	exampleText: {
 		fontSize: scaledSize(12),
-		color: '#555',
+		color: '#7f8c8d',
 		lineHeight: scaleHeight(18),
 		marginLeft: scaleWidth(6),
 	},
@@ -697,7 +689,7 @@ const styles = StyleSheet.create({
 	toggleText: {
 		fontSize: scaledSize(15),
 		fontWeight: '600',
-		color: '#00b894',
+		color: '#27ae60',
 	},
 	homeButton: {
 		marginTop: scaleHeight(20),
@@ -707,7 +699,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(25),
 	},
 	homeButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(15),
 		fontWeight: '600',
 		textAlign: 'center',
@@ -720,10 +712,9 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(16), // 32 → 16
 		width: '85%', // 추가
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 4 },
+		shadowOffset: { width: 0, height: scaleHeight(4) },
 		shadowOpacity: 0.08,
 		shadowRadius: 12,
-		elevation: 4,
 	},
 	emptyBadge: {
 		backgroundColor: '#FFF9E6',

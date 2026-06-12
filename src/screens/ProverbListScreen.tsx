@@ -27,13 +27,14 @@ import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import SuccessToast from './SuccessToast';
+import FadeInView from '@/components/animation/FadeInView';
 
 const PAGE_SIZE = 30;
 
 const COMMON_ALL_OPTION = {
 	label: '전체',
 	value: '전체',
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={16} color="#555" />,
+	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={16} color="#7f8c8d" />,
 	labelStyle: {
 		marginLeft: scaleWidth(6),
 		fontSize: scaledSize(14),
@@ -55,7 +56,7 @@ const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '보통',
 		value: '보통',
-		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#EB984E" />,
+		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#e67e22" />,
 	},
 	{
 		label: '어려움',
@@ -68,17 +69,17 @@ const FIELD_DROPDOWN_ITEMS = [
 	{
 		label: '운/우연',
 		value: '운/우연',
-		icon: () => <IconComponent type="FontAwesome6" name="dice" size={16} color="#81ecec" />,
+		icon: () => <IconComponent type="FontAwesome6" name="dice" size={16} color="#76d7c4" />,
 	},
 	{
 		label: '인간관계',
 		value: '인간관계',
-		icon: () => <IconComponent type="FontAwesome6" name="users" size={16} color="#a29bfe" />,
+		icon: () => <IconComponent type="FontAwesome6" name="users" size={16} color="#76d7c4" />,
 	},
 	{
 		label: '세상 이치',
 		value: '세상 이치',
-		icon: () => <IconComponent type="fontawesome5" name="globe" size={16} color="#fdcb6e" />,
+		icon: () => <IconComponent type="fontawesome5" name="globe" size={16} color="#f4d03f" />,
 	},
 	{
 		label: '근면/검소',
@@ -88,12 +89,12 @@ const FIELD_DROPDOWN_ITEMS = [
 	{
 		label: '노력/성공',
 		value: '노력/성공',
-		icon: () => <IconComponent type="fontawesome5" name="medal" size={16} color="#55efc4" />,
+		icon: () => <IconComponent type="fontawesome5" name="medal" size={16} color="#76d7c4" />,
 	},
 	{
 		label: '경계/조심',
 		value: '경계/조심',
-		icon: () => <IconComponent type="fontawesome5" name="exclamation-triangle" size={16} color="#ff7675" />,
+		icon: () => <IconComponent type="fontawesome5" name="exclamation-triangle" size={16} color="#e74c3c" />,
 	},
 	{
 		label: '욕심/탐욕',
@@ -103,7 +104,7 @@ const FIELD_DROPDOWN_ITEMS = [
 	{
 		label: '배신/불신',
 		value: '배신/불신',
-		icon: () => <IconComponent type="fontawesome5" name="user-slash" size={16} color="#b2bec3" />,
+		icon: () => <IconComponent type="fontawesome5" name="user-slash" size={16} color="#bdc3c7" />,
 	},
 ];
 
@@ -234,26 +235,26 @@ const ProverbListScreen = () => {
 
 	const getFieldColor = (field: string) => {
 		const categoryColorMap: Record<string, string> = {
-			'운/우연': '#00cec9',
-			인간관계: '#6c5ce7',
-			'세상 이치': '#fdcb6e',
+			'운/우연': '#16a085',
+			인간관계: '#16a085',
+			'세상 이치': '#f4d03f',
 			'근면/검소': '#e17055',
-			'노력/성공': '#00b894',
-			'경계/조심': '#d63031',
+			'노력/성공': '#27ae60',
+			'경계/조심': '#e74c3c',
 			'욕심/탐욕': '#e84393',
-			'배신/불신': '#2d3436',
+			'배신/불신': '#2c3e50',
 		};
-		return categoryColorMap[field] || '#b2bec3';
+		return categoryColorMap[field] || '#bdc3c7';
 	};
 
 	const getLevelColor = (levelName: number) => {
 		const levelColorMap: Record<string, string> = {
 			1: '#2ecc71',
 			2: '#F4D03F',
-			3: '#EB984E',
+			3: '#e67e22',
 			4: '#E74C3C',
 		};
-		return levelColorMap[levelName] || '#b2bec3';
+		return levelColorMap[levelName] || '#bdc3c7';
 	};
 
 	const handleReset = () => {
@@ -280,13 +281,13 @@ const ProverbListScreen = () => {
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type="FontAwesome6" name="seedling" size={14} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="seedling" size={14} color="#ffffff" />;
 			case 2:
-				return <IconComponent type="FontAwesome6" name="leaf" size={14} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="leaf" size={14} color="#ffffff" />;
 			case 3:
-				return <IconComponent type="FontAwesome6" name="tree" size={14} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="tree" size={14} color="#ffffff" />;
 			case 4:
-				return <IconComponent type="FontAwesome6" name="trophy" size={14} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="trophy" size={14} color="#ffffff" />;
 			default:
 				return null;
 		}
@@ -295,28 +296,29 @@ const ProverbListScreen = () => {
 	const getFieldIcon = (field: string) => {
 		switch (field) {
 			case '운/우연':
-				return <IconComponent type="FontAwesome6" name="dice" size={12} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="dice" size={12} color="#ffffff" />;
 			case '인간관계':
-				return <IconComponent type="FontAwesome6" name="users" size={12} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="users" size={12} color="#ffffff" />;
 			case '세상 이치':
-				return <IconComponent type="fontawesome5" name="globe" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="globe" size={12} color="#ffffff" />;
 			case '근면/검소':
-				return <IconComponent type="fontawesome5" name="hammer" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="hammer" size={12} color="#ffffff" />;
 			case '노력/성공':
-				return <IconComponent type="fontawesome5" name="medal" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="medal" size={12} color="#ffffff" />;
 			case '경계/조심':
-				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={12} color="#ffffff" />;
 			case '욕심/탐욕':
-				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={12} color="#ffffff" />;
 			case '배신/불신':
-				return <IconComponent type="fontawesome5" name="user-slash" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="user-slash" size={12} color="#ffffff" />;
 			default:
-				return <IconComponent type="FontAwesome6" name="tag" size={12} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="tag" size={12} color="#ffffff" />;
 		}
 	};
 
 	return (
 		<SafeAreaView style={styles.main} edges={['top']}>
+			<FadeInView style={{ flex: 1 }}>
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
 				<TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
 					<View style={{ flex: 1 }}>
@@ -328,7 +330,7 @@ const ProverbListScreen = () => {
 										ref={searchInputRef}
 										style={styles.input}
 										placeholder="속담이나 의미를 입력해주세요"
-										placeholderTextColor="#9CA3AF"
+										placeholderTextColor="#95a5a6"
 										onChangeText={(text) => {
 											setKeyword(text);
 											setFieldOpen(false);
@@ -337,7 +339,7 @@ const ProverbListScreen = () => {
 										value={keyword}
 									/>
 									<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset}>
-										<Icon name="rotate-right" size={18} color="#555" />
+										<Icon name="rotate-right" size={18} color="#7f8c8d" />
 									</TouchableOpacity>
 								</View>
 								<View style={styles.filterDropdownRow}>
@@ -346,7 +348,8 @@ const ProverbListScreen = () => {
 											open={levelOpen}
 											value={levelValue}
 											items={LEVEL_DROPDOWN_ITEMS}
-											setOpen={(open) => {
+											setOpen={(value) => {
+												const open = typeof value === 'function' ? value(levelOpen) : value;
 												setLevelOpen(open);
 												if (open) {
 													setFieldOpen(false);
@@ -376,7 +379,8 @@ const ProverbListScreen = () => {
 											open={fieldOpen}
 											value={fieldValue}
 											items={FIELD_DROPDOWN_ITEMS}
-											setOpen={(open) => {
+											setOpen={(value) => {
+												const open = typeof value === 'function' ? value(fieldOpen) : value;
 												setFieldOpen(open);
 												if (open) {
 													setLevelOpen(false);
@@ -411,7 +415,7 @@ const ProverbListScreen = () => {
 														paddingVertical: scaleHeight(14),
 														paddingHorizontal: scaleWidth(16),
 														borderBottomWidth: 1,
-														borderBottomColor: '#f0f0f0',
+														borderBottomColor: '#ecf0f1',
 													}}>
 													<View style={{ width: scaleWidth(28), alignItems: 'center', marginRight: scaleWidth(12) }}>
 														{typeof item.icon === 'function' ? item.icon() : item.icon}
@@ -429,22 +433,22 @@ const ProverbListScreen = () => {
 												width: '85%',
 												alignSelf: 'center',
 												maxHeight: scaleHeight(500),
-												backgroundColor: '#fff',
+												backgroundColor: '#ffffff',
 												borderWidth: 1,
-												borderColor: '#ccc',
+												borderColor: '#bdc3c7',
 												borderRadius: scaleWidth(20),
 												paddingHorizontal: 0,
 												paddingVertical: scaleHeight(20),
 												shadowColor: '#000',
 												shadowOpacity: 0.15,
-												shadowOffset: { width: 0, height: 6 },
+												shadowOffset: { width: 0, height: scaleHeight(6) },
 												shadowRadius: scaleWidth(8),
 												position: 'relative',
 											}}
 											modalTitleStyle={{
 												fontSize: scaledSize(16),
 												fontWeight: 'bold',
-												color: '#2d3436',
+												color: '#2c3e50',
 												textAlign: 'center',
 												paddingVertical: scaleHeight(12),
 												paddingHorizontal: scaleWidth(16),
@@ -474,7 +478,7 @@ const ProverbListScreen = () => {
 											setShowFavoritesOnly(!showFavoritesOnly);
 											scrollToTop();
 										}}>
-										<Icon name="star" solid={showFavoritesOnly} size={14} color={showFavoritesOnly ? '#FFD700' : '#999'} />
+										<Icon name="star" solid={showFavoritesOnly} size={14} color={showFavoritesOnly ? '#f1c40f' : '#95a5a6'} />
 										<Text style={[styles.favoriteFilterText, showFavoritesOnly && styles.favoriteFilterTextActive]}>즐겨찾기</Text>
 									</TouchableOpacity>
 									<Text style={styles.listCountText}>총 {proverbList.length}개가 검색되었어요!</Text>
@@ -555,8 +559,8 @@ const ProverbListScreen = () => {
 														handleToggleFavorite(item.id);
 													}}
 													style={styles.favoriteIconWrapper}
-													hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-													<Icon name="star" solid={favoriteIds.includes(item.id)} size={20} color={favoriteIds.includes(item.id) ? '#FFD700' : '#ccc'} />
+													hitSlop={{ top: scaleHeight(10), bottom: scaleHeight(10), left: scaleWidth(10), right: scaleWidth(10) }}>
+													<Icon name="star" solid={favoriteIds.includes(item.id)} size={20} color={favoriteIds.includes(item.id) ? '#f1c40f' : '#bdc3c7'} />
 												</TouchableOpacity>
 											</View>
 
@@ -602,6 +606,7 @@ const ProverbListScreen = () => {
 					</View>
 				</TouchableWithoutFeedback>
 			</KeyboardAvoidingView>
+			</FadeInView>
 		</SafeAreaView>
 	);
 };
@@ -615,7 +620,7 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(-18),
 	},
 	filterCard: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(16),
 		borderRadius: scaleWidth(16),
 		marginBottom: scaleHeight(8),
@@ -629,7 +634,7 @@ const styles = StyleSheet.create({
 		width: '80%',
 		height: scaleHeight(44),
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		borderRadius: scaleWidth(8),
 		fontSize: scaledSize(16),
 		paddingHorizontal: scaleWidth(12),
@@ -639,15 +644,15 @@ const styles = StyleSheet.create({
 	},
 	filterRow: { flexDirection: 'row' },
 	dropdown: {
-		backgroundColor: '#fff',
-		borderColor: '#ccc',
+		backgroundColor: '#ffffff',
+		borderColor: '#bdc3c7',
 		height: scaleHeight(44),
 	},
 	scrollTopButton: {
 		position: 'absolute',
 		right: scaleWidth(16),
 		bottom: scaleHeight(16),
-		backgroundColor: '#2196F3',
+		backgroundColor: '#3498db',
 		width: scaleWidth(40),
 		height: scaleWidth(40),
 		borderRadius: scaleWidth(20),
@@ -655,12 +660,12 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	itemBox: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(20),
 		borderRadius: scaleWidth(16),
 		marginBottom: scaleHeight(16),
 		borderWidth: 1,
-		borderColor: '#eee',
+		borderColor: '#ecf0f1',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.05,
@@ -668,7 +673,7 @@ const styles = StyleSheet.create({
 	},
 	modalContainer: {
 		width: '90%',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderRadius: scaleWidth(20),
 		overflow: 'hidden',
 		maxHeight: '85%',
@@ -676,7 +681,7 @@ const styles = StyleSheet.create({
 	modalTitle: {
 		fontSize: scaledSize(20),
 		fontWeight: 'bold',
-		color: '#2d3436',
+		color: '#2c3e50',
 		flexShrink: 1,
 	},
 	modalBody: {
@@ -686,7 +691,7 @@ const styles = StyleSheet.create({
 	},
 	modalSection: {
 		marginBottom: scaleHeight(16),
-		backgroundColor: '#f9f9f9',
+		backgroundColor: '#f8f9fa',
 		padding: scaleWidth(12),
 		borderRadius: scaleWidth(12),
 		shadowColor: '#000',
@@ -695,48 +700,48 @@ const styles = StyleSheet.create({
 		shadowRadius: scaleWidth(4),
 	},
 	modalLabel: {
-		fontSize: scaledSize(17),
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#0984e3',
+		color: '#3498db',
 		marginBottom: scaleHeight(6),
 	},
 	modalText: {
 		fontSize: scaledSize(15),
-		color: '#2d3436',
+		color: '#2c3e50',
 		lineHeight: scaleHeight(24),
 	},
 	modalHighlightTitle: {
 		fontSize: scaledSize(14),
 		fontWeight: 'bold',
-		color: '#0984e3',
+		color: '#3498db',
 		marginBottom: scaleHeight(4),
 	},
 	modalHighlightText: {
 		fontSize: scaledSize(15),
-		color: '#2d3436',
+		color: '#2c3e50',
 		lineHeight: scaleHeight(22),
 	},
 	modalCloseButton: {
-		backgroundColor: '#0984e3',
+		backgroundColor: '#3498db',
 		paddingVertical: scaleHeight(14),
 		alignItems: 'center',
 		borderBottomLeftRadius: scaleWidth(20),
 		borderBottomRightRadius: scaleWidth(20),
 	},
 	modalCloseButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 	},
 	proverbText: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2d3436',
+		color: '#2c3e50',
 		marginBottom: scaleHeight(8),
 	},
 	meaningText: {
 		fontSize: scaledSize(15),
-		color: '#2d3436',
+		color: '#2c3e50',
 		fontWeight: '400',
 		lineHeight: scaleHeight(24),
 		marginBottom: scaleHeight(12),
@@ -750,16 +755,16 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(10),
 		paddingVertical: scaleHeight(4),
 		borderRadius: scaleWidth(12),
-		backgroundColor: '#f1f2f6',
+		backgroundColor: '#ecf0f1',
 	},
 	badge2: {
 		paddingHorizontal: scaleWidth(10),
 		paddingVertical: scaleHeight(4),
 		borderRadius: scaleWidth(12),
-		backgroundColor: '#f1f2f6',
+		backgroundColor: '#ecf0f1',
 	},
 	badgeText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(12),
 		fontWeight: '600',
 	},
@@ -774,11 +779,11 @@ const styles = StyleSheet.create({
 	},
 	dropdownPlaceholder: {
 		textAlign: 'center',
-		color: '#999',
+		color: '#95a5a6',
 	},
 	dropdownList: {
-		backgroundColor: '#fff',
-		borderColor: '#dfe6e9',
+		backgroundColor: '#ffffff',
+		borderColor: '#ecf0f1',
 		borderWidth: 1.2,
 		borderRadius: scaleWidth(12),
 	},
@@ -797,7 +802,7 @@ const styles = StyleSheet.create({
 	},
 	listCountText: {
 		fontSize: scaledSize(14),
-		color: '#666',
+		color: '#7f8c8d',
 	},
 	favoriteFilterButton: {
 		flexDirection: 'row',
@@ -806,17 +811,17 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(6),
 		borderRadius: scaleWidth(20),
 		borderWidth: 1,
-		borderColor: '#ddd',
-		backgroundColor: '#fff',
+		borderColor: '#e0e0e0',
+		backgroundColor: '#ffffff',
 		gap: scaleWidth(6),
 	},
 	favoriteFilterButtonActive: {
 		backgroundColor: '#FFF9E6',
-		borderColor: '#FFD700',
+		borderColor: '#f1c40f',
 	},
 	favoriteFilterText: {
 		fontSize: scaledSize(13),
-		color: '#999',
+		color: '#95a5a6',
 		fontWeight: '600',
 	},
 	favoriteFilterTextActive: {
@@ -842,13 +847,13 @@ const styles = StyleSheet.create({
 	resetButton: {
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: '#eee',
+		backgroundColor: '#ecf0f1',
 		height: scaleHeight(50),
 		width: scaleWidth(44),
 		borderRadius: scaleWidth(8),
 	},
 	resetButtonText: {
-		color: '#555',
+		color: '#7f8c8d',
 		fontSize: scaledSize(14),
 		fontWeight: 'bold',
 	},
@@ -870,7 +875,7 @@ const styles = StyleSheet.create({
 	},
 	emptyText: {
 		fontSize: scaledSize(16),
-		color: '#636e72',
+		color: '#7f8c8d',
 		textAlign: 'center',
 		lineHeight: scaleHeight(22),
 	},
@@ -882,7 +887,7 @@ const styles = StyleSheet.create({
 		zIndex: 10,
 	},
 	modalHeader: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		paddingVertical: scaleHeight(16),
 		paddingHorizontal: scaleWidth(20),
 		justifyContent: 'center',
@@ -892,12 +897,12 @@ const styles = StyleSheet.create({
 	modalProverbText: {
 		fontSize: scaledSize(20),
 		fontWeight: 'bold',
-		color: '#2d3436',
+		color: '#2c3e50',
 		textAlign: 'center',
 		lineHeight: scaleHeight(30),
 	},
 	modalProverbBox: {
-		backgroundColor: '#f1f2f6',
+		backgroundColor: '#ecf0f1',
 		borderRadius: scaleWidth(12),
 		paddingVertical: scaleHeight(16),
 		paddingHorizontal: scaleWidth(20),
@@ -908,37 +913,37 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(22),
 		marginTop: scaleHeight(5),
 		fontWeight: 'bold',
-		color: '#2d3436',
+		color: '#2c3e50',
 		textAlign: 'center',
 	},
 	bannerContainer: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		alignItems: 'center',
 		paddingVertical: scaleHeight(6),
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		zIndex: 999,
 	},
 	dropdownLevel: {
 		backgroundColor: '#ffffff',
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		height: scaleHeight(44),
 		paddingHorizontal: scaleWidth(12),
 	},
 	dropdownField: {
 		backgroundColor: '#ffffff',
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		height: scaleHeight(44),
 		paddingHorizontal: scaleWidth(12),
 	},
 	dropdownListLevel: {
 		backgroundColor: '#ffffff',
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		borderWidth: 1,
 		borderRadius: scaleWidth(12),
 	},
 	dropdownListField: {
 		backgroundColor: '#ffffff',
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		borderWidth: 1,
 		borderRadius: scaleWidth(12),
 	},
@@ -946,26 +951,26 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(10),
 		padding: scaleWidth(10),
 		backgroundColor: '#f4f6f8',
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 	},
 	sameProverbTitle: {
 		fontSize: scaledSize(13),
-		color: '#0984e3',
+		color: '#3498db',
 		fontWeight: '600',
 		marginBottom: scaleHeight(6),
 	},
 	sameProverbText: {
 		fontSize: scaledSize(13),
-		color: '#34495e',
+		color: '#2c3e50',
 		fontWeight: '500',
 		lineHeight: scaleHeight(22),
 	},
 	modalHighlightBox: {
-		backgroundColor: '#f1f8ff',
-		borderLeftWidth: scaleWidth(4),
-		borderLeftColor: '#0984e3',
+		backgroundColor: '#eaf4ff',
+		borderWidth: 1,
+		borderColor: '#d6eaf8',
 		padding: scaleWidth(12),
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(16),
 		marginTop: scaleHeight(12),
 	},
@@ -978,7 +983,7 @@ const styles = StyleSheet.create({
 	proverbTextSingle: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#2d3436',
+		color: '#2c3e50',
 		flex: 1,
 		marginRight: scaleWidth(8),
 	},
@@ -986,7 +991,7 @@ const styles = StyleSheet.create({
 	proverbTextMulti: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2d3436',
+		color: '#2c3e50',
 		lineHeight: scaleHeight(26),
 		marginBottom: scaleHeight(8),
 	},
@@ -1006,7 +1011,7 @@ const styles = StyleSheet.create({
 	},
 	sameProverbTextModal: {
 		fontSize: scaledSize(13),
-		color: '#34495e',
+		color: '#2c3e50',
 		paddingVertical: scaleHeight(2),
 		paddingLeft: scaleWidth(10),
 	},
@@ -1027,7 +1032,7 @@ const styles = StyleSheet.create({
 	},
 	resetButtonInline: {
 		marginLeft: scaleWidth(8),
-		backgroundColor: '#eee',
+		backgroundColor: '#ecf0f1',
 		paddingHorizontal: scaleWidth(12),
 		height: scaleHeight(44),
 		borderRadius: scaleWidth(8),

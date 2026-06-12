@@ -4,6 +4,7 @@ import { NativeScrollEvent, NativeSyntheticEvent, RefreshControl, ScrollView, St
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome6Icon from "react-native-vector-icons/FontAwesome6";
 import IconComponent from "../atomic/IconComponent";
+import { scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 
 const ScrollViewScreens = () => {
 
@@ -90,12 +91,12 @@ export default ScrollViewScreens;
 const styles = StyleSheet.create({
     scrollTopButton: {
         position: "absolute",
-        right: 16,
-        bottom: 16,
-        backgroundColor: "#2196F3",
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        right: scaleWidth(16),
+        bottom: scaleHeight(16),
+        backgroundColor: "#3498db",
+        width: scaleWidth(40),
+        height: scaleHeight(40),
+        borderRadius: scaleWidth(20),
         justifyContent: "center",
         alignItems: "center",
     },

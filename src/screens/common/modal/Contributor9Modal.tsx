@@ -31,7 +31,7 @@ interface Props {
 
 	devText: {
 		fontSize: scaledSize(12),
-		color: '#999', // 흐릿한 회색
+		color: '#95a5a6', // 흐릿한 회색
 		textAlign: 'center',
 	},
 
@@ -63,7 +63,7 @@ interface Props {
 	},
 	devText: {
 		fontSize: scaledSize(13),
-		color: '#999999', // 조금 더 진한 회색
+		color: '#95a5a6', // 조금 더 진한 회색
 		textAlign: 'center',
 		fontWeight: '500',
 	},
@@ -92,7 +92,7 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 								style={styles.rightButton}
 								activeOpacity={0.85}
 								onPress={() => handleOpenUrl('https://www.ecodelab.im')}>
-								<IconComponent type='materialIcons' name='home' size={scaledSize(16)} color='#007AFF' />
+								<IconComponent type='materialIcons' name='home' size={scaledSize(16)} color='#3498db' />
 								<Text style={styles.buttonText}>바로가기</Text>
 							</TouchableOpacity>
 						</View>
@@ -102,7 +102,7 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 								style={styles.rightButton}
 								activeOpacity={0.85}
 								onPress={() => handleOpenUrl('https://adjh54.notion.site/1e816d47b05b80d08c29d5a039846dd6?pvs=4')}>
-								<IconComponent type="materialIcons" name="apps" size={scaledSize(16)} color="#007AFF" />
+								<IconComponent type="materialIcons" name="apps" size={scaledSize(16)} color="#3498db" />
 								<Text style={styles.buttonText}>바로가기</Text>
 							</TouchableOpacity>
 						</View>
@@ -112,7 +112,7 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 								style={styles.rightButton}
 								activeOpacity={0.85}
 								onPress={() => handleOpenUrl('https://adjh54.tistory.com/')}>
-								<IconComponent type='materialIcons' name='language' size={scaledSize(16)} color='#007AFF' />
+								<IconComponent type='materialIcons' name='language' size={scaledSize(16)} color='#3498db' />
 								<Text style={styles.buttonText}>방문하기</Text>
 							</TouchableOpacity>
 						</View>
@@ -123,7 +123,7 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 								style={styles.rightButton}
 								activeOpacity={0.85}
 								onPress={() => handleOpenUrl('https://github.com/adjh54ir')}>
-								<IconComponent type='materialCommunityIcons' name='github' size={scaledSize(16)} color='#007AFF' />
+								<IconComponent type='materialCommunityIcons' name='github' size={scaledSize(16)} color='#3498db' />
 								<Text style={styles.buttonText}>둘러보기</Text>
 							</TouchableOpacity>
 						</View>
@@ -134,7 +134,7 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 								style={styles.rightButton}
 								activeOpacity={0.85}
 								onPress={() => handleOpenUrl('mailto:adjh54ir@gmail.com')}>
-								<IconComponent type='materialIcons' name='email' size={scaledSize(16)} color='#007AFF' />
+								<IconComponent type='materialIcons' name='email' size={scaledSize(16)} color='#3498db' />
 								<Text style={styles.buttonText}>보내기</Text>
 							</TouchableOpacity>
 						</View>
@@ -162,13 +162,13 @@ const styles = StyleSheet.create({
 	container: {
 		width: '100%',
 		maxHeight: scaleHeight(680), // ✅ 기존 580 → 680 (또는 더 크게 조정 가능)
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderRadius: moderateScale(16),
 		paddingVertical: scaleHeight(24),
 		paddingHorizontal: scaleWidth(20),
 		shadowColor: '#000',
 		shadowOpacity: 0.1,
-		shadowOffset: { width: 0, height: 4 },
+		shadowOffset: { width: 0, height: scaleHeight(4) },
 		shadowRadius: 8,
 	},
 	scroll: {
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
 	},
 	subtext: {
 		fontSize: scaledSize(13),
-		color: '#666',
+		color: '#7f8c8d',
 		marginBottom: scaleHeight(20),
 	},
 	section: {
@@ -185,18 +185,18 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start',
 		marginTop: scaleHeight(14),
 		marginBottom: scaleHeight(20),
-		color: '#444',
+		color: '#2c3e50',
 	},
 	link: {
 		fontSize: scaledSize(14),
-		color: '#007AFF',
+		color: '#3498db',
 		alignSelf: 'flex-start',
 		marginBottom: scaleHeight(10),
 		textDecorationLine: 'underline',
 	},
 	closeButton: {
 		marginTop: scaleHeight(24),
-		backgroundColor: '#007AFF',
+		backgroundColor: '#3498db',
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(24),
 		borderRadius: moderateScale(12),
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
 		minWidth: scaleWidth(120), // ✅ 크기 제한
 	},
 	closeText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(15),
 		fontWeight: '600',
 		textAlign: 'center',
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'stretch',
 	},
 	linkButtonText: {
-		color: '#007AFF',
+		color: '#3498db',
 		fontSize: scaledSize(14),
 		fontWeight: '500',
 		textAlign: 'center',
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
 		minWidth: scaleWidth(220),
 	},
 	iconButtonText: {
-		color: '#007AFF',
+		color: '#3498db',
 		fontSize: scaledSize(14),
 		fontWeight: '500',
 		marginLeft: scaleWidth(8),
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
 	},
 	footerText: {
 		fontSize: scaledSize(13),
-		color: '#888',
+		color: '#95a5a6',
 		textAlign: 'center',
 		marginTop: scaleHeight(16),
 		lineHeight: scaleHeight(20),
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
 		marginLeft: scaleWidth(8),
 	},
 	inlineButtonText: {
-		color: '#007AFF',
+		color: '#3498db',
 		fontSize: scaledSize(15),
 		fontWeight: '500',
 		textDecorationLine: 'underline',
@@ -273,12 +273,12 @@ const styles = StyleSheet.create({
 		width: '100%',
 		paddingVertical: scaleHeight(10),
 		borderBottomWidth: 1,
-		borderBottomColor: '#eee',
+		borderBottomColor: '#ecf0f1',
 		marginBottom: scaleHeight(15),
 	},
 	labelText: {
 		fontSize: scaledSize(15),
-		color: '#333',
+		color: '#2c3e50',
 		fontWeight: '500',
 	},
 	rightButton: {
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
 		borderRadius: moderateScale(10),
 	},
 	buttonText: {
-		color: '#007AFF',
+		color: '#3498db',
 		fontSize: scaledSize(14),
 		fontWeight: '500',
 		marginLeft: scaleWidth(6),
@@ -304,12 +304,12 @@ const styles = StyleSheet.create({
 		height: scaleWidth(100),
 		borderRadius: scaleWidth(50),
 		borderWidth: 2,
-		borderColor: '#eee',
+		borderColor: '#ecf0f1',
 		marginBottom: scaleHeight(8), // 기존보다 살짝 조정
 	},
 	fixedCloseButton: {
 		marginTop: scaleHeight(12),
-		backgroundColor: '#007AFF',
+		backgroundColor: '#3498db',
 		paddingVertical: scaleHeight(12),
 		paddingHorizontal: scaleWidth(24),
 		borderRadius: moderateScale(12),

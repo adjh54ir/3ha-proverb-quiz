@@ -218,7 +218,7 @@ export default TermsScreen;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 	scrollContainer: {
 		paddingVertical: scaleHeight(24),
@@ -226,9 +226,9 @@ const styles = StyleSheet.create({
 	},
 	markdownBox: {
 		backgroundColor: '#f4f5f7',
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		borderWidth: 1,
-		borderColor: '#dcdde1',
+		borderColor: '#e0e0e0',
 		padding: scaleWidth(16),
 	},
 });
@@ -242,30 +242,31 @@ const markdownStyles = {
 	heading1: {
 		fontSize: scaledSize(22),
 		fontWeight: 'bold',
-		marginBottom: 16,
+		marginBottom: scaleHeight(16),
 	},
 	heading2: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		marginTop: 24,
-		marginBottom: 12,
+		marginTop: scaleHeight(24),
+		marginBottom: scaleHeight(12),
 	},
 	heading3: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		marginTop: 20,
-		marginBottom: 8,
+		marginTop: scaleHeight(20),
+		marginBottom: scaleHeight(8),
 	},
 	bullet_list: {
-		marginBottom: 16,
+		marginBottom: scaleHeight(16),
 	},
 	blockquote: {
-		borderLeftWidth: 4,
-		borderLeftColor: '#dfe6e9',
-		paddingLeft: 12,
+		backgroundColor: '#f8f9fa',
+		borderRadius: scaleWidth(8),
+		paddingHorizontal: scaleWidth(12),
+		paddingVertical: scaleHeight(8),
 		color: '#7f8c8d',
 	},
 	link: {
-		color: '#0984e3',
+		color: '#3498db',
 	},
 };

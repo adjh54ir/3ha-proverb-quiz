@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
 import IconComponent from '../common/atomic/IconComponent';
+import PopInView from '@/components/animation/PopInView';
 
 interface VersionModalProps {
     visible: boolean;
@@ -17,7 +18,7 @@ const CurrentVersionModal = ({ visible, currentVersion, latestVersion, onClose, 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.backdrop}>
-                <View style={styles.container}>
+                <PopInView visible={visible} style={styles.container}>
                     {/* ✅ 앱 아이콘 */}
                     <View style={styles.iconWrapper}>
                         <Image
@@ -29,7 +30,7 @@ const CurrentVersionModal = ({ visible, currentVersion, latestVersion, onClose, 
 
                     {/* 타이틀 */}
                     <View style={styles.headerRow}>
-                        <IconComponent type="MaterialCommunityIcons" name="update" size={24} color="#34495e" />
+                        <IconComponent type="MaterialCommunityIcons" name="update" size={24} color="#2c3e50" />
                         <Text style={styles.title}>버전 정보</Text>
                     </View>
 
@@ -64,7 +65,7 @@ const CurrentVersionModal = ({ visible, currentVersion, latestVersion, onClose, 
                             </TouchableOpacity>
                         )}
                     </View>
-                </View>
+                </PopInView>
             </View>
         </Modal>
     );
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
     },
     container: {
         width: '80%',
-        backgroundColor: '#fff',
+        backgroundColor: '#ffffff',
         borderRadius: scaleWidth(12),
         padding: scaleWidth(20),
         alignItems: 'center',
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
         borderRadius: scaleWidth(16),
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: '#e0e0e0',
     },
     appIcon: {
         width: '100%',
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
         fontSize: scaledSize(18),
         fontWeight: '700',
         marginLeft: scaleWidth(8),
-        color: '#34495e',
+        color: '#2c3e50',
     },
     versionBox: {
         flexDirection: 'row',
@@ -146,13 +147,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#3498db',
     },
     buttonText: {
-        color: '#fff',
+        color: '#ffffff',
         fontWeight: '700', // ⬆️ 조금 더 두껍게
         fontSize: scaledSize(16), // ⬆️ 기존 14 → 16
     },
     versionCard: {
         width: '100%',
-        borderRadius: scaleWidth(10),
+        borderRadius: scaleWidth(12),
         paddingVertical: scaleHeight(14),
         paddingHorizontal: scaleWidth(16),
         marginBottom: scaleHeight(12),
@@ -165,7 +166,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.05,
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 3,
-        elevation: 2,
     },
     versionLabel: {
         fontSize: scaledSize(15),

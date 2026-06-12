@@ -147,7 +147,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
                                             type="MaterialCommunityIcons"
                                             name="download"
                                             size={scaledSize(16)}
-                                            color="#fff"
+                                            color="#ffffff"
                                         />
                                         <Text style={styles.buttonText}>다운로드</Text>
                                     </TouchableOpacity>
@@ -174,13 +174,13 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         maxHeight: scaleHeight(680),
-        backgroundColor: '#fff',
+        backgroundColor: '#ffffff',
         borderRadius: moderateScale(16),
         paddingVertical: scaleHeight(24),
         paddingHorizontal: scaleWidth(20),
         shadowColor: '#000',
         shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: { width: 0, height: scaleHeight(4) },
         shadowRadius: 8,
     },
     scroll: {
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     titleText: {
         fontSize: scaledSize(20),
         fontWeight: 'bold',
-        color: '#1a1a1a',
+        color: '#2c3e50',
         textAlign: 'left',
         flexShrink: 1,
     },
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     },
     closeText: {
         fontSize: scaledSize(22),
-        color: '#555',
+        color: '#7f8c8d',
         fontWeight: 'bold',
     },
     appCard: {
@@ -212,8 +212,8 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         alignItems: 'flex-start',
         padding: scaleWidth(12),
-        borderRadius: 12,
-        backgroundColor: '#f9f9f9',
+        borderRadius: scaleWidth(12),
+        backgroundColor: '#f8f9fa',
         marginBottom: scaleHeight(14),
         shadowColor: '#000',
         shadowOpacity: 0.05,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     image: {
         width: scaleWidth(64),
         height: scaleWidth(64),
-        borderRadius: 12,
+        borderRadius: scaleWidth(12),
         marginRight: scaleWidth(12),
     },
     textArea: {
@@ -233,12 +233,12 @@ const styles = StyleSheet.create({
     appTitle: {
         fontSize: scaledSize(18),
         fontWeight: 'bold',
-        color: '#333',
+        color: '#2c3e50',
         marginBottom: scaleHeight(4),
     },
     appDesc: {
         fontSize: scaledSize(13),
-        color: '#666',
+        color: '#7f8c8d',
         marginBottom: scaleHeight(10),
     },
     buttonRow: {
@@ -254,11 +254,11 @@ const styles = StyleSheet.create({
         width: '60%',
         paddingHorizontal: scaleWidth(17),
         paddingVertical: scaleHeight(10),
-        borderRadius: 8,
+        borderRadius: scaleWidth(8),
         backgroundColor: '#0D96F6', // 다운로드 버튼 색상 (블루)
     },
     buttonText: {
-        color: '#fff',
+        color: '#ffffff',
         fontWeight: '600',
         marginLeft: scaleWidth(6),
         fontSize: scaledSize(13),

@@ -17,12 +17,12 @@ const { width, height } = Dimensions.get('window');
 
 interface TowerReward {
 	name: string;
-	description: string;
+	description?: string;
 	image: any;
 }
 
 interface TowerLevel {
-	id: string;
+	id: number;
 	name: string;
 	bossImage: any;
 	reward: TowerReward;
@@ -62,13 +62,15 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 	const bossAnim = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
+		let glowLoop: Animated.CompositeAnimation | undefined;
 		if (visible) {
-			Animated.loop(
+			glowLoop = Animated.loop(
 				Animated.sequence([
 					Animated.timing(glowAnim, { toValue: 1, duration: 1200, useNativeDriver: true }),
 					Animated.timing(glowAnim, { toValue: 0.4, duration: 1200, useNativeDriver: true }),
 				]),
-			).start();
+			);
+			glowLoop.start();
 
 			Animated.parallel([
 				Animated.spring(scaleAnim, { toValue: 1, tension: 50, friction: 7, useNativeDriver: true }),
@@ -99,10 +101,21 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 			glowAnim.setValue(0.4);
 			starAnims.forEach((anim) => anim.setValue(0));
 		}
+
+		// ✅ 종료 처리: 모달 숨김/언마운트 시 무한 루프 애니메이션 정지 (메모리 정리)
+		return () => {
+			glowLoop?.stop();
+			glowAnim.stopAnimation();
+			scaleAnim.stopAnimation();
+			fadeAnim.stopAnimation();
+			scoreCountAnim.stopAnimation();
+			bossAnim.stopAnimation();
+			starAnims.forEach((anim) => anim.stopAnimation());
+		};
 	}, [visible, isVictory]);
 
 	const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
-	const accentColor = isVictory ? '#f1c40f' : '#ff6b6b';
+	const accentColor = isVictory ? '#f1c40f' : '#e74c3c';
 	const bgColor = isVictory ? '#1a3a28' : '#2d1212';
 	const headerBgColor = isVictory ? '#27ae60' : '#c0392b';
 	const borderColor = isVictory ? '#2ecc71' : '#e74c3c';
@@ -245,7 +258,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 									/>
 									<View style={styles.rewardInfo}>
 										<Text style={styles.rewardName}>{towerLevel.reward.name}</Text>
-										<Text style={styles.rewardDescription}>{towerLevel.reward.description}</Text>
+										{!!towerLevel.reward.description && <Text style={styles.rewardDescription}>{towerLevel.reward.description}</Text>}
 									</View>
 								</View>
 							</View>
@@ -265,7 +278,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 					{/* 버튼 - 항상 하단 고정 */}
 					<View style={styles.buttonsContainer}>
 						<TouchableOpacity onPress={onHome} style={styles.btnSecondary}>
-							<IconComponent type="materialIcons" name="home" size={20} color="#fff" />
+							<IconComponent type="materialIcons" name="home" size={20} color="#ffffff" />
 							<Text style={styles.btnSecondaryText}>홈</Text>
 						</TouchableOpacity>
 
@@ -282,8 +295,8 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 							<TouchableOpacity
 								onPress={onRetry}
 								style={[styles.btnPrimary, { backgroundColor: '#e74c3c' }]}>
-								<IconComponent type="materialIcons" name="refresh" size={20} color="#fff" />
-								<Text style={[styles.btnPrimaryText, { color: '#fff' }]}>RETRY</Text>
+								<IconComponent type="materialIcons" name="refresh" size={20} color="#ffffff" />
+								<Text style={[styles.btnPrimaryText, { color: '#ffffff' }]}>RETRY</Text>
 							</TouchableOpacity>
 						)}
 					</View>
@@ -320,7 +333,7 @@ const styles = StyleSheet.create({
 	resultTitle: {
 		fontSize: scaledSize(22),
 		fontWeight: '900',
-		color: '#fff',
+		color: '#ffffff',
 		letterSpacing: 3,
 		textShadowColor: 'rgba(0,0,0,0.4)',
 		textShadowOffset: { width: 0, height: 2 },
@@ -459,7 +472,7 @@ const styles = StyleSheet.create({
 	},
 	rewardSection: {
 		marginTop: scaleHeight(12),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		overflow: 'hidden',
 		borderWidth: 1,
 		borderColor: 'rgba(241,196,15,0.35)',
@@ -495,7 +508,7 @@ const styles = StyleSheet.create({
 	rewardName: {
 		fontSize: scaledSize(14),
 		fontWeight: '700',
-		color: '#fff',
+		color: '#ffffff',
 		marginBottom: scaleHeight(4),
 	},
 	rewardDescription: {
@@ -506,7 +519,7 @@ const styles = StyleSheet.create({
 	failSection: {
 		marginTop: scaleHeight(12),
 		backgroundColor: 'rgba(0,0,0,0.25)',
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		padding: scaleWidth(16),
 		borderWidth: 1,
 		borderColor: 'rgba(255,100,100,0.25)',
@@ -515,7 +528,7 @@ const styles = StyleSheet.create({
 	failLabel: {
 		fontSize: scaledSize(11),
 		fontWeight: '800',
-		color: '#ff6b6b',
+		color: '#e74c3c',
 		letterSpacing: 3,
 		marginBottom: scaleHeight(8),
 	},
@@ -549,7 +562,7 @@ const styles = StyleSheet.create({
 	btnSecondaryText: {
 		fontSize: scaledSize(14),
 		fontWeight: '700',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	btnPrimary: {
 		flex: 2,

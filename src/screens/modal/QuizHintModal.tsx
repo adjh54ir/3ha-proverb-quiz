@@ -3,6 +3,7 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
+import PopInView from '@/components/animation/PopInView';
 
 interface Props {
 	visible: boolean;
@@ -12,38 +13,38 @@ interface Props {
 
 const getFieldColor = (field: string) => {
 	const map: Record<string, string> = {
-		'운/우연': '#00cec9',
-		인간관계: '#6c5ce7',
+		'운/우연': '#16a085',
+		인간관계: '#16a085',
 		'세상 이치': '#f6a623',
 		'근면/검소': '#e17055',
-		'노력/성공': '#00b894',
-		'경계/조심': '#d63031',
+		'노력/성공': '#27ae60',
+		'경계/조심': '#e74c3c',
 		'욕심/탐욕': '#e84393',
-		'배신/불신': '#2d3436',
+		'배신/불신': '#2c3e50',
 	};
-	return map[field] || '#b2bec3';
+	return map[field] || '#bdc3c7';
 };
 
 const getFieldIcon = (field: string) => {
 	switch (field) {
 		case '운/우연':
-			return <IconComponent type="FontAwesome6" name="dice" size={12} color="#fff" />;
+			return <IconComponent type="FontAwesome6" name="dice" size={12} color="#ffffff" />;
 		case '인간관계':
-			return <IconComponent type="FontAwesome6" name="users" size={12} color="#fff" />;
+			return <IconComponent type="FontAwesome6" name="users" size={12} color="#ffffff" />;
 		case '세상 이치':
-			return <IconComponent type="fontawesome5" name="globe" size={12} color="#fff" />;
+			return <IconComponent type="fontawesome5" name="globe" size={12} color="#ffffff" />;
 		case '근면/검소':
-			return <IconComponent type="fontawesome5" name="hammer" size={12} color="#fff" />;
+			return <IconComponent type="fontawesome5" name="hammer" size={12} color="#ffffff" />;
 		case '노력/성공':
-			return <IconComponent type="fontawesome5" name="medal" size={12} color="#fff" />;
+			return <IconComponent type="fontawesome5" name="medal" size={12} color="#ffffff" />;
 		case '경계/조심':
-			return <IconComponent type="fontawesome5" name="exclamation-triangle" size={12} color="#fff" />;
+			return <IconComponent type="fontawesome5" name="exclamation-triangle" size={12} color="#ffffff" />;
 		case '욕심/탐욕':
-			return <IconComponent type="fontawesome5" name="hand-holding-usd" size={12} color="#fff" />;
+			return <IconComponent type="fontawesome5" name="hand-holding-usd" size={12} color="#ffffff" />;
 		case '배신/불신':
-			return <IconComponent type="fontawesome5" name="user-slash" size={12} color="#fff" />;
+			return <IconComponent type="fontawesome5" name="user-slash" size={12} color="#ffffff" />;
 		default:
-			return <IconComponent type="FontAwesome6" name="tag" size={12} color="#fff" />;
+			return <IconComponent type="FontAwesome6" name="tag" size={12} color="#ffffff" />;
 	}
 };
 
@@ -51,7 +52,7 @@ const QuizHintModal: React.FC<Props> = ({ visible, question, onClose }) => {
 	return (
 		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.overlay}>
-				<View style={styles.modal}>
+				<PopInView visible={visible} style={styles.modal}>
 					{/* 헤더 */}
 					<View style={styles.header}>
 						<View style={styles.headerIconWrap}>
@@ -114,7 +115,7 @@ const QuizHintModal: React.FC<Props> = ({ visible, question, onClose }) => {
 					<TouchableOpacity style={styles.confirmBtn} onPress={onClose} activeOpacity={0.85}>
 						<Text style={styles.confirmText}>확인했어요</Text>
 					</TouchableOpacity>
-				</View>
+				</PopInView>
 			</View>
 		</Modal>
 	);
@@ -130,18 +131,17 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	modal: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		paddingHorizontal: scaleWidth(22),
 		paddingTop: scaleHeight(22),
 		paddingBottom: scaleHeight(24),
-		borderRadius: scaleWidth(22),
+		borderRadius: scaleWidth(20),
 		alignItems: 'center',
 		width: '88%',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: scaleHeight(8) },
 		shadowOpacity: 0.18,
 		shadowRadius: scaleWidth(20),
-		elevation: 10,
 	},
 
 	/* 헤더 */
@@ -153,8 +153,8 @@ const styles = StyleSheet.create({
 	headerIconWrap: {
 		width: scaleWidth(36),
 		height: scaleWidth(36),
-		borderRadius: scaleWidth(18),
-		backgroundColor: '#fef3c7',
+		borderRadius: scaleWidth(16),
+		backgroundColor: '#fef9e7',
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginRight: scaleWidth(10),
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(5),
 	},
 	categoryText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontWeight: '700',
 		fontSize: scaledSize(12),
 		marginLeft: scaleWidth(5),
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
 	/* 섹션 공통 */
 	section: {
 		backgroundColor: '#f0f7ff',
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		padding: scaleWidth(14),
 		marginBottom: scaleHeight(12),
 		borderWidth: 1,
@@ -259,17 +259,16 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(6),
 		backgroundColor: '#f39c12',
 		paddingVertical: scaleHeight(14),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		width: '100%',
 		alignItems: 'center',
 		shadowColor: '#f39c12',
 		shadowOffset: { width: 0, height: scaleHeight(4) },
 		shadowOpacity: 0.35,
 		shadowRadius: scaleWidth(8),
-		elevation: 5,
 	},
 	confirmText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(15),
 		fontWeight: '700',
 		letterSpacing: 0.3,

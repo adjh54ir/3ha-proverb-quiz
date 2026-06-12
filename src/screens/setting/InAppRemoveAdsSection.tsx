@@ -50,7 +50,7 @@
 //                     type="MaterialCommunityIcons"
 //                     name="diamond-stone"
 //                     size={scaledSize(32)}
-//                     color="#2c82f5"
+//                     color="#3498db"
 //                     style={{ marginBottom: scaleHeight(6) }}
 //                 />
 //                 <Text style={styles.title}>광고 없이 깔끔하게!</Text>
@@ -75,7 +75,7 @@
 //                 onPress={purchaseProduct}
 //                 disabled={loading}
 //             >
-//                 <IconComponent type="MaterialCommunityIcons" name="crown" size={18} color="#fff" style={{ marginRight: 8 }} />
+//                 <IconComponent type="MaterialCommunityIcons" name="crown" size={18} color="#ffffff" style={{ marginRight: scaleWidth(8) }} />
 //                 <Text style={styles.buttonText}>
 //                     평생 광고 제거하기
 //                 </Text>
@@ -86,7 +86,7 @@
 
 // const Benefit = ({ text }: { text: string }) => (
 //     <View style={styles.benefitItem}>
-//         <IconComponent type="MaterialCommunityIcons" name="check-circle" size={18} color="#2c82f5" />
+//         <IconComponent type="MaterialCommunityIcons" name="check-circle" size={18} color="#3498db" />
 //         <Text style={styles.benefitText}>{text}</Text>
 //     </View>
 // );
@@ -98,13 +98,13 @@
 //         marginHorizontal: scaleWidth(20),
 //         marginTop: scaleHeight(16),
 //         marginBottom: scaleHeight(12),
-//         borderRadius: scaleWidth(14),
+//         borderRadius: scaleWidth(12),
 //         borderWidth: 1,
 //         borderColor: '#e2e6ea',
 //         shadowColor: '#000',
 //         shadowOpacity: 0.06,
 //         shadowRadius: 6,
-//         shadowOffset: { width: 0, height: 3 },
+//         shadowOffset: { width: 0, height: scaleHeight(3) },
 //     },
 //     header: {
 //         alignItems: 'center',
@@ -123,7 +123,7 @@
 //     },
 //     badge: {
 //         backgroundColor: '#eaf4ff',
-//         borderColor: '#2c82f5',
+//         borderColor: '#3498db',
 //         borderWidth: 1,
 //         paddingVertical: scaleHeight(6),
 //         paddingHorizontal: scaleWidth(12),
@@ -133,7 +133,7 @@
 //     },
 //     badgeText: {
 //         fontSize: scaledSize(13),
-//         color: '#2c82f5',
+//         color: '#3498db',
 //         fontWeight: '700',
 //     },
 //     benefitList: {
@@ -153,12 +153,12 @@
 //         flexDirection: 'row',
 //         alignItems: 'center',
 //         justifyContent: 'center',
-//         backgroundColor: '#2c82f5',
+//         backgroundColor: '#3498db',
 //         paddingVertical: scaleHeight(12),
-//         borderRadius: scaleWidth(10),
+//         borderRadius: scaleWidth(12),
 //     },
 //     buttonText: {
-//         color: '#fff',
+//         color: '#ffffff',
 //         fontSize: scaledSize(14),
 //         fontWeight: '700',
 //     },

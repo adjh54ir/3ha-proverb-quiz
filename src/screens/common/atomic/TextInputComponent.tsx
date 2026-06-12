@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
 
 /**
  * TextInput 줄넘김 증상에 대한 해결
@@ -29,7 +30,7 @@ const TextInputComponent = () => {
 						});
 					}}
 					placeholder="텍스트를 입력해주세요"
-					placeholderTextColor="#9CA3AF"
+					placeholderTextColor="#95a5a6"
 				/>
 				{/* Text 활용예시 */}
 				<Text ref={textRef} style={styles.text} numberOfLines={1} ellipsizeMode="tail" />
@@ -41,30 +42,30 @@ export default TextInputComponent;
 
 const styles = StyleSheet.create({
 	formGroup: {
-		marginBottom: 16,
+		marginBottom: scaleHeight(16),
 		position: 'relative',
 	},
 	label: {
-		fontSize: 16,
-		marginBottom: 8,
+		fontSize: scaledSize(16),
+		marginBottom: scaleHeight(8),
 		fontWeight: '500',
 	},
 	text: {
-		color: '#007AFF',
+		color: '#3498db',
 		fontWeight: '600',
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		flexShrink: 1, // 텍스트가 너무 길 경우 축소 허용
-		marginLeft: 5,
+		marginLeft: scaleWidth(5),
 		maxWidth: '90%',
 	},
 	textInput: {
-		height: 100,
+		height: scaleHeight(100),
 		borderWidth: 1,
-		borderColor: '#ddd',
-		borderRadius: 8,
-		padding: 12,
-		fontSize: 14,
-		marginBottom: 16,
+		borderColor: '#e0e0e0',
+		borderRadius: scaleWidth(8),
+		padding: scaleWidth(12),
+		fontSize: scaledSize(14),
+		marginBottom: scaleHeight(16),
 		textAlignVertical: 'top',
 	},
 });

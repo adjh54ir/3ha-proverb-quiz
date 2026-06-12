@@ -23,6 +23,7 @@ import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import CurrentVersionModal from './modal/CurrentVersionModal';
 import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL } from '@env';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
+import FadeInView from '@/components/animation/FadeInView';
 
 // ─────────────────────────────────────────────
 // 상수
@@ -372,7 +373,7 @@ const SettingScreen = () => {
 						type={config.icon.type}
 						name={config.icon.name}
 						size={scaledSize(20)}
-						color={RESET_ITEM_KEYS.includes(item) ? '#e74c3c' : '#333'}
+						color={RESET_ITEM_KEYS.includes(item) ? '#e74c3c' : '#2c3e50'}
 						style={styles.icon}
 						isBottomIcon={true}
 					/>
@@ -389,7 +390,7 @@ const SettingScreen = () => {
 		}
 		return (
 			<View style={styles.modalTitleRow}>
-				<IconComponent type="MaterialCommunityIcons" name={resetConfig.iconName} size={20} color="#34495e" style={styles.iconLeft} />
+				<IconComponent type="MaterialCommunityIcons" name={resetConfig.iconName} size={20} color="#2c3e50" style={styles.iconLeft} />
 				<Text style={styles.modalTitleText}>{resetConfig.title}</Text>
 			</View>
 		);
@@ -399,6 +400,7 @@ const SettingScreen = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.container} edges={['top']}>
+				<FadeInView style={{ flex: 1 }}>
 				<SectionList
 					ref={sectionRef}
 					keyExtractor={(item, index) => `${item}-${index}`}
@@ -428,7 +430,7 @@ const SettingScreen = () => {
 								<View style={styles.storeButtons}>
 									<TouchableOpacity style={[styles.storeButton, { backgroundColor: '#2ecc71' }]} onPress={shareApp}>
 										<View style={styles.iconRow}>
-											<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color="#fff" />
+											<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color="#ffffff" />
 											<Text style={styles.storeButtonText}>공유하기</Text>
 										</View>
 									</TouchableOpacity>
@@ -471,6 +473,7 @@ const SettingScreen = () => {
 						</View>
 					}
 				/>
+				</FadeInView>
 			</SafeAreaView>
 
 			<Contributor9Modal visible={showDevModal} onClose={() => setShowDevModal(false)} />
@@ -507,7 +510,7 @@ const SettingScreen = () => {
 export default SettingScreen;
 
 const styles = StyleSheet.create({
-	container: { flex: 1, backgroundColor: '#f9f9f9' },
+	container: { flex: 1, backgroundColor: '#f8f9fa' },
 	listContent: { paddingBottom: scaleHeight(24) },
 	headerContainer: { marginBottom: scaleHeight(5) },
 	itemSpacing: { height: scaleHeight(10) },
@@ -518,23 +521,23 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(20),
 		paddingVertical: scaleHeight(10),
 		marginHorizontal: scaleWidth(16),
-		backgroundColor: '#ecf3f9',
-		borderLeftWidth: scaleWidth(4),
-		borderLeftColor: '#3498db',
+		backgroundColor: '#eaf4ff',
+		borderWidth: 1,
+		borderColor: '#d6eaf8',
 		marginBottom: scaleHeight(12),
-		borderRadius: scaleWidth(4),
+		borderRadius: scaleWidth(8),
 	},
 	sectionHeaderText: {
 		fontSize: scaledSize(15),
 		fontWeight: '600',
-		color: '#34495e',
+		color: '#2c3e50',
 		letterSpacing: 0.5,
 		textTransform: 'uppercase',
 	},
 
 	cardButton: {
-		backgroundColor: '#fff',
-		borderRadius: 12,
+		backgroundColor: '#ffffff',
+		borderRadius: scaleWidth(12),
 		paddingVertical: scaleHeight(16),
 		paddingHorizontal: scaleWidth(16),
 		marginHorizontal: scaleHeight(20),
@@ -546,14 +549,14 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	row: { flexDirection: 'row', alignItems: 'center' },
-	icon: { marginRight: scaleWidth(12), color: '#34495e' },
+	icon: { marginRight: scaleWidth(12), color: '#2c3e50' },
 	cardText: { fontSize: scaledSize(15), color: '#2c3e50', fontWeight: '500', letterSpacing: 0.3, flexShrink: 1 },
 
 	scrollTopButton: {
 		position: 'absolute',
 		right: scaleWidth(16),
 		bottom: scaleHeight(16),
-		backgroundColor: '#007AFF',
+		backgroundColor: '#3498db',
 		width: scaleWidth(36),
 		height: scaleWidth(36),
 		borderRadius: scaleWidth(24),
@@ -566,7 +569,7 @@ const styles = StyleSheet.create({
 	},
 
 	modalTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: scaleHeight(12) },
-	modalTitleText: { fontSize: scaledSize(18), lineHeight: scaleHeight(44), fontWeight: 'bold', color: '#34495e', textAlign: 'center' },
+	modalTitleText: { fontSize: scaledSize(18), lineHeight: scaleHeight(44), fontWeight: 'bold', color: '#2c3e50', textAlign: 'center' },
 	iconLeft: { marginRight: scaleWidth(8) },
 
 	recommendSection: {
@@ -583,21 +586,21 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginTop: scaleHeight(12),
 	},
-	recommendTitle: { fontSize: scaledSize(17), fontWeight: '700', color: '#34495e', marginBottom: scaleHeight(6) },
+	recommendTitle: { fontSize: scaledSize(16), fontWeight: '700', color: '#2c3e50', marginBottom: scaleHeight(6) },
 	recommendSubtitle: { fontSize: scaledSize(13), color: '#7f8c8d', textAlign: 'center', marginBottom: scaleHeight(12) },
 	appIconWrapper: {
 		width: scaleWidth(80),
 		height: scaleWidth(80),
 		marginBottom: scaleHeight(12),
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 		borderRadius: scaleWidth(16),
 		overflow: 'hidden',
 	},
 	appIcon: { width: '100%', height: '100%', borderRadius: scaleWidth(16) },
 	storeButtons: { marginTop: scaleHeight(6), flexDirection: 'row', gap: scaleWidth(8) },
 	storeButton: { flex: 1, paddingVertical: scaleHeight(12), borderRadius: scaleWidth(8), alignItems: 'center' },
-	storeButtonText: { color: '#fff', fontWeight: 'bold', fontSize: scaledSize(13) },
+	storeButtonText: { color: '#ffffff', fontWeight: 'bold', fontSize: scaledSize(13) },
 	iconRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleWidth(6) },
 
 	appVerText: { fontSize: scaledSize(12), color: '#95a5a6', textAlign: 'center', marginBottom: scaleHeight(20) },
@@ -609,7 +612,7 @@ const styles = StyleSheet.create({
 		width: scaleWidth(120),
 		padding: scaleWidth(12),
 		borderRadius: scaleWidth(12),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		alignItems: 'center',
 		justifyContent: 'flex-start',
 		shadowColor: '#000',

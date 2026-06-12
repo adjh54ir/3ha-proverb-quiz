@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
 
 		borderWidth: 1,
 		borderColor: '#d1d5db',
-		borderRadius: scaleWidth(22),
+		borderRadius: scaleWidth(20),
 
 		paddingVertical: scaleHeight(9),
 		paddingHorizontal: scaleWidth(22),
@@ -50,6 +50,6 @@ const styles = StyleSheet.create({
 	text: {
 		fontSize: scaledSize(12),
 		fontWeight: '600',
-		color: '#374151',
+		color: '#2c3e50',
 	},
 });

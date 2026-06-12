@@ -54,7 +54,7 @@ export const TOWER_LEVELS = [
 			name: '전설의 한글 수호자',
 			image: require('@/assets/images/costumes/legendary_guardian.png'),
 		},
-		color: '#9c27b0', // 보라색 (신비)
+		color: '#16a085', // 보라색 (신비)
 		backgroundColor: '#f3e5f5',
 	},
 	{

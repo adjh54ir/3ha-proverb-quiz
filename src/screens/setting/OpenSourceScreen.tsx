@@ -67,7 +67,7 @@ export default OpenSourceScreen;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 	content: {
 		padding: scaleWidth(15),
@@ -81,8 +81,8 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	card: {
-		backgroundColor: '#f9f9f9',
-		borderRadius: scaleWidth(10),
+		backgroundColor: '#f8f9fa',
+		borderRadius: scaleWidth(12),
 		padding: scaleWidth(16),
 		marginBottom: scaleHeight(16),
 		borderWidth: 1,
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
 	libName: {
 		fontSize: scaledSize(15),
 		fontWeight: '600',
-		color: '#34495e',
+		color: '#2c3e50',
 	},
 	license: {
 		fontSize: scaledSize(13),
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
 	linkText: {
 		fontSize: scaledSize(13),
 		color: '#2980b9',
-		marginLeft: 4,
+		marginLeft: scaleWidth(4),
 		textDecorationLine: 'underline',
 	},
 	footer: {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
 	wrapperBox: {
 		backgroundColor: '#f4f5f7',
 		borderWidth: 1,
-		borderColor: '#dcdde1',
+		borderColor: '#e0e0e0',
 		borderRadius: scaleWidth(12),
 		padding: scaleWidth(16),
 	},

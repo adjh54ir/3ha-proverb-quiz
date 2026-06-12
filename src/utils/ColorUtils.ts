@@ -33,7 +33,7 @@ export const color = {
     },
     theme4: {
         backgroundColor: '#f5f5f5', // misty rose
-        primaryColor: '#663399', // rebecca purple
+        primaryColor: '#16a085', // teal
         secondaryColor: '#ffe4e1', // light grey
         textColor: '#333333', // dark grey
     },

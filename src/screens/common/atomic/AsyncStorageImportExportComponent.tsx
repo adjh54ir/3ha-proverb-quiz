@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from 'react';
 import { Alert, Clipboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
 
 /**
  * AsyncStorage의 내보내기/ 들여오기 기능
@@ -78,7 +79,7 @@ const AsyncStorageImportExportComponent = () => {
 
 		<View style={styles.adminButtons}>
 			<TouchableOpacity style={styles.adminButton} onPress={exportData}>
-				<FeatherIcon name='copy' size={20} color='#fff' />
+				<FeatherIcon name='copy' size={20} color='#ffffff' />
 				<Text style={[styles.adminButtonText, { textAlign: 'center' }]}>데이터 내보내기</Text>
 			</TouchableOpacity>
 			<Text style={styles.description}>
@@ -95,7 +96,7 @@ const AsyncStorageImportExportComponent = () => {
 				onChangeText={setImportData}
 			/>
 			<TouchableOpacity style={[styles.adminButton, styles.adminButtonSecondary]} onPress={importJsonData}>
-				<FeatherIcon name='download' size={20} color='#fff' />
+				<FeatherIcon name='download' size={20} color='#ffffff' />
 				<Text style={styles.adminButtonText}>데이터 가져오기</Text>
 			</TouchableOpacity>
 		</View>
@@ -107,36 +108,36 @@ export default AsyncStorageImportExportComponent;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 	section: {
 		backgroundColor: '#f8f9fa',
-		borderRadius: 12,
-		padding: 16,
-		margin: 16,
+		borderRadius: scaleWidth(12),
+		padding: scaleWidth(16),
+		margin: scaleWidth(16),
 	},
 	subHeader: {
-		fontSize: 16,
+		fontSize: scaledSize(16),
 		fontWeight: '500',
-		marginTop: 16,
-		marginBottom: 10,
+		marginTop: scaleHeight(16),
+		marginBottom: scaleHeight(10),
 	},
 	adminButtons: {
-		marginTop: 12,
-		gap: 8,
+		marginTop: scaleHeight(12),
+		gap: scaleWidth(8),
 	},
 	adminButton: {
-		backgroundColor: '#ff6b6b',
-		padding: 12,
-		borderRadius: 8,
+		backgroundColor: '#e74c3c',
+		padding: scaleWidth(12),
+		borderRadius: scaleWidth(8),
 		alignItems: 'center',
-		marginBottom: 8,
+		marginBottom: scaleHeight(8),
 		flexDirection: 'row',
 		justifyContent: 'center', // 이 줄 추가
 	},
 	adminButtonText: {
 		color: '#ffffff',
-		fontSize: 14,
+		fontSize: scaledSize(14),
 		fontWeight: '600',
 		textAlign: 'center',
 		flex: 1,
@@ -145,19 +146,19 @@ const styles = StyleSheet.create({
 		backgroundColor: '#4dabf7',
 	},
 	description: {
-		fontSize: 14,
-		color: '#666',
-		marginTop: 8,
-		marginBottom: 12,
-		lineHeight: 20,
+		fontSize: scaledSize(14),
+		color: '#7f8c8d',
+		marginTop: scaleHeight(8),
+		marginBottom: scaleHeight(12),
+		lineHeight: scaleHeight(20),
 	},
 	textInput: {
 		borderWidth: 1,
-		borderColor: '#ccc',
-		borderRadius: 8,
-		padding: 12,
-		marginBottom: 12,
-		height: 100,
+		borderColor: '#bdc3c7',
+		borderRadius: scaleWidth(8),
+		padding: scaleWidth(12),
+		marginBottom: scaleHeight(12),
+		height: scaleHeight(100),
 		textAlignVertical: 'top',
 	},
 });

@@ -224,7 +224,7 @@ export const TermsOfServiceModal = ({ visible, onClose }) => (
           <View style={modalStyles.spacer} />
           <Text style={modalStyles.modalTitle}>개인정보처리방침 및 이용약관</Text>
           <TouchableOpacity style={modalStyles.closeIcon} onPress={onClose}>
-            <IconComponent type="materialIcons" name="close" size={22} color="#555" />
+            <IconComponent type="materialIcons" name="close" size={22} color="#7f8c8d" />
           </TouchableOpacity>
         </View>
 
@@ -300,7 +300,7 @@ export const OpenSourceModal = ({ visible, onClose }) => (
           <View style={modalStyles.spacer} />
           <Text style={modalStyles.modalTitle}>오픈소스 라이선스</Text>
           <TouchableOpacity style={modalStyles.closeIcon} onPress={onClose}>
-            <IconComponent type="materialIcons" name="close" size={22} color="#555" />
+            <IconComponent type="materialIcons" name="close" size={22} color="#7f8c8d" />
           </TouchableOpacity>
         </View>
 
@@ -356,13 +356,13 @@ const modalStyles = StyleSheet.create({
   container: {
     width: '100%',
     maxHeight: scaleHeight(680), // ✅ 기존 580 → 680 (또는 더 크게 조정 가능)
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     borderRadius: moderateScale(16),
     paddingVertical: scaleHeight(24),
     paddingHorizontal: scaleWidth(20),
     shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: scaleHeight(4) },
     shadowRadius: 8,
   },
   scrollContainer: {
@@ -371,15 +371,15 @@ const modalStyles = StyleSheet.create({
   },
   markdownBox: {
     backgroundColor: '#f4f5f7',
-    borderRadius: scaleWidth(10),
+    borderRadius: scaleWidth(12),
     borderWidth: 1,
-    borderColor: '#dcdde1',
+    borderColor: '#e0e0e0',
     padding: scaleWidth(16),
   },
   title: {
     fontSize: scaledSize(18),
     fontWeight: '700',
-    color: '#1a73e8',
+    color: '#3498db',
     marginBottom: scaleHeight(10),
   },
   contentBox: {
@@ -387,18 +387,18 @@ const modalStyles = StyleSheet.create({
   },
   content: {
     fontSize: scaledSize(14),
-    color: '#333',
+    color: '#2c3e50',
     lineHeight: scaleHeight(22),
   },
   closeButton: {
     alignSelf: 'center',
-    backgroundColor: '#1a73e8',
+    backgroundColor: '#3498db',
     paddingVertical: scaleHeight(10),
     paddingHorizontal: scaleWidth(24),
     borderRadius: scaleWidth(8),
   },
   closeText: {
-    color: '#fff',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: scaledSize(14),
   },
@@ -429,18 +429,18 @@ const modalStyles = StyleSheet.create({
 });
 const styles = StyleSheet.create({
   wrapperBox: {
-    backgroundColor: '#fdfefe',
+    backgroundColor: '#ffffff',
     borderRadius: scaleWidth(12),
     padding: scaleWidth(16),
   },
   card: {
     backgroundColor: '#ffffff',
-    borderRadius: scaleWidth(10),
+    borderRadius: scaleWidth(12),
     padding: scaleWidth(14),
     marginBottom: scaleHeight(12),
     borderWidth: 1,
     borderColor: '#ecf0f1',
-    shadowColor: '#ccc',
+    shadowColor: '#bdc3c7',
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 3,
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: scaledSize(13),
     color: '#2980b9',
-    marginLeft: 4,
+    marginLeft: scaleWidth(4),
     textDecorationLine: 'underline',
   },
   footer: {
@@ -516,13 +516,14 @@ const markdownStyles = {
     marginBottom: scaleHeight(16),
   },
   blockquote: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#dfe6e9',
-    paddingLeft: 12,
+    backgroundColor: '#f8f9fa',
+    borderRadius: scaleWidth(8),
+    paddingHorizontal: scaleWidth(12),
+    paddingVertical: scaleHeight(8),
     color: '#7f8c8d',
   },
   link: {
-    color: '#0984e3',
+    color: '#3498db',
   },
 
 };

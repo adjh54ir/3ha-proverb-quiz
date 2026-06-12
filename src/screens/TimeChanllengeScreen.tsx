@@ -41,14 +41,14 @@ const C = {
 	rose: '#F43F5E', // 오답/위험
 	roseLight: '#FFF0F3',
 	amber: '#FF8F00', // 콤보/경고
-	amberLight: '#FFF8E1',
+	amberLight: '#fef9e7',
 	purple: '#7C3AED', // 스킵
 	purpleLight: '#F3EFFF',
 	cyan: '#00ACC1', // 타이머
 	cyanLight: '#E0F7FA',
 	txt1: '#1A1D2E', // 텍스트 강조
 	txt2: '#5C6070', // 텍스트 보조
-	txt3: '#9CA3AF', // 텍스트 흐림
+	txt3: '#95a5a6', // 텍스트 흐림
 	shadow: 'rgba(92, 107, 192, 0.12)',
 };
 
@@ -433,7 +433,7 @@ const InfinityQuizScreen = () => {
 	if (questionList.length === 0) {
 		return (
 			<SafeAreaView style={styles.container}>
-				<Text style={{ color: C.txt2, textAlign: 'center', marginTop: 40 }}>문제를 불러오는 중...</Text>
+				<Text style={{ color: C.txt2, textAlign: 'center', marginTop: scaleHeight(40) }}>문제를 불러오는 중...</Text>
 			</SafeAreaView>
 		);
 	}
@@ -725,7 +725,7 @@ const InfinityQuizScreen = () => {
 								{solvedProverbs.map((q, i) => {
 									const isCorrect = resultMap[q.id] === 'correct';
 									return (
-										<View key={q.id} style={[styles.feedbackItem, { borderLeftColor: isCorrect ? C.emerald : C.rose }]}>
+										<View key={q.id} style={[styles.feedbackItem, { borderColor: isCorrect ? C.emerald : C.rose }]}>
 											<Text style={[styles.feedbackItemTitle, { color: isCorrect ? C.emerald : C.rose }]}>
 												{i + 1}. {q.proverb} {isCorrect ? '⭕' : '❌'}
 											</Text>
@@ -868,10 +868,9 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		borderTopWidth: 3,
 		shadowColor: C.shadow,
-		shadowOffset: { width: 0, height: 4 },
+		shadowOffset: { width: 0, height: scaleHeight(4) },
 		shadowOpacity: 1,
 		shadowRadius: 8,
-		elevation: 3,
 	},
 	statEmoji: { fontSize: scaledSize(18), marginBottom: scaleHeight(4) },
 	statValue: { fontSize: scaledSize(20), fontWeight: '800', color: C.txt1, letterSpacing: -0.5 },
@@ -880,7 +879,7 @@ const styles = StyleSheet.create({
 	// ── 타이머 ──────────────────────────────────────────────
 	timerWrapper: {
 		backgroundColor: C.card,
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(16),
 		marginBottom: scaleHeight(12),
@@ -888,7 +887,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 1,
 		shadowRadius: 6,
-		elevation: 2,
 	},
 	timerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(8) },
 	timerText: { fontSize: scaledSize(14), fontWeight: '700', marginLeft: scaleWidth(6), letterSpacing: 0.5 },
@@ -909,7 +907,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		backgroundColor: C.card,
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(14),
 		marginBottom: scaleHeight(14),
@@ -917,7 +915,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 1,
 		shadowRadius: 6,
-		elevation: 2,
 	},
 	heartsCenter: { flexDirection: 'row', alignItems: 'center' },
 	utilBtn: {
@@ -938,10 +935,9 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(20),
 		padding: scaleWidth(20),
 		shadowColor: C.shadow,
-		shadowOffset: { width: 0, height: 6 },
+		shadowOffset: { width: 0, height: scaleHeight(6) },
 		shadowOpacity: 1,
 		shadowRadius: 12,
-		elevation: 4,
 		borderWidth: 1,
 		borderColor: C.border,
 	},
@@ -965,7 +961,7 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(4),
 	},
 	feedbackBanner: {
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		paddingVertical: scaleHeight(8),
 		paddingHorizontal: scaleWidth(14),
 		marginTop: scaleHeight(10),
@@ -978,7 +974,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		backgroundColor: C.bg,
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		borderWidth: 1.5,
 		borderColor: C.border,
 		padding: scaleWidth(14),
@@ -1007,10 +1003,9 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: C.border,
 		shadowColor: C.shadow,
-		shadowOffset: { width: 0, height: 8 },
+		shadowOffset: { width: 0, height: scaleHeight(8) },
 		shadowOpacity: 1,
 		shadowRadius: 16,
-		elevation: 5,
 	},
 	resultHeader: {
 		flexDirection: 'row',
@@ -1039,14 +1034,14 @@ const styles = StyleSheet.create({
 	statsGrid: {
 		flexDirection: 'row',
 		backgroundColor: C.bg,
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		borderWidth: 1,
 		borderColor: C.border,
 		overflow: 'hidden',
 		marginBottom: scaleHeight(14),
 	},
 	statGridItem: { flex: 1, alignItems: 'center', paddingVertical: scaleHeight(14) },
-	statGridItemBorder: { borderLeftWidth: 1, borderLeftColor: C.border },
+	statGridItemBorder: {},
 	statGridEmoji: { fontSize: scaledSize(18), marginBottom: scaleHeight(4) },
 	statGridValue: { fontSize: scaledSize(18), fontWeight: '800', color: C.txt1 },
 	statGridLabel: { fontSize: scaledSize(11), color: C.txt3, marginTop: scaleHeight(2) },
@@ -1066,7 +1061,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		gap: scaleWidth(6),
 		paddingVertical: scaleHeight(14),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		borderWidth: 1.5,
 	},
 	resultBtnText: { fontSize: scaledSize(14), fontWeight: '700' },
@@ -1077,7 +1072,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		backgroundColor: C.card,
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(16),
 		marginTop: scaleHeight(12),
@@ -1090,7 +1085,6 @@ const styles = StyleSheet.create({
 		backgroundColor: C.card,
 		borderRadius: scaleWidth(12),
 		padding: scaleWidth(14),
-		borderLeftWidth: 4,
 		borderWidth: 1,
 		borderColor: C.border,
 	},
@@ -1130,10 +1124,9 @@ const styles = StyleSheet.create({
 		padding: scaleWidth(28),
 		alignItems: 'center',
 		shadowColor: 'rgba(0,0,0,0.15)',
-		shadowOffset: { width: 0, height: 12 },
+		shadowOffset: { width: 0, height: scaleHeight(12) },
 		shadowOpacity: 1,
 		shadowRadius: 24,
-		elevation: 10,
 	},
 	modalIconWrap: {
 		width: scaleWidth(60),
@@ -1184,10 +1177,9 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: C.indigo,
-		shadowOffset: { width: 0, height: 4 },
+		shadowOffset: { width: 0, height: scaleHeight(4) },
 		shadowOpacity: 0.35,
 		shadowRadius: 8,
-		elevation: 6,
 	},
 
 	// ── 콤보 이펙트 ─────────────────────────────────────────
@@ -1221,13 +1213,12 @@ const styles = StyleSheet.create({
 		backgroundColor: C.txt1,
 		paddingVertical: scaleHeight(18),
 		paddingHorizontal: scaleWidth(20),
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 		shadowColor: 'rgba(0,0,0,0.2)',
-		shadowOffset: { width: 0, height: 8 },
+		shadowOffset: { width: 0, height: scaleHeight(8) },
 		shadowOpacity: 1,
 		shadowRadius: 16,
-		elevation: 8,
 	},
 	toastText: {
 		color: C.white,
@@ -1241,7 +1232,7 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(255,255,255,0.15)',
 		paddingVertical: scaleHeight(6),
 		paddingHorizontal: scaleWidth(20),
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 	},
 	toastCloseBtnText: { color: C.white, fontSize: scaledSize(13), fontWeight: '700' },
 

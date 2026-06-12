@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+import { scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 
 /**
  * 
@@ -23,13 +24,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#ffffff",
-        padding: 20,
+        padding: scaleWidth(20),
     },
     section: {
-        marginBottom: 30,
+        marginBottom: scaleHeight(30),
         backgroundColor: "#f8f9fa",
-        padding: 15,
-        borderRadius: 10,
+        padding: scaleWidth(15),
+        borderRadius: scaleWidth(12),
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,

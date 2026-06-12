@@ -12,7 +12,7 @@
 		"jsx": "react-native",
 		"lib": ["es2017", "es2018", "dom"],
 		"module": "ESNext",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"noEmit": true,
 		"noImplicitAny": false,
@@ -34,5 +34,14 @@
 		"react-native.config.js",
 		"jest.setup.ts"
 	],
-	"exclude": ["node_modules", "**/*.test.tsx", "**/*.spec.ts", "_", "android", "ios"]
+	"exclude": [
+		"node_modules",
+		"**/*.test.tsx",
+		"**/*.spec.ts",
+		"_",
+		"android",
+		"ios",
+		"src/screens/common/refrence",
+		"src/navigation/ZTemplateDradwerNavigator.tsx"
+	]
 }

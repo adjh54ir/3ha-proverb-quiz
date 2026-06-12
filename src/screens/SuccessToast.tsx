@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		bottom: scaleHeight(30),
 		alignSelf: 'center',
-		backgroundColor: '#FFD700',
+		backgroundColor: '#f1c40f',
 		paddingVertical: scaleHeight(16), // ✅ 패딩 줄임
 		paddingHorizontal: scaleWidth(24), // ✅ 패딩 줄임
 		borderRadius: scaleWidth(16), // ✅ 더 둥글게
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
 		shadowColor: '#000',
 		shadowOpacity: 0.18,
 		shadowRadius: 8,
-		shadowOffset: { width: 0, height: 3 },
+		shadowOffset: { width: 0, height: scaleHeight(3) },
 		zIndex: 999999,
 	},
 	icon: {

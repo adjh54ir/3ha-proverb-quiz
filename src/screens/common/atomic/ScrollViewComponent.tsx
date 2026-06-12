@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Keyboard, RefreshControl, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
 
 const ScrollViewComponent = () => {
 	const scrollViewRef = useRef<ScrollView>(null);
@@ -70,7 +71,7 @@ const ScrollViewComponent = () => {
 					value={inputValue}
 					onChangeText={setInputValue}
 					onPress={scrollHandler.toBottom}
-					placeholderTextColor='#9CA3AF'
+					placeholderTextColor='#95a5a6'
 				/>
 			</View>
 
@@ -88,12 +89,12 @@ export default ScrollViewComponent;
 const styles = StyleSheet.create({
 	scrollTopButton: {
 		position: 'absolute',
-		right: 16,
-		bottom: 16,
-		backgroundColor: '#007AFF',
-		width: 48,
-		height: 48,
-		borderRadius: 24,
+		right: scaleWidth(16),
+		bottom: scaleHeight(16),
+		backgroundColor: '#3498db',
+		width: scaleWidth(48),
+		height: scaleHeight(48),
+		borderRadius: scaleWidth(24),
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: '#000',
@@ -102,13 +103,13 @@ const styles = StyleSheet.create({
 		shadowRadius: 4,
 	},
 	customInput: {
-		height: 100,
+		height: scaleHeight(100),
 		borderWidth: 1,
-		borderColor: '#ddd',
-		borderRadius: 8,
-		padding: 12,
-		fontSize: 14,
-		marginBottom: 5,
+		borderColor: '#e0e0e0',
+		borderRadius: scaleWidth(8),
+		padding: scaleWidth(12),
+		fontSize: scaledSize(14),
+		marginBottom: scaleHeight(5),
 		textAlignVertical: 'top',
 	},
 });

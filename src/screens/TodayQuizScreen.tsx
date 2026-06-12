@@ -29,6 +29,7 @@ import DateUtils from '@/utils/DateUtils';
 import FastImage from 'react-native-fast-image';
 import ProverbServices from '@/services/ProverbServices';
 import ProverbDetailModal from './modal/ProverbDetailModal';
+import FadeInView from '@/components/animation/FadeInView';
 
 const NOTIFICATION_ID = 'daily-quiz-reminder';
 
@@ -71,7 +72,7 @@ const TodayQuizScreen = () => {
 	const [quizOptionsMap, setQuizOptionsMap] = useState<{ [id: number]: string[] }>({});
 	const [currentIndex, setCurrentIndex] = useState(0); // 현재 문제 번호
 	const [progressPercent, setProgressPercent] = useState(quizList.length > 0 ? (currentIndex / quizList.length) * 100 : 0);
-	const labelColors = ['#1abc9c', '#3498db', '#9b59b6', '#e67e22'];
+	const labelColors = ['#1abc9c', '#3498db', '#16a085', '#e67e22'];
 	const [showAlarmModal, setShowAlarmModal] = useState(false);
 
 	const [showScrollTop, setShowScrollTop] = useState(false);
@@ -694,27 +695,27 @@ const TodayQuizScreen = () => {
 	};
 	const getFieldColor = (field: string) => {
 		const categoryColorMap: Record<string, string> = {
-			'운/우연': '#00cec9', // 청록
-			인간관계: '#6c5ce7', // 보라
-			'세상 이치': '#fdcb6e', // 연노랑
+			'운/우연': '#16a085', // 청록
+			인간관계: '#16a085', // 보라
+			'세상 이치': '#f4d03f', // 연노랑
 			'근면/검소': '#e17055', // 주황
-			'노력/성공': '#00b894', // 짙은 청록
-			'경계/조심': '#d63031', // 빨강
+			'노력/성공': '#27ae60', // 짙은 청록
+			'경계/조심': '#e74c3c', // 빨강
 			'욕심/탐욕': '#e84393', // 핫핑크
-			'배신/불신': '#2d3436', // 짙은 회색
+			'배신/불신': '#2c3e50', // 짙은 회색
 		};
 
-		return categoryColorMap[field] || '#b2bec3'; // 기본 회색
+		return categoryColorMap[field] || '#bdc3c7'; // 기본 회색
 	};
 	const getLevelColor = (levelName: string) => {
 		const levelColorMap: Record<string, string> = {
-			'아주 쉬움': '#dfe6e9',
+			'아주 쉬움': '#ecf0f1',
 			쉬움: '#74b9ff',
-			보통: '#0984e3',
-			어려움: '#2d3436',
+			보통: '#3498db',
+			어려움: '#2c3e50',
 		};
 
-		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
+		return levelColorMap[levelName] || '#bdc3c7'; // 기본 회색
 	};
 
 	const renderItem = ({ item }: { item: MainDataType.Proverb }) => {
@@ -746,7 +747,7 @@ const TodayQuizScreen = () => {
 						{/* 정답 의미 */}
 						<View style={styles.sectionCard}>
 							<View style={styles.sectionHeaderRow}>
-								<IconComponent name="check-circle" type="FontAwesome" size={14} color="#2e7d32" style={styles.sectionHeaderIcon} />
+								<IconComponent name="check-circle" type="FontAwesome" size={14} color="#1e8449" style={styles.sectionHeaderIcon} />
 								<Text style={styles.sectionHeaderText}>정답</Text>
 							</View>
 							<Text style={styles.correctMeaningValue}>- {item.longMeaning}</Text>
@@ -776,7 +777,7 @@ const TodayQuizScreen = () => {
 								setDetailQuiz(item);
 								setDetailModalVisible(true);
 							}}>
-							<IconComponent name="search" type="FontAwesome" size={14} color="#333" style={{ marginRight: 6 }} />
+							<IconComponent name="search" type="FontAwesome" size={14} color="#2c3e50" style={{ marginRight: scaleWidth(6) }} />
 							<Text style={styles.detailButtonText}>자세히 보기</Text>
 						</TouchableOpacity>
 					</View>
@@ -842,6 +843,7 @@ const TodayQuizScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.main} edges={['top']}>
+			<FadeInView style={{ flex: 1 }}>
 			<ScrollView
 				ref={scrollRef}
 				onScroll={onScroll}
@@ -855,7 +857,7 @@ const TodayQuizScreen = () => {
 						<View style={styles.leftButtonWrapper}>
 							{/* <TouchableOpacity onPress={handleResetTodayQuiz}>
 								<View style={[styles.buttonContent, { marginLeft: scaleWidth(12) }]}>
-									<IconComponent name="rotate-left" type="FontAwesome" size={13} color="#888" style={styles.iconSpacing} />
+									<IconComponent name="rotate-left" type="FontAwesome" size={13} color="#95a5a6" style={styles.iconSpacing} />
 									<Text style={styles.buttonText}>오늘 문제 다시 풀기</Text>
 								</View>
 							</TouchableOpacity> */}
@@ -864,7 +866,7 @@ const TodayQuizScreen = () => {
 						<View style={styles.rightButtonWrapper}>
 							<TouchableOpacity onPress={loadLastTodayQuizList}>
 								<View style={[styles.buttonContent, { marginRight: scaleWidth(12) }]}>
-									<IconComponent name="book" type="FontAwesome" size={13} color="#888" style={styles.iconSpacing} />
+									<IconComponent name="book" type="FontAwesome" size={13} color="#95a5a6" style={styles.iconSpacing} />
 									<Text style={styles.buttonText}>지난 오늘의 퀴즈</Text>
 								</View>
 							</TouchableOpacity>
@@ -971,7 +973,7 @@ const TodayQuizScreen = () => {
 							{!hasStarted && isTodayUnsolved ? (
 								// 👉 아직 시작 안 했을 때는 "퀴즈 도착 카드"
 								<View style={styles.emptyQuizBox}>
-									<IconComponent name="envelope" type="FontAwesome" size={48} color="#3B82F6" />
+									<IconComponent name="envelope" type="FontAwesome" size={48} color="#3498db" />
 									<Text style={styles.emptyQuizTitle}>오늘의 퀴즈가 도착했습니다 ✨</Text>
 									<Text style={styles.emptyQuizSubtitle}>지금 바로 시작해 보세요!</Text>
 
@@ -1006,8 +1008,8 @@ const TodayQuizScreen = () => {
 											name={showTodayReview ? 'chevron-up' : 'chevron-down'}
 											type="FontAwesome"
 											size={16}
-											color="#333"
-											style={{ marginRight: 8 }}
+											color="#2c3e50"
+											style={{ marginRight: scaleWidth(8) }}
 										/>
 										<Text style={styles.acodianTxt}>{showTodayReview ? '오늘의 퀴즈 접기' : '오늘의 퀴즈 다시 보기'}</Text>
 									</TouchableOpacity>
@@ -1025,20 +1027,21 @@ const TodayQuizScreen = () => {
 					)}
 					{/* ❗ fallback UI 추가 */}
 					{isAlarmEnabled && quizList.length === 0 && (
-						<View style={{ padding: 20, alignItems: 'center' }}>
-							<Text style={{ color: '#888', fontSize: 14 }}>퀴즈를 준비 중입니다...</Text>
-							<ActivityIndicator size="small" color="#007AFF" style={{ marginTop: 10 }} />
-							<TouchableOpacity onPress={initQuiz} style={{ marginTop: 10 }}>
-								<Text style={{ color: '#007AFF' }}>🔄 다시 불러오기</Text>
+						<View style={{ padding: scaleWidth(20), alignItems: 'center' }}>
+							<Text style={{ color: '#95a5a6', fontSize: scaledSize(14) }}>퀴즈를 준비 중입니다...</Text>
+							<ActivityIndicator size="small" color="#3498db" style={{ marginTop: scaleHeight(10) }} />
+							<TouchableOpacity onPress={initQuiz} style={{ marginTop: scaleHeight(10) }}>
+								<Text style={{ color: '#3498db' }}>🔄 다시 불러오기</Text>
 							</TouchableOpacity>
 						</View>
 					)}
 				</View>
 			</ScrollView>
+			</FadeInView>
 
 			{/* {showScrollTop && (
 				<TouchableOpacity style={styles.scrollTopButton} onPress={handleScrollToTop}>
-					<IconComponent type="fontawesome6" name="arrow-up" size={20} color="#fff" />
+					<IconComponent type="fontawesome6" name="arrow-up" size={20} color="#ffffff" />
 				</TouchableOpacity>
 			)} */}
 			<Modal visible={showAlarmModal} transparent animationType="fade" onRequestClose={() => setShowAlarmModal(false)}>
@@ -1164,11 +1167,11 @@ const TodayQuizScreen = () => {
 					<View style={styles.alarmModalCard}>
 						{/* 닫기 아이콘 */}
 						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowPrevQuizModal(false)}>
-							<IconComponent name="close" type="AntDesign" size={20} color="#333" />
+							<IconComponent name="close" type="AntDesign" size={20} color="#2c3e50" />
 						</TouchableOpacity>
 
 						<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(4) }}>
-							<IconComponent name="book" type="FontAwesome" size={20} color="#888" style={{ marginRight: scaleWidth(7) }} />
+							<IconComponent name="book" type="FontAwesome" size={20} color="#95a5a6" style={{ marginRight: scaleWidth(7) }} />
 							<Text style={styles.modalTitle}>지난 오늘의 퀴즈</Text>
 						</View>
 
@@ -1188,7 +1191,7 @@ const TodayQuizScreen = () => {
 											{/* 섹션 헤더 */}
 											<View style={styles.historySectionHeader}>
 												<View style={styles.historySectionHeaderLeft}>
-													<IconComponent name="calendar" type="FontAwesome" size={16} color="#4CAF50" style={{ marginRight: scaleWidth(6) }} />
+													<IconComponent name="calendar" type="FontAwesome" size={16} color="#27ae60" style={{ marginRight: scaleWidth(6) }} />
 													<Text style={styles.historySectionTitle}>
 														{formattedDate} ({dayOfWeek}) 퀴즈
 													</Text>
@@ -1223,7 +1226,7 @@ const TodayQuizScreen = () => {
 														{/* 정답 의미 */}
 														<View style={styles.sectionCard}>
 															<View style={styles.sectionHeaderRow}>
-																<IconComponent name="check-circle" type="FontAwesome" size={14} color="#2e7d32" style={styles.sectionHeaderIcon} />
+																<IconComponent name="check-circle" type="FontAwesome" size={14} color="#1e8449" style={styles.sectionHeaderIcon} />
 																<Text style={styles.sectionHeaderText}>정답</Text>
 															</View>
 															<Text style={styles.correctMeaningValue}>- {item.longMeaning}</Text>
@@ -1253,7 +1256,7 @@ const TodayQuizScreen = () => {
 																setDetailQuiz(item);
 																setDetailModalVisible(true);
 															}}>
-															<IconComponent name="search" type="FontAwesome" size={14} color="#333" style={{ marginRight: 6 }} />
+															<IconComponent name="search" type="FontAwesome" size={14} color="#2c3e50" style={{ marginRight: scaleWidth(6) }} />
 															<Text style={styles.detailButtonText}>자세히 보기</Text>
 														</TouchableOpacity>
 													</View>
@@ -1285,7 +1288,7 @@ export default TodayQuizScreen;
 const styles = StyleSheet.create({
 	main: {
 		flex: 1,
-		backgroundColor: '#f5f5f5', // ✅ 회색 배경
+		backgroundColor: '#f8f9fa', // ✅ 회색 배경
 	},
 	content: {
 		marginHorizontal: scaleWidth(24),
@@ -1303,12 +1306,12 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		marginBottom: scaleHeight(12),
-		color: '#222',
+		color: '#2c3e50',
 	},
 	description: {
 		fontSize: scaledSize(14),
-		color: '#555',
-		lineHeight: 22,
+		color: '#7f8c8d',
+		lineHeight: scaleHeight(22),
 		textAlign: 'left',
 		marginBottom: scaleHeight(12),
 	},
@@ -1319,7 +1322,7 @@ const styles = StyleSheet.create({
 	},
 	switchLabel: {
 		fontSize: scaledSize(14),
-		color: '#333',
+		color: '#2c3e50',
 	},
 	timeRow: {
 		flexDirection: 'row',
@@ -1328,11 +1331,11 @@ const styles = StyleSheet.create({
 	},
 	timeText: {
 		fontSize: scaledSize(14),
-		color: '#007AFF',
+		color: '#3498db',
 		paddingVertical: scaleHeight(4),
 		paddingHorizontal: scaleWidth(10),
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 		borderRadius: scaledSize(6),
 		minWidth: scaleWidth(70),
 		textAlign: 'center',
@@ -1344,7 +1347,7 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(12),
 		padding: scaleHeight(16),
 		borderRadius: scaledSize(8),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 	quizSubContainer: {
 		flexDirection: 'row',
@@ -1362,7 +1365,7 @@ const styles = StyleSheet.create({
 		padding: scaleHeight(10),
 		borderRadius: scaledSize(6),
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		marginBottom: scaleHeight(8),
 	},
 	correct: {
@@ -1393,7 +1396,7 @@ const styles = StyleSheet.create({
 		marginHorizontal: scaleWidth(24),
 		padding: scaleHeight(16),
 		borderRadius: scaledSize(10),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		alignItems: 'center',
 		justifyContent: 'center',
 		shadowColor: '#000',
@@ -1404,16 +1407,16 @@ const styles = StyleSheet.create({
 	scoreText: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#333',
+		color: '#2c3e50',
 	},
 	feedbackText: {
 		marginTop: scaleHeight(4),
 		fontSize: scaledSize(16),
-		color: '#555',
+		color: '#7f8c8d',
 	},
 	questionGuideCombined: {
 		fontSize: scaledSize(16),
-		color: '#333',
+		color: '#2c3e50',
 		fontWeight: 'bold',
 	},
 	questionCombined: {
@@ -1425,19 +1428,19 @@ const styles = StyleSheet.create({
 	questionMain: {
 		fontSize: scaledSize(22),
 		fontWeight: 'bold',
-		color: '#3B82F6', // ✅ 파란색 (DodgerBlue)
+		color: '#3498db', // ✅ 파란색 (DodgerBlue)
 		marginBottom: scaleHeight(10),
 	},
 	questionSub: {
 		fontSize: scaledSize(15),
-		color: '#777',
+		color: '#7f8c8d',
 	},
 
 	characterGridContainer: {
 		flexDirection: 'row',
 		justifyContent: 'space-between', // 또는 'center'
 		flexWrap: 'wrap',
-		backgroundColor: '#f1f2f6',
+		backgroundColor: '#ecf0f1',
 		borderRadius: scaleWidth(12),
 		paddingVertical: scaleHeight(12),
 		marginBottom: scaleHeight(12),
@@ -1451,32 +1454,32 @@ const styles = StyleSheet.create({
 	charText: {
 		fontSize: scaledSize(22),
 		fontWeight: 'bold',
-		color: '#222',
+		color: '#2c3e50',
 	},
 
 	hangulText: {
 		fontSize: scaledSize(16),
-		color: '#444',
+		color: '#2c3e50',
 		marginTop: scaleHeight(2),
 	},
 
 	meaningText: {
 		fontSize: scaledSize(12),
-		color: '#666',
+		color: '#7f8c8d',
 		marginTop: scaleHeight(2),
 		textAlign: 'center',
 	},
 
 	radicalText: {
 		fontSize: scaledSize(12),
-		color: '#999',
+		color: '#95a5a6',
 		marginTop: scaleHeight(2),
 	},
 
 	quizContainer: {
 		marginHorizontal: scaleWidth(16),
 		marginTop: scaleHeight(12),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderRadius: scaledSize(12),
 		borderWidth: 1,
 		borderColor: '#e0e0e0',
@@ -1488,7 +1491,7 @@ const styles = StyleSheet.create({
 
 	quizContainer2: {
 		marginHorizontal: scaleWidth(16),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderRadius: scaledSize(12),
 		borderWidth: 1,
 		borderColor: '#e0e0e0',
@@ -1510,7 +1513,7 @@ const styles = StyleSheet.create({
 	headerTitle: {
 		fontSize: scaledSize(20),
 		fontWeight: 'bold',
-		color: '#222',
+		color: '#2c3e50',
 		textAlign: 'center',
 	},
 
@@ -1525,7 +1528,7 @@ const styles = StyleSheet.create({
 	scoreValue: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#4CAF50',
+		color: '#27ae60',
 	},
 
 	progressContainer: {
@@ -1539,7 +1542,7 @@ const styles = StyleSheet.create({
 	progressBarBackground: {
 		flex: 1,
 		height: scaleHeight(10),
-		backgroundColor: '#eee',
+		backgroundColor: '#ecf0f1',
 		borderRadius: scaledSize(5),
 		overflow: 'hidden',
 		marginRight: scaleWidth(12),
@@ -1547,40 +1550,40 @@ const styles = StyleSheet.create({
 
 	progressBarFill: {
 		height: '100%',
-		backgroundColor: '#4CAF50',
+		backgroundColor: '#27ae60',
 	},
 
 	progressText: {
 		fontSize: scaledSize(13),
-		color: '#444',
+		color: '#2c3e50',
 		fontWeight: '500',
 	},
 
 	explanationBox: {
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		borderRadius: scaledSize(10),
 		padding: scaleHeight(12),
-		backgroundColor: '#fafafa',
+		backgroundColor: '#f8f9fa',
 		marginTop: scaleHeight(6),
 	},
 
 	correctMeaning: {
 		fontSize: scaledSize(16),
-		color: '#333',
+		color: '#2c3e50',
 		marginTop: scaleHeight(8),
 		marginBottom: scaleHeight(6),
 	},
 
 	correctMeaningHighlight: {
 		fontWeight: 'bold',
-		color: '#2e7d32',
+		color: '#1e8449',
 		fontSize: scaledSize(15),
 	},
 
 	correctMeaningHighlight2: {
 		fontWeight: 'bold',
-		color: '#2e7d32',
+		color: '#1e8449',
 		fontSize: scaledSize(15),
 		marginBottom: scaleHeight(6),
 	},
@@ -1588,7 +1591,7 @@ const styles = StyleSheet.create({
 	exampleSentence: {
 		fontSize: scaledSize(14),
 		fontStyle: 'italic',
-		color: '#666',
+		color: '#7f8c8d',
 		marginTop: scaleHeight(6),
 	},
 
@@ -1604,7 +1607,7 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(12),
 		padding: scaleHeight(16),
 		borderRadius: scaledSize(12),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: scaleHeight(1) },
 		shadowOpacity: 0.05,
@@ -1620,7 +1623,7 @@ const styles = StyleSheet.create({
 
 	modalContent: {
 		width: '80%',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderRadius: scaledSize(12),
 		padding: scaleHeight(24),
 		alignItems: 'center',
@@ -1633,18 +1636,18 @@ const styles = StyleSheet.create({
 	modalTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#333',
+		color: '#2c3e50',
 	},
 	modalTitle2: {
 		fontSize: scaledSize(18),
 		marginBottom: scaleHeight(18),
 		fontWeight: 'bold',
-		color: '#333',
+		color: '#2c3e50',
 	},
 
 	modalCloseButton: {
 		marginTop: scaleHeight(24),
-		backgroundColor: '#eee',
+		backgroundColor: '#ecf0f1',
 		paddingHorizontal: scaleWidth(16),
 		paddingVertical: scaleHeight(8),
 		borderRadius: scaledSize(8),
@@ -1652,7 +1655,7 @@ const styles = StyleSheet.create({
 
 	modalCloseText: {
 		fontSize: scaledSize(14),
-		color: '#333',
+		color: '#2c3e50',
 	},
 
 	scoreRightGroup: {
@@ -1662,7 +1665,7 @@ const styles = StyleSheet.create({
 
 	alarmModalCard: {
 		width: '85%',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderRadius: scaledSize(16),
 		padding: scaleHeight(24),
 		shadowColor: '#000',
@@ -1682,7 +1685,7 @@ const styles = StyleSheet.create({
 
 	modalLabel: {
 		fontSize: scaledSize(18),
-		color: '#333',
+		color: '#2c3e50',
 		fontWeight: '500',
 		marginBottom: scaleHeight(10),
 	},
@@ -1692,13 +1695,13 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(14),
 		borderRadius: scaledSize(6),
 		borderWidth: 1,
-		borderColor: '#ccc',
-		backgroundColor: '#f5f5f5',
+		borderColor: '#bdc3c7',
+		backgroundColor: '#f8f9fa',
 	},
 
 	timeSelectorText: {
 		fontSize: scaledSize(15),
-		color: '#007AFF',
+		color: '#3498db',
 	},
 
 	modalButtonRow: {
@@ -1713,7 +1716,7 @@ const styles = StyleSheet.create({
 		padding: scaleHeight(10),
 		borderRadius: scaledSize(8),
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		marginRight: scaleWidth(8),
 		alignItems: 'center',
 	},
@@ -1722,17 +1725,17 @@ const styles = StyleSheet.create({
 		flex: 1,
 		padding: scaleHeight(10),
 		borderRadius: scaledSize(8),
-		backgroundColor: '#4CAF50',
+		backgroundColor: '#27ae60',
 		alignItems: 'center',
 	},
 
 	cancelButtonText: {
-		color: '#555',
+		color: '#7f8c8d',
 		fontSize: scaledSize(15),
 	},
 
 	saveButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(15),
 		fontWeight: 'bold',
 	},
@@ -1741,15 +1744,15 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(10),
 		paddingVertical: scaleHeight(6),
 		paddingHorizontal: scaleWidth(14),
-		backgroundColor: '#f0f0f0',
+		backgroundColor: '#ecf0f1',
 		borderRadius: scaledSize(8),
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 	},
 
 	prevQuizButtonText: {
 		fontSize: scaledSize(14),
-		color: '#333',
+		color: '#2c3e50',
 		textAlign: 'center',
 	},
 
@@ -1759,7 +1762,7 @@ const styles = StyleSheet.create({
 
 	prevQuizFloatingText: {
 		fontSize: scaledSize(12),
-		color: '#888',
+		color: '#95a5a6',
 		textDecorationLine: 'underline',
 	},
 
@@ -1774,8 +1777,8 @@ const styles = StyleSheet.create({
 	modalFooterButton: {
 		marginTop: scaleHeight(16),
 		borderWidth: 1,
-		borderColor: '#ccc',
-		backgroundColor: '#fafafa',
+		borderColor: '#bdc3c7',
+		backgroundColor: '#f8f9fa',
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(20),
 		borderRadius: scaledSize(8),
@@ -1784,17 +1787,17 @@ const styles = StyleSheet.create({
 	modalFooterButtonText: {
 		fontSize: scaledSize(15),
 		fontWeight: 'bold',
-		color: '#333',
+		color: '#2c3e50',
 	},
 
 	highlightCorrectBorder: {
-		borderColor: '#4CAF50',
+		borderColor: '#27ae60',
 		borderWidth: 3,
 	},
 
 	quizSectionHeader: {
 		borderBottomWidth: 1,
-		borderBottomColor: '#ddd',
+		borderBottomColor: '#e0e0e0',
 		paddingBottom: scaleHeight(6),
 		marginBottom: scaleHeight(12),
 	},
@@ -1806,7 +1809,7 @@ const styles = StyleSheet.create({
 	},
 
 	quizCard: {
-		backgroundColor: '#fdfdfd',
+		backgroundColor: '#ffffff',
 		borderWidth: 1,
 		borderColor: '#e0e0e0',
 		borderRadius: scaledSize(10),
@@ -1821,33 +1824,33 @@ const styles = StyleSheet.create({
 	quizTitle: {
 		fontSize: scaledSize(16),
 		fontWeight: '600',
-		color: '#333',
+		color: '#2c3e50',
 	},
 
 	quizMeaning: {
 		fontSize: scaledSize(14),
-		color: '#444',
+		color: '#2c3e50',
 		marginBottom: scaleHeight(2),
 	},
 
 	quizExample: {
 		fontSize: scaledSize(13),
-		color: '#666',
+		color: '#7f8c8d',
 		fontStyle: 'italic',
 	},
 
 	optionText: {
 		fontSize: scaledSize(14), // 기존보다 약간 크게 (기본 13~14 예상)
-		color: '#333',
+		color: '#2c3e50',
 	},
 
 	calendarContainer: {
 		borderRadius: scaledSize(10),
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		padding: scaleHeight(8),
 		marginBottom: scaleHeight(16),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 
 	buttonContainer: {
@@ -1857,12 +1860,12 @@ const styles = StyleSheet.create({
 	},
 
 	resetButton: {
-		backgroundColor: '#eee',
+		backgroundColor: '#ecf0f1',
 		paddingVertical: scaleHeight(4),
 		paddingHorizontal: scaleWidth(10),
 		borderRadius: scaledSize(6),
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 	},
 
 	iconSpacing: {
@@ -1882,7 +1885,7 @@ const styles = StyleSheet.create({
 
 	completedTitle: {
 		fontSize: scaledSize(16),
-		color: '#444',
+		color: '#2c3e50',
 		fontWeight: '600',
 		marginBottom: scaleHeight(6),
 		textAlign: 'center',
@@ -1891,7 +1894,7 @@ const styles = StyleSheet.create({
 	completedScore: {
 		marginTop: scaleHeight(8),
 		fontSize: scaledSize(15),
-		color: '#2e7d32',
+		color: '#1e8449',
 		fontWeight: 'bold',
 		marginBottom: scaleHeight(6),
 		textAlign: 'center',
@@ -1912,14 +1915,14 @@ const styles = StyleSheet.create({
 		borderRadius: scaledSize(20),
 		backgroundColor: '#ffffff',
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: scaleHeight(1) },
 		shadowOpacity: 0.1,
 		shadowRadius: 2,
 	},
 
-	acodianTxt: { fontSize: scaledSize(14), fontWeight: '600', color: '#333' },
+	acodianTxt: { fontSize: scaledSize(14), fontWeight: '600', color: '#2c3e50' },
 
 	reviewList: {
 		marginTop: scaleHeight(12),
@@ -1927,7 +1930,7 @@ const styles = StyleSheet.create({
 
 	modalNotice: {
 		fontSize: scaledSize(13),
-		color: '#999',
+		color: '#95a5a6',
 		marginTop: scaleHeight(4),
 		marginBottom: scaleHeight(15),
 		textAlign: 'center',
@@ -1938,7 +1941,7 @@ const styles = StyleSheet.create({
 	},
 
 	dayOfWeekText: {
-		color: '#007AFF',
+		color: '#3498db',
 	},
 
 	scrollView: {
@@ -1957,12 +1960,12 @@ const styles = StyleSheet.create({
 
 	emptyText: {
 		fontSize: scaledSize(15),
-		color: '#999',
+		color: '#95a5a6',
 	},
 	bellWrapper: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderWidth: 1,
@@ -1975,13 +1978,13 @@ const styles = StyleSheet.create({
 	},
 	bullet: {
 		fontSize: scaledSize(14),
-		color: '#4CAF50',
+		color: '#27ae60',
 		marginRight: scaleWidth(8),
 		lineHeight: scaledSize(20),
 	},
 	bulletText: {
 		fontSize: scaledSize(14),
-		color: '#555',
+		color: '#7f8c8d',
 		flexShrink: 1,
 		lineHeight: scaledSize(20),
 	},
@@ -1993,7 +1996,7 @@ const styles = StyleSheet.create({
 	selectedHourText: {
 		marginLeft: scaleWidth(20),
 		fontSize: scaledSize(14),
-		color: '#007AFF',
+		color: '#3498db',
 		fontWeight: 'bold',
 	},
 	hourScrollContainer: {
@@ -2005,20 +2008,20 @@ const styles = StyleSheet.create({
 		marginRight: scaleWidth(8),
 		borderRadius: scaledSize(20),
 		borderWidth: 1,
-		borderColor: '#ccc',
-		backgroundColor: '#f0f0f0',
+		borderColor: '#bdc3c7',
+		backgroundColor: '#ecf0f1',
 	},
 	hourButtonSelected: {
-		backgroundColor: '#4CAF50',
-		borderColor: '#4CAF50',
+		backgroundColor: '#27ae60',
+		borderColor: '#27ae60',
 	},
 	hourText: {
 		fontSize: scaledSize(14),
 		fontWeight: 'bold',
-		color: '#333',
+		color: '#2c3e50',
 	},
 	hourTextSelected: {
-		color: '#fff',
+		color: '#ffffff',
 	},
 
 	timePickerRow: {
@@ -2058,8 +2061,8 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(12),
 		borderRadius: scaleWidth(8),
 		borderWidth: 1,
-		borderColor: '#ccc',
-		backgroundColor: '#fff',
+		borderColor: '#bdc3c7',
+		backgroundColor: '#ffffff',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
@@ -2067,16 +2070,16 @@ const styles = StyleSheet.create({
 	},
 	buttonText: {
 		fontSize: scaledSize(13),
-		color: '#333',
+		color: '#2c3e50',
 		fontWeight: '600',
 	},
 	todayReviewBox: {
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 		borderRadius: scaleWidth(12),
 		padding: scaleHeight(12),
 		marginHorizontal: scaleWidth(16),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 	continent: {
 		fontSize: scaledSize(12),
@@ -2090,7 +2093,7 @@ const styles = StyleSheet.create({
 	image: {
 		width: scaleWidth(90), // 기존 70 → 확대
 		height: scaleHeight(90), // 기존 70 → 확대
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		marginRight: scaleWidth(10),
 	},
 
@@ -2099,7 +2102,7 @@ const styles = StyleSheet.create({
 		bottom: scaleHeight(4),
 		right: scaleWidth(8),
 		backgroundColor: 'rgba(255, 255, 255, 0.85)',
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		padding: scaleWidth(3),
 	},
 	fullscreenOverlay: {
@@ -2140,7 +2143,7 @@ const styles = StyleSheet.create({
 	},
 	imageHintText: {
 		fontSize: scaledSize(10),
-		color: '#888',
+		color: '#95a5a6',
 		marginBottom: scaleHeight(12),
 	},
 
@@ -2154,9 +2157,9 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(12),
 		paddingHorizontal: scaleWidth(16),
 		borderRadius: scaleWidth(24), // ✅ 둥근 버튼
-		backgroundColor: '#f0f0f0',
+		backgroundColor: '#ecf0f1',
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		marginBottom: scaleHeight(10),
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
@@ -2166,34 +2169,34 @@ const styles = StyleSheet.create({
 
 	optionTextBase: {
 		fontSize: scaledSize(14),
-		color: '#333',
+		color: '#2c3e50',
 		fontWeight: '500',
 		textAlign: 'left',
 	},
 
 	// 변경 → 테두리만 강조
 	correctOption: {
-		backgroundColor: '#f0f0f0', // 기본 배경 유지
-		borderColor: '#4CAF50',
+		backgroundColor: '#ecf0f1', // 기본 배경 유지
+		borderColor: '#27ae60',
 		borderWidth: 3, // 테두리 두께 강조
 	},
 	wrongOption: {
-		backgroundColor: '#f0f0f0', // 기본 배경 유지
-		borderColor: '#F44336',
+		backgroundColor: '#ecf0f1', // 기본 배경 유지
+		borderColor: '#e74c3c',
 		borderWidth: 3,
 	},
 
 	correctText: {
-		color: '#4CAF50',
+		color: '#27ae60',
 		fontWeight: 'bold',
 	},
 	wrongText: {
-		color: '#F44336',
+		color: '#e74c3c',
 		fontWeight: 'bold',
 	},
 	hintText: {
 		fontSize: scaledSize(13),
-		color: '#444',
+		color: '#2c3e50',
 		marginTop: scaleHeight(2),
 	},
 	hintHighlight: {
@@ -2203,9 +2206,9 @@ const styles = StyleSheet.create({
 	dogInfoBox: {
 		backgroundColor: '#f8f9fa',
 		padding: scaleHeight(14),
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 		marginBottom: scaleHeight(12),
 	},
 	dogInfoTitle: {
@@ -2221,14 +2224,14 @@ const styles = StyleSheet.create({
 	},
 	dogInfoLabel: {
 		fontSize: scaledSize(13),
-		color: '#555',
+		color: '#7f8c8d',
 		width: scaleWidth(60),
 		fontWeight: 'bold',
 	},
 	dogInfoValue: {
 		fontSize: scaledSize(14),
 		marginBottom: scaleHeight(8),
-		color: '#333',
+		color: '#2c3e50',
 		flexShrink: 1,
 	},
 	questionResultInline: {
@@ -2242,7 +2245,7 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		right: scaleWidth(16),
 		bottom: scaleHeight(16),
-		backgroundColor: '#2196F3',
+		backgroundColor: '#3498db',
 		width: scaleWidth(40),
 		height: scaleWidth(40),
 		borderRadius: scaleWidth(20),
@@ -2251,11 +2254,11 @@ const styles = StyleSheet.create({
 	},
 	catInfoBox: {
 		width: '100%',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleHeight(12),
 		borderRadius: scaleWidth(12),
 		borderWidth: 1,
-		borderColor: '#eee',
+		borderColor: '#ecf0f1',
 		marginBottom: scaleHeight(6),
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
@@ -2280,13 +2283,13 @@ const styles = StyleSheet.create({
 	},
 	catInfoLabel: {
 		fontSize: scaledSize(13),
-		color: '#666',
+		color: '#7f8c8d',
 		fontWeight: '600',
 		width: scaleWidth(70),
 	},
 	catInfoValue: {
 		fontSize: scaledSize(13),
-		color: '#222',
+		color: '#2c3e50',
 		flexShrink: 1,
 	},
 	circleImageWrapper: {
@@ -2298,7 +2301,7 @@ const styles = StyleSheet.create({
 		height: scaleWidth(88),
 		borderRadius: scaleWidth(44),
 		borderWidth: 2,
-		borderColor: '#eee',
+		borderColor: '#ecf0f1',
 		// 살짝 그림자
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
@@ -2307,20 +2310,20 @@ const styles = StyleSheet.create({
 	},
 	answerExplainBox: {
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: '#bdc3c7',
 		borderRadius: scaledSize(10),
 		padding: scaleHeight(12),
-		backgroundColor: '#fafafa',
+		backgroundColor: '#f8f9fa',
 		marginTop: scaleHeight(6),
 	},
 	answerExplainCorrect: {
 		backgroundColor: 'rgba(76, 175, 80, 0.12)', // 연한 초록
-		borderColor: '#4CAF50',
+		borderColor: '#27ae60',
 	},
 
 	answerExplainWrong: {
 		backgroundColor: 'rgba(244, 67, 54, 0.12)', // 연한 빨강
-		borderColor: '#F44336',
+		borderColor: '#e74c3c',
 	},
 
 	answerBadge: {
@@ -2340,12 +2343,12 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap', // 👉 줄바꿈 허용
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#3B82F6',
+		color: '#3498db',
 		lineHeight: scaledSize(24),
 	},
 
 	correctInline: {
-		color: '#2e7d32',
+		color: '#1e8449',
 		fontWeight: 'bold',
 		fontSize: scaledSize(14),
 	},
@@ -2365,11 +2368,11 @@ const styles = StyleSheet.create({
 	},
 	pillCorrect: {
 		backgroundColor: 'rgba(76, 175, 80, 0.12)', // 연녹
-		borderColor: '#4CAF50',
+		borderColor: '#27ae60',
 	},
 	pillWrong: {
 		backgroundColor: 'rgba(244, 67, 54, 0.12)', // 연빨
-		borderColor: '#F44336',
+		borderColor: '#e74c3c',
 	},
 	resultPillText: {
 		fontSize: scaledSize(13),
@@ -2387,12 +2390,12 @@ const styles = StyleSheet.create({
 	// 정답 의미 라벨/값
 	correctMeaningLabel: {
 		fontSize: scaledSize(13),
-		color: '#777',
+		color: '#7f8c8d',
 		marginBottom: scaleHeight(4),
 	},
 	correctMeaningValue: {
 		fontSize: scaledSize(15),
-		color: '#2e7d32',
+		color: '#1e8449',
 		fontWeight: 'bold',
 		lineHeight: scaledSize(22),
 	},
@@ -2404,7 +2407,7 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(6),
 		marginBottom: scaleHeight(10),
 		borderBottomWidth: 1,
-		borderBottomColor: '#eee',
+		borderBottomColor: '#ecf0f1',
 	},
 	historySectionHeaderLeft: {
 		flexDirection: 'row',
@@ -2441,15 +2444,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.05,
 		shadowRadius: 2,
 	},
-	historyColorBar: {
-		width: scaleWidth(5),
-	},
-	historyBarCorrect: {
-		backgroundColor: '#4CAF50',
-	},
-	historyBarWrong: {
-		backgroundColor: '#F44336',
-	},
 	historyCardBody: {
 		flex: 1,
 		padding: scaleHeight(12),
@@ -2464,7 +2458,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		fontSize: scaledSize(16),
 		fontWeight: '700',
-		color: '#222',
+		color: '#2c3e50',
 		paddingRight: scaleWidth(10),
 	},
 
@@ -2473,18 +2467,18 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(6),
 		paddingHorizontal: scaleWidth(10),
 		borderRadius: scaleWidth(8),
-		backgroundColor: '#FAFAFA',
+		backgroundColor: '#f8f9fa',
 		borderWidth: 1,
-		borderColor: '#eee',
+		borderColor: '#ecf0f1',
 	},
 	historyMeaningLabel: {
 		fontSize: scaledSize(12),
-		color: '#777',
+		color: '#7f8c8d',
 		marginBottom: scaleHeight(4),
 	},
 	historyMeaningValue: {
 		fontSize: scaledSize(14),
-		color: '#2e7d32',
+		color: '#1e8449',
 		fontWeight: 'bold',
 		lineHeight: scaledSize(20),
 	},
@@ -2497,7 +2491,7 @@ const styles = StyleSheet.create({
 		marginLeft: scaleWidth(6),
 		fontSize: scaledSize(13),
 		fontWeight: '700',
-		color: '#333',
+		color: '#2c3e50',
 	},
 
 	phraseRow: {
@@ -2508,12 +2502,12 @@ const styles = StyleSheet.create({
 	},
 	phraseKr: {
 		fontSize: scaledSize(13),
-		color: '#222',
+		color: '#2c3e50',
 		fontWeight: '600',
 	},
 	phraseMean: {
 		fontSize: scaledSize(13),
-		color: '#444',
+		color: '#2c3e50',
 		flexShrink: 1,
 	},
 
@@ -2528,13 +2522,13 @@ const styles = StyleSheet.create({
 	bulletDot: {
 		fontSize: scaledSize(14),
 		lineHeight: scaledSize(18),
-		color: '#4CAF50',
+		color: '#27ae60',
 		marginRight: scaleWidth(6),
 	},
 	exampleText: {
 		flex: 1,
 		fontSize: scaledSize(13),
-		color: '#555',
+		color: '#7f8c8d',
 		lineHeight: scaledSize(18),
 	},
 
@@ -2545,13 +2539,13 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(4),
 		marginRight: scaleWidth(6),
 	},
-	dotCorrect: { backgroundColor: '#4CAF50' },
-	dotWrong: { backgroundColor: '#F44336' },
+	dotCorrect: { backgroundColor: '#27ae60' },
+	dotWrong: { backgroundColor: '#e74c3c' },
 	sectionCard: {
 		marginTop: scaleHeight(10),
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(12),
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		backgroundColor: '#FFFFFF',
 		borderWidth: 1,
 		borderColor: '#EAEAEA',
@@ -2567,13 +2561,13 @@ const styles = StyleSheet.create({
 	sectionHeaderText: {
 		fontSize: scaledSize(14),
 		fontWeight: '700',
-		color: '#222',
+		color: '#2c3e50',
 	},
 	sectionTag: {
 		marginLeft: 'auto',
 		paddingVertical: scaleHeight(2),
 		paddingHorizontal: scaleWidth(8),
-		borderRadius: scaleWidth(10),
+		borderRadius: scaleWidth(12),
 		backgroundColor: '#F0FDF4',
 		borderWidth: 1,
 		borderColor: '#DCFCE7',
@@ -2604,11 +2598,11 @@ const styles = StyleSheet.create({
 	},
 	sectionItemDash: {
 		fontSize: scaledSize(13),
-		color: '#9CA3AF',
+		color: '#95a5a6',
 	},
 	sectionItemValue: {
 		fontSize: scaledSize(13),
-		color: '#374151',
+		color: '#2c3e50',
 		flexShrink: 1,
 	},
 
@@ -2621,13 +2615,13 @@ const styles = StyleSheet.create({
 	sectionBulletDot: {
 		fontSize: scaledSize(14),
 		lineHeight: scaledSize(18),
-		color: '#4CAF50',
+		color: '#27ae60',
 		marginRight: scaleWidth(6),
 	},
 	sectionBulletText: {
 		flex: 1,
 		fontSize: scaledSize(13),
-		color: '#555',
+		color: '#7f8c8d',
 		lineHeight: scaledSize(18),
 	},
 	detailButton: {
@@ -2637,18 +2631,18 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(12),
 		paddingVertical: scaleHeight(8),
 		borderRadius: scaleWidth(8),
-		backgroundColor: '#f0f0f0',
+		backgroundColor: '#ecf0f1',
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 	},
 	detailButtonText: {
 		fontSize: scaledSize(13),
-		color: '#333',
+		color: '#2c3e50',
 		fontWeight: '600',
 	},
 	detailModalCard: {
 		width: '85%',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderRadius: scaleWidth(12),
 		padding: scaleHeight(20),
 		shadowColor: '#000',
@@ -2664,23 +2658,23 @@ const styles = StyleSheet.create({
 	},
 	detailMeaning: {
 		fontSize: scaledSize(15),
-		color: '#2e7d32',
+		color: '#1e8449',
 		fontWeight: '600',
 	},
 	detailSubTitle: {
 		fontSize: scaledSize(14),
 		fontWeight: '700',
 		marginBottom: scaleHeight(4),
-		color: '#333',
+		color: '#2c3e50',
 	},
 	detailPhrase: {
 		fontSize: scaledSize(13),
-		color: '#444',
+		color: '#2c3e50',
 		marginBottom: scaleHeight(3),
 	},
 	detailExample: {
 		fontSize: scaledSize(13),
-		color: '#555',
+		color: '#7f8c8d',
 		marginBottom: scaleHeight(3),
 	},
 	emptyQuizBox: {
@@ -2692,18 +2686,18 @@ const styles = StyleSheet.create({
 	emptyQuizTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#333',
+		color: '#2c3e50',
 		marginTop: scaleHeight(16),
 	},
 	emptyQuizSubtitle: {
 		fontSize: scaledSize(14),
-		color: '#777',
+		color: '#7f8c8d',
 		marginTop: scaleHeight(6),
 		marginBottom: scaleHeight(20),
 		textAlign: 'center',
 	},
 	startQuizButton: {
-		backgroundColor: '#3B82F6',
+		backgroundColor: '#3498db',
 		paddingVertical: scaleHeight(12),
 		paddingHorizontal: scaleWidth(24),
 		borderRadius: scaleWidth(24),
@@ -2711,12 +2705,12 @@ const styles = StyleSheet.create({
 	startQuizButtonText: {
 		fontSize: scaledSize(15),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	centerStartButton: {
 		alignSelf: 'center',
 		marginBottom: scaleHeight(8),
-		backgroundColor: '#3B82F6',
+		backgroundColor: '#3498db',
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(20),
 		borderRadius: scaleWidth(24),
@@ -2726,20 +2720,20 @@ const styles = StyleSheet.create({
 		shadowRadius: 4,
 	},
 	centerStartButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(15),
 		fontWeight: 'bold',
 	},
 	nextButton: {
 		marginTop: scaleHeight(12),
 		alignSelf: 'center',
-		backgroundColor: '#3B82F6',
+		backgroundColor: '#3498db',
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(20),
 		borderRadius: scaleWidth(20),
 	},
 	nextButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(15),
 		fontWeight: 'bold',
 	},

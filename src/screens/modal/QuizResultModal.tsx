@@ -39,7 +39,7 @@ const toastStyles = StyleSheet.create({
 		zIndex: 999,
 	},
 	text: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(13),
 		fontWeight: '600',
 	},
@@ -91,7 +91,7 @@ const ProverbInfoCard = ({
 				<Text style={styles.modalProverbText}>{question.proverb}</Text>
 			)}
 			<TouchableOpacity style={styles.favoriteIconButton} onPress={onToggleFavorite} activeOpacity={0.7}>
-				<Icon name={isFavorited ? 'star' : 'star'} solid={isFavorited} size={20} color={isFavorited ? '#FFD700' : '#ccc'} />
+				<Icon name={isFavorited ? 'star' : 'star'} solid={isFavorited} size={20} color={isFavorited ? '#f1c40f' : '#bdc3c7'} />
 			</TouchableOpacity>
 
 			{Boolean(question.longMeaning) && (
@@ -99,13 +99,13 @@ const ProverbInfoCard = ({
 					{quizMode === 'meaning' && shouldAnimate && !closing ? (
 						<Animatable.View animation="fadeInUp" duration={800} delay={300} onAnimationEnd={onAnimationEnd}>
 							<View style={styles.meaningQuoteBox}>
-								<Icon name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
+								<Icon name="quote-left" size={28} color="#2ecc71" style={{ marginBottom: scaleHeight(8) }} />
 								<Text style={styles.meaningQuoteText}>{question.longMeaning}</Text>
 							</View>
 						</Animatable.View>
 					) : (
 						<View style={styles.meaningQuoteBox}>
-							<Icon name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
+							<Icon name="quote-left" size={28} color="#2ecc71" style={{ marginBottom: scaleHeight(8) }} />
 							<Text style={styles.meaningQuoteText}>{question.longMeaning}</Text>
 						</View>
 					)}
@@ -332,7 +332,7 @@ export const styles = StyleSheet.create({
 	},
 	doneSubtitle: {
 		fontSize: scaledSize(16),
-		color: '#6b7280',
+		color: '#7f8c8d',
 		marginBottom: scaleHeight(16),
 	},
 	doneStatsCard: {
@@ -348,7 +348,7 @@ export const styles = StyleSheet.create({
 	},
 	doneStatsLabel: {
 		fontSize: scaledSize(12),
-		color: '#9ca3af',
+		color: '#95a5a6',
 		marginBottom: scaleHeight(4),
 		fontWeight: '600',
 	},
@@ -366,19 +366,19 @@ export const styles = StyleSheet.create({
 		marginBottom: scaleHeight(20),
 	},
 	donePrimaryButton: {
-		backgroundColor: '#f59e0b',
+		backgroundColor: '#f39c12',
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(32),
 		borderRadius: scaleWidth(28),
 		width: '100%',
 		alignItems: 'center' as const,
-		shadowColor: '#f59e0b',
-		shadowOffset: { width: 0, height: 4 },
+		shadowColor: '#f39c12',
+		shadowOffset: { width: 0, height: scaleHeight(4) },
 		shadowOpacity: 0.35,
 		shadowRadius: 6,
 	},
 	donePrimaryButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: '700' as const,
 	},
@@ -389,23 +389,23 @@ export const styles = StyleSheet.create({
 	},
 	doneSecondaryText: {
 		fontSize: scaledSize(14),
-		color: '#6b7280',
+		color: '#7f8c8d',
 		fontWeight: '600',
 		textDecorationLine: 'underline' as const,
 	},
 	resultModalDone: {
 		backgroundColor: '#fffbeb',
 		borderWidth: 2,
-		borderColor: '#f59e0b',
+		borderColor: '#f39c12',
 		paddingVertical: scaleHeight(28),
 		paddingHorizontal: scaleWidth(28),
-		shadowColor: '#f59e0b',
-		shadowOffset: { width: 0, height: 6 },
+		shadowColor: '#f39c12',
+		shadowOffset: { width: 0, height: scaleHeight(6) },
 		shadowOpacity: 0.2,
 		shadowRadius: 12,
 	},
 	resultModal: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(15),
 		borderRadius: scaleWidth(16),
 		alignItems: 'center',
@@ -421,7 +421,7 @@ export const styles = StyleSheet.create({
 	resultMascot: {
 		width: scaleWidth(120),
 		height: scaleHeight(120),
-		borderRadius: 60,
+		borderRadius: scaleWidth(60),
 	},
 	resultMessageContainer: {
 		alignItems: 'center',
@@ -461,7 +461,7 @@ export const styles = StyleSheet.create({
 	},
 	resultSubText: {
 		fontSize: scaledSize(15),
-		color: '#34495e',
+		color: '#2c3e50',
 		marginTop: scaleHeight(6),
 		textAlign: 'center',
 		lineHeight: scaleHeight(22),
@@ -488,7 +488,7 @@ export const styles = StyleSheet.create({
 		marginTop: scaleHeight(16),
 	},
 	modalConfirmText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: '600',
 	},
@@ -502,13 +502,13 @@ export const styles = StyleSheet.create({
 	correctInfoSubLabelInCard: {
 		fontSize: scaledSize(15),
 		fontWeight: '700',
-		color: '#34495e',
+		color: '#2c3e50',
 		marginBottom: scaleHeight(10),
 		textAlign: 'center',
 	},
 	resultMessage: {
 		fontSize: scaledSize(16),
-		color: '#34495e',
+		color: '#2c3e50',
 		textAlign: 'center',
 		marginBottom: scaleHeight(12),
 	},
@@ -554,17 +554,17 @@ export const styles = StyleSheet.create({
 		paddingBottom: scaleHeight(10),
 	},
 	exampleBox: {
-		backgroundColor: '#f9f9f9',
-		borderRadius: scaleWidth(10),
+		backgroundColor: '#f8f9fa',
+		borderRadius: scaleWidth(12),
 		padding: scaleWidth(12),
 		marginTop: scaleHeight(8),
 		borderWidth: 1,
-		borderColor: '#eee',
+		borderColor: '#ecf0f1',
 	},
 	modalProverbText: {
 		fontSize: scaledSize(20),
 		fontWeight: '700',
-		color: '#1E6BB8',
+		color: '#2980b9',
 		textAlign: 'center',
 		lineHeight: scaleHeight(28),
 		marginBottom: scaleHeight(4),
@@ -572,7 +572,7 @@ export const styles = StyleSheet.create({
 	sectionBox: {
 		borderWidth: 1,
 		borderColor: '#E6EEF5',
-		backgroundColor: '#FDFEFE',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(12),
 		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(12),
@@ -589,26 +589,26 @@ export const styles = StyleSheet.create({
 	},
 	sectionText: {
 		fontSize: scaledSize(14),
-		color: '#444',
+		color: '#2c3e50',
 		lineHeight: scaleHeight(20),
 	},
 	exampleText: {
 		fontSize: scaledSize(13),
-		color: '#555',
-		lineHeight: 20,
-		backgroundColor: '#FAFAFA',
+		color: '#7f8c8d',
+		lineHeight: scaleHeight(20),
+		backgroundColor: '#f8f9fa',
 		padding: scaleWidth(8),
 		borderRadius: scaleWidth(8),
 	},
 	modalCloseButton: {
-		backgroundColor: '#0984e3',
+		backgroundColor: '#3498db',
 		paddingVertical: scaleHeight(14),
 		alignItems: 'center',
 		borderBottomLeftRadius: scaleWidth(20),
 		borderBottomRightRadius: scaleWidth(20),
 	},
 	modalCloseButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 	},
@@ -617,7 +617,7 @@ export const styles = StyleSheet.create({
 		borderColor: '#A5D8FF',
 		backgroundColor: '#EAF4FF',
 		padding: scaleWidth(14),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(16),
 		shadowColor: '#000',
 		shadowOpacity: 0.08,
@@ -639,10 +639,10 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(10),
 		paddingVertical: scaleHeight(4),
 		borderRadius: scaleWidth(12),
-		backgroundColor: '#f1f2f6',
+		backgroundColor: '#ecf0f1',
 	},
 	sameProverbBox: {
-		backgroundColor: '#FAFAFA',
+		backgroundColor: '#f8f9fa',
 		borderWidth: 1,
 		borderColor: '#E6EEF5',
 		padding: scaleWidth(8),
@@ -651,7 +651,7 @@ export const styles = StyleSheet.create({
 	},
 	sameProverbText: {
 		fontSize: scaledSize(13),
-		color: '#444',
+		color: '#2c3e50',
 		lineHeight: scaleHeight(20),
 	},
 	favoriteIconButton: {

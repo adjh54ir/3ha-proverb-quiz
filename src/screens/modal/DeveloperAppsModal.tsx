@@ -16,6 +16,7 @@ import { moderateScale, scaleHeight, scaleWidth, scaledSize } from '@/utils';
 import IconComponent from '../common/atomic/IconComponent';
 import { COMMON_APPS_DATA } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
+import PopInView from '@/components/animation/PopInView';
 
 type CategoryFilter = 'all' | CommonType.AppCategory;
 
@@ -33,7 +34,7 @@ const CATEGORY_LABEL: Record<CommonType.AppCategory, string> = {
 };
 
 const CATEGORY_COLORS: Record<CommonType.AppCategory, { bg: string; text: string }> = {
-	quiz: { bg: '#E6F1FB', text: '#185FA5' },
+	quiz: { bg: '#E6F1FB', text: '#2980b9' },
 	calculator: { bg: '#EAF3DE', text: '#3B6D11' },
 	utility: { bg: '#FAEEDA', text: '#854F0B' },
 };
@@ -99,7 +100,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
 			<View style={styles.overlay}>
-				<View style={styles.container}>
+				<PopInView visible={visible} style={styles.container}>
 					{/* 헤더 */}
 					<View style={styles.header}>
 						<View style={styles.headerTop}>
@@ -111,11 +112,11 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 
 						{/* 검색 */}
 						<View style={styles.searchBox}>
-							<IconComponent type="Feather" name="search" size={scaledSize(14)} color="#aaa" style={styles.searchIcon} />
+							<IconComponent type="Feather" name="search" size={scaledSize(14)} color="#95a5a6" style={styles.searchIcon} />
 							<TextInput
 								style={styles.searchInput}
 								placeholder="앱 검색..."
-								placeholderTextColor="#bbb"
+								placeholderTextColor="#bdc3c7"
 								value={searchQuery}
 								onChangeText={setSearchQuery}
 							/>
@@ -173,7 +174,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 													<Text style={[styles.categoryBadgeText, { color: catColor.text }]}>{CATEGORY_LABEL[app.category]}</Text>
 												</View>
 												<TouchableOpacity style={styles.downloadButton} onPress={() => onDownloadApp(app)}>
-													<IconComponent type="Feather" name="download" size={scaledSize(12)} color="#185FA5" />
+													<IconComponent type="Feather" name="download" size={scaledSize(12)} color="#2980b9" />
 													<Text style={styles.downloadText}>다운로드</Text>
 												</TouchableOpacity>
 											</View>
@@ -183,7 +184,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 							})
 						)}
 					</ScrollView>
-				</View>
+				</PopInView>
 			</View>
 		</Modal>
 	);
@@ -202,14 +203,13 @@ const styles = StyleSheet.create({
 	container: {
 		width: '100%',
 		maxHeight: scaleHeight(660),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderRadius: moderateScale(20),
 		overflow: 'hidden',
 		shadowColor: '#000',
 		shadowOpacity: 0.12,
-		shadowOffset: { width: 0, height: 8 },
+		shadowOffset: { width: 0, height: scaleHeight(8) },
 		shadowRadius: 20,
-		elevation: 10,
 	},
 	header: {
 		paddingTop: scaleHeight(20),
@@ -222,28 +222,28 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(14),
 	},
 	titleText: {
-		fontSize: scaledSize(17),
+		fontSize: scaledSize(16),
 		fontWeight: '600',
-		color: '#1a1a1a',
+		color: '#2c3e50',
 	},
 	closeButton: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		borderWidth: 0.5,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 	closeText: {
 		fontSize: scaledSize(13),
-		color: '#888',
+		color: '#95a5a6',
 		fontWeight: '500',
 	},
 	searchBox: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#f5f5f5',
+		backgroundColor: '#f8f9fa',
 		borderRadius: moderateScale(10),
 		paddingHorizontal: scaleWidth(10),
 		marginBottom: scaleHeight(12),
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
 	searchInput: {
 		flex: 1,
 		fontSize: scaledSize(13),
-		color: '#1a1a1a',
+		color: '#2c3e50',
 		paddingVertical: 0,
 	},
 	tabsContainer: {
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
 	tabButton: {
 		paddingHorizontal: scaleWidth(14),
 		paddingVertical: scaleHeight(6),
-		borderRadius: 100,
+		borderRadius: scaleWidth(100),
 		borderWidth: 0.5,
 		borderColor: '#e0e0e0',
 		backgroundColor: 'transparent',
@@ -277,20 +277,20 @@ const styles = StyleSheet.create({
 	},
 	tabButtonText: {
 		fontSize: scaledSize(12),
-		color: '#888',
+		color: '#95a5a6',
 		fontWeight: '400',
 	},
 	tabButtonTextActive: {
-		color: '#185FA5',
+		color: '#2980b9',
 		fontWeight: '600',
 	},
 	divider: {
 		height: 0.5,
-		backgroundColor: '#ececec',
+		backgroundColor: '#ecf0f1',
 	},
 	countLabel: {
 		fontSize: scaledSize(12),
-		color: '#aaa',
+		color: '#95a5a6',
 		paddingHorizontal: scaleWidth(16),
 		paddingTop: scaleHeight(10),
 		paddingBottom: scaleHeight(4),
@@ -306,14 +306,14 @@ const styles = StyleSheet.create({
 		padding: scaleWidth(12),
 		borderRadius: moderateScale(14),
 		borderWidth: 0.5,
-		borderColor: '#ececec',
-		backgroundColor: '#fff',
+		borderColor: '#ecf0f1',
+		backgroundColor: '#ffffff',
 		marginBottom: scaleHeight(8),
 	},
 	image: {
 		width: scaleWidth(52),
 		height: scaleWidth(52),
-		borderRadius: 12,
+		borderRadius: scaleWidth(12),
 		flexShrink: 0,
 	},
 	appInfo: {
@@ -323,12 +323,12 @@ const styles = StyleSheet.create({
 	appTitle: {
 		fontSize: scaledSize(14),
 		fontWeight: '600',
-		color: '#1a1a1a',
+		color: '#2c3e50',
 		marginBottom: scaleHeight(3),
 	},
 	appDesc: {
 		fontSize: scaledSize(12),
-		color: '#888',
+		color: '#95a5a6',
 		lineHeight: scaleHeight(18),
 		marginBottom: scaleHeight(8),
 	},
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
 	categoryBadge: {
 		paddingHorizontal: scaleWidth(8),
 		paddingVertical: scaleHeight(3),
-		borderRadius: 100,
+		borderRadius: scaleWidth(100),
 	},
 	categoryBadgeText: {
 		fontSize: scaledSize(11),
@@ -354,11 +354,11 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(5),
 		borderRadius: moderateScale(8),
 		borderWidth: 0.5,
-		borderColor: '#185FA5',
+		borderColor: '#2980b9',
 	},
 	downloadText: {
 		fontSize: scaledSize(12),
-		color: '#185FA5',
+		color: '#2980b9',
 		fontWeight: '500',
 	},
 	emptyState: {
@@ -367,27 +367,27 @@ const styles = StyleSheet.create({
 	},
 	emptyText: {
 		fontSize: scaledSize(13),
-		color: '#bbb',
+		color: '#bdc3c7',
 	},
 	imageWrapper: {
 		width: scaleWidth(52),
 		height: scaleWidth(52),
 		flexShrink: 0,
 		overflow: 'hidden',
-		borderRadius: 12,
+		borderRadius: scaleWidth(12),
 	},
 	newBadge: {
 		position: 'absolute',
 		top: -scaleWidth(4),
 		left: -scaleWidth(4),
-		backgroundColor: '#FF3B30',
+		backgroundColor: '#e74c3c',
 		borderRadius: scaleWidth(4),
 		paddingHorizontal: scaleWidth(4),
 		paddingVertical: scaleHeight(2),
 		zIndex: 1,
 	},
 	newBadgeText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(8),
 		fontWeight: '800',
 		letterSpacing: 0.5,

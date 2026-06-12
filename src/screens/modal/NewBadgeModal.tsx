@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
 		paddingTop: scaleHeight(40),
 	},
 	badgeModal: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(20),
 		borderRadius: scaleWidth(20),
 		width: '85%',
@@ -119,17 +119,17 @@ const styles = StyleSheet.create({
 	badgeCard: {
 		flexDirection: 'row',
 		alignItems: 'flex-start',
-		backgroundColor: '#f9f9f9',
+		backgroundColor: '#f8f9fa',
 		borderRadius: scaleWidth(12),
 		padding: scaleWidth(12),
 		marginBottom: scaleHeight(10),
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 		width: '100%',
 	},
 	badgeCardActive: {
 		borderColor: '#27ae60',
-		backgroundColor: '#f0fbf4',
+		backgroundColor: '#eafaf1',
 	},
 	iconBox: {
 		width: scaleWidth(32),
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
 		color: '#27ae60',
 	},
 	badgeDescActive: {
-		color: '#2d8659',
+		color: '#1e8449',
 	},
 	badgeName: {
 		fontSize: scaledSize(16),
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
 		width: scaleWidth(80),
 		height: scaleWidth(80),
 		borderRadius: scaleWidth(40),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderWidth: 2,
 		borderColor: '#27ae60',
 		shadowColor: '#000',
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(8),
 	},
 	badgeNameCentered: {
-		fontSize: scaledSize(17),
+		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 		color: '#27ae60',
 		textAlign: 'center',
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
 	},
 	badgeDescriptionCentered: {
 		fontSize: scaledSize(14),
-		color: '#2d8659',
+		color: '#1e8449',
 		textAlign: 'center',
 		lineHeight: scaleHeight(20),
 	},
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
 		shadowRadius: 4,
 	},
 	modalConfirmText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: '600',
 	},

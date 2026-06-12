@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import { scaleHeight } from '@/utils';
+import { scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import {
 	LevelPlay,
 	LevelPlayAdError,
@@ -131,8 +131,8 @@ const styles = StyleSheet.create({
 		backgroundColor: 'transparent',
 	},
 	bannerAd: {
-		width: 320,
-		height: 50,
+		width: scaleWidth(320),
+		height: scaleHeight(50),
 		alignSelf: 'center',
 		position: 'absolute',
 		zIndex: 10,

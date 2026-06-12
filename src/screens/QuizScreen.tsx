@@ -26,7 +26,7 @@ import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import QuizHintModal from './modal/QuizHintModal';
 import { toggleFavorite } from '@/utils/favoriteUtils';
 
-const labelColors = ['#1abc9c', '#3498db', '#9b59b6', '#e67e22'];
+const labelColors = ['#1abc9c', '#3498db', '#16a085', '#e67e22'];
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
@@ -471,13 +471,13 @@ const QuizScreen = () => {
 	};
 	const getLevelColor = (level: number) => {
 		const levelColorMap: Record<string, string> = {
-			1: '#dfe6e9',
+			1: '#ecf0f1',
 			2: '#74b9ff',
-			3: '#0984e3',
-			4: '#2d3436',
+			3: '#3498db',
+			4: '#2c3e50',
 		};
 
-		return levelColorMap[level] || '#b2bec3'; // 기본 회색
+		return levelColorMap[level] || '#bdc3c7'; // 기본 회색
 	};
 
 	const triggerComboEffect = (comboValue: number) => {
@@ -602,7 +602,7 @@ const QuizScreen = () => {
 			},
 		],
 		position: 'absolute' as const,
-		top: -30,
+		top: scaleHeight(-30),
 	};
 
 	const safelyGoBack = () => {
@@ -684,29 +684,29 @@ const QuizScreen = () => {
 
 	const getFieldColor = (field: string) => {
 		const categoryColorMap: Record<string, string> = {
-			'운/우연': '#00cec9', // 청록
-			인간관계: '#6c5ce7', // 보라
-			'세상 이치': '#fdcb6e', // 연노랑
+			'운/우연': '#16a085', // 청록
+			인간관계: '#16a085', // 보라
+			'세상 이치': '#f4d03f', // 연노랑
 			'근면/검소': '#e17055', // 주황
-			'노력/성공': '#00b894', // 짙은 청록
-			'경계/조심': '#d63031', // 빨강
+			'노력/성공': '#27ae60', // 짙은 청록
+			'경계/조심': '#e74c3c', // 빨강
 			'욕심/탐욕': '#e84393', // 핫핑크
-			'배신/불신': '#2d3436', // 짙은 회색
+			'배신/불신': '#2c3e50', // 짙은 회색
 		};
 
-		return categoryColorMap[field] || '#b2bec3'; // 기본 회색
+		return categoryColorMap[field] || '#bdc3c7'; // 기본 회색
 	};
 
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type='FontAwesome6' name='seedling' size={14} color='#fff' />;
+				return <IconComponent type='FontAwesome6' name='seedling' size={14} color='#ffffff' />;
 			case 2:
-				return <IconComponent type='FontAwesome6' name='leaf' size={14} color='#fff' />;
+				return <IconComponent type='FontAwesome6' name='leaf' size={14} color='#ffffff' />;
 			case 3:
-				return <IconComponent type='FontAwesome6' name='tree' size={14} color='#fff' />;
+				return <IconComponent type='FontAwesome6' name='tree' size={14} color='#ffffff' />;
 			case 4:
-				return <IconComponent type='FontAwesome6' name='trophy' size={14} color='#fff' />;
+				return <IconComponent type='FontAwesome6' name='trophy' size={14} color='#ffffff' />;
 			default:
 				return null;
 		}
@@ -715,23 +715,23 @@ const QuizScreen = () => {
 	const getFieldIcon = (field: string) => {
 		switch (field) {
 			case '운/우연':
-				return <IconComponent type='FontAwesome6' name='dice' size={12} color='#fff' />;
+				return <IconComponent type='FontAwesome6' name='dice' size={12} color='#ffffff' />;
 			case '인간관계':
-				return <IconComponent type='FontAwesome6' name='users' size={12} color='#fff' />;
+				return <IconComponent type='FontAwesome6' name='users' size={12} color='#ffffff' />;
 			case '세상 이치':
-				return <IconComponent type='fontawesome5' name='globe' size={12} color='#fff' />;
+				return <IconComponent type='fontawesome5' name='globe' size={12} color='#ffffff' />;
 			case '근면/검소':
-				return <IconComponent type='fontawesome5' name='hammer' size={12} color='#fff' />;
+				return <IconComponent type='fontawesome5' name='hammer' size={12} color='#ffffff' />;
 			case '노력/성공':
-				return <IconComponent type='fontawesome5' name='medal' size={12} color='#fff' />;
+				return <IconComponent type='fontawesome5' name='medal' size={12} color='#ffffff' />;
 			case '경계/조심':
-				return <IconComponent type='fontawesome5' name='exclamation-triangle' size={12} color='#fff' />;
+				return <IconComponent type='fontawesome5' name='exclamation-triangle' size={12} color='#ffffff' />;
 			case '욕심/탐욕':
-				return <IconComponent type='fontawesome5' name='hand-holding-usd' size={12} color='#fff' />;
+				return <IconComponent type='fontawesome5' name='hand-holding-usd' size={12} color='#ffffff' />;
 			case '배신/불신':
-				return <IconComponent type='fontawesome5' name='user-slash' size={12} color='#fff' />;
+				return <IconComponent type='fontawesome5' name='user-slash' size={12} color='#ffffff' />;
 			default:
-				return <IconComponent type='FontAwesome6' name='tag' size={12} color='#fff' />;
+				return <IconComponent type='FontAwesome6' name='tag' size={12} color='#ffffff' />;
 		}
 	};
 
@@ -764,7 +764,7 @@ const QuizScreen = () => {
 	}, []);
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
 			<View style={{ flex: 1 }}>
 				<View style={{ flex: 1 }}>
 					<View style={styles.container}>
@@ -845,7 +845,7 @@ const QuizScreen = () => {
 									<TouchableOpacity onPress={() => setShowAdForHint(true)}>
 										<View
 											style={{
-												backgroundColor: '#fef3c7',
+												backgroundColor: '#fef9e7',
 												padding: scaleWidth(8),
 												borderRadius: scaleWidth(20),
 												flexDirection: 'row',
@@ -1107,7 +1107,7 @@ export default QuizScreen;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 	inner: {
 		flex: 1,
@@ -1146,7 +1146,7 @@ const styles = StyleSheet.create({
 	optionText: {
 		fontSize: scaledSize(16),
 		fontWeight: '600',
-		color: '#34495e',
+		color: '#2c3e50',
 	},
 	correct: { backgroundColor: '#2ecc71' },
 	wrong: { backgroundColor: '#e74c3c' },
@@ -1157,7 +1157,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	resultModal: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(24),
 		borderRadius: scaleWidth(16),
 		alignItems: 'center',
@@ -1171,7 +1171,7 @@ const styles = StyleSheet.create({
 	},
 	resultMessage: {
 		fontSize: scaledSize(16),
-		color: '#34495e',
+		color: '#2c3e50',
 		marginBottom: 0,
 		textAlign: 'center',
 	},
@@ -1183,7 +1183,7 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(20),
 	},
 	modalButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: '600',
 	},
@@ -1191,9 +1191,9 @@ const styles = StyleSheet.create({
 		width: '100%',
 		paddingVertical: scaleHeight(7),
 		alignItems: 'center',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderTopWidth: 1,
-		borderTopColor: '#eee',
+		borderTopColor: '#ecf0f1',
 	},
 	exitButton: {
 		backgroundColor: '#7f8c8d',
@@ -1202,12 +1202,12 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(30),
 	},
 	exitButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: '600',
 	},
 	selectModal: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		paddingHorizontal: scaleWidth(24),
 		paddingBottom: scaleHeight(24),
 		paddingTop: scaleHeight(48),
@@ -1224,7 +1224,7 @@ const styles = StyleSheet.create({
 	},
 	selectSub: {
 		fontSize: scaledSize(16),
-		color: '#34495e',
+		color: '#2c3e50',
 		marginBottom: scaleHeight(20),
 		textAlign: 'center',
 	},
@@ -1262,7 +1262,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: 0,
 		borderRadius: scaleWidth(30),
@@ -1320,7 +1320,7 @@ const styles = StyleSheet.create({
 		color: '#2c3e50',
 	},
 	exitModal: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(24),
 		borderRadius: scaleWidth(20),
 		width: '85%',
@@ -1354,7 +1354,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	badgeModal: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(20),
 		borderRadius: scaleWidth(20),
 		width: '85%',
@@ -1382,7 +1382,7 @@ const styles = StyleSheet.create({
 	correctHighlight: {
 		color: '#27ae60',
 		fontWeight: 'bold',
-		fontSize: scaledSize(17),
+		fontSize: scaledSize(16),
 	},
 	resultMessageContainer: {
 		alignItems: 'center',
@@ -1408,7 +1408,7 @@ const styles = StyleSheet.create({
 		shadowRadius: scaleWidth(4),
 	},
 	modalConfirmText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: '600',
 	},
@@ -1432,7 +1432,7 @@ const styles = StyleSheet.create({
 
 	resultSubText: {
 		fontSize: scaledSize(15),
-		color: '#34495e',
+		color: '#2c3e50',
 		marginTop: scaleHeight(6),
 		textAlign: 'center',
 		lineHeight: scaleHeight(22),
@@ -1440,19 +1440,19 @@ const styles = StyleSheet.create({
 	progressStatusWrapper: {
 		width: '100%',
 		maxWidth: scaleWidth(500),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(16),
 		marginBottom: scaleHeight(12),
 		borderRadius: scaleWidth(16),
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.1,
 		shadowRadius: scaleWidth(3),
 	},
 	progressText: {
-		fontSize: scaledSize(17),
+		fontSize: scaledSize(16),
 		color: '#2c3e50',
 		fontWeight: '600',
 		marginBottom: scaleHeight(8),
@@ -1462,7 +1462,7 @@ const styles = StyleSheet.create({
 	progressBarWrapper: {
 		height: scaleHeight(10),
 		width: '100%',
-		backgroundColor: '#eee',
+		backgroundColor: '#ecf0f1',
 		borderRadius: scaleWidth(5),
 		overflow: 'hidden',
 		marginBottom: scaleHeight(16),
@@ -1474,12 +1474,12 @@ const styles = StyleSheet.create({
 	},
 	fixedTopBar: {
 		width: '100%',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		zIndex: 10,
 		paddingTop: Platform.OS === 'ios' ? scaleHeight(50) : scaleHeight(20),
 		paddingBottom: scaleHeight(10),
 		borderBottomWidth: scaleHeight(1),
-		borderColor: '#eee',
+		borderColor: '#ecf0f1',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.05,
@@ -1492,18 +1492,18 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		top: scaleHeight(-10),
 		fontSize: scaledSize(22),
-		color: '#00b894',
+		color: '#27ae60',
 		fontWeight: 'bold',
 		textShadowColor: 'rgba(0, 0, 0, 0.2)',
 		textShadowOffset: { width: scaleWidth(1), height: scaleHeight(1) },
 		textShadowRadius: scaleWidth(2),
 	},
 	optionCard: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		padding: scaleWidth(14),
 		borderRadius: scaleWidth(16),
 		borderWidth: 1.2,
-		borderColor: '#dfe6e9',
+		borderColor: '#ecf0f1',
 		marginBottom: scaleHeight(10),
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: scaleHeight(2) },
@@ -1610,7 +1610,7 @@ const styles = StyleSheet.create({
 		lineHeight: scaleHeight(20),
 	},
 	modalConfirmText2: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(16),
 		fontWeight: '600',
 	},
@@ -1627,17 +1627,17 @@ const styles = StyleSheet.create({
 	badgeCard: {
 		flexDirection: 'row',
 		alignItems: 'flex-start',
-		backgroundColor: '#f9f9f9',
+		backgroundColor: '#f8f9fa',
 		borderRadius: scaleWidth(12),
 		padding: scaleWidth(12),
 		marginBottom: scaleHeight(10),
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 		width: '100%',
 	},
 	badgeCardActive: {
 		borderColor: '#27ae60',
-		backgroundColor: '#f0fbf4',
+		backgroundColor: '#eafaf1',
 	},
 	iconBox: {
 		width: scaleWidth(32),
@@ -1655,7 +1655,7 @@ const styles = StyleSheet.create({
 		color: '#27ae60',
 	},
 	badgeDescActive: {
-		color: '#2d8659',
+		color: '#1e8449',
 	},
 	closeButtonText2: {
 		color: 'white',
@@ -1665,7 +1665,7 @@ const styles = StyleSheet.create({
 	modalContentBox: {
 		width: '90%',
 		minHeight: scaleHeight(340),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		paddingVertical: scaleHeight(24),
 		paddingHorizontal: scaleWidth(20),
 		borderRadius: scaleWidth(20),
@@ -1688,7 +1688,7 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(13),
 		color: '#7f8c8d',
 		fontWeight: '500',
-		backgroundColor: '#f1f2f6',
+		backgroundColor: '#ecf0f1',
 		paddingHorizontal: scaleWidth(8),
 		paddingVertical: scaleHeight(4),
 		borderRadius: scaleWidth(8),
@@ -1728,7 +1728,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		paddingHorizontal: scaleWidth(10),
 		paddingVertical: scaleHeight(4),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(12),
 		marginHorizontal: scaleWidth(4),
 		backgroundColor: 'rgba(0,0,0,0.02)',
 	},
@@ -1742,7 +1742,7 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(6),
 	},
 	badgeText: {
-		color: '#fff',
+		color: '#ffffff',
 		marginLeft: scaleWidth(3),
 		fontSize: scaledSize(13), // ✅ 글씨도 조금 키워주면 더 균형 맞음
 		fontWeight: '600',

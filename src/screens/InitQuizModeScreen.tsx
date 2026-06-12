@@ -82,7 +82,7 @@ const InitQuizModeScreen = () => {
 										}
 									}}>
 									<View style={isDisabled ? styles.disabledInner : styles.iconTextRow}>
-										<IconComponent type={mode.type} name={mode.icon} size={28} color={isDisabled ? '#bdc3c7' : '#fff'} />
+										<IconComponent type={mode.type} name={mode.icon} size={28} color={isDisabled ? '#bdc3c7' : '#ffffff'} />
 										<Text style={[styles.modeLabel, isDisabled && styles.disabledText]}>{mode.label}</Text>
 									</View>
 								</TouchableOpacity>
@@ -115,7 +115,7 @@ const InitQuizModeScreen = () => {
 									style={[styles.accordionButton, { backgroundColor: '#e67e22' }]}
 									// @ts-ignore
 									onPress={() => navigation.navigate(Paths.QUIZ_WRONG_REVIEW)}>
-									<IconComponent type="FontAwesome5" name="book" size={16} color="#fff" />
+									<IconComponent type="FontAwesome5" name="book" size={16} color="#ffffff" />
 									<Text style={styles.accordionButtonText}>오답 복습</Text>
 								</TouchableOpacity>
 
@@ -123,7 +123,7 @@ const InitQuizModeScreen = () => {
 									style={[styles.accordionButton, { backgroundColor: '#2980b9' }]}
 									// @ts-ignore
 									onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.SETTING })}>
-									<IconComponent type="MaterialCommunityIcons" name="reload" size={18} color="#fff" />
+									<IconComponent type="MaterialCommunityIcons" name="reload" size={18} color="#ffffff" />
 									<Text style={styles.accordionButtonText}>다시 풀기</Text>
 								</TouchableOpacity>
 							</View>
@@ -135,7 +135,7 @@ const InitQuizModeScreen = () => {
 						style={styles.homeButton}
 						// @ts-ignore
 						onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME })}>
-						<IconComponent type="FontAwesome6" name="house" size={16} color="#fff" style={styles.icon} />
+						<IconComponent type="FontAwesome6" name="house" size={16} color="#ffffff" style={styles.icon} />
 						<Text style={styles.buttonText}>홈으로 가기</Text>
 					</TouchableOpacity>
 				</View>
@@ -147,12 +147,12 @@ const InitQuizModeScreen = () => {
 const styles = StyleSheet.create({
 	main: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		paddingTop: scaleHeight(5),
 	},
 	container: {
 		flex: 1,
-		backgroundColor: '#fefefe',
+		backgroundColor: '#f8f9fa',
 		paddingHorizontal: scaleWidth(10),
 		alignItems: 'center', // 가로 중앙 정렬
 	},
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.1,
 		shadowRadius: 4,
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 	iconTextRow: {
 		flex: 1,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
 		gap: scaleHeight(10),
 	},
 	modeLabel: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(18),
 		fontWeight: '700',
 		textAlign: 'center',
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(12),
 		backgroundColor: '#f8f9fa',
 		borderWidth: 1,
-		borderColor: '#ddd',
+		borderColor: '#e0e0e0',
 		marginBottom: scaleHeight(10),
 	},
 	accordionHeaderText: {
@@ -266,9 +266,9 @@ const styles = StyleSheet.create({
 	},
 	accordionContent: {
 		width: '100%',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderWidth: 1,
-		borderColor: '#eee',
+		borderColor: '#ecf0f1',
 		borderRadius: scaleWidth(12),
 		padding: scaleWidth(14),
 		marginBottom: scaleHeight(20),
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(20),
 	},
 	accordionButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontSize: scaledSize(14),
 		fontWeight: '600',
 	},
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
 	accordionText: {
 		flex: 1,
 		fontSize: scaledSize(13),
-		color: '#555',
+		color: '#7f8c8d',
 		lineHeight: scaleHeight(20),
 	},
 	warningText: {
@@ -324,9 +324,9 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(60),
 		borderWidth: 1,
 		borderColor: '#f1c40f',
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 4 },
+		shadowOffset: { width: 0, height: scaleHeight(4) },
 		shadowOpacity: 0.15,
 		shadowRadius: 6,
 	},
@@ -336,9 +336,9 @@ const styles = StyleSheet.create({
 		padding: scaleHeight(16),
 		marginBottom: scaleHeight(20),
 		borderRadius: scaleWidth(16),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 3 },
+		shadowOffset: { width: 0, height: scaleHeight(3) },
 		shadowOpacity: 0.1,
 		shadowRadius: 6,
 	},
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: scaleWidth(6),
 		marginTop: scaleHeight(8),
-		backgroundColor: '#fff8e1',
+		backgroundColor: '#fef9e7',
 		paddingVertical: scaleHeight(4),
 		paddingHorizontal: scaleWidth(12),
 		borderRadius: scaleWidth(20),

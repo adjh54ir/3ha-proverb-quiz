@@ -25,7 +25,7 @@ type RouteParams = {
 const TowerQuizScreen = () => {
 	const navigation = useNavigation();
 	const route = useRoute<RouteProp<RouteParams, 'TowerQuiz'>>();
-	const level = route.params?.level || 1;
+	const level = (route.params?.level || 1) as 1 | 2 | 3 | 4;
 
 	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 	const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -339,7 +339,7 @@ const TowerQuizScreen = () => {
 			<View style={styles.container}>
 				<LinearGradient colors={['#1a1a2e', '#16213e', '#0f3460']} style={StyleSheet.absoluteFillObject} />
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
-					<Text style={{ color: '#fff', fontSize: scaledSize(16) }}>퀴즈 생성 중...</Text>
+					<Text style={{ color: '#ffffff', fontSize: scaledSize(16) }}>퀴즈 생성 중...</Text>
 				</SafeAreaView>
 			</View>
 		);
@@ -350,8 +350,8 @@ const TowerQuizScreen = () => {
 			<View style={styles.container}>
 				<LinearGradient colors={['#1a1a2e', '#16213e', '#0f3460']} style={StyleSheet.absoluteFillObject} />
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
-					<Text style={{ color: '#fff', fontSize: scaledSize(16) }}>타워 정보를 찾을 수 없습니다.</Text>
-					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
+					<Text style={{ color: '#ffffff', fontSize: scaledSize(16) }}>타워 정보를 찾을 수 없습니다.</Text>
+					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: scaleHeight(20) }}>
 						<Text style={{ color: '#3498db', fontSize: scaledSize(14) }}>뒤로 가기</Text>
 					</TouchableOpacity>
 				</SafeAreaView>
@@ -364,8 +364,8 @@ const TowerQuizScreen = () => {
 			<View style={styles.container}>
 				<LinearGradient colors={['#1a1a2e', '#16213e', '#0f3460']} style={StyleSheet.absoluteFillObject} />
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
-					<Text style={{ color: '#fff', fontSize: scaledSize(16) }}>레벨 {level}에 해당하는 단어가 없습니다.</Text>
-					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
+					<Text style={{ color: '#ffffff', fontSize: scaledSize(16) }}>레벨 {level}에 해당하는 단어가 없습니다.</Text>
+					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: scaleHeight(20) }}>
 						<Text style={{ color: '#3498db', fontSize: scaledSize(14) }}>뒤로 가기</Text>
 					</TouchableOpacity>
 				</SafeAreaView>
@@ -382,7 +382,7 @@ const TowerQuizScreen = () => {
 				{/* 헤더 */}
 				<View style={styles.header}>
 					<TouchableOpacity onPress={handleExit} style={styles.exitButton}>
-						<IconComponent type="materialIcons" name="close" size={28} color="#fff" />
+						<IconComponent type="materialIcons" name="close" size={28} color="#ffffff" />
 					</TouchableOpacity>
 
 					<View style={styles.headerCenter}>
@@ -488,8 +488,8 @@ const TowerQuizScreen = () => {
 												<Text style={styles.answerNumberText}>{index + 1}</Text>
 											</View>
 											<Text style={styles.answerText}>{option}</Text>
-											{showCorrect && <IconComponent type="materialIcons" name="check-circle" size={24} color="#fff" />}
-											{showWrong && <IconComponent type="materialIcons" name="cancel" size={24} color="#fff" />}
+											{showCorrect && <IconComponent type="materialIcons" name="check-circle" size={24} color="#ffffff" />}
+											{showWrong && <IconComponent type="materialIcons" name="cancel" size={24} color="#ffffff" />}
 										</View>
 									</View>
 								</TouchableOpacity>
@@ -534,7 +534,7 @@ const TowerQuizScreen = () => {
 									type="materialIcons"
 									name={currentQuestionIndex < totalQuestions - 1 ? 'arrow-forward' : 'check'}
 									size={24}
-									color="#fff"
+									color="#ffffff"
 								/>
 							</View>
 						</TouchableOpacity>
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
 	levelTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	questionCount: {
 		fontSize: scaledSize(14),
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
 	scoreText: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	progressBarContainer: {
 		paddingHorizontal: scaleWidth(16),
@@ -641,8 +641,8 @@ const styles = StyleSheet.create({
 	questionText: {
 		fontSize: scaledSize(18),
 		fontWeight: '600',
-		color: '#fff',
-		lineHeight: scaledSize(26),
+		color: '#ffffff',
+		lineHeight: scaledSize(24),
 		textAlign: 'center',
 	},
 	answersContainer: {
@@ -671,12 +671,12 @@ const styles = StyleSheet.create({
 	answerNumberText: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	answerText: {
 		flex: 1,
 		fontSize: scaledSize(16),
-		color: '#fff',
+		color: '#ffffff',
 		lineHeight: scaledSize(22),
 	},
 	explanationCard: {
@@ -721,7 +721,7 @@ const styles = StyleSheet.create({
 	nextButtonText: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#fff',
+		color: '#ffffff',
 	},
 	headerRight: {
 		flexDirection: 'row',
@@ -734,7 +734,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: 'rgba(243, 156, 18, 0.2)',
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(16),
 		borderWidth: 1,
 		borderColor: 'rgba(243, 156, 18, 0.5)',
 	},

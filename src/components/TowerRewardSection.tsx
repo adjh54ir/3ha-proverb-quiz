@@ -18,7 +18,7 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
     const glowScale = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
-        Animated.sequence([
+        const animation = Animated.sequence([
             Animated.parallel([
                 Animated.spring(scale, {
                     toValue: 1,
@@ -84,7 +84,15 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
                     ])
                 ),
             ]),
-        ]).start();
+        ]);
+        animation.start();
+
+        // ✅ 종료 처리: 언마운트 시 무한 루프 애니메이션 정지 (메모리 정리)
+        return () => {
+            animation.stop();
+            [scale, opacity, shimmer, star1Rotate, star2Rotate, glowScale].forEach((v) => v.stopAnimation());
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const textOpacity = shimmer.interpolate({
@@ -259,7 +267,7 @@ const styles = StyleSheet.create({
         height: scaleWidth(48),
         borderRadius: scaleWidth(24),
         borderWidth: 2,
-        borderColor: '#9b59b6',
+        borderColor: '#16a085',
     },
     towerRewardBadge: {
         position: 'absolute',
@@ -271,7 +279,7 @@ const styles = StyleSheet.create({
     },
     towerRewardBadgeText: {
         fontSize: scaledSize(8),
-        color: '#fff',
+        color: '#ffffff',
         fontWeight: 'bold',
     },
     towerRewardName: {
@@ -291,7 +299,7 @@ const styles = StyleSheet.create({
     },
     popup: {
         width: scaleWidth(300),
-        backgroundColor: '#fff',
+        backgroundColor: '#ffffff',
         borderRadius: scaleWidth(16),
         overflow: 'hidden',
     },
@@ -311,7 +319,7 @@ const styles = StyleSheet.create({
     },
     bossTitle: {
         fontSize: scaledSize(11),
-        color: '#666',
+        color: '#7f8c8d',
         marginBottom: scaleHeight(2),
     },
     bossName: {
@@ -322,7 +330,7 @@ const styles = StyleSheet.create({
     },
     bossDesc: {
         fontSize: scaledSize(10),
-        color: '#555',
+        color: '#7f8c8d',
         lineHeight: scaledSize(14),
     },
 
@@ -374,7 +382,7 @@ const styles = StyleSheet.create({
         fontSize: scaledSize(28),
     },
     clearBadgeText: {
-        color: '#fff',
+        color: '#ffffff',
         fontSize: scaledSize(18),
         fontWeight: 'bold',
         letterSpacing: 1.5,
@@ -399,7 +407,7 @@ const styles = StyleSheet.create({
     },
     infoText: {
         fontSize: scaledSize(12),
-        color: '#555',
+        color: '#7f8c8d',
     },
     highlight: {
         fontWeight: 'bold',
@@ -407,7 +415,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 1,
-        backgroundColor: '#eee',
+        backgroundColor: '#ecf0f1',
         marginVertical: scaleHeight(12),
     },
     rewardRow: {
@@ -420,11 +428,11 @@ const styles = StyleSheet.create({
         height: scaleWidth(48),
         borderRadius: scaleWidth(8),
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: '#e0e0e0',
     },
     rewardType: {
         fontSize: scaledSize(10),
-        color: '#888',
+        color: '#95a5a6',
         marginBottom: scaleHeight(2),
     },
     rewardName: {
@@ -440,7 +448,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     closeBtnText: {
-        color: '#fff',
+        color: '#ffffff',
         fontWeight: 'bold',
         fontSize: scaledSize(13),
     },

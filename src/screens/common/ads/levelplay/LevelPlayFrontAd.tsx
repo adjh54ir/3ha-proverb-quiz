@@ -106,7 +106,7 @@ export default LevelPlayFrontAd;
 const styles = StyleSheet.create({
 	container: {
 		padding: scaleHeight(24),
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		borderRadius: scaleWidth(20),
 		alignItems: 'center',
 		justifyContent: 'center',

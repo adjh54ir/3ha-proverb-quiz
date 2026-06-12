@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { scaleWidth, scaleHeight, scaledSize } from '@/utils/DementionUtils';
+import PopInView from '@/components/animation/PopInView';
 
 interface StartModalProps {
 	visible: boolean;
@@ -12,7 +13,7 @@ const StartModal: React.FC<StartModalProps> = ({ visible, onStart, onBack }) => 
 	return (
 		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.modalOverlay}>
-				<View style={styles.startModal}>
+				<PopInView visible={visible} style={styles.startModal}>
 					{/* Header */}
 					<View style={styles.header}>
 						<Text style={styles.emoji}>🧠</Text>
@@ -60,7 +61,7 @@ const StartModal: React.FC<StartModalProps> = ({ visible, onStart, onBack }) => 
 							<Text style={styles.startButtonText}>시작하기 🚀</Text>
 						</TouchableOpacity>
 					</View>
-				</View>
+				</PopInView>
 			</View>
 		</Modal>
 	);
@@ -74,17 +75,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	startModal: {
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 		paddingHorizontal: scaleWidth(24),
 		paddingVertical: scaleHeight(28),
 		borderRadius: scaleWidth(24),
 		width: '88%',
 		alignItems: 'center',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 8 },
+		shadowOffset: { width: 0, height: scaleHeight(8) },
 		shadowOpacity: 0.15,
 		shadowRadius: 16,
-		elevation: 10,
 	},
 	header: {
 		alignItems: 'center',
@@ -144,12 +144,12 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(14),
 		width: '100%',
 		marginBottom: scaleHeight(20),
-		borderLeftWidth: 3,
-		borderLeftColor: '#f39c12',
+		borderWidth: 1,
+		borderColor: '#f4d03f',
 	},
 	descText: {
 		fontSize: scaledSize(12),
-		color: '#555',
+		color: '#7f8c8d',
 		lineHeight: scaleHeight(20),
 	},
 	modalButtonRow: {
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
 	},
 	modalBackButton: {
 		flex: 1,
-		backgroundColor: '#f0f0f0',
+		backgroundColor: '#ecf0f1',
 		paddingVertical: scaleHeight(13),
 		borderRadius: scaleWidth(12),
 		alignItems: 'center',
@@ -172,18 +172,17 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(12),
 		alignItems: 'center',
 		shadowColor: '#4f46e5',
-		shadowOffset: { width: 0, height: 4 },
+		shadowOffset: { width: 0, height: scaleHeight(4) },
 		shadowOpacity: 0.35,
 		shadowRadius: 8,
-		elevation: 6,
 	},
 	backButtonText: {
-		color: '#777',
+		color: '#7f8c8d',
 		fontWeight: '600',
 		fontSize: scaledSize(14),
 	},
 	startButtonText: {
-		color: '#fff',
+		color: '#ffffff',
 		fontWeight: 'bold',
 		fontSize: scaledSize(15),
 	},

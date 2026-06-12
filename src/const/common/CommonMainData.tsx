@@ -56,7 +56,7 @@ export const LEVELS: QuizLevel[] = [
 		label: '특급 문제',
 		icon: 'trophy',
 		type: 'FontAwesome6',
-		color: '#AF7AC5',
+		color: '#16a085',
 		desc: '',
 	},
 	{
@@ -192,8 +192,8 @@ export const FIELD_DROPDOWN_ITEMS = [
 		badgeId: 'category_relationship',
 		iconType: 'FontAwesome6',
 		iconName: 'users',
-		iconColor: '#a29bfe',
-		icon: () => <IconComponent type="FontAwesome6" name="users" size={16} color="#a29bfe" />,
+		iconColor: '#76d7c4',
+		icon: () => <IconComponent type="FontAwesome6" name="users" size={16} color="#76d7c4" />,
 	},
 	{
 		label: '세상 이치',

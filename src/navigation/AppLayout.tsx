@@ -24,17 +24,17 @@ const AppLayout = () => {
 	const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
 	const { height: screenHeight } = Dimensions.get('window');
 
-	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute), [currentRoute]);
+	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute as Paths), [currentRoute]);
 
 	// ✅ 라우트별 배경색 지정
 	const backgroundColor = useMemo(() => {
 		switch (currentRoute) {
 			case Paths.SETTING:
-				return '#f9f9f9';
+				return '#f8f9fa';
 			case Paths.MY_SCORE:
 				return '#ffffff';
 			case Paths.TODAY_QUIZ:
-				return '#f5f5f5';
+				return '#f8f9fa';
 			case Paths.PROVERB_LIST:
 				return '#f8f9fa';
 			default:
@@ -79,7 +79,7 @@ const AppLayout = () => {
 		}
 		// [CASE2] 광고가 없는 경우
 		else {
-			const isAdAllowed = AD_ALLOWED_ROUTES.includes(currentRoute);
+			const isAdAllowed = AD_ALLOWED_ROUTES.includes(currentRoute as Paths);
 			// 광고가 없고 허용된 경로일 때만 패딩 적용
 			if (isAdAllowed) {
 				switch (Platform.OS) {
@@ -125,7 +125,7 @@ const AppLayout = () => {
 const styles = StyleSheet.create({
 	safeArea: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#ffffff',
 	},
 	adWrapperAbsolute: {
 		position: 'absolute',
@@ -137,8 +137,8 @@ const styles = StyleSheet.create({
 		marginHorizontal: scaleWidth(16),
 		alignItems: 'center',
 		// borderWidth: 1,
-		// borderColor: '#ccc',
-		// borderRadius: 6,
+		// borderColor: '#bdc3c7',
+		// borderRadius: scaleWidth(6),
 	},
 	container: {
 		flex: 1,

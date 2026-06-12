@@ -77,20 +77,20 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         width: '85%', // 기존 80% → 90%로 변경
-        backgroundColor: '#fff',
-        borderRadius: scaleWidth(10),
+        backgroundColor: '#ffffff',
+        borderRadius: scaleWidth(12),
         padding: scaleWidth(24), // 패딩도 조금 더 여유 있게
     },
     modalTitle: {
         fontSize: scaledSize(18),
         fontWeight: 'bold',
-        color: '#34495e',
+        color: '#2c3e50',
         textAlign: 'center',
         marginBottom: scaleHeight(12),
     },
     modalSummary: {
         fontSize: scaledSize(14), // 기존 12 → 14로 증가
-        color: '#555',
+        color: '#7f8c8d',
         textAlign: 'center', // 중앙정렬에서 왼쪽 정렬로 변경 (더 자연스러운 느낌)
         lineHeight: scaleHeight(24), // 기존 22 → 24로 증가
         marginBottom: scaleHeight(24),
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#D32F2F',
     },
     modalButtonText: {
-        color: '#fff',
+        color: '#ffffff',
         fontWeight: 'bold',
     },
     modalTitleRow: {
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
         fontSize: scaledSize(18),
         lineHeight: scaleHeight(44),
         fontWeight: 'bold',
-        color: '#34495e',
+        color: '#2c3e50',
         textAlign: 'center',
     },
 });

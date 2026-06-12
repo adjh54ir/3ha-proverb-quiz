@@ -9,6 +9,7 @@
 	"scripts": {
 		"start": "npx react-native start --reset-cache",
 		"start:8082": "npx react-native start --reset-cache --port 8082",
+		"setup": "git pull && yarn install && yarn pod",
 		"uninstall": "adb uninstall com.tha",
 		"an": "npx react-native run-android APP_ENV=local",
 		"an:who": "adb devices",

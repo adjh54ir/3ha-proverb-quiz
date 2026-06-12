@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
 		includeFontPadding: false, // ✅ 안드로이드 폰트 패딩 이슈 완화
 	},
 	updateButton: {
-		backgroundColor: '#007AFF',
+		backgroundColor: '#3498db',
 		paddingVertical: scaleHeight(10), // ✅ 버튼 높이도 살짝 낮춤
 		paddingHorizontal: scaleWidth(30),
 		borderRadius: moderateScale(8),

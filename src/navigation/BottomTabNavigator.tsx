@@ -7,6 +7,7 @@ import IconComponent from '@/screens/common/atomic/IconComponent';
 import ProverbListScreen from '@/screens/ProverbListScreen';
 import MyScoreScreen from '@/screens/MyScoreScreen';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { COLORS } from '@/const/common/Theme';
 import DeviceInfo from 'react-native-device-info';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import TodayQuizScreen from '@/screens/TodayQuizScreen';
@@ -18,14 +19,18 @@ const BottomTabNavigator = () => {
 
 	// 📌 공통 스타일 함수
 	const getScreenOptions = (isTablet: boolean, insets: any) => ({
+		tabBarActiveTintColor: COLORS.primary,
+		tabBarInactiveTintColor: COLORS.textLight,
 		tabBarStyle: {
 			height: scaleWidth(50) + insets.bottom,
 			paddingTop: isTablet ? scaleHeight(8) : 0,
-			backgroundColor: '#fff',
+			backgroundColor: COLORS.surface,
+			borderTopColor: COLORS.borderLight,
 		},
 		tabBarLabelStyle: {
 			fontSize: isTablet ? scaledSize(12) : scaledSize(11),
 			marginTop: isTablet ? scaleHeight(10) : 0,
+			fontWeight: '600' as const,
 		},
 	});
 

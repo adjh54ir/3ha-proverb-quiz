@@ -26,12 +26,12 @@ import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import QuizHintModal from './modal/QuizHintModal';
 import { toggleFavorite } from '@/utils/favoriteUtils';
 
-const labelColors = ['#1abc9c', '#3498db', '#9b59b6', '#e67e22'];
+const labelColors = ['#1abc9c', '#3498db', '#16a085', '#e67e22'];
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
 type QuizRouteParams = {
-	mode: 'meaning' | 'proverb' | 'blank';
+	mode: 'meaning' | 'proverb' | 'blank' | 'example';
 	questionPool?: MainDataType.Proverb[];
 	isWrongReview?: boolean;
 	title?: string;
@@ -315,6 +315,12 @@ const QuizScreen = () => {
 			allOptions = [...shuffledDistractors.map((p) => pickBlankWord(p.proverb)), blank];
 			displayText = newQuestion.proverb.replace(blank, '(____)');
 			setBlankWord(blank);
+		} else if (routeMode === 'example') {
+			// 예시 문장 중 하나를 골라 속담 부분을 가린 뒤, 알맞은 속담을 고르게 함
+			const examples = Array.isArray(newQuestion.example) ? newQuestion.example.filter((e) => e?.trim()) : [];
+			const pickedExample = examples.length > 0 ? examples[Math.floor(Math.random() * examples.length)] : '';
+			allOptions = [...shuffledDistractors.map((p) => p.proverb), newQuestion.proverb];
+			displayText = pickedExample ? maskProverbInExample(newQuestion.proverb, pickedExample) : newQuestion.longMeaning;
 		}
 
 		// 상태 갱신
@@ -371,6 +377,7 @@ const QuizScreen = () => {
 		if (routeMode === 'meaning') correctAnswer = question.longMeaning!;
 		else if (routeMode === 'proverb') correctAnswer = question.proverb;
 		else if (routeMode === 'blank') correctAnswer = blankWord;
+		else if (routeMode === 'example') correctAnswer = question.proverb;
 
 		const isTimeout = answer === '';
 		const correct = answer === correctAnswer;
@@ -510,6 +517,53 @@ const QuizScreen = () => {
 		const randomWord = words[Math.floor(Math.random() * words.length)];
 		return randomWord;
 	};
+
+	/**
+	 * 예시 문장 속에 등장하는 속담을 빈칸으로 가립니다.
+	 * - 예시 문장은 보통 속담을 활용형(어미 변형)으로 포함하므로
+	 *   어절 단위 매칭 + 부분 문자열 매칭을 함께 사용합니다.
+	 */
+	const maskProverbInExample = (proverb: string, example: string): string => {
+		const placeholder = '( ○○○ )';
+		const strip = (s: string) => s.replace(/[.,!?'"’”·…~]/g, '');
+		const pw = proverb.trim().split(/\s+/).filter(Boolean);
+		if (pw.length === 0 || !example) return example;
+
+		// 1) 어절 단위 매칭 (마지막 어절은 활용형이라 시작/포함만 비교)
+		const ex = example.split(' ');
+		for (let i = 0; i <= ex.length - pw.length; i++) {
+			const first = strip(ex[i]);
+			if (!(first === pw[0] || first.startsWith(pw[0]) || pw[0].startsWith(first))) continue;
+
+			let matched = true;
+			for (let j = 1; j < pw.length - 1; j++) {
+				if (strip(ex[i + j]) !== pw[j]) {
+					matched = false;
+					break;
+				}
+			}
+			if (!matched) continue;
+
+			const lastIdx = i + pw.length - 1;
+			const tail = (ex[lastIdx].match(/[.,!?'"’”·…~]+$/) || [''])[0];
+			const masked = [...ex];
+			masked.splice(i, pw.length, placeholder + tail);
+			return masked.join(' ');
+		}
+
+		// 2) 부분 문자열 매칭 (속담 앞부분을 점진적으로 줄이며 탐색)
+		for (let len = proverb.length; len >= 4; len--) {
+			const sub = proverb.slice(0, len);
+			const idx = example.indexOf(sub);
+			if (idx !== -1) {
+				const rest = example.slice(idx + len).replace(/^[가-힣]*/, ''); // 활용 어미 제거
+				return example.slice(0, idx) + placeholder + rest;
+			}
+		}
+
+		// 3) 매칭 실패 시 원문 유지
+		return example;
+	};
 	const getSolvedCount = () => {
 		if (isWrongReview && questionPool) {
 			return reviewIndex; // ✅ 오답 복습 모드는 index 기반
@@ -642,7 +696,7 @@ const QuizScreen = () => {
 		}, 100); // 🔸 딜레이로 이전 상태가 반영된 뒤 새로운 문제 로드
 	};
 
-	const getModeLabel = (mode: 'meaning' | 'proverb' | 'blank') => {
+	const getModeLabel = (mode: 'meaning' | 'proverb' | 'blank' | 'example') => {
 		switch (mode) {
 			case 'meaning':
 				return '뜻 맞추기';
@@ -650,6 +704,8 @@ const QuizScreen = () => {
 				return '속담 맞추기';
 			case 'blank':
 				return '빈칸 채우기';
+			case 'example':
+				return '예시로 풀기';
 			default:
 				return '';
 		}
@@ -876,7 +932,7 @@ const QuizScreen = () => {
 								{question ? (
 									<Text style={styles.questionText}>
 										{`Q. ${
-											routeMode === 'blank'
+											routeMode === 'blank' || routeMode === 'example'
 												? questionText || '문제 준비중...'
 												: routeMode === 'meaning'
 													? question?.proverb
@@ -899,7 +955,12 @@ const QuizScreen = () => {
 										renderItem={({ item, index }) => {
 											const scaleAnim = scaleAnims.current[index] ?? new Animated.Value(1);
 											const isSelected = selected === item;
-											const correctAnswer = routeMode === 'meaning' ? question?.longMeaning : routeMode === 'proverb' ? question?.proverb : blankWord;
+											const correctAnswer =
+												routeMode === 'meaning'
+													? question?.longMeaning
+													: routeMode === 'proverb' || routeMode === 'example'
+														? question?.proverb
+														: blankWord;
 
 											const isCorrectAnswer = correctAnswer === item; // 실제 정답
 											const isSelectedWrong = isSelected && !isCorrectAnswer; // 내가 고른 오답

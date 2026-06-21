@@ -725,7 +725,7 @@ const InfinityQuizScreen = () => {
 								{solvedProverbs.map((q, i) => {
 									const isCorrect = resultMap[q.id] === 'correct';
 									return (
-										<View key={q.id} style={[styles.feedbackItem, { borderLeftColor: isCorrect ? C.emerald : C.rose }]}>
+										<View key={q.id} style={[styles.feedbackItem, { borderColor: isCorrect ? C.emerald : C.rose }]}>
 											<Text style={[styles.feedbackItemTitle, { color: isCorrect ? C.emerald : C.rose }]}>
 												{i + 1}. {q.proverb} {isCorrect ? '⭕' : '❌'}
 											</Text>
@@ -1090,7 +1090,6 @@ const styles = StyleSheet.create({
 		backgroundColor: C.card,
 		borderRadius: scaleWidth(12),
 		padding: scaleWidth(14),
-		borderLeftWidth: 4,
 		borderWidth: 1,
 		borderColor: C.border,
 	},

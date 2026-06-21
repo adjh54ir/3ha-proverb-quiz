@@ -26,6 +26,7 @@ import LevelModal from './modal/LevelModal';
 import { LEVEL_DATA, PET_REWARDS } from '@/const/ConstInfoData';
 import TowerRewardSection from '@/components/TowerRewardSection';
 import { TowerProgress } from '@/const/ConstTowerData';
+import { COLORS } from '@/theme/theme';
 
 const greetingMessages = [
 	'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
@@ -667,7 +668,7 @@ const Home = () => {
 						iconType="materialCommunityIcons"
 						label="타워 챌린지"
 						description="레벨별 보스를 차례로 도전하고 특별한 보상을 획득하세요!"
-						color="#9b59b6"
+						color="#16a085"
 						onPress={moveToHandler.towerchalleng}
 						isNew
 					/>
@@ -680,11 +681,11 @@ const Home = () => {
 					<TouchableOpacity
 						style={[
 							styles.curiousButton2,
-							{ borderColor: '#9b59b6' }, // 💜 보라색 계열로 변경
+							{ borderColor: COLORS.primary },
 						]}
 						onPress={() => setShowCheckInModal(true)}>
-						<IconComponent type="materialIcons" name="event-available" size={18} color="#9b59b6" />
-						<Text style={[styles.curiousButtonText, { color: '#9b59b6' }]}>오늘의 출석 확인하기</Text>
+						<IconComponent type="materialIcons" name="event-available" size={18} color={COLORS.primary} />
+						<Text style={[styles.curiousButtonText, { color: COLORS.primary }]}>오늘의 출석 확인하기</Text>
 					</TouchableOpacity>
 				</ScrollView>
 			</View>

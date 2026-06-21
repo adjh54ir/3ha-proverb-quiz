@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import FastImage from 'react-native-fast-image';
 import { LEVEL_DATA, QUIZ_MODES } from '@/const/ConstInfoData';
+import { COLORS } from '@/theme/theme';
 
 /**
  * 퀴즈 모드 선택
@@ -34,9 +35,9 @@ const InitQuizModeScreen = () => {
 
 	/**
 	 * 퀴즈 모드를 전달하여서 다음페이지로 이동
-	 * @param mode 'meaning' | 'proverb' | 'blank' | 'comingsoon'
+	 * @param mode 'meaning' | 'proverb' | 'blank' | 'example' | 'comingsoon'
 	 */
-	const handleSelectMode = (mode: 'meaning' | 'proverb' | 'blank' | 'comingsoon') => {
+	const handleSelectMode = (mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'comingsoon') => {
 		// @ts-ignore
 		navigation.navigate(Paths.QUIZ_MODE, { mode });
 	};
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#28a745',
+		backgroundColor: COLORS.primary,
 		paddingVertical: scaleHeight(12),
 		paddingHorizontal: scaleWidth(28),
 		borderRadius: scaleWidth(30),

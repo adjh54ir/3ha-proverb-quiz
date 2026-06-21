@@ -519,10 +519,8 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(10),
 		marginHorizontal: scaleWidth(16),
 		backgroundColor: '#ecf3f9',
-		borderLeftWidth: scaleWidth(4),
-		borderLeftColor: '#3498db',
 		marginBottom: scaleHeight(12),
-		borderRadius: scaleWidth(4),
+		borderRadius: scaleWidth(10),
 	},
 	sectionHeaderText: {
 		fontSize: scaledSize(15),

@@ -1169,7 +1169,7 @@ const CapitalResultScreen = () => {
 					)}
 					{/* 나의 타워 챌린지 내역 */}
 					<TouchableOpacity style={styles.sectionHeader} onPress={() => setShowTowerSection(!showTowerSection)}>
-						<View style={[styles.iconCircle3, { backgroundColor: '#8e44ad' }]}>
+						<View style={[styles.iconCircle3, { backgroundColor: '#16a085' }]}>
 							<IconComponent type="fontAwesome6" name="tower-observation" size={scaledSize(14)} color="#ffffff" />
 						</View>
 						<Text style={styles.sectionTitle}>나의 타워 챌린지</Text>
@@ -1845,7 +1845,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: scaleWidth(6),
-		backgroundColor: '#9b59b6', // 🟠 추천 색상: 진한 주황색 (희망, 성취 느낌)
+		backgroundColor: '#16a085',
 	},
 	calendarStyle: {
 		alignSelf: 'stretch', // 또는 width: '100%'

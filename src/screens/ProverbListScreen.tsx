@@ -962,8 +962,6 @@ const styles = StyleSheet.create({
 	},
 	modalHighlightBox: {
 		backgroundColor: '#f1f8ff',
-		borderLeftWidth: scaleWidth(4),
-		borderLeftColor: '#0984e3',
 		padding: scaleWidth(12),
 		borderRadius: scaleWidth(10),
 		marginBottom: scaleHeight(16),

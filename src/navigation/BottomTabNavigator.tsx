@@ -7,6 +7,7 @@ import IconComponent from '@/screens/common/atomic/IconComponent';
 import ProverbListScreen from '@/screens/ProverbListScreen';
 import MyScoreScreen from '@/screens/MyScoreScreen';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { COLORS, FONT } from '@/theme/theme';
 import DeviceInfo from 'react-native-device-info';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import TodayQuizScreen from '@/screens/TodayQuizScreen';
@@ -21,10 +22,15 @@ const BottomTabNavigator = () => {
 		tabBarStyle: {
 			height: scaleWidth(50) + insets.bottom,
 			paddingTop: isTablet ? scaleHeight(8) : 0,
-			backgroundColor: '#fff',
+			backgroundColor: COLORS.bg,
+			borderTopWidth: 1,
+			borderTopColor: COLORS.border,
 		},
+		tabBarActiveTintColor: COLORS.primary,
+		tabBarInactiveTintColor: COLORS.textDisabled,
 		tabBarLabelStyle: {
-			fontSize: isTablet ? scaledSize(12) : scaledSize(11),
+			fontSize: isTablet ? scaledSize(FONT.xs + 1) : scaledSize(FONT.xs),
+			fontWeight: '600' as const,
 			marginTop: isTablet ? scaleHeight(10) : 0,
 		},
 	});

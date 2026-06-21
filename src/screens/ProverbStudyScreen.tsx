@@ -1820,8 +1820,6 @@ const styles = StyleSheet.create({
 	meaningBox: {
 		borderRadius: scaleWidth(14),
 		backgroundColor: '#fff3cd', // 밝은 크림색
-		borderLeftWidth: 4,
-		borderLeftColor: '#f9a825', // 오렌지 강조선
 		padding: scaleWidth(14),
 		marginBottom: scaleHeight(12),
 	},

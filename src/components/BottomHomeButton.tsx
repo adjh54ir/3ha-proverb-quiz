@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { Paths } from '@/navigation/conf/Paths';
 import IconComponent from '@/screens/common/atomic/IconComponent';
+import { COLORS, FONT, RADIUS } from '@/theme/theme';
 
 const BottomHomeButton = ({ marginBottom = 0 }: { marginBottom?: number }) => {
 	const navigation = useNavigation<any>();
@@ -16,8 +17,8 @@ const BottomHomeButton = ({ marginBottom = 0 }: { marginBottom?: number }) => {
 	return (
 		<View style={[styles.wrapper, { marginBottom }]}>
 			<TouchableOpacity style={styles.button} onPress={goHome} activeOpacity={0.85}>
-				<IconComponent type="MaterialIcons" name="home" size={14} color="#4b5563" />
-				<Text style={styles.text}>HOME</Text>
+				<IconComponent type="MaterialIcons" name="home" size={16} color={COLORS.primary} />
+				<Text style={styles.text}>홈으로 가기</Text>
 			</TouchableOpacity>
 		</View>
 	);
@@ -36,20 +37,21 @@ const styles = StyleSheet.create({
 	button: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		justifyContent: 'center',
 		gap: scaleWidth(6),
 
 		borderWidth: 1,
-		borderColor: '#d1d5db',
-		borderRadius: scaleWidth(22),
+		borderColor: COLORS.primary,
+		borderRadius: scaleWidth(RADIUS.pill),
 
-		paddingVertical: scaleHeight(9),
-		paddingHorizontal: scaleWidth(22),
+		paddingVertical: scaleHeight(11),
+		paddingHorizontal: scaleWidth(28),
 
-		backgroundColor: '#ffffff',
+		backgroundColor: COLORS.bg,
 	},
 	text: {
-		fontSize: scaledSize(12),
-		fontWeight: '600',
-		color: '#374151',
+		fontSize: scaledSize(FONT.sm),
+		fontWeight: '700',
+		color: COLORS.primary,
 	},
 });

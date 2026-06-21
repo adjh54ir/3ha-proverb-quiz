@@ -10,6 +10,7 @@ import { TouchableOpacity } from 'react-native';
 import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
 import WrongReviewScreen from '@/screens/WrongReviewScreen';
 import { scaledSize, scaleWidth } from '@/utils';
+import { COLORS, FONT } from '@/theme/theme';
 import InitTimeChallengeScreen from '@/screens/InitTimeChallengeScreen';
 import TimeChanllengeScreen from '@/screens/TimeChanllengeScreen';
 import QuizModeScreen from '@/screens/QuizModeScreen';
@@ -31,12 +32,17 @@ const StackNavigator = () => {
 			screenOptions={{
 				headerTitleAlign: 'center', // 타이틀 가운데 정렬
 				headerStyle: {
-					backgroundColor: '#f9f9f9',
+					backgroundColor: COLORS.bg,
+					elevation: 0,
+					shadowOpacity: 0,
+					borderBottomWidth: 1,
+					borderBottomColor: COLORS.border,
 				},
+				headerTintColor: COLORS.text,
 				headerTitleStyle: {
-					fontSize: scaledSize(18),
-					fontWeight: 'bold',
-					color: '#2c3e50',
+					fontSize: scaledSize(FONT.lg),
+					fontWeight: '700',
+					color: COLORS.text,
 				},
 			}}
 			initialRouteName={Paths.MAIN_TAB}
@@ -64,7 +70,7 @@ const StackNavigator = () => {
 					headerLeft: () => <></>,
 					// headerLeft: () => (
 					// 	<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
-					// 		<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
+					// 		<IconComponent type="MaterialIcons" name="arrow-back" size={24} color={COLORS.text} />
 					// 	</TouchableOpacity>
 					// ),
 				})}
@@ -88,7 +94,7 @@ const StackNavigator = () => {
 					title: '퀴즈 모드 선택',
 					headerLeft: () => (
 						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
-							<Icon name="arrow-back" size={24} color="#2c3e50" />
+							<Icon name="arrow-back" size={24} color={COLORS.text} />
 						</TouchableOpacity>
 					),
 					headerRight: () => <></>,
@@ -133,7 +139,7 @@ const StackNavigator = () => {
 					title: '오답 복습',
 					headerLeft: () => (
 						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
-							<Icon name="arrow-back" size={24} color="#2c3e50" />
+							<Icon name="arrow-back" size={24} color={COLORS.text} />
 						</TouchableOpacity>
 					),
 				})}
@@ -147,7 +153,7 @@ const StackNavigator = () => {
 					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
 					headerLeft: () => (
 						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
-							<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
+							<IconComponent type="MaterialIcons" name="arrow-back" size={24} color={COLORS.text} />
 						</TouchableOpacity>
 					),
 				})}
@@ -161,7 +167,7 @@ const StackNavigator = () => {
 					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
 					headerLeft: () => (
 						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
-							<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
+							<IconComponent type="MaterialIcons" name="arrow-back" size={24} color={COLORS.text} />
 						</TouchableOpacity>
 					),
 				})}

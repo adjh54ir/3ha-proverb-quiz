@@ -71,7 +71,7 @@ const TodayQuizScreen = () => {
 	const [quizOptionsMap, setQuizOptionsMap] = useState<{ [id: number]: string[] }>({});
 	const [currentIndex, setCurrentIndex] = useState(0); // 현재 문제 번호
 	const [progressPercent, setProgressPercent] = useState(quizList.length > 0 ? (currentIndex / quizList.length) * 100 : 0);
-	const labelColors = ['#1abc9c', '#3498db', '#9b59b6', '#e67e22'];
+	const labelColors = ['#1abc9c', '#3498db', '#16a085', '#e67e22'];
 	const [showAlarmModal, setShowAlarmModal] = useState(false);
 
 	const [showScrollTop, setShowScrollTop] = useState(false);

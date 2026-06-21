@@ -144,8 +144,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(14),
 		width: '100%',
 		marginBottom: scaleHeight(20),
-		borderLeftWidth: 3,
-		borderLeftColor: '#f39c12',
 	},
 	descText: {
 		fontSize: scaledSize(12),

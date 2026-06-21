@@ -16,9 +16,10 @@ import { FIELD_DROPDOWN_ITEMS, LEVELS, QUIZ_MODES, QuizLevelKey } from '@/const/
 import ProverbServices from '@/services/ProverbServices';
 import IconComponent from './common/atomic/IconComponent';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
+import { COLORS } from '@/theme/theme';
 
 type QuizModeScreenRouteParams = {
-	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'comingsoon' }; // 전달되는 mode는 string 타입 (예: 'meaning' | 'proverb' | 'blank')
+	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'comingsoon' }; // 전달되는 mode는 string 타입 (예: 'meaning' | 'proverb' | 'blank' | 'example')
 };
 
 const QuizModeScreen = () => {
@@ -435,7 +436,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#28a745',
+		backgroundColor: COLORS.primary,
 		paddingVertical: scaleHeight(12),
 		paddingHorizontal: scaleWidth(28),
 		borderRadius: scaleWidth(30),
@@ -515,15 +516,15 @@ const styles = StyleSheet.create({
 		marginHorizontal: scaleWidth(10),
 	},
 	tabActive: {
-		borderBottomColor: '#2ecc71',
+		borderBottomColor: COLORS.primary,
 	},
 	tabText: {
 		fontSize: scaledSize(15),
-		color: '#7f8c8d',
+		color: COLORS.textMuted,
 		fontWeight: '500',
 	},
 	tabTextActive: {
-		color: '#2ecc71',
+		color: COLORS.primary,
 		fontWeight: '700',
 	},
 	categoryRowButton: {
@@ -535,7 +536,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(14),
 		width: '100%',
 		marginBottom: scaleHeight(14),
-		backgroundColor: '#6c5ce7',
+		backgroundColor: COLORS.primary,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 3 },
 		shadowOpacity: 0.1,

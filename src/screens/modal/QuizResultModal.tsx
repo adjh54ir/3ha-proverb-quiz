@@ -14,7 +14,7 @@ interface QuizResultModalProps {
 	resultType: 'correct' | 'wrong' | 'timeout' | 'done' | '';
 	resultTitle: string;
 	resultMessage: string;
-	quizMode: 'meaning' | 'proverb' | 'blank';
+	quizMode: 'meaning' | 'proverb' | 'blank' | 'example';
 	question: MainDataType.Proverb | null;
 	favoriteIds: number[];
 	onToggleFavorite: () => Promise<void>;
@@ -50,7 +50,7 @@ interface ProverbInfoCardProps {
 	question: MainDataType.Proverb | null;
 	highlightColor?: string;
 	backgroundColor?: string;
-	quizMode: 'meaning' | 'proverb' | 'blank';
+	quizMode: 'meaning' | 'proverb' | 'blank' | 'example';
 	favoriteIds: number[];
 	shouldAnimate: boolean;
 	closing: boolean;
@@ -79,7 +79,7 @@ const ProverbInfoCard = ({
 		<View style={[styles.infoCard, { backgroundColor, borderColor: highlightColor }]}>
 			<Text style={[styles.infoSectionTitle, { color: highlightColor }]}>📖 속담 해설</Text>
 
-			{quizMode === 'proverb' || quizMode === 'blank' ? (
+			{quizMode === 'proverb' || quizMode === 'blank' || quizMode === 'example' ? (
 				shouldAnimate && !closing ? (
 					<Animatable.View animation="fadeInUp" duration={800} delay={300} onAnimationEnd={onAnimationEnd}>
 						<Text style={styles.modalProverbText}>{question.proverb}</Text>

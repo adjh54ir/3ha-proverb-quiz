@@ -273,10 +273,10 @@ export const QUIZ_MODES = [
 		color: '#F5B041',
 	},
 	{
-		key: 'comingsoon', // 오타(commingsoon) 수정
-		label: '새로운 퀴즈\nComing Soon...',
-		icon: 'hourglass-half',
+		key: 'example',
+		label: '예시로 풀기 퀴즈',
+		icon: 'comment-dots',
 		type: 'fontAwesome6',
-		color: '#dfe6e9',
+		color: '#EC7063',
 	},
 ];

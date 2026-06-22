@@ -952,7 +952,7 @@ const QuizStudyScreen = () => {
 											style={styles.dropdown}
 											textStyle={{
 												fontSize: scaledSize(14), // 더 작게
-												color: '#2c3e50',
+												color: '#334155',
 												fontWeight: '500',
 											}}
 											placeholderStyle={{ color: '#95a5a6', fontSize: scaledSize(14) }}
@@ -985,7 +985,7 @@ const QuizStudyScreen = () => {
 											zIndex={5000}
 											zIndexInverse={4000}
 											containerStyle={{ zIndex: 5000 }}
-											labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
+											labelStyle={{ fontSize: scaledSize(14), color: '#334155' }}
 											iconContainerStyle={{ marginRight: scaleWidth(8) }}
 											showArrowIcon={true}
 											showTickIcon={false}
@@ -1004,7 +1004,7 @@ const QuizStudyScreen = () => {
 													<View style={{ width: scaleWidth(28), alignItems: 'center', marginRight: scaleWidth(12) }}>
 														{typeof item.icon === 'function' ? item.icon() : item.icon}
 													</View>
-													<Text style={{ fontSize: scaledSize(15), color: '#2c3e50', flex: 1 }}>{item.label}</Text>
+													<Text style={{ fontSize: scaledSize(15), color: '#334155', flex: 1 }}>{item.label}</Text>
 												</TouchableOpacity>
 											)}
 											modalProps={{
@@ -1032,7 +1032,7 @@ const QuizStudyScreen = () => {
 											modalTitleStyle={{
 												fontSize: scaledSize(16),
 												fontWeight: 'bold',
-												color: '#2d3436',
+												color: '#334155',
 												textAlign: 'center',
 												paddingVertical: scaleHeight(12),
 												paddingHorizontal: scaleWidth(16),
@@ -1220,11 +1220,11 @@ const QuizStudyScreen = () => {
 const styles = StyleSheet.create({
 	main: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#F8FAFC',
 	},
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#F8FAFC',
 	},
 	cardWrapper: {
 		height: scaleHeight(812 * 0.7),
@@ -1268,7 +1268,7 @@ const styles = StyleSheet.create({
 	progressTitle: {
 		fontSize: scaledSize(17),
 		fontWeight: '600',
-		color: '#2c3e50',
+		color: '#334155',
 		marginRight: scaleWidth(10),
 	},
 	progressBadge: {
@@ -1440,7 +1440,7 @@ const styles = StyleSheet.create({
 	},
 	cardHint: {
 		fontSize: scaledSize(16),
-		color: '#7f8c8d',
+		color: '#64748B',
 		marginTop: scaleHeight(20),
 	},
 	modalCloseIcon: {
@@ -1481,7 +1481,7 @@ const styles = StyleSheet.create({
 	badgeModalTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(16),
 		textAlign: 'center',
 	},
@@ -1516,7 +1516,7 @@ const styles = StyleSheet.create({
 	},
 	badgeDescription: {
 		fontSize: scaledSize(14),
-		color: '#7f8c8d',
+		color: '#64748B',
 		lineHeight: scaleHeight(20),
 	},
 	modalConfirmButton2: {
@@ -1545,12 +1545,12 @@ const styles = StyleSheet.create({
 	toastTitle: {
 		fontSize: scaledSize(20), // ✅ 더 큰 글자
 		fontWeight: 'bold',
-		color: '#2d3436',
+		color: '#334155',
 		marginBottom: scaleHeight(6),
 	},
 	toastText: {
 		fontSize: scaledSize(15), // ✅ 일반 텍스트도 확대
-		color: '#636e72',
+		color: '#64748B',
 		lineHeight: scaleHeight(24),
 	},
 	toastWrapper: {
@@ -1576,7 +1576,7 @@ const styles = StyleSheet.create({
 	},
 	emptyText: {
 		fontSize: scaledSize(16),
-		color: '#7f8c8d',
+		color: '#64748B',
 		textAlign: 'center',
 		lineHeight: scaleHeight(24),
 	},
@@ -1635,7 +1635,7 @@ const styles = StyleSheet.create({
 	statusCardValue: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 	},
 	badgeCard: {
 		flexDirection: 'row',
@@ -1676,7 +1676,7 @@ const styles = StyleSheet.create({
 		borderColor: '#ecf0f1',
 	},
 	studyEndButton: {
-		backgroundColor: '#7f8c8d',
+		backgroundColor: '#64748B',
 		paddingVertical: scaleHeight(12),
 		paddingHorizontal: scaleWidth(24),
 		borderRadius: scaleWidth(24),
@@ -1704,12 +1704,12 @@ const styles = StyleSheet.create({
 	exitTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		textAlign: 'center',
 	},
 	exitSub: {
 		fontSize: scaledSize(14),
-		color: '#7f8c8d',
+		color: '#64748B',
 		marginBottom: scaleHeight(20),
 		textAlign: 'center',
 		lineHeight: scaleHeight(20),
@@ -1776,7 +1776,7 @@ const styles = StyleSheet.create({
 	hanjaText: {
 		fontSize: scaledSize(28),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		textAlign: 'center',
 		marginBottom: scaleHeight(12),
 		letterSpacing: 2, // ✅ 기존보다 줄임
@@ -1786,7 +1786,7 @@ const styles = StyleSheet.create({
 
 	hangulText: {
 		fontSize: scaledSize(18),
-		color: '#7f8c8d',
+		color: '#64748B',
 		fontWeight: '500',
 		textAlign: 'center',
 		marginBottom: scaleHeight(8),
@@ -1813,7 +1813,7 @@ const styles = StyleSheet.create({
 	sectionTitle: {
 		fontSize: scaledSize(15),
 		fontWeight: '700',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(12),
 	},
 
@@ -1833,7 +1833,7 @@ const styles = StyleSheet.create({
 
 	sectionContent: {
 		fontSize: scaledSize(15),
-		color: '#2c3e50',
+		color: '#334155',
 		lineHeight: scaleHeight(22),
 		textAlign: 'left',
 	},
@@ -1892,7 +1892,7 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(13),
 		marginBottom: scaleHeight(3),
 		fontWeight: '700',
-		color: '#2c3e50',
+		color: '#334155',
 	},
 	inlineValue: {
 		fontSize: scaledSize(13),
@@ -1925,7 +1925,7 @@ const styles = StyleSheet.create({
 	highlightText: {
 		fontSize: scaledSize(15),
 		fontWeight: '600',
-		color: '#2c3e50',
+		color: '#334155',
 		lineHeight: 22,
 	},
 	metaWrap: {
@@ -1957,7 +1957,7 @@ const styles = StyleSheet.create({
 	meaningQuoteText: {
 		fontSize: scaledSize(16),
 		fontWeight: '600',
-		color: '#2c3e50',
+		color: '#334155',
 		lineHeight: scaleHeight(22),
 		textAlign: 'center', // 텍스트도 중앙 정렬
 	},
@@ -2018,7 +2018,7 @@ const styles = StyleSheet.create({
 	tagText: {
 		fontSize: scaledSize(13),
 		fontWeight: '600',
-		color: '#2c3e50',
+		color: '#334155',
 	},
 });
 

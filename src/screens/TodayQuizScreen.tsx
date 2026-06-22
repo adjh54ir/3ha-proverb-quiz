@@ -1285,25 +1285,28 @@ export default TodayQuizScreen;
 const styles = StyleSheet.create({
 	main: {
 		flex: 1,
-		backgroundColor: '#f5f5f5', // ✅ 회색 배경
+		backgroundColor: '#F8FAFC', // ✅ 통일 슬레이트 배경
 	},
 	content: {
-		marginHorizontal: scaleWidth(24),
+		marginHorizontal: scaleWidth(16),
+		marginTop: scaleHeight(12),
 		padding: scaleHeight(24),
-		borderRadius: scaledSize(12),
+		borderRadius: scaleWidth(16),
 		backgroundColor: '#ffffff',
+		borderWidth: 1,
+		borderColor: '#F1F5F9',
 		justifyContent: 'center', // ✅ 수직 가운데 정렬
 		alignItems: 'center', // ✅ 수평 가운데 정렬
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
+		shadowOpacity: 0.05,
+		shadowRadius: scaleWidth(8),
 	},
 	title: {
 		fontSize: scaledSize(18),
-		fontWeight: 'bold',
+		fontWeight: '800',
 		marginBottom: scaleHeight(12),
-		color: '#222',
+		color: '#334155',
 	},
 	description: {
 		fontSize: scaledSize(14),
@@ -1389,22 +1392,24 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 	},
 	scoreBox: {
-		marginTop: scaleHeight(8),
-		marginHorizontal: scaleWidth(24),
+		marginTop: scaleHeight(12),
+		marginHorizontal: scaleWidth(16),
 		padding: scaleHeight(16),
-		borderRadius: scaledSize(10),
+		borderRadius: scaleWidth(16),
 		backgroundColor: '#fff',
+		borderWidth: 1,
+		borderColor: '#F1F5F9',
 		alignItems: 'center',
 		justifyContent: 'center',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
+		shadowOpacity: 0.05,
+		shadowRadius: scaleWidth(8),
 	},
 	scoreText: {
 		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#333',
+		fontWeight: '800',
+		color: '#334155',
 	},
 	feedbackText: {
 		marginTop: scaleHeight(4),
@@ -1488,14 +1493,15 @@ const styles = StyleSheet.create({
 
 	quizContainer2: {
 		marginHorizontal: scaleWidth(16),
+		marginTop: scaleHeight(12),
 		backgroundColor: '#fff',
-		borderRadius: scaledSize(12),
+		borderRadius: scaleWidth(16),
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
+		borderColor: '#F1F5F9',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
+		shadowOffset: { width: 0, height: scaleHeight(2) },
 		shadowOpacity: 0.05,
-		shadowRadius: 3,
+		shadowRadius: scaleWidth(8),
 	},
 
 	header: {
@@ -1509,8 +1515,8 @@ const styles = StyleSheet.create({
 
 	headerTitle: {
 		fontSize: scaledSize(20),
-		fontWeight: 'bold',
-		color: '#222',
+		fontWeight: '800',
+		color: '#334155',
 		textAlign: 'center',
 	},
 
@@ -1539,7 +1545,7 @@ const styles = StyleSheet.create({
 	progressBarBackground: {
 		flex: 1,
 		height: scaleHeight(10),
-		backgroundColor: '#eee',
+		backgroundColor: '#E2E8F0',
 		borderRadius: scaledSize(5),
 		overflow: 'hidden',
 		marginRight: scaleWidth(12),
@@ -1547,7 +1553,7 @@ const styles = StyleSheet.create({
 
 	progressBarFill: {
 		height: '100%',
-		backgroundColor: '#4CAF50',
+		backgroundColor: '#3B82F6',
 	},
 
 	progressText: {

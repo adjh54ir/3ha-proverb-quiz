@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		textAlign: 'center',
 		marginBottom: scaleHeight(10),
 	},
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
 	},
 	subText: {
 		fontSize: scaledSize(15),
-		color: '#636e72',
+		color: '#64748B',
 		textAlign: 'center',
 	},
 	startButton: {
@@ -281,31 +281,31 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(12),
 		fontSize: scaledSize(15),
-		color: '#2c3e50',
+		color: '#334155',
 	},
 	headerCell: {
 		fontWeight: 'bold',
-		color: '#0984e3',
+		color: '#3B82F6',
 	},
 	center: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: '#fff',
+		backgroundColor: '#F8FAFC',
 	},
 	emptyText: {
 		fontSize: scaledSize(16),
-		color: '#636e72',
+		color: '#64748B',
 		fontWeight: 700,
 	},
 	scrollContainer: {
 		marginTop: scaleHeight(12),
 		paddingHorizontal: scaleWidth(24),
 		alignItems: 'center',
-		backgroundColor: '#f5f6fa',
+		backgroundColor: '#F8FAFC',
 	},
 	activityCardBox: {
-		backgroundColor: '#f5f6fa',
+		backgroundColor: '#fff',
 		borderRadius: scaleWidth(16),
 		padding: scaleWidth(10),
 		marginBottom: scaleHeight(12),
@@ -333,12 +333,12 @@ const styles = StyleSheet.create({
 	modalTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(12),
 	},
 	modalText: {
 		fontSize: scaledSize(15),
-		color: '#636e72',
+		color: '#64748B',
 		textAlign: 'left',
 	},
 	modalButton: {
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
 	headerTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginRight: scaleWidth(5),
 	},
 	guideModal: {
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
 	guideTitle: {
 		fontSize: scaledSize(20),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginLeft: scaleWidth(8),
 	},
 	guideDescription: {
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
 	guideCardTitle: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(8),
 	},
 	guideCardContent: {
@@ -458,12 +458,12 @@ const styles = StyleSheet.create({
 	reviewProverbText: {
 		fontSize: scaledSize(15),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(12),
 	},
 	reviewMeaningText: {
 		fontSize: scaledSize(14),
-		color: '#636e72',
+		color: '#64748B',
 		lineHeight: scaleHeight(20),
 	},
 	historyCard: {
@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
 	highlightText: {
 		fontSize: scaledSize(15),
 		fontWeight: '600',
-		color: '#2c3e50',
+		color: '#334155',
 		lineHeight: 22,
 	},
 	meaningQuoteBox: {
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
 	meaningQuoteText: {
 		fontSize: scaledSize(16),
 		fontWeight: '600',
-		color: '#2c3e50',
+		color: '#334155',
 		lineHeight: scaleHeight(22),
 		textAlign: 'center', // 텍스트도 중앙 정렬
 	},
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
 	sectionTitle: {
 		fontSize: scaledSize(15),
 		fontWeight: '700',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(12),
 	},
 	sectionText: {
@@ -668,7 +668,7 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(13),
 		marginBottom: scaleHeight(3),
 		fontWeight: '700',
-		color: '#2c3e50',
+		color: '#334155',
 	},
 	inlineValue: {
 		fontSize: scaledSize(13),
@@ -745,7 +745,7 @@ const styles = StyleSheet.create({
 	},
 	emptyDesc: {
 		fontSize: scaledSize(14),
-		color: '#7f8c8d',
+		color: '#64748B',
 		textAlign: 'center',
 		lineHeight: scaleHeight(22),
 		marginBottom: scaleHeight(28),

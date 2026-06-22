@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
 	badgeModalTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(16),
 		textAlign: 'center',
 	},
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
 	},
 	badgeDescription: {
 		fontSize: scaledSize(14),
-		color: '#7f8c8d',
+		color: '#64748B',
 		lineHeight: scaleHeight(20),
 		flexShrink: 1,
 		flexWrap: 'wrap',

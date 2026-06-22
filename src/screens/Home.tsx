@@ -483,6 +483,10 @@ const Home = () => {
 		timechalleng: () => navigation.navigate(Paths.INIT_TIME_CHANLLENGE),
 		//@ts-ignore
 		towerchalleng: () => navigation.navigate(Paths.TOWER_CHANLLENGE), // ✅ 추가
+		//@ts-ignore
+		favorite: () => navigation.navigate(Paths.FAVORITE), // ✅ 즐겨찾기
+		//@ts-ignore
+		myProverbBook: () => navigation.navigate(Paths.MY_PROVERB_BOOK), // ✅ 나만의 속담집
 	};
 	const ActionCard = ({
 		iconName,
@@ -672,6 +676,24 @@ const Home = () => {
 						onPress={moveToHandler.towerchalleng}
 						isNew
 					/>
+					<ActionCard
+						iconName="star"
+						iconType="materialIcons"
+						label="즐겨찾기"
+						description="마음에 드는 속담을 저장하고 모아서 다시 살펴봐요"
+						color="#f59e0b"
+						onPress={moveToHandler.favorite}
+						isNew
+					/>
+					<ActionCard
+						iconName="menu-book"
+						iconType="materialIcons"
+						label="나만의 속담집"
+						description="원하는 속담을 모아 나만의 속담집을 만들고 퀴즈로 풀어봐요"
+						color="#0ea5e9"
+						onPress={moveToHandler.myProverbBook}
+						isNew
+					/>
 
 					<TouchableOpacity style={styles.curiousButton} onPress={() => setShowBadgeModal(true)}>
 						<IconComponent type="materialIcons" name="emoji-events" size={18} color="#2ecc71" />
@@ -798,7 +820,7 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
-	wrapper: { flex: 1, backgroundColor: '#fff' },
+	wrapper: { flex: 1, backgroundColor: '#F8FAFC' },
 	scrollContainer: { paddingBottom: scaleHeight(40) },
 	container: {
 		flexGrow: 1,
@@ -1036,13 +1058,13 @@ const styles = StyleSheet.create({
 		padding: scaleWidth(14),
 		backgroundColor: '#ffffff',
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
+		borderColor: '#F1F5F9',
 		shadowColor: '#000',
 		shadowOpacity: 0.05,
 		alignSelf: 'center',
 		width: '88%',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowRadius: scaleWidth(2),
+		shadowOffset: { width: 0, height: scaleHeight(2) },
+		shadowRadius: scaleWidth(8),
 	},
 	iconCircle: {
 		width: scaleWidth(52),
@@ -1055,11 +1077,11 @@ const styles = StyleSheet.create({
 	cardTitle: {
 		fontSize: scaledSize(16),
 		fontWeight: '700',
-		color: '#2c3e50',
+		color: '#334155',
 	},
 	cardDescription: {
 		fontSize: scaledSize(13),
-		color: '#7f8c8d',
+		color: '#64748B',
 		marginTop: scaleHeight(4),
 		lineHeight: scaleHeight(18),
 	},
@@ -1236,7 +1258,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		lineHeight: scaleHeight(20),
 	},
-	main: { flex: 1, backgroundColor: '#fff' },
+	main: { flex: 1, backgroundColor: '#F8FAFC' },
 	mascoteView: {
 		width: scaleWidth(180),
 		height: scaleWidth(180),

@@ -19,6 +19,9 @@ import QuizScreen from '@/screens/QuizScreen';
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import TowerChallengeScreen from '@/screens/TowerChallengeScreen';
 import TowerQuizScreen from '@/screens/TowerQuizScreen';
+import FavoriteScreen from '@/screens/FavoriteScreen';
+import MyProverbBook from '@/screens/MyProverbBook';
+import MyProverbBookDetail from '@/screens/MyProverbBookDetail';
 
 /**
  * Stack Navigator : 일반적인 화면만 출력을 하는 경우
@@ -171,6 +174,25 @@ const StackNavigator = () => {
 						</TouchableOpacity>
 					),
 				})}
+			/>
+			<Stack.Screen
+				name={Paths.FAVORITE}
+				component={FavoriteScreen}
+				options={{
+					headerShown: true,
+					title: '즐겨찾기',
+					headerLeft: () => <></>,
+				}}
+			/>
+			<Stack.Screen
+				name={Paths.MY_PROVERB_BOOK}
+				component={MyProverbBook}
+				options={{ headerShown: false, title: '나만의 속담집' }}
+			/>
+			<Stack.Screen
+				name={Paths.MY_PROVERB_BOOK_DETAIL}
+				component={MyProverbBookDetail}
+				options={{ headerShown: false, title: '속담집 상세' }}
 			/>
 			<Stack.Screen name={Paths.HOME} component={Home} />
 			<Stack.Screen name={Paths.SETTING} component={SettingScreen} />

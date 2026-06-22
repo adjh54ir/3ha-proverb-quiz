@@ -118,12 +118,12 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: scaledSize(14),
-        color: '#2c3e50',
+        color: '#334155',
         fontWeight: '600',
     },
     value: {
         fontSize: scaledSize(14),
-        color: '#7f8c8d',
+        color: '#64748B',
     },
     buttonRow: {
         flexDirection: 'row',
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     versionLabel: {
         fontSize: scaledSize(15),
         fontWeight: '600',
-        color: '#2c3e50',
+        color: '#334155',
     },
     versionValue: {
         fontSize: scaledSize(15),

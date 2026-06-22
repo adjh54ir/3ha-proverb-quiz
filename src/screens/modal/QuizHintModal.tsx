@@ -19,7 +19,7 @@ const getFieldColor = (field: string) => {
 		'노력/성공': '#00b894',
 		'경계/조심': '#d63031',
 		'욕심/탐욕': '#e84393',
-		'배신/불신': '#2d3436',
+		'배신/불신': '#334155',
 	};
 	return map[field] || '#b2bec3';
 };
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
 	},
 	sectionItem: {
 		fontSize: scaledSize(14),
-		color: '#2c3e50',
+		color: '#334155',
 		lineHeight: scaleHeight(21),
 		flex: 1,
 		fontWeight: '500',

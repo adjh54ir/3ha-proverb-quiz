@@ -820,7 +820,7 @@ const QuizScreen = () => {
 	}, []);
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
 			<View style={{ flex: 1 }}>
 				<View style={{ flex: 1 }}>
 					<View style={styles.container}>
@@ -1168,7 +1168,7 @@ export default QuizScreen;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#F8FAFC',
 	},
 	inner: {
 		flex: 1,
@@ -1186,7 +1186,7 @@ const styles = StyleSheet.create({
 	timerText: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 	},
 	questionText: {
 		fontSize: scaledSize(18),
@@ -1199,10 +1199,12 @@ const styles = StyleSheet.create({
 	},
 	optionsContainer: { width: '100%' },
 	optionButton: {
-		backgroundColor: '#ecf0f1',
+		backgroundColor: '#fff',
 		padding: scaleWidth(16),
 		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(12),
+		borderWidth: 1,
+		borderColor: '#E2E8F0',
 	},
 	optionText: {
 		fontSize: scaledSize(16),
@@ -1227,7 +1229,7 @@ const styles = StyleSheet.create({
 	resultTitle: {
 		fontSize: scaledSize(22),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(6),
 	},
 	resultMessage: {
@@ -1280,7 +1282,7 @@ const styles = StyleSheet.create({
 	selectTitle: {
 		fontSize: scaledSize(22),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(8),
 	},
 	selectSub: {
@@ -1292,7 +1294,7 @@ const styles = StyleSheet.create({
 	selectLabel: {
 		fontSize: scaledSize(16),
 		fontWeight: '600',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(8),
 	},
 	selectButton: {
@@ -1378,7 +1380,7 @@ const styles = StyleSheet.create({
 	statusCardValue: {
 		fontSize: scaledSize(15),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 	},
 	exitModal: {
 		backgroundColor: '#fff',
@@ -1395,7 +1397,7 @@ const styles = StyleSheet.create({
 	exitModalTitle: {
 		fontSize: scaledSize(20),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(12),
 		textAlign: 'center',
 	},
@@ -1481,7 +1483,7 @@ const styles = StyleSheet.create({
 
 	proverbText: {
 		fontWeight: '700',
-		color: '#2c3e50',
+		color: '#334155',
 		fontSize: scaledSize(16),
 	},
 
@@ -1514,7 +1516,7 @@ const styles = StyleSheet.create({
 	},
 	progressText: {
 		fontSize: scaledSize(17),
-		color: '#2c3e50',
+		color: '#334155',
 		fontWeight: '600',
 		marginBottom: scaleHeight(8),
 		textAlign: 'center',
@@ -1582,13 +1584,13 @@ const styles = StyleSheet.create({
 	optionLabel: {
 		fontSize: scaledSize(15),
 		fontWeight: '600',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: 0,
 	},
 	optionContent: {
 		fontSize: scaledSize(16),
 		fontWeight: '700',
-		color: '#2c3e50',
+		color: '#334155',
 		lineHeight: scaleHeight(22),
 		flexShrink: 1,
 		flexWrap: 'wrap',
@@ -1616,7 +1618,7 @@ const styles = StyleSheet.create({
 	},
 	correctInfoText: {
 		fontSize: scaledSize(15),
-		color: '#2c3e50',
+		color: '#334155',
 		lineHeight: scaleHeight(22),
 		fontWeight: '500',
 	},
@@ -1624,7 +1626,7 @@ const styles = StyleSheet.create({
 	badgeModalTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(16),
 		textAlign: 'center',
 	},

@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
 	},
 	lockedText: {
 		fontSize: scaledSize(12),
-		color: '#7f8c8d',
+		color: '#64748B',
 		marginTop: scaleHeight(8),
 		fontWeight: '600',
 	},
@@ -729,7 +729,7 @@ const styles = StyleSheet.create({
 	},
 	rewardLockedText: {
 		fontSize: scaledSize(14),
-		color: '#7f8c8d',
+		color: '#64748B',
 		fontWeight: '600',
 	},
 	challengeButtonWrapper: {
@@ -755,7 +755,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#27ae60',
 	},
 	challengeButtonLocked: {
-		backgroundColor: '#7f8c8d',
+		backgroundColor: '#64748B',
 	},
 	challengeButtonText: {
 		color: '#fff',

@@ -22,6 +22,16 @@ type QuizModeScreenRouteParams = {
 	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'comingsoon' }; // 전달되는 mode는 string 타입 (예: 'meaning' | 'proverb' | 'blank' | 'example')
 };
 
+/** 난이도별 설명 (카드 서브텍스트) */
+const LEVEL_DESC: Record<string, string> = {
+	beginner: '아주 쉬운 속담으로 가볍게 시작해요',
+	intermediate: '한 단계 높은 속담에 도전해요',
+	advanced: '익숙하지 않은 속담까지 풀어봐요',
+	expert: '어려운 속담으로 실력을 확인해요',
+	all: '모든 난이도의 속담을 풀어보기',
+	comingsoon: '새로운 문제가 준비 중입니다',
+};
+
 const QuizModeScreen = () => {
 	const navigation = useNavigation();
 
@@ -136,7 +146,7 @@ const QuizModeScreen = () => {
 	const selectedMode = QUIZ_MODES.find((mode) => mode.key === passedMode);
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }} edges={['top', 'bottom']}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }} edges={['top', 'bottom']}>
 			<View style={styles.container}>
 				<View style={styles.centerWrapper}>
 					<View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: scaleHeight(20) }}>
@@ -185,12 +195,17 @@ const QuizModeScreen = () => {
 										return (
 											<TouchableOpacity
 												key={item.key}
-												style={[styles.gridButtonHalf, { backgroundColor: '#ecf0f1' }]}
+												style={[styles.levelCardFull, { opacity: 0.6 }]}
 												onPress={() => {
 													Alert.alert('준비중..', '새로운 문제를 준비 중입니다. 조금만 기다려 주세요!');
 												}}>
-												<IconComponent type={item.type} name={item.icon} size={28} color="#bdc3c7" />
-												<Text style={styles.disabledText}>{item.label}</Text>
+												<View style={[styles.levelIconChip, { backgroundColor: '#CBD5E1' }]}>
+													<IconComponent type={item.type} name={item.icon} size={scaledSize(22)} color="#fff" />
+												</View>
+												<View style={styles.levelTextWrap}>
+													<Text style={styles.levelLabelFull}>{item.label}</Text>
+													<Text style={styles.levelDescFull}>{LEVEL_DESC[item.key] ?? ''}</Text>
+												</View>
 												<Text style={styles.comingSoon}>Coming Soon</Text>
 											</TouchableOpacity>
 										);
@@ -210,7 +225,8 @@ const QuizModeScreen = () => {
 									return (
 										<TouchableOpacity
 											key={item.key}
-											style={[styles.gridButtonHalf, { backgroundColor: item.color }]}
+											style={styles.levelCardFull}
+											activeOpacity={0.85}
 											onPress={() => {
 												if (shouldShowAd) {
 													setSelectedLevelKey(item.key as QuizLevelKey);
@@ -219,58 +235,61 @@ const QuizModeScreen = () => {
 													moveToLevelQuiz(item.key as QuizLevelKey);
 												}
 											}}>
-											<View style={styles.iconTextRow}>
-												<IconComponent type={item.type} name={item.icon} size={28} color="#fff" />
-												<Text style={styles.modeLabel}>{item.label}</Text>
-												<Text style={styles.progressInlineText}>{`(${solved}/${total})`}</Text>
+											<View style={[styles.levelIconChip, { backgroundColor: item.color }]}>
+												<IconComponent type={item.type} name={item.icon} size={scaledSize(22)} color="#fff" />
+											</View>
+											<View style={styles.levelTextWrap}>
+												<Text style={styles.levelLabelFull}>{item.label}</Text>
+												<Text style={styles.levelDescFull} numberOfLines={2}>
+													{LEVEL_DESC[item.key] ?? ''}
+												</Text>
+											</View>
+											<View style={styles.levelProgressChip}>
+												<Text style={styles.levelProgressText}>{`${solved}/${total}`}</Text>
 											</View>
 										</TouchableOpacity>
 									);
 								})}
-						</View>
-						<View style={{ marginTop: scaleHeight(-10) }}>
-							{tab === 'category' && (
-								<View style={{ flex: 1, width: '100%', paddingHorizontal: scaleWidth(12) }}>
-									{CATEGORIES.map((item) => {
-										const filteredProverbs = item.label === '전체' ? proverbList : proverbList.filter((p) => p.category === item.label);
-										const total = filteredProverbs.length;
 
-										const correctSet = new Set(quizHistory?.correctProverbId ?? []);
-										const wrongSet = new Set(quizHistory?.wrongProverbId ?? []);
-										const solvedSet = new Set([...correctSet, ...wrongSet]);
+							{tab === 'category' &&
+								CATEGORIES.map((item) => {
+									const filteredProverbs = item.label === '전체' ? proverbList : proverbList.filter((p) => p.category === item.label);
+									const total = filteredProverbs.length;
 
-										const solved = filteredProverbs.filter((p) => solvedSet.has(p.id)).length;
+									const correctSet = new Set(quizHistory?.correctProverbId ?? []);
+									const wrongSet = new Set(quizHistory?.wrongProverbId ?? []);
+									const solvedSet = new Set([...correctSet, ...wrongSet]);
 
-										return (
-											<TouchableOpacity
-												key={item.key}
-												style={[styles.categoryRowButton, { backgroundColor: item.color }]}
-												onPress={() => {
-													if (shouldShowAd) {
-														setSelectedCategory(item.label);
-														setShowAd(true);
-													} else {
-														moveToCategoryQuiz(item.label);
-													}
-												}}>
-												{/* 왼쪽 아이콘 + 라벨 */}
-												<View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-													<IconComponent type={item.type} name={item.icon} size={22} color="#fff" />
-													<Text style={styles.categoryRowText}>{item.label}</Text>
-												</View>
+									const solved = filteredProverbs.filter((p) => solvedSet.has(p.id)).length;
 
-												{/* 오른쪽 진행률 */}
-												<View style={styles.progressWrapper}>
-													<View style={styles.progressBarBackground}>
-														<View style={[styles.progressBarFill, { width: `${(solved / total) * 100}%` }]} />
-													</View>
-													<Text style={styles.categoryRowProgress}>{`${solved}/${total}`}</Text>
-												</View>
-											</TouchableOpacity>
-										);
-									})}
-								</View>
-							)}
+									return (
+										<TouchableOpacity
+											key={item.key}
+											style={styles.levelCardFull}
+											activeOpacity={0.85}
+											onPress={() => {
+												if (shouldShowAd) {
+													setSelectedCategory(item.label);
+													setShowAd(true);
+												} else {
+													moveToCategoryQuiz(item.label);
+												}
+											}}>
+											<View style={[styles.levelIconChip, { backgroundColor: item.color }]}>
+												<IconComponent type={item.type} name={item.icon} size={scaledSize(22)} color="#fff" />
+											</View>
+											<View style={styles.levelTextWrap}>
+												<Text style={styles.levelLabelFull}>{item.label}</Text>
+												<Text style={styles.levelDescFull} numberOfLines={2}>
+													{item.label === '전체' ? '모든 주제의 속담을 풀어보기' : `${item.label} 주제의 속담에 도전`}
+												</Text>
+											</View>
+											<View style={styles.levelProgressChip}>
+												<Text style={styles.levelProgressText}>{`${solved}/${total}`}</Text>
+											</View>
+										</TouchableOpacity>
+									);
+								})}
 						</View>
 					</ScrollView>
 				</View>
@@ -321,7 +340,7 @@ const QuizModeScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#F8FAFC',
 	},
 	centerWrapper: {
 		flex: 1,
@@ -329,6 +348,29 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: scaleWidth(20),
 	},
+	levelCardFull: {
+		width: '100%',
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(14),
+		backgroundColor: '#fff',
+		borderRadius: scaleWidth(16),
+		paddingVertical: scaleHeight(16),
+		paddingHorizontal: scaleWidth(16),
+		borderWidth: 1,
+		borderColor: '#EEF2F7',
+		marginBottom: scaleHeight(12),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: scaleHeight(2) },
+		shadowOpacity: 0.05,
+		shadowRadius: scaleWidth(8),
+	},
+	levelIconChip: { width: scaleWidth(48), height: scaleWidth(48), borderRadius: scaleWidth(14), justifyContent: 'center', alignItems: 'center' },
+	levelTextWrap: { flex: 1 },
+	levelLabelFull: { fontSize: scaledSize(16), fontWeight: '800', color: '#1E293B', marginBottom: scaleHeight(3) },
+	levelDescFull: { fontSize: scaledSize(12.5), color: '#64748B', lineHeight: scaleHeight(17) },
+	levelProgressChip: { backgroundColor: '#F1F5F9', borderRadius: scaleWidth(10), paddingHorizontal: scaleWidth(10), paddingVertical: scaleHeight(5) },
+	levelProgressText: { fontSize: scaledSize(12), fontWeight: '700', color: '#475569' },
 	titleRow: {
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -337,7 +379,7 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: scaledSize(20),
 		lineHeight: scaleHeight(30),
-		color: '#2c3e50',
+		color: '#334155',
 		fontWeight: '700',
 		textAlign: 'center',
 	},
@@ -347,11 +389,8 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	gridWrap: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'center',
-		gap: scaleWidth(12),
-		paddingHorizontal: scaleWidth(20),
+		width: '100%',
+		paddingHorizontal: scaleWidth(10),
 	},
 	gridButtonHalf: {
 		width: '46%',
@@ -407,7 +446,7 @@ const styles = StyleSheet.create({
 	modalTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(14),
 		textAlign: 'center',
 	},
@@ -501,7 +540,7 @@ const styles = StyleSheet.create({
 	},
 	selectedModeTextEnhanced: {
 		fontSize: scaledSize(15),
-		color: '#2c3e50',
+		color: '#334155',
 		fontWeight: '500',
 		marginVertical: scaleHeight(6),
 	},

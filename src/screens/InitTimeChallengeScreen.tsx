@@ -267,7 +267,7 @@ const InitTimeChallengeScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#F8F9FB',
+		backgroundColor: '#F8FAFC',
 	},
 	contentWrapper: {
 		flex: 1,

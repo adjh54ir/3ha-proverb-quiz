@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		marginBottom: scaleHeight(12),
-		color: '#2c3e50',
+		color: '#334155',
 	},
 	levelCardBox: {
 		backgroundColor: '#fdfdfd',
@@ -148,12 +148,12 @@ const styles = StyleSheet.create({
 	levelLabel: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(2),
 	},
 	levelScore: {
 		fontSize: scaledSize(13),
-		color: '#7f8c8d',
+		color: '#64748B',
 	},
 	levelEncourage: {
 		fontSize: scaledSize(13),
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
 	},
 	levelDetailDescription: {
 		fontSize: scaledSize(12),
-		color: '#7f8c8d',
+		color: '#64748B',
 		textAlign: 'center',
 		marginTop: scaleHeight(6),
 		lineHeight: scaleHeight(18),

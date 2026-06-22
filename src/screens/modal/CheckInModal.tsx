@@ -49,7 +49,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 										<Text style={styles.petLabelText}>{item.label}</Text>
 										<Text style={styles.petStageText}>{item.name}</Text>
 
-										{index < arr.length - 1 && <IconComponent name="chevron-right" type="fontAwesome" size={12} color="#7f8c8d" style={styles.arrowIcon} />}
+										{index < arr.length - 1 && <IconComponent name="chevron-right" type="fontAwesome" size={12} color="#64748B" style={styles.arrowIcon} />}
 									</View>
 								))}
 							</ScrollView>
@@ -67,10 +67,10 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 									textMonthFontSize: scaledSize(14),
 									textDayHeaderFontSize: scaledSize(11),
 									calendarBackground: '#ffffff',
-									textSectionTitleColor: '#2c3e50',
+									textSectionTitleColor: '#334155',
 									selectedDayBackgroundColor: '#27ae60',
 									selectedDayTextColor: '#ffffff',
-									dayTextColor: '#2c3e50',
+									dayTextColor: '#334155',
 									textDisabledColor: '#d9e1e8',
 								}}
 								renderHeader={(date) => {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
 	modalTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(14),
 		textAlign: 'center',
 		marginTop: scaleHeight(3), // ✅ 상단 여백 추가
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
 	},
 	modalText: {
 		fontSize: scaledSize(13),
-		color: '#2c3e50',
+		color: '#334155',
 		lineHeight: scaleHeight(20),
 		marginTop: scaleHeight(6),
 		fontWeight: '500',
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
 	},
 	highlightText: {
 		fontSize: scaledSize(12),
-		color: '#2c3e50',
+		color: '#334155',
 		textAlign: 'center',
 		lineHeight: scaleHeight(20),
 		fontWeight: '500',
@@ -190,13 +190,13 @@ const styles = StyleSheet.create({
 	},
 	petLabelText: {
 		fontSize: scaledSize(11),
-		color: '#2c3e50',
+		color: '#334155',
 		fontWeight: '600',
 		textAlign: 'center',
 	},
 	petStageText: {
 		fontSize: scaledSize(10),
-		color: '#7f8c8d',
+		color: '#64748B',
 		marginTop: scaleHeight(2),
 		textAlign: 'center',
 	},
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
 	calendarHeaderText: {
 		fontSize: scaledSize(16), // ✅ 폰트 크기 조정
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		textAlign: 'center',
 		marginVertical: scaleHeight(12), // ✅ 여백 조정
 	},

@@ -307,7 +307,10 @@ const ProverbListScreen = () => {
 		if (keyword.trim()) {
 			const lowerKeyword = keyword.trim().toLowerCase();
 			filtered = filtered.filter(
-				(item) => item.proverb?.toLowerCase().includes(lowerKeyword) || item.meaning?.toLowerCase().includes(lowerKeyword),
+				(item) =>
+					item.proverb?.toLowerCase().includes(lowerKeyword) ||
+					item.meaning?.toLowerCase().includes(lowerKeyword) ||
+					item.longMeaning?.toLowerCase().includes(lowerKeyword),
 			);
 		}
 		if (categoryValue !== '전체') {
@@ -706,7 +709,7 @@ const ProverbListScreen = () => {
 														<Text style={styles.proverbTextMulti}>
 															{item.proverb}
 														</Text>
-														<Text style={styles.listMeaningText}>- {item.meaning}</Text>
+														<Text style={styles.listMeaningText}>- {item.longMeaning || item.meaning}</Text>
 													</View>
 													<Icon name="chevron-right" size={scaledSize(16)} color="#CBD5E1" />
 												</View>

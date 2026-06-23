@@ -3,7 +3,7 @@ import { Modal, View, Text, TouchableOpacity, Animated, StyleSheet } from 'react
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import IconComponent from '../common/atomic/IconComponent';
 
-export type QuizStartMode = 'meaning' | 'proverb' | 'blank' | 'example' | 'arrange';
+export type QuizStartMode = 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' | 'arrange';
 
 interface Props {
 	visible: boolean;
@@ -20,7 +20,8 @@ const MODE_META: Record<QuizStartMode, { title: string; desc: string; icon: stri
 	meaning: { title: '뜻 맞추기', desc: '속담을 보고 올바른 뜻을 골라보세요.', icon: 'lightbulb' },
 	proverb: { title: '속담 찾기', desc: '뜻을 보고 알맞은 속담을 골라보세요.', icon: 'search' },
 	blank: { title: '빈 칸 채우기', desc: '속담의 빠진 부분을 채워보세요.', icon: 'edit' },
-	example: { title: '예문 빈칸', desc: '예문 속 빈칸에 들어갈 속담을 골라보세요.', icon: 'subject' },
+	example: { title: '예문 속담', desc: '예문을 보고 어울리는 속담을 골라보세요.', icon: 'subject' },
+	exampleBlank: { title: '예문 빈칸', desc: '예문 속 빈칸에 들어갈 속담을 골라보세요.', icon: 'edit-note' },
 	arrange: { title: '단어 조각 배열', desc: '섞인 단어를 순서대로 배열해 속담을 완성하세요.', icon: 'extension' },
 };
 

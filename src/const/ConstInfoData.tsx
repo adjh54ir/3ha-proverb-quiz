@@ -256,6 +256,20 @@ export const QUIZ_MODES = [
 		color: '#F5B041',
 	},
 	{
+		key: 'example',
+		label: '예문 속담 퀴즈',
+		icon: 'comment-dots',
+		type: 'fontAwesome6',
+		color: '#AF7AC5',
+	},
+	{
+		key: 'exampleBlank',
+		label: '예문 빈칸 퀴즈',
+		icon: 'pen-to-square',
+		type: 'fontAwesome6',
+		color: '#14B8A6',
+	},
+	{
 		key: 'comingsoon', // 오타(commingsoon) 수정
 		label: '새로운 퀴즈\nComing Soon...',
 		icon: 'hourglass-half',

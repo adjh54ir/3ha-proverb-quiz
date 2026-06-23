@@ -208,7 +208,7 @@ const WrongReviewScreen = () => {
 											{proverb.proverb}
 										</Text>
 									</View>
-									<Text style={styles.reviewMeaningText}>{proverb.meaning}</Text>
+									<Text style={styles.reviewMeaningText}>{proverb.longMeaning || proverb.meaning}</Text>
 								</View>
 								<IconComponent type="MaterialIcons" name="chevron-right" size={scaledSize(22)} color="#CBD5E1" />
 							</TouchableOpacity>

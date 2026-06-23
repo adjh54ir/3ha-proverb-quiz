@@ -1090,7 +1090,7 @@ const TodayQuizScreen = () => {
 															<Text style={styles.reviewItemTitle} numberOfLines={1}>
 																{item.proverb}
 															</Text>
-															<Text style={styles.reviewItemMeaning} numberOfLines={1}>
+															<Text style={styles.reviewItemMeaning} numberOfLines={3}>
 																{item.longMeaning || item.meaning}
 															</Text>
 														</View>
@@ -1301,26 +1301,20 @@ const TodayQuizScreen = () => {
 																</View>
 															</View>
 															<View style={styles.historyMeaningBox}>
-																<Text style={styles.historyMeaningValue} numberOfLines={1}>{item.longMeaning || item.meaning}</Text>
+																<Text style={styles.historyMeaningValue}>{item.longMeaning || item.meaning}</Text>
 															</View>
 														</View>
-														<TouchableOpacity
-															onPress={() => {
-																setDetailQuiz(item);
-																setDetailModalVisible(true);
-															}}
-															hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-															<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(20)} color="#CBD5E1" style={{ marginLeft: scaleWidth(4) }} />
-														</TouchableOpacity>
-														<TouchableOpacity
-															style={styles.favoriteOverlayButton}
-															onPress={(e) => {
-																e.stopPropagation();
-																handleToggleFavorite(item.id);
-															}}
-															hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-															<Icon name="star" solid={isFavorite} size={scaledSize(18)} color={isFavorite ? '#FBBF24' : '#CBD5E1'} />
-														</TouchableOpacity>
+														<View style={styles.historyActionColumn}>
+															<TouchableOpacity
+																style={styles.historyActionButton}
+																onPress={(e) => {
+																	e.stopPropagation();
+																	handleToggleFavorite(item.id);
+																}}
+																hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+																<Icon name="star" solid={isFavorite} size={scaledSize(18)} color={isFavorite ? '#FBBF24' : '#CBD5E1'} />
+															</TouchableOpacity>
+														</View>
 													</View>
 												);
 											})}
@@ -1357,7 +1351,7 @@ const TodayQuizScreen = () => {
 export default TodayQuizScreen;
 
 const styles = StyleSheet.create({
-	historyHeaderRight: { flexDirection: 'row', alignItems: 'center', marginRight: scaleWidth(40) },
+	historyHeaderRight: { flexDirection: 'row', alignItems: 'center' },
 	favoriteOverlayButton: { position: 'absolute', top: scaleHeight(10), right: scaleWidth(10), padding: scaleWidth(4), zIndex: 10 },
 	completedCard: {
 		alignItems: 'center',
@@ -1409,7 +1403,7 @@ const styles = StyleSheet.create({
 	completedScoreTotal: { color: '#94A3B8', fontWeight: '700' },
 	reviewItemCard: {
 		flexDirection: 'row',
-		alignItems: 'center',
+		alignItems: 'flex-start',
 		gap: scaleWidth(10),
 		backgroundColor: '#FFFFFF',
 		borderRadius: scaleWidth(14),
@@ -1421,7 +1415,7 @@ const styles = StyleSheet.create({
 	},
 	reviewItemTextWrap: { flex: 1 },
 	reviewItemTitle: { fontSize: scaledSize(15), fontWeight: '700', color: '#1E293B' },
-	reviewItemMeaning: { marginTop: scaleHeight(3), fontSize: scaledSize(12.5), color: '#64748B' },
+	reviewItemMeaning: { marginTop: scaleHeight(3), fontSize: scaledSize(12.5), color: '#64748B', lineHeight: scaleHeight(18) },
 	reviewItemPill: { paddingVertical: scaleHeight(3), paddingHorizontal: scaleWidth(9), borderRadius: scaleWidth(999) },
 	resultBannerWrap: {
 		alignItems: 'center',
@@ -2473,14 +2467,16 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: '#bdc3c7',
 		borderRadius: scaledSize(10),
-		padding: scaleHeight(12),
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(14),
 		backgroundColor: '#f8f9fa',
 		marginTop: scaleHeight(6),
 	},
 	explainDetailWrap: {
 		backgroundColor: '#fff',
 		borderRadius: scaleWidth(14),
-		padding: scaleWidth(12),
+		paddingHorizontal: scaleWidth(16),
+		paddingVertical: scaleHeight(14),
 		marginTop: scaleHeight(4),
 	},
 	answerExplainCorrect: {
@@ -2610,6 +2606,19 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
 		shadowRadius: 2,
+	},
+	historyActionColumn: {
+		width: scaleWidth(42),
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingVertical: scaleHeight(10),
+		paddingRight: scaleWidth(8),
+	},
+	historyActionButton: {
+		width: scaleWidth(30),
+		height: scaleWidth(30),
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
 	historyCardBody: {
 		flex: 1,

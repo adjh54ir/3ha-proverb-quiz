@@ -202,6 +202,7 @@ const QuizStudyScreen = () => {
 	const isFocused = useIsFocused();
 	const scrollViewRef = useRef<ScrollView>(null);
 	const carouselRef = useRef<any>(null);
+	const isBackCardScrollingRef = useRef(false);
 	const toastAnim = useRef(new Animated.Value(0)).current;
 	const scaleAnim = useRef(new Animated.Value(0)).current;
 	const detailFilterHeightAnim = useRef(new Animated.Value(0)).current;
@@ -649,6 +650,9 @@ const QuizStudyScreen = () => {
 		}
 
 		const handleCardPress = () => {
+			if (isBackCardScrollingRef.current) {
+				return;
+			}
 			Animated.parallel([
 				Animated.sequence([
 					Animated.timing(pressAnim, {
@@ -678,8 +682,12 @@ const QuizStudyScreen = () => {
 				flipCard(proverbId); // 카드 flip 실행
 			});
 		};
-		const frontInterpolate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['0deg', '180deg'] });
-		const backInterpolate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['180deg', '360deg'] });
+		// ✅ rotateY(3D 회전)는 기기에 따라 뒷면 글씨가 거울 반전되어 깨지므로 사용하지 않음.
+		//    앞/뒷면 모두 회전 없이 스케일 + 페이드(크로스페이드)로 전환 → 글씨가 항상 똑바로 보임.
+		const frontScale = flipAnim.interpolate({ inputRange: [0, 90, 180], outputRange: [1, 0.97, 0.94] });
+		const backScale = flipAnim.interpolate({ inputRange: [0, 90, 180], outputRange: [0.94, 0.97, 1] });
+		const frontOpacity = flipAnim.interpolate({ inputRange: [0, 80, 90, 180], outputRange: [1, 1, 0, 0] });
+		const backOpacity = flipAnim.interpolate({ inputRange: [0, 90, 100, 180], outputRange: [0, 0, 1, 1] });
 
 		return (
 			<View style={styles.cardWrapper}>
@@ -688,10 +696,9 @@ const QuizStudyScreen = () => {
 						style={[
 							styles.cardFace,
 							{
-								// height: CARD_HEIGHT,
-								transform: [{ rotateY: frontInterpolate }],
-								backfaceVisibility: 'hidden', // 추가
-								// zIndex: flippedCard === proverbId ? 0 : 1, // 앞면 위
+								opacity: frontOpacity,
+								transform: [{ scale: frontScale }],
+								zIndex: flippedCard === proverbId ? 0 : 1, // 보이는 면이 위로
 								position: 'absolute',
 							},
 						]}>
@@ -769,10 +776,11 @@ const QuizStudyScreen = () => {
 						style={[
 							styles.cardFace2,
 							{
-								transform: [{ rotateY: backInterpolate }],
-								backfaceVisibility: 'hidden',
-								borderWidth: 1, // 👈 추가
-								borderColor: '#e0e0e0', // 👈 추가
+								opacity: backOpacity,
+								transform: [{ scale: backScale }],
+								borderWidth: 1,
+								borderColor: '#E2E8F0',
+								zIndex: flippedCard === proverbId ? 1 : 0, // 보이는 면이 위로
 								position: 'absolute',
 							},
 						]}>
@@ -780,14 +788,26 @@ const QuizStudyScreen = () => {
 							<ScrollView
 								ref={scrollViewRef}
 								style={{ flex: 1 }}
-								contentContainerStyle={{
-									paddingVertical: scaleHeight(0),
-									paddingHorizontal: 0,
-									flexGrow: 1,
-									minHeight: scaleHeight(520),
+								onScrollBeginDrag={() => {
+									isBackCardScrollingRef.current = true;
 								}}
+								onScrollEndDrag={() => {
+									setTimeout(() => {
+										isBackCardScrollingRef.current = false;
+									}, 120);
+								}}
+								onMomentumScrollEnd={() => {
+									isBackCardScrollingRef.current = false;
+								}}
+								contentContainerStyle={{
+									paddingTop: scaleHeight(4),
+									paddingHorizontal: 0,
+									paddingBottom: scaleHeight(80),
+									flexGrow: 1,
+								}}
+								nestedScrollEnabled
 								removeClippedSubviews={false}
-								showsVerticalScrollIndicator={false}>
+								showsVerticalScrollIndicator={true}>
 								{/* <View style={[styles.badge, { backgroundColor: getLevelColor(item.level) }]}>
 								<Text style={styles.badgeText}>{item.level}</Text>
 							</View> */}

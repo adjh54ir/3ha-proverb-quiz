@@ -40,6 +40,8 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { PET_REWARDS } from '@/const/ConstInfoData';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
+import ProverbDetailModal from './modal/ProverbDetailModal';
+import { FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 
 interface TodayQuizList {
 	quizDate: string;
@@ -214,6 +216,8 @@ const MyScoreScreen = () => {
 	const [selectedQuizData, setSelectedQuizData] = useState<MainDataType.TodayQuizList | null>(null);
 	const [todayQuizDataList, setTodayQuizDataList] = useState<MainDataType.TodayQuizList[]>([]);
 	const [petLevel, setPetLevel] = useState(-1);
+	const [detailProverb, setDetailProverb] = useState<MainDataType.Proverb | null>(null);
+	const [detailVisible, setDetailVisible] = useState(false);
 
 	const todayQuizListRef = useRef<MainDataType.TodayQuizList[]>([]);
 
@@ -755,10 +759,10 @@ const MyScoreScreen = () => {
 				onScroll={scrollHandler.onScroll}
 				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 				<View style={styles.sectionBox}>
-					<Animated.View style={{ alignItems: 'center', marginVertical: scaleHeight(8), opacity: mascotFade, transform: [{ scale: mascotScale }] }}>
+					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginVertical: scaleHeight(8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
 						<FastImage
 							source={mascot}
-							style={{ width: scaleWidth(120), height: scaleHeight(120) }}
+							style={{ width: scaleWidth(150), height: scaleWidth(150) }}
 							resizeMode={FastImage.resizeMode.contain}
 						/>
 
@@ -766,8 +770,8 @@ const MyScoreScreen = () => {
 							<View
 								style={{
 									position: 'absolute',
-									right: scaleWidth(24),
-									top: scaleHeight(64), // ✅ 홈과 동일하게 펫을 아래로 내려 캐릭터와 간격 확보
+									right: scaleWidth(-24),
+									top: scaleHeight(38),
 									width: scaleWidth(60),
 									height: scaleWidth(60),
 									borderRadius: scaleWidth(30),
@@ -814,7 +818,7 @@ const MyScoreScreen = () => {
 							<IconComponent type="fontAwesome6" name="trophy" size={scaledSize(14)} color="#F59E0B" />
 						</View>
 						<Text style={styles.levelDescriptionText} numberOfLines={1} adjustsFontSizeToFit>
-							모든 퀴즈를 풀면 <Text style={[styles.levelHighlight, { color: '#D97706' }]}>'도인(道人)'</Text> 등급을 획득할 수 있어요.
+							전체 퀴즈 완료 시 <Text style={[styles.levelHighlight, { color: '#D97706' }]}>'도인'</Text> 등급을 획득해요
 						</Text>
 					</View>
 
@@ -1116,9 +1120,13 @@ const MyScoreScreen = () => {
 								scrollEnabled={false}
 								renderItem={({ item: category }) => {
 									const isEarned = categoryMaster.includes(category);
-									const meta = CATEGORY_META[category] ?? {
-										color: '#CBD5E1',
-										icon: { type: 'FontAwesome6', name: 'question' },
+									const categoryInfo = FIELD_DROPDOWN_ITEMS.find((item) => item.label === category || item.value === category);
+									const meta = {
+										color: categoryInfo?.iconColor ?? CATEGORY_META[category]?.color ?? '#CBD5E1',
+										icon: {
+											type: categoryInfo?.iconType ?? 'FontAwesome6',
+											name: categoryInfo?.iconName ?? 'circle-question',
+										},
 									};
 
 									return (
@@ -1243,7 +1251,7 @@ const MyScoreScreen = () => {
 						)}
 
 						{selectedDate && selectedQuizData && (
-							<View style={[styles.sectionBox, { marginTop: scaleHeight(10) }]}>
+							<View style={[styles.sectionBox, { marginTop: scaleHeight(10), borderWidth: 0, paddingHorizontal: 0, paddingVertical: scaleHeight(6), backgroundColor: 'transparent' }]}>
 								<Text style={styles.sectionSubtitle}>{selectedDate} 퀴즈 결과</Text>
 								{selectedQuizData?.todayQuizIdArr.map((quizId, idx) => {
 									const userAnswer = selectedQuizData.selectedAnswers?.[quizId];
@@ -1251,16 +1259,22 @@ const MyScoreScreen = () => {
 									const quizItem = ProverbServices.selectProverbById(quizId); // 예시 함수
 
 									return (
-										<View
+										<TouchableOpacity
 											key={idx}
+											activeOpacity={0.85}
+											onPress={() => {
+												if (quizItem) {
+													setDetailProverb(quizItem);
+													setDetailVisible(true);
+												}
+											}}
 											style={{
 												width: '100%', // 👈 추가
 												backgroundColor: '#fff',
 												borderRadius: scaleWidth(12),
 												paddingVertical: scaleHeight(14),
-												paddingHorizontal: scaleWidth(18),
-												borderWidth: 1,
-												borderColor: '#E2E8F0',
+												paddingHorizontal: scaleWidth(14),
+												borderWidth: 0,
 												marginBottom: scaleHeight(12),
 												shadowColor: '#000',
 												shadowOffset: { width: 0, height: 1 },
@@ -1268,47 +1282,52 @@ const MyScoreScreen = () => {
 												shadowRadius: 2,
 												alignSelf: 'stretch', // ✅ 전체 너비 확보
 											}}>
-											<Text
-												style={{
-													fontSize: scaledSize(14),
-													fontWeight: 'bold',
-													marginBottom: scaleHeight(8),
-													color: '#334155',
-												}}>
-												{idx + 1}. {quizItem?.proverb ?? '문제 정보 없음'}
-											</Text>
-
-											{/* ✅ 정답/오답 배지 */}
-											{isCorrect !== undefined && (
-												<View
-													style={{
-														alignSelf: 'flex-start',
-														flexDirection: 'row',
-														alignItems: 'center',
-														gap: scaleWidth(4),
-														backgroundColor: isCorrect ? '#DCFCE7' : '#FEE2E2',
-														borderRadius: scaleWidth(8),
-														paddingHorizontal: scaleWidth(9),
-														paddingVertical: scaleHeight(3),
-														marginBottom: scaleHeight(8),
-													}}>
-													<IconComponent
-														type="materialIcons"
-														name={isCorrect ? 'check-circle' : 'cancel'}
-														size={scaledSize(13)}
-														color={isCorrect ? '#16A34A' : '#DC2626'}
-													/>
-													<Text style={{ fontSize: scaledSize(12), fontWeight: '800', color: isCorrect ? '#16A34A' : '#DC2626' }}>
-														{isCorrect ? '정답' : '오답'}
+											<View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: scaleWidth(8) }}>
+												<View style={{ flex: 1 }}>
+													<Text
+														style={{
+															fontSize: scaledSize(14),
+															fontWeight: 'bold',
+															marginBottom: scaleHeight(8),
+															color: '#334155',
+														}}>
+														{idx + 1}. {quizItem?.proverb ?? '문제 정보 없음'}
 													</Text>
+
+													{/* ✅ 정답/오답 배지 */}
+													{isCorrect !== undefined && (
+														<View
+															style={{
+																alignSelf: 'flex-start',
+																flexDirection: 'row',
+																alignItems: 'center',
+																gap: scaleWidth(4),
+																backgroundColor: isCorrect ? '#DCFCE7' : '#FEE2E2',
+																borderRadius: scaleWidth(8),
+																paddingHorizontal: scaleWidth(9),
+																paddingVertical: scaleHeight(3),
+																marginBottom: scaleHeight(8),
+															}}>
+															<IconComponent
+																type="materialIcons"
+																name={isCorrect ? 'check-circle' : 'cancel'}
+																size={scaledSize(13)}
+																color={isCorrect ? '#16A34A' : '#DC2626'}
+															/>
+															<Text style={{ fontSize: scaledSize(12), fontWeight: '800', color: isCorrect ? '#16A34A' : '#DC2626' }}>
+																{isCorrect ? '정답' : '오답'}
+															</Text>
+														</View>
+													)}
+													{!!(quizItem?.longMeaning || quizItem?.meaning) && (
+														<Text style={{ fontSize: scaledSize(12.5), color: '#64748B', lineHeight: scaleHeight(18) }} numberOfLines={2}>
+															{quizItem.longMeaning || quizItem.meaning}
+														</Text>
+													)}
 												</View>
-											)}
-											{!!quizItem?.meaning && (
-												<Text style={{ fontSize: scaledSize(12.5), color: '#64748B', lineHeight: scaleHeight(18) }} numberOfLines={2}>
-													{quizItem.meaning}
-												</Text>
-											)}
-										</View>
+												<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color="#94A3B8" style={{ marginTop: scaleHeight(2) }} />
+											</View>
+										</TouchableOpacity>
 									);
 								})}
 							</View>
@@ -1650,6 +1669,7 @@ const MyScoreScreen = () => {
 				isEarned={badgePopupBadge ? earnedBadgeIds.includes(badgePopupBadge.id) : false}
 				onClose={() => setBadgePopupVisible(false)}
 			/>
+			<ProverbDetailModal visible={detailVisible} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
 
 			{/* 최하단에 위치할것!! */}
 			{showScrollTop && (
@@ -1666,7 +1686,7 @@ export default MyScoreScreen;
 const styles = StyleSheet.create({
 	safeArea: { flex: 1, backgroundColor: Colors.background },
 	container: {
-		paddingHorizontal: scaleWidth(24),
+		paddingHorizontal: scaleWidth(16),
 	},
 	pageTitle: {
 		fontSize: scaledSize(20),
@@ -1747,7 +1767,7 @@ const styles = StyleSheet.create({
 	sectionBox: {
 		backgroundColor: '#F8FAFC',
 		padding: scaleWidth(16),
-		paddingHorizontal: scaleWidth(20),
+		paddingHorizontal: scaleWidth(12),
 		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(24),
 		borderWidth: 1,
@@ -2411,8 +2431,8 @@ const styles = StyleSheet.create({
 		borderColor: '#E2E8F0',
 		borderRadius: scaleWidth(16),
 		backgroundColor: '#FCFDFE',
-		marginHorizontal: 0,
-		paddingHorizontal: scaleWidth(16),
+		marginHorizontal: scaleWidth(-8),
+		paddingHorizontal: scaleWidth(8),
 		paddingVertical: scaleHeight(12),
 		marginTop: scaleHeight(8),
 	},

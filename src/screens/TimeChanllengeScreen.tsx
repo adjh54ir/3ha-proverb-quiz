@@ -97,11 +97,9 @@ const InfinityQuizScreen = () => {
 	const [chanceModalVisible, setChanceModalVisible] = useState(false);
 	const [chanceData, setChanceData] = useState<{
 		example: string[];
-		usageTip?: string;
-		origin?: string;
 		category?: string;
 		level?: string;
-		synonym?: string | null;
+		sameProverb?: string[];
 	} | null>(null);
 
 	const formattedTime = `${(timeLeftMs / 1000).toFixed(2)}초`;
@@ -146,8 +144,8 @@ const InfinityQuizScreen = () => {
 	useEffect(() => {
 		if (questionList.length > 0 && currentIndex < questionList.length) {
 			const current = questionList[currentIndex];
-			const allMeanings = questionList.map((q) => q.meaning);
-			const newChoices = getShuffledChoices(current.meaning, allMeanings);
+			const allMeanings = questionList.map((q) => q.longMeaning || q.meaning);
+			const newChoices = getShuffledChoices(current.longMeaning || current.meaning, allMeanings);
 			setChoices(newChoices);
 		}
 	}, [questionList, currentIndex]);
@@ -320,7 +318,7 @@ const InfinityQuizScreen = () => {
 
 	const handleAnswer = useCallback(
 		(choice: string) => {
-			const correct = questionList[currentIndex].meaning;
+			const correct = questionList[currentIndex].longMeaning || questionList[currentIndex].meaning;
 			const isCorrect = choice === correct;
 			setSelectedChoice(choice); // 사용자가 고른 보기 기록
 
@@ -607,11 +605,9 @@ const InfinityQuizScreen = () => {
 										const current = questionList[currentIndex];
 										setChanceData({
 											example: current.example ?? [],
-											usageTip: current.usageTip,
-											origin: current.origin,
 											category: current.category,
 											level: current.levelName,
-											synonym: current.synonym,
+											sameProverb: (current.sameProverb ?? []).filter((item) => item.trim()),
 										});
 										setChanceModalVisible(true);
 										setHasUsedChance(true); // ✅ 사용 처리
@@ -853,7 +849,7 @@ const InfinityQuizScreen = () => {
 														</View>
 													</View>
 													<Text style={styles.feedbackMeaning}>
-														의미: <Text style={{ fontWeight: 'bold' }}>{q.meaning}</Text>
+														의미: <Text style={{ fontWeight: 'bold' }}>{q.longMeaning || q.meaning}</Text>
 													</Text>
 												</View>
 												<IconComponent
@@ -901,7 +897,7 @@ const InfinityQuizScreen = () => {
 						</View>
 
 						{choices.map((choice, index) => {
-							const isCorrectAnswer = choice === current.meaning;
+							const isCorrectAnswer = choice === (current.longMeaning || current.meaning);
 							const isUserSelected = selectedChoice === choice;
 							const wasUserWrong = feedback === 'wrong' && isUserSelected && !isCorrectAnswer;
 							// 채점 후 정답 카드 / 사용자가 고른 오답 카드 강조
@@ -990,27 +986,15 @@ const InfinityQuizScreen = () => {
 							)}
 						</View>
 
-						{!!chanceData?.usageTip && (
-							<View style={styles.chanceCharBox}>
-								<Text style={styles.chanceExampleLabel}>💡 활용 팁</Text>
-								<Text style={styles.chanceExampleText}>{chanceData.usageTip}</Text>
-							</View>
-						)}
-
-						{!!chanceData?.origin && (
-							<View style={styles.chanceCharBox}>
-								<Text style={styles.chanceExampleLabel}>📜 유래</Text>
-								<Text style={styles.chanceExampleText}>{chanceData.origin}</Text>
-							</View>
-						)}
-
-						{!!chanceData?.synonym && (
+						{!!chanceData?.sameProverb?.length && (
 							<View style={styles.chanceKeywordBox}>
 								<Text style={styles.chanceExampleLabel}>🔑 비슷한 속담</Text>
 								<View style={styles.chanceKeywordWrap}>
-									<View style={styles.chanceKeywordChip}>
-										<Text style={styles.chanceKeywordText}>{chanceData.synonym}</Text>
-									</View>
+									{chanceData.sameProverb.map((same, i) => (
+										<View key={i} style={styles.chanceKeywordChip}>
+											<Text style={styles.chanceKeywordText}>{same}</Text>
+										</View>
+									))}
 								</View>
 							</View>
 						)}

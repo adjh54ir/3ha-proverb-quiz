@@ -32,7 +32,7 @@ const labelColors = ['#1abc9c', '#3498db', '#16a085', '#e67e22'];
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
 type QuizRouteParams = {
-	mode: 'meaning' | 'proverb' | 'blank' | 'example';
+	mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank';
 	questionPool?: MainDataType.Proverb[];
 	isWrongReview?: boolean;
 	title?: string;
@@ -93,6 +93,7 @@ const QuizScreen = () => {
 	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
 	const [showHintModal, setShowHintModal] = useState(false);
 	const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+	const [hintAdWatchedQuestionId, setHintAdWatchedQuestionId] = useState<number | null>(null);
 
 	const hasAnsweredRef = useRef(false);
 	const [totalScore, setTotalScore] = useState(0);
@@ -327,12 +328,11 @@ const QuizScreen = () => {
 			allOptions = [...shuffledDistractors.map((p) => pickBlankWord(p.proverb)), blank];
 			displayText = newQuestion.proverb.replace(blank, '(____)');
 			setBlankWord(blank);
-		} else if (routeMode === 'example') {
-			// ✅ 예문 모드: 예문을 보여주고 어울리는 속담을 고르는 방식
+		} else if (routeMode === 'example' || routeMode === 'exampleBlank') {
 			allOptions = [...shuffledDistractors.map((p) => p.proverb), newQuestion.proverb];
 			const ex = (newQuestion.example && newQuestion.example[0]) || '';
 			displayText = ex
-				? ex.includes(newQuestion.proverb)
+				? routeMode === 'exampleBlank' && ex.includes(newQuestion.proverb)
 					? ex.replace(new RegExp(newQuestion.proverb, 'g'), '◯◯◯')
 					: ex
 				: newQuestion.longMeaning || newQuestion.meaning;
@@ -392,7 +392,7 @@ const QuizScreen = () => {
 		if (routeMode === 'meaning') correctAnswer = question.longMeaning!;
 		else if (routeMode === 'proverb') correctAnswer = question.proverb;
 		else if (routeMode === 'blank') correctAnswer = blankWord;
-		else if (routeMode === 'example') correctAnswer = question.proverb;
+		else if (routeMode === 'example' || routeMode === 'exampleBlank') correctAnswer = question.proverb;
 
 		const isTimeout = answer === '';
 		const correct = answer === correctAnswer;
@@ -664,7 +664,7 @@ const QuizScreen = () => {
 		}, 100); // 🔸 딜레이로 이전 상태가 반영된 뒤 새로운 문제 로드
 	};
 
-	const getModeLabel = (mode: 'meaning' | 'proverb' | 'blank' | 'example') => {
+	const getModeLabel = (mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank') => {
 		switch (mode) {
 			case 'meaning':
 				return '뜻 맞추기';
@@ -674,6 +674,8 @@ const QuizScreen = () => {
 				return '빈칸 채우기';
 			case 'example':
 				return '예문 속담';
+			case 'exampleBlank':
+				return '예문 빈칸';
 			default:
 				return '';
 		}
@@ -894,24 +896,6 @@ const QuizScreen = () => {
 									</View>
 								</View>
 							</View>
-							{question && (
-								<View style={{ position: 'absolute', width: '100%', alignItems: 'flex-end', marginTop: scaleHeight(6) }}>
-									<TouchableOpacity onPress={() => setShowAdForHint(true)}>
-										<View
-											style={{
-												backgroundColor: '#fef9e7',
-												padding: scaleWidth(8),
-												borderRadius: scaleWidth(20),
-												flexDirection: 'row',
-												alignItems: 'center',
-											}}>
-											<IconComponent type='MaterialIcons' name='lightbulb' size={18} color='#f39c12' />
-											<Text style={{ marginLeft: scaleWidth(6), fontWeight: '600', color: '#f39c12' }}>힌트</Text>
-										</View>
-									</TouchableOpacity>
-								</View>
-							)}
-
 							<View style={styles.quizBox}>
 								<AnimatedCircularProgress
 									size={scaleWidth(70)}
@@ -930,21 +914,51 @@ const QuizScreen = () => {
 								{question ? (
 									<View style={{ alignItems: 'center', marginBottom: scaleHeight(5) }}>
 										<Text style={[styles.questionText, { textAlign: 'center' }]}>
-											{routeMode === 'blank' || routeMode === 'example'
+											{routeMode === 'blank' || routeMode === 'example' || routeMode === 'exampleBlank'
 												? questionText || '문제 준비중...'
 												: routeMode === 'meaning'
 													? question?.proverb
 													: question?.longMeaning || '문제 준비중...'}
 										</Text>
-										<Text style={styles.promptText}>
-											{routeMode === 'meaning'
-												? '무슨 의미일까요?'
-												: routeMode === 'proverb'
-													? '무슨 속담일까요?'
+										<View style={styles.promptRow}>
+											<Text style={styles.promptText}>
+												{routeMode === 'meaning'
+													? '무슨 의미일까요?'
+													: routeMode === 'proverb'
+														? '무슨 속담일까요?'
 													: routeMode === 'blank'
 														? '빈칸은 무엇일까요?'
-														: '어울리는 속담은?'}
-										</Text>
+														: routeMode === 'exampleBlank'
+															? '빈칸에 들어갈 속담은?'
+															: '어울리는 속담은?'}
+											</Text>
+											<TouchableOpacity
+												onPress={() => {
+													if (question?.id && hintAdWatchedQuestionId === question.id) {
+														setShowHintModal(true);
+														return;
+													}
+													setShowAdForHint(true);
+												}}
+												hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+												<Animated.View
+													style={[
+														styles.hintBulbButton,
+														remainingTime <= 20 && remainingTime > 10 && styles.hintBulbButtonWarning,
+														{
+															opacity: hintGlowAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.45] }),
+															transform: [{ scale: hintGlowAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.12] }) }],
+														},
+													]}>
+													<IconComponent
+														type='MaterialIcons'
+														name='lightbulb'
+														size={scaledSize(19)}
+														color='#F59E0B'
+													/>
+												</Animated.View>
+											</TouchableOpacity>
+										</View>
 									</View>
 								) : (
 									<Text>문제 불러오는 중...</Text>
@@ -962,7 +976,14 @@ const QuizScreen = () => {
 										renderItem={({ item, index }) => {
 											const scaleAnim = scaleAnims.current[index] ?? new Animated.Value(1);
 											const isSelected = selected === item;
-											const correctAnswer = routeMode === 'meaning' ? question?.longMeaning : routeMode === 'proverb' ? question?.proverb : blankWord;
+											const correctAnswer =
+												routeMode === 'meaning'
+													? question?.longMeaning
+													: routeMode === 'proverb'
+														? question?.proverb
+														: routeMode === 'example' || routeMode === 'exampleBlank'
+															? question?.proverb
+															: blankWord;
 
 											const isCorrectAnswer = correctAnswer === item; // 실제 정답
 											const isSelectedWrong = isSelected && !isCorrectAnswer; // 내가 고른 오답
@@ -1169,6 +1190,9 @@ const QuizScreen = () => {
 			{showAdForHint && (
 				<AdmobFrontAd
 					onAdClosed={() => {
+						if (question?.id) {
+							setHintAdWatchedQuestionId(question.id);
+						}
 						setShowAdForHint(false);
 						setShowHintModal(true);
 					}}
@@ -1209,15 +1233,35 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(6),
 		marginBottom: scaleHeight(6),
 		textAlign: 'center',
-		color: '#0F172A',
+		color: '#2563EB',
 		lineHeight: scaleHeight(28),
 	},
 	promptText: {
 		fontSize: scaledSize(14),
 		fontWeight: '700',
-		color: '#3B82F6',
+		color: '#111827',
 		textAlign: 'center',
+	},
+	promptRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		gap: scaleWidth(8),
 		marginBottom: scaleHeight(8),
+	},
+	hintBulbButton: {
+		width: scaleWidth(34),
+		height: scaleWidth(34),
+		borderRadius: scaleWidth(17),
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#FFFBEB',
+		borderWidth: 1,
+		borderColor: '#FDE68A',
+	},
+	hintBulbButtonWarning: {
+		backgroundColor: '#FFFBEB',
+		borderColor: '#FDE68A',
 	},
 	optionsContainer: { width: '100%' },
 	optionButton: {

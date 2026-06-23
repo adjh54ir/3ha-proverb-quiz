@@ -15,7 +15,7 @@ type Props = {
 	resultTitle: string;
 	resultMessage: string;
 	question: MainDataType.Proverb | null;
-	quizMode: 'meaning' | 'proverb' | 'blank' | 'example';
+	quizMode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank';
 	favoriteIds: number[];
 	onToggleFavorite: () => Promise<void>;
 	blankWord?: string;
@@ -98,6 +98,12 @@ const QuizResultModal = ({
 	};
 
 	const isFavorited = question?.id !== undefined && favoriteIds.includes(question.id);
+	const answerText =
+		quizMode === 'meaning'
+			? question?.longMeaning
+			: quizMode === 'blank'
+				? blankWord
+				: question?.proverb;
 
 	const sameProverbs = Array.isArray(question?.sameProverb)
 		? question!.sameProverb!.filter((p) => p.trim())
@@ -168,7 +174,7 @@ const QuizResultModal = ({
 								<Text style={styles.answerBadgeText}>정답</Text>
 							</View>
 
-							<Text style={styles.answerMain}>{question?.proverb}</Text>
+							<Text style={styles.answerMain}>{answerText}</Text>
 
 							{quizMode === 'blank' && !!blankWord && (
 								<Text style={styles.answerBlankText}>
@@ -202,6 +208,8 @@ const QuizResultModal = ({
 
 							{!!question?.longMeaning && (
 								<View style={styles.meaningBlock}>
+									<Text style={styles.explainLabel}>속담</Text>
+									<Text style={styles.proverbInExplain}>{question.proverb}</Text>
 									<Text style={styles.explainLabel}>의미</Text>
 									<Text style={styles.explainText}>{question.longMeaning}</Text>
 								</View>
@@ -378,29 +386,40 @@ const styles = StyleSheet.create({
 		color: '#1E293B',
 	},
 	meaningBlock: {
-		backgroundColor: '#F0FDF4',
+		backgroundColor: '#F8FAFC',
 		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(12),
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(14),
+		borderWidth: 1,
+		borderColor: '#E2E8F0',
 	},
 	explainLabel: {
 		fontSize: scaledSize(12),
 		fontWeight: '800',
-		color: '#15803D',
+		color: '#64748B',
 		marginBottom: scaleHeight(4),
+	},
+	proverbInExplain: {
+		fontSize: scaledSize(15),
+		fontWeight: '800',
+		color: '#1E293B',
+		lineHeight: scaleHeight(22),
+		marginBottom: scaleHeight(10),
 	},
 	explainText: {
 		fontSize: scaledSize(14),
-		color: '#334155',
+		color: '#0F172A',
 		fontWeight: '600',
 		lineHeight: scaleHeight(21),
 	},
 	exampleBlock: {
-		backgroundColor: '#EFF6FF',
+		backgroundColor: '#F0F7FF',
 		borderRadius: scaleWidth(12),
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(12),
 		marginTop: scaleHeight(10),
+		borderWidth: 1,
+		borderColor: '#BFDBFE',
 	},
 	explainExampleText: {
 		fontSize: scaledSize(14),
@@ -416,6 +435,8 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(12),
 		marginTop: scaleHeight(10),
+		borderWidth: 1,
+		borderColor: '#E9D5FF',
 	},
 	sameText: {
 		fontSize: scaledSize(14),

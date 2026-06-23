@@ -19,7 +19,7 @@ const BottomTabNavigator = () => {
 
 	// 📌 공통 스타일 함수
 	const getScreenOptions = (isTablet: boolean, insets: any) => ({
-		tabBarActiveTintColor: COLORS.primary,
+		tabBarActiveTintColor: COLORS.info,
 		tabBarInactiveTintColor: COLORS.textLight,
 		tabBarStyle: {
 			height: scaleWidth(50) + insets.bottom,

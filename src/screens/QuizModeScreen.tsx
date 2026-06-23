@@ -18,7 +18,17 @@ import IconComponent from './common/atomic/IconComponent';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 
 type QuizModeScreenRouteParams = {
-	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'example' }; // 전달되는 mode는 string 타입 (예: 'meaning' | 'proverb' | 'blank')
+	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' };
+};
+
+/** 난이도별 설명 (카드 서브텍스트) */
+const LEVEL_DESC: Record<string, string> = {
+	beginner: '아주 쉬운 속담으로 가볍게 시작해요',
+	intermediate: '한 단계 높은 속담에 도전해요',
+	advanced: '익숙하지 않은 속담까지 풀어봐요',
+	expert: '어려운 속담으로 실력을 확인해요',
+	all: '모든 난이도의 속담을 풀어보기',
+	comingsoon: '새로운 문제가 준비 중입니다',
 };
 
 const QuizModeScreen = () => {
@@ -229,7 +239,7 @@ const QuizModeScreen = () => {
 						</View>
 						<View style={{ marginTop: scaleHeight(-10) }}>
 							{tab === 'category' && (
-								<View style={{ flex: 1, width: '100%', paddingHorizontal: scaleWidth(12) }}>
+								<View style={styles.categoryGridWrap}>
 									{CATEGORIES.map((item) => {
 										const filteredProverbs = item.label === '전체' ? proverbList : proverbList.filter((p) => p.category === item.label);
 										const total = filteredProverbs.length;
@@ -252,13 +262,11 @@ const QuizModeScreen = () => {
 														moveToCategoryQuiz(item.label);
 													}
 												}}>
-												{/* 왼쪽 아이콘 + 라벨 */}
-												<View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+												<View style={styles.categoryCardTitleRow}>
 													<IconComponent type={item.type} name={item.icon} size={22} color="#ffffff" />
 													<Text style={styles.categoryRowText}>{item.label}</Text>
 												</View>
 
-												{/* 오른쪽 진행률 */}
 												<View style={styles.progressWrapper}>
 													<View style={styles.progressBarBackground}>
 														<View style={[styles.progressBarFill, { width: `${(solved / total) * 100}%` }]} />
@@ -527,31 +535,42 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 	},
 	categoryRowButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
+		width: '48%',
+		minHeight: scaleHeight(92),
 		justifyContent: 'space-between',
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(18),
+		paddingVertical: scaleHeight(13),
+		paddingHorizontal: scaleWidth(12),
 		borderRadius: scaleWidth(12),
-		width: '100%',
-		marginBottom: scaleHeight(14),
+		marginBottom: scaleHeight(12),
 		backgroundColor: '#16a085',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: scaleHeight(3) },
 		shadowOpacity: 0.1,
 		shadowRadius: 4,
 	},
+	categoryGridWrap: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		justifyContent: 'space-between',
+		width: '100%',
+		paddingHorizontal: scaleWidth(4),
+	},
+	categoryCardTitleRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
 	categoryRowText: {
 		flex: 1,
 		color: '#ffffff',
-		fontSize: scaledSize(16),
+		fontSize: scaledSize(14),
 		fontWeight: '700',
-		marginLeft: scaleWidth(12),
+		marginLeft: scaleWidth(8),
 	},
 	progressWrapper: {
 		flexDirection: 'column',
-		alignItems: 'flex-end',
-		minWidth: scaleWidth(90),
+		alignItems: 'stretch',
+		width: '100%',
+		marginTop: scaleHeight(10),
 	},
 	progressBarBackground: {
 		width: '100%',

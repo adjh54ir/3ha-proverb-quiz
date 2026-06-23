@@ -307,16 +307,16 @@ const Home = () => {
 	const getPetLevel = (checkedIn: { [date: string]: any }) => {
 		const count = Object.keys(checkedIn).length;
 		if (count >= 28) {
-			return 3;
+			return 4;
 		}
 		if (count >= 21) {
-			return 2;
+			return 3;
 		}
 		if (count >= 14) {
-			return 1;
+			return 2;
 		}
 		if (count >= 7) {
-			return 0;
+			return 1;
 		}
 		if (count >= 1) {
 			return 0;
@@ -731,13 +731,6 @@ const Home = () => {
 				<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false} ref={scrollViewRef}>
 					<View style={styles.container}>
 						<View style={styles.imageContainer}>
-							<View style={styles.speechWrapper}>
-								<View style={styles.speechBubble}>
-									<Text style={styles.speechText}>{greeting}</Text>
-								</View>
-								<View style={styles.speechTail} />
-							</View>
-
 							<View style={{ alignItems: 'center', marginBottom: scaleHeight(8) }}>
 								<View style={[styles.streakChip, streakInfo.current > 0 ? styles.streakChipActive : styles.streakChipIdle]}>
 									<IconComponent
@@ -750,6 +743,13 @@ const Home = () => {
 										{streakInfo.current > 0 ? `${streakInfo.current}일 연속 출석 중` : '오늘 출석하기'}
 									</Text>
 								</View>
+							</View>
+
+							<View style={styles.speechWrapper}>
+								<View style={styles.speechBubble}>
+									<Text style={styles.speechText}>{greeting}</Text>
+								</View>
+								<View style={styles.speechTail} />
 							</View>
 
 							<View style={styles.petView}>
@@ -851,7 +851,7 @@ const Home = () => {
 									<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: scaleWidth(10) }}>
 										{visibleBadges.map((item) => {
 											const rarity = BADGE_RARITY_META[item.rarity] ?? BADGE_RARITY_META.common;
-											const pulseScale = badgePulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.06] });
+											const pulseScale = badgePulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.14] });
 											return (
 												<View key={item.id} style={styles.badgeViewInner}>
 													<TouchableOpacity activeOpacity={0.8} onPress={() => setSelectedBadge(item)}>
@@ -1476,7 +1476,7 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		marginLeft: scaleWidth(6),
 	},
-	badgeView: { width: '100%', marginTop: scaleHeight(10) },
+	badgeView: { width: '100%', marginTop: scaleHeight(10), minHeight: scaleHeight(72), paddingVertical: scaleHeight(10), overflow: 'visible' },
 	badgeViewInner: {
 		marginRight: scaleWidth(12),
 		alignItems: 'center',
@@ -1611,11 +1611,11 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		textAlign: 'center',
 	},
-	petView: { alignItems: 'center', justifyContent: 'center', marginTop: scaleHeight(8), position: 'relative' },
+	petView: { alignItems: 'center', justifyContent: 'center', marginTop: scaleHeight(-4), marginBottom: scaleHeight(16), position: 'relative' },
 	petContent: {
 		position: 'absolute',
-		right: scaleWidth(-35), // ✅ 너무 멀리 떨어져 있음
-		top: scaleHeight(10),
+		right: scaleWidth(-24),
+		top: scaleHeight(38),
 		width: scaleWidth(60),
 		height: scaleWidth(60),
 		borderRadius: scaleWidth(30),
@@ -1626,8 +1626,8 @@ const styles = StyleSheet.create({
 	petImage: { width: '100%', height: '100%' },
 	petSpeechBubble: {
 		position: 'absolute',
-		right: scaleWidth(-58),
-		top: scaleHeight(35),
+		right: scaleWidth(-64),
+		top: scaleHeight(4),
 		backgroundColor: '#1E293B',
 		paddingVertical: scaleHeight(5),
 		paddingHorizontal: scaleWidth(10),

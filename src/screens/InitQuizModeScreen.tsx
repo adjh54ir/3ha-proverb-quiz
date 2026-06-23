@@ -36,7 +36,7 @@ const InitQuizModeScreen = () => {
 	 * 퀴즈 모드를 전달하여서 다음페이지로 이동
 	 * @param mode 'meaning' | 'proverb' | 'blank' | 'comingsoon'
 	 */
-	const handleSelectMode = (mode: 'meaning' | 'proverb' | 'blank' | 'comingsoon') => {
+	const handleSelectMode = (mode: 'meaning' | 'proverb' | 'blank' | 'example') => {
 		// @ts-ignore
 		navigation.navigate(Paths.QUIZ_MODE, { mode });
 	};

@@ -1,122 +1,132 @@
-import React from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Animated, ScrollView } from 'react-native';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
-import PopInView from '@/components/animation/PopInView';
+import ModalCloseButton from '../common/atomic/ModalCloseButton';
 
-interface Props {
+interface QuizHintModalProps {
 	visible: boolean;
 	question: MainDataType.Proverb | null;
 	onClose: () => void;
 }
 
-const getFieldColor = (field: string) => {
-	const map: Record<string, string> = {
-		'운/우연': '#16a085',
-		인간관계: '#16a085',
-		'세상 이치': '#f6a623',
-		'근면/검소': '#e17055',
-		'노력/성공': '#27ae60',
-		'경계/조심': '#e74c3c',
-		'욕심/탐욕': '#e84393',
-		'배신/불신': '#2c3e50',
-	};
-	return map[field] || '#bdc3c7';
-};
+const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, onClose }) => {
+	const scaleAnim = useRef(new Animated.Value(0)).current;
+	const fadeAnim = useRef(new Animated.Value(0)).current;
 
-const getFieldIcon = (field: string) => {
-	switch (field) {
-		case '운/우연':
-			return <IconComponent type="FontAwesome6" name="dice" size={12} color="#ffffff" />;
-		case '인간관계':
-			return <IconComponent type="FontAwesome6" name="users" size={12} color="#ffffff" />;
-		case '세상 이치':
-			return <IconComponent type="fontawesome5" name="globe" size={12} color="#ffffff" />;
-		case '근면/검소':
-			return <IconComponent type="fontawesome5" name="hammer" size={12} color="#ffffff" />;
-		case '노력/성공':
-			return <IconComponent type="fontawesome5" name="medal" size={12} color="#ffffff" />;
-		case '경계/조심':
-			return <IconComponent type="fontawesome5" name="exclamation-triangle" size={12} color="#ffffff" />;
-		case '욕심/탐욕':
-			return <IconComponent type="fontawesome5" name="hand-holding-usd" size={12} color="#ffffff" />;
-		case '배신/불신':
-			return <IconComponent type="fontawesome5" name="user-slash" size={12} color="#ffffff" />;
-		default:
-			return <IconComponent type="FontAwesome6" name="tag" size={12} color="#ffffff" />;
-	}
-};
+	useEffect(() => {
+		if (visible) {
+			scaleAnim.setValue(0.92);
+			fadeAnim.setValue(0);
 
-const QuizHintModal: React.FC<Props> = ({ visible, question, onClose }) => {
+			Animated.parallel([
+				Animated.spring(scaleAnim, {
+					toValue: 1,
+					useNativeDriver: true,
+					tension: 60,
+					friction: 8,
+				}),
+				Animated.timing(fadeAnim, {
+					toValue: 1,
+					duration: 200,
+					useNativeDriver: true,
+				}),
+			]).start();
+		}
+		// ✅ 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
+		return () => {
+			scaleAnim.stopAnimation();
+			fadeAnim.stopAnimation();
+		};
+	}, [visible]);
+
+	const similar = (question?.sameProverb ?? []).filter((p) => p.trim());
+	const examples = Array.isArray(question?.example) ? question!.example.filter((e) => e.trim()) : [];
+	const hasAnyHint = similar.length > 0 || examples.length > 0 || !!question?.usageTip;
+
 	return (
-		<Modal visible={visible} transparent animationType="fade">
-			<View style={styles.overlay}>
-				<PopInView visible={visible} style={styles.modal}>
+		<Modal visible={visible} transparent animationType="none">
+			<Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
+				<Animated.View style={[styles.modal, { transform: [{ scale: scaleAnim }] }]}>
+					<ModalCloseButton onPress={onClose} />
 					{/* 헤더 */}
 					<View style={styles.header}>
-						<View style={styles.headerIconWrap}>
-							<IconComponent type="MaterialIcons" name="lightbulb" size={22} color="#f39c12" />
+						<View style={styles.iconGlow}>
+							<View style={styles.iconCircle}>
+								<IconComponent type="MaterialIcons" name="lightbulb" size={scaledSize(26)} color="#fff" />
+							</View>
 						</View>
 						<Text style={styles.title}>힌트</Text>
+						<Text style={styles.subtitle}>이런 단서들을 참고해보세요!</Text>
 					</View>
 
-					<View style={styles.divider} />
-
-					{/* 카테고리 */}
-					{question?.category && (
-						<View style={styles.categoryRow}>
-							<Text style={styles.categoryLabel}>카테고리</Text>
-							<View style={[styles.categoryBadge, { backgroundColor: getFieldColor(question.category) }]}>
-								{getFieldIcon(question.category)}
-								<Text style={styles.categoryText}>{question.category}</Text>
-							</View>
-						</View>
-					)}
-
-					{question?.sameProverb && question.sameProverb.filter((sp) => sp?.trim() !== '').length > 0 && (
-						<View style={styles.section}>
-							<View style={styles.sectionHeader}>
-								<View style={[styles.sectionIconWrap, { backgroundColor: '#e8f4fd' }]}>
-									<IconComponent type="FontAwesome6" name="link" size={12} color="#3498db" />
+					{/* 컨텐츠 */}
+					<ScrollView style={styles.scrollView} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+						{/* 비슷한 속담 */}
+						{similar.length > 0 && (
+							<View style={styles.section}>
+								<View style={styles.sectionLabelRow}>
+									<IconComponent type="materialIcons" name="tag" size={scaledSize(14)} color="#D97706" />
+									<Text style={styles.sectionLabel}>비슷한 속담</Text>
 								</View>
-								<Text style={styles.sectionTitle}>💬 동의 속담</Text>
-							</View>
-							{question.sameProverb
-								.filter((sp) => sp?.trim() !== '')
-								.map((sp, idx) => (
-									<View key={idx} style={styles.itemRow}>
-										<View style={styles.itemDot} />
-										<Text style={styles.sectionItem}>{sp}</Text>
-									</View>
-								))}
-						</View>
-					)}
-
-					{/* 예시 문장 */}
-					{question?.example && question.example.length > 0 && (
-						<View style={[styles.section, styles.exampleSection]}>
-							<View style={styles.sectionHeader}>
-								<View style={[styles.sectionIconWrap, { backgroundColor: '#fef9e7' }]}>
-									<IconComponent type="FontAwesome6" name="pen" size={12} color="#f39c12" />
+								<View style={styles.tagRow}>
+									{similar.map((word, index) => (
+										<View key={index} style={styles.tag}>
+											<Text style={styles.tagText}>{word}</Text>
+										</View>
+									))}
 								</View>
-								<Text style={[styles.sectionTitle, { color: '#e67e22' }]}>속담 예시</Text>
 							</View>
-							{question.example.map((ex, idx) => (
-								<View key={idx} style={styles.itemRow}>
-									<View style={[styles.itemDot, { backgroundColor: '#f39c12' }]} />
-									<Text style={styles.sectionItem}>{ex}</Text>
-								</View>
-							))}
-						</View>
-					)}
+						)}
 
-					{/* 확인 버튼 */}
-					<TouchableOpacity style={styles.confirmBtn} onPress={onClose} activeOpacity={0.85}>
-						<Text style={styles.confirmText}>확인했어요</Text>
-					</TouchableOpacity>
-				</PopInView>
-			</View>
+						{/* 활용 팁 */}
+						{!!question?.usageTip && (
+							<View style={styles.section}>
+								<View style={styles.sectionLabelRow}>
+									<IconComponent type="materialIcons" name="emoji-objects" size={scaledSize(15)} color="#D97706" />
+									<Text style={styles.sectionLabel}>활용 팁</Text>
+								</View>
+								<View style={styles.exampleBox}>
+									<Text style={styles.exampleText}>{question.usageTip}</Text>
+								</View>
+							</View>
+						)}
+
+						{/* 예시 */}
+						{examples.length > 0 && (
+							<View style={styles.section}>
+								<View style={styles.sectionLabelRow}>
+									<IconComponent type="materialIcons" name="format-quote" size={scaledSize(15)} color="#D97706" />
+									<Text style={styles.sectionLabel}>사용 예시</Text>
+								</View>
+								<View style={styles.exampleBox}>
+									{examples.map((ex, index) => (
+										<Text key={index} style={styles.exampleText}>
+											· {ex}
+										</Text>
+									))}
+								</View>
+							</View>
+						)}
+
+						{!hasAnyHint && (
+							<View style={styles.emptyHint}>
+								<IconComponent type="materialIcons" name="search" size={scaledSize(22)} color="#CBD5E1" />
+								<Text style={styles.emptyHintText}>이 문제는 제공되는 힌트가 없어요.</Text>
+							</View>
+						)}
+					</ScrollView>
+
+					{/* 버튼 */}
+					<View style={styles.footer}>
+						<TouchableOpacity style={styles.confirmButton} onPress={onClose} activeOpacity={0.85}>
+							<IconComponent type="materialIcons" name="check" size={scaledSize(18)} color="#fff" />
+							<Text style={styles.confirmButtonText}>확인했어요</Text>
+						</TouchableOpacity>
+					</View>
+				</Animated.View>
+			</Animated.View>
 		</Modal>
 	);
 };
@@ -126,151 +136,141 @@ export default QuizHintModal;
 const styles = StyleSheet.create({
 	overlay: {
 		flex: 1,
-		backgroundColor: 'rgba(15, 20, 40, 0.55)',
+		backgroundColor: 'rgba(0,0,0,0.5)',
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
 	modal: {
-		backgroundColor: '#ffffff',
-		paddingHorizontal: scaleWidth(22),
-		paddingTop: scaleHeight(22),
-		paddingBottom: scaleHeight(24),
+		backgroundColor: '#fff',
 		borderRadius: scaleWidth(20),
-		alignItems: 'center',
 		width: '88%',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(8) },
-		shadowOpacity: 0.18,
-		shadowRadius: scaleWidth(20),
+		maxHeight: '80%',
+		overflow: 'hidden',
 	},
-
-	/* 헤더 */
 	header: {
-		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: scaleHeight(14),
+		gap: scaleHeight(6),
+		paddingHorizontal: scaleWidth(24),
+		paddingTop: scaleHeight(26),
+		paddingBottom: scaleHeight(18),
+		backgroundColor: '#FFFBEB',
+		borderBottomWidth: 1,
+		borderBottomColor: '#FDE68A',
 	},
-	headerIconWrap: {
-		width: scaleWidth(36),
-		height: scaleWidth(36),
-		borderRadius: scaleWidth(16),
-		backgroundColor: '#fef9e7',
-		justifyContent: 'center',
+	iconGlow: {
+		width: scaleWidth(64),
+		height: scaleWidth(64),
+		borderRadius: scaleWidth(32),
+		backgroundColor: '#FEF3C7',
 		alignItems: 'center',
-		marginRight: scaleWidth(10),
+		justifyContent: 'center',
+		marginBottom: scaleHeight(4),
+	},
+	iconCircle: {
+		width: scaleWidth(48),
+		height: scaleWidth(48),
+		borderRadius: scaleWidth(24),
+		backgroundColor: '#F59E0B',
+		alignItems: 'center',
+		justifyContent: 'center',
+		shadowColor: '#F59E0B',
+		shadowOffset: { width: 0, height: 3 },
+		shadowOpacity: 0.4,
+		shadowRadius: 6,
+		elevation: 4,
 	},
 	title: {
-		fontSize: scaledSize(20),
-		fontWeight: '700',
-		color: '#1a1a2e',
-		letterSpacing: -0.3,
+		fontSize: scaledSize(19),
+		fontWeight: '800',
+		color: '#92400E',
 	},
-	divider: {
-		width: '100%',
-		height: 1,
-		backgroundColor: '#f0f0f5',
-		marginBottom: scaleHeight(16),
-	},
-
-	/* 카테고리 */
-	categoryRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		alignSelf: 'flex-start',
-		marginBottom: scaleHeight(14),
-		gap: scaleWidth(8),
-	},
-	categoryLabel: {
-		fontSize: scaledSize(13),
-		color: '#8e8e9a',
+	subtitle: {
+		fontSize: scaledSize(12.5),
 		fontWeight: '500',
+		color: '#B45309',
 	},
-	categoryBadge: {
+	sectionLabelRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		borderRadius: scaleWidth(20),
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(5),
+		gap: scaleWidth(5),
 	},
-	categoryText: {
-		color: '#ffffff',
-		fontWeight: '700',
-		fontSize: scaledSize(12),
-		marginLeft: scaleWidth(5),
+	emptyHint: {
+		alignItems: 'center',
+		paddingVertical: scaleHeight(20),
+		gap: scaleHeight(8),
 	},
-
-	/* 섹션 공통 */
+	emptyHintText: {
+		fontSize: scaledSize(13),
+		color: '#94A3B8',
+	},
+	scrollView: {
+		flexGrow: 0,
+	},
+	content: {
+		padding: scaleWidth(24),
+		gap: scaleHeight(22),
+	},
 	section: {
-		backgroundColor: '#f0f7ff',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(14),
-		marginBottom: scaleHeight(12),
+		gap: scaleHeight(10),
+	},
+	sectionLabel: {
+		fontSize: scaledSize(11),
+		fontWeight: '600',
+		color: '#94A3B8',
+		letterSpacing: 0.8,
+		textTransform: 'uppercase',
+	},
+	tagRow: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		gap: scaleWidth(7),
+	},
+	tag: {
+		paddingHorizontal: scaleWidth(12),
+		paddingVertical: scaleHeight(6),
+		backgroundColor: '#FEF3C7',
+		borderRadius: scaleWidth(30),
 		borderWidth: 1,
-		borderColor: '#daeeff',
-		width: '100%',
+		borderColor: '#FDE68A',
 	},
-	exampleSection: {
-		backgroundColor: '#fffbf0',
-		borderColor: '#fde9b0',
-	},
-	sectionHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: scaleHeight(10),
-	},
-	sectionIconWrap: {
-		width: scaleWidth(26),
-		height: scaleWidth(26),
-		borderRadius: scaleWidth(8),
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginRight: scaleWidth(8),
-	},
-	sectionTitle: {
+	tagText: {
 		fontSize: scaledSize(13),
-		fontWeight: '700',
-		color: '#3498db',
-		letterSpacing: 0.2,
+		fontWeight: '600',
+		color: '#92400E',
 	},
-	itemRow: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		marginBottom: scaleHeight(5),
-	},
-	itemDot: {
-		width: scaleWidth(5),
-		height: scaleWidth(5),
-		borderRadius: scaleWidth(3),
-		backgroundColor: '#3498db',
-		marginTop: scaleHeight(7),
-		marginRight: scaleWidth(8),
-		flexShrink: 0,
-	},
-	sectionItem: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
-		lineHeight: scaleHeight(21),
-		flex: 1,
-		fontWeight: '500',
-	},
-
-	/* 버튼 */
-	confirmBtn: {
-		marginTop: scaleHeight(6),
-		backgroundColor: '#f39c12',
+	exampleBox: {
+		backgroundColor: '#F8FAFC',
+		borderRadius: scaleWidth(10),
+		paddingHorizontal: scaleWidth(16),
 		paddingVertical: scaleHeight(14),
-		borderRadius: scaleWidth(12),
-		width: '100%',
-		alignItems: 'center',
-		shadowColor: '#f39c12',
-		shadowOffset: { width: 0, height: scaleHeight(4) },
-		shadowOpacity: 0.35,
-		shadowRadius: scaleWidth(8),
+		borderWidth: 0.5,
+		borderColor: 'rgba(0,0,0,0.08)',
+		gap: scaleHeight(6),
 	},
-	confirmText: {
-		color: '#ffffff',
+	exampleText: {
+		fontSize: scaledSize(14),
+		color: '#334155',
+		lineHeight: scaleHeight(22),
+		fontStyle: 'italic',
+	},
+	footer: {
+		paddingHorizontal: scaleWidth(24),
+		paddingVertical: scaleHeight(16),
+		borderTopWidth: 0.5,
+		borderTopColor: 'rgba(0,0,0,0.08)',
+	},
+	confirmButton: {
+		flexDirection: 'row',
+		gap: scaleWidth(6),
+		backgroundColor: '#F59E0B',
+		borderRadius: scaleWidth(12),
+		paddingVertical: scaleHeight(14),
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	confirmButtonText: {
 		fontSize: scaledSize(15),
 		fontWeight: '700',
-		letterSpacing: 0.3,
+		color: '#fff',
 	},
 });

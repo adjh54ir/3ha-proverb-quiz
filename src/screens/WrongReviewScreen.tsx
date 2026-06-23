@@ -116,7 +116,7 @@ const WrongReviewScreen = () => {
 					/>
 					<Text style={styles.emptyTitle}>틀린 문제가 없어요! 🎉</Text>
 					<Text style={styles.emptyDesc}>
-						아직 오답으로 기록된 속담가 없어요.{'\n'}
+						아직 오답으로 기록된 속담이 없어요.{'\n'}
 						퀴즈를 풀다가 틀린 문제가 생기면{'\n'}
 						이곳에서 모아 다시 복습할 수 있어요.
 					</Text>

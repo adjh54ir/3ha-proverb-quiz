@@ -1,22 +1,22 @@
 // @/screens/TowerChallenge.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
+import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import FastImage from 'react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
 import Carousel from 'react-native-reanimated-carousel';
-import BottomHomeButton from '@/components/BottomHomeButton';
-import CompleteOverlay from '@/components/CompleteOverlay';
 import AdmobRewardAd from './common/ads/AdmobRewardAd';
+import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
+import CompleteOverlay from './common/CompleteOverlay';
+import BottomHomeButton from './common/BottomHomeButton';
 
 const TOWER_STORAGE_KEY = 'TOWER_CHALLENGE_PROGRESS';
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const SCREEN_WIDTH = screenWidth;
 
 const TowerChallengeScreen = () => {
 	const navigation = useNavigation();
@@ -33,7 +33,6 @@ const TowerChallengeScreen = () => {
 
 	// state
 	const [showAd, setShowAd] = useState(false);
-
 
 	useEffect(() => {
 		loadProgress();
@@ -77,7 +76,6 @@ const TowerChallengeScreen = () => {
 		}
 		setShowAd(true);
 	};
-
 
 	// handleStartChallenge 함수 수정
 	const handleStartChallenge = (level: number) => {
@@ -163,14 +161,14 @@ const TowerChallengeScreen = () => {
 		return (
 			<View style={styles.carouselItem}>
 				<View style={[styles.towerCard, isCompleted && styles.towerCardCompleted, isLocked && styles.towerCardLocked]}>
-					{isCompleted && <CompleteOverlay />}  {/* ← 추가 */}
+					{isCompleted && <CompleteOverlay />}
 					{/* 레벨 배지 */}
 					<View style={[styles.levelBadge, { backgroundColor: tower.color }]}>
 						<Text style={styles.levelText}>LV.{tower.level}</Text>
 						{isCompleted && (
-							<IconComponent type="materialIcons" name="check-circle" size={18} color="#ffffff" style={styles.badgeIcon} />
+							<IconComponent type="materialIcons" name="check-circle" size={scaledSize(18)} color="#fff" style={styles.badgeIcon} />
 						)}
-						{isLocked && <IconComponent type="materialIcons" name="lock" size={18} color="#ffffff" style={styles.badgeIcon} />}
+						{isLocked && <IconComponent type="materialIcons" name="lock" size={scaledSize(18)} color="#fff" style={styles.badgeIcon} />}
 					</View>
 					<Text style={styles.towerName}>{tower.name}</Text>
 					{/* 보스 섹션 */}
@@ -184,7 +182,7 @@ const TowerChallengeScreen = () => {
 							</View>
 						) : (
 							<View style={styles.lockedBoss}>
-								<IconComponent type="materialIcons" name="lock" size={48} color="#546e7a" />
+								<IconComponent type="materialIcons" name="lock" size={scaledSize(48)} color="#64748B" />
 								<Text style={styles.lockedText}>LOCKED</Text>
 							</View>
 						)}
@@ -222,12 +220,12 @@ const TowerChallengeScreen = () => {
 								<>
 									{progress.attempts > 0 ? (
 										<>
-											<IconComponent type="materialIcons" name="favorite" size={18} color="#ffffff" />
+											<IconComponent type="materialIcons" name="favorite" size={scaledSize(18)} color="#fff" />
 											<Text style={styles.challengeButtonText}>도전하기 (하트 -1)</Text>
 										</>
 									) : (
 										<>
-											<IconComponent type="materialIcons" name="play-circle-filled" size={18} color="#ffffff" />
+											<IconComponent type="materialIcons" name="play-circle-filled" size={scaledSize(18)} color="#fff" />
 											<Text style={styles.challengeButtonText}>광고 보고 도전하기</Text>
 										</>
 									)}
@@ -244,26 +242,21 @@ const TowerChallengeScreen = () => {
 
 	return (
 		<View style={styles.container}>
-			{/* 배경 그라디언트 */}
-			<LinearGradient colors={['#1a1a2e', '#16213e', '#0f3460']} style={StyleSheet.absoluteFillObject} />
+			{/* 배경 그라디언트 (드라큘라 컨셉) */}
+			<LinearGradient colors={['#2B2D3A', '#21222C', '#191A21']} style={StyleSheet.absoluteFillObject} />
 
-			<SafeAreaView style={styles.safeArea} edges={['top']}>
+			<SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
 				{/* 타워 메인 헤더 */}
 				<View style={styles.headerSection}>
-					{/* <View style={styles.towerImageContainer}>
-						<View style={styles.towerGlow} />
-						<FastImage source={require('@/assets/images/tower.png')} style={styles.towerMainImage} resizeMode="contain" />
-					</View> */}
 					{__DEV__ && (
 						<TouchableOpacity onPress={handleDevReset} style={styles.devButton}>
-							<IconComponent type="materialIcons" name="build" size={18} color="#f39c12" />
+							<IconComponent type="materialIcons" name="build" size={scaledSize(18)} color="#F59E0B" />
 							<Text style={styles.devButtonText}>DEV</Text>
 						</TouchableOpacity>
 					)}
 					<Text style={styles.mainTitle}>타워 챌린지</Text>
 					<Text style={styles.subTitle}>정상을 향한 여정</Text>
 				</View>
-
 
 				{/* 도전 횟수 표시 */}
 
@@ -272,7 +265,7 @@ const TowerChallengeScreen = () => {
 					<Carousel
 						loop={false}
 						width={SCREEN_WIDTH * 0.9}
-						height={scaleHeight(480)}  // 620 → 480
+						height={scaleHeight(480)} // 620 → 480
 						data={TOWER_LEVELS}
 						renderItem={renderTowerCard}
 						mode="parallax"
@@ -289,25 +282,21 @@ const TowerChallengeScreen = () => {
 						<View style={styles.attemptCard}>
 							<View style={styles.heartIconWrap}>
 								{Array.from({ length: progress.attempts }).map((_, i) => (
-									<IconComponent
-										key={i}
-										type="materialIcons"
-										name="favorite"
-										size={18}
-										color="#e74c3c"
-									/>
+									<IconComponent key={i} type="materialIcons" name="favorite" size={scaledSize(18)} color="#EF4444" />
 								))}
 							</View>
 							<Text style={styles.attemptLabel}>오늘 남은 도전</Text>
-							<Text style={styles.attemptCount}>{progress.attempts}<Text style={styles.attemptUnit}>회</Text></Text>
+							<Text style={styles.attemptCount}>
+								{progress.attempts}
+								<Text style={styles.attemptUnit}>회</Text>
+							</Text>
 						</View>
 
 						<TouchableOpacity
 							style={[styles.adCard, progress.adRewardUsed >= 3 && styles.adCardDisabled]}
 							onPress={handleWatchAd}
-							activeOpacity={0.8}
-						>
-							<IconComponent type="materialIcons" name="play-circle-filled" size={22} color="#ffffff" />
+							activeOpacity={0.8}>
+							<IconComponent type="materialIcons" name="play-circle-filled" size={scaledSize(22)} color="#fff" />
 							<View style={styles.adTextContainer}>
 								<Text style={styles.adButtonTitle}>광고 보고 +1회</Text>
 								<Text style={styles.adButtonSub}>
@@ -326,9 +315,13 @@ const TowerChallengeScreen = () => {
 					</View>
 				</View>
 
-
 				<View style={styles.bottomPadding} />
-				<BottomHomeButton />
+				<BottomHomeButton
+					backgroundColor="transparent"
+					borderColor="rgba(255,255,255,0.1)"
+					textColor="#F1F5F9"
+					iconColor="#CBD5E1"
+				/>
 
 				{showAd && (
 					<AdmobRewardAd
@@ -383,7 +376,7 @@ const styles = StyleSheet.create({
 		height: scaleWidth(110),
 		borderRadius: scaleWidth(55),
 		backgroundColor: 'rgba(52, 152, 219, 0.2)',
-		shadowColor: '#3498db',
+		shadowColor: '#22C55E',
 		shadowOffset: { width: 0, height: 0 },
 		shadowOpacity: 0.8,
 		shadowRadius: 20,
@@ -396,7 +389,7 @@ const styles = StyleSheet.create({
 	mainTitle: {
 		fontSize: scaledSize(24),
 		fontWeight: 'bold',
-		color: '#ffffff',
+		color: '#fff',
 		marginTop: scaleHeight(6),
 		textShadowColor: 'rgba(0, 0, 0, 0.3)',
 		textShadowOffset: { width: 0, height: 2 },
@@ -404,7 +397,7 @@ const styles = StyleSheet.create({
 	},
 	subTitle: {
 		fontSize: scaledSize(11),
-		color: '#bdc3c7',
+		color: '#CBD5E1',
 		marginTop: scaleHeight(1),
 		letterSpacing: 1,
 	},
@@ -418,14 +411,14 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		gap: scaleWidth(10),
 		marginBottom: scaleHeight(10),
-		height: scaleHeight(90),  // alignItems: 'stretch' 제거, 고정 높이
+		height: scaleHeight(90), // alignItems: 'stretch' 제거, 고정 높이
 	},
 	attemptCard: {
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: 'rgba(231, 76, 60, 0.1)',
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(14),
 		paddingHorizontal: scaleWidth(10),
 		borderWidth: 1.5,
 		borderColor: 'rgba(231, 76, 60, 0.35)',
@@ -438,15 +431,15 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		gap: scaleWidth(10),
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(14),
 		borderWidth: 1.5,
 		borderColor: 'rgba(52, 152, 219, 0.5)',
-		backgroundColor: '#2980b9',  // LinearGradient 대신 단색
+		backgroundColor: '#3B82F6', // LinearGradient 대신 단색
 		paddingHorizontal: scaleWidth(14),
 	},
 	adCardDisabled: {
-		borderColor: 'rgba(84, 110, 122, 0.4)',
-		backgroundColor: '#607d8b',
+		borderColor: 'rgba(100, 116, 139, 0.4)',
+		backgroundColor: '#64748B',
 	},
 	adTextContainer: {
 		flexShrink: 1,
@@ -454,7 +447,7 @@ const styles = StyleSheet.create({
 	adButtonTitle: {
 		fontSize: scaledSize(14),
 		fontWeight: 'bold',
-		color: '#ffffff',
+		color: '#fff',
 	},
 	adButtonSub: {
 		fontSize: scaledSize(10),
@@ -468,19 +461,19 @@ const styles = StyleSheet.create({
 	},
 	attemptLabel: {
 		fontSize: scaledSize(11),
-		color: '#bdc3c7',
+		color: '#CBD5E1',
 		fontWeight: '500',
 	},
 	attemptCount: {
-		fontSize: scaledSize(24),
+		fontSize: scaledSize(26),
 		fontWeight: 'bold',
-		color: '#ffffff',
+		color: '#fff',
 		lineHeight: scaledSize(30),
 	},
 	attemptUnit: {
 		fontSize: scaledSize(14),
 		fontWeight: '600',
-		color: '#bdc3c7',
+		color: '#CBD5E1',
 	},
 	adGradient: {
 		flexDirection: 'row',
@@ -489,27 +482,27 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(14),
 		gap: scaleWidth(10),
-		flex: 1,               // 추가
-		minHeight: scaleHeight(70),  // 추가
+		flex: 1, // 추가
+		minHeight: scaleHeight(70), // 추가
 	},
 
 	cardCompactText: {
 		fontSize: scaledSize(13),
 	},
 	cardLabel: {
-		color: '#bdc3c7',
+		color: '#CBD5E1',
 	},
 	cardValue: {
 		fontWeight: 'bold',
-		color: '#ffffff',
+		color: '#fff',
 	},
 	adValue: {
-		color: '#3498db',
+		color: '#22C55E',
 	},
 	cardIconWrapper: {
 		width: scaleWidth(44),
 		height: scaleWidth(44),
-		borderRadius: scaleWidth(20),
+		borderRadius: scaleWidth(22),
 		backgroundColor: 'rgba(231, 76, 60, 0.15)',
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -534,14 +527,14 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: scaleWidth(14),
 		paddingVertical: scaleHeight(12), // 10에서 12로 증가
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(10),
 		gap: scaleWidth(6),
 		minWidth: scaleWidth(100),
 		height: scaleHeight(44), // 고정 높이 추가
 	},
 	adCompactButton: {
 		flex: 1,
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(10),
 		overflow: 'hidden',
 		minWidth: scaleWidth(140),
 		height: scaleHeight(44), // 고정 높이 추가
@@ -556,16 +549,16 @@ const styles = StyleSheet.create({
 	},
 	attemptCompactText: {
 		fontSize: scaledSize(13),
-		color: '#ecf0f1',
+		color: '#F1F5F9',
 		flexShrink: 0,
 	},
 	attemptCompactCount: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#ffffff',
+		color: '#fff',
 	},
 	adCompactText: {
-		color: '#ffffff',
+		color: '#fff',
 		fontSize: scaledSize(12),
 		fontWeight: '600',
 		flexShrink: 0,
@@ -587,7 +580,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: 'rgba(255, 255, 255, 0.15)',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(4) },
+		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,
 		shadowRadius: 8,
 		overflow: 'hidden', // ← 추가
@@ -618,7 +611,7 @@ const styles = StyleSheet.create({
 	levelText: {
 		fontSize: scaledSize(12),
 		fontWeight: 'bold',
-		color: '#ffffff',
+		color: '#fff',
 	},
 	badgeIcon: {
 		marginLeft: scaleWidth(6),
@@ -633,7 +626,7 @@ const styles = StyleSheet.create({
 	towerName: {
 		fontSize: scaledSize(20),
 		fontWeight: 'bold',
-		color: '#ffffff',
+		color: '#fff',
 		marginBottom: scaleHeight(8),
 		textAlign: 'center',
 	},
@@ -680,14 +673,14 @@ const styles = StyleSheet.create({
 	},
 	lockedText: {
 		fontSize: scaledSize(12),
-		color: '#7f8c8d',
+		color: '#64748B',
 		marginTop: scaleHeight(8),
 		fontWeight: '600',
 	},
 	bossName: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#ffffff',
+		color: '#fff',
 	},
 	rewardSection: {
 		alignItems: 'center',
@@ -698,7 +691,7 @@ const styles = StyleSheet.create({
 	},
 	rewardLabel: {
 		fontSize: scaledSize(12),
-		color: '#bdc3c7',
+		color: '#CBD5E1',
 		marginBottom: scaleHeight(6),
 		fontWeight: '600',
 	},
@@ -708,18 +701,18 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(255, 255, 255, 0.1)',
 		paddingHorizontal: scaleWidth(12),
 		paddingVertical: scaleHeight(6),
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(10),
 	},
 	rewardImage: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(14),
 		marginRight: scaleWidth(6),
 	},
 	rewardName: {
 		fontSize: scaledSize(13),
 		fontWeight: '600',
-		color: '#ffffff',
+		color: '#fff',
 	},
 	rewardLocked: {
 		backgroundColor: 'rgba(255, 255, 255, 0.05)',
@@ -729,7 +722,7 @@ const styles = StyleSheet.create({
 	},
 	rewardLockedText: {
 		fontSize: scaledSize(14),
-		color: '#7f8c8d',
+		color: '#64748B',
 		fontWeight: '600',
 	},
 	challengeButtonWrapper: {
@@ -742,37 +735,37 @@ const styles = StyleSheet.create({
 
 	challengeButton: {
 		paddingVertical: scaleHeight(14),
-		minHeight: scaleHeight(48),
+		minHeight: 48,
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderRadius: scaleWidth(12),
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(3) },
+		shadowOffset: { width: 0, height: 3 },
 		shadowOpacity: 0.3,
 		shadowRadius: 5,
 	},
 	challengeButtonCompleted: {
-		backgroundColor: '#27ae60',
+		backgroundColor: '#3B82F6',
 	},
 	challengeButtonLocked: {
-		backgroundColor: '#7f8c8d',
+		backgroundColor: '#64748B',
 	},
 	challengeButtonText: {
-		color: '#ffffff',
+		color: '#fff',
 		fontSize: scaledSize(15),
 		fontWeight: 'bold',
 		letterSpacing: 0.5,
 	},
 	descriptionText: {
 		fontSize: scaledSize(14),
-		color: '#ecf0f1',
+		color: '#F1F5F9',
 		textAlign: 'center',
 		fontWeight: '600',
 		marginBottom: scaleHeight(4),
 	},
 	descriptionSubText: {
 		fontSize: scaledSize(11),
-		color: '#95a5a6',
+		color: '#94A3B8',
 		textAlign: 'center',
 	},
 	descriptionSection: {
@@ -782,7 +775,7 @@ const styles = StyleSheet.create({
 	},
 	descriptionTitle: {
 		fontSize: scaledSize(15),
-		color: '#ffffff',
+		color: '#fff',
 		fontWeight: 'bold',
 		marginBottom: scaleHeight(8),
 		textAlign: 'center',
@@ -796,7 +789,7 @@ const styles = StyleSheet.create({
 	},
 	descriptionBullet: {
 		fontSize: scaledSize(12),
-		color: '#ecf0f1',
+		color: '#F1F5F9',
 		lineHeight: scaledSize(18),
 		marginBottom: scaleHeight(4),
 	},
@@ -807,26 +800,26 @@ const styles = StyleSheet.create({
 		gap: scaleWidth(6),
 	},
 	challengeButtonAd: {
-		backgroundColor: '#3498db',
+		backgroundColor: '#3B82F6',
 	},
 	devButton: {
-		position: 'absolute',   // ← 추가
-		top: scaleHeight(8),    // ← 추가
-		right: scaleWidth(16),  // ← 추가
-		zIndex: 10,             // ← 추가
+		position: 'absolute', // ← 추가
+		top: scaleHeight(8), // ← 추가
+		right: scaleWidth(16), // ← 추가
+		zIndex: 10, // ← 추가
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: scaleWidth(4),
 		paddingHorizontal: scaleWidth(10),
 		paddingVertical: scaleHeight(4),
-		backgroundColor: 'rgba(243, 156, 18, 0.2)',
+		backgroundColor: 'rgba(245, 158, 11, 0.2)',
 		borderRadius: scaleWidth(12),
 		borderWidth: 1,
-		borderColor: 'rgba(243, 156, 18, 0.5)',
+		borderColor: 'rgba(245, 158, 11, 0.5)',
 	},
 	devButtonText: {
 		fontSize: scaledSize(11),
-		color: '#f39c12',
+		color: '#F59E0B',
 		fontWeight: 'bold',
 	},
 });

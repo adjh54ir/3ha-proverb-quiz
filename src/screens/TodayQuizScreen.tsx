@@ -29,6 +29,13 @@ import DateUtils from '@/utils/DateUtils';
 import FastImage from 'react-native-fast-image';
 import ProverbServices from '@/services/ProverbServices';
 import ProverbDetailModal from './modal/ProverbDetailModal';
+import ProverbDetailContent from './common/ProverbDetailContent';
+import NewBadgeModal from './modal/NewBadgeModal';
+import { CONST_BADGES } from '@/const/ConstBadges';
+import { TodayQuizBadgeInterceptor } from '@/services/interceptor/TodayQuizBadgeInterceptor';
+import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
+import FavoriteToast from './common/FavoriteToast';
+import Icon from 'react-native-vector-icons/FontAwesome6';
 import FadeInView from '@/components/animation/FadeInView';
 
 const NOTIFICATION_ID = 'daily-quiz-reminder';
@@ -66,6 +73,8 @@ const TodayQuizScreen = () => {
 	const [showPicker, setShowPicker] = useState(false);
 	const [quizList, setQuizList] = useState<MainDataType.Proverb[]>([]);
 	const [answerResults, setAnswerResults] = useState<{ [id: number]: boolean | null }>({});
+	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
+	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
 	const [selectedAnswers, setSelectedAnswers] = useState<{
 		[id: number]: { value: string; index: number };
 	}>({});
@@ -83,6 +92,9 @@ const TodayQuizScreen = () => {
 	const [showPrevQuizModal, setShowPrevQuizModal] = useState(false);
 
 	const [groupedPrevQuizzes, setGroupedPrevQuizzes] = useState<GroupedPrevQuiz[]>([]);
+	const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+	const [showToast, setShowToast] = useState(false);
+	const [toastMessage, setToastMessage] = useState('');
 	const [highlightAnswerId, setHighlightAnswerId] = useState<number | null>(null);
 
 	const [showTodayReview, setShowTodayReview] = useState(false);
@@ -100,6 +112,22 @@ const TodayQuizScreen = () => {
 	const { getLocalDateString, getLocalParamDateToString } = DateUtils;
 
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
+
+	const loadFavorites = async () => {
+		const ids = await getFavorites();
+		setFavoriteIds(ids);
+	};
+
+	const handleToggleFavorite = async (id: number) => {
+		const added = await toggleFavorite(id);
+		await loadFavorites();
+		setToastMessage(added ? '즐겨찾기 추가' : '즐겨찾기 제거');
+		setShowToast(true);
+	};
+
+	useEffect(() => {
+		loadFavorites();
+	}, [showPrevQuizModal]);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -565,6 +593,48 @@ const TodayQuizScreen = () => {
 		}
 	};
 
+	/**
+	 * 🏅 오늘의 퀴즈 누적 완료 일수를 기준으로 신규 뱃지를 지급하고 모달을 띄운다.
+	 */
+	const checkAndAwardTodayQuizBadges = async (storedArr: MainDataType.TodayQuizList[]) => {
+		const completedDayCount = storedArr.filter(
+			(d) =>
+				(d.todayQuizIdArr?.length ?? 0) > 0 &&
+				Object.keys(d.answerResults ?? {}).length >= (d.todayQuizIdArr?.length ?? 0),
+		).length;
+
+		const historyJson = await AsyncStorage.getItem(MainStorageKeyType.USER_QUIZ_HISTORY);
+		const history: MainDataType.UserQuizHistory = historyJson
+			? JSON.parse(historyJson)
+			: {
+					correctProverbId: [],
+					wrongProverbId: [],
+					lastAnsweredAt: new Date(),
+					quizCounts: {},
+					badges: [],
+					totalScore: 0,
+			  };
+		history.badges = history.badges ?? [];
+
+		const newBadgeIds = TodayQuizBadgeInterceptor(completedDayCount, history.badges);
+		if (newBadgeIds.length === 0) {
+			return;
+		}
+
+		const earnedBadgeObjects = newBadgeIds
+			.map((id) => CONST_BADGES.find((b) => b.id === id))
+			.filter(Boolean) as MainDataType.UserBadge[];
+
+		const updatedHistory: MainDataType.UserQuizHistory = {
+			...history,
+			badges: [...new Set([...history.badges, ...newBadgeIds])],
+		};
+		await AsyncStorage.setItem(MainStorageKeyType.USER_QUIZ_HISTORY, JSON.stringify(updatedHistory));
+
+		setNewlyEarnedBadges(earnedBadgeObjects);
+		setBadgeModalVisible(true);
+	};
+
 	const handleAnswer = async (quizId: number, selected: string, correct: string) => {
 		if (answerResults[quizId] !== undefined) {
 			return;
@@ -620,6 +690,12 @@ const TodayQuizScreen = () => {
 			// @ts-ignore
 			storedArr[todayIndex] = updatedToday;
 			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(storedArr));
+
+			// ✅ 오늘의 퀴즈를 모두 풀었으면 누적 완료 일수 기준 뱃지 부여
+			const isAllAnswered = Object.keys(newAnswerResults).length >= quizList.length && quizList.length > 0;
+			if (isAllAnswered) {
+				await checkAndAwardTodayQuizBadges(storedArr);
+			}
 		}
 		// handleAnswer 내부 마지막 부분에 추가
 		setTimeout(() => {
@@ -744,42 +820,10 @@ const TodayQuizScreen = () => {
 							</View>
 						</View>
 
-						{/* 정답 의미 */}
-						<View style={styles.sectionCard}>
-							<View style={styles.sectionHeaderRow}>
-								<IconComponent name="check-circle" type="FontAwesome" size={14} color="#1e8449" style={styles.sectionHeaderIcon} />
-								<Text style={styles.sectionHeaderText}>정답</Text>
-							</View>
-							<Text style={styles.correctMeaningValue}>- {item.longMeaning}</Text>
+						{/* ✅ 속담 상세 팝업과 동일한 내용을 해설로 인라인 표시 */}
+						<View style={styles.explainDetailWrap}>
+							<ProverbDetailContent proverb={item} />
 						</View>
-
-						{/* 예문 */}
-						{Array.isArray(item.example) && item.example.length > 0 && (
-							<View style={styles.sectionCard}>
-								<View style={styles.sectionHeaderRow}>
-									<Text style={styles.sectionHeaderText}>✍️ 예문</Text>
-								</View>
-
-								<View style={{ marginTop: scaleHeight(4) }}>
-									{item.example.map((ex, idx) => (
-										<View key={`${item.id}-ex-${idx}`} style={styles.sectionBulletRow}>
-											<Text style={styles.sectionBulletDot}>•</Text>
-											<Text style={styles.sectionBulletText}>{ex}</Text>
-										</View>
-									))}
-								</View>
-							</View>
-						)}
-						{/* 해설 하단: 자세히 보기 버튼 */}
-						<TouchableOpacity
-							style={styles.detailButton}
-							onPress={() => {
-								setDetailQuiz(item);
-								setDetailModalVisible(true);
-							}}>
-							<IconComponent name="search" type="FontAwesome" size={14} color="#2c3e50" style={{ marginRight: scaleWidth(6) }} />
-							<Text style={styles.detailButtonText}>자세히 보기</Text>
-						</TouchableOpacity>
 					</View>
 				) : (
 					<>
@@ -790,8 +834,15 @@ const TodayQuizScreen = () => {
 						</Text>
 
 						{result !== undefined && (
-							<View style={{ alignItems: 'center', marginTop: scaleHeight(-6), marginBottom: scaleHeight(12) }}>
-								<Text style={[styles.questionResultInline, result ? styles.correct : styles.wrong]}>{result ? '⭕ 정답!' : '❌ 오답입니다.'}</Text>
+							<View style={styles.resultBannerWrap}>
+								<View style={[styles.resultBanner, result ? styles.resultBannerCorrect : styles.resultBannerWrong]}>
+									<View style={[styles.resultBannerIcon, { backgroundColor: result ? '#22C55E' : '#EF4444' }]}>
+										<IconComponent type="materialIcons" name={result ? 'check' : 'close'} size={scaledSize(16)} color="#fff" />
+									</View>
+									<Text style={[styles.resultBannerText, { color: result ? '#15803D' : '#B91C1C' }]}>
+										{result ? '정답이에요!' : '아쉬워요, 오답이에요'}
+									</Text>
+								</View>
 							</View>
 						)}
 
@@ -996,11 +1047,19 @@ const TodayQuizScreen = () => {
 							) : (
 								// 👉 다 끝난 후 완료 화면
 								<>
-									<View style={styles.completedTextWrapper}>
-										<Text style={styles.completedTitle}>🎉 오늘의 문제 끝! 내일 또 만나요!! 👋</Text>
-										<Text style={styles.completedScore}>
-											✅ 오늘은 <Text style={styles.underline}>{correct}문제를 맞췄어요!</Text> 잘했어요!
-										</Text>
+									<View style={styles.completedCard}>
+										<View style={styles.completedEmojiCircle}>
+											<Text style={styles.completedEmoji}>🎉</Text>
+										</View>
+										<Text style={styles.completedTitle}>오늘의 문제 끝!</Text>
+										<Text style={styles.completedSubtitle}>내일 또 만나요 👋</Text>
+										<View style={styles.completedScorePill}>
+											<IconComponent type="materialIcons" name="check-circle" size={scaledSize(16)} color="#22C55E" />
+											<Text style={styles.completedScoreText}>
+												<Text style={styles.completedScoreNum}>{correct}</Text>
+												<Text style={styles.completedScoreTotal}> / {quizList.length}</Text> 정답
+											</Text>
+										</View>
 									</View>
 
 									<TouchableOpacity onPress={() => setShowTodayReview((prev) => !prev)} style={styles.reviewToggleButton}>
@@ -1016,9 +1075,32 @@ const TodayQuizScreen = () => {
 
 									{showTodayReview && (
 										<View style={styles.reviewList}>
-											{quizList.map((item) => (
-												<View key={item.id}>{renderItem({ item })}</View>
-											))}
+											{quizList.map((item) => {
+												const itemResult = answerResults[item.id];
+												return (
+													<TouchableOpacity
+														key={item.id}
+														activeOpacity={0.85}
+														style={styles.reviewItemCard}
+														onPress={() => {
+															setDetailQuiz(item);
+															setDetailModalVisible(true);
+														}}>
+														<View style={styles.reviewItemTextWrap}>
+															<Text style={styles.reviewItemTitle} numberOfLines={1}>
+																{item.proverb}
+															</Text>
+															<Text style={styles.reviewItemMeaning} numberOfLines={1}>
+																{item.longMeaning || item.meaning}
+															</Text>
+														</View>
+														<View style={[styles.reviewItemPill, itemResult ? styles.pillCorrect : styles.pillWrong]}>
+															<Text style={styles.resultPillText}>{itemResult ? '정답' : '오답'}</Text>
+														</View>
+														<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color="#94A3B8" />
+													</TouchableOpacity>
+												);
+											})}
 										</View>
 									)}
 								</>
@@ -1206,58 +1288,38 @@ const TodayQuizScreen = () => {
 											{/* ✅ 해설 스타일로 통일된 카드 */}
 											{group.quizList.map((item) => {
 												const isCorrect = group.answerResults?.[item.id] === true;
-
+												const isFavorite = favoriteIds.includes(item.id);
 												return (
-													<View
-														key={item.id}
-														style={[
-															styles.answerExplainBox,
-															{ marginBottom: scaleHeight(12) },
-															isCorrect ? styles.answerExplainCorrect : styles.answerExplainWrong,
-														]}>
-														{/* 헤더: 속담 + 정오답 배지 */}
-														<View style={styles.explainHeaderRow}>
-															<Text style={styles.explainIdiom} numberOfLines={2}>{item.proverb}</Text>
-															<View style={[styles.resultPill, isCorrect ? styles.pillCorrect : styles.pillWrong]}>
-																<Text style={styles.resultPillText}>{isCorrect ? '정답' : '오답'}</Text>
-															</View>
-														</View>
-
-														{/* 정답 의미 */}
-														<View style={styles.sectionCard}>
-															<View style={styles.sectionHeaderRow}>
-																<IconComponent name="check-circle" type="FontAwesome" size={14} color="#1e8449" style={styles.sectionHeaderIcon} />
-																<Text style={styles.sectionHeaderText}>정답</Text>
-															</View>
-															<Text style={styles.correctMeaningValue}>- {item.longMeaning}</Text>
-														</View>
-
-														{/* 예문 */}
-														{Array.isArray(item.example) && item.example.length > 0 && (
-															<View style={styles.sectionCard}>
-																<View style={styles.sectionHeaderRow}>
-																	<Text style={styles.sectionHeaderText}>✍️ 예문</Text>
-																</View>
-																<View style={{ marginTop: scaleHeight(4) }}>
-																	{item.example.map((ex, idx) => (
-																		<View key={`${item.id}-ex-${idx}`} style={styles.sectionBulletRow}>
-																			<Text style={styles.sectionBulletDot}>•</Text>
-																			<Text style={styles.sectionBulletText}>{ex}</Text>
-																		</View>
-																	))}
+													<View key={item.id} style={styles.historyCard}>
+														<View style={styles.historyCardBody}>
+															<View style={styles.historyHeaderRow}>
+																<Text style={styles.historyIdiom} numberOfLines={2}>{item.proverb}</Text>
+																<View style={styles.historyHeaderRight}>
+																	<View style={[styles.resultPill, isCorrect ? styles.pillCorrect : styles.pillWrong]}>
+																		<Text style={styles.resultPillText}>{isCorrect ? '정답' : '오답'}</Text>
+																	</View>
 																</View>
 															</View>
-														)}
-
-														{/* 자세히 보기 */}
+															<View style={styles.historyMeaningBox}>
+																<Text style={styles.historyMeaningValue} numberOfLines={1}>{item.longMeaning || item.meaning}</Text>
+															</View>
+														</View>
 														<TouchableOpacity
-															style={styles.detailButton}
 															onPress={() => {
 																setDetailQuiz(item);
 																setDetailModalVisible(true);
-															}}>
-															<IconComponent name="search" type="FontAwesome" size={14} color="#2c3e50" style={{ marginRight: scaleWidth(6) }} />
-															<Text style={styles.detailButtonText}>자세히 보기</Text>
+															}}
+															hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+															<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(20)} color="#CBD5E1" style={{ marginLeft: scaleWidth(4) }} />
+														</TouchableOpacity>
+														<TouchableOpacity
+															style={styles.favoriteOverlayButton}
+															onPress={(e) => {
+																e.stopPropagation();
+																handleToggleFavorite(item.id);
+															}}
+															hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+															<Icon name="star" solid={isFavorite} size={scaledSize(18)} color={isFavorite ? '#FBBF24' : '#CBD5E1'} />
 														</TouchableOpacity>
 													</View>
 												);
@@ -1273,12 +1335,21 @@ const TodayQuizScreen = () => {
 						</TouchableOpacity>
 					</View>
 				</View>
+				<FavoriteToast visible={showToast} message={toastMessage} onHide={() => setShowToast(false)} />
 			</Modal>
 
 			{/* 상세 모달 */}
 			<ProverbDetailModal visible={detailModalVisible} proverb={detailQuiz} onClose={() => setDetailModalVisible(false)} />
 
-			{/* <IdiomDetailModal idiom={detailQuiz} visible={detailModalVisible} onClose={() => setDetailModalVisible(false)} /> */}
+			{/* ✅ 신규 뱃지 획득 모달 */}
+			<NewBadgeModal
+				visible={badgeModalVisible}
+				badges={newlyEarnedBadges}
+				onConfirm={() => {
+					setBadgeModalVisible(false);
+					setNewlyEarnedBadges([]);
+				}}
+			/>
 		</SafeAreaView>
 	);
 };
@@ -1286,6 +1357,96 @@ const TodayQuizScreen = () => {
 export default TodayQuizScreen;
 
 const styles = StyleSheet.create({
+	historyHeaderRight: { flexDirection: 'row', alignItems: 'center', marginRight: scaleWidth(40) },
+	favoriteOverlayButton: { position: 'absolute', top: scaleHeight(10), right: scaleWidth(10), padding: scaleWidth(4), zIndex: 10 },
+	completedCard: {
+		alignItems: 'center',
+		marginTop: scaleHeight(24),
+		marginHorizontal: scaleWidth(16),
+		paddingVertical: scaleHeight(28),
+		paddingHorizontal: scaleWidth(20),
+		backgroundColor: '#FFFFFF',
+		borderRadius: scaleWidth(20),
+		borderWidth: 1,
+		borderColor: '#EEF2F7',
+		shadowColor: '#0F172A',
+		shadowOffset: { width: 0, height: scaleHeight(4) },
+		shadowOpacity: 0.06,
+		shadowRadius: 12,
+		elevation: 3,
+	},
+	completedEmojiCircle: {
+		width: scaleWidth(64),
+		height: scaleWidth(64),
+		borderRadius: scaleWidth(32),
+		backgroundColor: '#F0FDF4',
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginBottom: scaleHeight(14),
+	},
+	completedEmoji: { fontSize: scaledSize(30) },
+	completedSubtitle: {
+		marginTop: scaleHeight(4),
+		fontSize: scaledSize(14),
+		color: '#64748B',
+		fontWeight: '500',
+		textAlign: 'center',
+	},
+	completedScorePill: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(6),
+		marginTop: scaleHeight(16),
+		paddingVertical: scaleHeight(8),
+		paddingHorizontal: scaleWidth(16),
+		borderRadius: scaleWidth(999),
+		backgroundColor: '#F0FDF4',
+		borderWidth: 1,
+		borderColor: '#BBF7D0',
+	},
+	completedScoreText: { fontSize: scaledSize(14), color: '#334155', fontWeight: '600' },
+	completedScoreNum: { fontSize: scaledSize(16), color: '#16A34A', fontWeight: '800' },
+	completedScoreTotal: { color: '#94A3B8', fontWeight: '700' },
+	reviewItemCard: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(10),
+		backgroundColor: '#FFFFFF',
+		borderRadius: scaleWidth(14),
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(14),
+		marginBottom: scaleHeight(10),
+		borderWidth: 1,
+		borderColor: '#E2E8F0',
+	},
+	reviewItemTextWrap: { flex: 1 },
+	reviewItemTitle: { fontSize: scaledSize(15), fontWeight: '700', color: '#1E293B' },
+	reviewItemMeaning: { marginTop: scaleHeight(3), fontSize: scaledSize(12.5), color: '#64748B' },
+	reviewItemPill: { paddingVertical: scaleHeight(3), paddingHorizontal: scaleWidth(9), borderRadius: scaleWidth(999) },
+	resultBannerWrap: {
+		alignItems: 'center',
+		marginTop: scaleHeight(-2),
+		marginBottom: scaleHeight(12),
+	},
+	resultBanner: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingVertical: scaleHeight(8),
+		paddingHorizontal: scaleWidth(14),
+		borderRadius: scaleWidth(24),
+		borderWidth: 1,
+	},
+	resultBannerCorrect: { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' },
+	resultBannerWrong: { backgroundColor: '#FEF2F2', borderColor: '#FECACA' },
+	resultBannerIcon: {
+		width: scaleWidth(22),
+		height: scaleWidth(22),
+		borderRadius: scaleWidth(11),
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginRight: scaleWidth(8),
+	},
+	resultBannerText: { fontSize: scaledSize(14), fontWeight: '800' },
 	main: {
 		flex: 1,
 		backgroundColor: '#f8f9fa', // ✅ 회색 배경
@@ -2316,6 +2477,12 @@ const styles = StyleSheet.create({
 		backgroundColor: '#f8f9fa',
 		marginTop: scaleHeight(6),
 	},
+	explainDetailWrap: {
+		backgroundColor: '#fff',
+		borderRadius: scaleWidth(14),
+		padding: scaleWidth(12),
+		marginTop: scaleHeight(4),
+	},
 	answerExplainCorrect: {
 		backgroundColor: 'rgba(76, 175, 80, 0.12)', // 연한 초록
 		borderColor: '#27ae60',
@@ -2435,7 +2602,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		backgroundColor: '#ffffff',
 		borderWidth: 1,
-		borderColor: '#e6e6e6',
+		borderColor: '#E2E8F0',
 		borderRadius: scaledSize(12),
 		overflow: 'hidden',
 		marginBottom: scaleHeight(12),
@@ -2458,7 +2625,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		fontSize: scaledSize(16),
 		fontWeight: '700',
-		color: '#2c3e50',
+		color: '#0F172A',
 		paddingRight: scaleWidth(10),
 	},
 
@@ -2467,9 +2634,9 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(6),
 		paddingHorizontal: scaleWidth(10),
 		borderRadius: scaleWidth(8),
-		backgroundColor: '#f8f9fa',
+		backgroundColor: '#F8FAFC',
 		borderWidth: 1,
-		borderColor: '#ecf0f1',
+		borderColor: '#F1F5F9',
 	},
 	historyMeaningLabel: {
 		fontSize: scaledSize(12),
@@ -2478,7 +2645,7 @@ const styles = StyleSheet.create({
 	},
 	historyMeaningValue: {
 		fontSize: scaledSize(14),
-		color: '#1e8449',
+		color: '#334155',
 		fontWeight: 'bold',
 		lineHeight: scaledSize(20),
 	},

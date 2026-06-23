@@ -2,6 +2,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { Paths } from '@/navigation/conf/Paths';
 import SettingScreen from '@/screens/SettingScreen';
+import FavoriteScreen from '@/screens/FavoriteScreen';
+import MyProverbBook from '@/screens/MyProverbBook';
+import MyProverbBookDetail from '@/screens/MyProverbBookDetail';
 import Home from '@/screens/Home';
 import BottomTabNavigator from './BottomTabNavigator';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -170,6 +173,9 @@ const StackNavigator = () => {
 			/>
 			<Stack.Screen name={Paths.HOME} component={Home} />
 			<Stack.Screen name={Paths.SETTING} component={SettingScreen} />
+			<Stack.Screen name={Paths.FAVORITE} component={FavoriteScreen} />
+			<Stack.Screen name={Paths.MY_PROVERB_BOOK} component={MyProverbBook} />
+			<Stack.Screen name={Paths.MY_PROVERB_BOOK_DETAIL} component={MyProverbBookDetail} />
 		</Stack.Navigator>
 	);
 };

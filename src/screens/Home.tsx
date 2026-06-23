@@ -26,8 +26,10 @@ import ProverbServices from '@/services/ProverbServices';
 import moment from 'moment';
 import CheckInModal from './modal/CheckInModal';
 import DailyMissionModal from './modal/DailyMissionModal';
+import LevelUpModal, { LevelUpInfo } from './modal/LevelUpModal';
 import LevelModal from './modal/LevelModal';
 import { calcStreak, StreakInfo } from '@/utils/StreakUtils';
+import { AttendanceBadgeInterceptor } from '@/services/interceptor/AttendanceBadgeInterceptor';
 import { computeDailyMissions, countDoneMissions, allMissionsDone } from '@/utils/DailyMissionUtils';
 import { LEVEL_DATA, PET_REWARDS } from '@/const/ConstInfoData';
 import TowerRewardSection from '@/components/TowerRewardSection';
@@ -90,6 +92,9 @@ const Home = () => {
 	const [streakInfo, setStreakInfo] = useState<StreakInfo>({ current: 0, best: 0, total: 0, checkedToday: false });
 	const [showDailyMission, setShowDailyMission] = useState(false); // 오늘의 미션 모달
 	const [missionSummary, setMissionSummary] = useState({ done: 0, total: 3, allDone: false, claimed: false });
+	const [showLevelUp, setShowLevelUp] = useState(false); // 레벨업 축하 모달
+	const [levelUpData, setLevelUpData] = useState<LevelUpInfo | null>(null);
+	const levelUpPendingRef = useRef(false); // 출석/미션 모달과 겹침 방지용 보류 플래그
 
 	const [showMascotHint, setShowMascotHint] = useState(true);
 
@@ -175,6 +180,17 @@ const Home = () => {
 			return () => clearTimeout(t);
 		}
 	}, [petLevel, showPetSpeech]);
+
+	// ✅ 출석/미션 모달이 떠 있지 않을 때, 보류된 레벨업 모달을 살짝 지연 후 노출
+	useEffect(() => {
+		if (levelUpPendingRef.current && levelUpData && !showCheckInModal && !showDailyMission) {
+			const t = setTimeout(() => {
+				setShowLevelUp(true);
+				levelUpPendingRef.current = false;
+			}, 600);
+			return () => clearTimeout(t);
+		}
+	}, [showCheckInModal, showDailyMission, levelUpData]);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -412,6 +428,36 @@ const Home = () => {
 
 	const questionsToNext = nextLevel && nextLevel.score ? Math.max(Math.ceil((nextLevel.score - totalScore) / SCORE_PER_QUESTION), 0) : 0;
 
+	/** 현재 점수에 해당하는 레벨(등급) — LEVEL_DATA 순서 무관 */
+	const getCurrentLevelData = (score: number) => {
+		const asc = [...LEVEL_DATA].sort((a, b) => a.score - b.score);
+		return asc.reduce((acc, l) => (score >= l.score ? l : acc), asc[0]);
+	};
+
+	/** 마지막으로 확인한 등급보다 상승했으면 레벨업 모달 표시 (등급 임계 점수 기준) */
+	const detectLevelUp = async (score: number) => {
+		try {
+			const current = getCurrentLevelData(score);
+			const storedRaw = await AsyncStorage.getItem(MainStorageKeyType.LAST_SEEN_GRADE);
+			const stored = storedRaw != null ? parseInt(storedRaw, 10) : null;
+			if (stored != null && current.score > stored) {
+				setLevelUpData({
+					label: current.label,
+					mascot: current.mascot,
+					encouragement: current.encouragement,
+					description: current.description,
+					score: current.score,
+				});
+				levelUpPendingRef.current = true; // 안전한 시점(출석/미션 모달 닫힘)에 노출
+			}
+			if (stored == null || current.score !== stored) {
+				await AsyncStorage.setItem(MainStorageKeyType.LAST_SEEN_GRADE, String(current.score));
+			}
+		} catch (e) {
+			console.log('레벨업 감지 실패:', e);
+		}
+	};
+
 	const loadData = async () => {
 		const quizData = await AsyncStorage.getItem(USER_QUIZ_HISTORY_KEY);
 		const studyData = await AsyncStorage.getItem(USER_STUDY_HISTORY_KEY);
@@ -431,6 +477,7 @@ const Home = () => {
 		}
 
 		setTotalScore(realScore);
+		await detectLevelUp(realScore); // ✅ 레벨업 감지
 
 		const quizBadges = quizData ? JSON.parse(quizData).badges || [] : [];
 		const studyBadges = studyData ? JSON.parse(studyData).badges || [] : [];
@@ -548,6 +595,30 @@ const Home = () => {
 		// ✅ 연속 출석 스트릭 계산
 		const streak = calcStreak(Object.keys(marked), todayStr);
 		setStreakInfo(streak);
+
+		// ✅ 누적 출석일 기준 출석 뱃지 부여 (USER_QUIZ_HISTORY.badges 에 병합 저장)
+		await awardAttendanceBadges(Object.keys(marked).length);
+	};
+
+	/**
+	 * 누적 출석일로 출석 뱃지를 부여하고 저장/표시에 반영
+	 */
+	const awardAttendanceBadges = async (checkInCount: number) => {
+		try {
+			const quizJson = await AsyncStorage.getItem(USER_QUIZ_HISTORY_KEY);
+			const quiz = quizJson ? JSON.parse(quizJson) : {};
+			const existing: string[] = quiz.badges ?? [];
+			const earned = AttendanceBadgeInterceptor(checkInCount, existing);
+			if (earned.length === 0) {
+				return;
+			}
+			const merged = [...new Set([...existing, ...earned])];
+			quiz.badges = merged;
+			await AsyncStorage.setItem(USER_QUIZ_HISTORY_KEY, JSON.stringify(quiz));
+			setEarnedBadgeIds((prev) => [...new Set([...prev, ...earned])]);
+		} catch (e) {
+			console.log('출석 뱃지 부여 실패:', e);
+		}
 	};
 
 	// ✅ 오늘의 미션 요약을 스토리지에서 즉시 재계산
@@ -607,6 +678,10 @@ const Home = () => {
 		timechalleng: () => navigation.navigate(Paths.INIT_TIME_CHANLLENGE),
 		//@ts-ignore
 		towerchalleng: () => navigation.navigate(Paths.TOWER_CHANLLENGE), // ✅ 추가
+		//@ts-ignore
+		favorite: () => navigation.navigate(Paths.FAVORITE),
+		//@ts-ignore
+		myBook: () => navigation.navigate(Paths.MY_PROVERB_BOOK),
 	};
 	const ActionCard = ({
 		iconName,
@@ -838,6 +913,24 @@ const Home = () => {
 						onPress={moveToHandler.towerchalleng}
 						isNew
 					/>
+					<ActionCard
+						iconName="star"
+						iconType="materialIcons"
+						label="즐겨찾기"
+						description="자주 보고 싶은 속담을 모아두고 한눈에 다시 확인해요"
+						color="#f59e0b"
+						onPress={moveToHandler.favorite}
+						isNew
+					/>
+					<ActionCard
+						iconName="menu-book"
+						iconType="materialIcons"
+						label="나만의 속담집"
+						description="원하는 속담을 모아 나만의 속담집을 만들고 퀴즈로 풀어봐요"
+						color="#8e44ad"
+						onPress={moveToHandler.myBook}
+						isNew
+					/>
 
 					<View style={styles.quickActionRow}>
 						<TouchableOpacity style={styles.quickActionCard} activeOpacity={0.85} onPress={() => setShowDailyMission(true)}>
@@ -900,6 +993,8 @@ const Home = () => {
 					refreshMissionSummary();
 				}}
 			/>
+
+			<LevelUpModal visible={showLevelUp} level={levelUpData} onClose={() => setShowLevelUp(false)} />
 
 			<LevelModal visible={showLevelModal} totalScore={totalScore} onClose={() => setShowLevelModal(false)} />
 			<CheckInModal

@@ -3,8 +3,8 @@
 /* eslint-disable react-native/no-inline-styles */
 
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { Alert, Animated, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -64,19 +64,40 @@ const RESET_CONFIG: Record<ResetType, { title: string; summary: string; iconName
 };
 
 // ─────────────────────────────────────────────
+// 아코디언 그룹 정의 (사용자 정보 초기화)
+// ─────────────────────────────────────────────
+const ACCORDION_CONFIG = {
+	study: {
+		label: '학습 데이터 초기화',
+		icon: 'book-open-variant',
+		iconColor: '#22C55E',
+		iconBg: '#DCFCE7',
+		items: [
+			{ key: 'resetStudy', label: '학습 기록 초기화' },
+			{ key: 'resetQuiz', label: '퀴즈 기록 초기화' },
+			{ key: 'resetTodayQuiz', label: '오늘의 퀴즈 초기화' },
+		],
+	},
+	challenge: {
+		label: '챌린지 데이터 초기화',
+		icon: 'trophy-outline',
+		iconColor: '#F59E0B',
+		iconBg: '#FEF3C7',
+		items: [
+			{ key: 'resetTimeChallenge', label: '타임챌린지 기록 초기화' },
+			{ key: 'resetTowerChallenge', label: '타워챌린지 기록 초기화' },
+		],
+	},
+} as const;
+
+// ─────────────────────────────────────────────
 // 설정 아이템 정의 (컴포넌트 외부)
 // ─────────────────────────────────────────────
 type IconType = 'MaterialCommunityIcons' | 'materialIcons';
 
-const SETTINGS_MAP: Record<string, { label: string; icon: { type: IconType; name: string } }> = {
+const SETTINGS_MAP: Record<string, { label: string; icon: { type: IconType; name: string }; isDanger?: boolean }> = {
 	rate: { label: '앱 리뷰 남기기', icon: { type: 'MaterialCommunityIcons', name: 'star-outline' } },
 	inquiry: { label: '문의하기', icon: { type: 'MaterialCommunityIcons', name: 'email-outline' } },
-	resetStudy: { label: '학습 다시 풀기', icon: { type: 'MaterialCommunityIcons', name: 'refresh' } },
-	resetQuiz: { label: '퀴즈 다시 풀기', icon: { type: 'MaterialCommunityIcons', name: 'refresh' } },
-	resetTodayQuiz: { label: '오늘의 퀴즈 다시 풀기', icon: { type: 'MaterialCommunityIcons', name: 'refresh' } },
-	resetTimeChallenge: { label: '타임 챌린지 기록 초기화', icon: { type: 'MaterialCommunityIcons', name: 'refresh' } },
-	resetTowerChallenge: { label: '타워 챌린지 초기화', icon: { type: 'MaterialCommunityIcons', name: 'refresh' } },
-	resetAll: { label: '모두 다시 풀기', icon: { type: 'materialIcons', name: 'delete' } },
 	developerInfo: { label: '제작자 소개', icon: { type: 'MaterialCommunityIcons', name: 'account-circle-outline' } },
 	developerApps: { label: '제작자 앱 더보기', icon: { type: 'MaterialCommunityIcons', name: 'apps' } },
 	privacyPolicy: { label: '개인정보 처리방침 및 이용약관', icon: { type: 'MaterialCommunityIcons', name: 'shield-lock-outline' } },
@@ -89,16 +110,14 @@ const SETTINGS_MAP: Record<string, { label: string; icon: { type: IconType; name
 	}),
 };
 
-const RESET_ITEM_KEYS = ['resetStudy', 'resetQuiz', 'resetAll', 'resetTodayQuiz', 'resetTimeChallenge', 'resetTowerChallenge'];
-
 // ─────────────────────────────────────────────
 // 섹션 정의
 // ─────────────────────────────────────────────
 const BASE_SECTIONS = [
 	{
 		titleText: '사용자 정보 초기화',
-		titleColor: '#E53935' as string | undefined,
-		data: ['resetStudy', 'resetQuiz', 'resetTodayQuiz', 'resetTimeChallenge', 'resetTowerChallenge', 'resetAll'],
+		titleColor: '#EF4444' as string | undefined,
+		data: ['__accordion__'],
 	},
 	{
 		titleText: '문의 및 피드백',
@@ -109,6 +128,26 @@ const BASE_SECTIONS = [
 		data: ['privacyPolicy', 'openSource', 'checkVersion', ...(IS_DEV ? ['completeAllQuiz', 'completeAllStudy', 'completeAllTower'] : [])],
 	},
 ];
+
+// ─────────────────────────────────────────────
+// 카드 버튼 press scale 애니메이션 래퍼
+// ─────────────────────────────────────────────
+const AnimatedPressCard = ({ children, onPress }: { children: React.ReactNode; onPress: () => void }) => {
+	const scaleAnim = useRef(new Animated.Value(1)).current;
+
+	const handlePressIn = () => {
+		Animated.spring(scaleAnim, { toValue: 0.97, useNativeDriver: true, speed: 50, bounciness: 2 }).start();
+	};
+	const handlePressOut = () => {
+		Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, speed: 50, bounciness: 2 }).start();
+	};
+
+	return (
+		<TouchableOpacity onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut} activeOpacity={1}>
+			<Animated.View style={{ transform: [{ scale: scaleAnim }] }}>{children}</Animated.View>
+		</TouchableOpacity>
+	);
+};
 
 // ─────────────────────────────────────────────
 // 컴포넌트
@@ -123,6 +162,7 @@ const SettingScreen = () => {
 	const [showVersionModal, setShowVersionModal] = useState(false);
 	const [showScrollTop, setShowScrollTop] = useState(false);
 
+	const [openAccordion, setOpenAccordion] = useState<'study' | 'challenge' | null>(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [resetType, setResetType] = useState<ResetType | null>(null);
 	const [appVersion, setAppVersion] = useState('');
@@ -359,27 +399,110 @@ const SettingScreen = () => {
 		[],
 	);
 
+	const newAppIds = useMemo(
+		() =>
+			new Set(
+				[...COMMON_APPS_DATA.Apps]
+					.sort((a, b) => b.id - a.id)
+					.slice(0, 2)
+					.map((app) => app.id),
+			),
+		[],
+	);
+
 	// ── renderItem ────────────────────────────────
 	const renderItem = ({ item }: { item: string }) => {
+		// 사용자 정보 초기화 — 아코디언
+		if (item === '__accordion__') {
+			return (
+				<View style={styles.accordionWrapper}>
+					{(['study', 'challenge'] as const).map((groupKey) => {
+						const group = ACCORDION_CONFIG[groupKey];
+						const isOpen = openAccordion === groupKey;
+
+						return (
+							<View key={groupKey} style={styles.accordionGroup}>
+								<TouchableOpacity
+									style={styles.accordionHeader}
+									onPress={() => setOpenAccordion(isOpen ? null : groupKey)}
+									activeOpacity={0.7}>
+									<View style={styles.row}>
+										<View style={[styles.accordionIconChip, { backgroundColor: group.iconBg }]}>
+											<IconComponent type="MaterialCommunityIcons" name={group.icon} size={scaledSize(16)} color={group.iconColor} />
+										</View>
+										<Text style={styles.accordionHeaderText}>{group.label}</Text>
+									</View>
+									<IconComponent
+										type="MaterialCommunityIcons"
+										name={isOpen ? 'chevron-up' : 'chevron-down'}
+										size={scaledSize(20)}
+										color="#64748B"
+									/>
+								</TouchableOpacity>
+
+								{isOpen && (
+									<View style={styles.accordionBody}>
+										{group.items.map((subItem, index) => (
+											<TouchableOpacity
+												key={subItem.key}
+												style={[styles.accordionSubItem, index === group.items.length - 1 && { borderBottomWidth: 0 }]}
+												onPress={() => ITEM_HANDLERS[subItem.key]?.()}>
+												<IconComponent
+													type="MaterialCommunityIcons"
+													name="refresh"
+													size={scaledSize(16)}
+													color="#EF4444"
+													style={{ marginRight: scaleWidth(10) }}
+												/>
+												<Text style={styles.accordionSubText}>{subItem.label}</Text>
+											</TouchableOpacity>
+										))}
+									</View>
+								)}
+							</View>
+						);
+					})}
+
+					<TouchableOpacity style={styles.accordionGroup} onPress={() => ITEM_HANDLERS.resetAll?.()} activeOpacity={0.7}>
+						<View style={styles.accordionHeader}>
+							<View style={styles.row}>
+								<IconComponent
+									type="materialIcons"
+									name="delete"
+									size={scaledSize(20)}
+									color="#B91C1C"
+									style={{ marginRight: scaleWidth(8) }}
+								/>
+								<Text style={[styles.accordionHeaderText, { color: '#B91C1C' }]}>전체 데이터 초기화</Text>
+							</View>
+							<IconComponent type="MaterialCommunityIcons" name="chevron-right" size={scaledSize(20)} color="#B91C1C" />
+						</View>
+					</TouchableOpacity>
+				</View>
+			);
+		}
+
 		const config = SETTINGS_MAP[item];
 		if (!config) {
 			return null;
 		}
 
 		return (
-			<TouchableOpacity style={styles.cardButton} onPress={() => ITEM_HANDLERS[item]?.()}>
-				<View style={styles.row}>
-					<IconComponent
-						type={config.icon.type}
-						name={config.icon.name}
-						size={scaledSize(20)}
-						color={RESET_ITEM_KEYS.includes(item) ? '#e74c3c' : '#2c3e50'}
-						style={styles.icon}
-						isBottomIcon={true}
-					/>
-					<Text style={styles.cardText}>{config.label}</Text>
+			<AnimatedPressCard onPress={() => ITEM_HANDLERS[item]?.()}>
+				<View style={styles.cardButton}>
+					<View style={styles.row}>
+						<View style={[styles.itemIconChip, config.isDanger && styles.itemIconChipDanger]}>
+							<IconComponent
+								type={config.icon.type}
+								name={config.icon.name}
+								size={scaledSize(18)}
+								color={config.isDanger ? '#EF4444' : '#3B82F6'}
+							/>
+						</View>
+						<Text style={styles.cardText}>{config.label}</Text>
+					</View>
 				</View>
-			</TouchableOpacity>
+			</AnimatedPressCard>
 		);
 	};
 
@@ -390,7 +513,7 @@ const SettingScreen = () => {
 		}
 		return (
 			<View style={styles.modalTitleRow}>
-				<IconComponent type="MaterialCommunityIcons" name={resetConfig.iconName} size={20} color="#2c3e50" style={styles.iconLeft} />
+				<IconComponent type="MaterialCommunityIcons" name={resetConfig.iconName} size={scaledSize(20)} color="#334155" style={styles.iconLeft} />
 				<Text style={styles.modalTitleText}>{resetConfig.title}</Text>
 			</View>
 		);
@@ -401,78 +524,94 @@ const SettingScreen = () => {
 		<>
 			<SafeAreaView style={styles.container} edges={['top']}>
 				<FadeInView style={{ flex: 1 }}>
-				<SectionList
-					ref={sectionRef}
-					keyExtractor={(item, index) => `${item}-${index}`}
-					renderItem={renderItem}
-					sections={sections.map((section, i) => ({ ...section, key: `section-${i}` }))}
-					onScroll={(e) => setShowScrollTop(e.nativeEvent.contentOffset.y > 100)}
-					contentContainerStyle={styles.listContent}
-					ItemSeparatorComponent={() => <View style={styles.itemSpacing} />}
-					renderSectionFooter={() => <View style={styles.sectionSpacing} />}
-					renderSectionHeader={({ section }) =>
-						section.title ? (
-							<View style={styles.sectionHeader}>
-								<Text style={styles.sectionHeaderText}>{section.title}</Text>
-							</View>
-						) : (
-							<View style={{ height: scaleHeight(10) }} />
-						)
-					}
-					ListHeaderComponent={
-						<View style={styles.headerContainer}>
-							<View style={styles.recommendSection}>
-								<Text style={styles.recommendTitle}>📲 앱이 마음에 드셨나요?</Text>
-								<Text style={styles.recommendSubtitle}>가족이나 친구, 지인에게 유용한 앱을 함께 나눠보세요!</Text>
-								<View style={styles.appIconWrapper}>
-									<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
+					<SectionList
+						ref={sectionRef}
+						keyExtractor={(item, index) => `${item}-${index}`}
+						renderItem={renderItem}
+						sections={sections.map((section, i) => ({ ...section, key: `section-${i}` }))}
+						stickySectionHeadersEnabled={false}
+						onScroll={(e) => setShowScrollTop(e.nativeEvent.contentOffset.y > 100)}
+						contentContainerStyle={styles.listContent}
+						ItemSeparatorComponent={() => <View style={styles.itemSpacing} />}
+						renderSectionFooter={() => <View style={styles.sectionSpacing} />}
+						renderSectionHeader={({ section }) =>
+							section.title ? (
+								<View style={styles.sectionHeader}>
+									<Text style={styles.sectionHeaderText}>{section.title}</Text>
 								</View>
-								<View style={styles.storeButtons}>
-									<TouchableOpacity style={[styles.storeButton, { backgroundColor: '#2ecc71' }]} onPress={shareApp}>
-										<View style={styles.iconRow}>
-											<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color="#ffffff" />
-											<Text style={styles.storeButtonText}>공유하기</Text>
+							) : (
+								<View style={{ height: scaleHeight(10) }} />
+							)
+						}
+						ListHeaderComponent={
+							<View style={styles.headerContainer}>
+								<View style={styles.recommendSection}>
+									<View style={styles.recommendTitleRow}>
+										<View style={styles.recommendTitleIconChip}>
+											<IconComponent type="MaterialCommunityIcons" name="cellphone-check" size={scaledSize(16)} color="#3B82F6" />
 										</View>
-									</TouchableOpacity>
+										<Text style={styles.recommendTitle}>앱이 마음에 드셨나요?</Text>
+									</View>
+									<Text style={styles.recommendSubtitle}>가족이나 친구, 지인에게 유용한 앱을 함께 나눠보세요!</Text>
+									<View style={styles.appIconWrapper}>
+										<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
+									</View>
+									<View style={styles.storeButtons}>
+										<TouchableOpacity style={[styles.storeButton, { backgroundColor: '#22C55E' }]} onPress={shareApp}>
+											<View style={styles.iconRow}>
+												<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color="#fff" />
+												<Text style={styles.storeButtonText}>공유하기</Text>
+											</View>
+										</TouchableOpacity>
+									</View>
 								</View>
 							</View>
-						</View>
-					}
-					ListFooterComponent={
-						<View style={styles.footerAppWrapper}>
-							<Text style={styles.appVerText}>
-								📱 현재 앱 버전: <Text style={styles.appVerBoldText}>v{appVersion}</Text>
-							</Text>
-							<FlatList
-								horizontal
-								data={COMMON_APPS_DATA.Apps}
-								keyExtractor={(item, index) => `${item.id}-${index}`}
-								showsHorizontalScrollIndicator={false}
-								contentContainerStyle={styles.footerAppList}
-								renderItem={({ item }) => {
-									const handlePress = async () => {
-										const storeUrl = Platform.OS === 'android' ? item.android : item.ios;
-										if (!storeUrl) {
-											Alert.alert('Coming Soon..!', '아직 이 플랫폼에서는 출시되지 않았습니다.');
-											return;
-										}
-										const supported = await Linking.canOpenURL(storeUrl);
-										supported ? Linking.openURL(storeUrl) : Alert.alert('오류', '스토어 페이지를 열 수 없습니다.');
-									};
-									return (
-										<TouchableOpacity style={styles.footerAppCard} onPress={handlePress}>
-											<Image source={item.icon} style={styles.footerAppIcon} resizeMode="contain" />
-											<Text style={styles.footerAppTitle}>{item.title}</Text>
-											<Text style={styles.footerAppDesc} numberOfLines={2}>
-												{item.desc}
-											</Text>
-										</TouchableOpacity>
-									);
-								}}
-							/>
-						</View>
-					}
-				/>
+						}
+						ListFooterComponent={
+							<View style={styles.footerAppWrapper}>
+								<Text style={styles.appVerText}>
+									📱 현재 앱 버전: <Text style={styles.appVerBoldText}>v{appVersion}</Text>
+								</Text>
+								<FlatList
+									horizontal
+									data={COMMON_APPS_DATA.Apps}
+									keyExtractor={(item, index) => `${item.id}-${index}`}
+									showsHorizontalScrollIndicator={false}
+									contentContainerStyle={styles.footerAppList}
+									renderItem={({ item }) => {
+										const handlePress = async () => {
+											const storeUrl = Platform.OS === 'android' ? item.android : item.ios;
+											if (!storeUrl) {
+												Alert.alert('Coming Soon..!', '아직 이 플랫폼에서는 출시되지 않았습니다.');
+												return;
+											}
+											const supported = await Linking.canOpenURL(storeUrl);
+											supported ? Linking.openURL(storeUrl) : Alert.alert('오류', '스토어 페이지를 열 수 없습니다.');
+										};
+										return (
+											<TouchableOpacity style={styles.footerAppCard} onPress={handlePress}>
+												<View style={{ position: 'relative' }}>
+													<View style={styles.footerAppIconWrapper}>
+														<Image source={item.icon} style={styles.footerAppIcon} resizeMode="contain" />
+														{newAppIds.has(item.id) && (
+															<>
+																<View style={styles.footerNewBadge} />
+																<Text style={styles.footerNewBadgeText}>NEW</Text>
+															</>
+														)}
+													</View>
+												</View>
+												<Text style={styles.footerAppTitle}>{item.title}</Text>
+												<Text style={styles.footerAppDesc} numberOfLines={2}>
+													{item.desc}
+												</Text>
+											</TouchableOpacity>
+										);
+									}}
+								/>
+							</View>
+						}
+					/>
 				</FadeInView>
 			</SafeAreaView>
 
@@ -483,7 +622,7 @@ const SettingScreen = () => {
 
 			{showScrollTop && (
 				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
-					<IconComponent type="fontawesome6" name="arrow-up" size={20} color="#ffffff" />
+					<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color="#fff" />
 				</TouchableOpacity>
 			)}
 
@@ -510,7 +649,7 @@ const SettingScreen = () => {
 export default SettingScreen;
 
 const styles = StyleSheet.create({
-	container: { flex: 1, backgroundColor: '#f8f9fa' },
+	container: { flex: 1, backgroundColor: '#F8FAFC' },
 	listContent: { paddingBottom: scaleHeight(24) },
 	headerContainer: { marginBottom: scaleHeight(5) },
 	itemSpacing: { height: scaleHeight(10) },
@@ -521,23 +660,21 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(20),
 		paddingVertical: scaleHeight(10),
 		marginHorizontal: scaleWidth(16),
-		backgroundColor: '#eaf4ff',
-		borderWidth: 1,
-		borderColor: '#d6eaf8',
+		backgroundColor: '#EFF6FF',
 		marginBottom: scaleHeight(12),
 		borderRadius: scaleWidth(8),
 	},
 	sectionHeaderText: {
 		fontSize: scaledSize(15),
 		fontWeight: '600',
-		color: '#2c3e50',
+		color: '#334155',
 		letterSpacing: 0.5,
 		textTransform: 'uppercase',
 	},
 
 	cardButton: {
-		backgroundColor: '#ffffff',
-		borderRadius: scaleWidth(12),
+		backgroundColor: '#fff',
+		borderRadius: scaledSize(12),
 		paddingVertical: scaleHeight(16),
 		paddingHorizontal: scaleWidth(16),
 		marginHorizontal: scaleHeight(20),
@@ -549,16 +686,63 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	row: { flexDirection: 'row', alignItems: 'center' },
-	icon: { marginRight: scaleWidth(12), color: '#2c3e50' },
-	cardText: { fontSize: scaledSize(15), color: '#2c3e50', fontWeight: '500', letterSpacing: 0.3, flexShrink: 1 },
+	itemIconChip: {
+		width: scaleWidth(34),
+		height: scaleWidth(34),
+		borderRadius: scaleWidth(10),
+		backgroundColor: '#EFF6FF',
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginRight: scaleWidth(10),
+	},
+	itemIconChipDanger: { backgroundColor: '#FEF2F2' },
+	cardText: { fontSize: scaledSize(15), color: '#334155', fontWeight: '500', letterSpacing: 0.3, flexShrink: 1 },
+
+	// ── 아코디언 ──
+	accordionWrapper: { marginHorizontal: scaleWidth(20), gap: scaleHeight(10) },
+	accordionGroup: {
+		backgroundColor: '#fff',
+		borderRadius: scaleWidth(12),
+		overflow: 'hidden',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.06,
+		shadowRadius: 3,
+	},
+	accordionHeader: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		paddingVertical: scaleHeight(16),
+		paddingHorizontal: scaleWidth(16),
+	},
+	accordionIconChip: {
+		width: scaleWidth(28),
+		height: scaleWidth(28),
+		borderRadius: scaleWidth(14),
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginRight: scaleWidth(10),
+	},
+	accordionHeaderText: { fontSize: scaledSize(15), fontWeight: '600', color: '#334155' },
+	accordionBody: { borderTopWidth: 1, borderTopColor: '#F1F5F9', backgroundColor: '#F8FAFC' },
+	accordionSubItem: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingVertical: scaleHeight(14),
+		paddingHorizontal: scaleWidth(20),
+		borderBottomWidth: 1,
+		borderBottomColor: '#F1F5F9',
+	},
+	accordionSubText: { fontSize: scaledSize(14), color: '#EF4444', fontWeight: '500' },
 
 	scrollTopButton: {
 		position: 'absolute',
 		right: scaleWidth(16),
 		bottom: scaleHeight(16),
-		backgroundColor: '#3498db',
-		width: scaleWidth(36),
-		height: scaleWidth(36),
+		backgroundColor: '#3B82F6',
+		width: scaleWidth(48),
+		height: scaleWidth(48),
 		borderRadius: scaleWidth(24),
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -569,16 +753,16 @@ const styles = StyleSheet.create({
 	},
 
 	modalTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: scaleHeight(12) },
-	modalTitleText: { fontSize: scaledSize(18), lineHeight: scaleHeight(44), fontWeight: 'bold', color: '#2c3e50', textAlign: 'center' },
+	modalTitleText: { fontSize: scaledSize(18), lineHeight: scaleHeight(44), fontWeight: 'bold', color: '#334155', textAlign: 'center' },
 	iconLeft: { marginRight: scaleWidth(8) },
 
 	recommendSection: {
 		marginHorizontal: scaleWidth(20),
 		padding: scaleWidth(20),
-		backgroundColor: '#f2f2f2',
+		backgroundColor: '#F1F5F9',
 		borderRadius: scaleWidth(12),
 		borderWidth: 1,
-		borderColor: '#e1e4e8',
+		borderColor: '#E2E8F0',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.04,
@@ -586,24 +770,34 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginTop: scaleHeight(12),
 	},
-	recommendTitle: { fontSize: scaledSize(16), fontWeight: '700', color: '#2c3e50', marginBottom: scaleHeight(6) },
-	recommendSubtitle: { fontSize: scaledSize(13), color: '#7f8c8d', textAlign: 'center', marginBottom: scaleHeight(12) },
+	recommendTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) },
+	recommendTitleIconChip: {
+		width: scaleWidth(28),
+		height: scaleWidth(28),
+		borderRadius: scaleWidth(14),
+		backgroundColor: '#DBEAFE',
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginRight: scaleWidth(8),
+	},
+	recommendTitle: { fontSize: scaledSize(17), fontWeight: '700', color: '#334155' },
+	recommendSubtitle: { fontSize: scaledSize(13), color: '#64748B', textAlign: 'center', marginBottom: scaleHeight(12) },
 	appIconWrapper: {
 		width: scaleWidth(80),
 		height: scaleWidth(80),
 		marginBottom: scaleHeight(12),
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
+		borderColor: '#E2E8F0',
 		borderRadius: scaleWidth(16),
 		overflow: 'hidden',
 	},
 	appIcon: { width: '100%', height: '100%', borderRadius: scaleWidth(16) },
 	storeButtons: { marginTop: scaleHeight(6), flexDirection: 'row', gap: scaleWidth(8) },
 	storeButton: { flex: 1, paddingVertical: scaleHeight(12), borderRadius: scaleWidth(8), alignItems: 'center' },
-	storeButtonText: { color: '#ffffff', fontWeight: 'bold', fontSize: scaledSize(13) },
+	storeButtonText: { color: '#fff', fontWeight: 'bold', fontSize: scaledSize(13) },
 	iconRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleWidth(6) },
 
-	appVerText: { fontSize: scaledSize(12), color: '#95a5a6', textAlign: 'center', marginBottom: scaleHeight(20) },
+	appVerText: { fontSize: scaledSize(12), color: '#94A3B8', textAlign: 'center', marginBottom: scaleHeight(20) },
 	appVerBoldText: { fontWeight: 'bold' },
 
 	footerAppWrapper: { paddingVertical: scaleHeight(12) },
@@ -612,7 +806,7 @@ const styles = StyleSheet.create({
 		width: scaleWidth(120),
 		padding: scaleWidth(12),
 		borderRadius: scaleWidth(12),
-		backgroundColor: '#ffffff',
+		backgroundColor: '#fff',
 		alignItems: 'center',
 		justifyContent: 'flex-start',
 		shadowColor: '#000',
@@ -620,7 +814,34 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.08,
 		shadowRadius: 4,
 	},
-	footerAppIcon: { width: scaleWidth(64), height: scaleWidth(64), borderRadius: scaleWidth(12), marginBottom: scaleHeight(8) },
-	footerAppTitle: { fontSize: scaledSize(13), fontWeight: '600', color: '#2c3e50', textAlign: 'center', marginBottom: scaleHeight(4) },
-	footerAppDesc: { fontSize: scaledSize(11), color: '#7f8c8d', textAlign: 'center' },
+	footerAppIconWrapper: {
+		width: scaleWidth(64),
+		height: scaleWidth(64),
+		borderRadius: scaleWidth(12),
+		overflow: 'hidden',
+		marginBottom: scaleHeight(8),
+	},
+	footerAppIcon: { width: '100%', height: '100%' },
+	footerNewBadge: {
+		position: 'absolute',
+		top: 0,
+		right: 0,
+		width: 0,
+		height: 0,
+		borderTopWidth: scaleWidth(26),
+		borderTopColor: '#EF4444',
+		borderLeftWidth: scaleWidth(26),
+		borderLeftColor: 'transparent',
+	},
+	footerNewBadgeText: {
+		position: 'absolute',
+		top: scaleWidth(4),
+		right: scaleWidth(2),
+		fontSize: scaledSize(5),
+		fontWeight: '800',
+		color: '#fff',
+		transform: [{ rotate: '45deg' }],
+	},
+	footerAppTitle: { fontSize: scaledSize(13), fontWeight: '600', color: '#334155', textAlign: 'center', marginBottom: scaleHeight(4) },
+	footerAppDesc: { fontSize: scaledSize(11), color: '#64748B', textAlign: 'center' },
 });

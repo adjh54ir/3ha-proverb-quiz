@@ -18,7 +18,7 @@ import IconComponent from './common/atomic/IconComponent';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 
 type QuizModeScreenRouteParams = {
-	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'comingsoon' }; // 전달되는 mode는 string 타입 (예: 'meaning' | 'proverb' | 'blank')
+	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'example' }; // 전달되는 mode는 string 타입 (예: 'meaning' | 'proverb' | 'blank')
 };
 
 const QuizModeScreen = () => {

@@ -1,17 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import {
-	View,
-	Text,
-	StyleSheet,
-	Modal,
-	TouchableOpacity,
-	Animated,
-	Dimensions,
-	ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, Dimensions, ScrollView } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import IconComponent from '../common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import IconComponent from '../common/atomic/IconComponent';
 
 const { width, height } = Dimensions.get('window');
 
@@ -52,17 +43,13 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 }) => {
 	const scaleAnim = useRef(new Animated.Value(0)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const starAnims = useRef([
-		new Animated.Value(0),
-		new Animated.Value(0),
-		new Animated.Value(0),
-	]).current;
+	const starAnims = useRef([new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)]).current;
 	const scoreCountAnim = useRef(new Animated.Value(0)).current;
 	const glowAnim = useRef(new Animated.Value(0.4)).current;
 	const bossAnim = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
-		let glowLoop: Animated.CompositeAnimation | undefined;
+		let glowLoop: Animated.CompositeAnimation | null = null;
 		if (visible) {
 			glowLoop = Animated.loop(
 				Animated.sequence([
@@ -101,24 +88,23 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 			glowAnim.setValue(0.4);
 			starAnims.forEach((anim) => anim.setValue(0));
 		}
-
-		// ✅ 종료 처리: 모달 숨김/언마운트 시 무한 루프 애니메이션 정지 (메모리 정리)
+		// ✅ 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
 		return () => {
 			glowLoop?.stop();
-			glowAnim.stopAnimation();
 			scaleAnim.stopAnimation();
 			fadeAnim.stopAnimation();
 			scoreCountAnim.stopAnimation();
 			bossAnim.stopAnimation();
+			glowAnim.stopAnimation();
 			starAnims.forEach((anim) => anim.stopAnimation());
 		};
 	}, [visible, isVictory]);
 
 	const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
-	const accentColor = isVictory ? '#f1c40f' : '#e74c3c';
-	const bgColor = isVictory ? '#1a3a28' : '#2d1212';
-	const headerBgColor = isVictory ? '#27ae60' : '#c0392b';
-	const borderColor = isVictory ? '#2ecc71' : '#e74c3c';
+	const accentColor = isVictory ? '#FBBF24' : '#F87171';
+	const bgColor = isVictory ? '#064E3B' : '#7F1D1D';
+	const headerBgColor = isVictory ? '#22C55E' : '#B91C1C';
+	const borderColor = isVictory ? '#22C55E' : '#EF4444';
 
 	const renderScoreDots = () =>
 		Array.from({ length: totalQuestions }).map((_, i) => (
@@ -131,9 +117,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 						borderColor: i < correctCount ? accentColor : 'rgba(255,255,255,0.1)',
 					},
 				]}>
-				{i < correctCount && (
-					<IconComponent type="materialIcons" name="check" size={10} color="#1a1a2e" />
-				)}
+				{i < correctCount && <IconComponent type="materialIcons" name="check" size={scaledSize(10)} color="#0F172A" />}
 			</View>
 		));
 
@@ -151,20 +135,14 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 							borderColor,
 						},
 					]}>
-
 					{/* 헤더 - 고정 */}
 					<View style={[styles.titleBanner, { backgroundColor: headerBgColor }]}>
-						<Text style={styles.resultTitle}>
-							{isVictory ? '⚔️  VICTORY  ⚔️' : '💀  DEFEAT  💀'}
-						</Text>
+						<Text style={styles.resultTitle}>{isVictory ? '⚔️  VICTORY  ⚔️' : '💀  DEFEAT  💀'}</Text>
 					</View>
 
 					{/* 보스 이미지 - 헤더 바로 아래, 스크롤 밖 */}
-					<Animated.View
-						style={[styles.bossContainer, { opacity: bossAnim, transform: [{ scale: bossAnim }] }]}>
-						<Animated.View
-							style={[styles.bossGlowRing, { opacity: glowAnim, borderColor: accentColor }]}
-						/>
+					<Animated.View style={[styles.bossContainer, { opacity: bossAnim, transform: [{ scale: bossAnim }] }]}>
+						<Animated.View style={[styles.bossGlowRing, { opacity: glowAnim, borderColor: accentColor }]} />
 						<View style={[styles.bossImageWrapper, { borderColor: accentColor }]}>
 							<FastImage
 								source={towerLevel.bossImage}
@@ -190,14 +168,11 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 						style={styles.scrollArea}
 						showsVerticalScrollIndicator={false}
 						contentContainerStyle={styles.scrollContent}>
-
 						{/* 점수 */}
 						<View style={styles.scoreMainBox}>
 							<Text style={styles.scoreLabel}>SCORE</Text>
 							<View style={styles.scoreRow}>
-								<Text style={[styles.scoreCorrect, { color: accentColor }]}>
-									{correctCount}
-								</Text>
+								<Text style={[styles.scoreCorrect, { color: accentColor }]}>{correctCount}</Text>
 								<Text style={styles.scoreSlash}> / </Text>
 								<Text style={styles.scoreTotal}>{totalQuestions}</Text>
 							</View>
@@ -216,9 +191,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 									]}
 								/>
 							</View>
-							<Text style={[styles.percentText, { color: accentColor }]}>
-								{scorePercentage}%
-							</Text>
+							<Text style={[styles.percentText, { color: accentColor }]}>{scorePercentage}%</Text>
 						</View>
 
 						{/* 승리 별 */}
@@ -238,7 +211,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 												},
 											],
 										}}>
-										<IconComponent type="materialIcons" name="star" size={36} color="#f1c40f" />
+										<IconComponent type="materialIcons" name="star" size={scaledSize(36)} color="#FBBF24" />
 									</Animated.View>
 								))}
 							</View>
@@ -247,15 +220,15 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 						{/* 보상 */}
 						{isVictory && (
 							<View style={styles.rewardSection}>
-								<View style={[styles.rewardHeader, { backgroundColor: 'rgba(241,196,15,0.15)', borderBottomColor: 'rgba(241,196,15,0.3)' }]}>
-									<Text style={styles.rewardHeaderText}>🎁  REWARD UNLOCKED</Text>
+								<View
+									style={[
+										styles.rewardHeader,
+										{ backgroundColor: 'rgba(241,196,15,0.15)', borderBottomColor: 'rgba(241,196,15,0.3)' },
+									]}>
+									<Text style={styles.rewardHeaderText}>🎁 REWARD UNLOCKED</Text>
 								</View>
 								<View style={styles.rewardBody}>
-									<FastImage
-										source={towerLevel.reward.image}
-										style={styles.rewardImage}
-										resizeMode="contain"
-									/>
+									<FastImage source={towerLevel.reward.image} style={styles.rewardImage} resizeMode="contain" />
 									<View style={styles.rewardInfo}>
 										<Text style={styles.rewardName}>{towerLevel.reward.name}</Text>
 										{!!towerLevel.reward.description && <Text style={styles.rewardDescription}>{towerLevel.reward.description}</Text>}
@@ -268,9 +241,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 						{!isVictory && (
 							<View style={styles.failSection}>
 								<Text style={styles.failLabel}>MISSION FAILED</Text>
-								<Text style={styles.failText}>
-									모든 문제를 맞춰야 클리어됩니다.{'\n'}포기하지 말고 다시 도전하세요!
-								</Text>
+								<Text style={styles.failText}>모든 문제를 맞춰야 클리어됩니다.{'\n'}포기하지 말고 다시 도전하세요!</Text>
 							</View>
 						)}
 					</ScrollView>
@@ -278,25 +249,21 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 					{/* 버튼 - 항상 하단 고정 */}
 					<View style={styles.buttonsContainer}>
 						<TouchableOpacity onPress={onHome} style={styles.btnSecondary}>
-							<IconComponent type="materialIcons" name="home" size={20} color="#ffffff" />
+							<IconComponent type="materialIcons" name="home" size={scaledSize(20)} color="#fff" />
 							<Text style={styles.btnSecondaryText}>홈</Text>
 						</TouchableOpacity>
 
 						{isVictory ? (
 							onNext && (
-								<TouchableOpacity
-									onPress={onNext}
-									style={[styles.btnPrimary, { backgroundColor: '#f39c12' }]}>
-									<Text style={[styles.btnPrimaryText, { color: '#1a1a2e' }]}>NEXT LEVEL</Text>
-									<IconComponent type="materialIcons" name="arrow-forward" size={20} color="#1a1a2e" />
+								<TouchableOpacity onPress={onNext} style={[styles.btnPrimary, { backgroundColor: '#F59E0B' }]}>
+									<Text style={[styles.btnPrimaryText, { color: '#0F172A' }]}>NEXT LEVEL</Text>
+									<IconComponent type="materialIcons" name="arrow-forward" size={scaledSize(20)} color="#0F172A" />
 								</TouchableOpacity>
 							)
 						) : (
-							<TouchableOpacity
-								onPress={onRetry}
-								style={[styles.btnPrimary, { backgroundColor: '#e74c3c' }]}>
-								<IconComponent type="materialIcons" name="refresh" size={20} color="#ffffff" />
-								<Text style={[styles.btnPrimaryText, { color: '#ffffff' }]}>RETRY</Text>
+							<TouchableOpacity onPress={onRetry} style={[styles.btnPrimary, { backgroundColor: '#EF4444' }]}>
+								<IconComponent type="materialIcons" name="refresh" size={scaledSize(20)} color="#fff" />
+								<Text style={[styles.btnPrimaryText, { color: '#fff' }]}>RETRY</Text>
 							</TouchableOpacity>
 						)}
 					</View>
@@ -333,7 +300,7 @@ const styles = StyleSheet.create({
 	resultTitle: {
 		fontSize: scaledSize(22),
 		fontWeight: '900',
-		color: '#ffffff',
+		color: '#fff',
 		letterSpacing: 3,
 		textShadowColor: 'rgba(0,0,0,0.4)',
 		textShadowOffset: { width: 0, height: 2 },
@@ -375,7 +342,7 @@ const styles = StyleSheet.create({
 	},
 	defeatOverlayText: {
 		fontSize: scaledSize(42),
-		color: '#e74c3c',
+		color: '#EF4444',
 		fontWeight: 'bold',
 	},
 	crownBadge: {
@@ -472,7 +439,7 @@ const styles = StyleSheet.create({
 	},
 	rewardSection: {
 		marginTop: scaleHeight(12),
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(14),
 		overflow: 'hidden',
 		borderWidth: 1,
 		borderColor: 'rgba(241,196,15,0.35)',
@@ -486,7 +453,7 @@ const styles = StyleSheet.create({
 	rewardHeaderText: {
 		fontSize: scaledSize(11),
 		fontWeight: '800',
-		color: '#f1c40f',
+		color: '#FBBF24',
 		letterSpacing: 2,
 	},
 	rewardBody: {
@@ -508,7 +475,7 @@ const styles = StyleSheet.create({
 	rewardName: {
 		fontSize: scaledSize(14),
 		fontWeight: '700',
-		color: '#ffffff',
+		color: '#fff',
 		marginBottom: scaleHeight(4),
 	},
 	rewardDescription: {
@@ -519,7 +486,7 @@ const styles = StyleSheet.create({
 	failSection: {
 		marginTop: scaleHeight(12),
 		backgroundColor: 'rgba(0,0,0,0.25)',
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(14),
 		padding: scaleWidth(16),
 		borderWidth: 1,
 		borderColor: 'rgba(255,100,100,0.25)',
@@ -528,7 +495,7 @@ const styles = StyleSheet.create({
 	failLabel: {
 		fontSize: scaledSize(11),
 		fontWeight: '800',
-		color: '#e74c3c',
+		color: '#F87171',
 		letterSpacing: 3,
 		marginBottom: scaleHeight(8),
 	},
@@ -562,7 +529,7 @@ const styles = StyleSheet.create({
 	btnSecondaryText: {
 		fontSize: scaledSize(14),
 		fontWeight: '700',
-		color: '#ffffff',
+		color: '#fff',
 	},
 	btnPrimary: {
 		flex: 2,

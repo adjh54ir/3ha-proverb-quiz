@@ -847,22 +847,30 @@ const QuizScreen = () => {
 
 								<View style={styles.statusCardRow}>
 									<View style={styles.statusCard}>
-										<Text style={styles.statusCardTitle}>📝 문제</Text>
-										<Text style={[styles.statusCardValue]}>
-											<Text style={{ color: '#3498db' }}>{getSolvedCount()}</Text>
-											{' / '}
-											{totalCount}
+										<View style={[styles.statusCardIcon, { backgroundColor: '#DBEAFE' }]}>
+											<IconComponent type='materialIcons' name='quiz' size={scaledSize(16)} color='#3B82F6' />
+										</View>
+										<Text style={styles.statusCardTitle}>푼 퀴즈</Text>
+										<Text style={styles.statusCardValue}>
+											<Text style={{ color: '#3B82F6' }}>{getSolvedCount()}</Text>
+											<Text style={styles.statusCardUnit}>{` / ${totalCount}`}</Text>
 										</Text>
 									</View>
 									<View style={styles.statusCard}>
-										<Text style={styles.statusCardTitle}>🎯 총점</Text>
+										<View style={[styles.statusCardIcon, { backgroundColor: '#DCFCE7' }]}>
+											<IconComponent type='materialIcons' name='star' size={scaledSize(16)} color='#22C55E' />
+										</View>
+										<Text style={styles.statusCardTitle}>총점</Text>
 										<View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
-											<Text style={styles.statusCardValue}>{totalScore}점</Text>
+											<Text style={styles.statusCardValue}>{totalScore}<Text style={styles.statusCardUnit}>점</Text></Text>
 											{showScoreBonus && <Animated.Text style={[styles.scoreBonusText, scoreBonusStyle]}>+10점!</Animated.Text>}
 										</View>
 									</View>
 									<View style={styles.statusCard}>
-										<Text style={[styles.statusCardTitle, { color: '#e67e22' }]}>🔥 콤보</Text>
+										<View style={[styles.statusCardIcon, { backgroundColor: '#FEF3C7' }]}>
+											<IconComponent type='materialCommunityIcons' name='fire' size={scaledSize(16)} color={combo > 0 ? '#F97316' : '#94A3B8'} />
+										</View>
+										<Text style={styles.statusCardTitle}>콤보</Text>
 										<Animated.View
 											style={{
 												transform: [
@@ -878,13 +886,9 @@ const QuizScreen = () => {
 													outputRange: [1, 1],
 												}),
 											}}>
-											<Text
-												style={[
-													styles.statusCardValue,
-													styles.comboValue,
-													{ color: combo > 0 ? '#e74c3c' : '#2c3e50' }, // 🔥 조건부 색상 적용
-												]}>
-												🔥 {combo} Combo
+											<Text style={[styles.statusCardValue, { color: combo > 0 ? '#F97316' : '#334155' }]}>
+												{combo}
+												<Text style={styles.statusCardUnit}> Combo</Text>
 											</Text>
 										</Animated.View>
 									</View>
@@ -914,25 +918,34 @@ const QuizScreen = () => {
 									width={scaleWidth(6)} // ✅ 기존 8 → 6
 									fill={((40 - remainingTime) / 40) * 100} // ✅ 수정된 부분
 									duration={500}
-									tintColor='#3498db'
-									backgroundColor='#ecf0f1'>
+									tintColor={remainingTime > 20 ? '#3B82F6' : remainingTime > 10 ? '#F59E0B' : '#EF4444'}
+									backgroundColor='#F1F5F9'>
 									{() => (
 										<View style={styles.timerInner}>
-											<Text style={styles.timerText}>{remainingTime}s</Text>
+											<Text style={[styles.timerText, { color: remainingTime > 20 ? '#3B82F6' : remainingTime > 10 ? '#F59E0B' : '#EF4444' }]}>{remainingTime}초</Text>
 										</View>
 									)}
 								</AnimatedCircularProgress>
 
 								{question ? (
-									<Text style={styles.questionText}>
-										{`Q. ${
-											routeMode === 'blank'
+									<View style={{ alignItems: 'center', marginBottom: scaleHeight(5) }}>
+										<Text style={[styles.questionText, { textAlign: 'center' }]}>
+											{routeMode === 'blank' || routeMode === 'example'
 												? questionText || '문제 준비중...'
 												: routeMode === 'meaning'
 													? question?.proverb
-													: question?.longMeaning || '문제 준비중...'
-										}`}
-									</Text>
+													: question?.longMeaning || '문제 준비중...'}
+										</Text>
+										<Text style={styles.promptText}>
+											{routeMode === 'meaning'
+												? '무슨 의미일까요?'
+												: routeMode === 'proverb'
+													? '무슨 속담일까요?'
+													: routeMode === 'blank'
+														? '빈칸은 무엇일까요?'
+														: '어울리는 속담은?'}
+										</Text>
+									</View>
 								) : (
 									<Text>문제 불러오는 중...</Text>
 								)}
@@ -1080,6 +1093,7 @@ const QuizScreen = () => {
 			/>
 			<StartModal
 				visible={showStartModal}
+				mode={routeMode}
 				onStart={() => {
 					setShowStartModal(false);
 					setTimeout(() => onStart(), 100); // ✅ onStart 호출 추가
@@ -1118,6 +1132,7 @@ const QuizScreen = () => {
 				resultType={resultType}
 				resultTitle={resultTitle}
 				quizMode={routeMode}
+			blankWord={blankWord}
 				resultMessage={resultMessage}
 				question={question}
 				favoriteIds={favoriteIds} // ✅ 추가
@@ -1192,10 +1207,17 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
 		marginTop: scaleHeight(6),
-		marginBottom: scaleHeight(12),
+		marginBottom: scaleHeight(6),
 		textAlign: 'center',
-		color: '#3498db',
+		color: '#0F172A',
 		lineHeight: scaleHeight(28),
+	},
+	promptText: {
+		fontSize: scaledSize(14),
+		fontWeight: '700',
+		color: '#3B82F6',
+		textAlign: 'center',
+		marginBottom: scaleHeight(8),
 	},
 	optionsContainer: { width: '100%' },
 	optionButton: {
@@ -1359,26 +1381,37 @@ const styles = StyleSheet.create({
 	},
 	statusCard: {
 		flex: 1,
-		backgroundColor: '#ecf0f1',
-		marginHorizontal: scaleWidth(2),
-		paddingVertical: scaleHeight(12),
-		borderRadius: scaleWidth(12),
+		backgroundColor: '#F8FAFC',
+		marginHorizontal: scaleWidth(3),
+		paddingVertical: scaleHeight(10),
+		borderRadius: scaleWidth(14),
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowOpacity: 0.1,
-		shadowRadius: scaleWidth(2),
+		borderWidth: 1,
+		borderColor: '#E2E8F0',
+	},
+	statusCardIcon: {
+		width: scaleWidth(30),
+		height: scaleWidth(30),
+		borderRadius: scaleWidth(15),
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginBottom: scaleHeight(5),
 	},
 	statusCardTitle: {
-		fontSize: scaledSize(15),
-		color: '#7f8c8d',
-		fontWeight: 600,
-		marginBottom: scaleHeight(4),
+		fontSize: scaledSize(12),
+		color: '#64748B',
+		fontWeight: '600',
+		marginBottom: scaleHeight(3),
 	},
 	statusCardValue: {
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-		color: '#2c3e50',
+		fontSize: scaledSize(17),
+		fontWeight: '800',
+		color: '#334155',
+	},
+	statusCardUnit: {
+		fontSize: scaledSize(11),
+		fontWeight: '600',
+		color: '#94A3B8',
 	},
 	exitModal: {
 		backgroundColor: '#ffffff',

@@ -43,39 +43,39 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 
 	const getFieldColor = (field: string) => {
 		const categoryColorMap: Record<string, string> = {
-			'운/우연': '#16a085', // 청록
-			인간관계: '#16a085', // 보라
-			'세상 이치': '#f4d03f', // 연노랑
+			'운/우연': '#00cec9', // 청록
+			인간관계: '#6c5ce7', // 보라
+			'세상 이치': '#fdcb6e', // 연노랑
 			'근면/검소': '#e17055', // 주황
-			'노력/성공': '#27ae60', // 짙은 청록
-			'경계/조심': '#e74c3c', // 빨강
+			'노력/성공': '#00b894', // 짙은 청록
+			'경계/조심': '#d63031', // 빨강
 			'욕심/탐욕': '#e84393', // 핫핑크
-			'배신/불신': '#2c3e50', // 짙은 회색
+			'배신/불신': '#2d3436', // 짙은 회색
 		};
 
-		return categoryColorMap[field] || '#bdc3c7'; // 기본 회색
+		return categoryColorMap[field] || '#b2bec3'; // 기본 회색
 	};
 	const getLevelColor = (levelName: number) => {
 		const levelColorMap: Record<string, string> = {
 			1: '#2ecc71',
 			2: '#F4D03F',
-			3: '#e67e22',
+			3: '#EB984E',
 			4: '#E74C3C',
 		};
 
-		return levelColorMap[levelName] || '#bdc3c7'; // 기본 회색
+		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
 	};
 
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type="FontAwesome6" name="seedling" size={14} color="#ffffff" />;
+				return <IconComponent type="FontAwesome6" name="seedling" size={14} color="#fff" />;
 			case 2:
-				return <IconComponent type="FontAwesome6" name="leaf" size={14} color="#ffffff" />;
+				return <IconComponent type="FontAwesome6" name="leaf" size={14} color="#fff" />;
 			case 3:
-				return <IconComponent type="FontAwesome6" name="tree" size={14} color="#ffffff" />;
+				return <IconComponent type="FontAwesome6" name="tree" size={14} color="#fff" />;
 			case 4:
-				return <IconComponent type="FontAwesome6" name="trophy" size={14} color="#ffffff" />;
+				return <IconComponent type="FontAwesome6" name="trophy" size={14} color="#fff" />;
 			default:
 				return null;
 		}
@@ -84,23 +84,23 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 	const getFieldIcon = (field: string) => {
 		switch (field) {
 			case '운/우연':
-				return <IconComponent type="FontAwesome6" name="dice" size={12} color="#ffffff" />;
+				return <IconComponent type="FontAwesome6" name="dice" size={12} color="#fff" />;
 			case '인간관계':
-				return <IconComponent type="FontAwesome6" name="users" size={12} color="#ffffff" />;
+				return <IconComponent type="FontAwesome6" name="users" size={12} color="#fff" />;
 			case '세상 이치':
-				return <IconComponent type="fontawesome5" name="globe" size={12} color="#ffffff" />;
+				return <IconComponent type="fontawesome5" name="globe" size={12} color="#fff" />;
 			case '근면/검소':
-				return <IconComponent type="fontawesome5" name="hammer" size={12} color="#ffffff" />;
+				return <IconComponent type="fontawesome5" name="hammer" size={12} color="#fff" />;
 			case '노력/성공':
-				return <IconComponent type="fontawesome5" name="medal" size={12} color="#ffffff" />;
+				return <IconComponent type="fontawesome5" name="medal" size={12} color="#fff" />;
 			case '경계/조심':
-				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={12} color="#ffffff" />;
+				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={12} color="#fff" />;
 			case '욕심/탐욕':
-				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={12} color="#ffffff" />;
+				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={12} color="#fff" />;
 			case '배신/불신':
-				return <IconComponent type="fontawesome5" name="user-slash" size={12} color="#ffffff" />;
+				return <IconComponent type="fontawesome5" name="user-slash" size={12} color="#fff" />;
 			default:
-				return <IconComponent type="FontAwesome6" name="tag" size={12} color="#ffffff" />;
+				return <IconComponent type="FontAwesome6" name="tag" size={12} color="#fff" />;
 		}
 	};
 	const handleToggleFavorite = async () => {
@@ -131,7 +131,7 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 						<View style={styles.modalHeader}>
 							<Text style={styles.modalHeaderTitle}>속담 상세</Text>
 							<TouchableOpacity style={styles.modalCloseIcon} onPress={onClose}>
-								<Icon name="xmark" size={20} color="#3498db" />
+								<Icon name="xmark" size={20} color="#0984e3" />
 							</TouchableOpacity>
 						</View>
 
@@ -177,7 +177,7 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 									name={isFavorite ? 'star' : 'star'}
 									solid={isFavorite}
 									size={20} // 28 → 20
-									color={isFavorite ? '#f1c40f' : '#bdc3c7'}
+									color={isFavorite ? '#FFD700' : '#ccc'}
 								/>
 							</TouchableOpacity>
 
@@ -185,7 +185,7 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 							{Boolean(proverb.longMeaning) && (
 								<View style={styles.meaningHighlight}>
 									<View style={styles.meaningQuoteBox}>
-										<Icon name="quote-left" size={28} color="#2ecc71" style={{ marginBottom: scaleHeight(8) }} />
+										<Icon name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
 										<Text style={styles.meaningQuoteText}>{proverb.longMeaning}</Text>
 									</View>
 								</View>
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
 	},
 	modalContainer: {
 		width: '90%',
-		backgroundColor: '#ffffff',
+		backgroundColor: '#fff',
 		borderRadius: scaleWidth(20),
 		overflow: 'hidden',
 		maxHeight: '85%',
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
 
 	/* ✅ 헤더는 기존 스타일 유지 */
 	modalHeader: {
-		backgroundColor: '#ffffff',
+		backgroundColor: '#fff',
 		paddingVertical: scaleHeight(16),
 		paddingHorizontal: scaleWidth(20),
 		justifyContent: 'center',
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
 	modalHeaderTitle: {
 		fontSize: scaledSize(22),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#2d3436',
 		textAlign: 'center',
 	},
 	modalCloseIcon: {
@@ -288,10 +288,10 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: scaleWidth(12),
 		paddingVertical: scaleHeight(6),
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(14),
 	},
 	badgeText: {
-		color: '#ffffff',
+		color: '#fff',
 		fontSize: scaledSize(12),
 		fontWeight: '600',
 	},
@@ -302,14 +302,14 @@ const styles = StyleSheet.create({
 		backgroundColor: '#EAF4FF',
 		paddingVertical: scaleHeight(16),
 		paddingHorizontal: scaleWidth(14),
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(14),
 		marginBottom: scaleHeight(16),
 		alignItems: 'center',
 	},
 	modalProverbText: {
 		fontSize: scaledSize(20),
 		fontWeight: '700',
-		color: '#2980b9', // 파란색 강조
+		color: '#1E6BB8', // 파란색 강조
 		textAlign: 'center',
 		lineHeight: scaleHeight(28),
 		marginBottom: scaleHeight(16), // 아래 요소와 간격만 추가
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
 	sectionBox: {
 		borderWidth: 1,
 		borderColor: '#E6EEF5',
-		backgroundColor: '#ffffff',
+		backgroundColor: '#FDFEFE',
 		padding: scaleWidth(12),
 		borderRadius: scaleWidth(12),
 		marginBottom: scaleHeight(12),
@@ -335,28 +335,28 @@ const styles = StyleSheet.create({
 	},
 	sectionText: {
 		fontSize: scaledSize(14),
-		color: '#2c3e50',
+		color: '#444',
 		lineHeight: scaleHeight(20),
 	},
 	exampleText: {
 		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		lineHeight: scaleHeight(20),
-		backgroundColor: '#f8f9fa',
+		color: '#555',
+		lineHeight: 20,
+		backgroundColor: '#FAFAFA',
 		padding: scaleWidth(6),
 		borderRadius: scaleWidth(8),
 	},
 
 	/* ✅ 닫기 버튼 */
 	modalCloseButton: {
-		backgroundColor: '#3498db',
+		backgroundColor: '#0984e3',
 		paddingVertical: scaleHeight(14),
 		alignItems: 'center',
 		borderBottomLeftRadius: scaleWidth(20),
 		borderBottomRightRadius: scaleWidth(20),
 	},
 	modalCloseButtonText: {
-		color: '#ffffff',
+		color: '#fff',
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
 	},
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
 		borderColor: '#A5D8FF',
 		backgroundColor: '#EAF4FF',
 		padding: scaleWidth(14),
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(14),
 		marginBottom: scaleHeight(16),
 		shadowColor: '#000',
 		shadowOpacity: 0.08,
@@ -387,10 +387,10 @@ const styles = StyleSheet.create({
 		paddingHorizontal: scaleWidth(10),
 		paddingVertical: scaleHeight(4),
 		borderRadius: scaleWidth(12),
-		backgroundColor: '#ecf0f1',
+		backgroundColor: '#f1f2f6',
 	},
 	sameProverbBox: {
-		backgroundColor: '#f8f9fa',
+		backgroundColor: '#FAFAFA',
 		borderWidth: 1,
 		borderColor: '#E6EEF5',
 		padding: scaleWidth(8),
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
 	sameProverbText: {
 		fontSize: scaledSize(13),
 		padding: scaleWidth(6),
-		color: '#2c3e50',
+		color: '#444',
 		lineHeight: scaleHeight(20),
 	},
 	favoriteIconButton: {

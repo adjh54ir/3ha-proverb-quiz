@@ -103,4 +103,31 @@ export declare namespace MainDataType {
 	}
 	// 전체 타임 챌린지 기록 배열 타입
 	export type TimeChallengeHistory = TimeChallengeResult[];
+
+	/**
+	 * 나만의 속담집
+	 */
+	export type ProverbBook = {
+		id: string;
+		title: string;
+		description: string;
+		proverbIds: number[];
+		createdAt: string;
+		color: string;
+		icon: string;
+		isShared?: boolean;
+	};
+
+	export interface ProverbBookPracticeAttempt {
+		timestamp: string;
+		correctCount: number;
+		wrongCount: number;
+		accuracy: number;
+	}
+
+	export interface ProverbBookPracticeRecord {
+		bookId: string;
+		proverbIds: number[];
+		attempts: ProverbBookPracticeAttempt[]; // 최대 3개
+	}
 }

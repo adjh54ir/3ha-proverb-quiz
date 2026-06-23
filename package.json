@@ -60,6 +60,7 @@
 		"react-native": "0.78.0",
 		"react-native-animatable": "^1.4.0",
 		"react-native-animated-numbers": "^0.6.3",
+		"react-native-bootsplash": "^7.3.2",
 		"react-native-bouncy-checkbox": "^4.1.2",
 		"react-native-calendars": "^1.1312.1",
 		"react-native-circular-progress": "^1.4.1",

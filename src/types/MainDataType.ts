@@ -35,13 +35,18 @@ export declare namespace MainDataType {
 	/**
 	 * 사용자 뱃지 데이터 정의
 	 */
+	/** 뱃지 희귀도 등급 */
+	export type BadgeRarity = 'common' | 'rare' | 'epic' | 'legendary';
+
 	export interface UserBadge {
 		id: string; // 'asia_master'
 		name: string; // '아시아 마스터'
 		description: string; // '아시아 국가 정답률 90% 이상'
+		condition: string; // 획득 조건 (예: '속담 10개 학습')
+		rarity: BadgeRarity; // 희귀도 (common | rare | epic | legendary)
 		iconType: string; // 아이콘 타입(FontAwesome6)
 		icon: string; // 아이콘 이름(earth-asia)
-		type: 'quiz' | 'study';
+		type: 'quiz' | 'study' | 'attendance';
 		mascotImage?: any; // 뱃지 마스코트 이미지 (선택)
 	}
 	/**

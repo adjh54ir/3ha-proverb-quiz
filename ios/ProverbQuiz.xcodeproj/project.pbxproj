@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		42B6E327EB9E14C0D7F045A1 /* Pods_ProverbQuiz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 258D903D6EF7D8D264CCB5E1 /* Pods_ProverbQuiz.framework */; };
+		4710D17E6B8048DAADCDBA3A /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FBAC0347A09B47018C7047A0 /* BootSplash.storyboard */; };
+		50DD17319E934E4F81CAA745 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 78B0E1A4DF544214A0CEC724 /* Colors.xcassets */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		7802120C2EE5714200BD5940 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7802120B2EE5714200BD5940 /* StoreKit.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -25,10 +27,12 @@
 		68851B6F45F5056F5698709F /* Pods-ProverbQuiz.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProverbQuiz.debug.xcconfig"; path = "Target Support Files/Pods-ProverbQuiz/Pods-ProverbQuiz.debug.xcconfig"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ProverbQuiz/AppDelegate.swift; sourceTree = "<group>"; };
 		7802120B2EE5714200BD5940 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		78B0E1A4DF544214A0CEC724 /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = ProverbQuiz/Colors.xcassets; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ProverbQuiz/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A7434ECA2E37670300BC2BA7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B3B2CE0117B2F0DE5A6C7720 /* Pods-ProverbQuiz.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProverbQuiz.release.xcconfig"; path = "Target Support Files/Pods-ProverbQuiz/Pods-ProverbQuiz.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		FBAC0347A09B47018C7047A0 /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = ProverbQuiz/BootSplash.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +57,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				FBAC0347A09B47018C7047A0 /* BootSplash.storyboard */,
+				78B0E1A4DF544214A0CEC724 /* Colors.xcassets */,
 			);
 			name = ProverbQuiz;
 			sourceTree = "<group>";
@@ -173,6 +179,8 @@
 				A7434ECB2E37670300BC2BA7 /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				BDDAD110C7AFBFEE3CCD39D7 /* PrivacyInfo.xcprivacy in Resources */,
+				4710D17E6B8048DAADCDBA3A /* BootSplash.storyboard in Resources */,
+				50DD17319E934E4F81CAA745 /* Colors.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

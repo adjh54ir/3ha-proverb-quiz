@@ -1,39 +1,34 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Modal, Alert } from 'react-native';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { useIsFocused } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
+import ProverbDetailModal from './modal/ProverbDetailModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
-import QuizHistoryService from '@/services/QuizHistoryService';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
-import FadeInView from '@/components/animation/FadeInView';
 
-/**
- * 사용자 퀴즈 데이터 정의
- */
-export interface UserQuizHistory {
-	correctProverbId: number[]; // 사용자가 정답을 맞춘 속담의 아이디 목록 (예: [1, 2])
-	wrongProverbId: number[]; // 사용자가 오답을 선택한 속담의 아이디 목록
-	lastAnsweredAt: Date; // 마지막으로 퀴즈를 푼 시간 (Date 객체 또는 ISO 문자열)
-	quizCounts: { [id: number]: number }; // 각 속담별 퀴즈 시도 횟수 (key는 사용자 아이디)
-	badges: string[]; // 사용자가 획득한 뱃지의 ID 목록 (ex: ['asia_master', 'level1_perfect'])
-	totalScore: number; // 사용자의 퀴즈 총 누적 점수
-	bestCombo?: number; // 사용자가 기록한 가장 높은 연속 정답 수 (선택 값)
-}
+const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
 const WrongReviewScreen = () => {
 	const navigation = useNavigation();
 	const isFocused = useIsFocused();
 	const [loading, setLoading] = useState(true);
-	const [wrongCountries, setWrongCountries] = useState<MainDataType.Proverb[]>([]);
+	const scrollViewRef = useRef<ScrollView>(null);
+	const [wrongProverbIds, setWrongProverbIds] = useState<MainDataType.Proverb[]>([]);
+	const [showScrollTop, setShowScrollTop] = useState(false);
+	const [showGuideModal, setShowGuideModal] = useState(false);
 	const [totalSolvedCount, setTotalSolvedCount] = useState(0);
 	const [correctCount, setCorrectCount] = useState(0);
 	const [showWrongList, setShowWrongList] = useState(false);
+	const [detailProverb, setDetailProverb] = useState<MainDataType.Proverb | null>(null);
+	const [detailVisible, setDetailVisible] = useState(false);
 
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
@@ -41,159 +36,216 @@ const WrongReviewScreen = () => {
 		if (!isFocused) {
 			return;
 		}
-
-		const fetchWrongData = async () => {
-			setLoading(true);
-			try {
-				const [wrongIdList, correctIdList] = await Promise.all([QuizHistoryService.getWrongProverbIds(), QuizHistoryService.getCorrectProverbIds()]);
-
-				setTotalSolvedCount(wrongIdList.length + correctIdList.length);
-				setCorrectCount(correctIdList.length);
-
-				const allProverbs = ProverbServices.selectProverbList();
-				const result = allProverbs.filter((item) => wrongIdList.includes(item.id));
-				setWrongCountries(result);
-			} catch (e) {
-				console.error('❌ 오답 로딩 실패:', e);
-			} finally {
-				setLoading(false);
-			}
-		};
-
 		fetchWrongData();
 	}, [isFocused]);
 
+	const fetchWrongData = async () => {
+		setLoading(true);
+		try {
+			const stored = await AsyncStorage.getItem(STORAGE_KEY);
+			if (!stored) {
+				setWrongProverbIds([]);
+				return;
+			}
+			const parsed: MainDataType.UserQuizHistory = JSON.parse(stored);
+			const wrongCca3List: number[] = parsed.wrongProverbId ?? [];
+			const correctCca3List: number[] = parsed.correctProverbId ?? [];
+			setTotalSolvedCount(wrongCca3List.length + correctCca3List.length);
+			setCorrectCount(correctCca3List.length);
+
+			const fullList = ProverbServices.selectProverbList();
+			const result = fullList.filter((c) => wrongCca3List.includes(c.id));
+			console.log('result : ', result);
+			setWrongProverbIds(result);
+		} catch (e) {
+			console.error('오답 로딩 실패:', e);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	/**
+	 * 스크롤을 움직일때 동작을 합니다. 하단으로 스크롤을 내릴때 아이콘 생성
+	 * @param event
+	 */
+	const handleScroll = (event: any) => {
+		const offsetY = event.nativeEvent.contentOffset.y;
+		setShowScrollTop(offsetY > 100);
+	};
+
 	const startWrongReview = () => {
-		if (wrongCountries.length === 0) {
+		const titleMap = {
+			all: '전체 퀴즈',
+			beginner: '초급 퀴즈',
+			intermediate: '중급 퀴즈',
+			advanced: '고급 퀴즈',
+			expert: '특급 퀴즈',
+		};
+
+		if (wrongProverbIds.length === 0) {
 			return;
 		}
 
 		// @ts-ignore
-		navigation.navigate(Paths.QUIZ, {
-			mode: 'meaning',
-			questionPool: wrongCountries,
-			title: '오답 복습',
+		navigation.push(Paths.QUIZ, {
+			questionPool: wrongProverbIds,
 			isWrongReview: true,
+			title: '오답 복습',
+			mode: 'meaning',
+			selectedLevel: '전체',
+			levelKey: 'all',
 		});
 	};
 
 	if (loading) {
 		return (
 			<View style={styles.center}>
-				<ActivityIndicator size="large" color="#3498db" />
+				<ActivityIndicator size="large" color="#22C55E" />
 			</View>
 		);
 	}
 
-	if (wrongCountries.length === 0) {
+	if (wrongProverbIds.length === 0) {
 		return (
-			<View style={styles.center}>
+			<View style={styles.emptyWrap}>
 				<View style={styles.emptyCard}>
-					<View style={styles.mascotImageWrapper}>
-						<FastImage source={require('@/assets/images/no-data-worng.jpg')} style={styles.mascotImage} resizeMode="contain" />
-					</View>
-					<View style={styles.emptyBadge}>
-						<Text style={styles.emptyBadgeText}>🏆 완벽해요!</Text>
-					</View>
-					<Text style={styles.emptyTitle}>오답이 없어요</Text>
-					<Text style={styles.emptyDesc}>틀린 문제가 하나도 없네요.{'\n'}정말 대단한 실력이에요! 🎉</Text>
-					<TouchableOpacity
-						style={styles.homeButton}
-						onPress={() => {
-							// @ts-ignore
-							navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME });
-						}}>
-						<Text style={styles.homeButtonText}>홈으로 돌아가기</Text>
-					</TouchableOpacity>
+					<FastImage
+						source={require('@/assets/images/correct_mascote.png')}
+						style={styles.emptyMascot}
+						resizeMode="contain"
+					/>
+					<Text style={styles.emptyTitle}>틀린 문제가 없어요! 🎉</Text>
+					<Text style={styles.emptyDesc}>
+						아직 오답으로 기록된 속담가 없어요.{'\n'}
+						퀴즈를 풀다가 틀린 문제가 생기면{'\n'}
+						이곳에서 모아 다시 복습할 수 있어요.
+					</Text>
 				</View>
 			</View>
 		);
 	}
+
+	const accuracy = totalSolvedCount > 0 ? Math.round((correctCount / totalSolvedCount) * 100) : 0;
 
 	return (
-		<ScrollView contentContainerStyle={styles.scrollContainer}>
-			<FadeInView>
-			<View style={styles.card}>
-				<Text style={styles.title}>
-					지금까지 <Text style={styles.highlight}>{totalSolvedCount}</Text>문제를 직접 풀었어요!{'\n'}그 중{' '}
-					<Text style={styles.highlight}>{wrongCountries.length}</Text>문제는 조금 아쉬웠네요 😅{'\n'}한 번 더 도전해볼까요? 💪
-				</Text>
-				<Text style={styles.subText}>
-					나의 정답률은 <Text style={styles.highlight2}>{totalSolvedCount > 0 ? Math.round((correctCount / totalSolvedCount) * 100) : 0}%</Text>
-					예요!{'\n'}정말 열심히 하고 있어요, 계속 힘내봐요! 🚀
-				</Text>
-			</View>
-			<View style={styles.guideCard}>
-				<Text style={styles.guideCardTitle}>📘 오답 복습이란?</Text>
-				<Text style={styles.guideCardContent}>
-					❗ 이전 퀴즈에서 틀린 문제들을 다시 풀 수 있어요.{'\n'}- 틀린 속담이 반복 출제되며,{' '}
-					<Text style={styles.guideHighlight}>정답을 맞히면 오답 목록에서 자동 제거</Text>돼요!{'\n'}- 문제는 항상{' '}
-					<Text style={styles.guideHighlight}>뜻 맞추기</Text> 형식으로 출제되고 <Text style={styles.guideHighlight}>정답 시 10점</Text>을 받을 수 있어요
-					🎯{'\n'}- 만약 오답 복습 중에 다시 틀린 문제는 <Text style={styles.guideHighlight}>오답 목록에 그대로 남게</Text> 되며, 반복적으로 복습할 수
-					있어요! 🔄{'\n'}- 여러 번 틀리더라도 걱정하지 말고, 계속 도전하면서 실력을 쌓아가세요! 💪
-				</Text>
-			</View>
-
-			<TouchableOpacity style={styles.startButton} onPress={startWrongReview}>
-				<Text style={styles.buttonText}>🚀 실력 업! 오답 다시 풀어보기</Text>
-			</TouchableOpacity>
-
-			<View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-				<TouchableOpacity style={styles.toggleCard} onPress={() => setShowWrongList((prev) => !prev)}>
-					<IconComponent type="MaterialIcons" name={showWrongList ? 'expand-less' : 'expand-more'} size={22} color="#27ae60" />
-					<Text style={styles.toggleText}>{showWrongList ? '오답 목록 접기' : '오답 목록 펼치기'}</Text>
-				</TouchableOpacity>
-			</View>
-			{showWrongList && (
-				<View style={styles.reviewCardList}>
-					{wrongCountries.map((item) => (
-						<View key={item.id} style={styles.historyCard}>
-							<View style={styles.historyCardBody}>
-								{/* 타이틀 + 정오답 배지 */}
-								<View style={styles.headerCenter}>
-									<Text style={styles.headerTitle2}>{item.proverb}</Text>
-								</View>
-
-								{/* 풀이 */}
-								{Boolean(item.longMeaning) && (
-									<View style={styles.highlightSection}>
-										<View style={styles.meaningQuoteBox}>
-											<IconComponent type="fontAwesome6" name="quote-left" size={28} color="#2ecc71" style={{ marginBottom: scaleHeight(8) }} />
-											<Text style={styles.meaningQuoteText}>{item.longMeaning}</Text>
-										</View>
-									</View>
-								)}
-
-								{/* 상세 풀이 */}
-								{Array.isArray(item.sameProverb) && item.sameProverb.length > 0 && (
-									<View style={styles.sectionBox}>
-										<Text style={styles.sectionTitle}>💬 동의 속담</Text>
-										{item.sameProverb.map((p, i) => (
-											<View key={`same-${i}`} style={styles.phraseRow}>
-												<Text style={styles.inlineValue}>- {p}</Text>
-											</View>
-										))}
-									</View>
-								)}
-
-								{/* 예문 */}
-								{item.example.length > 0 && (
-									<View style={styles.sectionBox}>
-										<Text style={styles.sectionTitle}>✍️ 예문</Text>
-										{item.example.map((ex, i) => (
-											<Text key={i} style={styles.exampleText}>
-												• {ex}
-											</Text>
-										))}
-									</View>
-								)}
-							</View>
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff', marginTop: scaleHeight(-15) }} edges={['bottom']}>
+			<ScrollView contentContainerStyle={styles.scrollContainer} ref={scrollViewRef} onScroll={handleScroll}>
+				<View style={styles.activityCardBox}>
+					{/* ✅ 컴팩트 통계 카드 */}
+					<View style={styles.statsCard}>
+						<View style={styles.statsItem}>
+							<Text style={styles.statsValue}>{totalSolvedCount}</Text>
+							<Text style={styles.statsLabel}>푼 문제</Text>
 						</View>
-					))}
+						<View style={styles.statsDivider} />
+						<View style={styles.statsItem}>
+							<Text style={[styles.statsValue, { color: '#EF4444' }]}>{wrongProverbIds.length}</Text>
+							<Text style={styles.statsLabel}>오답</Text>
+						</View>
+						<View style={styles.statsDivider} />
+						<View style={styles.statsItem}>
+							<Text style={[styles.statsValue, { color: '#16A34A' }]}>{accuracy}%</Text>
+							<Text style={styles.statsLabel}>정답률</Text>
+						</View>
+					</View>
+
+					{/* ✅ 격려 메시지 */}
+					<Text style={styles.encourageText}>
+						지금까지 <Text style={styles.encourageHighlight}>{totalSolvedCount}</Text>문제를 풀었고,{' '}
+						<Text style={styles.encourageHighlight}>{wrongProverbIds.length}</Text>문제가 남았어요.{'\n'}한 번 더 도전해볼까요? 💪
+					</Text>
+
+					{/* ✅ 안내 */}
+					<View style={styles.guideCard}>
+						<Text style={styles.guideCardTitle}>📘 오답 복습이란?</Text>
+						<Text style={styles.guideCardContent}>
+							• 틀린 문제를 다시 풀고, <Text style={styles.guideHighlight}>정답</Text>을 맞히면 목록에서 자동으로 사라져요.{'\n'}•
+							항상 <Text style={styles.guideHighlight}>뜻 맞추기</Text>로 출제되며, 정답 시 <Text style={styles.guideHighlight}>10점</Text>을
+							받아요 🎯{'\n'}• 다시 틀려도 걱정 마세요. 반복하며 실력을 쌓을 수 있어요! 🔄
+						</Text>
+					</View>
+
+					<TouchableOpacity style={styles.startButton} onPress={startWrongReview} activeOpacity={0.85}>
+						<IconComponent type="MaterialIcons" name="refresh" size={scaledSize(18)} color="#fff" style={{ marginRight: scaleWidth(6) }} />
+						<Text style={styles.buttonText}>오답 다시 풀기</Text>
+					</TouchableOpacity>
 				</View>
+
+				{/* ✅ 펼치기/접기 */}
+				<TouchableOpacity style={styles.toggleButton} onPress={() => setShowWrongList((prev) => !prev)} activeOpacity={0.8}>
+					<View style={styles.toggleLeft}>
+						<IconComponent type="MaterialIcons" name="format-list-bulleted" size={scaledSize(18)} color="#334155" />
+						<Text style={styles.toggleButtonText}>오답 목록</Text>
+						<View style={styles.toggleCountBadge}>
+							<Text style={styles.toggleCountText}>{wrongProverbIds.length}</Text>
+						</View>
+					</View>
+					<IconComponent
+						type="MaterialIcons"
+						name={showWrongList ? 'expand-less' : 'expand-more'}
+						size={scaledSize(22)}
+						color="#64748B"
+					/>
+				</TouchableOpacity>
+
+				{showWrongList && (
+					<View style={styles.reviewCardList}>
+						{wrongProverbIds.map((proverb, idx) => (
+							<TouchableOpacity
+								key={proverb.id}
+								style={[styles.reviewCard, { flexDirection: 'row', alignItems: 'center' }]}
+								activeOpacity={0.8}
+								onPress={() => {
+									setDetailProverb(proverb);
+									setDetailVisible(true);
+								}}>
+								<View style={{ flex: 1 }}>
+									<View style={styles.reviewCardHeader}>
+										<View style={styles.reviewIndexBadge}>
+											<Text style={styles.reviewIndexText}>{idx + 1}</Text>
+										</View>
+										<Text style={styles.reviewProverbText}>
+											{proverb.proverb}
+										</Text>
+									</View>
+									<Text style={styles.reviewMeaningText}>{proverb.meaning}</Text>
+								</View>
+								<IconComponent type="MaterialIcons" name="chevron-right" size={scaledSize(22)} color="#CBD5E1" />
+							</TouchableOpacity>
+						))}
+					</View>
+				)}
+
+				{/* {showWrongList && (
+					<View style={{ paddingHorizontal: scaleWidth(12), width: '100%' }}>
+						<View style={styles.reviewTable}>
+							<View style={[styles.reviewRow, styles.reviewHeader]}>
+								<Text style={[styles.reviewCell, styles.headerCell]}>오답 속담</Text>
+								<Text style={[styles.reviewCell, styles.headerCell]}>정답</Text>
+							</View>
+							{wrongProverbIds.map((item) => (
+								<View key={item.id} style={styles.reviewRow}>
+									<Text style={styles.reviewCell}>
+										{item.proverb}
+									</Text>
+									<Text style={styles.reviewCell}>{item.meaning}</Text>
+								</View>
+							))}
+						</View>
+					</View>
+				)} */}
+			</ScrollView>
+			{/* 최하단에 위치할것!! */}
+			{showScrollTop && (
+				<TouchableOpacity
+					style={styles.scrollTopButton}
+					onPress={() => scrollViewRef.current?.scrollTo({ y: 0, animated: true })}>
+					<IconComponent type="MaterialIcons" name="arrow-upward" size={scaledSize(24)} color="#fff" />
+				</TouchableOpacity>
 			)}
-			</FadeInView>
-		</ScrollView>
+
+			<ProverbDetailModal visible={detailVisible} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
+		</SafeAreaView>
 	);
 };
 
@@ -201,25 +253,25 @@ export default WrongReviewScreen;
 
 const styles = StyleSheet.create({
 	card: {
-		backgroundColor: '#ffffff',
+		backgroundColor: '#fff',
 		paddingVertical: scaleHeight(28),
-		paddingHorizontal: scaleWidth(10),
+		paddingHorizontal: scaleWidth(24),
 		borderRadius: scaleWidth(16),
 		borderWidth: 1,
-		borderColor: '#ecf0f1',
-		marginBottom: scaleHeight(10),
+		borderColor: '#E2E8F0',
+		marginBottom: scaleHeight(16),
 		width: '100%',
 		alignItems: 'center',
 	},
 	title: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		textAlign: 'center',
 		marginBottom: scaleHeight(10),
 	},
 	highlight: {
-		color: '#e74c3c',
+		color: '#EF4444',
 		fontWeight: 'bold',
 	},
 	highlight2: {
@@ -227,92 +279,215 @@ const styles = StyleSheet.create({
 	},
 	subText: {
 		fontSize: scaledSize(15),
-		color: '#7f8c8d',
+		color: '#64748B',
 		textAlign: 'center',
 	},
 	startButton: {
-		backgroundColor: '#f1c40f',
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#F59E0B',
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(40),
-		marginBottom: scaleHeight(30),
-		borderRadius: scaleWidth(30),
-		marginTop: scaleHeight(20),
+		marginBottom: scaleHeight(6),
+		borderRadius: scaleWidth(14),
+		marginTop: scaleHeight(12),
+		width: '100%',
 	},
 	buttonText: {
-		color: '#ffffff',
-		fontSize: scaledSize(16),
-		fontWeight: '600',
+		color: '#fff',
+		fontSize: scaledSize(15),
+		fontWeight: '700',
 		textAlign: 'center',
 	},
-	toggleButton: {
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(24),
-		borderRadius: scaleWidth(20),
+	statsCard: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		backgroundColor: '#fff',
+		borderRadius: scaleWidth(16),
 		borderWidth: 1,
-		borderColor: '#16a085',
-		backgroundColor: '#e0f7fa',
+		borderColor: '#E2E8F0',
+		paddingVertical: scaleHeight(16),
+		paddingHorizontal: scaleWidth(8),
+		width: '100%',
+		marginBottom: scaleHeight(12),
+	},
+	encourageText: {
+		fontSize: scaledSize(14),
+		color: '#475569',
+		textAlign: 'center',
+		lineHeight: scaleHeight(21),
+		fontWeight: '600',
+		marginBottom: scaleHeight(12),
+	},
+	encourageHighlight: {
+		color: '#EF4444',
+		fontWeight: '800',
+	},
+	statsItem: {
+		flex: 1,
+		alignItems: 'center',
+	},
+	statsValue: {
+		fontSize: scaledSize(20),
+		fontWeight: '800',
+		color: '#334155',
+		marginBottom: scaleHeight(2),
+	},
+	statsLabel: {
+		fontSize: scaledSize(12),
+		color: '#94A3B8',
+		fontWeight: '600',
+	},
+	statsDivider: {
+		width: 1,
+		height: scaleHeight(28),
+		backgroundColor: '#E2E8F0',
+	},
+	toggleButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(16),
+		borderRadius: scaleWidth(14),
+		borderWidth: 1,
+		borderColor: '#E2E8F0',
+		backgroundColor: '#fff',
+		width: '100%',
+	},
+	toggleLeft: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(8),
 	},
 	toggleButtonText: {
-		color: '#27ae60',
+		color: '#334155',
 		fontSize: scaledSize(15),
-		fontWeight: '600',
+		fontWeight: '700',
+	},
+	toggleCountBadge: {
+		minWidth: scaleWidth(22),
+		height: scaleWidth(22),
+		borderRadius: scaleWidth(11),
+		backgroundColor: '#FEE2E2',
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingHorizontal: scaleWidth(6),
+	},
+	toggleCountText: {
+		fontSize: scaledSize(12),
+		fontWeight: '800',
+		color: '#EF4444',
+	},
+	reviewCardHeader: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(8),
+		marginBottom: scaleHeight(8),
+	},
+	reviewIndexBadge: {
+		width: scaleWidth(24),
+		height: scaleWidth(24),
+		borderRadius: scaleWidth(12),
+		backgroundColor: '#F1F5F9',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	reviewIndexText: {
+		fontSize: scaledSize(12),
+		fontWeight: '800',
+		color: '#64748B',
 	},
 	reviewTable: {
 		marginTop: scaleHeight(24),
 		width: '100%',
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
+		borderColor: '#CBD5E1',
 		borderRadius: scaleWidth(12),
-		backgroundColor: '#f8f9fa',
+		backgroundColor: '#F8FAFC',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
-		shadowRadius: scaleWidth(2),
+		shadowRadius: 2,
 	},
 	reviewRow: {
 		flexDirection: 'row',
 		borderBottomWidth: 1,
-		borderBottomColor: '#ecf0f1',
+		borderBottomColor: '#F1F5F9',
 	},
 	reviewHeader: {
-		backgroundColor: '#ecf0f1',
+		backgroundColor: '#F1F5F9',
 	},
 	reviewCell: {
 		flex: 1,
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(12),
 		fontSize: scaledSize(15),
-		color: '#2c3e50',
+		color: '#334155',
 	},
 	headerCell: {
 		fontWeight: 'bold',
-		color: '#3498db',
+		color: '#22C55E',
 	},
 	center: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: '#ffffff',
+		backgroundColor: '#fff',
 	},
 	emptyText: {
 		fontSize: scaledSize(16),
-		color: '#7f8c8d',
-		fontWeight: 700,
+		color: '#64748B',
+	},
+	emptyWrap: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#F8FAFC',
+		paddingHorizontal: scaleWidth(28),
+	},
+	emptyCard: {
+		width: '100%',
+		alignItems: 'center',
+		backgroundColor: '#fff',
+		borderRadius: scaleWidth(20),
+		borderWidth: 1,
+		borderColor: '#E2E8F0',
+		paddingVertical: scaleHeight(28),
+		paddingHorizontal: scaleWidth(20),
+	},
+	emptyMascot: {
+		width: scaleWidth(96),
+		height: scaleWidth(96),
+		marginBottom: scaleHeight(14),
+	},
+	emptyTitle: {
+		fontSize: scaledSize(17),
+		fontWeight: '800',
+		color: '#1E293B',
+		marginBottom: scaleHeight(10),
+		textAlign: 'center',
+	},
+	emptyDesc: {
+		fontSize: scaledSize(13.5),
+		color: '#64748B',
+		textAlign: 'center',
+		lineHeight: scaleHeight(20),
 	},
 	scrollContainer: {
-		marginTop: scaleHeight(12),
-		paddingHorizontal: scaleWidth(24),
+		paddingVertical: scaleHeight(40),
+		paddingHorizontal: scaleWidth(12),
+		paddingBottom: scaleWidth(12),
 		alignItems: 'center',
-		backgroundColor: '#f5f6fa',
+		backgroundColor: '#F8FAFC',
 	},
 	activityCardBox: {
-		backgroundColor: '#f5f6fa',
+		backgroundColor: 'transparent',
 		borderRadius: scaleWidth(16),
-		padding: scaleWidth(10),
+		padding: scaleWidth(4),
 		marginBottom: scaleHeight(12),
-		borderWidth: 1,
-		borderColor: '#ecf0f1',
-		// 추가
 		width: '100%',
 		alignItems: 'center', // 내부 요소 정렬용
 	},
@@ -324,7 +499,7 @@ const styles = StyleSheet.create({
 		padding: scaleWidth(20),
 	},
 	modalContent: {
-		backgroundColor: '#ffffff',
+		backgroundColor: '#fff',
 		padding: scaleWidth(24),
 		borderRadius: scaleWidth(16),
 		width: '100%',
@@ -334,23 +509,23 @@ const styles = StyleSheet.create({
 	modalTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(12),
 	},
 	modalText: {
 		fontSize: scaledSize(15),
-		color: '#7f8c8d',
+		color: '#64748B',
 		textAlign: 'left',
 	},
 	modalButton: {
 		marginTop: scaleHeight(20),
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(24),
-		backgroundColor: '#3498db',
+		backgroundColor: '#3B82F6',
 		borderRadius: scaleWidth(8),
 	},
 	modalButtonText: {
-		color: '#ffffff',
+		color: '#fff',
 		fontWeight: 'bold',
 		fontSize: scaledSize(15),
 	},
@@ -359,23 +534,25 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginBottom: scaleHeight(10),
+		marginBottom: scaleHeight(12),
 	},
 	headerTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginRight: scaleWidth(5),
 	},
 	guideModal: {
-		backgroundColor: '#ffffff',
-		paddingHorizontal: scaleWidth(20),
-		paddingTop: scaleHeight(20),
-		paddingBottom: scaleHeight(12),
-		borderRadius: scaleWidth(16),
-		width: '85%',
+		backgroundColor: '#fff',
+		padding: scaleWidth(24),
+		borderRadius: scaleWidth(20),
+		width: '90%',
+		maxWidth: scaleWidth(340),
 		alignItems: 'center',
-		maxHeight: scaleHeight(600),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.15,
+		shadowRadius: 5,
 	},
 	guideHeader: {
 		flexDirection: 'row',
@@ -385,45 +562,52 @@ const styles = StyleSheet.create({
 	guideTitle: {
 		fontSize: scaledSize(20),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginLeft: scaleWidth(8),
 	},
 	guideDescription: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
+		fontSize: scaledSize(15),
+		color: '#334155',
 		textAlign: 'left',
 		lineHeight: scaleHeight(22),
 		marginBottom: scaleHeight(20),
 	},
 	guideHighlight: {
 		fontWeight: 'bold',
-		color: '#e67e22',
+		color: '#F97316',
 	},
 	guideConfirmButton: {
-		marginTop: scaleHeight(16),
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(24),
-		backgroundColor: '#27ae60',
-		borderRadius: scaleWidth(8),
+		backgroundColor: '#3B82F6',
+		paddingVertical: scaleHeight(12),
+		paddingHorizontal: scaleWidth(40),
+		borderRadius: scaleWidth(30),
+		width: '100%',
+		alignItems: 'center',
 	},
 	guideConfirmText: {
-		color: '#ffffff',
+		color: '#fff',
 		fontWeight: '600',
-		fontSize: scaledSize(14),
+		fontSize: scaledSize(16),
 	},
 	guideDescriptionBox: {
-		backgroundColor: '#f8f9fa',
+		backgroundColor: '#F8FAFC',
 		borderWidth: 1,
-		borderColor: '#ecf0f1',
+		borderColor: '#F1F5F9',
 		borderRadius: scaleWidth(12),
 		padding: scaleWidth(16),
 		width: '100%',
+		marginBottom: scaleHeight(20),
+	},
+	mascotImage: {
+		width: scaleWidth(120),
+		height: scaleWidth(120),
+		marginBottom: scaleHeight(10),
 	},
 	guideCard: {
-		backgroundColor: '#ffffff',
+		backgroundColor: '#fff',
 		borderWidth: 1,
-		borderColor: '#ecf0f1',
-		borderRadius: scaleWidth(12),
+		borderColor: '#E2E8F0',
+		borderRadius: scaleWidth(14),
 		padding: scaleWidth(16),
 		marginBottom: scaleHeight(20),
 		width: '100%',
@@ -431,12 +615,12 @@ const styles = StyleSheet.create({
 	guideCardTitle: {
 		fontSize: scaledSize(16),
 		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(8),
+		color: '#334155',
+		marginBottom: scaleHeight(12),
 	},
 	guideCardContent: {
 		fontSize: scaledSize(13),
-		color: '#2c3e50',
+		color: '#334155',
 		lineHeight: scaleHeight(20),
 	},
 	reviewCardList: {
@@ -444,325 +628,38 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(16),
 	},
 	reviewCard: {
-		backgroundColor: '#ffffff',
-		borderRadius: scaleWidth(12),
+		backgroundColor: '#fff',
+		borderRadius: scaleWidth(14),
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(16),
 		marginBottom: scaleHeight(12),
 		borderWidth: 1,
-		borderColor: '#ecf0f1',
+		borderColor: '#F1F5F9',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
 		shadowRadius: scaleWidth(2),
 	},
 	reviewProverbText: {
+		flex: 1,
 		fontSize: scaledSize(15),
 		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(12),
+		color: '#334155',
 	},
 	reviewMeaningText: {
 		fontSize: scaledSize(14),
-		color: '#7f8c8d',
+		color: '#64748B',
 		lineHeight: scaleHeight(20),
 	},
-	historyCard: {
-		flexDirection: 'row',
-		backgroundColor: '#ffffff',
-		borderWidth: 2, // ✅ 두께를 늘림
-		borderColor: '#b0b0b0', // ✅ 좀 더 진한 회색 (또는 #95a5a6, #95a5a6)
-		borderRadius: scaledSize(12),
-		overflow: 'hidden',
-		marginBottom: scaleHeight(12),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.08, // ✅ 살짝 강조
-		shadowRadius: 3,
-	},
-	historyCardBody: {
-		flex: 1,
-		padding: scaleHeight(12),
-	},
-
-	historyHeaderRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-	},
-	historyIdiom: {
-		flex: 1,
-		fontSize: scaledSize(20),
-		fontWeight: '700',
-		color: '#2c3e50',
-		paddingRight: scaleWidth(10),
-	},
-
-	historyMeaningBox: {
-		marginTop: scaleHeight(6),
-		paddingVertical: scaleHeight(6),
-		paddingHorizontal: scaleWidth(10),
-		borderRadius: scaleWidth(8),
-		backgroundColor: '#f8f9fa',
-		borderWidth: 1,
-		borderColor: '#ecf0f1',
-	},
-	historyMeaningLabel: {
-		fontSize: scaledSize(12),
-		color: '#7f8c8d',
-		marginBottom: scaleHeight(4),
-	},
-	historyMeaningValue: {
-		fontSize: scaledSize(16),
-		color: '#1e8449',
-		fontWeight: 'bold',
-		lineHeight: scaledSize(16),
-	},
-
-	historySubTitleRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	historySubTitle: {
-		fontSize: scaledSize(13),
-		fontWeight: '700',
-		color: '#2c3e50',
-	},
-
-	phraseRow: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		marginBottom: scaleHeight(4),
-		flexWrap: 'wrap',
-	},
-	phraseKr: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		fontWeight: '600',
-	},
-	phraseMean: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		flexShrink: 1,
-	},
-
-	exampleList: {
-		marginTop: scaleHeight(4),
-	},
-	bulletItem: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		marginBottom: scaleHeight(4),
-	},
-	bulletDot: {
-		fontSize: scaledSize(14),
-		lineHeight: scaledSize(18),
-		color: '#27ae60',
-		marginRight: scaleWidth(6),
-	},
-	sectionHeaderIcon: {
-		marginRight: scaleWidth(6),
-	},
-	sectionHeaderRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: scaleHeight(10),
-	},
-	historyBox: {
-		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(10),
-		backgroundColor: '#f8f9fa',
-	},
-	headerCenter: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		gap: scaleWidth(8),
-		flex: 1, // 중앙 정렬
-		marginVertical: scaleHeight(12),
-	},
-	headerTitle2: {
-		fontSize: scaledSize(20),
-		fontWeight: '700',
-		color: '#2980b9',
-		textAlign: 'center', // ✅ 줄바꿈 시 가운데 정렬
-	},
-	highlightSection: {
-		borderWidth: 1.5,
-		borderColor: '#A5D8FF',
-		backgroundColor: '#EAF4FF',
-		padding: scaleWidth(14),
-		borderRadius: scaleWidth(12),
-		marginVertical: scaleHeight(12),
-		shadowColor: '#000',
-		shadowOpacity: 0.08,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 4,
-	},
-	highlightHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: scaleHeight(8),
-	},
-	highlightTitle: {
-		fontSize: scaledSize(15),
-		fontWeight: '700',
-		color: '#2980b9',
-		marginLeft: scaleWidth(6),
-	},
-	highlightText: {
-		fontSize: scaledSize(15),
-		fontWeight: '600',
-		color: '#2c3e50',
-		lineHeight: scaleHeight(22),
-	},
-	meaningQuoteBox: {
-		alignItems: 'center', // 중앙 정렬
-		justifyContent: 'center',
-		backgroundColor: '#EAF4FF', // 파란색 계열 배경
-		borderRadius: scaleWidth(12),
-		marginBottom: scaleHeight(16),
-	},
-
-	meaningQuoteText: {
-		fontSize: scaledSize(16),
-		fontWeight: '600',
-		color: '#2c3e50',
-		lineHeight: scaleHeight(22),
-		textAlign: 'center', // 텍스트도 중앙 정렬
-	},
-	sectionBox: {
-		borderWidth: 1,
-		borderColor: '#E6EEF5',
-		backgroundColor: '#ffffff',
-		padding: scaleWidth(12),
-		borderRadius: scaleWidth(12),
-		marginVertical: scaleHeight(10),
-		shadowColor: '#000',
-		shadowOpacity: 0.05,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 4,
-	},
-	sectionTitle: {
-		fontSize: scaledSize(15),
-		fontWeight: '700',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(12),
-	},
-	sectionText: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
-		lineHeight: scaleHeight(20),
-	},
-	inlineLabel: {
-		fontSize: scaledSize(13),
-		marginBottom: scaleHeight(3),
-		fontWeight: '700',
-		color: '#2c3e50',
-	},
-	inlineValue: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		marginTop: scaleHeight(2),
-	},
-	exampleText: {
-		fontSize: scaledSize(12),
-		color: '#7f8c8d',
-		lineHeight: scaleHeight(18),
-		marginLeft: scaleWidth(6),
-	},
-	toggleCard: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(24),
-		borderRadius: scaleWidth(25),
-		backgroundColor: '#e8fdfd',
-		shadowColor: '#000',
-		shadowOpacity: 0.08,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 3,
-	},
-	toggleText: {
-		fontSize: scaledSize(15),
-		fontWeight: '600',
-		color: '#27ae60',
-	},
-	homeButton: {
-		marginTop: scaleHeight(20),
-		backgroundColor: '#3498db',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(28),
-		borderRadius: scaleWidth(25),
-	},
-	homeButtonText: {
-		color: '#ffffff',
-		fontSize: scaledSize(15),
-		fontWeight: '600',
-		textAlign: 'center',
-	},
-	emptyCard: {
-		alignItems: 'center',
-		backgroundColor: '#ffffff',
-		borderRadius: scaleWidth(24),
-		paddingVertical: scaleHeight(36),
-		paddingHorizontal: scaleWidth(16), // 32 → 16
-		width: '85%', // 추가
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(4) },
-		shadowOpacity: 0.08,
-		shadowRadius: 12,
-	},
-	emptyBadge: {
-		backgroundColor: '#FFF9E6',
-		borderRadius: scaleWidth(20),
-		paddingVertical: scaleHeight(5),
-		paddingHorizontal: scaleWidth(14),
-		marginBottom: scaleHeight(12),
-	},
-	emptyBadgeText: {
-		fontSize: scaledSize(13),
-		fontWeight: '700',
-		color: '#f39c12',
-	},
-	emptyTitle: {
-		fontSize: scaledSize(22),
-		fontWeight: '800',
-		color: '#1a1a2e',
-		marginBottom: scaleHeight(10),
-	},
-	emptyDesc: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		textAlign: 'center',
-		lineHeight: scaleHeight(22),
-		marginBottom: scaleHeight(28),
-	},
-	mascotImageWrapper: {
-		width: scaleWidth(200),
-		height: scaleWidth(200),
-		borderRadius: scaleWidth(100),
-		overflow: 'hidden',
-		marginBottom: scaleHeight(16),
-	},
-	mascotImage: {
-		width: '100%',
-		height: '100%',
-	},
-	petView: { alignItems: 'center', justifyContent: 'center', marginTop: scaleHeight(8), position: 'relative' },
-	petContent: {
+	scrollTopButton: {
 		position: 'absolute',
-		right: scaleWidth(-35), // ✅ 너무 멀리 떨어져 있음
-		top: scaleHeight(10),
-		width: scaleWidth(60),
-		height: scaleWidth(60),
-		borderRadius: scaleWidth(30),
-		borderWidth: 2,
-		borderColor: '#27ae60',
-		overflow: 'hidden',
+		right: scaleWidth(32),
+		bottom: scaleHeight(32),
+		backgroundColor: '#3B82F6',
+		width: scaleWidth(45),
+		height: scaleWidth(45),
+		borderRadius: scaleWidth(25),
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
-	petImage: { width: '100%', height: '100%' },
 });

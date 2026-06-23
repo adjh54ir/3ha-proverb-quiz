@@ -13,6 +13,7 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import QuizResultModal from './modal/QuizResultModal';
+import QuizCompletionModal from './modal/QuizCompletionModal';
 import { QuizBadgeInterceptor } from '@/services/interceptor/QuizBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
 import IconComponent from './common/atomic/IconComponent';
@@ -31,7 +32,7 @@ const labelColors = ['#1abc9c', '#3498db', '#16a085', '#e67e22'];
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
 type QuizRouteParams = {
-	mode: 'meaning' | 'proverb' | 'blank';
+	mode: 'meaning' | 'proverb' | 'blank' | 'example';
 	questionPool?: MainDataType.Proverb[];
 	isWrongReview?: boolean;
 	title?: string;
@@ -57,6 +58,9 @@ const QuizScreen = () => {
 	const comboAnim = useRef(new Animated.Value(0)).current;
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	const scaleAnims = useRef<Animated.Value[]>([]);
+	// ⏱ 타이머가 경고 구간에 들어오면 힌트 전구가 빛나는 애니메이션
+	const hintGlowAnim = useRef(new Animated.Value(0)).current;
+	const hintGlowLoopRef = useRef<Animated.CompositeAnimation | null>(null);
 	const scaleAnim = useRef(new Animated.Value(0)).current;
 	const comboEffectAnim = useRef(new Animated.Value(0)).current;
 	const comboShake = useRef(new Animated.Value(0)).current;
@@ -74,6 +78,8 @@ const QuizScreen = () => {
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 	const [remainingTime, setRemainingTime] = useState(40);
 	const [showResultModal, setShowResultModal] = useState(false);
+	const [showCompletionModal, setShowCompletionModal] = useState(false);
+	const [completionData, setCompletionData] = useState({ correct: 0, wrong: 0, total: 0, accuracy: 0 });
 	const [resultTitle, setResultTitle] = useState('');
 	const [resultMessage, setResultMessage] = useState('');
 	const [confettiKey, setConfettiKey] = useState(0);
@@ -252,6 +258,16 @@ const QuizScreen = () => {
 	 * - 일반 모드: 기존 로직 유지 (이미 푼 문제 제외하고 랜덤 출제)
 	 * - 오답 복습 모드: reviewIndex 기반 순차 출제
 	 */
+	// ✅ 퀴즈 완료 팝업 표시 (누적 정답/오답 기준 통계 계산)
+	const showCompletion = () => {
+		const correct = quizHistory?.correctProverbId?.length ?? 0;
+		const wrong = quizHistory?.wrongProverbId?.length ?? 0;
+		const total = correct + wrong;
+		const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+		setCompletionData({ correct, wrong, total, accuracy });
+		setShowCompletionModal(true);
+	};
+
 	const loadQuestion = (pool?: MainDataType.Proverb[]) => {
 		if (!quizHistory) return;
 
@@ -266,9 +282,7 @@ const QuizScreen = () => {
 		if (isWrongReview && questionPool && questionPool.length > 0) {
 			if (reviewIndex >= questionPool.length) {
 				setResultType('done');
-				setResultTitle('오답 복습 완료!');
-				setResultMessage('모든 오답을 다시 풀었어요 🎉');
-				setShowResultModal(true);
+				showCompletion();
 				return;
 			}
 			setupQuestion(questionPool[reviewIndex]);
@@ -286,9 +300,7 @@ const QuizScreen = () => {
 
 		if (unSolved.length === 0) {
 			setResultType('done');
-			setResultTitle('모든 퀴즈 완료!');
-			setResultMessage('훌륭해요! 모든 문제를 마쳤어요 🎉');
-			setShowResultModal(true);
+			showCompletion();
 			return;
 		}
 
@@ -315,6 +327,15 @@ const QuizScreen = () => {
 			allOptions = [...shuffledDistractors.map((p) => pickBlankWord(p.proverb)), blank];
 			displayText = newQuestion.proverb.replace(blank, '(____)');
 			setBlankWord(blank);
+		} else if (routeMode === 'example') {
+			// ✅ 예문 모드: 예문을 보여주고 어울리는 속담을 고르는 방식
+			allOptions = [...shuffledDistractors.map((p) => p.proverb), newQuestion.proverb];
+			const ex = (newQuestion.example && newQuestion.example[0]) || '';
+			displayText = ex
+				? ex.includes(newQuestion.proverb)
+					? ex.replace(new RegExp(newQuestion.proverb, 'g'), '◯◯◯')
+					: ex
+				: newQuestion.longMeaning || newQuestion.meaning;
 		}
 
 		// 상태 갱신
@@ -371,6 +392,7 @@ const QuizScreen = () => {
 		if (routeMode === 'meaning') correctAnswer = question.longMeaning!;
 		else if (routeMode === 'proverb') correctAnswer = question.proverb;
 		else if (routeMode === 'blank') correctAnswer = blankWord;
+		else if (routeMode === 'example') correctAnswer = question.proverb;
 
 		const isTimeout = answer === '';
 		const correct = answer === correctAnswer;
@@ -642,7 +664,7 @@ const QuizScreen = () => {
 		}, 100); // 🔸 딜레이로 이전 상태가 반영된 뒤 새로운 문제 로드
 	};
 
-	const getModeLabel = (mode: 'meaning' | 'proverb' | 'blank') => {
+	const getModeLabel = (mode: 'meaning' | 'proverb' | 'blank' | 'example') => {
 		switch (mode) {
 			case 'meaning':
 				return '뜻 맞추기';
@@ -650,6 +672,8 @@ const QuizScreen = () => {
 				return '속담 맞추기';
 			case 'blank':
 				return '빈칸 채우기';
+			case 'example':
+				return '예문 속담';
 			default:
 				return '';
 		}
@@ -762,6 +786,32 @@ const QuizScreen = () => {
 	useEffect(() => {
 		loadFavorites();
 	}, []);
+
+	// ⏱ 타이머가 경고 구간(<=15초)에 들어오면 힌트 전구 글로우 시작 / 벗어나면 정지
+	useEffect(() => {
+		const inWarning = remainingTime <= 15 && remainingTime > 0 && !hasAnsweredRef.current && !!question && !selected;
+		if (inWarning) {
+			if (!hintGlowLoopRef.current) {
+				hintGlowLoopRef.current = Animated.loop(
+					Animated.sequence([
+						Animated.timing(hintGlowAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+						Animated.timing(hintGlowAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
+					]),
+				);
+				hintGlowLoopRef.current.start();
+			}
+		} else if (hintGlowLoopRef.current) {
+			hintGlowLoopRef.current.stop();
+			hintGlowLoopRef.current = null;
+			hintGlowAnim.setValue(0);
+		}
+		return () => {
+			if (hintGlowLoopRef.current) {
+				hintGlowLoopRef.current.stop();
+				hintGlowLoopRef.current = null;
+			}
+		};
+	}, [remainingTime, question, selected, hintGlowAnim]);
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
@@ -1088,6 +1138,17 @@ const QuizScreen = () => {
 					} else {
 						handleNextQuestion();
 					}
+				}}
+			/>
+			<QuizCompletionModal
+				visible={showCompletionModal}
+				correct={completionData.correct}
+				wrong={completionData.wrong}
+				total={completionData.total}
+				accuracy={completionData.accuracy}
+				onConfirm={() => {
+					setShowCompletionModal(false);
+					safelyGoBack();
 				}}
 			/>
 			{showAdForHint && (

@@ -1,4 +1,19 @@
 import { MainDataType } from '@/types/MainDataType';
+
+/**
+ * 희귀도별 표시 메타 (라벨 / 색상 / 그라데이션 / 별 개수)
+ * BadgeDetailPopup, 나의 활동 등에서 공통 사용합니다.
+ */
+export const BADGE_RARITY_META: Record<
+	MainDataType.BadgeRarity,
+	{ label: string; color: string; soft: string; gradient: [string, string]; stars: number }
+> = {
+	common: { label: '일반', color: '#10B981', soft: '#D1FAE5', gradient: ['#34D399', '#059669'], stars: 1 },
+	rare: { label: '희귀', color: '#3B82F6', soft: '#DBEAFE', gradient: ['#60A5FA', '#2563EB'], stars: 2 },
+	epic: { label: '영웅', color: '#F59E0B', soft: '#FEF3C7', gradient: ['#FBBF24', '#D97706'], stars: 3 },
+	legendary: { label: '전설', color: '#EF4444', soft: '#FEE2E2', gradient: ['#FB7185', '#E11D48'], stars: 4 },
+};
+
 /*
 =========================================
 📚 학습 관련 뱃지
@@ -80,6 +95,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'school',
 		type: 'study',
+		condition: '속담 1개 학습',
+		rarity: 'common',
 	},
 	{
 		id: 'study_10',
@@ -88,6 +105,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'travel-explore',
 		type: 'study',
+		condition: '속담 10개 학습',
+		rarity: 'common',
 	},
 	{
 		id: 'study_50',
@@ -96,6 +115,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'menu-book',
 		type: 'study',
+		condition: '속담 50개 학습',
+		rarity: 'rare',
 	},
 	{
 		id: 'study_100',
@@ -104,6 +125,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'public',
 		type: 'study',
+		condition: '속담 100개 학습',
+		rarity: 'rare',
 	},
 	{
 		id: 'study_200',
@@ -112,6 +135,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'school',
 		type: 'study',
+		condition: '속담 200개 학습',
+		rarity: 'epic',
 	},
 	{
 		id: 'study_300',
@@ -120,6 +145,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'menu-book',
 		type: 'study',
+		condition: '속담 300개 학습',
+		rarity: 'epic',
 	},
 	{
 		id: 'study_400',
@@ -128,6 +155,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'auto-awesome',
 		type: 'study',
+		condition: '속담 400개 학습',
+		rarity: 'epic',
 	},
 	{
 		id: 'study_500',
@@ -136,6 +165,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'rocket-launch',
 		type: 'study',
+		condition: '속담 500개 학습',
+		rarity: 'legendary',
 	},
 	{
 		id: 'study_600',
@@ -144,6 +175,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'stars',
 		type: 'study',
+		condition: '속담 600개 학습',
+		rarity: 'legendary',
 	},
 	{
 		id: 'study_all',
@@ -152,6 +185,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'verified',
 		type: 'study',
+		condition: '모든 속담 학습 완료',
+		rarity: 'legendary',
 	},
 
 	// 퀴즈 뱃지
@@ -162,6 +197,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'looks-one',
 		type: 'quiz',
+		condition: '퀴즈 1문제 완료',
+		rarity: 'common',
 	},
 	{
 		id: 'quiz_10',
@@ -170,6 +207,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'military-tech',
 		type: 'quiz',
+		condition: '퀴즈 10문제 완료',
+		rarity: 'common',
 	},
 	{
 		id: 'quiz_50',
@@ -178,6 +217,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'workspace-premium',
 		type: 'quiz',
+		condition: '퀴즈 50문제 완료',
+		rarity: 'rare',
 	},
 	{
 		id: 'quiz_100',
@@ -186,6 +227,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'emoji-events',
 		type: 'quiz',
+		condition: '퀴즈 100문제 완료',
+		rarity: 'rare',
 	},
 	{
 		id: 'quiz_150',
@@ -194,6 +237,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'military-tech',
 		type: 'quiz',
+		condition: '퀴즈 150문제 완료',
+		rarity: 'rare',
 	},
 	{
 		id: 'quiz_200',
@@ -202,6 +247,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'grade',
 		type: 'quiz',
+		condition: '퀴즈 200문제 완료',
+		rarity: 'epic',
 	},
 	{
 		id: 'quiz_300',
@@ -210,6 +257,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'workspace-premium',
 		type: 'quiz',
+		condition: '퀴즈 300문제 완료',
+		rarity: 'epic',
 	},
 	{
 		id: 'quiz_400',
@@ -218,6 +267,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'emoji-events',
 		type: 'quiz',
+		condition: '퀴즈 400문제 완료',
+		rarity: 'epic',
 	},
 	{
 		id: 'quiz_500',
@@ -226,6 +277,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'rocket-launch',
 		type: 'quiz',
+		condition: '퀴즈 500문제 완료',
+		rarity: 'legendary',
 	},
 	{
 		id: 'quiz_600',
@@ -234,6 +287,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'stars',
 		type: 'quiz',
+		condition: '퀴즈 600문제 완료',
+		rarity: 'legendary',
 	},
 	{
 		id: 'quiz_all',
@@ -242,6 +297,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'verified',
 		type: 'quiz',
+		condition: '모든 퀴즈 문제 완료',
+		rarity: 'legendary',
 	},
 
 	// 레벨 마스터 (퀴즈 유형)
@@ -252,6 +309,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'fontAwesome6',
 		icon: 'seedling',
 		type: 'quiz',
+		condition: '아주 쉬움 난이도 전체 정답',
+		rarity: 'rare',
 	},
 	{
 		id: 'level_easy_2',
@@ -260,6 +319,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'fontAwesome6',
 		icon: 'leaf',
 		type: 'quiz',
+		condition: '쉬움 난이도 전체 정답',
+		rarity: 'rare',
 	},
 	{
 		id: 'level_medium',
@@ -268,6 +329,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'fontAwesome6',
 		icon: 'tree',
 		type: 'quiz',
+		condition: '보통 난이도 전체 정답',
+		rarity: 'epic',
 	},
 	{
 		id: 'level_hard',
@@ -276,6 +339,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'fontAwesome6',
 		icon: 'trophy',
 		type: 'quiz',
+		condition: '어려움 난이도 전체 정답',
+		rarity: 'legendary',
 	},
 
 	// 카테고리 마스터 (퀴즈 유형)
@@ -286,6 +351,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'casino',
 		type: 'quiz',
+		condition: '운/우연 카테고리 속담 전체 정복',
+		rarity: 'rare',
 	},
 	{
 		id: 'category_relation',
@@ -294,6 +361,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'groups',
 		type: 'quiz',
+		condition: '인간관계 카테고리 속담 전체 정복',
+		rarity: 'rare',
 	},
 	{
 		id: 'category_life',
@@ -302,6 +371,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'language',
 		type: 'quiz',
+		condition: '세상 이치 카테고리 속담 전체 정복',
+		rarity: 'rare',
 	},
 	{
 		id: 'category_diligence',
@@ -310,6 +381,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'cleaning-services',
 		type: 'quiz',
+		condition: '근면/검소 카테고리 속담 전체 정복',
+		rarity: 'rare',
 	},
 	{
 		id: 'category_effort',
@@ -318,6 +391,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'trending-up',
 		type: 'quiz',
+		condition: '노력/성공 카테고리 속담 전체 정복',
+		rarity: 'rare',
 	},
 	{
 		id: 'category_caution',
@@ -326,6 +401,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'report-problem',
 		type: 'quiz',
+		condition: '경계/조심 카테고리 속담 전체 정복',
+		rarity: 'rare',
 	},
 	{
 		id: 'category_greed',
@@ -334,6 +411,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'paid',
 		type: 'quiz',
+		condition: '욕심/탐욕 카테고리 속담 전체 정복',
+		rarity: 'rare',
 	},
 	{
 		id: 'category_betrayal',
@@ -342,6 +421,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialIcons',
 		icon: 'handshake',
 		type: 'quiz',
+		condition: '배신/불신 카테고리 속담 전체 정복',
+		rarity: 'rare',
 	},
 
 	// 콤보 달성 (퀴즈)
@@ -352,6 +433,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialCommunityIcons',
 		icon: 'fire',
 		type: 'quiz',
+		condition: '퀴즈 3연속 정답',
+		rarity: 'common',
 	},
 	{
 		id: 'combo_5',
@@ -360,6 +443,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialCommunityIcons',
 		icon: 'fire',
 		type: 'quiz',
+		condition: '퀴즈 5연속 정답',
+		rarity: 'rare',
 	},
 	{
 		id: 'combo_10',
@@ -368,6 +453,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialCommunityIcons',
 		icon: 'fire',
 		type: 'quiz',
+		condition: '퀴즈 10연속 정답',
+		rarity: 'epic',
 	},
 	{
 		id: 'combo_15',
@@ -376,6 +463,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialCommunityIcons',
 		icon: 'fire',
 		type: 'quiz',
+		condition: '퀴즈 15연속 정답',
+		rarity: 'epic',
 	},
 	{
 		id: 'combo_20',
@@ -384,6 +473,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'materialCommunityIcons',
 		icon: 'fire-alert',
 		type: 'quiz',
+		condition: '퀴즈 20연속 정답',
+		rarity: 'legendary',
 	},
 
 	// 점수 달성 (700개 × 10점 = 7,000점 기준)
@@ -394,6 +485,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'fontAwesome6',
 		icon: 'seedling',
 		type: 'quiz',
+		condition: '누적 점수 1000점 달성',
+		rarity: 'common',
 	},
 	{
 		id: 'score_2000',
@@ -402,6 +495,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'fontAwesome6',
 		icon: 'leaf',
 		type: 'quiz',
+		condition: '누적 점수 2000점 달성',
+		rarity: 'rare',
 	},
 	{
 		id: 'score_3000',
@@ -410,6 +505,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'fontAwesome6',
 		icon: 'tree',
 		type: 'quiz',
+		condition: '누적 점수 3000점 달성',
+		rarity: 'rare',
 	},
 	{
 		id: 'score_5000',
@@ -418,6 +515,8 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'fontAwesome6',
 		icon: 'chess-knight',
 		type: 'quiz',
+		condition: '누적 점수 5000점 달성',
+		rarity: 'epic',
 	},
 	{
 		id: 'score_7000',
@@ -426,5 +525,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 		iconType: 'fontAwesome6',
 		icon: 'crown',
 		type: 'quiz',
+		condition: '누적 점수 7000점 달성',
+		rarity: 'legendary',
 	},
 ];

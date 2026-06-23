@@ -8,6 +8,7 @@ import { scaleHeight, scaleWidth } from '@/utils';
 import DeviceInfo from 'react-native-device-info';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
+import BootSplash from 'react-native-bootsplash'; // 추가
 
 const AD_ALLOWED_ROUTES = [
 	Paths.TODAY_QUIZ,
@@ -100,6 +101,7 @@ const AppLayout = () => {
 			ref={navigationRef}
 			onReady={() => {
 				setCurrentRoute(navigationRef.current?.getCurrentRoute()?.name || '');
+				BootSplash.hide({ fade: true }); // 추가
 			}}
 			onStateChange={() => {
 				const routeName = navigationRef.current?.getCurrentRoute()?.name;

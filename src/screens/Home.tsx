@@ -8,7 +8,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FastImage from 'react-native-fast-image';
 import { Paths } from '@/navigation/conf/Paths';
 import IconComponent from './common/atomic/IconComponent';
-import { CONST_BADGES } from '@/const/ConstBadges';
+import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
+import BadgeDetailPopup from './modal/BadgeDetailPopup';
+import BadgeListModal from './modal/BadgeListModal';
+import Colors from '@/const/ConstColors';
 
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
@@ -22,7 +25,10 @@ import notifee, { EventType } from '@notifee/react-native';
 import ProverbServices from '@/services/ProverbServices';
 import moment from 'moment';
 import CheckInModal from './modal/CheckInModal';
+import DailyMissionModal from './modal/DailyMissionModal';
 import LevelModal from './modal/LevelModal';
+import { calcStreak, StreakInfo } from '@/utils/StreakUtils';
+import { computeDailyMissions, countDoneMissions, allMissionsDone } from '@/utils/DailyMissionUtils';
 import { LEVEL_DATA, PET_REWARDS } from '@/const/ConstInfoData';
 import TowerRewardSection from '@/components/TowerRewardSection';
 import { TowerProgress } from '@/const/ConstTowerData';
@@ -81,10 +87,94 @@ const Home = () => {
 	const [showStamp, setShowStamp] = useState(false);
 	const [checkedInDates, setCheckedInDates] = useState<{ [date: string]: any }>({});
 	const [showCheckInModal, setShowCheckInModal] = useState(false); // 초기값 false
+	const [streakInfo, setStreakInfo] = useState<StreakInfo>({ current: 0, best: 0, total: 0, checkedToday: false });
+	const [showDailyMission, setShowDailyMission] = useState(false); // 오늘의 미션 모달
+	const [missionSummary, setMissionSummary] = useState({ done: 0, total: 3, allDone: false, claimed: false });
 
 	const [showMascotHint, setShowMascotHint] = useState(true);
 
+	// 🏅 뱃지 리스트 펄스 애니메이션
+	const badgePulse = useRef(new Animated.Value(0)).current;
+
+	// ✅ 펫 탭 애니메이션 / 말풍선
+	const petScale = useRef(new Animated.Value(1)).current;
+	const petSpeechAnim = useRef(new Animated.Value(0)).current;
+	const petSpeechTimer = useRef<NodeJS.Timeout | null>(null);
+	const [petSpeech, setPetSpeech] = useState<string | null>(null);
+	const hasShownInitialPetSpeech = useRef(false);
+
+	const PET_MESSAGES = [
+		'뀨! 안녕하세요!',
+		'오늘도 같이 공부해요!',
+		'속담 한 개 배워볼까요?',
+		'나랑 놀아줘서 고마워요!',
+		'잘하고 있어요, 최고예요!',
+		'조금만 더 힘내봐요!',
+		'쓰담쓰담 좋아요~',
+		'퀴즈 풀러 가볼까요?',
+		'배고파요... 점수 주세요!',
+		'오늘도 출석 잊지 마세요!',
+	];
+
+	// 펫 말풍선 노출(공통)
+	const showPetSpeech = useCallback(
+		(msg?: string) => {
+			const message = msg ?? PET_MESSAGES[Math.floor(Math.random() * PET_MESSAGES.length)];
+			setPetSpeech(message);
+			petSpeechAnim.setValue(0);
+			Animated.spring(petSpeechAnim, { toValue: 1, friction: 6, tension: 120, useNativeDriver: true }).start();
+
+			if (petSpeechTimer.current) {
+				clearTimeout(petSpeechTimer.current);
+			}
+			petSpeechTimer.current = setTimeout(() => {
+				Animated.timing(petSpeechAnim, { toValue: 0, duration: 240, useNativeDriver: true }).start(() => setPetSpeech(null));
+			}, 2200);
+		},
+		[petSpeechAnim],
+	);
+
+	// 🏅 뱃지 리스트 은은한 펄스 애니메이션 루프
+	useEffect(() => {
+		const loop = Animated.loop(
+			Animated.sequence([
+				Animated.timing(badgePulse, { toValue: 1, duration: 1200, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+				Animated.timing(badgePulse, { toValue: 0, duration: 1200, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+			]),
+		);
+		loop.start();
+		return () => loop.stop();
+	}, [badgePulse]);
+
+	// 펫 통통 튀는 모션
+	const bouncePet = useCallback(() => {
+		Animated.sequence([
+			Animated.timing(petScale, { toValue: 1.22, duration: 140, useNativeDriver: true }),
+			Animated.spring(petScale, { toValue: 1, friction: 3, tension: 120, useNativeDriver: true }),
+		]).start();
+	}, [petScale]);
+
 	const todayStr = DateUtils.getLocalDateString();
+
+	// ✅ 펫이 처음 등장하면 한 번 인사 말풍선 자동 노출
+	useEffect(() => {
+		if (petLevel >= 0 && !hasShownInitialPetSpeech.current) {
+			hasShownInitialPetSpeech.current = true;
+			// 요일별로 좀 더 귀여운 인사말
+			const dayGreetings = [
+				'일요일이에요~ 푹 쉬면서 한 문제 어때요? 😴',
+				'월요일 파이팅! 오늘도 같이 시작해요 💪',
+				'화요일이에요! 가볍게 한 판 풀어볼까요? 🔥',
+				'수요일, 벌써 한 주의 절반! 잘하고 있어요 🌱',
+				'목요일이에요~ 조금만 더 힘내요! ✨',
+				'불금이에요! 오늘도 똑똑해지고 가요 🎉',
+				'토요일이에요~ 여유롭게 한 문제 풀어요 ☕',
+			];
+			const firstGreeting = dayGreetings[new Date().getDay()] ?? '안녕하세요! 오늘도 함께 공부해요 😊';
+			const t = setTimeout(() => showPetSpeech(firstGreeting), 900);
+			return () => clearTimeout(t);
+		}
+	}, [petLevel, showPetSpeech]);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -98,10 +188,12 @@ const Home = () => {
 			hasAutoCheckedIn.current = false;
 
 			(async () => {
+				await refreshMissionSummary(); // ✅ 미션 요약 먼저 즉시 갱신
 				await ensureTodayQuizExists();
 				await loadData();
 				await checkTodayCheckIn();
 				await loadCheckedInDates();
+				await refreshMissionSummary(); // ✅ 데이터 로드 후 한 번 더 갱신
 			})();
 
 			scrollViewRef.current?.scrollTo({ y: 0, animated: true });
@@ -439,7 +531,7 @@ const Home = () => {
 				marked[date] = {
 					customStyles: {
 						container: {
-							backgroundColor: isToday ? '#27ae60' : '#2980b9', // ✅ 초록: 오늘, 파랑: 이전 출석
+							backgroundColor: isToday ? '#3B82F6' : '#22C55E', // ✅ 블루: 오늘(강조), 그린: 이전 출석
 							borderRadius: scaleWidth(6),
 						},
 						text: {
@@ -452,6 +544,33 @@ const Home = () => {
 		});
 		setCheckedInDates(marked);
 		setPetLevel(getPetLevel(marked)); // ✅ 추가
+
+		// ✅ 연속 출석 스트릭 계산
+		const streak = calcStreak(Object.keys(marked), todayStr);
+		setStreakInfo(streak);
+	};
+
+	// ✅ 오늘의 미션 요약을 스토리지에서 즉시 재계산
+	const refreshMissionSummary = async () => {
+		try {
+			const today = DateUtils.getLocalDateString();
+			const [json, claimedJson] = await Promise.all([
+				AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY),
+				AsyncStorage.getItem(MainStorageKeyType.DAILY_MISSION_CLAIMED),
+			]);
+			const list: MainDataType.TodayQuizList[] = json ? JSON.parse(json) : [];
+			const todayItem = list.find((q) => q.quizDate.slice(0, 10) === today) ?? null;
+			const missions = computeDailyMissions(todayItem);
+			const claimedList: string[] = claimedJson ? JSON.parse(claimedJson) : [];
+			setMissionSummary({
+				done: countDoneMissions(missions),
+				total: missions.length,
+				allDone: allMissionsDone(missions),
+				claimed: claimedList.includes(today),
+			});
+		} catch (e) {
+			// no-op
+		}
 	};
 
 	const handleMascotPress = () => {
@@ -462,6 +581,12 @@ const Home = () => {
 		// 빵빠레 텍스트는 한 번 클릭하면 사라지게
 		if (showMascotHint) {
 			setShowMascotHint(false);
+		}
+
+		// ✅ 캐릭터를 누르면 펫 말풍선도 함께 노출
+		if (petLevel >= 0) {
+			bouncePet();
+			showPetSpeech();
 		}
 
 		requestAnimationFrame(() => setShowConfetti(true));
@@ -538,6 +663,20 @@ const Home = () => {
 								<View style={styles.speechTail} />
 							</View>
 
+							<View style={{ alignItems: 'center', marginBottom: scaleHeight(8) }}>
+								<View style={[styles.streakChip, streakInfo.current > 0 ? styles.streakChipActive : styles.streakChipIdle]}>
+									<IconComponent
+										name="local-fire-department"
+										type="materialIcons"
+										size={scaledSize(14)}
+										color={streakInfo.current > 0 ? '#F97316' : '#94A3B8'}
+									/>
+									<Text style={[styles.streakChipText, streakInfo.current > 0 && styles.streakChipTextActive]}>
+										{streakInfo.current > 0 ? `${streakInfo.current}일 연속 출석 중` : '오늘 출석하기'}
+									</Text>
+								</View>
+							</View>
+
 							<View style={styles.petView}>
 								<TouchableOpacity onPress={handleMascotPress}>
 									<View style={styles.mascoteView}>
@@ -546,9 +685,30 @@ const Home = () => {
 								</TouchableOpacity>
 
 								{petLevel >= 0 && (
-									<View style={styles.petContent}>
-										<FastImage source={PET_REWARDS[petLevel].image} style={styles.petImage} resizeMode="cover" />
-									</View>
+									<TouchableOpacity style={styles.petContent} activeOpacity={0.8} onPress={bouncePet}>
+										<Animated.View style={{ width: '100%', height: '100%', transform: [{ scale: petScale }] }}>
+											<FastImage source={PET_REWARDS[petLevel].image} style={styles.petImage} resizeMode="cover" />
+										</Animated.View>
+									</TouchableOpacity>
+								)}
+
+								{/* ✅ 펫 말풍선 */}
+								{petLevel >= 0 && petSpeech && (
+									<Animated.View
+										style={[
+											styles.petSpeechBubble,
+											{
+												opacity: petSpeechAnim,
+												transform: [
+													{ scale: petSpeechAnim.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] }) },
+													{ translateY: petSpeechAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(6), 0] }) },
+												],
+											},
+										]}>
+										<Text style={styles.petSpeechText} numberOfLines={1}>
+											{petSpeech}
+										</Text>
+									</Animated.View>
 								)}
 							</View>
 						</View>
@@ -614,16 +774,23 @@ const Home = () => {
 							{earnedBadges.length > 0 && (
 								<View style={styles.badgeView}>
 									<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: scaleWidth(10) }}>
-										{visibleBadges.map((item) => (
-											<View key={item.id} style={styles.badgeViewInner}>
-												<TouchableOpacity
-													style={styles.iconBoxActive}
-													onPress={() => setSelectedBadge(item)} // ✅ 툴팁 관리 필요없음
-												>
-													<IconComponent name={item.icon} type={item.iconType} size={20} color="#27ae60" />
-												</TouchableOpacity>
-											</View>
-										))}
+										{visibleBadges.map((item) => {
+											const rarity = BADGE_RARITY_META[item.rarity] ?? BADGE_RARITY_META.common;
+											const pulseScale = badgePulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.06] });
+											return (
+												<View key={item.id} style={styles.badgeViewInner}>
+													<TouchableOpacity activeOpacity={0.8} onPress={() => setSelectedBadge(item)}>
+														<Animated.View
+															style={[
+																styles.iconBoxActive,
+																{ backgroundColor: rarity.soft, borderColor: rarity.color, transform: [{ scale: pulseScale }] },
+															]}>
+															<IconComponent name={item.icon} type={item.iconType} size={scaledSize(17)} color={rarity.color} />
+														</Animated.View>
+													</TouchableOpacity>
+												</View>
+											);
+										})}
 									</ScrollView>
 								</View>
 							)}
@@ -672,111 +839,67 @@ const Home = () => {
 						isNew
 					/>
 
-					<TouchableOpacity style={styles.curiousButton} onPress={() => setShowBadgeModal(true)}>
-						<IconComponent type="materialIcons" name="emoji-events" size={18} color="#2ecc71" />
-						<Text style={styles.curiousButtonText}>숨겨진 뱃지들을 찾아보세요!</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity
-						style={[
-							styles.curiousButton2,
-							{ borderColor: '#16a085' }, // 💜 보라색 계열로 변경
-						]}
-						onPress={() => setShowCheckInModal(true)}>
-						<IconComponent type="materialIcons" name="event-available" size={18} color="#16a085" />
-						<Text style={[styles.curiousButtonText, { color: '#16a085' }]}>오늘의 출석 확인하기</Text>
-					</TouchableOpacity>
+					<View style={styles.quickActionRow}>
+						<TouchableOpacity style={styles.quickActionCard} activeOpacity={0.85} onPress={() => setShowDailyMission(true)}>
+							<View style={[styles.quickActionIconChip, { backgroundColor: '#DCFCE7' }]}>
+								<IconComponent type="materialIcons" name="task-alt" size={scaledSize(20)} color="#22C55E" />
+								{!missionSummary.allDone && <View style={styles.quickActionDot} />}
+							</View>
+							<Text style={styles.quickActionTitle}>오늘의 미션</Text>
+							<Text style={styles.quickActionDesc}>
+								{missionSummary.allDone
+									? missionSummary.claimed
+										? '완료 🎉'
+										: '보상 받기 🎁'
+									: `${missionSummary.done}/${missionSummary.total} 진행`}
+							</Text>
+						</TouchableOpacity>
+						<TouchableOpacity style={styles.quickActionCard} activeOpacity={0.85} onPress={() => setShowBadgeModal(true)}>
+							<View style={[styles.quickActionIconChip, { backgroundColor: '#FEF3C7' }]}>
+								<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(20)} color="#F59E0B" />
+							</View>
+							<Text style={styles.quickActionTitle}>숨겨진 뱃지</Text>
+							<Text style={styles.quickActionDesc}>모아보기</Text>
+						</TouchableOpacity>
+						<TouchableOpacity style={styles.quickActionCard} activeOpacity={0.85} onPress={() => setShowCheckInModal(true)}>
+							<View style={[styles.quickActionIconChip, { backgroundColor: '#DBEAFE' }]}>
+								<IconComponent type="materialIcons" name="event-available" size={scaledSize(20)} color="#3B82F6" />
+							</View>
+							<Text style={styles.quickActionTitle}>오늘의 출석</Text>
+							<Text style={styles.quickActionDesc}>확인하기</Text>
+						</TouchableOpacity>
+					</View>
 				</ScrollView>
 			</View>
 
-			{/* 설명 모달 */}
-			<Modal visible={!!selectedBadge} transparent animationType="fade">
-				<View style={styles.modalOverlay}>
-					<View style={styles.badgeDetailModal}>
-						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setSelectedBadge(null)}>
-							<IconComponent type="materialIcons" name="close" size={24} color="#7f8c8d" />
-						</TouchableOpacity>
-
-						{selectedBadge && (
-							<>
-								<View style={styles.badgeIconWrapper}>
-									<IconComponent name={selectedBadge.icon} type={selectedBadge.iconType} size={48} color="#27ae60" />
-								</View>
-
-								<Text style={styles.badgeDetailTitle}>{selectedBadge.name}</Text>
-								<Text style={styles.badgeDetailDescription}>{selectedBadge.description}</Text>
-
-								<TouchableOpacity onPress={() => setSelectedBadge(null)} style={styles.modalConfirmButton}>
-									<Text style={styles.modalConfirmText}>닫기</Text>
-								</TouchableOpacity>
-							</>
-						)}
-					</View>
-				</View>
-			</Modal>
+			{/* 뱃지 상세 팝업 (나의 활동과 동일 컴포넌트 재사용) */}
+			<BadgeDetailPopup
+				visible={!!selectedBadge}
+				badge={selectedBadge}
+				isEarned={!!selectedBadge && earnedBadgeIds.includes(selectedBadge.id)}
+				onClose={() => setSelectedBadge(null)}
+			/>
 
 			{/* 획득 가능한 뱃지 모달 */}
-			<Modal transparent visible={showBadgeModal} animationType="fade">
-				<View style={styles.modalOverlay}>
-					<View style={styles.badgeModalContent}>
-						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowBadgeModal(false)}>
-							<IconComponent type="materialIcons" name="close" size={24} color="#7f8c8d" />
-						</TouchableOpacity>
+			<BadgeListModal
+				visible={showBadgeModal}
+				badges={CONST_BADGES}
+				earnedIds={earnedBadgeIds}
+				onClose={() => setShowBadgeModal(false)}
+				onSelectBadge={setSelectedBadge}
+			/>
 
-						<Text style={styles.pageTitle}>획득 가능한 뱃지</Text>
-						<Text style={styles.badgeProgressText}>
-							총 {CONST_BADGES.length}개 뱃지 중 <Text style={{ fontWeight: 'bold', color: '#27ae60' }}>{earnedBadgeIds.length}개를 획득했어요!</Text>
-						</Text>
-
-						<ScrollView contentContainerStyle={{ padding: scaleWidth(10) }} style={styles.badgeScrollView}>
-							{CONST_BADGES.map((badge) => {
-								const isEarned = earnedBadgeIds.includes(badge.id);
-								return (
-									<View
-										key={badge.id}
-										style={[
-											styles.badgeCard,
-											isEarned && styles.badgeCardActive, // ✅ 활성화된 스타일 적용
-										]}>
-										<View
-											style={[
-												styles.iconBox,
-												isEarned && styles.badgeCardActive, // 아이콘 박스도 강조
-											]}>
-											<IconComponent
-												name={badge.icon}
-												type={badge.iconType}
-												size={20}
-												color={isEarned ? '#27ae60' : '#2c3e50'} // ✅ 색상 강조
-											/>
-										</View>
-										<View style={styles.textBox}>
-											<Text
-												style={[
-													styles.badgeTitle,
-													isEarned && styles.badgeTitleActive, // 텍스트 강조
-												]}>
-												{badge.name}
-											</Text>
-											<Text
-												style={[
-													styles.badgeDesc,
-													isEarned && styles.badgeDescActive, // 설명 강조
-												]}>
-												획득조건: {badge.description}
-											</Text>
-										</View>
-									</View>
-								);
-							})}
-						</ScrollView>
-
-						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowBadgeModal(false)}>
-							<Text style={styles.modalCloseText}>닫기</Text>
-						</TouchableOpacity>
-					</View>
-				</View>
-			</Modal>
+			<DailyMissionModal
+				visible={showDailyMission}
+				onClose={() => {
+					setShowDailyMission(false);
+					refreshMissionSummary();
+				}}
+				onClaimed={() => {
+					loadData();
+					refreshMissionSummary();
+				}}
+			/>
 
 			<LevelModal visible={showLevelModal} totalScore={totalScore} onClose={() => setShowLevelModal(false)} />
 			<CheckInModal
@@ -786,6 +909,7 @@ const Home = () => {
 				mascot={mascot}
 				showStamp={showStamp}
 				stampStyle={stampStyle}
+				petLevel={petLevel}
 				onClose={() => {
 					setShowCheckInModal(false);
 					loadCheckedInDates();
@@ -1405,6 +1529,27 @@ const styles = StyleSheet.create({
 		overflow: 'hidden',
 	},
 	petImage: { width: '100%', height: '100%' },
+	petSpeechBubble: {
+		position: 'absolute',
+		right: scaleWidth(-58),
+		top: scaleHeight(35),
+		backgroundColor: '#1E293B',
+		paddingVertical: scaleHeight(5),
+		paddingHorizontal: scaleWidth(10),
+		borderRadius: scaleWidth(12),
+		zIndex: 20,
+		shadowColor: '#000',
+		shadowOpacity: 0.18,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 4,
+		elevation: 4,
+	},
+	petSpeechText: {
+		color: '#fff',
+		fontSize: scaledSize(11),
+		fontWeight: '700',
+		textAlign: 'center',
+	},
 	titleContainer: {
 		alignItems: 'center',
 		marginBottom: scaleHeight(10),
@@ -1566,6 +1711,85 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(10),
 		fontWeight: '800',
 		letterSpacing: 0.8,
+	},
+	streakChip: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		borderRadius: scaleHeight(12),
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(4),
+		borderWidth: 1,
+	},
+	streakChipActive: {
+		backgroundColor: '#FFF7ED',
+		borderColor: '#FDBA74',
+	},
+	streakChipIdle: {
+		backgroundColor: '#F1F5F9',
+		borderColor: '#E2E8F0',
+	},
+	streakChipText: {
+		fontSize: scaledSize(13),
+		fontWeight: '700',
+		color: '#94A3B8',
+		marginLeft: scaleWidth(4),
+	},
+	streakChipTextActive: {
+		color: '#EA580C',
+	},
+	quickActionRow: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+		marginTop: scaleHeight(16),
+		marginBottom: scaleHeight(24),
+		gap: scaleWidth(10),
+	},
+	quickActionCard: {
+		flex: 1,
+		alignItems: 'center',
+		paddingVertical: scaleHeight(16),
+		paddingHorizontal: scaleWidth(6),
+		borderRadius: scaleWidth(16),
+		backgroundColor: Colors.surface,
+		borderWidth: 1,
+		borderColor: Colors.surfaceAlt,
+		shadowColor: '#000',
+		shadowOpacity: 0.05,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 6,
+		elevation: 2,
+	},
+	quickActionIconChip: {
+		width: scaleWidth(44),
+		height: scaleWidth(44),
+		borderRadius: scaleWidth(22),
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginBottom: scaleHeight(10),
+	},
+	quickActionDot: {
+		position: 'absolute',
+		top: scaleWidth(2),
+		right: scaleWidth(2),
+		width: scaleWidth(10),
+		height: scaleWidth(10),
+		borderRadius: scaleWidth(5),
+		backgroundColor: '#EF4444',
+		borderWidth: 1.5,
+		borderColor: '#fff',
+	},
+	quickActionTitle: {
+		color: Colors.textStrong,
+		fontWeight: '700',
+		fontSize: scaledSize(14),
+		textAlign: 'center',
+	},
+	quickActionDesc: {
+		color: Colors.textMuted,
+		fontWeight: '500',
+		fontSize: scaledSize(11),
+		marginTop: scaleHeight(2),
+		textAlign: 'center',
 	},
 });
 

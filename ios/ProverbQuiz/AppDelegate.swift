@@ -2,6 +2,7 @@ import Firebase
 import React
 import ReactAppDependencyProvider
 import React_RCTAppDelegate
+import RNBootSplash // ← 추가
 import UIKit
 
 @main
@@ -18,6 +19,13 @@ class AppDelegate: RCTAppDelegate {
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
+
+   // ✅ 해당 부분 추가
+  override func customize(_ rootView: RCTRootView!) {
+    super.customize(rootView)
+    RNBootSplash.initWithStoryboard("BootSplash", rootView: rootView)
+  }
+
 
   override func sourceURL(for bridge: RCTBridge) -> URL? {
     self.bundleURL()

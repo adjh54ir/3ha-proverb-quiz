@@ -15,15 +15,16 @@ interface CheckInModalProps {
 	showStamp: boolean;
 	stampStyle: any;
 	onClose: () => void;
+	petLevel?: number; // ✅ 현재 획득한 펫 단계(-1: 없음). 출석 모달에서 내 펫 상태를 표시
 }
 
-const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, checkedInDates, mascot, showStamp, stampStyle, onClose }) => {
+const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, checkedInDates, mascot, showStamp, stampStyle, onClose, petLevel = -1 }) => {
 	return (
 		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.modalOverlay}>
 				<View style={styles.modalContent}>
 					<TouchableOpacity style={styles.modalCloseIcon} onPress={onClose}>
-						<IconComponent type="materialIcons" name="close" size={24} color="#7f8c8d" />
+						<IconComponent type="materialIcons" name="close" size={scaledSize(24)} color="#64748B" />
 					</TouchableOpacity>
 
 					<Text style={styles.modalTitle}>오늘의 출석</Text>
@@ -43,15 +44,48 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 
 						<View style={styles.petScrollContainer}>
 							<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.petScrollContent}>
-								{PET_REWARDS.map((item, index, arr) => (
-									<View key={index} style={[styles.petItemBox, { marginRight: index !== arr.length - 1 ? scaleWidth(10) : 0 }]}>
-										<FastImage source={item.image} style={styles.petImage} resizeMode="contain" />
-										<Text style={styles.petLabelText}>{item.label}</Text>
-										<Text style={styles.petStageText}>{item.name}</Text>
+								{PET_REWARDS.map((item, index, arr) => {
+									const isEarned = index <= petLevel; // ✅ 획득 완료
+									const isCurrent = index === petLevel; // ✅ 현재 단계
+									const isLocked = index > petLevel; // ✅ 미획득(잠금)
+									return (
+										<View
+											key={index}
+											style={[
+												styles.petItemBox,
+												{ marginRight: index !== arr.length - 1 ? scaleWidth(10) : 0 },
+												isCurrent && styles.petItemBoxCurrent,
+											]}>
+											<View>
+												<FastImage
+													source={item.image}
+													style={[styles.petImage, isLocked && styles.petImageLocked]}
+													resizeMode="cover"
+												/>
+												{isEarned && (
+													<View style={styles.petEarnedCheck}>
+														<IconComponent type="materialIcons" name="check" size={scaledSize(10)} color="#fff" />
+													</View>
+												)}
+												{isLocked && (
+													<View style={styles.petLockOverlay}>
+														<IconComponent type="materialIcons" name="lock" size={scaledSize(14)} color="#94A3B8" />
+													</View>
+												)}
+											</View>
+											<Text style={[styles.petLabelText, isLocked && styles.petTextLocked]}>{item.label}</Text>
+											<Text style={[styles.petStageText, isLocked && styles.petTextLocked]}>{item.name}</Text>
 
-										{index < arr.length - 1 && <IconComponent name="chevron-right" type="fontAwesome" size={12} color="#7f8c8d" style={styles.arrowIcon} />}
-									</View>
-								))}
+											{isCurrent && (
+												<View style={styles.petCurrentBadge}>
+													<Text style={styles.petCurrentBadgeText}>현재</Text>
+												</View>
+											)}
+
+											{index < arr.length - 1 && <IconComponent name="chevron-right" type="fontAwesome" size={scaledSize(12)} color="#64748B" style={styles.arrowIcon} />}
+										</View>
+									);
+								})}
 							</ScrollView>
 						</View>
 
@@ -60,32 +94,48 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 								markingType="custom"
 								markedDates={checkedInDates}
 								disableAllTouchEventsForDisabledDays={true}
+								enableSwipeMonths={true}
 								theme={{
-									todayTextColor: '#e74c3c',
-									arrowColor: '#2ecc71',
-									textDayFontSize: scaledSize(12),
-									textMonthFontSize: scaledSize(14),
+									todayTextColor: '#EF4444',
+									todayBackgroundColor: '#FEF2F2',
+									arrowColor: '#22C55E',
+									textDayFontSize: scaledSize(13),
+									textDayFontWeight: '600',
+									textMonthFontSize: scaledSize(15),
+									textMonthFontWeight: '800',
 									textDayHeaderFontSize: scaledSize(11),
-									calendarBackground: '#ffffff',
-									textSectionTitleColor: '#2c3e50',
-									selectedDayBackgroundColor: '#27ae60',
-									selectedDayTextColor: '#ffffff',
-									dayTextColor: '#2c3e50',
-									textDisabledColor: '#d9e1e8',
+									textDayHeaderFontWeight: '700',
+									calendarBackground: '#fff',
+									textSectionTitleColor: '#94A3B8',
+									selectedDayBackgroundColor: '#22C55E',
+									selectedDayTextColor: '#fff',
+									dayTextColor: '#334155',
+									textDisabledColor: '#CBD5E1',
 								}}
 								renderHeader={(date) => {
 									const year = date.getFullYear();
 									const month = (date.getMonth() + 1).toString().padStart(2, '0');
 									return <Text style={styles.calendarHeaderText}>{`${year}년 ${month}월`} 출석</Text>;
 								}}
-								hideArrows
 								style={styles.calendarContainer}
 							/>
+							<View style={styles.swipeHintRow}>
+								<IconComponent type="materialIcons" name="swipe" size={scaledSize(13)} color="#94A3B8" />
+								<Text style={styles.swipeHintText}>좌우 화살표 버튼을 눌러서 출석을 확인해보세요!</Text>
+							</View>
 						</View>
 
 						{showStamp && (
 							<Animated.View style={[stampStyle, styles.stampContainer]}>
-								<FastImage source={mascot} style={styles.stampImage} resizeMode="contain" />
+								<View style={styles.stampImageWrap}>
+									<FastImage source={mascot} style={styles.stampImage} resizeMode="contain" />
+									{/* ✅ 획득한 펫이 캐릭터 옆에 함께 따라다님 */}
+									{petLevel >= 0 && (
+										<View style={styles.stampPetBadge}>
+											<FastImage source={PET_REWARDS[petLevel].image} style={styles.stampPetImage} resizeMode="cover" />
+										</View>
+									)}
+								</View>
 								<Text style={styles.stampText}>오늘 출석 완료!</Text>
 							</Animated.View>
 						)}
@@ -109,7 +159,7 @@ const styles = StyleSheet.create({
 	},
 	modalContent: {
 		width: '85%',
-		backgroundColor: '#ffffff',
+		backgroundColor: '#fff',
 		padding: scaleWidth(20),
 		borderRadius: scaleWidth(12),
 		maxHeight: scaleHeight(700),
@@ -125,7 +175,7 @@ const styles = StyleSheet.create({
 	modalTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: 'bold',
-		color: '#2c3e50',
+		color: '#334155',
 		marginBottom: scaleHeight(14),
 		textAlign: 'center',
 		marginTop: scaleHeight(3), // ✅ 상단 여백 추가
@@ -139,26 +189,26 @@ const styles = StyleSheet.create({
 		height: scaleWidth(48),
 		borderRadius: scaleWidth(24),
 		borderWidth: 2,
-		borderColor: '#27ae60',
+		borderColor: '#22C55E',
 		marginRight: scaleWidth(10),
 	},
 	modalText: {
 		fontSize: scaledSize(13),
-		color: '#2c3e50',
+		color: '#334155',
 		lineHeight: scaleHeight(20),
 		marginTop: scaleHeight(6),
 		fontWeight: '500',
 	},
 	highlightBox: {
 		padding: scaleHeight(10),
-		backgroundColor: '#fef9e7',
-		borderRadius: scaleWidth(12),
+		backgroundColor: '#FFFBEB',
+		borderRadius: scaleWidth(10),
 		borderWidth: 1,
-		borderColor: '#f1c40f',
+		borderColor: '#FBBF24',
 	},
 	highlightText: {
 		fontSize: scaledSize(12),
-		color: '#2c3e50',
+		color: '#334155',
 		textAlign: 'center',
 		lineHeight: scaleHeight(20),
 		fontWeight: '500',
@@ -175,9 +225,9 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: scaleWidth(6),
 		borderRadius: scaleWidth(8),
-		backgroundColor: '#f8f9fa',
+		backgroundColor: '#F8FAFC',
 		borderWidth: 1,
-		borderColor: '#dcdcdc',
+		borderColor: '#CBD5E1',
 		position: 'relative',
 	},
 	petImage: {
@@ -185,18 +235,88 @@ const styles = StyleSheet.create({
 		height: scaleWidth(48),
 		borderRadius: scaleWidth(24),
 		borderWidth: 2,
-		borderColor: '#27ae60',
+		borderColor: '#22C55E',
 		marginBottom: scaleHeight(6),
+	},
+	petItemBoxCurrent: {
+		borderColor: '#22C55E',
+		borderWidth: 2,
+		backgroundColor: '#EFF6FF',
+	},
+	petImageLocked: {
+		opacity: 0.35,
+		borderColor: '#CBD5E1',
+	},
+	petTextLocked: {
+		color: '#94A3B8',
+	},
+	petEarnedCheck: {
+		position: 'absolute',
+		top: -scaleHeight(2),
+		right: -scaleWidth(2),
+		width: scaleWidth(16),
+		height: scaleWidth(16),
+		borderRadius: scaleWidth(8),
+		backgroundColor: '#3B82F6',
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderWidth: 1.5,
+		borderColor: '#fff',
+	},
+	petLockOverlay: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: scaleHeight(6),
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	petCurrentBadge: {
+		marginTop: scaleHeight(4),
+		backgroundColor: '#3B82F6',
+		borderRadius: scaleWidth(10),
+		paddingHorizontal: scaleWidth(8),
+		paddingVertical: scaleHeight(2),
+	},
+	petCurrentBadgeText: {
+		fontSize: scaledSize(9),
+		color: '#fff',
+		fontWeight: '700',
+	},
+	stampImageWrap: {
+		position: 'relative',
+	},
+	stampPetBadge: {
+		position: 'absolute',
+		right: -scaleWidth(6),
+		bottom: scaleHeight(6),
+		width: scaleWidth(56),
+		height: scaleWidth(56),
+		borderRadius: scaleWidth(28),
+		borderWidth: 2,
+		borderColor: '#fff',
+		backgroundColor: '#fff',
+		overflow: 'hidden',
+		shadowColor: '#000',
+		shadowOpacity: 0.15,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: scaleWidth(4),
+		elevation: 3,
+	},
+	stampPetImage: {
+		width: '100%',
+		height: '100%',
 	},
 	petLabelText: {
 		fontSize: scaledSize(11),
-		color: '#2c3e50',
+		color: '#334155',
 		fontWeight: '600',
 		textAlign: 'center',
 	},
 	petStageText: {
 		fontSize: scaledSize(10),
-		color: '#7f8c8d',
+		color: '#64748B',
 		marginTop: scaleHeight(2),
 		textAlign: 'center',
 	},
@@ -216,7 +336,7 @@ const styles = StyleSheet.create({
 	},
 	stampText: {
 		fontSize: scaledSize(16),
-		color: '#e74c3c',
+		color: '#EF4444',
 		fontWeight: 'bold',
 		textShadowColor: 'rgba(0,0,0,0.2)',
 		textShadowOffset: { width: 1, height: 1 },
@@ -228,22 +348,42 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(8),
 	},
 	calendarContainer: {
-		width: '100%', // ✅ 100%로 유지
-		borderRadius: scaleWidth(8),
+		width: '100%',
+		borderRadius: scaleWidth(16),
 		borderWidth: 1,
-		borderColor: '#27ae60',
+		borderColor: '#E2E8F0',
+		paddingVertical: scaleHeight(6),
+		paddingHorizontal: scaleWidth(4),
 		overflow: 'hidden',
+		backgroundColor: '#fff',
+		shadowColor: '#0F172A',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+		elevation: 2,
+	},
+	swipeHintRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		gap: scaleWidth(5),
+		marginTop: scaleHeight(8),
+	},
+	swipeHintText: {
+		fontSize: scaledSize(11),
+		color: '#94A3B8',
+		fontWeight: '600',
 	},
 	calendarHeaderText: {
-		fontSize: scaledSize(16), // ✅ 폰트 크기 조정
-		fontWeight: 'bold',
-		color: '#2c3e50',
+		fontSize: scaledSize(15),
+		fontWeight: '800',
+		color: '#334155',
 		textAlign: 'center',
-		marginVertical: scaleHeight(12), // ✅ 여백 조정
+		marginVertical: scaleHeight(10),
 	},
 	checkInCompleteText: {
 		fontSize: scaledSize(14),
-		color: '#27ae60',
+		color: '#22C55E',
 		marginTop: scaleHeight(10),
 		fontWeight: 'bold',
 		textAlign: 'center',

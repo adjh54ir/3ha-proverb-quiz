@@ -5,12 +5,39 @@ export const COMMON_APPS_DATA: {
 } = {
 	Apps: [
 		{
+			id: 20,
+			icon: require('@/assets/appicons/main_financeCalc.png'),
+			title: '나만의 생활 금융 계산기',
+			desc: '예금·적금·대출·연봉 등 생활 속 금융 계산을 한곳에서 빠르고 간편하게 해결할 수 있는 생활금융 계산기 앱.',
+			category: 'quiz',
+			android: 'https://play.google.com/store/apps/details?id=com.tha.lifefinancecalc',
+			ios: 'https://apps.apple.com/us/app/id6759258758',
+		},
+		{
+			id: 19,
+			icon: require('@/assets/appicons/main_infinityOper.png'),
+			title: '무한 수학 퀴즈',
+			desc: '매일 반복하며 수학 감각을 키우고, 점수와 뱃지로 성취감까지 쌓이는 수학 퀴즈 앱.',
+			category: 'quiz',
+			android: 'https://play.google.com/store/apps/details?id=com.tha.infinityoperations',
+			ios: 'https://apps.apple.com/us/app/id6775210879',
+		},
+		{
+			id: 18,
+			icon: require('@/assets/appicons/main_bloodType.png'),
+			title: '혈액형 연구소',
+			desc: '혈액형에 관한 모든 것 — 유전 계산부터 궁합, 속설, 퀴즈, 헌혈까지 알고 싶은 정보를 담고 있는 앱입니다!',
+			category: 'utility',
+			android: 'https://play.google.com/store/apps/details?id=com.tha.bloodtype',
+			ios: 'https://apps.apple.com/us/app/id6769299321',
+		},
+		{
 			id: 17,
 			icon: require('@/assets/appicons/main_linkManager.png'),
 			title: '퀵 링크: 스마트 링크 매니저',
 			desc: '쉽게 저장하고 빠르게 찾아보세요. 나만의 폴더로 링크를 깔끔하게 관리해보세요!',
 			category: 'utility',
-			android: '',
+			android: 'https://play.google.com/store/apps/details?id=com.tha.linkmanager',
 			ios: 'https://apps.apple.com/kr/app/id6761520189',
 		},
 		{
@@ -59,7 +86,7 @@ export const COMMON_APPS_DATA: {
 			desc:
 				'기분 팡: 나의 기분을 팡!은 지금 느끼는 기분을 버튼 하나로 표현하고,다양한 이펙트로 가볍게 스트레스를 풀 수 있는 앱입니다. 내가 좋아하는 이미지로 나만의 버튼을 만들고 자유롭게 배치해 나만의 감정 공간을 꾸며보세요.',
 			category: 'utility',
-			android: '',
+			android: 'https://play.google.com/store/apps/details?id=com.tha.emotionbutton',
 			ios: 'https://apps.apple.com/kr/app/id6755211160',
 		},
 		{

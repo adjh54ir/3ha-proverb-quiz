@@ -177,7 +177,7 @@ const QuizScreen = () => {
 		}
 	}, [showHintModal]);
 	useEffect(() => {
-		if (quizHistory) setTotalScore(quizHistory.totalScore);
+		if (quizHistory) setTotalScore(quizHistory.totalScore ?? 0);
 	}, [quizHistory]);
 
 	// 3️⃣ 퀴즈 데이터 로드 useEffect 수정
@@ -438,6 +438,8 @@ const QuizScreen = () => {
 				updated.correctProverbId = updated.correctProverbId ?? [];
 				updated.wrongProverbId = updated.wrongProverbId ?? [];
 				updated.badges = updated.badges ?? [];
+				updated.totalScore = updated.totalScore ?? 0;
+				updated.bestCombo = updated.bestCombo ?? 0;
 
 				updated.quizCounts[id] = (updated.quizCounts[id] || 0) + 1;
 				updated.lastAnsweredAt = new Date();
@@ -878,7 +880,7 @@ const QuizScreen = () => {
 										</View>
 										<Text style={styles.statusCardTitle}>총점</Text>
 										<View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
-											<Text style={styles.statusCardValue}>{totalScore}<Text style={styles.statusCardUnit}>점</Text></Text>
+											<Text style={styles.statusCardValue}>{Number.isFinite(totalScore) ? totalScore : 0}<Text style={styles.statusCardUnit}>점</Text></Text>
 											{showScoreBonus && <Animated.Text style={[styles.scoreBonusText, scoreBonusStyle]}>+10점!</Animated.Text>}
 										</View>
 									</View>

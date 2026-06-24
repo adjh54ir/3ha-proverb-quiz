@@ -68,7 +68,7 @@ const BadgeListModal = ({
 					{/* 헤더 */}
 					<View style={styles.badgeModalHeader}>
 						<TouchableOpacity style={styles.badgeModalClose} onPress={onClose}>
-							<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color="#92400E" />
+							<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color="#6B6456" />
 						</TouchableOpacity>
 						<View style={styles.badgeModalHeaderIcon}>
 							<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(30)} color="#fff" />
@@ -101,8 +101,8 @@ const BadgeListModal = ({
 
 					{/* 목록 */}
 					<ScrollView
-						contentContainerStyle={{ padding: scaleWidth(16) }}
-						style={{ height: scaleHeight(380), width: '100%' }}
+						contentContainerStyle={{ paddingHorizontal: scaleWidth(16), paddingTop: scaleHeight(16), paddingBottom: scaleHeight(20) }}
+						style={{ height: scaleHeight(440), width: '100%', marginTop: scaleHeight(6) }}
 						showsVerticalScrollIndicator={false}>
 						{sorted.length === 0 && (
 							<View style={styles.badgeEmptyBox}>
@@ -179,28 +179,28 @@ const styles = StyleSheet.create({
 	},
 	badgeModalContent: {
 		width: '90%',
-		backgroundColor: '#FFF8E7',
+		backgroundColor: '#FFFDF8',
 		borderRadius: scaleWidth(24),
 		alignItems: 'center',
 		overflow: 'hidden',
 		paddingBottom: scaleHeight(18),
 		borderWidth: 1,
-		borderColor: '#FDE68A',
-		shadowColor: '#92400E',
-		shadowOpacity: 0.14,
+		borderColor: '#EFE7D6',
+		shadowColor: '#000',
+		shadowOpacity: 0.12,
 		shadowOffset: { width: 0, height: 10 },
 		shadowRadius: 18,
 		elevation: 8,
 	},
 	badgeModalHeader: {
 		width: '100%',
-		backgroundColor: '#FFF3D6',
+		backgroundColor: '#FBF6EA',
 		paddingTop: scaleHeight(22),
 		paddingBottom: scaleHeight(18),
 		paddingHorizontal: scaleWidth(20),
 		alignItems: 'center',
 		borderBottomWidth: 1,
-		borderBottomColor: '#FDE68A',
+		borderBottomColor: '#EFE7D6',
 	},
 	badgeModalClose: {
 		position: 'absolute',
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
 		width: scaleWidth(58),
 		height: scaleWidth(58),
 		borderRadius: scaleWidth(29),
-		backgroundColor: '#D97706',
+		backgroundColor: '#475569',
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: scaleHeight(10),
@@ -221,12 +221,12 @@ const styles = StyleSheet.create({
 	badgeModalTitle: {
 		fontSize: scaledSize(18),
 		fontWeight: '800',
-		color: '#78350F',
+		color: '#3F3A33',
 		marginBottom: scaleHeight(4),
 	},
 	badgeModalSubtitle: {
 		fontSize: scaledSize(12.5),
-		color: '#B45309',
+		color: '#8B8475',
 		marginBottom: scaleHeight(12),
 		fontWeight: '600',
 	},
@@ -234,18 +234,18 @@ const styles = StyleSheet.create({
 		width: '100%',
 		height: scaleHeight(8),
 		borderRadius: scaleHeight(4),
-		backgroundColor: '#FDE68A',
+		backgroundColor: '#ECE3D2',
 		overflow: 'hidden',
 	},
 	badgeModalProgressFill: {
 		height: '100%',
 		borderRadius: scaleHeight(4),
-		backgroundColor: '#B45309',
+		backgroundColor: '#475569',
 	},
 	badgeModalPercent: {
 		marginTop: scaleHeight(6),
 		fontSize: scaledSize(11),
-		color: '#92400E',
+		color: '#6B6456',
 		fontWeight: '700',
 	},
 	badgeFilterRow: {
@@ -259,13 +259,13 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingVertical: scaleHeight(8),
 		borderRadius: scaleWidth(10),
-		backgroundColor: '#FFF7ED',
+		backgroundColor: '#FFFFFF',
 		borderWidth: 1,
-		borderColor: '#FED7AA',
+		borderColor: '#ECE3D2',
 	},
 	badgeFilterChipActive: {
-		backgroundColor: '#B45309',
-		borderColor: '#B45309',
+		backgroundColor: '#475569',
+		borderColor: '#475569',
 	},
 	badgeFilterChipText: {
 		fontSize: scaledSize(12.5),
@@ -294,19 +294,19 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(12),
 		width: '100%',
 		borderWidth: 1,
-		borderColor: '#FDE68A',
-		backgroundColor: '#FFFCF2',
+		borderColor: '#EFE7D6',
+		backgroundColor: '#FFFFFF',
 		shadowColor: '#000',
 		shadowOpacity: 0.06,
 		shadowOffset: { width: 0, height: 1 },
 		shadowRadius: 3,
 	},
 	badgeCardActive: {
-		backgroundColor: '#FEF3C7',
-		borderColor: '#F59E0B',
+		backgroundColor: '#F7F2E8',
+		borderColor: '#D8CEB8',
 		borderWidth: 1.5,
-		shadowColor: '#F59E0B',
-		shadowOpacity: 0.2,
+		shadowColor: '#000',
+		shadowOpacity: 0.1,
 		shadowOffset: { width: 0, height: 1 },
 		shadowRadius: 3,
 	},
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
 		width: scaleWidth(44),
 		height: scaleWidth(44),
 		borderRadius: scaleWidth(22),
-		backgroundColor: '#FEF3C7',
+		backgroundColor: '#F3EEE2',
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginRight: scaleWidth(14),
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
 		color: '#334155',
 	},
 	badgeTitleActive: {
-		color: '#B45309',
+		color: '#3F3A33',
 	},
 	badgeRarityChip: {
 		flexDirection: 'row',
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(4),
 	},
 	badgeDescActive: {
-		color: '#B45309',
+		color: '#5C564B',
 	},
 	badgeCondRow: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(4), marginTop: scaleHeight(6) },
 	badgeCondText: { flex: 1, fontSize: scaledSize(11), color: '#94A3B8' },
@@ -355,11 +355,11 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(2),
 	},
 	badgeStatusPillEarned: { backgroundColor: '#DCFCE7' },
-	badgeStatusPillLocked: { backgroundColor: '#FFF7ED' },
+	badgeStatusPillLocked: { backgroundColor: '#F3EEE2' },
 	badgeStatusPillText: { fontSize: scaledSize(10), fontWeight: '800' },
 	badgeModalDoneBtn: {
 		marginTop: scaleHeight(6),
-		backgroundColor: '#B45309',
+		backgroundColor: '#475569',
 		paddingVertical: scaleHeight(12),
 		borderRadius: scaleWidth(12),
 		alignItems: 'center',

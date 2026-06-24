@@ -426,53 +426,67 @@ const QuizScreen = () => {
 			setCombo(0);
 		}
 		// ✅ 🔽 여기에 퀴즈 기록 업데이트 추가
+		// ⚠️ 기록/뱃지 처리 중 어떤 오류가 나더라도 아래의 결과(해설) 모달은 반드시 노출되도록 try/catch 로 감쌉니다.
 		if (quizHistory && question) {
-			// 기존 업데이트 로직 유지
-			const updated = { ...quizHistory };
-			const id = question.id;
+			try {
+				// 기존 업데이트 로직 유지
+				const updated = { ...quizHistory };
+				const id = question.id;
 
-			updated.quizCounts[id] = (updated.quizCounts[id] || 0) + 1;
-			updated.lastAnsweredAt = new Date();
+				// 누락 가능 필드 방어 (오래된 저장 데이터 대비)
+				updated.quizCounts = updated.quizCounts ?? {};
+				updated.correctProverbId = updated.correctProverbId ?? [];
+				updated.wrongProverbId = updated.wrongProverbId ?? [];
+				updated.badges = updated.badges ?? [];
 
-			// 오답 복습 모드일 경우 오답 → 정답 처리 먼저 실행
-			if (correct && isWrongReview && updated.wrongProverbId.includes(id)) {
-				updated.wrongProverbId = updated.wrongProverbId.filter((wrongId) => wrongId !== id);
-				if (!updated.correctProverbId.includes(id)) {
-					updated.correctProverbId.push(id);
+				updated.quizCounts[id] = (updated.quizCounts[id] || 0) + 1;
+				updated.lastAnsweredAt = new Date();
+
+				// 오답 복습 모드일 경우 오답 → 정답 처리 먼저 실행
+				if (correct && isWrongReview && updated.wrongProverbId.includes(id)) {
+					updated.wrongProverbId = updated.wrongProverbId.filter((wrongId) => wrongId !== id);
+					if (!updated.correctProverbId.includes(id)) {
+						updated.correctProverbId.push(id);
+					}
 				}
-			}
 
-			// 정답/오답 처리
-			updated.quizCounts[id] = (updated.quizCounts[id] || 0) + 1;
-			updated.lastAnsweredAt = new Date();
-			if (correct) {
-				if (!updated.correctProverbId.includes(id)) {
-					updated.correctProverbId.push(id);
+				// 정답/오답 처리
+				updated.quizCounts[id] = (updated.quizCounts[id] || 0) + 1;
+				updated.lastAnsweredAt = new Date();
+				if (correct) {
+					if (!updated.correctProverbId.includes(id)) {
+						updated.correctProverbId.push(id);
+					}
+					updated.totalScore += 10;
+					updated.bestCombo = Math.max(updated.bestCombo || 0, combo + 1);
+				} else {
+					if (!updated.wrongProverbId.includes(id)) {
+						updated.wrongProverbId.push(id);
+					}
 				}
-				updated.totalScore += 10;
-				updated.bestCombo = Math.max(updated.bestCombo || 0, combo + 1);
-			} else {
-				if (!updated.wrongProverbId.includes(id)) {
-					updated.wrongProverbId.push(id);
+
+				acquiredBadges = QuizBadgeInterceptor(updated, ProverbServices.selectProverbList());
+
+				const finalUpdated = {
+					...updated,
+					badges: [...new Set([...(updated.badges || []), ...acquiredBadges])],
+				};
+				setQuizHistory(finalUpdated);
+				await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(finalUpdated));
+				setTotalScore(finalUpdated.totalScore); // ← 총점 상태 갱신 추가
+
+				if (acquiredBadges.length > 0) {
+					const earnedBadgeObjects = CONST_BADGES.filter((b) => acquiredBadges.includes(b.id));
+					if (earnedBadgeObjects.length > 0) {
+						setNewlyEarnedBadges(earnedBadgeObjects); // ✨ 뱃지 정보 세팅
+						setBadgeModalVisible(true); // ✨ 모달 표시
+						setConfettiKey(Math.random()); // 🎉 축포 터뜨리기
+						return; // 정답/오답 모달 생략 (뱃지 모달 우선 표시)
+					}
 				}
-			}
-
-			acquiredBadges = QuizBadgeInterceptor(updated, ProverbServices.selectProverbList());
-
-			const finalUpdated = {
-				...updated,
-				badges: [...new Set([...(updated.badges || []), ...acquiredBadges])],
-			};
-			setQuizHistory(finalUpdated);
-			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(finalUpdated));
-			setTotalScore(finalUpdated.totalScore); // ← 총점 상태 갱신 추가
-
-			if (acquiredBadges.length > 0) {
-				const earnedBadgeObjects = CONST_BADGES.filter((b) => acquiredBadges.includes(b.id));
-				setNewlyEarnedBadges(earnedBadgeObjects); // ✨ 뱃지 정보 세팅
-				setBadgeModalVisible(true); // ✨ 모달 표시
-				setConfettiKey(Math.random()); // 🎉 축포 터뜨리기
-				return; // 정답/오답 모달 생략
+			} catch (e) {
+				// 기록/뱃지 처리 실패 시에도 해설(결과 모달)은 정상적으로 보여줍니다.
+				console.warn('[QuizScreen] 기록/뱃지 처리 중 오류 발생, 결과 모달로 계속 진행합니다:', e);
 			}
 		}
 
@@ -789,9 +803,9 @@ const QuizScreen = () => {
 		loadFavorites();
 	}, []);
 
-	// ⏱ 타이머가 경고 구간(<=15초)에 들어오면 힌트 전구 글로우 시작 / 벗어나면 정지
+	// ⏱ 타이머가 노란색(경고) 구간(<=20초)에 진입하면 힌트 전구 깜빡임 시작 / 벗어나면 정지
 	useEffect(() => {
-		const inWarning = remainingTime <= 15 && remainingTime > 0 && !hasAnsweredRef.current && !!question && !selected;
+		const inWarning = remainingTime <= 20 && remainingTime > 0 && !hasAnsweredRef.current && !!question && !selected;
 		if (inWarning) {
 			if (!hintGlowLoopRef.current) {
 				hintGlowLoopRef.current = Animated.loop(

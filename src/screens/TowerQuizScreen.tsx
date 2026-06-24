@@ -434,7 +434,10 @@ const TowerQuizScreen = () => {
 
 					<View style={styles.questionCard}>
 						<View style={styles.questionCardGradient}>
-							<Text style={styles.questionText}>{currentQuestion.question}</Text>
+							<Text style={styles.questionText}>
+								<Text style={styles.questionProverb}>'{currentQuestion.proverb}'</Text>
+								<Text style={styles.questionAsk}>의 뜻은 무엇일까요?</Text>
+							</Text>
 						</View>
 					</View>
 
@@ -578,7 +581,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(60),
 	},
 	bossImage: { width: scaleWidth(120), height: scaleWidth(120), borderRadius: scaleWidth(60) },
-	questionCard: { marginBottom: scaleHeight(24), borderRadius: scaleWidth(16), overflow: 'hidden' },
+	questionCard: { marginBottom: scaleHeight(24) },
 	questionCardGradient: { padding: scaleWidth(20) },
 	questionText: {
 		fontSize: scaledSize(18),
@@ -586,6 +589,14 @@ const styles = StyleSheet.create({
 		color: '#fff',
 		lineHeight: scaledSize(26),
 		textAlign: 'center',
+	},
+	questionProverb: {
+		color: '#60A5FA', // ✅ 속담 부분만 파란색 강조
+		fontWeight: '800',
+	},
+	questionAsk: {
+		color: '#fff', // 질문 문구는 흰색
+		fontWeight: '600',
 	},
 	answersContainer: { gap: scaleHeight(12) },
 	answerButton: { borderRadius: scaleWidth(12), overflow: 'hidden' },

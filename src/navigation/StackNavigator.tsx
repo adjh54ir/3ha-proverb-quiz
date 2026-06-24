@@ -173,9 +173,9 @@ const StackNavigator = () => {
 			/>
 			<Stack.Screen name={Paths.HOME} component={Home} />
 			<Stack.Screen name={Paths.SETTING} component={SettingScreen} />
-			<Stack.Screen name={Paths.FAVORITE} component={FavoriteScreen} />
-			<Stack.Screen name={Paths.MY_PROVERB_BOOK} component={MyProverbBook} />
-			<Stack.Screen name={Paths.MY_PROVERB_BOOK_DETAIL} component={MyProverbBookDetail} />
+			<Stack.Screen name={Paths.FAVORITE} component={FavoriteScreen} options={{ headerShown: false }} />
+			<Stack.Screen name={Paths.MY_PROVERB_BOOK} component={MyProverbBook} options={{ headerShown: false }} />
+			<Stack.Screen name={Paths.MY_PROVERB_BOOK_DETAIL} component={MyProverbBookDetail} options={{ headerShown: false }} />
 		</Stack.Navigator>
 	);
 };

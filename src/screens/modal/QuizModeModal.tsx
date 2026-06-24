@@ -22,10 +22,9 @@ const MODES: { key: QuizMode; label: string; desc: string; icon: string; color: 
 
 const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
 	return (
-		<Modal visible={!!book} transparent animationType="slide" onRequestClose={onClose}>
+		<Modal visible={!!book} transparent animationType="fade" onRequestClose={onClose}>
 			<TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
 				<TouchableOpacity activeOpacity={1} style={styles.sheet}>
-					<View style={styles.handleBar} />
 					<View style={styles.headerRow}>
 						<Text style={styles.title} numberOfLines={1}>{book?.title ? `${book.title} 퀴즈` : '퀴즈 모드 선택'}</Text>
 						<TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
@@ -55,9 +54,21 @@ const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
 export default QuizModeModal;
 
 const styles = StyleSheet.create({
-	overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-	sheet: { backgroundColor: '#fff', borderTopLeftRadius: scaleWidth(24), borderTopRightRadius: scaleWidth(24), paddingHorizontal: scaleWidth(20), paddingTop: scaleHeight(10), paddingBottom: scaleHeight(30) },
-	handleBar: { width: scaleWidth(40), height: scaleHeight(4), borderRadius: scaleWidth(2), backgroundColor: '#E2E8F0', alignSelf: 'center', marginBottom: scaleHeight(14) },
+	overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: scaleWidth(24) },
+	sheet: {
+		width: '100%',
+		maxWidth: scaleWidth(420),
+		backgroundColor: '#fff',
+		borderRadius: scaleWidth(24),
+		paddingHorizontal: scaleWidth(20),
+		paddingTop: scaleHeight(20),
+		paddingBottom: scaleHeight(20),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 8 },
+		shadowOpacity: 0.18,
+		shadowRadius: 16,
+		elevation: 12,
+	},
 	headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 	title: { fontSize: scaledSize(18), fontWeight: '800', color: '#334155', flex: 1, marginRight: scaleWidth(10) },
 	subtitle: { fontSize: scaledSize(13), color: '#94A3B8', marginTop: scaleHeight(4), marginBottom: scaleHeight(14) },

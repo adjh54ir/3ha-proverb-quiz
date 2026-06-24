@@ -16,6 +16,9 @@ const AD_ALLOWED_ROUTES = [
 	Paths.HOME,
 	Paths.SETTING,
 	Paths.MY_SCORE,
+	Paths.FAVORITE,
+	Paths.MY_PROVERB_BOOK,
+	Paths.MY_PROVERB_BOOK_DETAIL
 	// 필요하면 추가
 ];
 

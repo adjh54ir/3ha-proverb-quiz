@@ -528,8 +528,8 @@ const FavoriteScreen = () => {
 export default FavoriteScreen;
 
 const styles = StyleSheet.create({
-	main: { flex: 1, backgroundColor: '#F8FAFC' },
-	headerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: scaleHeight(6), marginBottom: scaleHeight(14) },
+	main: { flex: 1, backgroundColor: '#F8FAFC', marginTop: scaleHeight(-6) },
+	headerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: scaleHeight(14) },
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(8) },
 	headerTitle: { fontSize: scaledSize(20), fontWeight: '800', color: '#334155', letterSpacing: -0.3 },
 	headerSubText: { fontSize: scaledSize(13), color: '#64748B', textAlign: 'right' },

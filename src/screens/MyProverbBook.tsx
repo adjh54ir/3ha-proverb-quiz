@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
 	quizBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleWidth(6), marginTop: scaleHeight(14), paddingVertical: scaleHeight(11), borderRadius: scaleWidth(12), backgroundColor: '#22C55E' },
 	quizBtnDisabled: { backgroundColor: '#CBD5E1' },
 	quizBtnText: { color: '#fff', fontSize: scaledSize(14), fontWeight: '700' },
-	fab: { position: 'absolute', right: scaleWidth(20), bottom: scaleHeight(70), width: scaleWidth(56), height: scaleWidth(56), borderRadius: scaleWidth(28), backgroundColor: '#3B82F6', alignItems: 'center', justifyContent: 'center', shadowColor: '#3B82F6', shadowOffset: { width: 0, height: scaleHeight(4) }, shadowOpacity: 0.35, shadowRadius: scaleWidth(8), elevation: 6 },
+	fab: { position: 'absolute', right: scaleWidth(20), bottom: scaleHeight(90), width: scaleWidth(56), height: scaleWidth(56), borderRadius: scaleWidth(28), backgroundColor: '#3B82F6', alignItems: 'center', justifyContent: 'center', shadowColor: '#3B82F6', shadowOffset: { width: 0, height: scaleHeight(4) }, shadowOpacity: 0.35, shadowRadius: scaleWidth(8), elevation: 6 },
 	modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: scaleWidth(32) },
 	confirmModal: { width: '100%', backgroundColor: '#fff', borderRadius: scaleWidth(20), padding: scaleWidth(24), alignItems: 'center' },
 	confirmTitle: { fontSize: scaledSize(17), fontWeight: '800', color: '#334155', marginTop: scaleHeight(12), marginBottom: scaleHeight(8) },

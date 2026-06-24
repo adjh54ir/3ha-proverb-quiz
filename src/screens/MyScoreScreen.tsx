@@ -760,17 +760,20 @@ const MyScoreScreen = () => {
 				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 				<View style={styles.sectionBox}>
 					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginVertical: scaleHeight(8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
-						<FastImage
-							source={mascot}
-							style={{ width: scaleWidth(150), height: scaleWidth(150) }}
-							resizeMode={FastImage.resizeMode.contain}
-						/>
+						{/* ✅ 홈화면과 동일한 캐릭터/펫 배치 구조 (180 래퍼 + 150 이미지, 펫은 캐릭터 우측) */}
+						<View style={{ width: scaleWidth(180), height: scaleWidth(180), alignItems: 'center', justifyContent: 'center' }}>
+							<FastImage
+								source={mascot}
+								style={{ width: scaleWidth(150), height: scaleWidth(150) }}
+								resizeMode={FastImage.resizeMode.contain}
+							/>
+						</View>
 
 						{petLevel >= 0 && (
 							<View
 								style={{
 									position: 'absolute',
-									right: scaleWidth(-24),
+									right: scaleWidth(40),
 									top: scaleHeight(38),
 									width: scaleWidth(60),
 									height: scaleWidth(60),
@@ -1047,7 +1050,7 @@ const MyScoreScreen = () => {
 									정복한 레벨 ({levelMaster.length} / {DIFFICULTIES.length})
 								</Text>
 							</View>
-							<Text style={styles.levelHelperText}> - 각 레벨의 속담 퀴즈를 모두 풀었을때 획득할 수 있습니다.! </Text>
+							<Text style={styles.levelHelperText}> - 각 레벨의 속담 퀴즈를 모두 풀었을때 획득할 수 있습니다! </Text>
 							<View style={{ alignItems: 'center' }}>
 								<FlatList
 									data={DIFFICULTIES}

@@ -9826,7 +9826,7 @@ export const CONST_MAIN_DATA: {
 			id: 690,
 			proverb: '간장이 시고 소금이 곰팡 난다[슨다]',
 			meaning: '도저히 있을 수 없는 일이다.',
-			longMeaning: '	간장이 시어질 수 없고 소금에 곰팡이가 날 수 없다는 뜻으로, 절대로 있을 수 없는 일을 이르는 말.',
+			longMeaning: '간장이 시어질 수 없고 소금에 곰팡이가 날 수 없다는 뜻으로, 절대로 있을 수 없는 일을 이르는 말.',
 			sameProverb: [''],
 			category: '세상 이치',
 			level: 4,

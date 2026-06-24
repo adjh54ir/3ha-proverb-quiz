@@ -827,11 +827,11 @@ const TodayQuizScreen = () => {
 					</View>
 				) : (
 					<>
-						{/* 👉 문제 텍스트 출력 추가 */}
-						<Text style={styles.questionCombined}>
+						{/* 👉 문제 텍스트 출력 추가 (속담 / 의미는? 줄바꿈) */}
+						<View style={styles.questionCombined}>
 							<Text style={styles.questionMain}>{item.proverb}</Text>
-							{!isQuizCompleted && <Text style={styles.questionSub}> 의미는?</Text>}
-						</Text>
+							{!isQuizCompleted && <Text style={styles.questionSub}>의미는?</Text>}
+						</View>
 
 						{result !== undefined && (
 							<View style={styles.resultBannerWrap}>
@@ -1087,10 +1087,10 @@ const TodayQuizScreen = () => {
 															setDetailModalVisible(true);
 														}}>
 														<View style={styles.reviewItemTextWrap}>
-															<Text style={styles.reviewItemTitle} numberOfLines={1}>
+															<Text style={styles.reviewItemTitle}>
 																{item.proverb}
 															</Text>
-															<Text style={styles.reviewItemMeaning} numberOfLines={3}>
+															<Text style={styles.reviewItemMeaning}>
 																{item.longMeaning || item.meaning}
 															</Text>
 														</View>
@@ -1575,8 +1575,7 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 	},
 	questionCombined: {
-		flexShrink: 1,
-		flexWrap: 'wrap',
+		alignItems: 'center',
 		marginTop: scaleHeight(5),
 		marginBottom: scaleHeight(16),
 	},
@@ -1584,11 +1583,13 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(22),
 		fontWeight: 'bold',
 		color: '#3498db', // ✅ 파란색 (DodgerBlue)
-		marginBottom: scaleHeight(10),
+		marginBottom: scaleHeight(8),
+		textAlign: 'center',
 	},
 	questionSub: {
 		fontSize: scaledSize(15),
 		color: '#7f8c8d',
+		textAlign: 'center',
 	},
 
 	characterGridContainer: {
@@ -2081,6 +2082,8 @@ const styles = StyleSheet.create({
 
 	reviewList: {
 		marginTop: scaleHeight(12),
+		paddingHorizontal: scaleWidth(14),
+		paddingBottom: scaleHeight(6),
 	},
 
 	modalNotice: {

@@ -33,6 +33,7 @@ import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeIntercep
 import { CONST_BADGES } from '@/const/ConstBadges';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import ProverbServices from '@/services/ProverbServices';
+import NewBadgeModal from '@/screens/modal/NewBadgeModal';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -784,10 +785,10 @@ const QuizStudyScreen = () => {
 								position: 'absolute',
 							},
 						]}>
-						<View style={{ flex: 1 }}>
+						<View style={{ flex: 1, backgroundColor: '#ffffff', borderRadius: scaleWidth(16), overflow: 'hidden' }}>
 							<ScrollView
 								ref={scrollViewRef}
-								style={{ flex: 1 }}
+								style={{ flex: 1, backgroundColor: '#ffffff' }}
 								onScrollBeginDrag={() => {
 									isBackCardScrollingRef.current = true;
 								}}
@@ -1207,33 +1208,7 @@ const QuizStudyScreen = () => {
 				</View>
 			)}
 
-			<Modal visible={badgeModalVisible} transparent animationType="fade">
-				<View style={styles.modalOverlay}>
-					<ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart explosionSpeed={350} />
-					<Animated.View style={[styles.badgeModal, { transform: [{ scale: scaleAnim }] }]}>
-						<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지를 획득했어요!</Text>
-						<ScrollView style={{ maxHeight: scaleHeight(300), width: '100%' }} contentContainerStyle={{ paddingHorizontal: scaleWidth(12) }}>
-							{newlyEarnedBadges.map((badge, index) => (
-								<View
-									key={index}
-									style={[styles.badgeCard, styles.badgeCardActive]} // 액티브 카드 스타일 항상 적용
-								>
-									<View style={[styles.iconBox, styles.iconBoxActive]}>
-										<IconComponent type={badge.iconType} name={badge.icon} size={20} color={'#27ae60'} />
-									</View>
-									<View style={styles.badgeTextWrap}>
-										<Text style={[styles.badgeName, styles.badgeTitleActive]}>{badge.name}</Text>
-										<Text style={[styles.badgeDescription, styles.badgeDescActive]}>{badge.description}</Text>
-									</View>
-								</View>
-							))}
-						</ScrollView>
-						<TouchableOpacity onPress={() => setBadgeModalVisible(false)} style={styles.modalConfirmButton2}>
-							<Text style={styles.closeButtonText}>확인</Text>
-						</TouchableOpacity>
-					</Animated.View>
-				</View>
-			</Modal>
+			<NewBadgeModal visible={badgeModalVisible} badges={newlyEarnedBadges} onConfirm={() => setBadgeModalVisible(false)} />
 		</>
 	);
 };
@@ -1255,8 +1230,9 @@ const styles = StyleSheet.create({
 	},
 	cardFront: {
 		width: scaleWidth(370), // ✅ 내부 카드(cardFace)와 같은 크기로
-		height: scaleHeight(540),
+		height: CARD_HEIGHT, // ✅ 앞/뒷면(cardFace)과 동일 높이로 맞춰 크로스페이드 중 빈 영역 방지
 		borderRadius: scaleWidth(20),
+		backgroundColor: '#ffffff', // ✅ 플립 전환 중에도 카드 영역이 항상 흰색으로 가득 채워지도록
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -1812,14 +1788,13 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(8),
 	},
 	cardBackContainer: {
-		flex: 1,
+		flexGrow: 1,
 		paddingHorizontal: scaleWidth(12),
 		paddingTop: scaleHeight(12),
 		paddingBottom: scaleHeight(30),
 		backgroundColor: '#ffffff', // 더 깔끔한 흰색 배경
 		borderRadius: scaleWidth(20),
 		width: '100%',
-		height: '100%',
 	},
 
 	cardTitle: {

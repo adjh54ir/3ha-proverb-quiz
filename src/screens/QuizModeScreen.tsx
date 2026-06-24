@@ -16,6 +16,7 @@ import { FIELD_DROPDOWN_ITEMS, LEVELS, QUIZ_MODES, QuizLevelKey } from '@/const/
 import ProverbServices from '@/services/ProverbServices';
 import IconComponent from './common/atomic/IconComponent';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
+import BottomHomeButton from './common/BottomHomeButton';
 
 type QuizModeScreenRouteParams = {
 	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' };
@@ -185,7 +186,7 @@ const QuizModeScreen = () => {
 								</View>
 							</View>
 						)}
-						<View style={styles.gridWrap}>
+						<View style={styles.levelListWrap}>
 							{tab === 'level' &&
 								LEVELS.map((item) => {
 									// @ts-ignore
@@ -194,13 +195,23 @@ const QuizModeScreen = () => {
 										return (
 											<TouchableOpacity
 												key={item.key}
-												style={[styles.gridButtonHalf, { backgroundColor: '#ecf0f1' }]}
+												style={[styles.levelCardFull, styles.levelCardDisabled]}
+												activeOpacity={1}
 												onPress={() => {
 													Alert.alert('준비중..', '새로운 문제를 준비 중입니다. 조금만 기다려 주세요!');
 												}}>
-												<IconComponent type={item.type} name={item.icon} size={28} color="#bdc3c7" />
-												<Text style={styles.disabledText}>{item.label}</Text>
-												<Text style={styles.comingSoon}>Coming Soon</Text>
+												<View style={[styles.levelIconChip, { backgroundColor: '#CBD5E1' }]}>
+													<IconComponent type={item.type} name={item.icon} size={scaledSize(24)} color="#fff" />
+												</View>
+												<View style={styles.levelTextWrap}>
+													<Text style={[styles.levelLabelFull, { color: '#94A3B8' }]} numberOfLines={1}>
+														{item.label}
+													</Text>
+													<Text style={styles.levelDescFull} numberOfLines={2}>
+														Coming Soon
+													</Text>
+												</View>
+												<IconComponent type="materialIcons" name="lock" size={scaledSize(22)} color="#CBD5E1" />
 											</TouchableOpacity>
 										);
 									}
@@ -219,7 +230,8 @@ const QuizModeScreen = () => {
 									return (
 										<TouchableOpacity
 											key={item.key}
-											style={[styles.gridButtonHalf, { backgroundColor: item.color }]}
+											style={styles.levelCardFull}
+											activeOpacity={0.85}
 											onPress={() => {
 												if (shouldShowAd) {
 													setSelectedLevelKey(item.key as QuizLevelKey);
@@ -228,11 +240,21 @@ const QuizModeScreen = () => {
 													moveToLevelQuiz(item.key as QuizLevelKey);
 												}
 											}}>
-											<View style={styles.iconTextRow}>
-												<IconComponent type={item.type} name={item.icon} size={28} color="#ffffff" />
-												<Text style={styles.modeLabel}>{item.label}</Text>
-												<Text style={styles.progressInlineText}>{`(${solved}/${total})`}</Text>
+											<View style={[styles.levelIconChip, { backgroundColor: item.color }]}>
+												<IconComponent type={item.type} name={item.icon} size={scaledSize(24)} color="#fff" />
 											</View>
+											<View style={styles.levelTextWrap}>
+												<Text style={[styles.levelLabelFull, { color: item.color }]} numberOfLines={1}>
+													{item.label}
+												</Text>
+												<Text style={styles.levelDescFull} numberOfLines={2}>
+													{LEVEL_DESC[item.key] ?? '난이도를 선택해 퀴즈를 시작하세요'}
+												</Text>
+											</View>
+											<View style={styles.levelProgressPill}>
+												<Text style={[styles.levelProgressText, { color: item.color }]}>{`${solved}/${total}`}</Text>
+											</View>
+											<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color="#CBD5E1" />
 										</TouchableOpacity>
 									);
 								})}
@@ -282,15 +304,7 @@ const QuizModeScreen = () => {
 					</ScrollView>
 				</View>
 			</View>
-			<View style={styles.bottomExitWrapper}>
-				<TouchableOpacity
-					style={styles.homeButton}
-					// @ts-ignore
-					onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME })}>
-					<IconComponent type="FontAwesome6" name="house" size={16} color="#ffffff" style={styles.icon} />
-					<Text style={styles.buttonText}>홈으로 가기</Text>
-				</TouchableOpacity>
-			</View>
+			<BottomHomeButton backgroundColor="#ffffff" />
 
 			{showInfoModal && (
 				<View style={styles.modalOverlay}>
@@ -334,7 +348,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(20),
+		paddingHorizontal: scaleWidth(12),
 	},
 	titleRow: {
 		alignItems: 'center',
@@ -372,6 +386,49 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.1,
 		shadowRadius: 3,
 	},
+	// ✅ 난이도 카드 (퀴즈 모드 페이지의 모드 카드와 동일한 가로 배치 디자인)
+	levelListWrap: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		justifyContent: 'space-between',
+		width: '100%',
+		rowGap: 12,
+		paddingHorizontal: scaleWidth(6),
+	},
+	levelCardFull: {
+		width: '100%',
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(10),
+		backgroundColor: '#fff',
+		borderRadius: scaleWidth(16),
+		paddingVertical: scaleHeight(16),
+		paddingHorizontal: scaleWidth(12),
+		borderWidth: 1,
+		borderColor: '#EEF2F7',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: scaleHeight(2) },
+		shadowOpacity: 0.05,
+		shadowRadius: scaleWidth(8),
+	},
+	levelCardDisabled: { opacity: 0.7 },
+	levelIconChip: {
+		width: scaleWidth(48),
+		height: scaleWidth(48),
+		borderRadius: scaleWidth(14),
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	levelTextWrap: { flex: 1 },
+	levelLabelFull: { fontSize: scaledSize(16), fontWeight: '800', marginBottom: scaleHeight(3) },
+	levelDescFull: { color: '#64748B', fontSize: scaledSize(12.5), lineHeight: scaleHeight(17) },
+	levelProgressPill: {
+		backgroundColor: '#F1F5F9',
+		borderRadius: scaleWidth(10),
+		paddingHorizontal: scaleWidth(8),
+		paddingVertical: scaleHeight(3),
+	},
+	levelProgressText: { fontSize: scaledSize(12), fontWeight: '800' },
 	modeLabel: {
 		color: '#ffffff',
 		fontSize: scaledSize(16),

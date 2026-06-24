@@ -90,7 +90,9 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 			{/* 의미 (강조 카드) */}
 			<View style={[styles.modalSection, styles.modalSectionPrimary]}>
 				<View style={styles.sectionLabelRow}>
-					<View style={[styles.sectionAccent, { backgroundColor: '#3B82F6' }]} />
+					<View style={[styles.sectionIconChip, { backgroundColor: '#DBEAFE' }]}>
+						<IconComponent type="materialIcons" name="lightbulb" size={scaledSize(15)} color="#3B82F6" />
+					</View>
 					<Text style={styles.modalLabel}>의미</Text>
 				</View>
 				<Text style={styles.modalTextStrong}>{proverb.longMeaning || proverb.meaning}</Text>
@@ -100,7 +102,9 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 			{examples.length > 0 && (
 				<View style={styles.modalSection}>
 					<View style={styles.sectionLabelRow}>
-						<View style={[styles.sectionAccent, { backgroundColor: '#22C55E' }]} />
+						<View style={[styles.sectionIconChip, { backgroundColor: '#DCFCE7' }]}>
+							<IconComponent type="materialIcons" name="format-quote" size={scaledSize(15)} color="#22C55E" />
+						</View>
 						<Text style={styles.modalLabel}>예시</Text>
 					</View>
 					{examples.map((ex, idx) => (
@@ -115,7 +119,9 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 			{sameProverbs.length > 0 && (
 				<View style={styles.modalSection}>
 					<View style={styles.sectionLabelRow}>
-						<View style={[styles.sectionAccent, { backgroundColor: '#F59E0B' }]} />
+						<View style={[styles.sectionIconChip, { backgroundColor: '#FEF3C7' }]}>
+							<IconComponent type="materialIcons" name="swap-horiz" size={scaledSize(15)} color="#F59E0B" />
+						</View>
 						<Text style={styles.modalLabel}>동의 속담</Text>
 					</View>
 					<View style={styles.tagsWrapper}>
@@ -132,7 +138,9 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 			{!!proverb.origin && (
 				<View style={styles.modalSection}>
 					<View style={styles.sectionLabelRow}>
-						<View style={[styles.sectionAccent, { backgroundColor: '#F97316' }]} />
+						<View style={[styles.sectionIconChip, { backgroundColor: '#FFEDD5' }]}>
+							<IconComponent type="materialIcons" name="auto-stories" size={scaledSize(15)} color="#F97316" />
+						</View>
 						<Text style={styles.modalLabel}>유래</Text>
 					</View>
 					<Text style={styles.modalText2}>{proverb.origin}</Text>
@@ -143,7 +151,9 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 			{!!proverb.usageTip && (
 				<View style={styles.modalSection}>
 					<View style={styles.sectionLabelRow}>
-						<View style={[styles.sectionAccent, { backgroundColor: '#9333EA' }]} />
+						<View style={[styles.sectionIconChip, { backgroundColor: '#CCFBF1' }]}>
+							<IconComponent type="materialIcons" name="tips-and-updates" size={scaledSize(15)} color="#14B8A6" />
+						</View>
 						<Text style={styles.modalLabel}>활용 팁</Text>
 					</View>
 					<Text style={styles.modalText2}>{proverb.usageTip}</Text>
@@ -218,10 +228,12 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginBottom: scaleHeight(8),
 	},
-	sectionAccent: {
-		width: scaleWidth(4),
-		height: scaledSize(16),
-		borderRadius: scaleWidth(2),
+	sectionIconChip: {
+		width: scaleWidth(26),
+		height: scaleWidth(26),
+		borderRadius: scaleWidth(8),
+		justifyContent: 'center',
+		alignItems: 'center',
 		marginRight: scaleWidth(8),
 	},
 	modalLabel: {

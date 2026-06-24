@@ -143,8 +143,8 @@ const Home = () => {
 	useEffect(() => {
 		const loop = Animated.loop(
 			Animated.sequence([
-				Animated.timing(badgePulse, { toValue: 1, duration: 1200, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-				Animated.timing(badgePulse, { toValue: 0, duration: 1200, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+				Animated.timing(badgePulse, { toValue: 1, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+				Animated.timing(badgePulse, { toValue: 0, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
 			]),
 		);
 		loop.start();
@@ -848,17 +848,35 @@ const Home = () => {
 							</View>
 							{earnedBadges.length > 0 && (
 								<View style={styles.badgeView}>
-									<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: scaleWidth(10) }}>
-										{visibleBadges.map((item) => {
+									<ScrollView
+										horizontal
+										showsHorizontalScrollIndicator={false}
+										contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingHorizontal: scaleWidth(10), paddingVertical: scaleHeight(6), alignItems: 'center' }}>
+										{visibleBadges.map((item, idx) => {
 											const rarity = BADGE_RARITY_META[item.rarity] ?? BADGE_RARITY_META.common;
-											const pulseScale = badgePulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.14] });
+											// 인덱스에 따라 위상을 살짝 어긋나게 하여 물결치듯 펄스
+											const phase = (idx % 3) / 3;
+											const pulseScale = badgePulse.interpolate({
+												inputRange: [0, phase, Math.min(phase + 0.5, 1), 1],
+												outputRange: [1, 1, 1.18, 1],
+												extrapolate: 'clamp',
+											});
+											const pulseLift = badgePulse.interpolate({
+												inputRange: [0, phase, Math.min(phase + 0.5, 1), 1],
+												outputRange: [0, 0, -scaleHeight(4), 0],
+												extrapolate: 'clamp',
+											});
 											return (
 												<View key={item.id} style={styles.badgeViewInner}>
 													<TouchableOpacity activeOpacity={0.8} onPress={() => setSelectedBadge(item)}>
 														<Animated.View
 															style={[
 																styles.iconBoxActive,
-																{ backgroundColor: rarity.soft, borderColor: rarity.color, transform: [{ scale: pulseScale }] },
+																{
+																	backgroundColor: rarity.soft,
+																	borderColor: rarity.color,
+																	transform: [{ scale: pulseScale }, { translateY: pulseLift }],
+																},
 															]}>
 															<IconComponent name={item.icon} type={item.iconType} size={scaledSize(17)} color={rarity.color} />
 														</Animated.View>
@@ -1016,7 +1034,7 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
-	wrapper: { flex: 1, backgroundColor: '#ffffff' },
+	wrapper: { flex: 1, backgroundColor: '#ffffff', marginTop: scaleHeight(-16) },
 	scrollContainer: { paddingBottom: scaleHeight(40) },
 	container: {
 		flexGrow: 1,
@@ -1476,7 +1494,7 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		marginLeft: scaleWidth(6),
 	},
-	badgeView: { width: '100%', marginTop: scaleHeight(10), minHeight: scaleHeight(72), paddingVertical: scaleHeight(10), overflow: 'visible' },
+	badgeView: { width: '100%', marginTop: scaleHeight(6), minHeight: scaleHeight(60), paddingVertical: scaleHeight(2), justifyContent: 'center', overflow: 'visible' },
 	badgeViewInner: {
 		marginRight: scaleWidth(12),
 		alignItems: 'center',

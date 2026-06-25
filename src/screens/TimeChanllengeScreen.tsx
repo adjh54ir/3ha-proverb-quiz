@@ -875,12 +875,12 @@ const InfinityQuizScreen = () => {
 							feedback === 'correct' && styles.questionBoxCorrect,
 							feedback === 'wrong' && styles.questionBoxWrong,
 						]}>
-						<View style={{ marginBottom: scaleHeight(18) }}>
+						<View style={{ marginBottom: scaleHeight(18), alignItems: 'center' }}>
 							<Text style={styles.questionText}>
 								<Text style={styles.questionIdiom}>
 									{current.proverb}
 								</Text>
-								<Text>{'\n'}의미는?</Text>
+								<Text style={styles.questionAsk}>{'\n'}의미는?</Text>
 							</Text>
 							{feedback && (
 								<View
@@ -1429,16 +1429,21 @@ const styles = StyleSheet.create({
 		shadowRadius: 6,
 	},
 	questionText: {
-		fontSize: scaledSize(20),
+		fontSize: scaledSize(15),
 		fontWeight: 'bold',
-		textAlign: 'left',
+		textAlign: 'center',
 		color: '#334155',
-		marginLeft: scaleWidth(12),
-		lineHeight: scaleHeight(30),
+		lineHeight: scaleHeight(26),
 	},
 	questionIdiom: {
+		fontSize: scaledSize(17),
 		color: '#3B82F6',
 		fontWeight: '800',
+	},
+	questionAsk: {
+		fontSize: scaledSize(13),
+		color: '#64748B',
+		fontWeight: '700',
 	},
 	feedbackTag: {
 		flexDirection: 'row',

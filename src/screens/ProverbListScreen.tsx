@@ -28,7 +28,7 @@ import DeviceInfo from 'react-native-device-info';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
-import { getCategoryColor, getLevelColor, getFieldIcon } from './common/CommonProverbModule';
+import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName, getLevelIconName } from './common/CommonProverbModule';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import FavoriteToast from './common/FavoriteToast';
@@ -227,12 +227,23 @@ const FIELD_DROPDOWN_ITEMS = [
 	},
 ];
 
-// 라벨 → 아이콘 포함 드롭다운 아이템 매핑 (항목 재설정 시 아이콘 유지)
-const LEVEL_ITEM_MAP: Record<string, any> = Object.fromEntries(LEVEL_DROPDOWN_ITEMS.map((i) => [i.value, i]));
-const FIELD_ITEM_MAP: Record<string, any> = Object.fromEntries(FIELD_DROPDOWN_ITEMS.map((i) => [i.value, i]));
-
-const buildLevelItems = (levels: string[]) => [COMMON_ALL_OPTION2, ...levels.map((lv) => LEVEL_ITEM_MAP[lv] ?? { label: lv, value: lv })];
-const buildFieldItems = (fields: string[]) => [COMMON_ALL_OPTION, ...fields.map((f) => FIELD_ITEM_MAP[f] ?? { label: f, value: f })];
+// 공통 아이콘(CommonProverbModule)을 실제 데이터 값 기준으로 불러와 드롭다운 좌측 아이콘 구성
+const buildLevelItems = (levels: string[]) => [
+	COMMON_ALL_OPTION2,
+	...levels.map((lv) => ({
+		label: lv,
+		value: lv,
+		icon: () => <IconComponent type="FontAwesome6" name={getLevelIconName(lv)} size={scaledSize(15)} color={getLevelColor(lv)} />,
+	})),
+];
+const buildFieldItems = (fields: string[]) => [
+	COMMON_ALL_OPTION,
+	...fields.map((f) => ({
+		label: f,
+		value: f,
+		icon: () => <IconComponent type="materialIcons" name={getFieldIconName(f)} size={scaledSize(16)} color={getCategoryColor(f)} />,
+	})),
+];
 
 /**
  * FlatList 아이템 fade+slide-up 진입 애니메이션 래퍼

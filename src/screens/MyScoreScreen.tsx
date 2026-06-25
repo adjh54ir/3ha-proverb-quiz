@@ -1107,9 +1107,9 @@ const MyScoreScreen = () => {
 												<IconComponent
 													name={item.icon}
 													type="fontAwesome6"
-													size={scaledSize(22)}
-													color={isEarned ? '#fff' : '#CBD5E1'}
-													style={{ marginBottom: scaleHeight(4) }}
+													size={scaledSize(24)}
+													color={isEarned ? '#fff' : '#94A3B8'}
+													style={{ marginBottom: scaleHeight(6) }}
 												/>
 												<Text style={[styles.levelText, isEarned && { color: '#fff', fontWeight: 'bold' }]}> {item.title} </Text>
 												<Text style={[styles.levelSubText, isEarned && { color: '#fff' }]}> {item.subtitle} </Text>
@@ -1168,13 +1168,23 @@ const MyScoreScreen = () => {
 													shadowOffset: { width: 0, height: 2 },
 												},
 											]}>
-											<IconComponent
-												type={meta.icon.type}
-												name={meta.icon.name}
-												size={scaledSize(20)}
-												color={isEarned ? '#fff' : '#CBD5E1'}
-												style={{ marginRight: scaleWidth(8) }}
-											/>
+											<View
+												style={{
+													width: scaleWidth(34),
+													height: scaleWidth(34),
+													borderRadius: scaleWidth(11),
+													alignItems: 'center',
+													justifyContent: 'center',
+													marginRight: scaleWidth(10),
+													backgroundColor: isEarned ? 'rgba(255,255,255,0.22)' : '#EEF2F6',
+												}}>
+												<IconComponent
+													type={meta.icon.type}
+													name={meta.icon.name}
+													size={scaledSize(18)}
+													color={isEarned ? '#fff' : meta.color}
+												/>
+											</View>
 											<Text
 												style={[
 													styles.categoryRowText,
@@ -1550,13 +1560,18 @@ const MyScoreScreen = () => {
 									key={tower.level}
 									style={{
 										flexDirection: 'row',
-										borderRadius: scaleWidth(12),
+										borderRadius: scaleWidth(16),
 										overflow: 'hidden',
 										marginBottom: scaleHeight(12),
-										borderWidth: 1,
+										borderWidth: 1.5,
 										borderColor: isCleared ? tower.color : '#E2E8F0',
 										backgroundColor: '#fff',
-										opacity: isCleared ? 1 : 0.4,
+										opacity: isCleared ? 1 : 0.55,
+										shadowColor: isCleared ? tower.color : '#64748B',
+										shadowOffset: { width: 0, height: 2 },
+										shadowOpacity: isCleared ? 0.18 : 0.06,
+										shadowRadius: 5,
+										elevation: isCleared ? 3 : 1,
 									}}>
 									{/* 왼쪽: 보스 이미지 + 레벨 배지 */}
 									<View
@@ -2150,16 +2165,21 @@ const styles = StyleSheet.create({
 		marginHorizontal: scaleWidth(5),
 	},
 	levelCard: {
-		width: '40%',
+		width: '42%',
 		aspectRatio: 1,
-		borderWidth: 1,
-		borderColor: '#CBD5E1',
-		borderRadius: scaleWidth(12),
+		borderWidth: 1.5,
+		borderColor: '#E2E8F0',
+		borderRadius: scaleWidth(18),
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#fff',
+		backgroundColor: '#F8FAFC',
 		marginHorizontal: scaleWidth(8),
 		marginBottom: scaleHeight(12),
+		shadowColor: '#64748B',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.1,
+		shadowRadius: 5,
+		elevation: 2,
 	},
 	regionText: {
 		fontSize: scaledSize(14),
@@ -2169,7 +2189,8 @@ const styles = StyleSheet.create({
 	levelText: {
 		fontSize: scaledSize(15),
 		textAlign: 'center',
-		color: '#64748B',
+		color: '#475569',
+		fontWeight: '700',
 	},
 	cardActive: {
 		backgroundColor: '#EFF6FF',
@@ -2538,18 +2559,24 @@ const styles = StyleSheet.create({
 	categoryRowCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		paddingVertical: scaleHeight(12),
+		paddingVertical: scaleHeight(13),
 		paddingHorizontal: scaleWidth(16),
-		borderWidth: 1,
-		borderColor: '#CBD5E1',
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#fff',
+		borderWidth: 1.5,
+		borderColor: '#E2E8F0',
+		borderRadius: scaleWidth(14),
+		backgroundColor: '#F8FAFC',
 		marginBottom: scaleHeight(10),
 		width: '100%',
+		shadowColor: '#64748B',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 4,
+		elevation: 1,
 	},
 	categoryRowText: {
 		fontSize: scaledSize(15),
-		color: '#64748B',
+		color: '#475569',
+		fontWeight: '600',
 	},
 	levelDetailDescription: {
 		fontSize: scaledSize(12),

@@ -33,8 +33,8 @@ export const getLevelColor = (level: string): string => {
 	return map[level] || '#94A3B8';
 };
 
-/** 카테고리별 아이콘 */
-export const getFieldIcon = (category: string): React.ReactNode => {
+/** 카테고리별 아이콘 이름 (materialIcons) */
+export const getFieldIconName = (category: string): string => {
 	const iconMap: Record<string, string> = {
 		'운/우연': 'casino',
 		인간관계: 'groups',
@@ -45,8 +45,24 @@ export const getFieldIcon = (category: string): React.ReactNode => {
 		'욕심/탐욕': 'paid',
 		'배신/불신': 'handshake',
 	};
-	const name = iconMap[category] || 'category';
-	return <IconComponent type="materialIcons" name={name} size={14} color="#ffffff" />;
+	return iconMap[category] || 'category';
+};
+
+/** 카테고리별 아이콘 (배경 위 흰색 표시용) */
+export const getFieldIcon = (category: string): React.ReactNode => {
+	return <IconComponent type="materialIcons" name={getFieldIconName(category)} size={14} color="#ffffff" />;
+};
+
+/** 난이도(levelName)별 아이콘 이름 (FontAwesome6) — 속담 목록 레벨 배지와 동일 */
+export const getLevelIconName = (level: string): string => {
+	const iconMap: Record<string, string> = {
+		'아주 쉬움': 'seedling',
+		'매우 쉬움': 'seedling',
+		쉬움: 'leaf',
+		보통: 'tree',
+		어려움: 'trophy',
+	};
+	return iconMap[level] || 'seedling';
 };
 
 // ── 속담집 색상/아이콘 팔레트

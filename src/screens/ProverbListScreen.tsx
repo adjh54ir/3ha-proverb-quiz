@@ -227,6 +227,13 @@ const FIELD_DROPDOWN_ITEMS = [
 	},
 ];
 
+// 라벨 → 아이콘 포함 드롭다운 아이템 매핑 (항목 재설정 시 아이콘 유지)
+const LEVEL_ITEM_MAP: Record<string, any> = Object.fromEntries(LEVEL_DROPDOWN_ITEMS.map((i) => [i.value, i]));
+const FIELD_ITEM_MAP: Record<string, any> = Object.fromEntries(FIELD_DROPDOWN_ITEMS.map((i) => [i.value, i]));
+
+const buildLevelItems = (levels: string[]) => [COMMON_ALL_OPTION2, ...levels.map((lv) => LEVEL_ITEM_MAP[lv] ?? { label: lv, value: lv })];
+const buildFieldItems = (fields: string[]) => [COMMON_ALL_OPTION, ...fields.map((f) => FIELD_ITEM_MAP[f] ?? { label: f, value: f })];
+
 /**
  * FlatList 아이템 fade+slide-up 진입 애니메이션 래퍼
  */
@@ -352,12 +359,12 @@ const ProverbListScreen = () => {
 			setVisibleList([]);
 			setMainList([]);
 
-			// ✅ 드롭다운 항목 새로 세팅
+			// ✅ 드롭다운 항목 새로 세팅 (아이콘 포함)
 			const fieldList = ProverbServices.selectCategoryList();
-			setCategoryItems([{ label: '전체', value: '전체' }, ...fieldList.map((field) => ({ label: field, value: field }))]);
+			setCategoryItems(buildFieldItems(fieldList));
 
 			const levelList = ProverbServices.selectLevelNameList();
-			setLevelItems([{ label: '전체', value: '전체' }, ...levelList.map((level) => ({ label: level, value: level }))]);
+			setLevelItems(buildLevelItems(levelList));
 			loadFavorites(); // ✅ 즐겨찾기 로드
 
 			// ✅ 데이터 새로 불러오기
@@ -418,12 +425,12 @@ const ProverbListScreen = () => {
 			setCategoryValue('전체');
 			setLevelValue('전체');
 
-			// 필터 목록 초기화
+			// 필터 목록 초기화 (아이콘 포함)
 			const fieldList = ProverbServices.selectCategoryList();
-			setCategoryItems([{ label: '전체', value: '전체' }, ...fieldList.map((field) => ({ label: field, value: field }))]);
+			setCategoryItems(buildFieldItems(fieldList));
 
 			const levelList = ProverbServices.selectLevelNameList();
-			setLevelItems([{ label: '전체', value: '전체' }, ...levelList.map((level) => ({ label: level, value: level }))]);
+			setLevelItems(buildLevelItems(levelList));
 
 			scrollToTop(); // 스크롤 이동은 마지막에
 		}, 50);
@@ -453,18 +460,21 @@ const ProverbListScreen = () => {
 						<View style={styles.container}>
 							<View style={styles.filterCard}>
 								<View style={styles.searchRow}>
-									<TextInput
-										ref={searchInputRef}
-										style={styles.input}
-										placeholder="속담이나 의미를 입력해주세요"
-										placeholderTextColor="#94A3B8"
-										onChangeText={(text) => {
-											setKeyword(text);
-											setFieldOpen(false);
-											setLevelOpen(false);
-										}}
-										value={keyword}
-									/>
+									<View style={styles.searchInputWrapper}>
+										<Icon name="magnifying-glass" size={scaledSize(16)} color="#94A3B8" style={styles.searchIcon} />
+										<TextInput
+											ref={searchInputRef}
+											style={[styles.input, styles.searchInput]}
+											placeholder="속담이나 의미를 입력해주세요"
+											placeholderTextColor="#94A3B8"
+											onChangeText={(text) => {
+												setKeyword(text);
+												setFieldOpen(false);
+												setLevelOpen(false);
+											}}
+											value={keyword}
+										/>
+									</View>
 									{(keyword.trim() !== '' || levelValue !== '전체' || categoryValue !== '전체') && (
 										<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset}>
 											<Icon name="rotate-right" size={scaledSize(18)} color="#64748B" />
@@ -717,7 +727,10 @@ const ProverbListScreen = () => {
 
 											{Array.isArray(item.sameProverb) && item.sameProverb.filter((p) => p.trim()).length > 0 && (
 												<View style={styles.sameProverbBox}>
-													<Text style={styles.sameProverbTitle}>비슷한 속담</Text>
+													<View style={styles.sameProverbTitleRow}>
+														<IconComponent type="FontAwesome6" name="equals" size={scaledSize(13)} color="#22C55E" />
+														<Text style={styles.sameProverbTitle}>동의속담</Text>
+													</View>
 													{item.sameProverb
 														.filter((p) => p.trim())
 														.map((p, idx) => (
@@ -1053,11 +1066,16 @@ const styles = StyleSheet.create({
 		backgroundColor: '#F1F5F9',
 		borderRadius: scaleWidth(10),
 	},
+	sameProverbTitleRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(6),
+		marginBottom: scaleHeight(6),
+	},
 	sameProverbTitle: {
 		fontSize: scaledSize(14),
 		color: '#22C55E',
 		fontWeight: '600',
-		marginBottom: scaleHeight(6),
 	},
 	sameProverbText: {
 		fontSize: scaledSize(13),
@@ -1136,6 +1154,24 @@ const styles = StyleSheet.create({
 	searchRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
+	},
+	searchInputWrapper: {
+		flex: 1,
+		position: 'relative',
+		justifyContent: 'center',
+		marginBottom: scaleHeight(12),
+	},
+	searchIcon: {
+		position: 'absolute',
+		left: scaleWidth(12),
+		top: scaleHeight(14),
+		zIndex: 1,
+	},
+	searchInput: {
+		flex: 0,
+		width: '100%',
+		paddingLeft: scaleWidth(36),
+		marginBottom: 0,
 	},
 	resetButtonInline: {
 		marginLeft: scaleWidth(8),

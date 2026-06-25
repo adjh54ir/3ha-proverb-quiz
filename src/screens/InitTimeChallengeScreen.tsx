@@ -11,6 +11,18 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import BottomHomeButton from './common/BottomHomeButton';
 
+// 규칙 한 줄 행 (아이콘 + 한 줄 텍스트)
+const RuleRow = ({ iconType, iconName, iconColor, chipColor, text }: { iconType: string; iconName: string; iconColor: string; chipColor: string; text: string }) => (
+	<View style={styles.ruleItem}>
+		<View style={[styles.ruleIcon, { backgroundColor: chipColor }]}>
+			<IconComponent type={iconType} name={iconName} size={scaledSize(13)} color={iconColor} />
+		</View>
+		<Text style={styles.ruleText} numberOfLines={1}>
+			{text}
+		</Text>
+	</View>
+);
+
 const InitTimeChallengeScreen = () => {
 	const STORAGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 	const navigation = useNavigation();
@@ -108,10 +120,7 @@ const InitTimeChallengeScreen = () => {
 	};
 
 	const handleStartChallenge = () => {
-		if (!adWatched && shouldShowAdRef.current) {
-			setShowAd(true);
-			return;
-		}
+		// 타임 챌린지 시작 시 광고 미노출
 		startCountdown();
 	};
 
@@ -146,28 +155,11 @@ const InitTimeChallengeScreen = () => {
 
 						{showAllRules ? (
 							<>
-								<View style={styles.ruleItem}>
-									<Text style={styles.ruleBullet}>•</Text>
-									<Text style={styles.ruleText}>
-										<Text style={styles.ruleBold}>180초 안에 속담의 의미를 최대한 많이 맞히는 게임입니다.</Text>
-									</Text>
-								</View>
-								<View style={styles.ruleItem}>
-									<Text style={styles.ruleBullet}>•</Text>
-									<Text style={styles.ruleText}>문제를 틀릴 경우 하트(❤️ 총 5개)가 1개씩 줄어듭니다.</Text>
-								</View>
-								<View style={styles.ruleItem}>
-									<Text style={styles.ruleBullet}>•</Text>
-									<Text style={styles.ruleText}>1회 스킵 기능으로 어려운 문제를 건너뛸 수 있습니다.</Text>
-								</View>
-								<View style={styles.ruleItem}>
-									<Text style={styles.ruleBullet}>•</Text>
-									<Text style={styles.ruleText}>1회 찬스 기능으로 활용 팁과 예문을 확인할 수 있습니다.</Text>
-								</View>
-								<View style={styles.ruleItem}>
-									<Text style={styles.ruleBullet}>•</Text>
-									<Text style={styles.ruleText}>중간에 종료하면 기록이 저장되지 않습니다.</Text>
-								</View>
+								<RuleRow iconType="FontAwesome6" iconName="bullseye" iconColor="#22C55E" chipColor="#DCFCE7" text="180초 안에 속담 의미를 최대한 많이 맞히기" />
+								<RuleRow iconType="FontAwesome6" iconName="heart" iconColor="#F87171" chipColor="#FEE2E2" text="오답 시 하트 1개 감소 (총 5개)" />
+								<RuleRow iconType="FontAwesome6" iconName="forward" iconColor="#3B82F6" chipColor="#DBEAFE" text="스킵 1회 — 어려운 문제 건너뛰기" />
+								<RuleRow iconType="FontAwesome6" iconName="lightbulb" iconColor="#F59E0B" chipColor="#FEF3C7" text="찬스 1회 — 활용 팁·예문 확인" />
+								<RuleRow iconType="FontAwesome6" iconName="ban" iconColor="#94A3B8" chipColor="#F1F5F9" text="중간 종료 시 기록 미저장" />
 
 								<View style={styles.bonusSection}>
 									<Text style={styles.bonusTitle}>💎 점수별 보너스</Text>
@@ -221,16 +213,8 @@ const InitTimeChallengeScreen = () => {
 							</>
 						) : (
 							<>
-								<View style={styles.ruleItem}>
-									<Text style={styles.ruleBullet}>•</Text>
-									<Text style={styles.ruleText}>
-										<Text style={styles.ruleBold}>180초 안에 속담의 의미를 최대한 많이 맞히는 게임입니다.</Text>
-									</Text>
-								</View>
-								<View style={styles.ruleItem}>
-									<Text style={styles.ruleBullet}>•</Text>
-									<Text style={styles.ruleText}>문제를 틀릴 경우 하트(❤️ 총 5개)가 1개씩 줄어듭니다.</Text>
-								</View>
+								<RuleRow iconType="FontAwesome6" iconName="bullseye" iconColor="#22C55E" chipColor="#DCFCE7" text="180초 안에 속담 의미를 최대한 많이 맞히기" />
+								<RuleRow iconType="FontAwesome6" iconName="heart" iconColor="#F87171" chipColor="#FEE2E2" text="오답 시 하트 1개 감소 (총 5개)" />
 
 								<View style={styles.warningBox}>
 									<IconComponent name="alert-circle" type="Feather" size={scaledSize(16)} color="#F87171" />
@@ -452,23 +436,26 @@ const styles = StyleSheet.create({
 	},
 	ruleItem: {
 		flexDirection: 'row',
-		marginBottom: scaleHeight(10),
+		alignItems: 'center',
+		backgroundColor: '#F8FAFC',
+		borderRadius: scaleWidth(10),
+		paddingVertical: scaleHeight(9),
+		paddingHorizontal: scaleWidth(12),
+		marginBottom: scaleHeight(8),
 	},
-	ruleBullet: {
-		fontSize: scaledSize(14),
-		color: '#22C55E',
-		marginRight: scaleWidth(8),
-		marginTop: scaleHeight(2),
+	ruleIcon: {
+		width: scaleWidth(26),
+		height: scaleWidth(26),
+		borderRadius: scaleWidth(13),
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginRight: scaleWidth(10),
 	},
 	ruleText: {
 		flex: 1,
-		fontSize: scaledSize(14),
-		color: '#64748B',
-		lineHeight: scaleHeight(22),
-	},
-	ruleBold: {
-		fontWeight: '600',
-		color: '#334155',
+		fontSize: scaledSize(13.5),
+		color: '#475569',
+		fontWeight: '500',
 	},
 
 	// 보너스 섹션

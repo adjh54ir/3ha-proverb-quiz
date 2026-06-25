@@ -63,12 +63,12 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, onClos
 
 					{/* 컨텐츠 */}
 					<ScrollView style={styles.scrollView} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-						{/* 비슷한 속담 */}
+						{/* 동의속담 */}
 						{similar.length > 0 && (
 							<View style={styles.section}>
 								<View style={styles.sectionLabelRow}>
 									<IconComponent type="materialIcons" name="tag" size={scaledSize(14)} color="#D97706" />
-									<Text style={styles.sectionLabel}>비슷한 속담</Text>
+									<Text style={styles.sectionLabel}>동의속담</Text>
 								</View>
 								<View style={styles.tagRow}>
 									{similar.map((word, index) => (

@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
 	},
 	badgeModalContent: {
 		width: '90%',
+		maxHeight: '86%',  // ← 고정 height 대신
 		backgroundColor: '#FFFDF8',
 		borderRadius: scaleWidth(24),
 		alignItems: 'center',

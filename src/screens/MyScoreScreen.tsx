@@ -150,6 +150,37 @@ const categoryMap2: { [key: string]: string } = {
 	기타: 'category_etc',
 };
 
+// 정복/클리어 섹션 공통 헤더 (아이콘 칩 + 타이틀 + 진행 카운트 pill)
+const ConquerHeader = ({
+	iconType,
+	iconName,
+	tint,
+	chipBg,
+	title,
+	current,
+	total,
+}: {
+	iconType: string;
+	iconName: string;
+	tint: string;
+	chipBg: string;
+	title: string;
+	current: number;
+	total: number;
+}) => (
+	<View style={styles.conquerHeader}>
+		<View style={[styles.conquerHeaderIcon, { backgroundColor: chipBg }]}>
+			<IconComponent type={iconType} name={iconName} size={scaledSize(14)} color={tint} />
+		</View>
+		<Text style={styles.conquerHeaderTitle}>{title}</Text>
+		<View style={[styles.conquerCountPill, { backgroundColor: chipBg }]}>
+			<Text style={[styles.conquerCountText, { color: tint }]}>
+				{current} / {total}
+			</Text>
+		</View>
+	</View>
+);
+
 const MyScoreScreen = () => {
 	const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 	const isFocused = useIsFocused();
@@ -759,9 +790,9 @@ const MyScoreScreen = () => {
 				onScroll={scrollHandler.onScroll}
 				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 				<View style={styles.sectionBox}>
-					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginVertical: scaleHeight(8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
-						{/* ✅ 홈화면과 동일한 캐릭터/펫 배치 구조 (180 래퍼 + 150 이미지, 펫은 캐릭터 우측) */}
-						<View style={{ width: scaleWidth(180), height: scaleWidth(180), alignItems: 'center', justifyContent: 'center' }}>
+					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginTop: scaleHeight(14), marginBottom: scaleHeight(-8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
+						{/* ✅ 홈화면과 동일한 캐릭터/펫 배치 구조 (래퍼 높이 축소로 타이틀과 밀착) */}
+						<View style={{ width: scaleWidth(180), height: scaleWidth(150), alignItems: 'center', justifyContent: 'center' }}>
 							<FastImage
 								source={mascot}
 								style={{ width: scaleWidth(150), height: scaleWidth(150) }}
@@ -821,7 +852,7 @@ const MyScoreScreen = () => {
 							<IconComponent type="fontAwesome6" name="trophy" size={scaledSize(14)} color="#F59E0B" />
 						</View>
 						<Text style={styles.levelDescriptionText} numberOfLines={1} adjustsFontSizeToFit>
-							전체 퀴즈 완료 시 <Text style={[styles.levelHighlight, { color: '#D97706' }]}>'도인'</Text> 등급을 획득해요
+							전체 퀴즈 완료 시 <Text style={[styles.levelHighlight, { color: '#D97706' }]}>'속담 전설'</Text> 등급을 획득해요
 						</Text>
 					</View>
 
@@ -1044,13 +1075,16 @@ const MyScoreScreen = () => {
 						</View>
 
 						<View style={styles.subSectionBox2}>
-							<View style={styles.subtitleRow}>
-								<IconComponent type="fontAwesome6" name="medal" size={scaledSize(15)} color="#F59E0B" />
-								<Text style={styles.sectionSubtitleInline}>
-									정복한 레벨 ({levelMaster.length} / {DIFFICULTIES.length})
-								</Text>
-							</View>
-							<Text style={styles.levelHelperText}> - 각 레벨의 속담 퀴즈를 모두 풀었을때 획득할 수 있습니다! </Text>
+							<ConquerHeader
+								iconType="fontAwesome6"
+								iconName="medal"
+								tint="#F59E0B"
+								chipBg="#FEF3C7"
+								title="정복한 레벨"
+								current={levelMaster.length}
+								total={DIFFICULTIES.length}
+							/>
+							<Text style={styles.levelHelperText}>각 레벨의 속담 퀴즈를 모두 풀면 획득할 수 있어요</Text>
 							<View style={{ alignItems: 'center' }}>
 								<FlatList
 									data={DIFFICULTIES}
@@ -1080,25 +1114,11 @@ const MyScoreScreen = () => {
 												<Text style={[styles.levelText, isEarned && { color: '#fff', fontWeight: 'bold' }]}> {item.title} </Text>
 												<Text style={[styles.levelSubText, isEarned && { color: '#fff' }]}> {item.subtitle} </Text>
 
-												{/* ✅ 정복 배지 추가 */}
+												{/* ✅ 정복 배지 */}
 												{isEarned && (
-													<View
-														style={{
-															marginTop: scaleHeight(6),
-															backgroundColor: '#fff',
-															paddingHorizontal: scaleWidth(6),
-															paddingVertical: scaleHeight(2),
-															borderRadius: scaleWidth(10),
-														}}>
-														<Text
-															style={{
-																fontSize: scaledSize(12),
-																color: '#22C55E',
-																fontWeight: 'bold',
-																textAlign: 'center',
-															}}>
-															정복
-														</Text>
+													<View style={[styles.conquerTag, { marginTop: scaleHeight(6) }]}>
+														<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color="#16A34A" />
+														<Text style={styles.conquerTagText}>정복</Text>
 													</View>
 												)}
 											</View>
@@ -1110,13 +1130,16 @@ const MyScoreScreen = () => {
 
 						{/* ✅ 정복한 카테고리 출력 */}
 						<View style={styles.subSectionBox1}>
-							<View style={styles.subtitleRow}>
-								<IconComponent type="fontAwesome6" name="brain" size={scaledSize(15)} color="#0EA5E9" />
-								<Text style={styles.sectionSubtitleInline}>
-									정복한 카테고리 ({categoryMaster.length} / {allCategories.length})
-								</Text>
-							</View>
-							<Text style={styles.regionHelperText}>- 특정 분야의 속담를 모두 풀었을때 획득할 수 있습니다.</Text>
+							<ConquerHeader
+								iconType="fontAwesome6"
+								iconName="brain"
+								tint="#0EA5E9"
+								chipBg="#E0F2FE"
+								title="정복한 카테고리"
+								current={categoryMaster.length}
+								total={allCategories.length}
+							/>
+							<Text style={styles.regionHelperText}>특정 분야의 속담을 모두 풀면 획득할 수 있어요</Text>
 							<FlatList
 								data={allCategories}
 								keyExtractor={(item) => item}
@@ -1165,24 +1188,11 @@ const MyScoreScreen = () => {
 												]}>
 												{category}
 											</Text>
-											{/* ✅ 이 위치에 추가 */}
+											{/* ✅ 정복 배지 */}
 											{isEarned && (
-												<View
-													style={{
-														marginLeft: 'auto',
-														backgroundColor: '#fff',
-														paddingHorizontal: scaleWidth(6),
-														paddingVertical: scaleHeight(2),
-														borderRadius: scaleWidth(10),
-													}}>
-													<Text
-														style={{
-															fontSize: scaledSize(12),
-															color: '#22C55E',
-															fontWeight: 'bold',
-														}}>
-														정복
-													</Text>
+												<View style={[styles.conquerTag, { marginLeft: 'auto' }]}>
+													<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color="#16A34A" />
+													<Text style={styles.conquerTagText}>정복</Text>
 												</View>
 											)}
 										</View>
@@ -1523,12 +1533,16 @@ const MyScoreScreen = () => {
 
 				{(activeTab === 'all' || activeTab === 'tower') && (
 					<View style={styles.sectionBox}>
-						<View style={styles.subtitleRow}>
-							<IconComponent type="fontAwesome6" name="tower-observation" size={scaledSize(14)} color="#0EA5E9" />
-							<Text style={styles.topRankingTitleInline}>
-								클리어한 타워 ({unlockedRewards.length} / {TOWER_LEVELS.length})
-							</Text>
-						</View>
+						<ConquerHeader
+							iconType="fontAwesome6"
+							iconName="tower-observation"
+							tint="#0EA5E9"
+							chipBg="#E0F2FE"
+							title="클리어한 타워"
+							current={unlockedRewards.length}
+							total={TOWER_LEVELS.length}
+						/>
+						<Text style={styles.regionHelperText}>레벨별 보스를 클리어하면 보상을 받을 수 있어요</Text>
 						{TOWER_LEVELS.map((tower) => {
 							const isCleared = unlockedRewards.includes(tower.level);
 							return (
@@ -2266,6 +2280,49 @@ const styles = StyleSheet.create({
 		gap: scaleWidth(6),
 		marginBottom: scaleHeight(12),
 		marginTop: scaleHeight(8),
+	},
+	conquerHeader: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginTop: scaleHeight(8),
+		marginBottom: scaleHeight(4),
+	},
+	conquerHeaderIcon: {
+		width: scaleWidth(28),
+		height: scaleWidth(28),
+		borderRadius: scaleWidth(9),
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginRight: scaleWidth(9),
+	},
+	conquerHeaderTitle: {
+		fontSize: scaledSize(15),
+		fontWeight: '800',
+		color: '#334155',
+	},
+	conquerCountPill: {
+		marginLeft: 'auto',
+		paddingHorizontal: scaleWidth(11),
+		paddingVertical: scaleHeight(4),
+		borderRadius: scaleWidth(12),
+	},
+	conquerCountText: {
+		fontSize: scaledSize(12),
+		fontWeight: '800',
+	},
+	conquerTag: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(3),
+		backgroundColor: '#fff',
+		paddingHorizontal: scaleWidth(7),
+		paddingVertical: scaleHeight(2),
+		borderRadius: scaleWidth(10),
+	},
+	conquerTagText: {
+		fontSize: scaledSize(11),
+		color: '#16A34A',
+		fontWeight: '800',
 	},
 	sectionSubtitleInline: {
 		fontSize: scaledSize(15),

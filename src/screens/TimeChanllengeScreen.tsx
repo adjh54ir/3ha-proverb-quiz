@@ -25,6 +25,7 @@ import AnimatedNumbers from 'react-native-animated-numbers';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import ProverbDetailModal from './modal/ProverbDetailModal';
+import AdmobFrontAd from './common/ads/AdmobFrontAd';
 
 const MAX_LIVES = 5;
 const CHOICE_COUNT = 4;
@@ -95,6 +96,7 @@ const InfinityQuizScreen = () => {
 	const [timeLeftMs, setTimeLeftMs] = useState(180_000); // 180초 → 180,000ms
 	const [hasUsedChance, setHasUsedChance] = useState(false);
 	const [chanceModalVisible, setChanceModalVisible] = useState(false);
+	const [showChanceAd, setShowChanceAd] = useState(false);
 	const [chanceData, setChanceData] = useState<{
 		example: string[];
 		category?: string;
@@ -609,9 +611,9 @@ const InfinityQuizScreen = () => {
 											level: current.levelName,
 											sameProverb: (current.sameProverb ?? []).filter((item) => item.trim()),
 										});
-										setChanceModalVisible(true);
 										setHasUsedChance(true); // ✅ 사용 처리
 										setIsPaused(true); // ✅ 찬스 팝업 동안 타이머 일시정지
+										setShowChanceAd(true); // ✅ 찬스 사용 시 무조건 광고 노출 후 힌트 표시
 									}}
 									style={styles.chanceContent}>
 									<IconComponent name="magic" type="FontAwesome" color="#16A34A" size={scaledSize(12)} />
@@ -878,7 +880,7 @@ const InfinityQuizScreen = () => {
 								<Text style={styles.questionIdiom}>
 									{current.proverb}
 								</Text>
-								<Text> 의미는?</Text>
+								<Text>{'\n'}의미는?</Text>
 							</Text>
 							{feedback && (
 								<View
@@ -955,6 +957,16 @@ const InfinityQuizScreen = () => {
 				onClose={() => setDetailModalVisible(false)}
 			/>
 
+			{/* ✅ 찬스 광고 (광고 종료 후 힌트 모달 표시) */}
+			{showChanceAd && (
+				<AdmobFrontAd
+					onAdClosed={() => {
+						setShowChanceAd(false);
+						setChanceModalVisible(true);
+					}}
+				/>
+			)}
+
 			{/* ✅ 찬스 힌트 모달 */}
 			<Modal
 				visible={chanceModalVisible}
@@ -988,7 +1000,7 @@ const InfinityQuizScreen = () => {
 
 						{!!chanceData?.sameProverb?.length && (
 							<View style={styles.chanceKeywordBox}>
-								<Text style={styles.chanceExampleLabel}>🔑 비슷한 속담</Text>
+								<Text style={styles.chanceExampleLabel}>🔑 동의속담</Text>
 								<View style={styles.chanceKeywordWrap}>
 									{chanceData.sameProverb.map((same, i) => (
 										<View key={i} style={styles.chanceKeywordChip}>

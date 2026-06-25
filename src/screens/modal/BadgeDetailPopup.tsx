@@ -94,7 +94,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 										{Array.from({ length: 8 }).map((_, i) => (
 											<View
 												key={i}
-												style={[styles.ray, { transform: [{ rotate: `${i * 45}deg` }, { translateY: -scaleWidth(46) }] }]}
+												style={[styles.ray, { transform: [{ rotate: `${i * 45}deg` }, { translateY: -scaleWidth(36) }] }]}
 											/>
 										))}
 									</Animated.View>
@@ -103,7 +103,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 									<IconComponent
 										type={badge.iconType}
 										name={isEarned ? badge.icon : 'lock'}
-										size={scaledSize(40)}
+										size={scaledSize(34)}
 										color={isEarned ? meta.color : Colors.textMuted}
 									/>
 								</View>
@@ -216,8 +216,8 @@ const styles = StyleSheet.create({
 	},
 	headerGrad: {
 		width: '100%',
-		paddingTop: scaleHeight(18),
-		paddingBottom: scaleHeight(22),
+		paddingTop: scaleHeight(12),
+		paddingBottom: scaleHeight(14),
 		paddingHorizontal: scaleWidth(20),
 	},
 	// 우하단 방향 어두운 오버레이 → 그라데이션 대체
@@ -238,42 +238,42 @@ const styles = StyleSheet.create({
 	},
 	rarityPillText: { color: Colors.textInverse, fontSize: scaledSize(12), fontWeight: '800', marginLeft: scaleWidth(3) },
 	iconStage: {
-		width: scaleWidth(120),
-		height: scaleWidth(120),
+		width: scaleWidth(98),
+		height: scaleWidth(98),
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginVertical: scaleHeight(10),
+		marginVertical: scaleHeight(4),
 	},
 	glowCircle: {
 		position: 'absolute',
-		top: scaleWidth(5),
-		left: scaleWidth(5),
-		width: scaleWidth(110),
-		height: scaleWidth(110),
-		borderRadius: scaleWidth(55),
+		top: scaleWidth(4),
+		left: scaleWidth(4),
+		width: scaleWidth(90),
+		height: scaleWidth(90),
+		borderRadius: scaleWidth(45),
 	},
 	spinRing: {
 		position: 'absolute',
-		top: scaleWidth(5),
-		left: scaleWidth(5),
-		width: scaleWidth(110),
-		height: scaleWidth(110),
+		top: scaleWidth(4),
+		left: scaleWidth(4),
+		width: scaleWidth(90),
+		height: scaleWidth(90),
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 	ray: {
 		position: 'absolute',
-		top: scaleWidth(55) - scaleWidth(7),
-		left: scaleWidth(55) - scaleWidth(2),
+		top: scaleWidth(45) - scaleWidth(7),
+		left: scaleWidth(45) - scaleWidth(2),
 		width: scaleWidth(4),
-		height: scaleWidth(14),
+		height: scaleWidth(13),
 		borderRadius: scaleWidth(2),
 		backgroundColor: 'rgba(255,255,255,0.85)',
 	},
 	iconCircle: {
-		width: scaleWidth(82),
-		height: scaleWidth(82),
-		borderRadius: scaleWidth(41),
+		width: scaleWidth(68),
+		height: scaleWidth(68),
+		borderRadius: scaleWidth(34),
 		backgroundColor: Colors.surface,
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -286,13 +286,13 @@ const styles = StyleSheet.create({
 	iconCircleLocked: { backgroundColor: Colors.surfaceAlt },
 	badgeName: {
 		color: Colors.textInverse,
-		fontSize: scaledSize(20),
+		fontSize: scaledSize(18),
 		fontWeight: '900',
-		marginTop: scaleHeight(4),
+		marginTop: scaleHeight(2),
 		textAlign: 'center',
 	},
 	typeChip: {
-		marginTop: scaleHeight(8),
+		marginTop: scaleHeight(6),
 		backgroundColor: 'rgba(255,255,255,0.22)',
 		borderRadius: scaleWidth(8),
 		paddingHorizontal: scaleWidth(10),
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
 	},
 	typeChipText: { color: Colors.textInverse, fontSize: scaledSize(11), fontWeight: '700' },
 
-	body: { padding: scaleWidth(18), gap: scaleHeight(12) },
+	body: { padding: scaleWidth(16), gap: scaleHeight(9) },
 	infoRow: { flexDirection: 'row', alignItems: 'flex-start', gap: scaleWidth(11) },
 	infoIcon: {
 		width: scaleWidth(30),
@@ -326,17 +326,17 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		gap: scaleWidth(6),
 		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(11),
-		marginTop: scaleHeight(2),
+		paddingVertical: scaleHeight(9),
+		marginTop: scaleHeight(1),
 	},
 	statusBannerLocked: { backgroundColor: Colors.surfaceAlt },
 	statusText: { fontSize: scaledSize(13), fontWeight: '800' },
 	closeBtn: {
 		backgroundColor: Colors.textStrong,
 		borderRadius: scaleWidth(14),
-		paddingVertical: scaleHeight(14),
+		paddingVertical: scaleHeight(12),
 		alignItems: 'center',
-		marginTop: scaleHeight(2),
+		marginTop: scaleHeight(1),
 	},
 	closeBtnText: { color: Colors.textInverse, fontSize: scaledSize(15), fontWeight: '800' },
 });

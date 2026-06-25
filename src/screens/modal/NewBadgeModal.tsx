@@ -86,52 +86,57 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 							<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(28)} color="#F59E0B" />
 						</View>
 					</View>
-					<Text style={styles.badgeModalTitle}>새로운 뱃지 획득!</Text>
+					<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지 획득!</Text>
+					<Text style={styles.badgeModalSubtitle}>{badges.length}개의 새로운 뱃지를 손에 넣었어요!</Text>
 					<ScrollView
 						style={{ maxHeight: scaleHeight(380), width: '100%' }}
-						contentContainerStyle={{ paddingHorizontal: scaleHeight(4), paddingTop: scaleHeight(4) }}
+						contentContainerStyle={{ paddingHorizontal: scaleHeight(4), paddingTop: scaleHeight(8) }}
 						showsVerticalScrollIndicator={false}>
 						{badges.map((badge, index) => {
 							const rarity = BADGE_RARITY_META[badge.rarity] ?? BADGE_RARITY_META.common;
 							return (
-								<View key={index} style={[styles.badgeCard, { borderColor: rarity.color }]}>
-									<View style={styles.badgeCardTop}>
-										{badge.mascotImage ? (
-											<FastImage
-												source={badge.mascotImage}
-												style={[styles.badgeThumb, { borderColor: rarity.color }]}
-												resizeMode={FastImage.resizeMode.contain}
-											/>
-										) : (
-											<View style={[styles.badgeThumb, styles.badgeThumbIcon, { backgroundColor: rarity.soft, borderColor: rarity.color }]}>
-												<IconComponent type={badge.iconType} name={badge.icon} size={scaledSize(26)} color={rarity.color} />
-											</View>
-										)}
-										<View style={{ flex: 1, minWidth: 0 }}>
-											<Text style={[styles.badgeName, { color: rarity.color }]} numberOfLines={1}>
-												{badge.name}
-											</Text>
-											<View style={styles.badgeMetaRow}>
-												<View style={[styles.rarityChip, { backgroundColor: rarity.soft }]}>
-													<Text style={[styles.rarityChipText, { color: rarity.color }]}>{rarity.label}</Text>
-												</View>
-												<View style={styles.starRow}>
-													{Array.from({ length: 4 }).map((_, i) => (
-														<IconComponent
-															key={i}
-															type="materialIcons"
-															name="star"
-															size={scaledSize(12)}
-															color={i < rarity.stars ? rarity.color : '#E2E8F0'}
-														/>
-													))}
-												</View>
-											</View>
-											<Text style={styles.badgeDescription}>{badge.description}</Text>
+								<View key={index} style={[styles.badgeCard, { backgroundColor: rarity.soft, borderColor: rarity.color }]}>
+									{/* 희귀도 리본 (등급 + 별점) */}
+									<View style={[styles.rarityRibbon, { backgroundColor: rarity.color }]}>
+										<IconComponent type="materialIcons" name="military-tech" size={scaledSize(13)} color="#fff" />
+										<Text style={styles.rarityRibbonText}>{rarity.label}</Text>
+										<View style={styles.ribbonStarRow}>
+											{Array.from({ length: 4 }).map((_, i) => (
+												<IconComponent
+													key={i}
+													type="materialIcons"
+													name="star"
+													size={scaledSize(11)}
+													color={i < rarity.stars ? '#fff' : 'rgba(255,255,255,0.4)'}
+												/>
+											))}
 										</View>
 									</View>
+
+									{/* 엠블럼 (마스코트 또는 아이콘) */}
+									<View style={styles.emblemStage}>
+										<View style={[styles.emblemRing, { borderColor: rarity.color }]}>
+											{badge.mascotImage ? (
+												<FastImage source={badge.mascotImage} style={styles.emblemImage} resizeMode={FastImage.resizeMode.contain} />
+											) : (
+												<View style={styles.emblemIconBg}>
+													<IconComponent type={badge.iconType} name={badge.icon} size={scaledSize(34)} color={rarity.color} />
+												</View>
+											)}
+										</View>
+									</View>
+
+									{/* 이름 + 설명 */}
+									<Text style={[styles.badgeName, { color: rarity.color }]} numberOfLines={1}>
+										{badge.name}
+									</Text>
+									<Text style={styles.badgeDescription} numberOfLines={3}>
+										{badge.description}
+									</Text>
+
+									{/* 획득 조건 */}
 									{!!badge.condition && (
-										<View style={[styles.conditionRow, { backgroundColor: rarity.soft }]}>
+										<View style={[styles.conditionRow, { borderColor: rarity.color }]}>
 											<IconComponent type="materialIcons" name="flag" size={scaledSize(13)} color={rarity.color} />
 											<Text style={[styles.conditionText, { color: rarity.color }]} numberOfLines={2}>
 												{badge.condition}
@@ -217,14 +222,55 @@ const styles = StyleSheet.create({
 	},
 	rarityChipText: { fontSize: scaledSize(10), fontWeight: '800' },
 	badgeCard: {
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(14),
-		padding: scaleWidth(14),
-		marginBottom: scaleHeight(10),
+		borderRadius: scaleWidth(16),
+		paddingTop: scaleHeight(14),
+		paddingBottom: scaleWidth(14),
+		paddingHorizontal: scaleWidth(14),
+		marginBottom: scaleHeight(12),
+		marginTop: scaleHeight(14),
 		borderWidth: 1.5,
 		borderColor: '#E2E8F0',
 		width: '100%',
+		alignItems: 'center',
 	},
+	rarityRibbon: {
+		position: 'absolute',
+		top: scaleHeight(-12),
+		alignSelf: 'center',
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(4),
+		paddingHorizontal: scaleWidth(12),
+		paddingVertical: scaleHeight(4),
+		borderRadius: scaleWidth(14),
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.18,
+		shadowRadius: 3,
+		elevation: 3,
+	},
+	rarityRibbonText: { color: '#fff', fontSize: scaledSize(11), fontWeight: '900', marginRight: scaleWidth(2) },
+	ribbonStarRow: { flexDirection: 'row', gap: scaleWidth(1) },
+	emblemStage: {
+		marginTop: scaleHeight(10),
+		marginBottom: scaleHeight(8),
+	},
+	emblemRing: {
+		width: scaleWidth(78),
+		height: scaleWidth(78),
+		borderRadius: scaleWidth(39),
+		borderWidth: 3,
+		backgroundColor: '#fff',
+		justifyContent: 'center',
+		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.15,
+		shadowRadius: 5,
+		elevation: 4,
+	},
+	emblemImage: { width: scaleWidth(60), height: scaleWidth(60) },
+	emblemIconBg: { justifyContent: 'center', alignItems: 'center' },
 	badgeCardTop: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -252,12 +298,17 @@ const styles = StyleSheet.create({
 	conditionRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		justifyContent: 'center',
 		gap: scaleWidth(6),
 		borderRadius: scaleWidth(10),
 		paddingHorizontal: scaleWidth(10),
 		paddingVertical: scaleHeight(7),
+		marginTop: scaleHeight(10),
+		backgroundColor: '#fff',
+		borderWidth: 1,
+		width: '100%',
 	},
-	conditionText: { flex: 1, fontSize: scaledSize(12), fontWeight: '700' },
+	conditionText: { fontSize: scaledSize(12), fontWeight: '700', textAlign: 'center', flexShrink: 1 },
 	badgeCardActive: {
 		borderColor: '#22C55E',
 		backgroundColor: '#EFF6FF',
@@ -281,10 +332,11 @@ const styles = StyleSheet.create({
 		maxWidth: '85%',
 	},
 	badgeName: {
-		flexShrink: 1,
-		fontSize: scaledSize(15),
-		fontWeight: '800',
+		fontSize: scaledSize(16),
+		fontWeight: '900',
 		color: '#22C55E',
+		textAlign: 'center',
+		marginBottom: scaleHeight(4),
 	},
 	badgeTitleActive: {
 		color: '#22C55E',
@@ -293,7 +345,8 @@ const styles = StyleSheet.create({
 		fontSize: scaledSize(13),
 		color: '#475569',
 		lineHeight: scaleHeight(19),
-		marginTop: scaleHeight(6),
+		textAlign: 'center',
+		paddingHorizontal: scaleWidth(4),
 	},
 	badgeDescActive: {
 		color: '#22C55E',

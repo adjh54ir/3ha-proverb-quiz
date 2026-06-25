@@ -929,7 +929,6 @@ const Home = () => {
 						description="레벨별 보스를 차례로 도전하고 특별한 보상을 획득하세요!"
 						color="#16a085"
 						onPress={moveToHandler.towerchalleng}
-						isNew
 					/>
 					<ActionCard
 						iconName="star"
@@ -1475,7 +1474,7 @@ const styles = StyleSheet.create({
 	main: { flex: 1, backgroundColor: '#ffffff' },
 	mascoteView: {
 		width: scaleWidth(180),
-		height: scaleWidth(180),
+		height: scaleWidth(158),
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -1629,7 +1628,7 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		textAlign: 'center',
 	},
-	petView: { alignItems: 'center', justifyContent: 'center', marginTop: scaleHeight(-4), marginBottom: scaleHeight(16), position: 'relative' },
+	petView: { alignItems: 'center', justifyContent: 'center', marginTop: scaleHeight(14), marginBottom: scaleHeight(2), position: 'relative' },
 	petContent: {
 		position: 'absolute',
 		right: scaleWidth(-24),

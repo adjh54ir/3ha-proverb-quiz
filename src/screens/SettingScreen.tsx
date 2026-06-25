@@ -39,6 +39,7 @@ const STORAGE_KEYS = {
 	todayQuiz: MainStorageKeyType.TODAY_QUIZ_LIST,
 	timeChallenge: MainStorageKeyType.TIME_CHALLENGE_HISTORY,
 	towerChallenge: MainStorageKeyType.TOWER_CHALLENGE_PROGRESS,
+	favorites: MainStorageKeyType.FAVORITES_STORAGE_KEY,
 };
 
 type ResetType = 'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'towerChallenge' | 'all';

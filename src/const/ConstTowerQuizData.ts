@@ -32,19 +32,20 @@ export function generateTowerQuiz(level: MainDataType.Proverb['level'], question
 	const selectedWords = shuffle(levelWords).slice(0, Math.min(questionCount, levelWords.length));
 
 	return selectedWords.map((item) => {
+		const correctMeaning = item.longMeaning || item.meaning;
 		const otherWords = CONST_MAIN_DATA.PROVERB.filter((w) => w.id !== item.id);
 		const wrongAnswers = shuffle(otherWords)
 			.slice(0, 3)
-			.map((w) => w.meaning);
+			.map((w) => w.longMeaning || w.meaning);
 
-		const allOptions = shuffle([item.meaning, ...wrongAnswers]);
-		const correctAnswer = allOptions.indexOf(item.meaning);
+		const allOptions = shuffle([correctMeaning, ...wrongAnswers]);
+		const correctAnswer = allOptions.indexOf(correctMeaning);
 
 		return {
 			question: `'${item.proverb}'의 뜻은 무엇일까요?`,
 			options: allOptions,
 			correctAnswer,
-			explanation: `${item.meaning}\n\n예시: ${item.example[0] ?? ''}`,
+			explanation: `${item.longMeaning || item.meaning}\n\n예시: ${item.example[0] ?? ''}`,
 			proverb: item.proverb,
 			level: item.level,
 			category: item.category,

@@ -1654,7 +1654,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.18,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 4,
-		elevation: 4,
 	},
 	petSpeechText: {
 		color: '#fff',
@@ -1868,9 +1867,7 @@ const styles = StyleSheet.create({
 		shadowColor: '#000',
 		shadowOpacity: 0.05,
 		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 6,
-		elevation: 2,
-	},
+		shadowRadius: 6,	},
 	quickActionIconChip: {
 		width: scaleWidth(44),
 		height: scaleWidth(44),

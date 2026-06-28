@@ -1366,9 +1366,7 @@ const styles = StyleSheet.create({
 		shadowColor: '#0F172A',
 		shadowOffset: { width: 0, height: scaleHeight(4) },
 		shadowOpacity: 0.06,
-		shadowRadius: 12,
-		elevation: 3,
-	},
+		shadowRadius: 12,	},
 	completedEmojiCircle: {
 		width: scaleWidth(64),
 		height: scaleWidth(64),

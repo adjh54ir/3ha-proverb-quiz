@@ -1152,7 +1152,6 @@ const InfinityQuizScreen = () => {
 							shadowOffset: { width: 0, height: 4 },
 							shadowOpacity: 0.25,
 							shadowRadius: 8,
-							elevation: 6,
 						}}>
 						<Text
 							style={{
@@ -1830,7 +1829,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 8 },
 		shadowOpacity: 0.18,
 		shadowRadius: 16,
-		elevation: 8,
 	},
 	chanceModalHeaderIcon: {
 		width: scaleWidth(52),

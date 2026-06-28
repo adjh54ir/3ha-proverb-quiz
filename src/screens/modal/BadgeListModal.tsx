@@ -191,7 +191,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.12,
 		shadowOffset: { width: 0, height: 10 },
 		shadowRadius: 18,
-		elevation: 8,
 	},
 	badgeModalHeader: {
 		width: '100%',

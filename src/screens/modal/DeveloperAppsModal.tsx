@@ -116,7 +116,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 							<TextInput
 								style={styles.searchInput}
 								placeholder="앱 검색..."
-								placeholderTextColor="#bdc3c7"
+								placeholderTextColor="#9CA3AF"
 								value={searchQuery}
 								onChangeText={setSearchQuery}
 							/>
@@ -143,7 +143,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 					<Text style={styles.countLabel}>{filteredApps.length}개 앱</Text>
 
 					{/* 리스트 */}
-					<ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+					<ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
 						{filteredApps.length === 0 ? (
 							<View style={styles.emptyState}>
 								<Text style={styles.emptyText}>검색 결과가 없습니다</Text>

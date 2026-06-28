@@ -187,7 +187,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 										<TextInput
 											style={styles.searchInput}
 											placeholder="속담이나 의미를 검색해보세요"
-											placeholderTextColor="#94A3B8"
+											placeholderTextColor="#9CA3AF"
 											value={keyword}
 											onChangeText={(text) => {
 												setKeyword(text);
@@ -284,6 +284,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 								renderItem={renderItem}
 								scrollEnabled={!levelOpen && !categoryOpen}
 								keyboardShouldPersistTaps="handled"
+									keyboardDismissMode="on-drag"
 								contentContainerStyle={styles.listContent}
 								showsVerticalScrollIndicator={false}
 								ListEmptyComponent={() => (

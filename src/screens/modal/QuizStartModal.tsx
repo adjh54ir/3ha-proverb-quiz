@@ -137,9 +137,7 @@ const styles = StyleSheet.create({
 		shadowColor: '#0F172A',
 		shadowOffset: { width: 0, height: 10 },
 		shadowOpacity: 0.18,
-		shadowRadius: 24,
-		elevation: 10,
-	},
+		shadowRadius: 24,	},
 	iconCircle: {
 		width: scaleWidth(60),
 		height: scaleWidth(60),

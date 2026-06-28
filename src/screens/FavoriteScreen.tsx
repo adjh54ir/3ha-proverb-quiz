@@ -340,7 +340,7 @@ const FavoriteScreen = () => {
 										<TextInput
 											style={styles.searchInput}
 											placeholder="속담이나 의미를 입력해주세요"
-											placeholderTextColor="#94A3B8"
+											placeholderTextColor="#9CA3AF"
 											value={keyword}
 											onChangeText={(text) => {
 												setKeyword(text);
@@ -451,6 +451,7 @@ const FavoriteScreen = () => {
 							renderItem={renderItem}
 							contentContainerStyle={[styles.listContent, isSelectionMode && { paddingBottom: scaleHeight(120) }]}
 							keyboardShouldPersistTaps="handled"
+								keyboardDismissMode="on-drag"
 							refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 							ListEmptyComponent={() => (
 								<View style={styles.emptyWrapper}>

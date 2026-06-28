@@ -108,7 +108,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 	return (
 		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.overlay}>
-				<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+				<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
 					<View style={styles.modal}>
 						<TouchableOpacity style={styles.closeIcon} onPress={onClose}>
 							<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color="#64748B" />
@@ -129,12 +129,12 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 
 						<Text style={styles.fieldLabel}>이름</Text>
 						<View style={[styles.inputWrap, { marginTop: scaleHeight(4) }]}>
-							<TextInput style={styles.input} placeholder="속담집 이름 *" placeholderTextColor="#94A3B8" value={title} onChangeText={setTitle} maxLength={20} autoFocus={!isEdit} />
+							<TextInput style={styles.input} placeholder="속담집 이름 *" placeholderTextColor="#9CA3AF" value={title} onChangeText={setTitle} maxLength={20} autoFocus={!isEdit} />
 						</View>
 
 						<Text style={styles.fieldLabel}>설명</Text>
 						<View style={[styles.inputWrap, { marginTop: scaleHeight(4) }]}>
-							<TextInput style={styles.input} placeholder="설명 (선택)" placeholderTextColor="#94A3B8" value={desc} onChangeText={setDesc} maxLength={40} />
+							<TextInput style={styles.input} placeholder="설명 (선택)" placeholderTextColor="#9CA3AF" value={desc} onChangeText={setDesc} maxLength={40} />
 						</View>
 
 						<ColorIconPicker selectedColor={color} selectedIcon={icon} onColorChange={setColor} onIconChange={setIcon} />

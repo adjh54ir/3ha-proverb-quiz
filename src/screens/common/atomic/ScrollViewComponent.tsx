@@ -62,6 +62,8 @@ const ScrollViewComponent = () => {
 		<ScrollView
 			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
 			onScroll={handleScroll}
+			keyboardShouldPersistTaps="handled"
+			keyboardDismissMode="on-drag"
 			ref={scrollViewRef}>
 			<View>
 				<TextInput
@@ -71,7 +73,7 @@ const ScrollViewComponent = () => {
 					value={inputValue}
 					onChangeText={setInputValue}
 					onPress={scrollHandler.toBottom}
-					placeholderTextColor='#95a5a6'
+					placeholderTextColor='#9CA3AF'
 				/>
 			</View>
 

@@ -302,7 +302,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.15,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: scaleWidth(4),
-		elevation: 3,
 	},
 	stampPetImage: {
 		width: '100%',
@@ -360,7 +359,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.06,
 		shadowRadius: 8,
-		elevation: 2,
 	},
 	swipeHintRow: {
 		flexDirection: 'row',

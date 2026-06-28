@@ -106,7 +106,6 @@ const modalStyles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 8 },
 		shadowOpacity: 0.18,
 		shadowRadius: 20,
-		elevation: 10,
 	},
 	iconCircle: {
 		width: scaleWidth(52),

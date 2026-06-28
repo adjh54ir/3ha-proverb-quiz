@@ -1571,7 +1571,6 @@ const MyScoreScreen = () => {
 										shadowOffset: { width: 0, height: 2 },
 										shadowOpacity: isCleared ? 0.18 : 0.06,
 										shadowRadius: 5,
-										elevation: isCleared ? 3 : 1,
 									}}>
 									{/* 왼쪽: 보스 이미지 + 레벨 배지 */}
 									<View
@@ -1815,9 +1814,7 @@ const styles = StyleSheet.create({
 		shadowColor: '#0F172A',
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.06,
-		shadowRadius: 12,
-		elevation: 3,
-	},
+		shadowRadius: 12,	},
 	scoreDashHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -2178,9 +2175,7 @@ const styles = StyleSheet.create({
 		shadowColor: '#64748B',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.1,
-		shadowRadius: 5,
-		elevation: 2,
-	},
+		shadowRadius: 5,	},
 	regionText: {
 		fontSize: scaledSize(14),
 		textAlign: 'center',
@@ -2498,9 +2493,7 @@ const styles = StyleSheet.create({
 		shadowColor: '#0F172A',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.04,
-		shadowRadius: 4,
-		elevation: 1,
-	},
+		shadowRadius: 4,	},
 	sectionHeaderStatic: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -2570,9 +2563,7 @@ const styles = StyleSheet.create({
 		shadowColor: '#64748B',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.08,
-		shadowRadius: 4,
-		elevation: 1,
-	},
+		shadowRadius: 4,	},
 	categoryRowText: {
 		fontSize: scaledSize(15),
 		color: '#475569',
@@ -2744,9 +2735,7 @@ const styles = StyleSheet.create({
 		shadowColor: '#0F172A',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.04,
-		shadowRadius: 4,
-		elevation: 1,
-	},
+		shadowRadius: 4,	},
 	levelDescIconChip: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),

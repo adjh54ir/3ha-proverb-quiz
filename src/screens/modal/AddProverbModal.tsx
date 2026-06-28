@@ -159,7 +159,7 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 								<View style={styles.searchRow}>
 									<View style={styles.searchBox}>
 										<Icon name="magnifying-glass" size={scaledSize(14)} color="#94A3B8" style={styles.searchIcon} />
-										<TextInput style={styles.searchInput} placeholder="속담이나 의미를 검색해보세요" placeholderTextColor="#94A3B8" value={keyword} onChangeText={(t) => { setKeyword(t); setLevelOpen(false); setCategoryOpen(false); }} />
+										<TextInput style={styles.searchInput} placeholder="속담이나 의미를 검색해보세요" placeholderTextColor="#9CA3AF" value={keyword} onChangeText={(t) => { setKeyword(t); setLevelOpen(false); setCategoryOpen(false); }} />
 										{keyword.length > 0 && (
 											<TouchableOpacity onPress={() => setKeyword('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
 												<Icon name="circle-xmark" size={scaledSize(15)} color="#94A3B8" />
@@ -223,6 +223,7 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 								renderItem={renderItem}
 								scrollEnabled={!levelOpen && !categoryOpen}
 								keyboardShouldPersistTaps="handled"
+									keyboardDismissMode="on-drag"
 								contentContainerStyle={styles.listContent}
 								showsVerticalScrollIndicator={false}
 								ListEmptyComponent={() => (

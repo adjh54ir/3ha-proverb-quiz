@@ -67,7 +67,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 8 },
 		shadowOpacity: 0.18,
 		shadowRadius: 16,
-		elevation: 12,
 	},
 	headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 	title: { fontSize: scaledSize(18), fontWeight: '800', color: '#334155', flex: 1, marginRight: scaleWidth(10) },

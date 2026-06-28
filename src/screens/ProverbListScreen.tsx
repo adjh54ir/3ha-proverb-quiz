@@ -477,7 +477,7 @@ const ProverbListScreen = () => {
 											ref={searchInputRef}
 											style={[styles.input, styles.searchInput]}
 											placeholder="속담이나 의미를 입력해주세요"
-											placeholderTextColor="#94A3B8"
+											placeholderTextColor="#9CA3AF"
 											onChangeText={(text) => {
 												setKeyword(text);
 												setFieldOpen(false);
@@ -655,6 +655,7 @@ const ProverbListScreen = () => {
 								}}
 								scrollEventThrottle={16}
 								keyboardShouldPersistTaps="handled"
+								keyboardDismissMode="on-drag"
 								ListEmptyComponent={() => (
 									<View style={[styles.emptyWrapper, { height: '100%', marginTop: scaleHeight(40) }]}>
 										<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />

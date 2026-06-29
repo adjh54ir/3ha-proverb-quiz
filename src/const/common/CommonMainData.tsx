@@ -77,53 +77,8 @@ export const LEVELS: QuizLevel[] = [
 		desc: '',
 	},
 ];
-export const LEVEL_DATA = [
-	{
-		score: 3320,
-		next: 5000, // 413문제 = 전체 달성
-		label: '속담 마스터',
-		icon: 'trophy',
-		encouragement: '👑 속담의 왕좌에 올랐습니다!\n당신은 이제 속담의 진정한 달인입니다!',
-		description: '속담을 자유자재로 구사하며,\n누구에게나 귀감이 되는 지혜의 경지에 올랐습니다.\n속담의 참뜻을 깨닫고 삶에 녹여내는 최상위 단계예요.',
-		mascot: require('@/assets/images/level5_mascote2.png'),
-	},
-	{
-		score: 2490,
-		next: 3320, // 332문제
-		label: '속담 고수',
-		icon: 'chess-knight',
-		encouragement: '⚔️ 속담의 전장에서 승리하고 있어요!\n어떤 도전도 당당히 맞설 수 있네요!',
-		description: '속담을 무기처럼 활용하며,\n어려운 문제도 당당히 맞설 수 있는 단계예요.\n탄탄한 자신감으로 진정한 실력을 보여줍니다.',
-		mascot: require('@/assets/images/level4_mascote.png'),
-	},
-	{
-		score: 1660,
-		next: 2490, // 249문제
-		label: '속담 숙련자',
-		icon: 'tree',
-		encouragement: '🌳 지식이 뿌리내려 점점 자라고 있어요!\n이제 훨씬 더 능숙해졌네요!',
-		description: '속담의 의미와 쓰임새를 제대로 이해하고,\n실전에서도 능숙하게 활용할 수 있는 단계예요.\n기초를 넘어 한층 성숙한 실력을 갖췄습니다.',
-		mascot: require('@/assets/images/level3_mascote.png'),
-	},
-	{
-		score: 830,
-		next: 1660, // 166문제
-		label: '속담 입문자',
-		icon: 'leaf',
-		encouragement: '🍃 좋은 출발이에요!\n조금씩 자신감이 붙고 있어요!',
-		description: '기초 속담에 차츰 익숙해지고,\n다양한 표현을 접하며 감을 쌓아가는 단계예요.\n이제 막 본격적인 성장의 길에 들어섰습니다.',
-		mascot: require('@/assets/images/level2_mascote.png'),
-	},
-	{
-		score: 0,
-		next: 830, // 83문제
-		label: '속담 초심자',
-		icon: 'seedling',
-		encouragement: '🌱 첫걸음을 내디뎠어요!\n앞으로가 더욱 기대돼요!',
-		description: '속담 학습의 출발선에 선 단계로,\n새싹처럼 작은 배움부터 차근차근 키워가는 시기예요.\n앞으로의 성장이 더욱 기대됩니다.',
-		mascot: require('@/assets/images/level1_mascote.png'),
-	},
-];
+// LEVEL_DATA(점수별 캐릭터)는 단일 소스 @/const/common/CommonCharacterData 로 이관됨.
+// (중복 정의 제거 — 필요 시 ConstInfoData 또는 CommonCharacterData 에서 import)
 
 const COMMON_ALL_OPTION = {
 	label: '전체',

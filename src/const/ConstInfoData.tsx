@@ -2,6 +2,7 @@
 import React from 'react';
 import { scaledSize } from '@/utils/DementionUtils';
 import IconComponent from '@/screens/common/atomic/IconComponent';
+import { LEVEL_DATA } from '@/const/common/CommonCharacterData';
 
 export const GREETING_MESSAGES = [
 	'🎯 반가워요! 우리말의 결을 느껴볼까요?',
@@ -48,72 +49,23 @@ export const QUIZ_PRAISE_MESSAGE = [
 	'정확히 알고 있네요! 🧠\n이제 진정한 우리말 지킴이에 가까워지고 있어요!',
 ];
 
-/*
- * 790개 × 10점 = 7,900점 기준
- * 레벨 구간 재분배 (6단계)
- * 초심자:  0     ~ 1,580
- * 입문자:  1,580 ~ 3,160
- * 숙련자:  3,160 ~ 4,740
- * 고수:    4,740 ~ 6,320
- * 마스터:  6,320 ~ 7,900
- * 전설:    7,900 ~
+/**
+ * 점수별 캐릭터(등급) 데이터.
+ * 단일 소스인 @/const/common/CommonCharacterData 에서 재수출한다.
+ * (임계 점수는 전체 속담 수 × 문제당 점수를 만점으로 비율 자동 산정)
  */
-export const LEVEL_DATA = [
-	{
-		score: 7000,
-		next: Infinity,
-		label: '속담 전설',
-		icon: 'crown',
-		encouragement: '🌌 전설이 되셨습니다!\n속담의 모든 지혜를 완전히 정복한 유일무이한 존재예요!',
-		description: '790개 속담을 모두 정복하고,\n그 깊은 지혜를 삶 속에 온전히 녹여낸 최고의 경지예요.\n당신의 이름은 속담의 역사에 새겨질 것입니다.',
-		mascot: require('@/assets/images/level6_mascote.png'),
-	},
-	{
-		score: 5000,
-		next: 7000,
-		label: '속담 마스터',
-		icon: 'trophy',
-		encouragement: '👑 속담의 왕좌에 올랐습니다!\n당신은 이제 속담의 진정한 달인입니다!',
-		description: '속담을 자유자재로 구사하며,\n누구에게나 귀감이 되는 지혜의 경지에 올랐습니다.\n속담의 참뜻을 깨닫고 삶에 녹여내는 최상위 단계예요.',
-		mascot: require('@/assets/images/level5_mascote2.png'),
-	},
-	{
-		score: 3000,
-		next: 5000,
-		label: '속담 고수',
-		icon: 'chess-knight',
-		encouragement: '⚔️ 속담의 전장에서 승리하고 있어요!\n어떤 도전도 당당히 맞설 수 있네요!',
-		description: '속담을 무기처럼 활용하며,\n어려운 문제도 당당히 맞설 수 있는 단계예요.\n탄탄한 자신감으로 진정한 실력을 보여줍니다.',
-		mascot: require('@/assets/images/level4_mascote.png'),
-	},
-	{
-		score: 2000,
-		next: 3000,
-		label: '속담 숙련자',
-		icon: 'tree',
-		encouragement: '🌳 지식이 뿌리내려 점점 자라고 있어요!\n이제 훨씬 더 능숙해졌네요!',
-		description: '속담의 의미와 쓰임새를 제대로 이해하고,\n실전에서도 능숙하게 활용할 수 있는 단계예요.\n기초를 넘어 한층 성숙한 실력을 갖췄습니다.',
-		mascot: require('@/assets/images/level3_mascote.png'),
-	},
-	{
-		score: 1000,
-		next: 2000,
-		label: '속담 입문자',
-		icon: 'leaf',
-		encouragement: '🍃 좋은 출발이에요!\n조금씩 자신감이 붙고 있어요!',
-		description: '기초 속담에 차츰 익숙해지고,\n다양한 표현을 접하며 감을 쌓아가는 단계예요.\n이제 막 본격적인 성장의 길에 들어섰습니다.',
-		mascot: require('@/assets/images/level2_mascote.png'),
-	},
-	{
-		score: 0,
-		next: 1000,
-		label: '속담 초심자',
-		icon: 'seedling',
-		encouragement: '🌱 첫걸음을 내디뎠어요!\n앞으로가 더욱 기대돼요!',
-		description: '속담 학습의 출발선에 선 단계로,\n새싹처럼 작은 배움부터 차근차근 키워가는 시기예요.\n앞으로의 성장이 더욱 기대됩니다.',
-		mascot: require('@/assets/images/level1_mascote.png'),
-	},
-];
+export {
+	LEVEL_DATA,
+	SCORE_PER_QUESTION,
+	getLevelByScore,
+	getNextLevel,
+	getProgressPercent,
+	getQuestionsToNext,
+	getCurrentLevelIndex,
+	getMaxScore,
+	getTotalProverbCount,
+} from '@/const/common/CommonCharacterData';
+export type { CharacterLevel, ScoredCharacterLevel } from '@/const/common/CommonCharacterData';
 
 export const PET_REWARDS = [
 	{ day: 1, label: '1일 출석', name: '멍뭉 견습생', image: require('@/assets/images/pet_level0.jpg') },

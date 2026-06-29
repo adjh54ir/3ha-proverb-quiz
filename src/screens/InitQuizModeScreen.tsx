@@ -8,7 +8,7 @@ import IconComponent from './common/atomic/IconComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import FastImage from 'react-native-fast-image';
-import { LEVEL_DATA, QUIZ_MODES } from '@/const/ConstInfoData';
+import { QUIZ_MODES, getLevelByScore } from '@/const/ConstInfoData';
 import BottomHomeButton from './common/BottomHomeButton';
 
 /** 모드별 설명 (카드 서브텍스트) */
@@ -57,8 +57,7 @@ const InitQuizModeScreen = () => {
 		navigation.navigate(Paths.QUIZ_MODE, { mode });
 	};
 
-	const getLevelInfoByScore = (score: number) => LEVEL_DATA.slice().find((l) => score >= l.score) || LEVEL_DATA[0];
-	const levelInfo = useMemo(() => getLevelInfoByScore(totalScore), [totalScore]);
+	const levelInfo = useMemo(() => getLevelByScore(totalScore), [totalScore]);
 	const { mascot } = levelInfo;
 
 	return (

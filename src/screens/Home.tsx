@@ -31,7 +31,7 @@ import LevelModal from './modal/LevelModal';
 import { calcStreak, StreakInfo } from '@/utils/StreakUtils';
 import { AttendanceBadgeInterceptor } from '@/services/interceptor/AttendanceBadgeInterceptor';
 import { computeDailyMissions, countDoneMissions, allMissionsDone } from '@/utils/DailyMissionUtils';
-import { LEVEL_DATA, PET_REWARDS } from '@/const/ConstInfoData';
+import { LEVEL_DATA, PET_REWARDS, SCORE_PER_QUESTION, getLevelByScore, getNextLevel, getProgressPercent, getQuestionsToNext } from '@/const/ConstInfoData';
 import TowerRewardSection from '@/components/TowerRewardSection';
 import { TowerProgress } from '@/const/ConstTowerData';
 
@@ -234,12 +234,10 @@ const Home = () => {
 	}, [showCheckInModal, isCheckedIn]);
 
 	const levelDataForScroll = useMemo(() => [...LEVEL_DATA], []);
-	// 오름차순 정렬된 데이터
-	const levelDataAsc = [...LEVEL_DATA].sort((a, b) => a.score - b.score);
 
-	const currentLevel = levelDataAsc.find((l) => totalScore >= l.score && totalScore < (l.next ?? Infinity));
+	const currentLevel = getLevelByScore(totalScore);
 
-	const nextLevel = levelDataAsc.find((l) => totalScore < l.score);
+	const nextLevel = getNextLevel(totalScore);
 
 	const currentLevelIndex = levelDataForScroll.findIndex((item) => totalScore >= item.score && totalScore < (item.next ?? Infinity));
 	useEffect(() => {
@@ -253,11 +251,7 @@ const Home = () => {
 		}
 	}, [showLevelModal]);
 
-	const getLevelData = (score: number) => {
-		return LEVEL_DATA.slice().find((l) => score >= l.score) || LEVEL_DATA[0];
-	};
-	// 이걸 기존 getLevelData 아래에 추가해
-	const levelData = useMemo(() => getLevelData(totalScore), [totalScore]);
+	const levelData = useMemo(() => getLevelByScore(totalScore), [totalScore]);
 
 	const { label, icon, mascot, description } = levelData;
 
@@ -396,23 +390,8 @@ const Home = () => {
 		scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
 	};
 
-	// getTitleByScore 함수 추가
-	const getLevelInfoByScore = (score: number) => {
-		return LEVEL_DATA.slice().find((l) => score >= l.score) || LEVEL_DATA[0];
-	};
-
-	// 진행도 계산 함수
-	const getProgressPercent = () => {
-		const currentLevel = LEVEL_DATA.find((l) => totalScore >= l.score && totalScore < (l.next ?? Infinity));
-		if (!currentLevel || !currentLevel.next) {
-			return 100;
-		} // 마지막 레벨이면 꽉 찬 상태
-
-		const progress = ((totalScore - currentLevel.score) / (currentLevel.next - currentLevel.score)) * 100;
-		return Math.min(Math.max(progress, 0), 100);
-	};
-
-	const progressPercent = getProgressPercent();
+	// 진행도(다음 등급까지 %) — 중앙 헬퍼 사용
+	const progressPercent = getProgressPercent(totalScore);
 	let progressColor = '#82c91e'; // 연두빛 초록 (0~59%)
 
 	if (progressPercent >= 60 && progressPercent < 90) {
@@ -423,21 +402,13 @@ const Home = () => {
 		progressColor = '#e74c3c'; // 부드러운 빨강 (90~100%)
 	}
 
-	// 예: 문제당 10점 (필요시 상수화)
-	const SCORE_PER_QUESTION = 10;
-
-	const questionsToNext = nextLevel && nextLevel.score ? Math.max(Math.ceil((nextLevel.score - totalScore) / SCORE_PER_QUESTION), 0) : 0;
-
-	/** 현재 점수에 해당하는 레벨(등급) — LEVEL_DATA 순서 무관 */
-	const getCurrentLevelData = (score: number) => {
-		const asc = [...LEVEL_DATA].sort((a, b) => a.score - b.score);
-		return asc.reduce((acc, l) => (score >= l.score ? l : acc), asc[0]);
-	};
+	// 다음 등급까지 남은 문제 수 — 중앙 헬퍼 사용
+	const questionsToNext = getQuestionsToNext(totalScore);
 
 	/** 마지막으로 확인한 등급보다 상승했으면 레벨업 모달 표시 (등급 임계 점수 기준) */
 	const detectLevelUp = async (score: number) => {
 		try {
-			const current = getCurrentLevelData(score);
+			const current = getLevelByScore(score);
 			const storedRaw = await AsyncStorage.getItem(MainStorageKeyType.LAST_SEEN_GRADE);
 			const stored = storedRaw != null ? parseInt(storedRaw, 10) : null;
 			if (stored != null && current.score > stored) {

@@ -38,7 +38,7 @@ import { MainDataType } from '@/types/MainDataType';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
-import { PET_REWARDS } from '@/const/ConstInfoData';
+import { PET_REWARDS, LEVEL_DATA as CHARACTER_LEVELS } from '@/const/ConstInfoData';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import { FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
@@ -590,62 +590,8 @@ const MyScoreScreen = () => {
 	const totalSolved = correctCount + wrongCount;
 	const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
 
-	const LEVEL_DATA = [
-		{
-			score: 0,
-			next: 1000,
-			label: '속담 초심자',
-			icon: 'seedling',
-			mascot: require('@/assets/images/level1_mascote.png'),
-			encouragement: '🌱 첫걸음을 내디뎠어요!\n앞으로가 더욱 기대돼요!',
-			description: '속담 학습의 출발선에 선 단계로,\n새싹처럼 작은 배움부터 차근차근 키워가는 시기예요.\n앞으로의 성장이 더욱 기대됩니다.',
-		},
-		{
-			score: 1000,
-			next: 2000,
-			label: '속담 입문자',
-			icon: 'leaf',
-			mascot: require('@/assets/images/level2_mascote.png'),
-			encouragement: '🍃 좋은 출발이에요!\n조금씩 자신감이 붙고 있어요!',
-			description: '기초 속담에 차츰 익숙해지고,\n다양한 표현을 접하며 감을 쌓아가는 단계예요.\n이제 막 본격적인 성장의 길에 들어섰습니다.',
-		},
-		{
-			score: 2000,
-			next: 3000,
-			label: '속담 숙련자',
-			icon: 'tree',
-			mascot: require('@/assets/images/level3_mascote.png'),
-			encouragement: '🌳 지식이 뿌리내려 점점 자라고 있어요!\n이제 훨씬 더 능숙해졌네요!',
-			description: '속담의 의미와 쓰임새를 제대로 이해하고,\n실전에서도 능숙하게 활용할 수 있는 단계예요.\n기초를 넘어 한층 성숙한 실력을 갖췄습니다.',
-		},
-		{
-			score: 3000,
-			next: 5000,
-			label: '속담 고수',
-			icon: 'chess-knight',
-			mascot: require('@/assets/images/level4_mascote.png'),
-			encouragement: '⚔️ 속담의 전장에서 승리하고 있어요!\n어떤 도전도 당당히 맞설 수 있네요!',
-			description: '속담을 무기처럼 활용하며,\n어려운 문제도 당당히 맞설 수 있는 단계예요.\n탄탄한 자신감으로 진정한 실력을 보여줍니다.',
-		},
-		{
-			score: 5000,
-			next: 7000,
-			label: '속담 마스터',
-			icon: 'trophy',
-			mascot: require('@/assets/images/level5_mascote2.png'),
-			encouragement: '👑 속담의 왕좌에 올랐습니다!\n당신은 이제 속담의 진정한 달인입니다!',
-			description: '속담을 자유자재로 구사하며,\n누구에게나 귀감이 되는 지혜의 경지에 올랐습니다.\n속담의 참뜻을 깨닫고 삶에 녹여내는 최상위 단계예요.',
-		},
-		{
-			score: 7000,
-			next: 99999,
-			label: '속담 전설',
-			icon: 'crown',
-			mascot: require('@/assets/images/level6_mascote.png'),
-			encouragement: '🌌 전설이 되셨습니다!\n속담의 모든 지혜를 완전히 정복한 유일무이한 존재예요!',
-			description: '790개 속담을 모두 정복하고,\n그 깊은 지혜를 삶 속에 온전히 녹여낸 최고의 경지예요.\n당신의 이름은 속담의 역사에 새겨질 것입니다.',
-		},
-	];
+	// 점수별 캐릭터(등급) — 단일 소스에서 가져와 오름차순(초심자→전설)으로 사용
+	const LEVEL_DATA = [...CHARACTER_LEVELS].sort((a, b) => a.score - b.score);
 
 	const reversedLevelGuide = [...LEVEL_DATA].reverse();
 	const currentLevelIndex = reversedLevelGuide.findIndex((item) => totalScore >= item.score && totalScore < item.next);

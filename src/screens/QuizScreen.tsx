@@ -697,11 +697,16 @@ const QuizScreen = () => {
 		}
 	};
 	const onStart = (skipLoad?: boolean) => {
-		const filtered = ProverbServices.selectProverbList().filter((p) => {
-			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-			return levelMatch && categoryMatch;
-		});
+		// ✅ 난이도/카테고리 선택 화면에서 넘어온 questionPool(이미 필터링됨)을 최우선 사용.
+		//    questionPool이 없을 때만 로컬 상태 기준으로 필터링한다.
+		const filtered =
+			questionPool && questionPool.length > 0
+				? questionPool
+				: ProverbServices.selectProverbList().filter((p) => {
+						const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+						const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+						return levelMatch && categoryMatch;
+					});
 		setProverbs(filtered);
 
 		if (!skipLoad && filtered.length > 0) {

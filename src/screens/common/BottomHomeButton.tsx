@@ -13,6 +13,7 @@ const BottomHomeButton = ({
 	iconColor = '#475569',
 	confirmTitle = '퀴즈를 종료할까요?',
 	confirmMessage = '진행 중인 내용은 저장되지 않아요.',
+	skipConfirm = false,
 }: {
 	paddingBottom?: number;
 	backgroundColor?: string;
@@ -21,6 +22,7 @@ const BottomHomeButton = ({
 	iconColor?: string;
 	confirmTitle?: string;
 	confirmMessage?: string;
+	skipConfirm?: boolean; // ✅ true면 확인 팝업 없이 바로 홈으로 이동
 }) => {
 	const navigation = useNavigation<any>();
 	const [showConfirm, setShowConfirm] = useState(false);
@@ -56,7 +58,7 @@ const BottomHomeButton = ({
 
 	return (
 		<View style={[styles.wrapper, paddingBottom !== undefined && { paddingBottom: scaleHeight(paddingBottom) }]}>
-			<TouchableOpacity style={styles.button} onPress={() => setShowConfirm(true)} activeOpacity={0.85}>
+			<TouchableOpacity style={styles.button} onPress={() => (skipConfirm ? goHome() : setShowConfirm(true))} activeOpacity={0.85}>
 				<IconComponent type="MaterialIcons" name="home" size={14} color={iconColor} />
 				<Text style={styles.text}>HOME</Text>
 			</TouchableOpacity>

@@ -96,22 +96,22 @@ export const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '초급',
 		value: 1,
-		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={16} color="#2ecc71" />,
+		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={16} color="#34D399" />,
 	},
 	{
 		label: '중급',
 		value: 2,
-		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={16} color="#F4D03F" />,
+		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={16} color="#F59E0B" />,
 	},
 	{
 		label: '고급',
 		value: 3,
-		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#EB984E" />,
+		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#EA580C" />,
 	},
 	{
 		label: '특급',
 		value: 4,
-		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={16} color="#E74C3C" />,
+		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={16} color="#B91C1C" />,
 	},
 ];
 
@@ -258,10 +258,10 @@ export const LEVEL_ICON_MAP: Record<number, string> = {
  * 레벨별 색상 매핑
  */
 export const LEVEL_COLOR_MAP: Record<number, string> = {
-	1: '#2ecc71', // 초급 - 녹색
-	2: '#F4D03F', // 중급 - 노랑
-	3: '#EB984E', // 고급 - 주황
-	4: '#E74C3C', // 특급 - 빨강
+	1: '#34D399', // 초급 - 밝은 민트
+	2: '#F59E0B', // 중급 - 앰버
+	3: '#EA580C', // 고급 - 진한 주황
+	4: '#B91C1C', // 특급 - 가장 어두운 빨강(난이도 강조)
 };
 
 /**

@@ -23,12 +23,13 @@ export const getCategoryColor = (category: string): string => {
 
 /** 난이도(levelName)별 색상 — 쉬움→어려움으로 갈수록 진해지는 램프 */
 export const getLevelColor = (level: string): string => {
+	// 난이도가 올라갈수록 어두워지는 램프(난이도 강조)
 	const map: Record<string, string> = {
-		'아주 쉬움': '#22C55E',
-		'매우 쉬움': '#22C55E',
-		쉬움: '#84CC16',
-		보통: '#F59E0B',
-		어려움: '#EF4444',
+		'아주 쉬움': '#34D399',
+		'매우 쉬움': '#34D399',
+		쉬움: '#F59E0B',
+		보통: '#EA580C',
+		어려움: '#B91C1C',
 	};
 	return map[level] || '#94A3B8';
 };

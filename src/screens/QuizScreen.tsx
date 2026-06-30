@@ -508,11 +508,12 @@ const QuizScreen = () => {
 		}, 600); // 약간
 	};
 	const getLevelColor = (level: number) => {
+		// 퀴즈 모드 선택 화면(LEVELS)과 동일한 색상 사용 (난이도가 올라갈수록 어두워짐)
 		const levelColorMap: Record<string, string> = {
-			1: '#ecf0f1',
-			2: '#74b9ff',
-			3: '#3498db',
-			4: '#2c3e50',
+			1: '#34D399', // 초급
+			2: '#F59E0B', // 중급
+			3: '#EA580C', // 고급
+			4: '#B91C1C', // 특급
 		};
 
 		return levelColorMap[level] || '#bdc3c7'; // 기본 회색
@@ -717,13 +718,13 @@ const QuizScreen = () => {
 	const getLevelLabel = (level: number) => {
 		switch (level) {
 			case 1:
-				return '아주 쉬움';
+				return '초급';
 			case 2:
-				return '쉬움';
+				return '중급';
 			case 3:
-				return '보통';
+				return '고급';
 			case 4:
-				return '어려움';
+				return '특급';
 			default:
 				return '알수없음';
 		}
@@ -1142,7 +1143,7 @@ const QuizScreen = () => {
 				}}
 				onBack={() => safelyGoBack()}
 			/>
-			<QuizHintModal visible={showHintModal} question={question} onClose={() => setShowHintModal(false)} />
+			<QuizHintModal visible={showHintModal} question={question} mode={routeMode} questionText={questionText} onClose={() => setShowHintModal(false)} />
 			{/* ======================= 퀴즈 종료 ============================ */}
 			<Modal visible={showExitModal} transparent animationType='fade'>
 				<View style={styles.modalOverlay}>

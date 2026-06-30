@@ -41,6 +41,7 @@ import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { PET_REWARDS, LEVEL_DATA as CHARACTER_LEVELS } from '@/const/ConstInfoData';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import ProverbDetailModal from './modal/ProverbDetailModal';
+import LevelModal from './modal/LevelModal';
 import { FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 
 interface TodayQuizList {
@@ -1597,47 +1598,8 @@ const MyScoreScreen = () => {
 				</View>
 			</ScrollView>
 
-			<Modal visible={showLevelModal} transparent animationType="fade">
-				<View style={styles.modalOverlay}>
-					<View style={[styles.levelModal, { maxHeight: scaleHeight(600) }]}>
-						<Text style={styles.levelModalTitle}>등급 안내</Text>
-
-						<ScrollView
-							ref={levelScrollRef}
-							style={{ width: '100%' }}
-							contentContainerStyle={{ paddingBottom: scaleHeight(12) }}
-							showsVerticalScrollIndicator={false}>
-							{[...LEVEL_DATA].reverse().map((item) => {
-								const isCurrent = totalScore >= item.score && totalScore < item.next;
-								const mascotImage = getTitleByScore(item.score).mascot;
-
-								return (
-									<View key={item.label} style={[styles.levelCardBox, isCurrent && styles.levelCardBoxActive]}>
-										{isCurrent && (
-											<View style={[styles.levelBadge, { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(4) }]}>
-												<IconComponent type="fontAwesome6" name="trophy" size={scaledSize(11)} color="#fff" />
-												<Text style={styles.levelBadgeText}>현재 등급</Text>
-											</View>
-										)}
-										<FastImage source={mascotImage} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
-										<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
-											<IconComponent name={item.icon} type="fontAwesome6" size={scaledSize(16)} color="#22C55E" />
-											<Text style={[styles.levelLabel, { marginLeft: scaleWidth(6) }]}>{item.label}</Text>
-										</View>
-										<Text style={styles.levelScore}>{item.score}점 이상</Text>
-										{isCurrent && <Text style={styles.levelEncourage}>{item.encouragement}</Text>}
-										<Text style={styles.levelDetailDescription}>{item.description}</Text>
-									</View>
-								);
-							})}
-						</ScrollView>
-
-						<TouchableOpacity onPress={() => setShowLevelModal(false)} style={styles.modalConfirmButton}>
-							<Text style={styles.modalConfirmText}>닫기</Text>
-						</TouchableOpacity>
-					</View>
-				</View>
-			</Modal>
+			{/* 등급 안내 팝업 — 홈과 동일한 공통 컴포넌트 사용 */}
+			<LevelModal visible={showLevelModal} totalScore={totalScore} onClose={() => setShowLevelModal(false)} />
 
 			{/* 🏅 뱃지 상세 팝업 */}
 			<BadgeDetailPopup

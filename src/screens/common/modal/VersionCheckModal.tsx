@@ -88,15 +88,16 @@ const VersionCheckModal = () => {
 			onRequestClose={() => {}}>
 			<View style={styles.modalContainer}>
 				<View style={styles.modalContent}>
-					<Text style={styles.title}>업데이트 알림</Text>
-					<Image source={require('@/assets/images/update.png')} style={styles.image} />
-					<Text style={styles.message}>
-						🎉 새로운 버전이 출시되었습니다 🎉{'\n'}더 편리해진 기능을 만나보세요!
-						{'\n\n'}
-					</Text>
-					<TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
+					<View style={styles.iconWrap}>
+						<Image source={require('@/assets/images/update.png')} style={styles.image} />
+					</View>
+					<Text style={styles.badge}>새로운 버전 출시</Text>
+					<Text style={styles.title}>업데이트가 필요해요</Text>
+					<Text style={styles.message}>더 편리해진 기능과 개선 사항이 준비됐어요.{'\n'}최신 버전으로 업데이트해 주세요.</Text>
+					<TouchableOpacity style={styles.updateButton} onPress={handleUpdate} activeOpacity={0.85}>
 						<Text style={styles.buttonText}>지금 업데이트</Text>
 					</TouchableOpacity>
+					<Text style={styles.subtle}>업데이트 후 모든 기능을 정상적으로 이용할 수 있어요.</Text>
 				</View>
 			</View>
 		</Modal>
@@ -106,48 +107,80 @@ const VersionCheckModal = () => {
 const styles = StyleSheet.create({
 	modalContainer: {
 		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		backgroundColor: 'rgba(15, 23, 42, 0.55)',
 		justifyContent: 'center',
 		alignItems: 'center',
+		padding: scaleWidth(24),
 	},
 	modalContent: {
-		backgroundColor: 'white',
-		borderRadius: moderateScale(10),
-		padding: scaleWidth(20),
-		width: scaleWidth(300),
-		maxWidth: '90%', // ✅ 작은 기기 대비
-		maxHeight: '85%', // ✅ 텍스트가 길어도 안전
+		backgroundColor: '#ffffff',
+		borderRadius: scaleWidth(24),
+		paddingTop: scaleHeight(24),
+		paddingBottom: scaleHeight(20),
+		paddingHorizontal: scaleWidth(22),
+		width: '100%',
+		maxWidth: scaleWidth(340),
+		maxHeight: '85%',
 		alignItems: 'center',
 	},
-	title: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(10),
-	},
-	message: {
-		fontSize: scaledSize(16),
-		textAlign: 'center',
-		marginBottom: scaleHeight(6),
-		// lineHeight: scaleHeight(20),  // ❌ 제거
-		lineHeight: Math.round(scaledSize(16) * 1.4), // ✅ 쓰려면 최소 1.3~1.5배
-		includeFontPadding: false, // ✅ 안드로이드 폰트 패딩 이슈 완화
-	},
-	updateButton: {
-		backgroundColor: '#3498db',
-		paddingVertical: scaleHeight(10), // ✅ 버튼 높이도 살짝 낮춤
-		paddingHorizontal: scaleWidth(30),
-		borderRadius: moderateScale(8),
-	},
-	buttonText: {
-		color: 'white',
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
+	iconWrap: {
+		width: scaleWidth(92),
+		height: scaleWidth(92),
+		borderRadius: scaleWidth(46),
+		backgroundColor: '#EFF6FF',
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginBottom: scaleHeight(14),
 	},
 	image: {
-		width: scaleWidth(100),
-		height: scaleWidth(100),
-		marginBottom: scaleHeight(15),
+		width: scaleWidth(58),
+		height: scaleWidth(58),
 		resizeMode: 'contain',
+	},
+	badge: {
+		fontSize: scaledSize(11.5),
+		fontWeight: '800',
+		color: '#2563EB',
+		backgroundColor: '#DBEAFE',
+		borderRadius: scaleWidth(20),
+		paddingHorizontal: scaleWidth(12),
+		paddingVertical: scaleHeight(5),
+		overflow: 'hidden',
+		marginBottom: scaleHeight(10),
+	},
+	title: {
+		fontSize: scaledSize(19),
+		fontWeight: '800',
+		color: '#1E293B',
+		marginBottom: scaleHeight(8),
+		textAlign: 'center',
+	},
+	message: {
+		fontSize: scaledSize(14),
+		textAlign: 'center',
+		color: '#64748B',
+		marginBottom: scaleHeight(20),
+		lineHeight: Math.round(scaledSize(14) * 1.5),
+		includeFontPadding: false,
+	},
+	updateButton: {
+		backgroundColor: '#3B82F6',
+		paddingVertical: scaleHeight(14),
+		borderRadius: scaleWidth(14),
+		width: '100%',
+		alignItems: 'center',
+	},
+	buttonText: {
+		color: '#ffffff',
+		fontSize: scaledSize(15),
+		fontWeight: '800',
+	},
+	subtle: {
+		fontSize: scaledSize(11.5),
+		color: '#94A3B8',
+		textAlign: 'center',
+		marginTop: scaleHeight(12),
+		lineHeight: Math.round(scaledSize(11.5) * 1.5),
 	},
 });
 

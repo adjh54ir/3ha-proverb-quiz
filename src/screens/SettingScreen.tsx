@@ -21,15 +21,17 @@ import DeveloperAppsModal from './modal/DeveloperAppsModal';
 import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModal';
 import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import CurrentVersionModal from './modal/CurrentVersionModal';
-import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL } from '@env';
+import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL, APP_NAME as ENV_APP_NAME, APP_DESCRIPTION as ENV_APP_DESCRIPTION } from '@env';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import FadeInView from '@/components/animation/FadeInView';
 
 // ─────────────────────────────────────────────
 // 상수
 // ─────────────────────────────────────────────
-const APP_NAME = '속픽: 속담 퀴즈';
+// .env 의 앱 정보를 우선 사용하고, 누락 시 기본값으로 폴백
+const APP_NAME = ENV_APP_NAME || '속픽: 속담 퀴즈';
 const DESCRIPTION =
+	ENV_APP_DESCRIPTION ||
 	'속픽: 속담 퀴즈는 대한민국 속담을 쉽고 재미있게 학습하고, 다양한 퀴즈를 통해 기억을 점검하며, 틀린 문제는 반복 학습으로 완전히 익힐 수 있도록 돕는 속담 학습 앱입니다.';
 const IS_DEV = __DEV__ === true;
 
@@ -284,11 +286,12 @@ const SettingScreen = () => {
 			}
 
 			const message = [
-				`📱 ${APP_NAME}`,
+				'요즘 제가 재미있게 쓰고 있는 앱이 있어서 추천드려요! 😊',
 				'',
+				`📱 ${APP_NAME}`,
 				DESCRIPTION,
 				'',
-				'🔗 다운로드 링크',
+				'👇 아래 링크에서 받아보세요',
 				`• Android: ${androidUrl || '출시 예정입니다..'}`,
 				'',
 				`• iOS: ${iosUrl || '출시 예정입니다..'}`,
@@ -467,13 +470,9 @@ const SettingScreen = () => {
 					<TouchableOpacity style={styles.accordionGroup} onPress={() => ITEM_HANDLERS.resetAll?.()} activeOpacity={0.7}>
 						<View style={styles.accordionHeader}>
 							<View style={styles.row}>
-								<IconComponent
-									type="materialIcons"
-									name="delete"
-									size={scaledSize(20)}
-									color="#B91C1C"
-									style={{ marginRight: scaleWidth(8) }}
-								/>
+								<View style={[styles.accordionIconChip, { backgroundColor: '#FEE2E2' }]}>
+									<IconComponent type="materialIcons" name="delete" size={scaledSize(16)} color="#B91C1C" />
+								</View>
 								<Text style={[styles.accordionHeaderText, { color: '#B91C1C' }]}>전체 데이터 초기화</Text>
 							</View>
 							<IconComponent type="MaterialCommunityIcons" name="chevron-right" size={scaledSize(20)} color="#B91C1C" />

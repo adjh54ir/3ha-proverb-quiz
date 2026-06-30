@@ -79,4 +79,8 @@ declare module '@env' {
 	// 출시 URL
 	export const GOOGLE_PLAY_STORE_URL: string;
 	export const APP_STORE_URL: string;
+
+	// 앱 정보 (공유/추천 메시지에 사용)
+	export const APP_NAME: string;
+	export const APP_DESCRIPTION: string;
 }

@@ -5,6 +5,7 @@ import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { LEVEL_DATA } from '@/const/ConstInfoData';
 import PopInView from '@/components/animation/PopInView';
+import IconComponent from '../common/atomic/IconComponent';
 
 interface LevelModalProps {
 	visible: boolean;
@@ -66,13 +67,17 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 										cardHeightsRef.current[index] = height;
 									}}>
 									{isCurrent && (
-										<View style={styles.levelBadge}>
-											<Text style={styles.levelBadgeText}>🏆 현재 등급</Text>
+										<View style={[styles.levelBadge, { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(4) }]}>
+											<IconComponent type="fontAwesome6" name="trophy" size={scaledSize(11)} color="#fff" />
+											<Text style={styles.levelBadgeText}>현재 등급</Text>
 										</View>
 									)}
 									<FastImage source={item.mascot} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
-									<Text style={styles.levelLabel}>{item.label}</Text>
-									<Text style={styles.levelScore}>{item.score}점 이상</Text>
+									<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) }}>
+										<IconComponent name={item.icon} type="fontAwesome6" size={scaledSize(16)} color="#22C55E" />
+										<Text style={[styles.levelLabel, { marginLeft: scaleWidth(6) }]}>{item.label}</Text>
+									</View>
+									<Text style={styles.levelScore}>{item.score === 0 ? '기본 등급' : `${item.score.toLocaleString()}점 이상`}</Text>
 									{isCurrent && <Text style={styles.levelEncourage}>{item.encouragement}</Text>}
 									<Text style={styles.levelDetailDescription}>{item.description}</Text>
 								</View>

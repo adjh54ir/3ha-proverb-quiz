@@ -8,10 +8,12 @@ import ModalCloseButton from '../common/atomic/ModalCloseButton';
 interface QuizHintModalProps {
 	visible: boolean;
 	question: MainDataType.Proverb | null;
+	mode?: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank';
+	questionText?: string;
 	onClose: () => void;
 }
 
-const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, onClose }) => {
+const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, questionText, onClose }) => {
 	const scaleAnim = useRef(new Animated.Value(0)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -41,6 +43,15 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, onClos
 		};
 	}, [visible]);
 
+	// 현재 화면에 출제된 문제 프롬프트를 그대로 보여줘 추론을 돕는다.
+	const questionPrompt = !question
+		? ''
+		: mode === 'meaning'
+			? question.proverb
+			: mode === 'proverb'
+				? question.longMeaning || question.meaning
+				: questionText || question.proverb;
+
 	const similar = (question?.sameProverb ?? []).filter((p) => p.trim());
 	const examples = Array.isArray(question?.example) ? question!.example.filter((e) => e.trim()) : [];
 	const hasAnyHint = similar.length > 0 || examples.length > 0 || !!question?.usageTip;
@@ -63,6 +74,19 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, onClos
 
 					{/* 컨텐츠 */}
 					<ScrollView style={styles.scrollView} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+						{/* 문제 (추론용) */}
+						{!!questionPrompt && (
+							<View style={styles.section}>
+								<View style={styles.sectionLabelRow}>
+									<IconComponent type="materialIcons" name="quiz" size={scaledSize(14)} color="#D97706" />
+									<Text style={styles.sectionLabel}>문제</Text>
+								</View>
+								<View style={styles.questionBox}>
+									<Text style={styles.questionText}>{questionPrompt}</Text>
+								</View>
+							</View>
+						)}
+
 						{/* 동의속담 */}
 						{similar.length > 0 && (
 							<View style={styles.section}>
@@ -245,6 +269,20 @@ const styles = StyleSheet.create({
 		borderWidth: 0.5,
 		borderColor: 'rgba(0,0,0,0.08)',
 		gap: scaleHeight(6),
+	},
+	questionBox: {
+		backgroundColor: '#FFFBEB',
+		borderRadius: scaleWidth(10),
+		paddingHorizontal: scaleWidth(16),
+		paddingVertical: scaleHeight(14),
+		borderWidth: 1,
+		borderColor: '#FDE68A',
+	},
+	questionText: {
+		fontSize: scaledSize(15),
+		fontWeight: '700',
+		color: '#1E293B',
+		lineHeight: scaleHeight(23),
 	},
 	exampleText: {
 		fontSize: scaledSize(14),

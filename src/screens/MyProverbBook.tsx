@@ -247,7 +247,7 @@ const MyProverbBook = () => {
 				<TouchableOpacity style={styles.fab} onPress={() => setFormTarget(null)}>
 					<IconComponent type="materialIcons" name="add" size={scaledSize(28)} color="#fff" />
 				</TouchableOpacity>
-				<BottomHomeButton backgroundColor="#F1F5F9" />
+				<BottomHomeButton backgroundColor="#F1F5F9" skipConfirm />
 			</SafeAreaView>
 
 			{/* 생성/편집 모달 */}

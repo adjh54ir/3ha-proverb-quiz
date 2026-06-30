@@ -121,7 +121,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 						<InfoRow icon="format-quote" label="뱃지 설명" value={badge.description} tint={meta.color} />
 						<InfoRow icon="flag" label="획득 조건" value={badge.condition} tint={meta.color} />
 
-						<View style={styles.infoRow}>
+						<View style={[styles.infoRow, styles.sectionCard]}>
 							<View style={[styles.infoIcon, { backgroundColor: meta.soft }]}>
 								<IconComponent type="materialIcons" name="auto-awesome" size={scaledSize(15)} color={meta.color} />
 							</View>
@@ -181,7 +181,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 };
 
 const InfoRow = ({ icon, label, value, tint }: { icon: string; label: string; value: string; tint: string }) => (
-	<View style={styles.infoRow}>
+	<View style={[styles.infoRow, styles.sectionCard]}>
 		<View style={[styles.infoIcon, { backgroundColor: `${tint}1A` }]}>
 			<IconComponent type="materialIcons" name={icon} size={scaledSize(15)} color={tint} />
 		</View>
@@ -298,8 +298,16 @@ const styles = StyleSheet.create({
 	},
 	typeChipText: { color: Colors.textInverse, fontSize: scaledSize(11), fontWeight: '700' },
 
-	body: { padding: scaleWidth(16), gap: scaleHeight(9) },
+	body: { padding: scaleWidth(16), gap: scaleHeight(10) },
 	infoRow: { flexDirection: 'row', alignItems: 'flex-start', gap: scaleWidth(11) },
+	// ✅ 설명 / 획득조건 / 희귀도 각 영역을 border로 구분
+	sectionCard: {
+		borderWidth: 1,
+		borderColor: Colors.border,
+		borderRadius: scaleWidth(12),
+		padding: scaleWidth(12),
+		backgroundColor: Colors.surface,
+	},
 	infoIcon: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),

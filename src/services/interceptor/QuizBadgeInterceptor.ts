@@ -64,7 +64,8 @@ export const QuizBadgeInterceptor = (history: MainDataType.UserQuizHistory, allP
 		if (!history.badges.includes(id) && (history.bestCombo ?? 0) >= n) newBadges.push(id);
 	});
 
-	const scoreThresholds = [1000, 2000, 3000, 5000, 7000, 7900];
+	// 캐릭터 획득 milestone과 동일: 100/200/500/1,000/2,000문제
+	const scoreThresholds = [1000, 2000, 5000, 10000, 20000];
 	scoreThresholds.forEach((score) => {
 		const id = `score_${score}`;
 		if (!history.badges.includes(id) && (history.totalScore ?? 0) >= score) newBadges.push(id);

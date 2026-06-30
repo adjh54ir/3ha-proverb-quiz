@@ -215,7 +215,7 @@ const MyProverbBookDetail = () => {
 						</TouchableOpacity>
 					</View>
 				)}
-				{!removeMode && <BottomHomeButton backgroundColor="#F1F5F9" />}
+				{!removeMode && <BottomHomeButton backgroundColor="#F1F5F9" skipConfirm />}
 			</SafeAreaView>
 
 			<AddProverbModal visible={addModalVisible} book={book} onClose={() => setAddModalVisible(false)} onAdd={handleAddProverbs} />

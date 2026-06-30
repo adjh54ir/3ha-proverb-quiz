@@ -521,7 +521,7 @@ const FavoriteScreen = () => {
 			</Modal>
 
 			<FavoriteToast visible={showToast} message={toastMessage} onHide={() => setShowToast(false)} />
-			{!isSelectionMode && <BottomHomeButton />}
+			{!isSelectionMode && <BottomHomeButton skipConfirm />}
 		</SafeAreaView>
 	);
 };

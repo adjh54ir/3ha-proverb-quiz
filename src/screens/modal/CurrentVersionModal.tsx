@@ -56,7 +56,7 @@ const CurrentVersionModal = ({ visible, currentVersion, latestVersion, onClose, 
                     {/* 버튼 */}
                     <View style={styles.buttonRow}>
                         <TouchableOpacity style={[styles.button, styles.closeBtn]} onPress={onClose}>
-                            <Text style={styles.buttonText}>닫기</Text>
+                            <Text style={[styles.buttonText, { color: '#475569' }]}>닫기</Text>
                         </TouchableOpacity>
 
                         {!isLatest && (
@@ -76,15 +76,17 @@ export default CurrentVersionModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.4)',
+        backgroundColor: 'rgba(15,23,42,0.55)',
         justifyContent: 'center',
         alignItems: 'center',
+        padding: scaleWidth(24),
     },
     container: {
-        width: '80%',
+        width: '100%',
+        maxWidth: scaleWidth(340),
         backgroundColor: '#ffffff',
-        borderRadius: scaleWidth(12),
-        padding: scaleWidth(20),
+        borderRadius: scaleWidth(20),
+        padding: scaleWidth(22),
         alignItems: 'center',
     },
     iconWrapper: {
@@ -141,10 +143,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     closeBtn: {
-        backgroundColor: '#95a5a6',
+        backgroundColor: '#E2E8F0',
     },
     updateBtn: {
-        backgroundColor: '#3498db',
+        backgroundColor: '#3B82F6',
     },
     buttonText: {
         color: '#ffffff',

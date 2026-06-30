@@ -32,7 +32,7 @@ export const LEVELS: QuizLevel[] = [
 		label: '초급 문제',
 		icon: 'seedling',
 		type: 'FontAwesome6',
-		color: '#58D68D',
+		color: '#34D399', // 초급 - 밝은 민트
 		desc: '',
 	},
 	{
@@ -40,7 +40,7 @@ export const LEVELS: QuizLevel[] = [
 		label: '중급 문제',
 		icon: 'leaf',
 		type: 'FontAwesome6',
-		color: '#F5B041',
+		color: '#F59E0B', // 중급 - 앰버
 		desc: '',
 	},
 	{
@@ -48,7 +48,7 @@ export const LEVELS: QuizLevel[] = [
 		label: '고급 문제',
 		icon: 'tree',
 		type: 'FontAwesome6',
-		color: '#E67E22',
+		color: '#EA580C', // 고급 - 진한 주황
 		desc: '',
 	},
 	{
@@ -56,7 +56,7 @@ export const LEVELS: QuizLevel[] = [
 		label: '특급 문제',
 		icon: 'trophy',
 		type: 'FontAwesome6',
-		color: '#16a085',
+		color: '#B91C1C', // 특급 - 가장 어두운 빨강(난이도 강조)
 		desc: '',
 	},
 	{
@@ -112,22 +112,22 @@ export const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '초급',
 		value: '초급',
-		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={16} color="#2ecc71" />,
+		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={16} color="#34D399" />,
 	},
 	{
 		label: '중급',
 		value: '중급',
-		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={16} color="#F4D03F" />,
+		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={16} color="#F59E0B" />,
 	},
 	{
 		label: '고급',
 		value: '고급',
-		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#EB984E" />,
+		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#EA580C" />,
 	},
 	{
 		label: '특급',
 		value: '특급',
-		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={16} color="#E74C3C" />,
+		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={16} color="#B91C1C" />,
 	},
 ];
 export const FIELD_DROPDOWN_ITEMS = [

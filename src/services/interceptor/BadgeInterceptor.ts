@@ -28,13 +28,13 @@ export const BadgeInterceptor = (history: MainDataType.UserQuizHistory, allProve
 
 	// 2. 점수 기반 마스터
 	const score = history.totalScore ?? 0;
+	// 캐릭터 획득 milestone과 동일: 100/200/500/1,000/2,000문제 = 1,000/2,000/5,000/10,000/20,000점
 	const scoreBadges = [
 		{ id: 'score_1000', threshold: 1000 },
 		{ id: 'score_2000', threshold: 2000 },
-		{ id: 'score_3000', threshold: 3000 },
 		{ id: 'score_5000', threshold: 5000 },
-		{ id: 'score_7000', threshold: 7000 },
-		{ id: 'score_7900', threshold: 7900 },
+		{ id: 'score_10000', threshold: 10000 },
+		{ id: 'score_20000', threshold: 20000 },
 	];
 	scoreBadges.forEach(({ id, threshold }) => {
 		isEligible(id, score >= threshold);

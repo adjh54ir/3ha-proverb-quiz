@@ -111,7 +111,7 @@ class ProverbServices {
 		try {
 			const levels = filterData.map((item) => item.levelName).filter(Boolean);
 			const uniqueLevels = Array.from(new Set(levels));
-			const LEVEL_ORDER = ['아주 쉬움', '쉬움', '보통', '어려움'];
+			const LEVEL_ORDER = ['초급', '중급', '고급', '특급'];
 
 			// 정해진 순서대로 정렬, 없으면 기본 순서 유지
 			const sorted = uniqueLevels.sort((a, b) => {

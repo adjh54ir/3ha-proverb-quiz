@@ -29,6 +29,7 @@ const AppLayout = () => {
 	const { height: screenHeight } = Dimensions.get('window');
 
 	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute as Paths), [currentRoute]);
+	// const shouldShowAd = false
 
 	// ✅ 라우트별 배경색 지정
 	const backgroundColor = useMemo(() => {

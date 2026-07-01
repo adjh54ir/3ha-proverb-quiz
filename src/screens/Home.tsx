@@ -72,8 +72,12 @@ const Home = () => {
 	const [selectedBadge, setSelectedBadge] = useState<(typeof CONST_BADGES)[number] | null>(null);
 	const [unlockedRewards, setUnlockedRewards] = useState<number[]>([]);
 
+	// 획득 뱃지 (CONST_BADGES 기준으로 유효한 것만 — 중복/유령 id 방지)
 	const earnedBadges = CONST_BADGES.filter((b) => earnedBadgeIds.includes(b.id));
-	const visibleBadges = earnedBadges; // 제한 없이 모두 보여줌
+	// 홈 상단에는 미리보기만 노출하고, 초과분은 +N 칩으로 안내 → 전체는 뱃지 모달에서 확인
+	const BADGE_PREVIEW_LIMIT = 12;
+	const previewBadges = earnedBadges.slice(0, BADGE_PREVIEW_LIMIT);
+	const extraBadgeCount = Math.max(earnedBadges.length - previewBadges.length, 0);
 	const [showLevelModal, setShowLevelModal] = useState(false);
 
 	// 오늘의 퀴즈
@@ -822,8 +826,8 @@ const Home = () => {
 									<ScrollView
 										horizontal
 										showsHorizontalScrollIndicator={false}
-										contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingHorizontal: scaleWidth(10), paddingVertical: scaleHeight(6), alignItems: 'center' }}>
-										{visibleBadges.map((item, idx) => {
+										contentContainerStyle={styles.badgeScrollContent}>
+										{previewBadges.map((item, idx) => {
 											const rarity = BADGE_RARITY_META[item.rarity] ?? BADGE_RARITY_META.common;
 											// 인덱스에 따라 위상을 살짝 어긋나게 하여 물결치듯 펄스
 											const phase = (idx % 3) / 3;
@@ -838,23 +842,33 @@ const Home = () => {
 												extrapolate: 'clamp',
 											});
 											return (
-												<View key={item.id} style={styles.badgeViewInner}>
-													<TouchableOpacity activeOpacity={0.8} onPress={() => setSelectedBadge(item)}>
-														<Animated.View
-															style={[
-																styles.iconBoxActive,
-																{
-																	backgroundColor: rarity.soft,
-																	borderColor: rarity.color,
-																	transform: [{ scale: pulseScale }, { translateY: pulseLift }],
-																},
-															]}>
-															<IconComponent name={item.icon} type={item.iconType} size={scaledSize(17)} color={rarity.color} />
-														</Animated.View>
-													</TouchableOpacity>
-												</View>
+												<TouchableOpacity
+													key={item.id}
+													activeOpacity={0.8}
+													onPress={() => setSelectedBadge(item)}
+													style={styles.badgeChipTouch}>
+													<Animated.View
+														style={[
+															styles.iconBoxActive,
+															{
+																backgroundColor: rarity.soft,
+																borderColor: rarity.color,
+																transform: [{ scale: pulseScale }, { translateY: pulseLift }],
+															},
+														]}>
+														<IconComponent name={item.icon} type={item.iconType} size={scaledSize(17)} color={rarity.color} />
+													</Animated.View>
+												</TouchableOpacity>
 											);
 										})}
+										{extraBadgeCount > 0 && (
+											<TouchableOpacity
+												activeOpacity={0.85}
+												onPress={() => setShowBadgeModal(true)}
+												style={[styles.iconBoxActive, styles.badgeMoreChip]}>
+												<Text style={styles.badgeMoreText}>+{extraBadgeCount}</Text>
+											</TouchableOpacity>
+										)}
 									</ScrollView>
 								</View>
 							)}
@@ -976,7 +990,10 @@ const Home = () => {
 					setShowDailyMission(false);
 					refreshMissionSummary();
 				}}
-				onClaimed={() => {
+				onClaimed={(bonus) => {
+					// ✅ 보너스 즉시 반영 (캐릭터/점수/게이지 바로 갱신)
+					setTotalScore((prev) => prev + (bonus ?? 0));
+					// 스토리지 기준으로 한 번 더 정합성 맞춤
 					loadData();
 					refreshMissionSummary();
 				}}
@@ -1059,15 +1076,28 @@ const styles = StyleSheet.create({
 		marginTop: scaleHeight(8),
 	},
 	iconBoxActive: {
-		width: scaleWidth(36),
-		height: scaleWidth(36),
-		marginHorizontal: scaleWidth(2),
-		borderRadius: scaleWidth(16),
+		width: scaleWidth(38),
+		height: scaleWidth(38),
+		borderRadius: scaleWidth(19),
 		backgroundColor: '#d0f0dc',
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderWidth: 1,
 		borderColor: '#27ae60',
+	},
+	badgeChipTouch: {
+		// 터치 영역을 아이콘 칩 크기로 한정 (빈 공간 오터치 방지)
+		width: scaleWidth(38),
+		height: scaleWidth(38),
+	},
+	badgeMoreChip: {
+		backgroundColor: '#F1F5F9',
+		borderColor: '#CBD5E1',
+	},
+	badgeMoreText: {
+		fontSize: scaledSize(12),
+		fontWeight: '800',
+		color: '#64748B',
 	},
 	toggleBadgeText: {
 		color: '#27ae60',
@@ -1465,9 +1495,14 @@ const styles = StyleSheet.create({
 		marginLeft: scaleWidth(6),
 	},
 	badgeView: { width: '100%', marginTop: scaleHeight(6), minHeight: scaleHeight(60), paddingVertical: scaleHeight(2), justifyContent: 'center', overflow: 'visible' },
-	badgeViewInner: {
-		marginRight: scaleWidth(12),
+	// 일정한 간격(gap)으로 균일 배치 + 적을 때는 가운데 정렬
+	badgeScrollContent: {
+		flexGrow: 1,
+		justifyContent: 'center',
 		alignItems: 'center',
+		gap: scaleWidth(10),
+		paddingHorizontal: scaleWidth(12),
+		paddingVertical: scaleHeight(6),
 	},
 	badgeScrollView: {
 		maxHeight: scaleHeight(400),

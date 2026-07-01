@@ -36,8 +36,8 @@ type QuizRouteParams = {
 	questionPool?: MainDataType.Proverb[];
 	isWrongReview?: boolean;
 	title?: string;
-	selectedLevel: string;
-	levelKey: string;
+	selectedLevel?: number | 'all';
+	levelKey?: string;
 	selectedCategory?: string;
 };
 
@@ -106,6 +106,22 @@ const QuizScreen = () => {
 
 	const [reviewIndex, setReviewIndex] = useState(0);
 
+	const normalizeRouteLevel = (level?: number | 'all'): string => {
+		switch (level) {
+			case 1:
+				return '초급';
+			case 2:
+				return '중급';
+			case 3:
+				return '고급';
+			case 4:
+				return '특급';
+			case 'all':
+			default:
+				return '전체';
+		}
+	};
+
 	const praiseMessages = [
 		'정답이에요! 정말 똑똑하네요! 🎉\n이번 퀴즈를 정확히 짚어냈어요!',
 		'대단해요! 완벽한 정답이에요! 🏆\n계속 이렇게만 간다면 금방 속담 마스터가 되겠어요!',
@@ -117,7 +133,11 @@ const QuizScreen = () => {
 	];
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
-	// ✅ 기존 selectedLevel/selectedCategory 의존 useEffect 삭제하고, 아래로 교체
+	useEffect(() => {
+		setSelectedLevel(normalizeRouteLevel(routeLevel));
+		setSelectedCategory(routeCategory ?? '전체');
+	}, [routeLevel, routeCategory]);
+
 	useEffect(() => {
 		if (!quizHistory) return;
 		if (showStartModal) return; // ✅ 시작 모달이 열려있으면 문제 로드 금지
@@ -126,7 +146,7 @@ const QuizScreen = () => {
 
 		if (questionPool && questionPool.length > 0) {
 			setProverbs(questionPool);
-			loadQuestion();
+			loadQuestion(questionPool);
 		} else {
 			const all = ProverbServices.selectProverbList();
 			const filtered = all.filter((p) => {
@@ -135,9 +155,9 @@ const QuizScreen = () => {
 				return levelMatch && categoryMatch;
 			});
 			setProverbs(filtered);
-			if (filtered.length > 0) loadQuestion();
+			if (filtered.length > 0) loadQuestion(filtered);
 		}
-	}, [quizHistory, selectedLevel]); // ✅ showStartModal 의존성 추가
+	}, [quizHistory, showStartModal, isAnswerLocked, questionPool, selectedLevel, selectedCategory]); // ✅ showStartModal 의존성 추가
 
 	useEffect(() => {
 		(async () => {
@@ -179,23 +199,6 @@ const QuizScreen = () => {
 	useEffect(() => {
 		if (quizHistory) setTotalScore(quizHistory.totalScore ?? 0);
 	}, [quizHistory]);
-
-	// 3️⃣ 퀴즈 데이터 로드 useEffect 수정
-	useEffect(() => {
-		if (questionPool && questionPool.length > 0) {
-			setProverbs(questionPool); // 오답 복습용
-			loadQuestion();
-		} else {
-			const all = ProverbServices.selectProverbList();
-			const filtered = all.filter((p) => {
-				const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-				const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-				return levelMatch && categoryMatch;
-			});
-			setProverbs(filtered);
-			if (filtered.length > 0) loadQuestion();
-		}
-	}, [selectedLevel, selectedCategory]);
 
 	useEffect(() => {
 		if (showExitModal && timerRef.current) {
@@ -286,7 +289,7 @@ const QuizScreen = () => {
 				showCompletion();
 				return;
 			}
-			setupQuestion(questionPool[reviewIndex]);
+			setupQuestion(questionPool[reviewIndex], questionPool);
 			return;
 		}
 
@@ -305,13 +308,13 @@ const QuizScreen = () => {
 			return;
 		}
 
-		setupQuestion(unSolved[Math.floor(Math.random() * unSolved.length)]);
+		setupQuestion(unSolved[Math.floor(Math.random() * unSolved.length)], source);
 	};
 	/**
 	 * 문제 2: 문제 세팅 로직을 별도로 분리하여 재사용 가능하게
 	 */
-	const setupQuestion = (newQuestion: MainDataType.Proverb) => {
-		const distractors = filteredProverbs.filter((p) => p.id !== newQuestion.id);
+	const setupQuestion = (newQuestion: MainDataType.Proverb, pool: MainDataType.Proverb[] = filteredProverbs) => {
+		const distractors = pool.filter((p) => p.id !== newQuestion.id);
 		const shuffledDistractors = [...distractors].sort(() => Math.random() - 0.5).slice(0, 3);
 
 		let allOptions: string[] = [];

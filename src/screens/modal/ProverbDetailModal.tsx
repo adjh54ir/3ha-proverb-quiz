@@ -151,7 +151,7 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 									]}>
 									{getLevelIcon(proverb.level)}
 									<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>
-										{{ 1: '아주 쉬움', 2: '쉬움', 3: '보통', 4: '어려움' }[proverb.level] || '알 수 없음'}
+										{{ 1: '초급', 2: '중급', 3: '고급', 4: '특급' }[proverb.level] || '알 수 없음'}
 									</Text>
 								</View>
 								<View

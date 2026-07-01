@@ -14,12 +14,12 @@ import Colors from '@/const/ConstColors';
 interface DailyMissionModalProps {
 	visible: boolean;
 	onClose: () => void;
-	/** 보상 수령(점수 변동) 후 부모 갱신용 콜백 */
-	onClaimed?: () => void;
+	/** 보상 수령(점수 변동) 후 부모 갱신용 콜백. 지급된 보너스 점수를 전달한다. */
+	onClaimed?: (bonus: number) => void;
 }
 
 /** 미션 전체 완료 보너스 점수 */
-const MISSION_BONUS = 30;
+const MISSION_BONUS = 100;
 
 const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose, onClaimed }) => {
 	const [missions, setMissions] = useState<DailyMission[]>([]);
@@ -89,7 +89,8 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 			);
 
 			setClaimedToday(true);
-			onClaimed?.();
+			// ✅ 지급 보너스를 부모로 전달해 즉시 점수 반영 (스토리지 재조회 지연 방지)
+			onClaimed?.(MISSION_BONUS);
 		} catch {
 			// 무시
 		}

@@ -24,6 +24,8 @@ import CurrentVersionModal from './modal/CurrentVersionModal';
 import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL, APP_NAME as ENV_APP_NAME, APP_DESCRIPTION as ENV_APP_DESCRIPTION } from '@env';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import FadeInView from '@/components/animation/FadeInView';
+import { COLORS, FONT_SIZES } from '@/const/common/Theme';
+import { SCORE_PER_QUESTION } from '@/const/common/CommonCharacterData';
 
 // ─────────────────────────────────────────────
 // 상수
@@ -73,8 +75,8 @@ const ACCORDION_CONFIG = {
 	study: {
 		label: '학습 데이터 초기화',
 		icon: 'book-open-variant',
-		iconColor: '#22C55E',
-		iconBg: '#DCFCE7',
+		iconColor: COLORS.primary,
+		iconBg: COLORS.primarySoft,
 		items: [
 			{ key: 'resetStudy', label: '학습 기록 초기화' },
 			{ key: 'resetQuiz', label: '퀴즈 기록 초기화' },
@@ -84,8 +86,8 @@ const ACCORDION_CONFIG = {
 	challenge: {
 		label: '챌린지 데이터 초기화',
 		icon: 'trophy-outline',
-		iconColor: '#F59E0B',
-		iconBg: '#FEF3C7',
+		iconColor: COLORS.warning,
+		iconBg: COLORS.warningBg,
 		items: [
 			{ key: 'resetTimeChallenge', label: '타임챌린지 기록 초기화' },
 			{ key: 'resetTowerChallenge', label: '타워챌린지 기록 초기화' },
@@ -119,15 +121,29 @@ const SETTINGS_MAP: Record<string, { label: string; icon: { type: IconType; name
 const BASE_SECTIONS = [
 	{
 		titleText: '사용자 정보 초기화',
-		titleColor: '#EF4444' as string | undefined,
+		titleColor: COLORS.danger as string | undefined,
+		iconType: 'materialIcons',
+		icon: 'restart-alt',
+		iconColor: COLORS.danger,
+		iconBg: COLORS.dangerBg,
 		data: ['__accordion__'],
 	},
 	{
 		titleText: '문의 및 피드백',
+		titleColor: COLORS.secondaryDark as string | undefined,
+		iconType: 'materialIcons',
+		icon: 'forum',
+		iconColor: COLORS.secondaryDark,
+		iconBg: COLORS.secondarySoft,
 		data: ['rate', 'inquiry', 'developerInfo', 'developerApps'],
 	},
 	{
 		titleText: '정책 및 라이선스',
+		titleColor: '#059669' as string | undefined,
+		iconType: 'materialIcons',
+		icon: 'gavel',
+		iconColor: '#059669',
+		iconBg: '#D1FAE5',
 		data: ['privacyPolicy', 'openSource', 'checkVersion', ...(IS_DEV ? ['completeAllQuiz', 'completeAllStudy', 'completeAllTower'] : [])],
 	},
 ];
@@ -306,29 +322,41 @@ const SettingScreen = () => {
 	// ── 개발 더미 액션 ────────────────────────────
 	const handleCompleteAllQuiz = async () => {
 		const allProverbs = ProverbServices.selectProverbList();
+		// 전체 속담 수 기준 만점으로 산정 (데이터 증가 자동 반영)
+		const fullScore = allProverbs.length * SCORE_PER_QUESTION;
+		// 문제별 풀이 횟수도 1회씩 채워 누적 통계와 정합성 유지
+		const quizCounts = allProverbs.reduce<{ [id: number]: number }>((acc, p) => {
+			acc[p.id] = 1;
+			return acc;
+		}, {});
 		const parsed: MainDataType.UserQuizHistory = {
 			badges: CONST_BADGES.filter((b) => b.type === 'quiz').map((b) => b.id),
 			correctProverbId: allProverbs.map((p) => p.id),
 			wrongProverbId: [],
-			totalScore: 7900,
+			totalScore: fullScore,
 			bestCombo: 20,
 			lastAnsweredAt: new Date(),
-			quizCounts: {},
+			quizCounts,
 		};
 		await AsyncStorage.setItem(STORAGE_KEYS.quiz, JSON.stringify(parsed));
-		Alert.alert('처리됨', '모든 퀴즈 완료 + 뱃지 지급!');
+		Alert.alert('처리됨', `모든 퀴즈 완료 + 뱃지 지급! (${allProverbs.length.toLocaleString()}문제 / ${fullScore.toLocaleString()}점)`);
 	};
 
 	const handleCompleteAllStudy = async () => {
 		const allProverbs = ProverbServices.selectProverbList();
+		// 속담별 학습 횟수도 1회씩 채워 정합성 유지
+		const studyCounts = allProverbs.reduce<{ [id: string]: number }>((acc, p) => {
+			acc[String(p.id)] = 1;
+			return acc;
+		}, {});
 		const parsed: MainDataType.UserStudyHistory = {
 			badges: CONST_BADGES.filter((b) => b.type === 'study').map((b) => b.id),
 			studyProverbes: allProverbs.map((p) => p.id),
 			lastStudyAt: new Date(),
-			studyCounts: {},
+			studyCounts,
 		};
 		await AsyncStorage.setItem(STORAGE_KEYS.study, JSON.stringify(parsed));
-		Alert.alert('처리됨', '모든 학습 완료 + 뱃지 지급!');
+		Alert.alert('처리됨', `모든 학습 완료 + 뱃지 지급! (${allProverbs.length.toLocaleString()}개)`);
 	};
 
 	const handleCompleteAllTower = async () => {
@@ -397,7 +425,12 @@ const SettingScreen = () => {
 	const sections = useMemo(
 		() =>
 			BASE_SECTIONS.map((s) => ({
-				title: <Text style={[styles.sectionHeaderText, s.titleColor ? { color: s.titleColor } : undefined]}>{s.titleText}</Text>,
+				titleText: s.titleText,
+				titleColor: s.titleColor,
+				iconType: s.iconType,
+				icon: s.icon,
+				iconColor: s.iconColor,
+				iconBg: s.iconBg,
 				data: s.data,
 			})),
 		[],
@@ -440,7 +473,7 @@ const SettingScreen = () => {
 										type="MaterialCommunityIcons"
 										name={isOpen ? 'chevron-up' : 'chevron-down'}
 										size={scaledSize(20)}
-										color="#64748B"
+										color={COLORS.textSecondary}
 									/>
 								</TouchableOpacity>
 
@@ -455,7 +488,7 @@ const SettingScreen = () => {
 													type="MaterialCommunityIcons"
 													name="refresh"
 													size={scaledSize(16)}
-													color="#EF4444"
+													color={COLORS.danger}
 													style={{ marginRight: scaleWidth(10) }}
 												/>
 												<Text style={styles.accordionSubText}>{subItem.label}</Text>
@@ -470,7 +503,7 @@ const SettingScreen = () => {
 					<TouchableOpacity style={styles.accordionGroup} onPress={() => ITEM_HANDLERS.resetAll?.()} activeOpacity={0.7}>
 						<View style={styles.accordionHeader}>
 							<View style={styles.row}>
-								<View style={[styles.accordionIconChip, { backgroundColor: '#FEE2E2' }]}>
+								<View style={[styles.accordionIconChip, { backgroundColor: COLORS.dangerBg }]}>
 									<IconComponent type="materialIcons" name="delete" size={scaledSize(16)} color="#B91C1C" />
 								</View>
 								<Text style={[styles.accordionHeaderText, { color: '#B91C1C' }]}>전체 데이터 초기화</Text>
@@ -496,7 +529,7 @@ const SettingScreen = () => {
 								type={config.icon.type}
 								name={config.icon.name}
 								size={scaledSize(18)}
-								color={config.isDanger ? '#EF4444' : '#3B82F6'}
+								color={config.isDanger ? COLORS.danger : COLORS.secondary}
 							/>
 						</View>
 						<Text style={styles.cardText}>{config.label}</Text>
@@ -513,7 +546,7 @@ const SettingScreen = () => {
 		}
 		return (
 			<View style={styles.modalTitleRow}>
-				<IconComponent type="MaterialCommunityIcons" name={resetConfig.iconName} size={scaledSize(20)} color="#334155" style={styles.iconLeft} />
+				<IconComponent type="MaterialCommunityIcons" name={resetConfig.iconName} size={scaledSize(20)} color={COLORS.text} style={styles.iconLeft} />
 				<Text style={styles.modalTitleText}>{resetConfig.title}</Text>
 			</View>
 		);
@@ -535,9 +568,12 @@ const SettingScreen = () => {
 						ItemSeparatorComponent={() => <View style={styles.itemSpacing} />}
 						renderSectionFooter={() => <View style={styles.sectionSpacing} />}
 						renderSectionHeader={({ section }) =>
-							section.title ? (
-								<View style={styles.sectionHeader}>
-									<Text style={styles.sectionHeaderText}>{section.title}</Text>
+							section.titleText ? (
+								<View style={[styles.sectionHeader, section.iconBg ? { backgroundColor: section.iconBg } : undefined]}>
+									<View style={styles.sectionHeaderChip}>
+										<IconComponent type={section.iconType} name={section.icon} size={scaledSize(15)} color={section.iconColor} />
+									</View>
+									<Text style={[styles.sectionHeaderText, section.titleColor ? { color: section.titleColor } : undefined]}>{section.titleText}</Text>
 								</View>
 							) : (
 								<View style={{ height: scaleHeight(10) }} />
@@ -548,7 +584,7 @@ const SettingScreen = () => {
 								<View style={styles.recommendSection}>
 									<View style={styles.recommendTitleRow}>
 										<View style={styles.recommendTitleIconChip}>
-											<IconComponent type="MaterialCommunityIcons" name="cellphone-check" size={scaledSize(16)} color="#3B82F6" />
+											<IconComponent type="MaterialCommunityIcons" name="cellphone-check" size={scaledSize(16)} color={COLORS.secondary} />
 										</View>
 										<Text style={styles.recommendTitle}>앱이 마음에 드셨나요?</Text>
 									</View>
@@ -557,7 +593,7 @@ const SettingScreen = () => {
 										<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
 									</View>
 									<View style={styles.storeButtons}>
-										<TouchableOpacity style={[styles.storeButton, { backgroundColor: '#22C55E' }]} onPress={shareApp}>
+										<TouchableOpacity style={[styles.storeButton, { backgroundColor: COLORS.primary }]} onPress={shareApp}>
 											<View style={styles.iconRow}>
 												<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color="#fff" />
 												<Text style={styles.storeButtonText}>공유하기</Text>
@@ -649,27 +685,36 @@ const SettingScreen = () => {
 export default SettingScreen;
 
 const styles = StyleSheet.create({
-	container: { flex: 1, backgroundColor: '#F8FAFC' },
+	container: { flex: 1, backgroundColor: COLORS.background },
 	listContent: { paddingBottom: scaleHeight(24) },
 	headerContainer: { marginBottom: scaleHeight(5) },
 	itemSpacing: { height: scaleHeight(10) },
 	sectionSpacing: { height: scaleHeight(24) },
 
 	sectionHeader: {
-		marginVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(20),
-		paddingVertical: scaleHeight(10),
-		marginHorizontal: scaleWidth(16),
-		backgroundColor: '#EFF6FF',
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: scaleWidth(10),
+		marginTop: scaleHeight(12),
 		marginBottom: scaleHeight(12),
-		borderRadius: scaleWidth(8),
+		marginHorizontal: scaleWidth(16),
+		paddingHorizontal: scaleWidth(14),
+		paddingVertical: scaleHeight(10),
+		borderRadius: scaleWidth(14),
+	},
+	sectionHeaderChip: {
+		width: scaleWidth(30),
+		height: scaleWidth(30),
+		borderRadius: scaleWidth(10),
+		backgroundColor: '#FFFFFF',
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 	sectionHeaderText: {
-		fontSize: scaledSize(15),
-		fontWeight: '600',
-		color: '#334155',
-		letterSpacing: 0.5,
-		textTransform: 'uppercase',
+		fontSize: scaledSize(14.5),
+		fontWeight: '800',
+		color: COLORS.text,
+		letterSpacing: 0.3,
 	},
 
 	cardButton: {
@@ -690,13 +735,13 @@ const styles = StyleSheet.create({
 		width: scaleWidth(34),
 		height: scaleWidth(34),
 		borderRadius: scaleWidth(10),
-		backgroundColor: '#EFF6FF',
+		backgroundColor: COLORS.secondaryBg,
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: scaleWidth(10),
 	},
 	itemIconChipDanger: { backgroundColor: '#FEF2F2' },
-	cardText: { fontSize: scaledSize(15), color: '#334155', fontWeight: '500', letterSpacing: 0.3, flexShrink: 1 },
+	cardText: { fontSize: FONT_SIZES.mdPlus, color: COLORS.text, fontWeight: '500', letterSpacing: 0.3, flexShrink: 1 },
 
 	// ── 아코디언 ──
 	accordionWrapper: { marginHorizontal: scaleWidth(20), gap: scaleHeight(10) },
@@ -724,23 +769,23 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		marginRight: scaleWidth(10),
 	},
-	accordionHeaderText: { fontSize: scaledSize(15), fontWeight: '600', color: '#334155' },
-	accordionBody: { borderTopWidth: 1, borderTopColor: '#F1F5F9', backgroundColor: '#F8FAFC' },
+	accordionHeaderText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '600', color: COLORS.text },
+	accordionBody: { borderTopWidth: 1, borderTopColor: COLORS.surfaceAlt, backgroundColor: COLORS.background },
 	accordionSubItem: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(20),
 		borderBottomWidth: 1,
-		borderBottomColor: '#F1F5F9',
+		borderBottomColor: COLORS.surfaceAlt,
 	},
-	accordionSubText: { fontSize: scaledSize(14), color: '#EF4444', fontWeight: '500' },
+	accordionSubText: { fontSize: FONT_SIZES.md, color: COLORS.danger, fontWeight: '500' },
 
 	scrollTopButton: {
 		position: 'absolute',
 		right: scaleWidth(16),
 		bottom: scaleHeight(16),
-		backgroundColor: '#3B82F6',
+		backgroundColor: COLORS.secondary,
 		width: scaleWidth(48),
 		height: scaleWidth(48),
 		borderRadius: scaleWidth(24),
@@ -753,16 +798,16 @@ const styles = StyleSheet.create({
 	},
 
 	modalTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: scaleHeight(12) },
-	modalTitleText: { fontSize: scaledSize(18), lineHeight: scaleHeight(44), fontWeight: 'bold', color: '#334155', textAlign: 'center' },
+	modalTitleText: { fontSize: FONT_SIZES.xl, lineHeight: scaleHeight(44), fontWeight: 'bold', color: COLORS.text, textAlign: 'center' },
 	iconLeft: { marginRight: scaleWidth(8) },
 
 	recommendSection: {
 		marginHorizontal: scaleWidth(20),
 		padding: scaleWidth(20),
-		backgroundColor: '#F1F5F9',
+		backgroundColor: COLORS.surfaceAlt,
 		borderRadius: scaleWidth(12),
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.04,
@@ -775,29 +820,29 @@ const styles = StyleSheet.create({
 		width: scaleWidth(28),
 		height: scaleWidth(28),
 		borderRadius: scaleWidth(14),
-		backgroundColor: '#DBEAFE',
+		backgroundColor: COLORS.secondarySoft,
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: scaleWidth(8),
 	},
-	recommendTitle: { fontSize: scaledSize(17), fontWeight: '700', color: '#334155' },
-	recommendSubtitle: { fontSize: scaledSize(13), color: '#64748B', textAlign: 'center', marginBottom: scaleHeight(12) },
+	recommendTitle: { fontSize: scaledSize(17), fontWeight: '700', color: COLORS.text },
+	recommendSubtitle: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', marginBottom: scaleHeight(12) },
 	appIconWrapper: {
 		width: scaleWidth(80),
 		height: scaleWidth(80),
 		marginBottom: scaleHeight(12),
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 		borderRadius: scaleWidth(16),
 		overflow: 'hidden',
 	},
 	appIcon: { width: '100%', height: '100%', borderRadius: scaleWidth(16) },
 	storeButtons: { marginTop: scaleHeight(6), flexDirection: 'row', gap: scaleWidth(8) },
 	storeButton: { flex: 1, paddingVertical: scaleHeight(12), borderRadius: scaleWidth(8), alignItems: 'center' },
-	storeButtonText: { color: '#fff', fontWeight: 'bold', fontSize: scaledSize(13) },
+	storeButtonText: { color: '#fff', fontWeight: 'bold', fontSize: FONT_SIZES.smPlus },
 	iconRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleWidth(6) },
 
-	appVerText: { fontSize: scaledSize(12), color: '#94A3B8', textAlign: 'center', marginBottom: scaleHeight(20) },
+	appVerText: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, textAlign: 'center', marginBottom: scaleHeight(20) },
 	appVerBoldText: { fontWeight: 'bold' },
 
 	footerAppWrapper: { paddingVertical: scaleHeight(12) },
@@ -829,7 +874,7 @@ const styles = StyleSheet.create({
 		width: 0,
 		height: 0,
 		borderTopWidth: scaleWidth(26),
-		borderTopColor: '#EF4444',
+		borderTopColor: COLORS.danger,
 		borderLeftWidth: scaleWidth(26),
 		borderLeftColor: 'transparent',
 	},
@@ -842,6 +887,6 @@ const styles = StyleSheet.create({
 		color: '#fff',
 		transform: [{ rotate: '45deg' }],
 	},
-	footerAppTitle: { fontSize: scaledSize(13), fontWeight: '600', color: '#334155', textAlign: 'center', marginBottom: scaleHeight(4) },
-	footerAppDesc: { fontSize: scaledSize(11), color: '#64748B', textAlign: 'center' },
+	footerAppTitle: { fontSize: FONT_SIZES.smPlus, fontWeight: '600', color: COLORS.text, textAlign: 'center', marginBottom: scaleHeight(4) },
+	footerAppDesc: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, textAlign: 'center' },
 });

@@ -19,17 +19,17 @@ interface Props {
 
 const LEVEL_ITEMS = [
 	{ label: '전체', value: '전체', icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#64748B" /> },
-	{ label: '아주 쉬움', value: '아주 쉬움', icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color="#34D399" /> },
-	{ label: '쉬움', value: '쉬움', icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color="#F59E0B" /> },
-	{ label: '보통', value: '보통', icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color="#EA580C" /> },
-	{ label: '어려움', value: '어려움', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color="#B91C1C" /> },
+	{ label: '초급', value: '초급', icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color="#34D399" /> },
+	{ label: '중급', value: '중급', icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color="#F59E0B" /> },
+	{ label: '고급', value: '고급', icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color="#EA580C" /> },
+	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color="#B91C1C" /> },
 ];
 
 const LEVEL_ICON_MAP: Record<string, string> = {
-	'아주 쉬움': 'seedling',
-	쉬움: 'leaf',
-	보통: 'tree',
-	어려움: 'trophy',
+	'초급': 'seedling',
+	중급: 'leaf',
+	고급: 'tree',
+	특급: 'trophy',
 };
 
 const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {

@@ -21,15 +21,14 @@ export const getCategoryColor = (category: string): string => {
 	return map[category] || '#94A3B8';
 };
 
-/** 난이도(levelName)별 색상 — 쉬움→어려움으로 갈수록 진해지는 램프 */
+/** 난이도(levelName)별 색상 — 초급에서 특급으로 갈수록 진해지는 램프 */
 export const getLevelColor = (level: string): string => {
 	// 난이도가 올라갈수록 어두워지는 램프(난이도 강조)
 	const map: Record<string, string> = {
-		'아주 쉬움': '#34D399',
-		'매우 쉬움': '#34D399',
-		쉬움: '#F59E0B',
-		보통: '#EA580C',
-		어려움: '#B91C1C',
+		초급: '#34D399',
+		중급: '#F59E0B',
+		고급: '#EA580C',
+		특급: '#B91C1C',
 	};
 	return map[level] || '#94A3B8';
 };
@@ -57,11 +56,10 @@ export const getFieldIcon = (category: string): React.ReactNode => {
 /** 난이도(levelName)별 아이콘 이름 (FontAwesome6) — 속담 목록 레벨 배지와 동일 */
 export const getLevelIconName = (level: string): string => {
 	const iconMap: Record<string, string> = {
-		'아주 쉬움': 'seedling',
-		'매우 쉬움': 'seedling',
-		쉬움: 'leaf',
-		보통: 'tree',
-		어려움: 'trophy',
+		초급: 'seedling',
+		중급: 'leaf',
+		고급: 'tree',
+		특급: 'trophy',
 	};
 	return iconMap[level] || 'seedling';
 };

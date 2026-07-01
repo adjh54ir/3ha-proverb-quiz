@@ -785,10 +785,10 @@ const TodayQuizScreen = () => {
 	};
 	const getLevelColor = (levelName: string) => {
 		const levelColorMap: Record<string, string> = {
-			'아주 쉬움': '#ecf0f1',
-			쉬움: '#74b9ff',
-			보통: '#3498db',
-			어려움: '#2c3e50',
+			'초급': '#ecf0f1',
+			중급: '#74b9ff',
+			고급: '#3498db',
+			특급: '#2c3e50',
 		};
 
 		return levelColorMap[levelName] || '#bdc3c7'; // 기본 회색

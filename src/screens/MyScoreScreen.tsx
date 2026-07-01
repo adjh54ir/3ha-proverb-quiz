@@ -187,7 +187,6 @@ const MyScoreScreen = () => {
 	const isFocused = useIsFocused();
 	const scrollRef = useRef<ScrollView>(null);
 	const [refreshing, setRefreshing] = useState(false);
-	const levelScrollRef = useRef<ScrollView>(null);
 
 	// 마스코트 진입 애니메이션
 	const mascotFade = useRef(new Animated.Value(0)).current;
@@ -333,7 +332,7 @@ const MyScoreScreen = () => {
 			const quizJson = quizData ? JSON.parse(quizData) : null;
 			const quizBadges = quizJson?.badges ?? [];
 			const studyJson = studyData ? JSON.parse(studyData) : null;
-			const studiedIds: number[] = studyJson?.studyProverbs ?? [];
+			const studiedIds: number[] = studyJson?.studyProverbes ?? [];
 			const studyCounts = studyJson?.studyCounts ?? {};
 			const lastDate = studyJson?.lastStudyAt ?? '';
 
@@ -592,20 +591,8 @@ const MyScoreScreen = () => {
 	const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
 
 	// 점수별 캐릭터(등급) — 단일 소스에서 가져와 오름차순(초심자→전설)으로 사용
+	// 등급 안내 팝업은 공통 컴포넌트 LevelModal 을 사용한다.
 	const LEVEL_DATA = [...CHARACTER_LEVELS].sort((a, b) => a.score - b.score);
-
-	const reversedLevelGuide = [...LEVEL_DATA].reverse();
-	const currentLevelIndex = reversedLevelGuide.findIndex((item) => totalScore >= item.score && totalScore < item.next);
-	useEffect(() => {
-		if (showLevelModal && levelScrollRef.current) {
-			setTimeout(() => {
-				levelScrollRef.current?.scrollTo({
-					y: currentLevelIndex * scaleHeight(150), // 카드 높이 예상값
-					animated: true,
-				});
-			}, 100); // 모달이 나타난 후 살짝 delay
-		}
-	}, [showLevelModal]);
 
 	/**
 	 * 스크롤을 관리하는 Handler

@@ -11,19 +11,15 @@ export const StudyBadgeInterceptor = (study: MainDataType.UserStudyHistory): str
 	const existing = new Set(study.badges ?? []);
 	const total = ProverbServices.selectProverbList().length;
 
-	if (!existing.has('study_1') && count >= 1) newBadges.push('study_1');
-	if (!existing.has('study_10') && count >= 10) newBadges.push('study_10');
-	if (!existing.has('study_50') && count >= 50) newBadges.push('study_50');
-	if (!existing.has('study_100') && count >= 100) newBadges.push('study_100');
-	if (!existing.has('study_200') && count >= 200) newBadges.push('study_200');
-	if (!existing.has('study_300') && count >= 300) newBadges.push('study_300');
-	if (!existing.has('study_400') && count >= 400) newBadges.push('study_400');
-	if (!existing.has('study_500') && count >= 500) newBadges.push('study_500');
-	if (!existing.has('study_600') && count >= 600) newBadges.push('study_600');
-	if (!existing.has('study_700') && count >= 700) newBadges.push('study_700');
+	// 누적 학습 수 마일스톤 (데이터 증가에 맞춰 3,000까지 확장)
+	const studyThresholds = [1, 10, 50, 100, 200, 300, 400, 500, 600, 700, 800, 1000, 1500, 2000, 2500, 3000];
+	studyThresholds.forEach((n) => {
+		const id = `study_${n}`;
+		if (!existing.has(id) && count >= n) newBadges.push(id);
+	});
 
 	// ✅ 전체 속담 학습 완료 시 부여
-	if (!existing.has('study_all') && count >= total) {
+	if (!existing.has('study_all') && total > 0 && count >= total) {
 		newBadges.push('study_all');
 	}
 

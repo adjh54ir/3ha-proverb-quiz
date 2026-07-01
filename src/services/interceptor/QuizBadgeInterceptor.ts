@@ -17,10 +17,10 @@ export const QuizBadgeInterceptor = (history: MainDataType.UserQuizHistory, allP
 
 	// 레벨별 마스터 조건 (난이도별 속담 정복 여부)
 	const LEVEL_META = [
-		{ level: '아주 쉬움', badgeId: 'level_easy_1' },
-		{ level: '쉬움', badgeId: 'level_easy_2' },
-		{ level: '보통', badgeId: 'level_medium' },
-		{ level: '어려움', badgeId: 'level_hard' },
+		{ level: '초급', badgeId: 'level_easy_1' },
+		{ level: '중급', badgeId: 'level_easy_2' },
+		{ level: '고급', badgeId: 'level_medium' },
+		{ level: '특급', badgeId: 'level_hard' },
 	];
 	LEVEL_META.forEach(({ level, badgeId }) => {
 		const levelList = allProverbs.filter((p) => p.levelName === level);
@@ -51,7 +51,7 @@ export const QuizBadgeInterceptor = (history: MainDataType.UserQuizHistory, allP
 
 	// 퀴즈 누적 횟수 뱃지
 	const totalSolved = (history.correctProverbId?.length ?? 0) + (history.wrongProverbId?.length ?? 0);
-	const quizThresholds = [1, 10, 50, 100, 150, 200, 300, 400, 500, 600, 700];
+	const quizThresholds = [1, 10, 50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 1000, 1500, 2000, 2500, 3000];
 	quizThresholds.forEach((n) => {
 		const id = `quiz_${n}`;
 		if (!history.badges.includes(id) && totalSolved >= n) newBadges.push(id);

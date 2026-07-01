@@ -91,10 +91,10 @@ export function generateCategoryQuiz(category: MainDataType.Proverb['category'],
 // 유틸: 레벨 이름 반환
 export function getLevelName(level: MainDataType.Proverb['level']): string {
 	const levelMap: Record<MainDataType.Proverb['level'], string> = {
-		1: '아주 쉬움',
-		2: '쉬움',
-		3: '보통',
-		4: '어려움',
+		1: '초급',
+		2: '중급',
+		3: '고급',
+		4: '특급',
 	};
 	return levelMap[level];
 }

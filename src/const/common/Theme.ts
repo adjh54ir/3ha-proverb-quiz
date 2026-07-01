@@ -1,52 +1,60 @@
-import { scaledSize } from '@/utils/DementionUtils';
+import { scaledSize, scaleWidth, scaleHeight } from '@/utils/DementionUtils';
 
 /**
- * 앱 전체 디자인 토큰 (그린 기반 통일 테마)
- * - 색상/폰트 사이즈는 반드시 이 파일의 토큰을 사용한다.
- * - Primary: 그린(#27ae60) / Text: 다크네이비(#2c3e50)
+ * 앱 전체 디자인 토큰 (단일 소스, Single Source of Truth)
+ * - 색상/폰트/여백/라운드는 반드시 이 파일의 토큰을 사용한다.
+ * - Primary: 그린(#22C55E) / Text: 슬레이트(#334155)
+ * - 모던 slate/green 팔레트로 통일 (구 팔레트 대비 채도·명도 정리).
  */
 export const COLORS = {
-	// ===== Primary (Green) =====
-	primary: '#27ae60', // 메인 액센트
-	primaryLight: '#2ecc71', // 밝은 그린 (활성/포인트)
-	primaryDark: '#1e8449', // 진한 그린 (눌림/강조)
-	primaryBg: '#eafaf1', // 그린 배경 틴트
-	primaryBorder: '#d0f0dc', // 그린 보더 틴트
+	// ===== Primary (Green) — 메인 액션/활성/정답 강조 =====
+	primary: '#22C55E', // 메인 액센트
+	primaryLight: '#4ADE80', // 밝은 그린 (활성/포인트)
+	primaryDark: '#16A34A', // 진한 그린 (눌림/강조)
+	primaryDeep: '#15803D', // 가장 진한 강조
+	primaryBg: '#F0FDF4', // 그린 배경 틴트
+	primarySoft: '#DCFCE7', // 배지/칩 배경
+	primaryBorder: '#DCFCE7', // 그린 보더 틴트
 
-	// ===== Secondary (Teal) — 보조 액센트 =====
-	secondary: '#16a085',
-	secondaryLight: '#76d7c4',
+	// ===== Secondary (Blue) — 보조 강조/링크/정보 =====
+	secondary: '#3B82F6',
+	secondaryLight: '#93C5FD',
+	secondaryDark: '#2563EB',
+	secondarySoft: '#DBEAFE',
+	secondaryBg: '#EFF6FF',
 
-	// ===== Text =====
-	text: '#2c3e50', // 본문/타이틀
-	textSecondary: '#7f8c8d', // 보조 텍스트
-	textLight: '#95a5a6', // 비활성/캡션
-	textWhite: '#ffffff',
+	// ===== Text (Slate) =====
+	text: '#334155', // 본문/타이틀
+	textStrong: '#1E293B', // 강한 제목
+	textSecondary: '#64748B', // 보조 텍스트
+	textLight: '#94A3B8', // 비활성/캡션
+	textWhite: '#FFFFFF',
 
 	// ===== Background / Surface =====
-	background: '#f8f9fa', // 화면 기본 배경
-	surface: '#ffffff', // 카드/모달 표면
-	surfaceAlt: '#ecf0f1', // 옅은 회색 표면
+	background: '#F8FAFC', // 화면 기본 배경
+	surface: '#FFFFFF', // 카드/모달 표면
+	surfaceAlt: '#F1F5F9', // 옅은 회색 표면
 
 	// ===== Border / Divider =====
-	border: '#e0e0e0',
-	borderLight: '#ecf0f1',
-	borderDark: '#bdc3c7',
+	border: '#E2E8F0',
+	borderLight: '#E2E8F0',
+	borderDark: '#CBD5E1',
 
 	// ===== Semantic =====
-	success: '#27ae60',
-	successBg: '#eafaf1',
-	info: '#3498db',
-	infoDark: '#2980b9',
-	infoBg: '#eaf4ff',
-	warning: '#f39c12',
-	warningDark: '#e67e22',
-	warningBg: '#fef9e7',
-	danger: '#e74c3c',
-	dangerDark: '#c0392b',
-	dangerBg: '#fdecea',
-	gold: '#f1c40f',
-	goldLight: '#f4d03f',
+	success: '#22C55E',
+	successBg: '#F0FDF4',
+	successSoft: '#DCFCE7',
+	info: '#3B82F6',
+	infoDark: '#2563EB',
+	infoBg: '#EFF6FF',
+	warning: '#F59E0B',
+	warningDark: '#D97706',
+	warningBg: '#FEF3C7',
+	danger: '#EF4444',
+	dangerDark: '#DC2626',
+	dangerBg: '#FEE2E2',
+	gold: '#FACC15',
+	goldLight: '#FDE047',
 
 	// ===== Dark (타워/챌린지 다크 화면 전용) =====
 	darkBg: '#1a1a2e',
@@ -77,11 +85,46 @@ export const FONT_SIZES = {
 	display: scaledSize(28), // 결과/점수 강조
 } as const;
 
-/** 공통 radius/spacing 토큰 */
+/** 공통 radius 토큰 */
 export const RADIUS = {
 	sm: 8,
 	md: 12,
 	lg: 16,
 	xl: 20,
 	round: 999,
+} as const;
+
+/**
+ * 공통 간격(spacing) 토큰 — raw 값.
+ * 좌우 간격에는 scaleWidth(SPACING.md), 위아래 간격에는 scaleHeight(SPACING.md) 처럼 사용한다.
+ */
+export const SPACING = {
+	xxs: 2,
+	xs: 4,
+	sm: 8,
+	md: 12,
+	lg: 16,
+	xl: 20,
+	xxl: 24,
+	xxxl: 32,
+} as const;
+
+/** 좌우(수평) 간격 — scaleWidth 적용 완료 값 */
+export const SPACING_W = {
+	xs: scaleWidth(SPACING.xs),
+	sm: scaleWidth(SPACING.sm),
+	md: scaleWidth(SPACING.md),
+	lg: scaleWidth(SPACING.lg),
+	xl: scaleWidth(SPACING.xl),
+	xxl: scaleWidth(SPACING.xxl),
+} as const;
+
+/** 위아래(수직) 간격 — scaleHeight 적용 완료 값 */
+export const SPACING_H = {
+	xs: scaleHeight(SPACING.xs),
+	sm: scaleHeight(SPACING.sm),
+	md: scaleHeight(SPACING.md),
+	lg: scaleHeight(SPACING.lg),
+	xl: scaleHeight(SPACING.xl),
+	xxl: scaleHeight(SPACING.xxl),
 } as const;

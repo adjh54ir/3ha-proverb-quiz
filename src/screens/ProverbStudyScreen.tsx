@@ -53,23 +53,23 @@ const COMMON_ALL_OPTION = {
 const LEVEL_DROPDOWN_ITEMS = [
 	COMMON_ALL_OPTION,
 	{
-		label: '아주 쉬움',
-		value: '아주 쉬움',
+		label: '초급',
+		value: '초급',
 		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={16} color="#85C1E9" />,
 	},
 	{
-		label: '쉬움',
-		value: '쉬움',
+		label: '중급',
+		value: '중급',
 		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={16} color="#F4D03F" />,
 	},
 	{
-		label: '보통',
-		value: '보통',
+		label: '고급',
+		value: '고급',
 		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#e67e22" />,
 	},
 	{
-		label: '어려움',
-		value: '어려움',
+		label: '특급',
+		value: '특급',
 		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={16} color="#E74C3C" />,
 	},
 ];
@@ -205,6 +205,8 @@ const QuizStudyScreen = () => {
 	const carouselRef = useRef<any>(null);
 	const isBackCardScrollingRef = useRef(false);
 	const toastAnim = useRef(new Animated.Value(0)).current;
+	const toastHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const toastAnimRef = useRef<Animated.CompositeAnimation | null>(null);
 	const scaleAnim = useRef(new Animated.Value(0)).current;
 	const detailFilterHeightAnim = useRef(new Animated.Value(0)).current;
 	const flipAnimRefs = useRef<Record<string, Animated.Value>>({});
@@ -228,7 +230,7 @@ const QuizStudyScreen = () => {
 	const [showGuideModal, setShowGuideModal] = useState(false);
 	const [showToast, setShowToast] = useState(false);
 	const [praiseText, setPraiseText] = useState('');
-	const [levelFilter, setLevelFilter] = useState<'전체' | '아주 쉬움' | '쉬움' | '보통' | '어려움'>('전체');
+	const [levelFilter, setLevelFilter] = useState<'전체' | '초급' | '중급' | '고급' | '특급'>('전체');
 	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 	const [regionFilter, setRegionFilter] = useState<string>('전체');
 	const [isDetailFilterOpen, setIsDetailFilterOpen] = useState(false);
@@ -309,19 +311,19 @@ const QuizStudyScreen = () => {
 	}, []);
 
 	// 레벨 이름/숫자 매핑(재사용용)
-	const LEVEL_NAME_MAP: Record<number, '아주 쉬움' | '쉬움' | '보통' | '어려움'> = {
-		1: '아주 쉬움',
-		2: '쉬움',
-		3: '보통',
-		4: '어려움',
+	const LEVEL_NAME_MAP: Record<number, '초급' | '중급' | '고급' | '특급'> = {
+		1: '초급',
+		2: '중급',
+		3: '고급',
+		4: '특급',
 	};
 	// 레벨 색상
 	const getLevelColor = (level: number) => {
 		const levelColorMap: Record<number, string> = {
-			1: '#2ecc71', // 아주 쉬움
-			2: '#F4D03F', // 쉬움
-			3: '#e67e22', // 보통
-			4: '#E74C3C', // 어려움
+			1: '#2ecc71', // 초급
+			2: '#F4D03F', // 중급
+			3: '#e67e22', // 고급
+			4: '#E74C3C', // 특급
 		};
 		return levelColorMap[level] || '#bdc3c7';
 	};
@@ -518,21 +520,54 @@ const QuizStudyScreen = () => {
 	};
 
 	const showEncourageToast = () => {
+		// 이전에 예약된 숨김/애니메이션 정리 (중복 호출 대비)
+		if (toastHideTimerRef.current) {
+			clearTimeout(toastHideTimerRef.current);
+			toastHideTimerRef.current = null;
+		}
+		toastAnimRef.current?.stop();
+
 		setShowToast(true);
-		Animated.timing(toastAnim, {
+		toastAnim.setValue(0);
+
+		// 등장: 스프링 팝인
+		const inAnim = Animated.spring(toastAnim, {
 			toValue: 1,
-			duration: 100,
+			friction: 7,
+			tension: 80,
 			useNativeDriver: true,
-		}).start(() => {
-			setTimeout(() => {
-				Animated.timing(toastAnim, {
+		});
+		toastAnimRef.current = inAnim;
+		inAnim.start(() => {
+			// 일정 시간 노출 후 페이드 아웃
+			toastHideTimerRef.current = setTimeout(() => {
+				const outAnim = Animated.timing(toastAnim, {
 					toValue: 0,
-					duration: 300,
+					duration: 260,
+					easing: Easing.in(Easing.quad),
 					useNativeDriver: true,
-				}).start(() => setShowToast(false));
-			}, 1500); // 보여지는 시간
+				});
+				toastAnimRef.current = outAnim;
+				outAnim.start(({ finished }) => {
+					if (finished) {
+						setShowToast(false);
+					}
+				});
+			}, 1600);
 		});
 	};
+
+	// ✅ 언마운트 시 토스트 타이머/애니메이션 정리 (메모리 누수 방지)
+	useEffect(
+		() => () => {
+			if (toastHideTimerRef.current) {
+				clearTimeout(toastHideTimerRef.current);
+			}
+			toastAnimRef.current?.stop();
+			toastAnim.stopAnimation();
+		},
+		[toastAnim],
+	);
 
 	const flipCard = (id: number) => {
 		if (isButtonDisabled) {
@@ -574,7 +609,7 @@ const QuizStudyScreen = () => {
 			filtered = filtered.filter((c) => !studyHistory.studyProverbes.includes(c.id));
 		}
 
-		const LEVEL_MAP: Record<string, number> = { '아주 쉬움': 1, 쉬움: 2, 보통: 3, 어려움: 4 };
+		const LEVEL_MAP: Record<string, number> = { '초급': 1, 중급: 2, 고급: 3, 특급: 4 };
 		if (levelFilter !== '전체') {
 			filtered = filtered.filter((item) => item.level === LEVEL_MAP[levelFilter]);
 		}
@@ -1178,35 +1213,73 @@ const QuizStudyScreen = () => {
 				</View>
 			</Modal>
 
-			{showToast && (
-				<View style={styles.toastWrapper}>
-					<Animated.View
-						style={[
-							styles.toastContainer,
-							{
-								opacity: toastAnim,
-								transform: [
+			{showToast &&
+				(() => {
+					const isComplete = typeof completedCardId === 'number' && (studyHistory.studyProverbes ?? []).includes(completedCardId);
+					const accent = isComplete ? '#22C55E' : '#3B82F6';
+					const accentSoft = isComplete ? '#DCFCE7' : '#DBEAFE';
+					const learnedCount = (studyHistory.studyProverbes ?? []).length;
+					const totalCount = proverbList.length;
+					const pct = totalCount > 0 ? Math.min(Math.round((learnedCount / totalCount) * 100), 100) : 0;
+					return (
+						<View style={styles.toastWrapper} pointerEvents="none">
+							<Animated.View
+								style={[
+									styles.toastCard,
 									{
-										translateY: toastAnim.interpolate({
-											inputRange: [0, 1],
-											outputRange: [-50, 0],
-										}),
+										opacity: toastAnim,
+										transform: [
+											{
+												translateY: toastAnim.interpolate({
+													inputRange: [0, 1],
+													outputRange: [scaleHeight(28), 0],
+												}),
+											},
+											{
+												scale: toastAnim.interpolate({
+													inputRange: [0, 1],
+													outputRange: [0.9, 1],
+												}),
+											},
+										],
 									},
-								],
-							},
-						]}>
-						<View style={styles.toastInner}>
-							<Image source={completionImages} style={styles.toastImage} />
-							<View style={styles.toastTextBox}>
-								<Text style={styles.toastTitle}>
-									{typeof completedCardId === 'number' && studyHistory.studyProverbes.includes(completedCardId) ? '🎉 학습 완료!' : '📚 복습 시작!'}
-								</Text>
-								<Text style={styles.toastText}>{praiseText}</Text>
-							</View>
+								]}>
+								{/* 상단 상태 칩 */}
+								<View style={[styles.toastPill, { backgroundColor: accentSoft }]}>
+									<IconComponent
+										type="materialIcons"
+										name={isComplete ? 'check-circle' : 'menu-book'}
+										size={scaledSize(13)}
+										color={accent}
+									/>
+									<Text style={[styles.toastPillText, { color: accent }]}>{isComplete ? '학습 완료' : '복습 시작'}</Text>
+								</View>
+
+								{/* 마스코트 (은은한 헤일로) */}
+								<View style={[styles.toastHalo, { backgroundColor: accentSoft }]}>
+									<View style={[styles.toastHaloInner, { borderColor: accent }]}>
+										<Image source={completionImages} style={styles.toastMascot} />
+									</View>
+								</View>
+
+								{/* 칭찬 문구 */}
+								<Text style={styles.toastPraise}>{praiseText}</Text>
+
+								{/* 학습 진행도 */}
+								<View style={styles.toastProgressRow}>
+									<Text style={styles.toastProgressLabel}>학습 진행</Text>
+									<Text style={[styles.toastProgressValue, { color: accent }]}>
+										{learnedCount} / {totalCount}
+										<Text style={styles.toastProgressPct}> · {pct}%</Text>
+									</Text>
+								</View>
+								<View style={styles.toastProgressTrack}>
+									<View style={[styles.toastProgressFill, { backgroundColor: accent, width: `${pct}%` }]} />
+								</View>
+							</Animated.View>
 						</View>
-					</Animated.View>
-				</View>
-			)}
+					);
+				})()}
 
 			<NewBadgeModal visible={badgeModalVisible} badges={newlyEarnedBadges} onConfirm={() => setBadgeModalVisible(false)} />
 		</>
@@ -1452,19 +1525,22 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		fontSize: scaledSize(15),
 	},
-	toastContainer: {
-		width: scaleWidth(340), // ✅ 기존보다 더 넓게
-		backgroundColor: 'rgba(255,255,255,0.98)',
-		borderRadius: scaleWidth(28), // ✅ 더 둥글게
-		paddingVertical: scaleHeight(20), // ✅ 더 넓은 여백
-		paddingHorizontal: scaleWidth(24),
+	toastCard: {
+		width: scaleWidth(300),
+		maxWidth: '88%',
+		backgroundColor: '#FFFFFF',
+		borderRadius: scaleWidth(24),
+		paddingTop: scaleHeight(14),
+		paddingBottom: scaleHeight(18),
+		paddingHorizontal: scaleWidth(22),
+		borderWidth: 1,
+		borderColor: '#EEF2F7',
 		alignItems: 'center',
-		shadowColor: '#000',
-
-		shadowOffset: { width: 0, height: scaleHeight(6) },
-		shadowOpacity: 0.2, // ✅ 그림자 강조
-		shadowRadius: scaleWidth(10),
-		transform: [{ translateY: -scaleHeight(70) }],
+		shadowColor: '#0F172A',
+		shadowOffset: { width: 0, height: scaleHeight(10) },
+		shadowOpacity: 0.16,
+		shadowRadius: scaleWidth(22),
+		elevation: 10,
 	},
 	badgeModal: {
 		backgroundColor: '#ffffff',
@@ -1525,37 +1601,96 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.2,
 		shadowRadius: 4,
 	},
-	toastInner: {
+	toastPill: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		gap: scaleWidth(4),
+		paddingHorizontal: scaleWidth(10),
+		paddingVertical: scaleHeight(4),
+		borderRadius: scaleWidth(999),
 	},
-	toastImage: {
-		width: scaleWidth(60), // ✅ 이미지 더 크게
-		height: scaleWidth(60),
-		marginRight: scaleWidth(18),
-		borderRadius: scaleWidth(12),
+	toastPillText: {
+		fontSize: scaledSize(11.5),
+		fontWeight: '800',
 	},
-	toastTextBox: {
-		flex: 1,
+	toastHalo: {
+		width: scaleWidth(88),
+		height: scaleWidth(88),
+		borderRadius: scaleWidth(44),
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginTop: scaleHeight(12),
+		marginBottom: scaleHeight(12),
 	},
-	toastTitle: {
-		fontSize: scaledSize(20), // ✅ 더 큰 글자
-		fontWeight: 'bold',
-		color: '#2c3e50',
+	toastHaloInner: {
+		width: scaleWidth(70),
+		height: scaleWidth(70),
+		borderRadius: scaleWidth(35),
+		backgroundColor: '#FFFFFF',
+		borderWidth: 2,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	toastMascot: {
+		width: scaleWidth(52),
+		height: scaleWidth(52),
+		borderRadius: scaleWidth(14),
+	},
+	toastPraise: {
+		alignSelf: 'stretch', // ✅ 카드 폭에 맞춰 줄바꿈 (긴 문구 오른쪽 잘림 방지)
+		width: '100%',
+		flexShrink: 1,
+		fontSize: scaledSize(13.5),
+		color: '#334155',
+		lineHeight: scaleHeight(20),
+		fontWeight: '700',
+		textAlign: 'center',
+		paddingHorizontal: scaleWidth(2),
+		marginBottom: scaleHeight(14),
+	},
+	toastProgressRow: {
+		width: '100%',
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
 		marginBottom: scaleHeight(6),
 	},
-	toastText: {
-		fontSize: scaledSize(15), // ✅ 일반 텍스트도 확대
-		color: '#7f8c8d',
-		lineHeight: scaleHeight(24),
+	toastProgressLabel: {
+		fontSize: scaledSize(11.5),
+		fontWeight: '700',
+		color: '#94A3B8',
+	},
+	toastProgressValue: {
+		fontSize: scaledSize(12.5),
+		fontWeight: '800',
+	},
+	toastProgressPct: {
+		fontSize: scaledSize(11.5),
+		fontWeight: '700',
+		color: '#94A3B8',
+	},
+	toastProgressTrack: {
+		width: '100%',
+		height: scaleHeight(7),
+		borderRadius: scaleHeight(4),
+		backgroundColor: '#EEF2F7',
+		overflow: 'hidden',
+	},
+	toastProgressFill: {
+		height: '100%',
+		borderRadius: scaleHeight(4),
 	},
 	toastWrapper: {
+		// 전체화면 중앙 오버레이 (퍼센트 top 제거 → 위치 어긋남/잘림 방지)
 		position: 'absolute',
-		top: '40%',
+		top: 0,
 		left: 0,
 		right: 0,
+		bottom: 0,
+		justifyContent: 'center',
 		alignItems: 'center',
 		zIndex: 999,
+		elevation: 999,
 	},
 	emptyWrapper: {
 		flex: 1,

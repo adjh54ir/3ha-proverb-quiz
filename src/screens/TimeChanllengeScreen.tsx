@@ -17,6 +17,7 @@ import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -118,7 +119,7 @@ const InfinityQuizScreen = () => {
 	const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
 	const [showScrollTop, setShowScrollTop] = useState(false);
-	const labelColors = ['#3B82F6', '#22C55E', '#F97316', '#EC4899']; // A, B, C, D 색상 (각각 다르게)
+	const labelColors = [COLORS.secondary, COLORS.primary, '#F97316', '#EC4899']; // A, B, C, D 색상 (각각 다르게)
 	const solvedProverbs = questionList.slice(0, currentIndex + 1).filter((q) => resultMap[q.id]);
 
 	const [bonusHistory, setBonusHistory] = useState<number[]>([]);
@@ -127,6 +128,14 @@ const InfinityQuizScreen = () => {
 
 	const [encouragements, setEncouragements] = useState<string[]>([]);
 	const [animatedScore, setAnimatedScore] = useState(0);
+
+	// 문제 전환 진입 애니메이션 (fade + slide-up)
+	const questionFade = useRef(new Animated.Value(0)).current;
+	const questionSlide = useRef(new Animated.Value(scaleHeight(12))).current;
+	// 타이머 정리를 위한 ref (카운트다운 / 결과 점수 딜레이)
+	const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const countdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const scoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	useEffect(() => {
 		const allProverbs = ProverbServices.selectProverbList();
@@ -137,11 +146,49 @@ const InfinityQuizScreen = () => {
 	useEffect(() => {
 		if (gameResult) {
 			// 애니메이션을 위해 100ms 딜레이 후 점수 적용
-			setTimeout(() => {
+			scoreTimeoutRef.current = setTimeout(() => {
 				setAnimatedScore(gameResult.finalScore);
 			}, 100);
 		}
+		return () => {
+			if (scoreTimeoutRef.current) {
+				clearTimeout(scoreTimeoutRef.current);
+			}
+		};
 	}, [gameResult]);
+
+	// 문제가 바뀔 때마다 카드 진입 애니메이션
+	useEffect(() => {
+		if (isGameOver) {
+			return;
+		}
+		questionFade.setValue(0);
+		questionSlide.setValue(scaleHeight(12));
+		const entrance = Animated.parallel([
+			Animated.timing(questionFade, { toValue: 1, duration: 250, useNativeDriver: true }),
+			Animated.timing(questionSlide, { toValue: 0, duration: 250, useNativeDriver: true }),
+		]);
+		entrance.start();
+		return () => entrance.stop();
+	}, [currentIndex, isGameOver, questionFade, questionSlide]);
+
+	// 언마운트 시 카운트다운 타이머 / 애니메이션 정리
+	useEffect(() => {
+		return () => {
+			if (countdownTimerRef.current) {
+				clearInterval(countdownTimerRef.current);
+			}
+			if (countdownTimeoutRef.current) {
+				clearTimeout(countdownTimeoutRef.current);
+			}
+			scaleAnim.stopAnimation();
+			scoreAnim.stopAnimation();
+			comboAnim.stopAnimation();
+			comboShake.stopAnimation();
+			comboEffectAnim.stopAnimation();
+			toastOpacity.stopAnimation();
+		};
+	}, [scaleAnim, scoreAnim, comboAnim, comboShake, comboEffectAnim, toastOpacity]);
 
 	useEffect(() => {
 		if (questionList.length > 0 && currentIndex < questionList.length) {
@@ -185,21 +232,24 @@ const InfinityQuizScreen = () => {
 
 	// lives 감소 시 애니메이션
 	useEffect(() => {
-		if (lives < MAX_LIVES) {
-			const indexToAnimate = lives; // ex: 4 -> 3일 때 index 3 애니메이션
-			Animated.sequence([
-				Animated.timing(heartAnimations[indexToAnimate], {
-					toValue: 0.8,
-					duration: 250,
-					useNativeDriver: true,
-				}),
-				Animated.timing(heartAnimations[indexToAnimate], {
-					toValue: 1,
-					duration: 150,
-					useNativeDriver: true,
-				}),
-			]).start();
+		if (lives >= MAX_LIVES) {
+			return;
 		}
+		const indexToAnimate = lives; // ex: 4 -> 3일 때 index 3 애니메이션
+		const heartAnim = Animated.sequence([
+			Animated.timing(heartAnimations[indexToAnimate], {
+				toValue: 0.8,
+				duration: 250,
+				useNativeDriver: true,
+			}),
+			Animated.timing(heartAnimations[indexToAnimate], {
+				toValue: 1,
+				duration: 150,
+				useNativeDriver: true,
+			}),
+		]);
+		heartAnim.start();
+		return () => heartAnim.stop();
 	}, [lives]);
 
 	/**
@@ -263,13 +313,16 @@ const InfinityQuizScreen = () => {
 		setCount(countdown); // 시작 시 3 한 번만 세팅
 		animateScale(); // 첫 애니메이션도 같이 실행
 
+		if (countdownTimerRef.current) {
+			clearInterval(countdownTimerRef.current);
+		}
 		const timer = setInterval(() => {
 			countdown--;
 
 			if (countdown < 0) {
 				clearInterval(timer);
 
-				setTimeout(() => {
+				countdownTimeoutRef.current = setTimeout(() => {
 					setIsCountingDown(false);
 					resetGame(); // 기존 resetGame 호출
 				}, 800);
@@ -279,6 +332,7 @@ const InfinityQuizScreen = () => {
 			setCount(countdown);
 			animateScale();
 		}, 1000);
+		countdownTimerRef.current = timer;
 	};
 
 	const handleGameOver = () => {
@@ -531,7 +585,7 @@ const InfinityQuizScreen = () => {
 			<ScrollView
 				ref={scrollViewRef}
 				style={{ flex: 1 }}
-				contentContainerStyle={isGameOver ? styles.resultScrollContent : undefined}
+				contentContainerStyle={isGameOver ? styles.resultScrollContent : styles.quizScrollContent}
 				onScroll={scrollHandler.onScroll}
 				keyboardShouldPersistTaps="handled">
 				{!isGameOver && (
@@ -581,7 +635,7 @@ const InfinityQuizScreen = () => {
 											},
 										],
 									},
-									combo >= 2 && { color: '#EF4444' },
+									combo >= 2 && { color: COLORS.danger },
 								]}>
 								{combo} Combo
 							</Animated.Text>
@@ -591,7 +645,7 @@ const InfinityQuizScreen = () => {
 				{!isGameOver && (
 					<View style={styles.timeBoxWrapper}>
 						<View style={styles.timeBox}>
-							<IconComponent name="clock-o" type="FontAwesome" color="#22C55E" size={scaledSize(18)} />
+							<IconComponent name="clock-o" type="FontAwesome" color={COLORS.primary} size={scaledSize(18)} />
 							<Text style={styles.timeText}>남은 시간: {formattedTime}</Text>
 						</View>
 					</View>
@@ -615,8 +669,10 @@ const InfinityQuizScreen = () => {
 										setIsPaused(true); // ✅ 찬스 팝업 동안 타이머 일시정지
 										setShowChanceAd(true); // ✅ 찬스 사용 시 무조건 광고 노출 후 힌트 표시
 									}}
-									style={styles.chanceContent}>
-									<IconComponent name="magic" type="FontAwesome" color="#16A34A" size={scaledSize(12)} />
+									style={styles.chanceContent}
+									activeOpacity={0.8}
+									hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+									<IconComponent name="magic" type="FontAwesome" color={COLORS.primaryDark} size={scaledSize(12)} />
 									<Text style={styles.chanceText}>찬스</Text>
 								</TouchableOpacity>
 							</View>
@@ -635,7 +691,7 @@ const InfinityQuizScreen = () => {
 										name="heart"
 										type="FontAwesome"
 										size={scaledSize(15)}
-										color={i < lives ? '#EF4444' : '#E2E8F0'}
+										color={i < lives ? COLORS.danger : COLORS.border}
 									/>
 								</Animated.View>
 							))}
@@ -651,9 +707,11 @@ const InfinityQuizScreen = () => {
 									setCombo(0);
 									showToast('⏭️ 이번 문제는 건너뛸게요! 스킵은 게임당 한 번만 사용할 수 있어요');
 								}}
-								style={styles.rightFixed}>
+								style={styles.rightFixed}
+								activeOpacity={0.8}
+								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
 								<View style={styles.skipContent}>
-									<IconComponent name="forward" type="FontAwesome" color="#16A34A" size={scaledSize(12)} />
+									<IconComponent name="forward" type="FontAwesome" color={COLORS.primaryDark} size={scaledSize(12)} />
 									<Text style={styles.skipText}>스킵</Text>
 								</View>
 							</TouchableOpacity>
@@ -701,18 +759,18 @@ const InfinityQuizScreen = () => {
 									<>
 										{/* ✅ 정답 / 오답 강조 카드 */}
 										<View style={styles.resultScoreCardRow}>
-											<View style={[styles.resultScoreCard, { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' }]}>
-												<View style={[styles.resultScoreIcon, { backgroundColor: '#22C55E' }]}>
-													<IconComponent name="check" type="materialIcons" color="#fff" size={scaledSize(16)} />
+											<View style={[styles.resultScoreCard, { backgroundColor: COLORS.primaryBg, borderColor: '#BBF7D0' }]}>
+												<View style={[styles.resultScoreIcon, { backgroundColor: COLORS.primary }]}>
+													<IconComponent name="check" type="materialIcons" color={COLORS.textWhite} size={scaledSize(16)} />
 												</View>
-												<Text style={[styles.resultScoreValue, { color: '#16A34A' }]}>{gameResult.correctCount}</Text>
+												<Text style={[styles.resultScoreValue, { color: COLORS.primaryDark }]}>{gameResult.correctCount}</Text>
 												<Text style={styles.resultScoreLabel}>정답</Text>
 											</View>
 											<View style={[styles.resultScoreCard, { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }]}>
-												<View style={[styles.resultScoreIcon, { backgroundColor: '#EF4444' }]}>
-													<IconComponent name="close" type="materialIcons" color="#fff" size={scaledSize(16)} />
+												<View style={[styles.resultScoreIcon, { backgroundColor: COLORS.danger }]}>
+													<IconComponent name="close" type="materialIcons" color={COLORS.textWhite} size={scaledSize(16)} />
 												</View>
-												<Text style={[styles.resultScoreValue, { color: '#DC2626' }]}>{gameResult.wrongCount}</Text>
+												<Text style={[styles.resultScoreValue, { color: COLORS.dangerDark }]}>{gameResult.wrongCount}</Text>
 												<Text style={styles.resultScoreLabel}>오답</Text>
 											</View>
 										</View>
@@ -764,7 +822,7 @@ const InfinityQuizScreen = () => {
 											name="bar-chart"
 											type="FontAwesome"
 											size={scaledSize(16)}
-											color="#3B82F6"
+											color={COLORS.secondary}
 											style={{ marginRight: scaleWidth(6) }}
 										/>
 										<Text style={styles.resultBtnSecondaryText}>랭킹</Text>
@@ -778,7 +836,7 @@ const InfinityQuizScreen = () => {
 										<IconComponent
 											name="refresh"
 											type="FontAwesome"
-											color="#fff"
+											color={COLORS.textWhite}
 											size={scaledSize(16)}
 											style={{ marginRight: scaleWidth(6) }}
 										/>
@@ -789,22 +847,23 @@ const InfinityQuizScreen = () => {
 						</View>
 
 						<TouchableOpacity
+							activeOpacity={0.8}
 							onPress={() => setIsFeedbackOpen(!isFeedbackOpen)}
 							style={{
-								backgroundColor: '#F1F5F9',
-								borderRadius: scaleWidth(10),
+								backgroundColor: COLORS.surfaceAlt,
+								borderRadius: RADIUS.sm,
 								paddingVertical: scaleHeight(10),
-								paddingHorizontal: scaleWidth(16),
-								marginTop: scaleHeight(12),
+								paddingHorizontal: SPACING_W.lg,
+								marginTop: SPACING_H.md,
 								flexDirection: 'row',
 								justifyContent: 'space-between',
 								alignItems: 'center',
 							}}>
 							<Text
 								style={{
-									fontSize: scaledSize(15),
+									fontSize: FONT_SIZES.mdPlus,
 									fontWeight: '600',
-									color: '#334155',
+									color: COLORS.text,
 									marginRight: scaleWidth(5),
 								}}>
 								정답과 해설 보기
@@ -812,7 +871,7 @@ const InfinityQuizScreen = () => {
 							<IconComponent
 								name={isFeedbackOpen ? 'angle-up' : 'angle-down'}
 								type="FontAwesome"
-								color="#334155"
+								color={COLORS.text}
 								size={scaledSize(18)}
 							/>
 						</TouchableOpacity>
@@ -831,34 +890,34 @@ const InfinityQuizScreen = () => {
 												setSelectedProverb(q);
 												setDetailModalVisible(true);
 											}}
-											style={[styles.feedbackItem, { backgroundColor: isCorrect ? '#EFF6FF' : '#FEF2F2' }]}>
+											style={[styles.feedbackItem, { backgroundColor: isCorrect ? COLORS.secondaryBg : '#FEF2F2' }]}>
 											<View style={styles.feedbackContent}>
 												<View style={{ flex: 1 }}>
 													<View style={styles.feedbackTitleRow}>
-														<Text style={[styles.feedbackTitle, { color: '#1E293B', flex: 1 }]} numberOfLines={1}>
+														<Text style={[styles.feedbackTitle, { color: COLORS.textStrong, flex: 1 }]} numberOfLines={1}>
 															{i + 1}. {q.proverb}
 														</Text>
-														<View style={[styles.feedbackResultBadge, { backgroundColor: isCorrect ? '#DCFCE7' : '#FEE2E2' }]}>
+														<View style={[styles.feedbackResultBadge, { backgroundColor: isCorrect ? COLORS.primarySoft : COLORS.dangerBg }]}>
 															<IconComponent
 																type="materialIcons"
 																name={isCorrect ? 'check-circle' : 'cancel'}
 																size={scaledSize(12)}
-																color={isCorrect ? '#16A34A' : '#DC2626'}
+																color={isCorrect ? COLORS.primaryDark : COLORS.dangerDark}
 															/>
-															<Text style={[styles.feedbackResultBadgeText, { color: isCorrect ? '#16A34A' : '#DC2626' }]}>
+															<Text style={[styles.feedbackResultBadgeText, { color: isCorrect ? COLORS.primaryDark : COLORS.dangerDark }]}>
 																{isCorrect ? '정답' : '오답'}
 															</Text>
 														</View>
 													</View>
 													<Text style={styles.feedbackMeaning}>
-														의미: <Text style={{ fontWeight: 'bold' }}>{q.longMeaning || q.meaning}</Text>
+														의미: <Text style={{ fontWeight: '700' }}>{q.longMeaning || q.meaning}</Text>
 													</Text>
 												</View>
 												<IconComponent
 													name="chevron-right"
 													type="FontAwesome"
 													size={scaledSize(16)}
-													color="#94A3B8"
+													color={COLORS.textLight}
 													style={styles.feedbackArrow}
 												/>
 											</View>
@@ -869,13 +928,14 @@ const InfinityQuizScreen = () => {
 						)}
 					</>
 				) : (
-					<View
+					<Animated.View
 						style={[
 							styles.questionBox,
 							feedback === 'correct' && styles.questionBoxCorrect,
 							feedback === 'wrong' && styles.questionBoxWrong,
+							{ opacity: questionFade, transform: [{ translateY: questionSlide }] },
 						]}>
-						<View style={{ marginBottom: scaleHeight(18), alignItems: 'center' }}>
+						<View style={{ marginBottom: SPACING_H.lg, alignItems: 'center' }}>
 							<Text style={styles.questionText}>
 								<Text style={styles.questionIdiom}>
 									{current.proverb}
@@ -889,9 +949,9 @@ const InfinityQuizScreen = () => {
 										type="materialIcons"
 										name={feedback === 'correct' ? 'check-circle' : 'cancel'}
 										size={scaledSize(14)}
-										color={feedback === 'correct' ? '#16A34A' : '#DC2626'}
+										color={feedback === 'correct' ? COLORS.primaryDark : COLORS.dangerDark}
 									/>
-									<Text style={[styles.feedbackTagText, { color: feedback === 'correct' ? '#16A34A' : '#DC2626' }]}>
+									<Text style={[styles.feedbackTagText, { color: feedback === 'correct' ? COLORS.primaryDark : COLORS.dangerDark }]}>
 										{feedback === 'correct' ? '정답입니다' : '오답입니다'}
 									</Text>
 								</View>
@@ -931,19 +991,20 @@ const InfinityQuizScreen = () => {
 										{choice}
 									</Text>
 									{showCorrect && (
-										<IconComponent name="check-circle" type="materialIcons" size={scaledSize(20)} color="#16A34A" />
+										<IconComponent name="check-circle" type="materialIcons" size={scaledSize(20)} color={COLORS.primaryDark} />
 									)}
-									{showWrong && <IconComponent name="cancel" type="materialIcons" size={scaledSize(20)} color="#DC2626" />}
+									{showWrong && <IconComponent name="cancel" type="materialIcons" size={scaledSize(20)} color={COLORS.dangerDark} />}
 								</TouchableOpacity>
 							);
 						})}
-					</View>
+					</Animated.View>
 				)}
 			</ScrollView>
 
 			<View style={styles.bottomExitWrapper}>
 				<TouchableOpacity
 					style={styles.exitButton}
+					activeOpacity={0.85}
 					onPress={() => {
 						setIsPaused(true); // 타이머 일시정지
 						setShowExitModal(true);
@@ -979,7 +1040,7 @@ const InfinityQuizScreen = () => {
 				<View style={styles.modalOverlay}>
 					<View style={styles.chanceModalCard}>
 						<View style={styles.chanceModalHeaderIcon}>
-							<IconComponent name="magic" type="FontAwesome" color="#fff" size={scaledSize(22)} />
+							<IconComponent name="magic" type="FontAwesome" color={COLORS.textWhite} size={scaledSize(22)} />
 						</View>
 						<Text style={styles.chanceModalTitle}>찬스 힌트</Text>
 						<Text style={styles.chanceModalSubtitle}>아래 단서를 모두 활용해 정답을 찾아보세요</Text>
@@ -1043,7 +1104,8 @@ const InfinityQuizScreen = () => {
 							<Text style={styles.exitModalMessage}>진행 중인 퀴즈는 저장되지 않습니다.</Text>
 							<View style={styles.modalButtonRow}>
 								<TouchableOpacity
-									style={[styles.modalBackButton, { backgroundColor: '#CBD5E1' }]}
+									activeOpacity={0.85}
+									style={[styles.modalBackButton, { backgroundColor: COLORS.borderDark }]}
 									onPress={() => {
 										setShowExitModal(false);
 										setIsPaused(false); // 타이머 재개
@@ -1051,6 +1113,7 @@ const InfinityQuizScreen = () => {
 									<Text style={styles.modalButtonText}>취소</Text>
 								</TouchableOpacity>
 								<TouchableOpacity
+									activeOpacity={0.85}
 									style={styles.exitModalConfirmButton}
 									onPress={() => {
 										setShowExitModal(false);
@@ -1083,8 +1146,8 @@ const InfinityQuizScreen = () => {
 
 			{/* 최하단에 위치할것!! */}
 			{showScrollTop && (
-				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop}>
-					<IconComponent type="MaterialIcons" name="arrow-upward" size={scaledSize(24)} color="#fff" />
+				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop} activeOpacity={0.85}>
+					<IconComponent type="MaterialIcons" name="arrow-upward" size={scaledSize(24)} color={COLORS.textWhite} />
 				</TouchableOpacity>
 			)}
 
@@ -1113,8 +1176,8 @@ const InfinityQuizScreen = () => {
 					<Text
 						style={{
 							fontSize: scaledSize(36),
-							fontWeight: 'bold',
-							color: '#EF4444',
+							fontWeight: '700',
+							color: COLORS.danger,
 							textShadowColor: '#000',
 							textShadowOffset: { width: 1, height: 1 },
 							textShadowRadius: 2,
@@ -1137,17 +1200,17 @@ const InfinityQuizScreen = () => {
 					}}>
 					<View
 						style={{
-							backgroundColor: '#1E293B',
+							backgroundColor: COLORS.textStrong,
 							paddingVertical: isToastClosable ? scaleHeight(20) : scaleHeight(12),
 							paddingHorizontal: isToastClosable ? scaleWidth(24) : scaleWidth(18),
-							borderRadius: scaleWidth(24),
+							borderRadius: RADIUS.xl,
 							minHeight: isToastClosable ? scaleHeight(100) : undefined,
 							minWidth: isToastClosable ? scaleWidth(200) : undefined,
 							maxWidth: '88%',
 							justifyContent: 'center',
 							alignItems: 'center',
 							flexDirection: isToastClosable ? 'column' : 'row',
-							gap: scaleWidth(8),
+							gap: SPACING_W.sm,
 							shadowColor: '#000',
 							shadowOffset: { width: 0, height: 4 },
 							shadowOpacity: 0.25,
@@ -1155,7 +1218,7 @@ const InfinityQuizScreen = () => {
 						}}>
 						<Text
 							style={{
-								color: '#fff',
+								color: COLORS.textWhite,
 								fontSize: isToastClosable ? scaledSize(18) : scaledSize(14),
 								fontWeight: '700',
 								textAlign: 'center',
@@ -1173,16 +1236,16 @@ const InfinityQuizScreen = () => {
 									toastOpacity.setValue(0);
 								}}
 								style={{
-									marginTop: scaleHeight(4),
-									backgroundColor: '#334155',
+									marginTop: SPACING_H.xs,
+									backgroundColor: COLORS.text,
 									paddingVertical: scaleHeight(6),
-									paddingHorizontal: scaleWidth(16),
-									borderRadius: scaleWidth(12),
+									paddingHorizontal: SPACING_W.lg,
+									borderRadius: RADIUS.md,
 								}}>
 								<Text
 									style={{
-										color: '#fff',
-										fontSize: scaledSize(14),
+										color: COLORS.textWhite,
+										fontSize: FONT_SIZES.md,
 										fontWeight: '600',
 									}}>
 									닫기
@@ -1199,76 +1262,76 @@ const InfinityQuizScreen = () => {
 export default InfinityQuizScreen;
 
 const styles = StyleSheet.create({
-	container: { flex: 1, padding: scaleWidth(20), backgroundColor: '#fff' },
+	container: { flex: 1, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.md, backgroundColor: COLORS.surface },
 	header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-	score: { fontSize: scaledSize(20), fontWeight: 'bold' },
-	lives: { fontSize: scaledSize(20), color: 'red' },
+	score: { fontSize: FONT_SIZES.xxl, fontWeight: '700' },
+	lives: { fontSize: FONT_SIZES.xxl, color: 'red' },
 	statusText: {
-		fontSize: scaledSize(14),
-		color: '#64748B',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
 	},
 	scoreValue: {
-		fontSize: scaledSize(20),
-		fontWeight: 'bold',
-		color: '#334155',
-		marginTop: scaleHeight(4),
+		fontSize: FONT_SIZES.xxl,
+		fontWeight: '700',
+		color: COLORS.text,
+		marginTop: SPACING_H.xs,
 	},
 
-	correct: { backgroundColor: '#DBEAFE' },
+	correct: { backgroundColor: COLORS.secondarySoft },
 	wrong: { backgroundColor: '#FECACA' },
 	gameOverBox: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingTop: scaleHeight(8),
+		paddingTop: SPACING_H.sm,
 	},
 	gameOverText: {
-		fontSize: scaledSize(24),
-		fontWeight: 'bold',
+		fontSize: FONT_SIZES.title,
+		fontWeight: '700',
 	},
 	finalScore: {
-		fontSize: scaledSize(22),
+		fontSize: FONT_SIZES.heading,
 		marginBottom: scaleHeight(30),
 	},
 	restartBtn: {
 		paddingVertical: scaleHeight(14),
 		paddingHorizontal: scaleWidth(30),
-		backgroundColor: '#3B82F6',
-		borderRadius: scaledSize(10),
-		marginBottom: scaleHeight(24),
+		backgroundColor: COLORS.secondary,
+		borderRadius: RADIUS.sm,
+		marginBottom: SPACING_H.xxl,
 	},
 	restartText: {
-		color: 'white',
-		fontWeight: 'bold',
-		fontSize: scaledSize(18),
+		color: COLORS.textWhite,
+		fontWeight: '700',
+		fontSize: FONT_SIZES.xl,
 	},
 	bottomExitWrapper: {
 		width: '100%',
 		height: scaleHeight(30), // ✅ 명시적 높이 추가
 		alignItems: 'center',
-		backgroundColor: '#fff',
+		backgroundColor: COLORS.surface,
 		borderTopWidth: 1,
-		borderTopColor: '#F1F5F9',
+		borderTopColor: COLORS.surfaceAlt,
 		paddingTop: scaleHeight(6),
 		paddingBottom: Platform.OS === 'android' ? scaleHeight(10) : scaleHeight(14),
 	},
 	exitButton: {
-		backgroundColor: '#64748B',
+		backgroundColor: COLORS.textSecondary,
 		paddingVertical: scaleHeight(10),
 		paddingHorizontal: scaleWidth(32),
-		borderRadius: scaleWidth(20),
+		borderRadius: RADIUS.round,
 		height: scaleHeight(40), // ✅ 버튼 높이 보장
 		justifyContent: 'center', // 수직 정렬 보장
 		alignItems: 'center',
 	},
 	exitButtonText: {
-		color: '#fff',
-		fontSize: scaledSize(14), // 🔽 기존보다 작게
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.md, // 🔽 기존보다 작게
 		fontWeight: '600',
 	},
 	modalOverlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.5)',
+		backgroundColor: COLORS.dim,
 		// backgroundColor: 'red',
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -1277,30 +1340,30 @@ const styles = StyleSheet.create({
 	exitModal: {
 		width: '85%',
 		maxHeight: '80%',
-		backgroundColor: 'white',
+		backgroundColor: COLORS.surface,
 		// backgroundColor: 'red',
-		borderRadius: scaleWidth(16),
-		padding: scaleWidth(20),
+		borderRadius: RADIUS.lg,
+		padding: SPACING_W.xl,
 	},
 	exitModalTitle: {
-		fontSize: scaledSize(20),
-		fontWeight: 'bold',
-		color: '#334155',
-		marginBottom: scaleHeight(12),
+		fontSize: FONT_SIZES.xxl,
+		fontWeight: '700',
+		color: COLORS.text,
+		marginBottom: SPACING_H.md,
 		textAlign: 'center',
 	},
 	exitModalMessage: {
-		fontSize: scaledSize(15),
-		color: '#64748B',
-		marginBottom: scaleHeight(20),
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.textSecondary,
+		marginBottom: SPACING_H.xl,
 		textAlign: 'center',
 		lineHeight: scaleHeight(22),
 	},
 	exitModalConfirmButton: {
 		flex: 1,
-		backgroundColor: '#EF4444',
+		backgroundColor: COLORS.danger,
 		padding: scaleHeight(12),
-		borderRadius: scaleWidth(8),
+		borderRadius: RADIUS.sm,
 		marginLeft: scaleWidth(6),
 		alignItems: 'center',
 	},
@@ -1311,45 +1374,45 @@ const styles = StyleSheet.create({
 	},
 	modalBackButton: {
 		flex: 1,
-		backgroundColor: '#CBD5E1',
+		backgroundColor: COLORS.borderDark,
 		padding: scaleHeight(12),
-		borderRadius: scaleWidth(8),
+		borderRadius: RADIUS.sm,
 		marginRight: scaleWidth(6),
 		alignItems: 'center',
 	},
 	modalStartButton: {
 		flex: 1,
-		backgroundColor: '#3B82F6',
+		backgroundColor: COLORS.secondary,
 		padding: scaleHeight(12),
-		borderRadius: scaleWidth(8),
+		borderRadius: RADIUS.sm,
 		marginLeft: scaleWidth(6),
 		alignItems: 'center',
 	},
 	modalButtonText: {
-		color: '#fff',
+		color: COLORS.textWhite,
 		fontWeight: '600',
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.mdPlus,
 	},
 	fixedHeader: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'flex-start',
-		backgroundColor: '#fff',
-		paddingHorizontal: scaleWidth(8),
-		paddingTop: scaleHeight(12),
-		paddingBottom: scaleHeight(8),
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.sm,
+		paddingTop: SPACING_H.md,
+		paddingBottom: SPACING_H.sm,
 		borderBottomWidth: 1,
-		borderBottomColor: '#F1F5F9',
+		borderBottomColor: COLORS.surfaceAlt,
 		zIndex: 10,
 	},
 
 	statusBox: {
 		flex: 1,
-		marginHorizontal: scaleWidth(4),
-		backgroundColor: '#F8FAFC',
-		borderRadius: scaleWidth(12),
+		marginHorizontal: SPACING_W.xs,
+		backgroundColor: COLORS.background,
+		borderRadius: RADIUS.md,
 		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(8),
+		paddingHorizontal: SPACING_W.sm,
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
@@ -1360,18 +1423,18 @@ const styles = StyleSheet.create({
 	statusRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(4),
+		gap: SPACING_W.xs,
 	},
 
 	statusLabel: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 	},
 
 	statusValue: {
-		fontSize: scaledSize(14),
-		fontWeight: 'bold',
-		color: '#334155',
+		fontSize: FONT_SIZES.md,
+		fontWeight: '700',
+		color: COLORS.text,
 	},
 	heartRow: {
 		flexDirection: 'row',
@@ -1382,33 +1445,33 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		gap: scaleWidth(4),
+		gap: SPACING_W.xs,
 		marginBottom: scaleHeight(6),
 	},
 	statusWrapper: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		paddingHorizontal: scaleWidth(8),
+		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: scaleHeight(10),
-		backgroundColor: '#fff',
+		backgroundColor: COLORS.surface,
 		borderBottomWidth: 1,
-		borderBottomColor: '#F1F5F9',
+		borderBottomColor: COLORS.surfaceAlt,
 		gap: scaleWidth(6),
 	},
 	statusBoxRow: {
-		marginTop: scaleHeight(30),
+		marginTop: SPACING_H.sm,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		paddingHorizontal: scaleWidth(8),
-		paddingVertical: scaleHeight(10),
-		backgroundColor: '#fff',
-		gap: scaleWidth(6),
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.md,
+		backgroundColor: COLORS.surface,
+		gap: SPACING_W.sm,
 
 		// ✅ 추가된 테두리 스타일
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		borderRadius: scaleWidth(12),
-		marginBottom: scaleHeight(12),
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.md,
+		marginBottom: SPACING_H.md,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
@@ -1416,101 +1479,101 @@ const styles = StyleSheet.create({
 	},
 
 	questionBox: {
-		marginTop: scaleHeight(10),
-		padding: scaleWidth(20),
-		borderRadius: scaledSize(16),
-		backgroundColor: '#F8FAFC',
+		marginTop: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		borderRadius: RADIUS.lg,
+		backgroundColor: COLORS.background,
 		borderWidth: 1,
-		borderColor: '#DBEAFE',
+		borderColor: COLORS.secondarySoft,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 6,
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
 	questionText: {
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
 		textAlign: 'center',
-		color: '#334155',
+		color: COLORS.text,
 		lineHeight: scaleHeight(26),
 	},
 	questionIdiom: {
-		fontSize: scaledSize(17),
-		color: '#3B82F6',
+		fontSize: FONT_SIZES.lg,
+		color: COLORS.secondary,
 		fontWeight: '800',
 	},
 	questionAsk: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 		fontWeight: '700',
 	},
 	feedbackTag: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		alignSelf: 'center',
-		gap: scaleWidth(4),
+		gap: SPACING_W.xs,
 		marginTop: scaleHeight(10),
-		paddingHorizontal: scaleWidth(12),
+		paddingHorizontal: SPACING_W.md,
 		paddingVertical: scaleHeight(5),
-		borderRadius: scaleWidth(999),
+		borderRadius: RADIUS.round,
 	},
-	feedbackTagCorrect: { backgroundColor: '#DCFCE7' },
-	feedbackTagWrong: { backgroundColor: '#FEE2E2' },
-	feedbackTagText: { fontSize: scaledSize(13), fontWeight: '800' },
+	feedbackTagCorrect: { backgroundColor: COLORS.primarySoft },
+	feedbackTagWrong: { backgroundColor: COLORS.dangerBg },
+	feedbackTagText: { fontSize: FONT_SIZES.smPlus, fontWeight: '800' },
 	choicesWrapper: {
 		gap: scaleHeight(10),
 	},
 	choiceBtn: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		paddingVertical: scaleWidth(16),
-		paddingHorizontal: scaleWidth(22),
-		marginVertical: scaleHeight(8),
-		marginHorizontal: scaleWidth(-5),
-		backgroundColor: '#F1F5F9',
-		borderRadius: scaledSize(12),
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.lg,
+		marginVertical: SPACING_H.sm,
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.md,
 		borderWidth: 2,
-		borderColor: '#CBD5E1',
+		borderColor: COLORS.borderDark,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.12,
-		shadowRadius: 4,
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
 	choiceBtnText: {
 		flex: 1,
-		fontSize: scaledSize(16),
+		fontSize: FONT_SIZES.lg,
 		textAlign: 'left',
-		color: '#334155',
+		color: COLORS.text,
 		fontWeight: '500',
 	},
 	choiceLabelBadge: {
 		width: scaleWidth(26),
 		height: scaleWidth(26),
-		borderRadius: scaleWidth(8),
-		backgroundColor: '#fff',
+		borderRadius: RADIUS.sm,
+		backgroundColor: COLORS.surface,
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: scaleWidth(12),
+		marginRight: SPACING_W.md,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 	},
 	choiceLabelText: {
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 		fontWeight: '800',
 	},
 	choiceBtnCorrect: {
-		backgroundColor: '#DCFCE7',
-		borderColor: '#16A34A',
+		backgroundColor: COLORS.primarySoft,
+		borderColor: COLORS.primaryDark,
 	},
 	choiceBtnWrong: {
-		backgroundColor: '#FEE2E2',
-		borderColor: '#DC2626',
+		backgroundColor: COLORS.dangerBg,
+		borderColor: COLORS.dangerDark,
 	},
 	choiceBtnDimmed: {
 		opacity: 0.5,
 	},
 	choiceTextCorrect: {
-		color: '#15803D',
+		color: COLORS.primaryDeep,
 		fontWeight: '800',
 	},
 	choiceTextWrong: {
@@ -1519,28 +1582,28 @@ const styles = StyleSheet.create({
 	},
 	skipTopRightButton: {
 		position: 'absolute',
-		top: scaleHeight(12),
-		right: scaleWidth(12),
+		top: SPACING_H.md,
+		right: SPACING_W.md,
 		zIndex: 1,
 	},
 	skipTopRightText: {
-		fontSize: scaledSize(12),
-		color: '#64748B',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
 		opacity: 0.6,
 		fontWeight: '500',
 	},
 	timeBoxWrapper: {
 		alignItems: 'center',
-		marginBottom: scaleHeight(12),
+		marginBottom: SPACING_H.md,
 	},
 
 	timeBox: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#EFF6FF', // 💚 연한 초록 계열 배경
-		paddingVertical: scaleHeight(8),
-		paddingHorizontal: scaleWidth(16),
-		borderRadius: scaleWidth(20),
+		backgroundColor: COLORS.secondaryBg, // 💚 연한 초록 계열 배경
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.round,
 		borderWidth: 1,
 		borderColor: '#BFDBFE',
 		shadowColor: '#000',
@@ -1550,39 +1613,39 @@ const styles = StyleSheet.create({
 	},
 
 	timeText: {
-		marginLeft: scaleWidth(8),
-		fontSize: scaledSize(15),
+		marginLeft: SPACING_W.sm,
+		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '600',
-		color: '#334155',
+		color: COLORS.text,
 	},
 	skipInlineButton: {
-		backgroundColor: '#F1F5F9',
-		paddingVertical: scaleHeight(4),
+		backgroundColor: COLORS.surfaceAlt,
+		paddingVertical: SPACING_H.xs,
 		paddingHorizontal: scaleWidth(10),
-		borderRadius: scaledSize(8),
+		borderRadius: RADIUS.sm,
 		marginLeft: scaleWidth(6),
 	},
 	skipInlineText: {
-		fontSize: scaledSize(12),
-		color: '#64748B',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
 		fontWeight: '500',
 	},
 	questionBoxCorrect: {
-		backgroundColor: '#DBEAFE', // 연한 초록색 배경
+		backgroundColor: COLORS.secondarySoft, // 연한 초록색 배경
 	},
 	questionBoxWrong: {
-		backgroundColor: '#FEE2E2', // 연한 빨간색 배경
+		backgroundColor: COLORS.dangerBg, // 연한 빨간색 배경
 	},
 	resultSummaryBox: {
 		width: '100%', // ✅ 전체 너비 사용
-		marginTop: scaleHeight(20),
-		marginBottom: scaleHeight(24),
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(20),
-		borderRadius: scaleWidth(14),
-		backgroundColor: '#F8FAFC',
+		marginTop: SPACING_H.xl,
+		marginBottom: SPACING_H.xxl,
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.xl,
+		borderRadius: RADIUS.lg,
+		backgroundColor: COLORS.background,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.05,
@@ -1592,35 +1655,35 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		paddingVertical: scaleHeight(6),
-		paddingHorizontal: scaleWidth(4),
+		paddingHorizontal: SPACING_W.xs,
 		borderBottomWidth: 1,
-		borderBottomColor: '#F1F5F9',
+		borderBottomColor: COLORS.surfaceAlt,
 	},
 	resultText: {
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.mdPlus,
 		marginLeft: scaleWidth(10),
-		color: '#334155',
+		color: COLORS.text,
 		fontWeight: '500',
 	},
 	bold: {
-		fontWeight: 'bold',
+		fontWeight: '700',
 	},
 
 	feedbackList: {
 		width: '100%',
-		marginTop: scaleHeight(20),
-		padding: scaleWidth(12),
+		marginTop: SPACING_H.xl,
+		padding: SPACING_W.md,
 		borderWidth: 1,
-		borderColor: '#CBD5E1',
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#F8FAFC',
+		borderColor: COLORS.borderDark,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.background,
 	},
 	feedbackItem: {
-		padding: scaleWidth(12),
-		borderRadius: scaleWidth(10),
+		padding: SPACING_W.md,
+		borderRadius: RADIUS.sm,
 		marginBottom: scaleHeight(10),
 		borderWidth: 1,
-		borderColor: '#CBD5E1',
+		borderColor: COLORS.borderDark,
 	},
 	feedbackTitleRow: {
 		flexDirection: 'row',
@@ -1632,24 +1695,24 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: scaleWidth(3),
-		borderRadius: scaleWidth(7),
+		borderRadius: RADIUS.sm,
 		paddingHorizontal: scaleWidth(7),
 		paddingVertical: scaleHeight(2),
 	},
-	feedbackResultBadgeText: { fontSize: scaledSize(11), fontWeight: '800' },
+	feedbackResultBadgeText: { fontSize: FONT_SIZES.xs, fontWeight: '800' },
 	feedbackTitle: {
 		flex: 1,
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
 	},
 	feedbackMeaning: {
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 		marginBottom: scaleHeight(2),
-		color: '#334155',
+		color: COLORS.text,
 	},
 	feedbackResult: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 	},
 	countdownOverlay: {
 		flex: 1,
@@ -1660,8 +1723,8 @@ const styles = StyleSheet.create({
 	},
 	countdownText: {
 		fontSize: scaledSize(72),
-		fontWeight: 'bold',
-		color: '#fff',
+		fontWeight: '700',
+		color: COLORS.textWhite,
 		textAlign: 'center',
 		includeFontPadding: false,
 		textAlignVertical: 'center',
@@ -1673,39 +1736,39 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(80),
 		backgroundColor: 'rgba(20, 184, 166, 0.2)',
 		borderWidth: 4,
-		borderColor: '#22C55E',
+		borderColor: COLORS.primary,
 		justifyContent: 'center',
 		alignItems: 'center',
 		overflow: 'hidden',
 	},
 	countdownMessage: {
-		fontSize: scaledSize(17),
-		color: '#fff',
+		fontSize: FONT_SIZES.lg,
+		color: COLORS.textWhite,
 		fontWeight: '700',
 		textAlign: 'center',
 		letterSpacing: 0.3,
 	},
 	countdownMessageWrapper: {
 		marginTop: scaleHeight(32),
-		paddingHorizontal: scaleWidth(24),
+		paddingHorizontal: SPACING_W.xxl,
 		paddingVertical: scaleHeight(10),
 		backgroundColor: 'rgba(255,255,255,0.12)',
-		borderRadius: scaledSize(20),
+		borderRadius: RADIUS.xl,
 		minWidth: scaleWidth(180),
 		alignItems: 'center',
 	},
 	feedbackStatus: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		marginLeft: scaleWidth(8),
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		marginLeft: SPACING_W.sm,
 	},
 	skipButton: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#EFF6FF',
-		borderRadius: scaleWidth(14),
+		backgroundColor: COLORS.secondaryBg,
+		borderRadius: RADIUS.round,
 		paddingVertical: scaleHeight(6),
-		paddingHorizontal: scaleWidth(12),
+		paddingHorizontal: SPACING_W.md,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.1,
@@ -1715,11 +1778,11 @@ const styles = StyleSheet.create({
 	skipContent: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(4),
+		gap: SPACING_W.xs,
 	},
 
 	skipText: {
-		fontSize: scaledSize(11),
+		fontSize: FONT_SIZES.xs,
 		color: '#115E59',
 		fontWeight: '700',
 		lineHeight: scaleHeight(13),
@@ -1729,12 +1792,12 @@ const styles = StyleSheet.create({
 		height: scaleHeight(32),
 		justifyContent: 'center',
 		marginBottom: scaleHeight(6),
-		paddingVertical: scaleHeight(4),
-		paddingHorizontal: scaleWidth(8),
+		paddingVertical: SPACING_H.xs,
+		paddingHorizontal: SPACING_W.sm,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#F8FAFC',
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.background,
 	},
 
 	heartCentered: {
@@ -1752,10 +1815,10 @@ const styles = StyleSheet.create({
 		marginLeft: 'auto',
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#EFF6FF',
-		borderRadius: scaleWidth(14),
+		backgroundColor: COLORS.secondaryBg,
+		borderRadius: RADIUS.round,
 		paddingVertical: scaleHeight(6),
-		paddingHorizontal: scaleWidth(12),
+		paddingHorizontal: SPACING_W.md,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.1,
@@ -1764,9 +1827,9 @@ const styles = StyleSheet.create({
 	},
 	scrollTopButton: {
 		position: 'absolute',
-		right: scaleWidth(24),
+		right: SPACING_W.xxl,
 		bottom: scaleHeight(80), // 기존 16 → 80으로 조정하여 종료 버튼과 겹치지 않도록
-		backgroundColor: '#3B82F6',
+		backgroundColor: COLORS.secondary,
 		width: scaleWidth(40),
 		height: scaleWidth(40),
 		borderRadius: scaleWidth(20),
@@ -1775,22 +1838,22 @@ const styles = StyleSheet.create({
 	},
 	leftFixed: {
 		position: 'absolute',
-		left: scaleWidth(8),
+		left: SPACING_W.sm,
 		justifyContent: 'center',
 		height: '100%',
 	},
 
 	rightFixed: {
 		position: 'absolute',
-		right: scaleWidth(8),
+		right: SPACING_W.sm,
 		justifyContent: 'center',
 		height: '100%',
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#F0FDF4',
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(4),
-		paddingHorizontal: scaleWidth(8),
+		backgroundColor: COLORS.primaryBg,
+		borderRadius: RADIUS.md,
+		paddingVertical: SPACING_H.xs,
+		paddingHorizontal: SPACING_W.sm,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.1,
@@ -1798,32 +1861,32 @@ const styles = StyleSheet.create({
 	},
 
 	chanceText: {
-		fontSize: scaledSize(11),
+		fontSize: FONT_SIZES.xs,
 		lineHeight: scaleHeight(13),
-		color: '#16A34A',
+		color: COLORS.primaryDark,
 		fontWeight: '700',
 	},
 	chanceContent: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#F0FDF4', // 💚 연한 초록색 배경
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(4),
-		paddingHorizontal: scaleWidth(8),
+		backgroundColor: COLORS.primaryBg, // 💚 연한 초록색 배경
+		borderRadius: RADIUS.md,
+		paddingVertical: SPACING_H.xs,
+		paddingHorizontal: SPACING_W.sm,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.1,
 		shadowRadius: 2,
-		gap: scaleWidth(4), // 아이콘과 텍스트 간격
+		gap: SPACING_W.xs, // 아이콘과 텍스트 간격
 	},
 	chanceModalCard: {
 		width: '85%',
 		maxWidth: scaleWidth(360),
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(20),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
 		paddingTop: scaleHeight(22),
 		paddingBottom: scaleHeight(18),
-		paddingHorizontal: scaleWidth(20),
+		paddingHorizontal: SPACING_W.xl,
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 8 },
@@ -1834,109 +1897,109 @@ const styles = StyleSheet.create({
 		width: scaleWidth(52),
 		height: scaleWidth(52),
 		borderRadius: scaleWidth(26),
-		backgroundColor: '#16A34A',
+		backgroundColor: COLORS.primaryDark,
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginBottom: scaleHeight(10),
 	},
 	chanceModalTitle: {
-		fontSize: scaledSize(18),
+		fontSize: FONT_SIZES.xl,
 		fontWeight: '800',
-		color: '#1E293B',
+		color: COLORS.textStrong,
 		marginBottom: scaleHeight(2),
 	},
 	chanceModalSubtitle: {
-		fontSize: scaledSize(12.5),
-		color: '#94A3B8',
-		marginBottom: scaleHeight(16),
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textLight,
+		marginBottom: SPACING_H.lg,
 		fontWeight: '600',
 	},
 	chanceCharBox: {
 		width: '100%',
 		flexDirection: 'row',
-		gap: scaleWidth(8),
+		gap: SPACING_W.sm,
 		marginBottom: scaleHeight(14),
 	},
 	chanceCharRow: {
 		flex: 1,
 		alignItems: 'center',
-		backgroundColor: '#F1F5F9',
-		borderRadius: scaleWidth(10),
-		paddingVertical: scaleHeight(8),
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.sm,
+		paddingVertical: SPACING_H.sm,
 		paddingHorizontal: scaleWidth(6),
 	},
 	chanceCharChar: {
-		fontSize: scaledSize(18),
+		fontSize: FONT_SIZES.xl,
 		fontWeight: '800',
 		color: '#0F172A',
 		marginBottom: scaleHeight(3),
 	},
 	chanceCharReading: {
-		fontSize: scaledSize(11),
-		color: '#3B82F6',
+		fontSize: FONT_SIZES.xs,
+		color: COLORS.secondary,
 		fontWeight: '800',
 		textAlign: 'center',
 		marginTop: scaleHeight(2),
 	},
 	chanceCharMeaning: {
-		fontSize: scaledSize(11),
-		color: '#64748B',
+		fontSize: FONT_SIZES.xs,
+		color: COLORS.textSecondary,
 		fontWeight: '600',
 		textAlign: 'center',
 	},
 	chanceCharSub: {
-		fontSize: scaledSize(9.5),
-		color: '#94A3B8',
+		fontSize: FONT_SIZES.xxs,
+		color: COLORS.textLight,
 		fontWeight: '600',
 		textAlign: 'center',
 		marginTop: scaleHeight(2),
 	},
 	chanceMetaRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: scaleWidth(6), marginBottom: scaleHeight(10) },
-	chanceMetaChip: { backgroundColor: '#EFF6FF', borderRadius: scaleWidth(999), paddingHorizontal: scaleWidth(10), paddingVertical: scaleHeight(4) },
-	chanceMetaChipText: { fontSize: scaledSize(11.5), fontWeight: '700', color: '#3B82F6' },
+	chanceMetaChip: { backgroundColor: COLORS.secondaryBg, borderRadius: RADIUS.round, paddingHorizontal: scaleWidth(10), paddingVertical: SPACING_H.xs },
+	chanceMetaChipText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.secondary },
 	chanceKeywordBox: { width: '100%', marginBottom: scaleHeight(10) },
 	chanceKeywordWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: scaleWidth(6), marginTop: scaleHeight(6) },
-	chanceKeywordChip: { backgroundColor: '#F1F5F9', borderRadius: scaleWidth(8), paddingHorizontal: scaleWidth(8), paddingVertical: scaleHeight(3) },
-	chanceKeywordText: { fontSize: scaledSize(12), fontWeight: '600', color: '#475569' },
+	chanceKeywordChip: { backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.sm, paddingHorizontal: SPACING_W.sm, paddingVertical: scaleHeight(3) },
+	chanceKeywordText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#475569' },
 
 	chanceExampleBox: {
 		width: '100%',
-		backgroundColor: '#F0FDF4',
-		borderRadius: scaleWidth(12),
+		backgroundColor: COLORS.primaryBg,
+		borderRadius: RADIUS.md,
 		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(12),
+		paddingHorizontal: SPACING_W.md,
 		marginBottom: scaleHeight(18),
 	},
 	chanceExampleLabel: {
-		fontSize: scaledSize(12),
+		fontSize: FONT_SIZES.sm,
 		fontWeight: '800',
-		color: '#15803D',
-		marginBottom: scaleHeight(4),
+		color: COLORS.primaryDeep,
+		marginBottom: SPACING_H.xs,
 	},
 	chanceExampleText: {
-		fontSize: scaledSize(13.5),
-		color: '#334155',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.text,
 		fontWeight: '600',
 		lineHeight: scaleHeight(20),
 	},
 	chanceModalButton: {
 		width: '100%',
-		backgroundColor: '#16A34A',
+		backgroundColor: COLORS.primaryDark,
 		paddingVertical: scaleHeight(13),
-		borderRadius: scaleWidth(14),
+		borderRadius: RADIUS.md,
 		alignItems: 'center',
 	},
 	chanceModalButtonText: {
-		color: '#fff',
-		fontSize: scaledSize(15),
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
 	},
 	resultTitleCard: {
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(12),
+		paddingHorizontal: SPACING_W.md,
 		paddingVertical: scaleHeight(10),
 		backgroundColor: '#FFFBEB',
-		borderRadius: scaleWidth(12),
+		borderRadius: RADIUS.md,
 		borderWidth: 1,
 		borderColor: '#FCD34D',
 		shadowColor: '#000',
@@ -1945,23 +2008,26 @@ const styles = StyleSheet.create({
 		shadowRadius: 4,
 	},
 	animatedScore: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
 		color: '#F97316',
+	},
+	quizScrollContent: {
+		paddingBottom: scaleHeight(40),
 	},
 	resultScrollContent: {
 		flexGrow: 1,
 		justifyContent: 'center',
-		paddingBottom: scaleHeight(20),
+		paddingBottom: SPACING_H.xl,
 	},
 	resultWrapper: {
-		marginTop: scaleHeight(8),
+		marginTop: SPACING_H.sm,
 		width: '100%',
 		borderWidth: 1,
-		borderColor: '#CBD5E1',
-		borderRadius: scaleWidth(14),
-		backgroundColor: '#fff',
-		padding: scaleWidth(16),
+		borderColor: COLORS.borderDark,
+		borderRadius: RADIUS.lg,
+		backgroundColor: COLORS.surface,
+		padding: SPACING_W.lg,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
@@ -1972,35 +2038,35 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		width: '100%',
 		gap: scaleWidth(10),
-		marginTop: scaleHeight(4),
-		marginBottom: scaleHeight(8),
+		marginTop: SPACING_H.xs,
+		marginBottom: SPACING_H.sm,
 	},
 	resultHeader: {
 		width: '100%',
 		alignItems: 'center',
-		marginBottom: scaleHeight(4),
+		marginBottom: SPACING_H.xs,
 	},
 	resultHeaderTitle: {
-		fontSize: scaledSize(20),
+		fontSize: FONT_SIZES.xxl,
 		fontWeight: '800',
-		color: '#1E293B',
+		color: COLORS.textStrong,
 	},
 	resultHeaderSub: {
-		fontSize: scaledSize(12.5),
-		color: '#94A3B8',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textLight,
 		fontWeight: '600',
 		marginTop: scaleHeight(3),
 	},
 	scoreHero: {
 		width: '100%',
 		alignItems: 'center',
-		paddingVertical: scaleHeight(12),
+		paddingVertical: SPACING_H.md,
 		marginTop: scaleHeight(6),
 	},
 	scoreHeroLabel: {
-		fontSize: scaledSize(13),
+		fontSize: FONT_SIZES.smPlus,
 		fontWeight: '700',
-		color: '#94A3B8',
+		color: COLORS.textLight,
 		marginBottom: scaleHeight(2),
 	},
 	resultScoreCardRow: {
@@ -2014,7 +2080,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		paddingVertical: scaleHeight(14),
-		borderRadius: scaleWidth(14),
+		borderRadius: RADIUS.lg,
 		borderWidth: 1,
 	},
 	resultScoreIcon: {
@@ -2026,25 +2092,25 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(6),
 	},
 	resultScoreValue: {
-		fontSize: scaledSize(24),
+		fontSize: FONT_SIZES.title,
 		fontWeight: '800',
 	},
 	resultScoreLabel: {
-		fontSize: scaledSize(12.5),
-		color: '#64748B',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
 		fontWeight: '700',
 		marginTop: scaleHeight(2),
 	},
 	statList: {
 		width: '100%',
-		backgroundColor: '#F8FAFC',
-		borderRadius: scaleWidth(14),
+		backgroundColor: COLORS.background,
+		borderRadius: RADIUS.lg,
 		borderWidth: 1,
-		borderColor: '#EEF2F6',
-		paddingHorizontal: scaleWidth(16),
-		paddingVertical: scaleHeight(4),
+		borderColor: COLORS.border,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xs,
 		marginTop: scaleHeight(6),
-		marginBottom: scaleHeight(12),
+		marginBottom: SPACING_H.md,
 	},
 	statLine: {
 		flexDirection: 'row',
@@ -2053,33 +2119,33 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(11),
 	},
 	statLineLabel: {
-		fontSize: scaledSize(13.5),
-		color: '#64748B',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 		fontWeight: '600',
 	},
 	statLineValue: {
-		fontSize: scaledSize(14.5),
-		color: '#1E293B',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textStrong,
 		fontWeight: '800',
 	},
 	statLineDivider: {
 		height: 1,
-		backgroundColor: '#EEF2F6',
+		backgroundColor: COLORS.border,
 	},
 	scoreHeroNumber: {
 		fontSize: scaledSize(56),
-		fontWeight: 'bold',
-		color: '#EF4444',
+		fontWeight: '700',
+		color: COLORS.danger,
 	},
 	scoreHeroUnit: {
-		fontSize: scaledSize(24),
+		fontSize: FONT_SIZES.title,
 		fontWeight: '700',
-		color: '#EF4444',
-		marginLeft: scaleWidth(4),
-		marginBottom: scaleHeight(12),
+		color: COLORS.danger,
+		marginLeft: SPACING_W.xs,
+		marginBottom: SPACING_H.md,
 	},
 	scoreHeroMsg: {
-		fontSize: scaledSize(13),
+		fontSize: FONT_SIZES.smPlus,
 		color: '#475569',
 		textAlign: 'center',
 		fontWeight: '600',
@@ -2091,46 +2157,46 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
 		width: '100%',
-		gap: scaleWidth(8),
+		gap: SPACING_W.sm,
 		marginTop: scaleHeight(14),
-		marginBottom: scaleHeight(12),
+		marginBottom: SPACING_H.md,
 	},
 	statChip: {
 		flexGrow: 1,
 		flexBasis: '30%',
 		alignItems: 'center',
-		backgroundColor: '#F8FAFC',
-		borderRadius: scaleWidth(12),
+		backgroundColor: COLORS.background,
+		borderRadius: RADIUS.md,
 		borderWidth: 1,
-		borderColor: '#EEF2F6',
-		paddingVertical: scaleHeight(12),
+		borderColor: COLORS.border,
+		paddingVertical: SPACING_H.md,
 	},
 	statChipValue: {
-		fontSize: scaledSize(18),
+		fontSize: FONT_SIZES.xl,
 		fontWeight: '800',
-		color: '#334155',
+		color: COLORS.text,
 		marginBottom: scaleHeight(2),
 	},
 	statChipLabel: {
-		fontSize: scaledSize(11),
-		color: '#94A3B8',
+		fontSize: FONT_SIZES.xs,
+		color: COLORS.textLight,
 		fontWeight: '600',
 	},
 	usedTagRow: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		gap: scaleWidth(8),
+		gap: SPACING_W.sm,
 		marginBottom: scaleHeight(14),
 	},
 	usedTag: {
-		backgroundColor: '#F0FDF4',
-		borderRadius: scaleWidth(20),
+		backgroundColor: COLORS.primaryBg,
+		borderRadius: RADIUS.round,
 		paddingVertical: scaleHeight(5),
-		paddingHorizontal: scaleWidth(12),
+		paddingHorizontal: SPACING_W.md,
 	},
 	usedTagText: {
-		fontSize: scaledSize(11.5),
-		color: '#15803D',
+		fontSize: FONT_SIZES.xs,
+		color: COLORS.primaryDeep,
 		fontWeight: '700',
 	},
 	resultBtn: {
@@ -2138,26 +2204,26 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
-		borderRadius: scaleWidth(12),
+		borderRadius: RADIUS.md,
 		paddingVertical: scaleHeight(13),
 	},
 	resultBtnPrimary: {
-		backgroundColor: '#3B82F6',
+		backgroundColor: COLORS.secondary,
 	},
 	resultBtnPrimaryText: {
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 		fontWeight: '800',
-		color: '#fff',
+		color: COLORS.textWhite,
 	},
 	resultBtnSecondary: {
-		backgroundColor: '#EFF6FF',
+		backgroundColor: COLORS.secondaryBg,
 		borderWidth: 1,
 		borderColor: '#BFDBFE',
 	},
 	resultBtnSecondaryText: {
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 		fontWeight: '800',
-		color: '#3B82F6',
+		color: COLORS.secondary,
 	},
 	globalConfettiWrapper: {
 		position: 'absolute',

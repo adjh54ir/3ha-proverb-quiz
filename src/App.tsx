@@ -14,6 +14,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainDataType } from './types/MainDataType';
 import ProverbServices from './services/ProverbServices';
 import { MainStorageKeyType } from './types/MainStorageKeyType';
+import { requestTrackingPermission } from './utils/PermissionUtils';
+import DateUtils from './utils/DateUtils';
 // import * as RNIap from 'react-native-iap';
 
 /**
@@ -29,6 +31,7 @@ const App = () => {
 		console.log('Now env mode : [', REACT_NATIVE_APP_MODE, ']');
 
 		checkTodayQuiz();
+		requestTrackingPermission(); // iOS ATT (내부에서 플랫폼/AppState 가드)
 		// initIAP();
 
 		// initPurchaseInfo(); // ✅ 구매정보 초기 세팅
@@ -95,11 +98,11 @@ const App = () => {
 	 * 최초 앱을 접근하면 오늘의 퀴즈를 발급합니다.
 	 */
 	const checkTodayQuiz = async () => {
-		const todayStr = new Date().toISOString().slice(0, 10);
+		const todayStr = DateUtils.getLocalDateString();
 		const storedJson = await AsyncStorage.getItem(TODAY_QUIZ_LIST);
 		const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
 
-		const alreadyExists = storedArr.some((q) => q.quizDate.slice(0, 10) === todayStr);
+		const alreadyExists = storedArr.some((q) => DateUtils.toLocalDateKey(q.quizDate) === todayStr);
 
 		console.log('alreadyExists :: ', alreadyExists);
 		if (!alreadyExists) {

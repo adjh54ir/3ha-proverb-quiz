@@ -1,6 +1,7 @@
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { Paths } from "./conf/Paths";
 import Home from "@/screens/Home";
+import { COLORS } from "@/const/common/Theme";
 
 const TopTab = createMaterialTopTabNavigator();
 const TopNavigator = () => {
@@ -8,10 +9,10 @@ const TopNavigator = () => {
     <TopTab.Navigator
       initialRouteName={Paths.HOME}
       screenOptions={{
-        tabBarActiveTintColor: "#e91e63",
+        tabBarActiveTintColor: COLORS.primary,
         swipeEnabled: true, // 스와이프 활성화
         tabBarStyle: {
-          backgroundColor: "#ffffff",
+          backgroundColor: COLORS.surface,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: -2 },
           shadowOpacity: 0.1,

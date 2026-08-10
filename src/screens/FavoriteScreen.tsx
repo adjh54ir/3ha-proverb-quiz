@@ -14,6 +14,7 @@ import {
 	Platform,
 	RefreshControl,
 	Modal,
+	Animated,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +23,7 @@ import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
@@ -34,8 +36,8 @@ import FavoriteAddModal from './modal/FavoriteAddModal';
 const COMMON_ALL_OPTION = {
 	label: '전체',
 	value: '전체',
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#64748B" />,
-	labelStyle: { marginLeft: scaleWidth(6), fontSize: scaledSize(14) },
+	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />,
+	labelStyle: { marginLeft: SPACING_W.xs, fontSize: FONT_SIZES.md },
 };
 
 const LEVEL_DROPDOWN_ITEMS = [
@@ -46,9 +48,31 @@ const LEVEL_DROPDOWN_ITEMS = [
 	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color="#EF4444" /> },
 ];
 
+/**
+ * FlatList 아이템 fade + slide-up 진입 애니메이션 래퍼
+ */
+const AnimatedListItem = React.memo(({ children, index }: { children: React.ReactNode; index: number }) => {
+	const fadeAnim = useRef(new Animated.Value(0)).current;
+	const translateY = useRef(new Animated.Value(scaleHeight(12))).current;
+
+	useEffect(() => {
+		// 처음 6개만 stagger, 이후는 즉시 표시 (스크롤 성능 보호)
+		const delay = index < 6 ? index * 40 : 0;
+		const anim = Animated.parallel([
+			Animated.timing(fadeAnim, { toValue: 1, duration: 250, delay, useNativeDriver: true }),
+			Animated.timing(translateY, { toValue: 0, duration: 250, delay, useNativeDriver: true }),
+		]);
+		anim.start();
+		return () => anim.stop();
+	}, []);
+
+	return <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY }] }}>{children}</Animated.View>;
+});
+
 const FavoriteScreen = () => {
 	const emptyImage = require('@/assets/images/no-data.png');
 	const flatListRef = useRef<FlatList>(null);
+	const headerAnim = useRef(new Animated.Value(0)).current;
 
 	const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
 	const [allFavorites, setAllFavorites] = useState<MainDataType.Proverb[]>([]);
@@ -75,6 +99,13 @@ const FavoriteScreen = () => {
 	const [levelValue, setLevelValue] = useState('전체');
 	const [levelItems, setLevelItems] = useState(LEVEL_DROPDOWN_ITEMS);
 	const [categoryItems, setCategoryItems] = useState<any[]>([COMMON_ALL_OPTION]);
+
+	// 화면 진입 fade + slide-up
+	useEffect(() => {
+		const anim = Animated.timing(headerAnim, { toValue: 1, duration: 300, useNativeDriver: true });
+		anim.start();
+		return () => anim.stop();
+	}, []);
 
 	// 카테고리 항목을 데이터에서 동적 구성
 	useEffect(() => {
@@ -226,68 +257,72 @@ const FavoriteScreen = () => {
 	};
 
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
-		const isLast = index === filteredList.length - 1;
 		const isSelected = selectedIds.includes(item.id);
 
 		return (
-			<TouchableOpacity
-				style={[
-					styles.itemCard,
-					{ marginBottom: isLast ? scaleHeight(24) : scaleHeight(12) },
-					isSelectionMode && isSelected && styles.itemCardSelected,
-				]}
-				activeOpacity={0.75}
-				onPress={() => {
-					if (isSelectionMode) {
-						toggleSelection(item.id);
-					} else {
-						setSelectedProverb(item);
-						setShowDetailModal(true);
-					}
-				}}
-				onLongPress={() => {
-					if (!isSelectionMode) {
-						enterSelectionMode();
-						toggleSelection(item.id);
-					}
-				}}>
-				<View style={styles.proverbBlock}>
-					<View style={styles.badgeInlineRow}>
-						<View style={{ flexDirection: 'row', gap: scaleWidth(6) }}>
-							<View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.levelName), flexDirection: 'row', alignItems: 'center', paddingHorizontal: scaleWidth(8), paddingVertical: scaleHeight(4) }]}>
-								<IconComponent type="FontAwesome6" name={getLevelIcon(item.levelName)} size={scaledSize(14)} color="#fff" />
-								<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>{item.levelName}</Text>
+			<AnimatedListItem index={index}>
+				<TouchableOpacity
+					style={[styles.itemCard, isSelectionMode && isSelected && styles.itemCardSelected]}
+					activeOpacity={0.8}
+					onPress={() => {
+						if (isSelectionMode) {
+							toggleSelection(item.id);
+						} else {
+							setSelectedProverb(item);
+							setShowDetailModal(true);
+						}
+					}}
+					onLongPress={() => {
+						if (!isSelectionMode) {
+							enterSelectionMode();
+							toggleSelection(item.id);
+						}
+					}}>
+					<View style={styles.proverbBlock}>
+						<View style={styles.badgeInlineRow}>
+							<View style={styles.badgeGroup}>
+								<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
+									<IconComponent
+										type="FontAwesome6"
+										name={getLevelIcon(item.levelName)}
+										size={scaledSize(14)}
+										color={COLORS.textWhite}
+									/>
+									<Text style={styles.badgeText}>{item.levelName}</Text>
+								</View>
+								<View style={[styles.badge, { backgroundColor: getCategoryColor(item.category) }]}>
+									<Text style={styles.badgeText}>{item.category || '미지정'}</Text>
+								</View>
 							</View>
-							<View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(item.category), flexDirection: 'row', alignItems: 'center', paddingHorizontal: scaleWidth(8) }]}>
-								<Text style={[styles.badgeText, { marginLeft: scaleWidth(4) }]}>{item.category || '미지정'}</Text>
-							</View>
+
+							{isSelectionMode ? (
+								<View style={[styles.checkbox, isSelected && styles.checkboxChecked]}>
+									{isSelected && <Icon name="check" size={scaledSize(12)} color={COLORS.textWhite} />}
+								</View>
+							) : (
+								<TouchableOpacity
+									onPress={(e) => {
+										e.stopPropagation();
+										handleToggleFavorite(item.id);
+									}}
+									hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+									<Icon name="star" solid size={scaledSize(18)} color={COLORS.warning} />
+								</TouchableOpacity>
+							)}
 						</View>
 
-						{isSelectionMode ? (
-							<View style={[styles.checkbox, isSelected && styles.checkboxChecked]}>
-								{isSelected && <Icon name="check" size={scaledSize(12)} color="#fff" />}
+						<View style={styles.rowWithArrow}>
+							<View style={{ flex: 1 }}>
+								<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
+								<Text style={styles.listMeaningText} numberOfLines={2}>
+									- {item.longMeaning || item.meaning}
+								</Text>
 							</View>
-						) : (
-							<TouchableOpacity
-								onPress={(e) => {
-									e.stopPropagation();
-									handleToggleFavorite(item.id);
-								}}
-								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-								<Icon name="star" solid size={scaledSize(18)} color="#F59E0B" />
-							</TouchableOpacity>
-						)}
-					</View>
-
-					<View style={styles.rowWithArrow}>
-						<View style={{ flex: 1 }}>
-							<Text style={styles.proverbTextMulti}>{item.proverb}</Text>
-							<Text style={styles.listMeaningText} numberOfLines={2}>- {item.longMeaning || item.meaning}</Text>
+							{!isSelectionMode && <Icon name="chevron-right" size={scaledSize(16)} color={COLORS.borderDark} />}
 						</View>
-						{!isSelectionMode && <Icon name="chevron-right" size={scaledSize(16)} color="#CBD5E1" />}
 					</View>
-				</View>
-			</TouchableOpacity>
+				</TouchableOpacity>
+			</AnimatedListItem>
 		);
 	};
 
@@ -298,7 +333,16 @@ const FavoriteScreen = () => {
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 					<View style={{ flex: 1 }}>
-						<View style={styles.filterContainer}>
+						<Animated.View
+							style={[
+								styles.filterContainer,
+								{
+									opacity: headerAnim,
+									transform: [
+										{ translateY: headerAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) },
+									],
+								},
+							]}>
 							<View style={styles.filterCard}>
 								<View style={styles.headerTopRow}>
 									<View style={styles.headerTitleRow}>
@@ -311,7 +355,7 @@ const FavoriteScreen = () => {
 												style={styles.headerActionBtn}
 												onPress={() => setShowAddModal(true)}
 												hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-												<Icon name="plus" size={scaledSize(14)} color="#F59E0B" />
+												<Icon name="plus" size={scaledSize(14)} color={COLORS.warning} />
 												<Text style={styles.headerActionText}>추가</Text>
 											</TouchableOpacity>
 											{allFavorites.length > 0 && (
@@ -319,7 +363,7 @@ const FavoriteScreen = () => {
 													style={[styles.headerActionBtn, styles.headerActionBtnDelete]}
 													onPress={enterSelectionMode}
 													hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-													<Icon name="trash-can" size={scaledSize(13)} color="#EF4444" />
+													<Icon name="trash-can" size={scaledSize(13)} color={COLORS.danger} />
 													<Text style={styles.headerActionTextDelete}>선택 삭제</Text>
 												</TouchableOpacity>
 											)}
@@ -336,11 +380,11 @@ const FavoriteScreen = () => {
 
 								<View style={styles.searchRow}>
 									<View style={styles.searchBox}>
-										<Icon name="magnifying-glass" size={scaledSize(15)} color="#94A3B8" style={styles.searchIcon} />
+										<Icon name="magnifying-glass" size={scaledSize(15)} color={COLORS.textLight} style={styles.searchIcon} />
 										<TextInput
 											style={styles.searchInput}
 											placeholder="속담이나 의미를 입력해주세요"
-											placeholderTextColor="#9CA3AF"
+											placeholderTextColor={COLORS.textLight}
 											value={keyword}
 											onChangeText={(text) => {
 												setKeyword(text);
@@ -350,7 +394,7 @@ const FavoriteScreen = () => {
 										/>
 									</View>
 									<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset}>
-										<Icon name="rotate-right" size={scaledSize(16)} color="#64748B" />
+										<Icon name="rotate-right" size={scaledSize(16)} color={COLORS.textSecondary} />
 									</TouchableOpacity>
 								</View>
 
@@ -366,9 +410,9 @@ const FavoriteScreen = () => {
 											style={styles.dropdownLevel}
 											scrollViewProps={{ nestedScrollEnabled: true }}
 											dropDownContainerStyle={{ ...styles.dropdownListLevel, overflow: 'visible', zIndex: 3000 }}
-											listItemLabelStyle={{ marginLeft: scaleWidth(6), fontSize: scaledSize(14) }}
-											labelStyle={{ fontSize: scaledSize(14), color: '#334155' }}
-											iconContainerStyle={{ marginRight: scaleWidth(8) }}
+											listItemLabelStyle={{ marginLeft: SPACING_W.xs, fontSize: FONT_SIZES.md }}
+											labelStyle={{ fontSize: FONT_SIZES.md, color: COLORS.text }}
+											iconContainerStyle={{ marginRight: SPACING_W.sm }}
 											showArrowIcon={true}
 											showTickIcon={false}
 										/>
@@ -390,8 +434,8 @@ const FavoriteScreen = () => {
 											zIndex={5000}
 											zIndexInverse={4000}
 											containerStyle={{ zIndex: 5000 }}
-											labelStyle={{ fontSize: scaledSize(14), color: '#334155' }}
-											iconContainerStyle={{ marginRight: scaleWidth(8) }}
+											labelStyle={{ fontSize: FONT_SIZES.md, color: COLORS.text }}
+											iconContainerStyle={{ marginRight: SPACING_W.sm }}
 											showArrowIcon={true}
 											showTickIcon={false}
 											modalProps={{ animationType: 'fade', presentationStyle: 'overFullScreen', transparent: true }}
@@ -400,19 +444,19 @@ const FavoriteScreen = () => {
 												width: '85%',
 												alignSelf: 'center',
 												maxHeight: scaleHeight(500),
-												backgroundColor: '#fff',
+												backgroundColor: COLORS.surface,
 												borderWidth: 1,
-												borderColor: '#CBD5E1',
-												borderRadius: scaleWidth(20),
-												paddingVertical: scaleHeight(20),
+												borderColor: COLORS.borderDark,
+												borderRadius: RADIUS.xl,
+												paddingVertical: SPACING_H.xl,
 											}}
 											modalTitleStyle={{
-												fontSize: scaledSize(16),
-												fontWeight: 'bold',
-												color: '#334155',
+												fontSize: FONT_SIZES.lg,
+												fontWeight: '700',
+												color: COLORS.text,
 												textAlign: 'center',
-												paddingVertical: scaleHeight(12),
-												paddingHorizontal: scaleWidth(16),
+												paddingVertical: SPACING_H.md,
+												paddingHorizontal: SPACING_W.lg,
 											}}
 										/>
 									</View>
@@ -422,7 +466,7 @@ const FavoriteScreen = () => {
 									{isSelectionMode && filteredList.length > 0 && (
 										<TouchableOpacity style={styles.selectAllBtn} onPress={handleSelectAll}>
 											<View style={[styles.miniCheckbox, isAllSelected && styles.miniCheckboxChecked]}>
-												{isAllSelected && <Icon name="check" size={scaledSize(9)} color="#fff" />}
+												{isAllSelected && <Icon name="check" size={scaledSize(9)} color={COLORS.textWhite} />}
 											</View>
 											<Text style={styles.selectAllText}>전체 선택</Text>
 										</TouchableOpacity>
@@ -441,7 +485,7 @@ const FavoriteScreen = () => {
 									)}
 								</View>
 							</View>
-						</View>
+						</Animated.View>
 
 						<FlatList
 							ref={flatListRef}
@@ -461,7 +505,7 @@ const FavoriteScreen = () => {
 											<Text style={styles.emptyTitle}>아직 즐겨찾기가 없어요</Text>
 											<Text style={styles.emptyDesc}>속담 목록에서 ★를 눌러{'\n'}원하는 속담을 저장해보세요!</Text>
 											<TouchableOpacity style={styles.emptyAddBtn} onPress={() => setShowAddModal(true)} activeOpacity={0.85}>
-												<Icon name="plus" size={scaledSize(14)} color="#fff" />
+												<Icon name="plus" size={scaledSize(14)} color={COLORS.textWhite} />
 												<Text style={styles.emptyAddBtnText}>즐겨찾기 추가하기</Text>
 											</TouchableOpacity>
 										</>
@@ -483,7 +527,7 @@ const FavoriteScreen = () => {
 									disabled={selectedIds.length === 0}
 									onPress={() => setShowDeleteConfirmModal(true)}
 									activeOpacity={0.85}>
-									<Icon name="trash-can" size={scaledSize(16)} color="#fff" />
+									<Icon name="trash-can" size={scaledSize(16)} color={COLORS.textWhite} />
 									<Text style={styles.deleteActionBtnText}>
 										{selectedIds.length > 0 ? `${selectedIds.length}개 삭제` : '항목을 선택해주세요'}
 									</Text>
@@ -501,7 +545,7 @@ const FavoriteScreen = () => {
 				<View style={styles.confirmOverlay}>
 					<View style={styles.confirmBox}>
 						<View style={styles.confirmIconWrapper}>
-							<Icon name="triangle-exclamation" size={scaledSize(28)} color="#EF4444" />
+							<Icon name="triangle-exclamation" size={scaledSize(28)} color={COLORS.danger} />
 						</View>
 						<Text style={styles.confirmTitle}>정말 삭제하시겠어요?</Text>
 						<Text style={styles.confirmDesc}>
@@ -529,131 +573,235 @@ const FavoriteScreen = () => {
 export default FavoriteScreen;
 
 const styles = StyleSheet.create({
-	main: { flex: 1, backgroundColor: '#F8FAFC', marginTop: scaleHeight(-6) },
-	headerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: scaleHeight(14) },
-	headerTitleRow: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(8) },
-	headerTitle: { fontSize: scaledSize(20), fontWeight: '800', color: '#334155', letterSpacing: -0.3 },
-	headerSubText: { fontSize: scaledSize(13), color: '#64748B', textAlign: 'right' },
-	headerCount: { fontWeight: '700', color: '#F59E0B', fontSize: scaledSize(13) },
-	headerCountDelete: { fontWeight: '700', color: '#EF4444', fontSize: scaledSize(13) },
-	headerActions: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(6) },
+	main: { flex: 1, backgroundColor: COLORS.background },
+	headerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.md },
+	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
+	headerTitle: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },
+	headerSubText: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'right' },
+	headerCount: { fontWeight: '700', color: COLORS.warning, fontSize: FONT_SIZES.smPlus },
+	headerCountDelete: { fontWeight: '700', color: COLORS.danger, fontSize: FONT_SIZES.smPlus },
+	headerActions: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
 	headerActionBtn: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(4),
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(6),
-		borderRadius: scaleWidth(8),
+		columnGap: SPACING_W.xs,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.sm,
+		borderRadius: RADIUS.round,
 		backgroundColor: '#FFFBEB',
 		borderWidth: 1,
 		borderColor: '#FDE68A',
 	},
-	headerActionText: { fontSize: scaledSize(12), fontWeight: '700', color: '#F59E0B' },
-	headerActionBtnDelete: { backgroundColor: '#FEF2F2', borderColor: '#FCA5A5' },
-	headerActionTextDelete: { fontSize: scaledSize(12), fontWeight: '700', color: '#EF4444' },
-	cancelBtn: { paddingHorizontal: scaleWidth(12), paddingVertical: scaleHeight(6), borderRadius: scaleWidth(8), backgroundColor: '#F1F5F9' },
-	cancelBtnText: { fontSize: scaledSize(13), fontWeight: '600', color: '#64748B' },
-	filterContainer: { zIndex: 10, paddingHorizontal: scaleWidth(16), paddingTop: scaleHeight(12), overflow: 'visible' },
-	resultSummaryRow: { paddingTop: scaleHeight(4), marginBottom: scaleHeight(4), alignItems: 'flex-end' },
+	headerActionText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.warning },
+	headerActionBtnDelete: { backgroundColor: COLORS.dangerBg, borderColor: '#FCA5A5' },
+	headerActionTextDelete: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.danger },
+	cancelBtn: {
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.sm,
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.surfaceAlt,
+	},
+	cancelBtnText: { fontSize: FONT_SIZES.smPlus, fontWeight: '600', color: COLORS.textSecondary },
+	filterContainer: { zIndex: 10, paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, overflow: 'visible' },
+	resultSummaryRow: { paddingTop: SPACING_H.xs, alignItems: 'flex-end' },
 	filterCard: {
-		backgroundColor: '#fff',
-		padding: scaleWidth(12),
-		borderRadius: scaleWidth(16),
-		marginBottom: scaleHeight(10),
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.lg,
+		marginBottom: SPACING_H.md,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.05,
-		shadowRadius: scaleWidth(8),
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
 		overflow: 'visible',
 	},
-	searchRow: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(10) },
-	searchBox: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: '#F1F5F9', borderRadius: scaleWidth(10), paddingHorizontal: scaleWidth(12), height: scaleHeight(40) },
-	searchIcon: { marginRight: scaleWidth(8) },
-	searchInput: { flex: 1, fontSize: scaledSize(14), color: '#334155', paddingVertical: 0 },
-	resetButtonInline: { marginLeft: scaleWidth(8), backgroundColor: '#F1F5F9', paddingHorizontal: scaleWidth(12), height: scaleHeight(40), borderRadius: scaleWidth(8), justifyContent: 'center', alignItems: 'center' },
-	filterDropdownRow: { flexDirection: 'row', marginBottom: scaleHeight(8) },
-	dropdownWrapper: { flex: 1, marginRight: scaleWidth(6) },
-	dropdownWrapperLast: { flex: 1, marginLeft: scaleWidth(6) },
-	dropdownLevel: { backgroundColor: '#fff', borderColor: '#CBD5E1', height: scaleHeight(40), minHeight: scaleHeight(40), paddingHorizontal: scaleWidth(12) },
-	dropdownField: { backgroundColor: '#fff', borderColor: '#CBD5E1', height: scaleHeight(40), minHeight: scaleHeight(40), paddingHorizontal: scaleWidth(12) },
-	dropdownListLevel: { backgroundColor: '#fff', borderColor: '#CBD5E1', borderWidth: 1, borderRadius: scaleWidth(12) },
-	dropdownListField: { backgroundColor: '#fff', borderColor: '#CBD5E1', borderWidth: 1, borderRadius: scaleWidth(12) },
-	listCountWrapper: { marginTop: scaleHeight(4), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-	selectAllBtn: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(6), paddingVertical: scaleHeight(4) },
-	selectAllText: { fontSize: scaledSize(13), color: '#334155', fontWeight: '600' },
-	miniCheckbox: { width: scaleWidth(16), height: scaleWidth(16), borderRadius: scaleWidth(4), borderWidth: 1.5, borderColor: '#94A3B8', backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
-	miniCheckboxChecked: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
-	listContent: { paddingTop: scaleHeight(4), paddingHorizontal: scaleWidth(16), paddingBottom: scaleHeight(60), flexGrow: 1 },
-	itemCard: {
-		backgroundColor: '#fff',
-		padding: scaleWidth(20),
-		borderRadius: scaleWidth(16),
-		borderWidth: 1,
-		borderColor: '#F1F5F9',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.05,
-		shadowRadius: scaleWidth(8),
+	searchRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm, marginBottom: SPACING_H.md },
+	searchBox: {
+		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.md,
+		height: scaleHeight(44),
 	},
-	itemCardSelected: { borderColor: '#F59E0B', backgroundColor: '#FFFBEB' },
-	levelBadge: { paddingHorizontal: scaleWidth(10), paddingVertical: scaleHeight(4), borderRadius: scaleWidth(12) },
-	categoryBadge: { paddingHorizontal: scaleWidth(10), paddingVertical: scaleHeight(4), borderRadius: scaleWidth(12) },
-	badgeText: { color: '#fff', marginTop: scaleHeight(1), fontSize: scaledSize(12), fontWeight: '600' },
-	badgeInlineRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: scaleHeight(10) },
-	proverbBlock: { marginBottom: scaleHeight(6) },
-	proverbTextMulti: { fontSize: scaledSize(18), fontWeight: 'bold', color: '#334155', lineHeight: scaleHeight(26), marginBottom: scaleHeight(8) },
-	listMeaningText: { fontSize: scaledSize(14), color: '#334155', lineHeight: scaleHeight(20), marginTop: scaleHeight(2) },
-	rowWithArrow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-	checkbox: { width: scaleWidth(22), height: scaleWidth(22), borderRadius: scaleWidth(6), borderWidth: 2, borderColor: '#CBD5E1', backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
-	checkboxChecked: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
-	emptyWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: scaleHeight(60) },
-	emptyImage: { width: scaleWidth(160), height: scaleWidth(160), marginBottom: scaleHeight(16) },
-	emptyTitle: { fontSize: scaledSize(16), fontWeight: '700', color: '#334155', marginBottom: scaleHeight(8) },
-	emptyDesc: { fontSize: scaledSize(13), color: '#64748B', textAlign: 'center', lineHeight: scaleHeight(20) },
+	searchIcon: { marginRight: SPACING_W.sm },
+	searchInput: { flex: 1, fontSize: FONT_SIZES.md, color: COLORS.text, paddingVertical: 0 },
+	resetButtonInline: {
+		backgroundColor: COLORS.surfaceAlt,
+		width: scaleWidth(44),
+		height: scaleHeight(44),
+		borderRadius: RADIUS.md,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	filterDropdownRow: { flexDirection: 'row', columnGap: SPACING_W.sm, marginBottom: SPACING_H.sm },
+	dropdownWrapper: { flex: 1 },
+	dropdownWrapperLast: { flex: 1 },
+	dropdownLevel: {
+		backgroundColor: COLORS.surface,
+		borderColor: COLORS.borderDark,
+		borderRadius: RADIUS.md,
+		height: scaleHeight(44),
+		minHeight: scaleHeight(44),
+		paddingHorizontal: SPACING_W.md,
+	},
+	dropdownField: {
+		backgroundColor: COLORS.surface,
+		borderColor: COLORS.borderDark,
+		borderRadius: RADIUS.md,
+		height: scaleHeight(44),
+		minHeight: scaleHeight(44),
+		paddingHorizontal: SPACING_W.md,
+	},
+	dropdownListLevel: { backgroundColor: COLORS.surface, borderColor: COLORS.borderDark, borderWidth: 1, borderRadius: RADIUS.md },
+	dropdownListField: { backgroundColor: COLORS.surface, borderColor: COLORS.borderDark, borderWidth: 1, borderRadius: RADIUS.md },
+	listCountWrapper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+	selectAllBtn: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm, paddingVertical: SPACING_H.xs },
+	selectAllText: { fontSize: FONT_SIZES.smPlus, color: COLORS.text, fontWeight: '600' },
+	miniCheckbox: {
+		width: scaleWidth(18),
+		height: scaleWidth(18),
+		borderRadius: RADIUS.sm / 2,
+		borderWidth: 1.5,
+		borderColor: COLORS.textLight,
+		backgroundColor: COLORS.surface,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	miniCheckboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
+	listContent: { paddingTop: SPACING_H.xs, paddingHorizontal: SPACING_W.lg, paddingBottom: scaleHeight(40), flexGrow: 1 },
+	itemCard: {
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.lg,
+		marginBottom: SPACING_H.md,
+		borderWidth: 1,
+		borderColor: COLORS.surfaceAlt,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+	},
+	itemCardSelected: { borderColor: COLORS.warning, backgroundColor: '#FFFBEB' },
+	badgeGroup: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.xs },
+	badge: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.xs,
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
+	},
+	badgeText: { color: COLORS.textWhite, fontSize: FONT_SIZES.sm, fontWeight: '600' },
+	badgeInlineRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.sm },
+	proverbBlock: { marginBottom: 0 },
+	proverbTextMulti: {
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		lineHeight: scaledSize(24),
+		marginBottom: SPACING_H.xs,
+	},
+	listMeaningText: { fontSize: FONT_SIZES.md, color: COLORS.textSecondary, lineHeight: scaledSize(21), marginTop: SPACING_H.xs },
+	rowWithArrow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', columnGap: SPACING_W.sm },
+	checkbox: {
+		width: scaleWidth(24),
+		height: scaleWidth(24),
+		borderRadius: RADIUS.sm,
+		borderWidth: 2,
+		borderColor: COLORS.borderDark,
+		backgroundColor: COLORS.surface,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	checkboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
+	emptyWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: scaleHeight(40) },
+	emptyImage: { width: scaleWidth(160), height: scaleWidth(160), marginBottom: SPACING_H.lg },
+	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
+	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', lineHeight: scaledSize(20) },
 	emptyAddBtn: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(6),
-		marginTop: scaleHeight(20),
-		paddingHorizontal: scaleWidth(18),
-		paddingVertical: scaleHeight(10),
-		borderRadius: scaleWidth(10),
-		backgroundColor: '#F59E0B',
-		shadowColor: '#F59E0B',
-		shadowOffset: { width: 0, height: scaleHeight(3) },
-		shadowOpacity: 0.25,
-		shadowRadius: scaleWidth(6),
+		columnGap: SPACING_W.sm,
+		marginTop: SPACING_H.xl,
+		paddingHorizontal: SPACING_W.xl,
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.warning,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
-	emptyAddBtnText: { color: '#fff', fontSize: scaledSize(13), fontWeight: '700' },
+	emptyAddBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '700' },
 	bottomActionBar: {
 		position: 'absolute',
 		bottom: 0,
 		left: 0,
 		right: 0,
-		backgroundColor: '#fff',
-		paddingHorizontal: scaleWidth(16),
-		paddingTop: scaleHeight(12),
-		paddingBottom: scaleHeight(20),
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.md,
+		paddingBottom: SPACING_H.xl,
 		borderTopWidth: 1,
-		borderTopColor: '#F1F5F9',
+		borderTopColor: COLORS.surfaceAlt,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: -2 },
-		shadowOpacity: 0.05,
-		shadowRadius: scaleWidth(8),
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
 	},
-	deleteActionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleWidth(8), height: scaleHeight(50), borderRadius: scaleWidth(12), backgroundColor: '#EF4444' },
-	deleteActionBtnDisabled: { backgroundColor: '#CBD5E1' },
-	deleteActionBtnText: { color: '#fff', fontSize: scaledSize(15), fontWeight: '700' },
-	confirmOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: scaleWidth(32) },
-	confirmBox: { width: '100%', backgroundColor: '#fff', borderRadius: scaleWidth(20), paddingTop: scaleHeight(24), paddingBottom: scaleHeight(18), paddingHorizontal: scaleWidth(20), alignItems: 'center' },
-	confirmIconWrapper: { width: scaleWidth(60), height: scaleWidth(60), borderRadius: scaleWidth(30), backgroundColor: '#FEF2F2', justifyContent: 'center', alignItems: 'center', marginBottom: scaleHeight(14) },
-	confirmTitle: { fontSize: scaledSize(17), fontWeight: '800', color: '#334155', marginBottom: scaleHeight(10) },
-	confirmDesc: { fontSize: scaledSize(14), color: '#64748B', textAlign: 'center', lineHeight: scaleHeight(21), marginBottom: scaleHeight(22) },
-	confirmCount: { fontWeight: '800', color: '#EF4444' },
-	confirmBtnRow: { flexDirection: 'row', width: '100%', gap: scaleWidth(10) },
-	confirmBtn: { flex: 1, height: scaleHeight(46), borderRadius: scaleWidth(12), justifyContent: 'center', alignItems: 'center' },
-	confirmBtnCancel: { backgroundColor: '#F1F5F9' },
-	confirmBtnCancelText: { fontSize: scaledSize(14), fontWeight: '700', color: '#64748B' },
-	confirmBtnDelete: { backgroundColor: '#EF4444' },
-	confirmBtnDeleteText: { fontSize: scaledSize(14), fontWeight: '700', color: '#fff' },
+	deleteActionBtn: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		columnGap: SPACING_W.sm,
+		height: scaleHeight(52),
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.danger,
+	},
+	deleteActionBtnDisabled: { backgroundColor: COLORS.borderDark },
+	deleteActionBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '700' },
+	confirmOverlay: {
+		flex: 1,
+		backgroundColor: COLORS.dim,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: scaleWidth(32),
+	},
+	confirmBox: {
+		width: '100%',
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingTop: SPACING_H.xxl,
+		paddingBottom: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.xl,
+		alignItems: 'center',
+	},
+	confirmIconWrapper: {
+		width: scaleWidth(60),
+		height: scaleWidth(60),
+		borderRadius: scaleWidth(60) / 2,
+		backgroundColor: COLORS.dangerBg,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginBottom: SPACING_H.md,
+	},
+	confirmTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
+	confirmDesc: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		textAlign: 'center',
+		lineHeight: scaledSize(21),
+		marginBottom: SPACING_H.xl,
+	},
+	confirmCount: { fontWeight: '700', color: COLORS.danger },
+	confirmBtnRow: { flexDirection: 'row', width: '100%', columnGap: SPACING_W.md },
+	confirmBtn: { flex: 1, height: scaleHeight(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
+	confirmBtnCancel: { backgroundColor: COLORS.surfaceAlt },
+	confirmBtnCancelText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textSecondary },
+	confirmBtnDelete: { backgroundColor: COLORS.danger },
+	confirmBtnDeleteText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textWhite },
 });

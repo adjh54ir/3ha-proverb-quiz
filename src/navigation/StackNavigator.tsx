@@ -12,8 +12,8 @@ import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
 import WrongReviewScreen from '@/screens/WrongReviewScreen';
-import { scaledSize, scaleWidth } from '@/utils';
-import { COLORS } from '@/const/common/Theme';
+import { scaledSize } from '@/utils';
+import { COLORS, FONT_SIZES, SPACING_W } from '@/const/common/Theme';
 import InitTimeChallengeScreen from '@/screens/InitTimeChallengeScreen';
 import TimeChanllengeScreen from '@/screens/TimeChanllengeScreen';
 import QuizModeScreen from '@/screens/QuizModeScreen';
@@ -38,8 +38,8 @@ const StackNavigator = () => {
 					backgroundColor: COLORS.background,
 				},
 				headerTitleStyle: {
-					fontSize: scaledSize(18),
-					fontWeight: 'bold',
+					fontSize: FONT_SIZES.xl,
+					fontWeight: '700',
 					color: COLORS.text,
 				},
 				headerShadowVisible: false,
@@ -69,7 +69,7 @@ const StackNavigator = () => {
 					headerLeft: () => <></>,
 					// headerLeft: () => (
 					// 	<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
-					// 		<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
+					// 		<IconComponent type="MaterialIcons" name="arrow-back" size={scaledSize(24)} color="#2c3e50" />
 					// 	</TouchableOpacity>
 					// ),
 				})}
@@ -92,15 +92,18 @@ const StackNavigator = () => {
 					headerShown: true,
 					title: '퀴즈 모드 선택',
 					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
-							<Icon name="arrow-back" size={24} color="#2c3e50" />
+						<TouchableOpacity
+							onPress={() => navigation.goBack()}
+							style={{ marginLeft: SPACING_W.lg }}
+							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+							<Icon name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
 						</TouchableOpacity>
 					),
 					headerRight: () => <></>,
 					// headerRight: () => (
 					// 	//@ts-ignore
 					// 	<TouchableOpacity onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })} style={{ marginRight: scaleWidth(16) }}>
-					// 		<IconComponent type='materialIcons' name='info-outline' size={24} color='#3498db' />
+					// 		<IconComponent type='materialIcons' name='info-outline' size={scaledSize(24)} color='#3498db' />
 					// 	</TouchableOpacity>
 					// ),
 				})}
@@ -137,8 +140,11 @@ const StackNavigator = () => {
 					headerShown: true,
 					title: '오답 복습',
 					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
-							<Icon name="arrow-back" size={24} color="#2c3e50" />
+						<TouchableOpacity
+							onPress={() => navigation.goBack()}
+							style={{ marginLeft: SPACING_W.lg }}
+							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+							<Icon name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
 						</TouchableOpacity>
 					),
 				})}
@@ -151,8 +157,11 @@ const StackNavigator = () => {
 					title: '타워 챌린지',
 					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
 					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
-							<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
+						<TouchableOpacity
+							onPress={() => navigation.goBack()}
+							style={{ marginLeft: SPACING_W.lg }}
+							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+							<IconComponent type="MaterialIcons" name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
 						</TouchableOpacity>
 					),
 				})}
@@ -165,8 +174,11 @@ const StackNavigator = () => {
 					title: '타워퀴즈',
 					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
 					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
-							<IconComponent type="MaterialIcons" name="arrow-back" size={24} color="#2c3e50" />
+						<TouchableOpacity
+							onPress={() => navigation.goBack()}
+							style={{ marginLeft: SPACING_W.lg }}
+							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+							<IconComponent type="MaterialIcons" name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
 						</TouchableOpacity>
 					),
 				})}

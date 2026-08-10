@@ -87,7 +87,7 @@ const COMMON_ALL_OPTION = {
 	badgeId: '',
 	iconName: 'clipboard-list',
 	iconColor: '#3498db',
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={16} color="#555" />,
+	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#555" />,
 	labelStyle: {
 		marginLeft: scaleWidth(6),
 		fontSize: scaledSize(14),
@@ -100,7 +100,7 @@ const COMMON_ALL_OPTION2 = {
 	iconType: 'FontAwesome6',
 	iconName: 'clipboard-list',
 	iconColor: '#555',
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={16} color="#555" />,
+	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#555" />,
 	labelStyle: {
 		marginLeft: scaleWidth(6),
 		fontSize: scaledSize(14),
@@ -112,22 +112,22 @@ export const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '초급',
 		value: '초급',
-		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={16} color="#34D399" />,
+		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color="#34D399" />,
 	},
 	{
 		label: '중급',
 		value: '중급',
-		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={16} color="#F59E0B" />,
+		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color="#F59E0B" />,
 	},
 	{
 		label: '고급',
 		value: '고급',
-		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#EA580C" />,
+		icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color="#EA580C" />,
 	},
 	{
 		label: '특급',
 		value: '특급',
-		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={16} color="#B91C1C" />,
+		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color="#B91C1C" />,
 	},
 ];
 export const FIELD_DROPDOWN_ITEMS = [
@@ -139,7 +139,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'dice',
 		iconColor: '#81ecec',
-		icon: () => <IconComponent type="FontAwesome6" name="dice" size={16} color="#81ecec" />,
+		icon: () => <IconComponent type="FontAwesome6" name="dice" size={scaledSize(16)} color="#81ecec" />,
 	},
 	{
 		label: '인간관계',
@@ -148,7 +148,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'users',
 		iconColor: '#76d7c4',
-		icon: () => <IconComponent type="FontAwesome6" name="users" size={16} color="#76d7c4" />,
+		icon: () => <IconComponent type="FontAwesome6" name="users" size={scaledSize(16)} color="#76d7c4" />,
 	},
 	{
 		label: '세상 이치',
@@ -157,7 +157,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'globe',
 		iconColor: '#fdcb6e',
-		icon: () => <IconComponent type="FontAwesome5" name="globe" size={16} color="#fdcb6e" />,
+		icon: () => <IconComponent type="FontAwesome5" name="globe" size={scaledSize(16)} color="#fdcb6e" />,
 	},
 	{
 		label: '근면/검소',
@@ -166,7 +166,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'hammer',
 		iconColor: '#fab1a0',
-		icon: () => <IconComponent type="FontAwesome5" name="hammer" size={16} color="#fab1a0" />,
+		icon: () => <IconComponent type="FontAwesome5" name="hammer" size={scaledSize(16)} color="#fab1a0" />,
 	},
 	{
 		label: '노력/성공',
@@ -175,7 +175,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'medal',
 		iconColor: '#55efc4',
-		icon: () => <IconComponent type="FontAwesome5" name="medal" size={16} color="#55efc4" />,
+		icon: () => <IconComponent type="FontAwesome5" name="medal" size={scaledSize(16)} color="#55efc4" />,
 	},
 	{
 		label: '경계/조심',
@@ -184,7 +184,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'exclamation-triangle',
 		iconColor: '#ff7675',
-		icon: () => <IconComponent type="FontAwesome5" name="exclamation-triangle" size={16} color="#ff7675" />,
+		icon: () => <IconComponent type="FontAwesome5" name="exclamation-triangle" size={scaledSize(16)} color="#ff7675" />,
 	},
 	{
 		label: '욕심/탐욕',
@@ -193,7 +193,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'hand-holding-usd',
 		iconColor: '#fd79a8',
-		icon: () => <IconComponent type="FontAwesome5" name="hand-holding-usd" size={16} color="#fd79a8" />,
+		icon: () => <IconComponent type="FontAwesome5" name="hand-holding-usd" size={scaledSize(16)} color="#fd79a8" />,
 	},
 	{
 		label: '배신/불신',
@@ -202,7 +202,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'user-slash',
 		iconColor: '#b2bec3',
-		icon: () => <IconComponent type="FontAwesome5" name="user-slash" size={16} color="#b2bec3" />,
+		icon: () => <IconComponent type="FontAwesome5" name="user-slash" size={scaledSize(16)} color="#b2bec3" />,
 	},
 ];
 export const QUIZ_MODES = [

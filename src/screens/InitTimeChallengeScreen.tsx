@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Platform, Image, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Image, Modal } from 'react-native';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
@@ -27,6 +28,10 @@ const InitTimeChallengeScreen = () => {
 	const STORAGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 	const navigation = useNavigation();
 	const scaleAnim = useRef(new Animated.Value(1)).current;
+	const fadeAnim = useRef(new Animated.Value(0)).current;
+	const slideAnim = useRef(new Animated.Value(scaleHeight(12))).current;
+	const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const countdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const [count, setCount] = useState(3);
 	const [showAllRules, setShowAllRules] = useState(false);
@@ -40,6 +45,29 @@ const InitTimeChallengeScreen = () => {
 	useEffect(() => {
 		fetchTopHistory();
 	}, []);
+
+	// 화면 진입 애니메이션 (fade + slide-up)
+	useEffect(() => {
+		const entrance = Animated.parallel([
+			Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+			Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+		]);
+		entrance.start();
+		return () => entrance.stop();
+	}, [fadeAnim, slideAnim]);
+
+	// 언마운트 시 카운트다운 타이머 정리
+	useEffect(() => {
+		return () => {
+			if (countdownTimerRef.current) {
+				clearInterval(countdownTimerRef.current);
+			}
+			if (countdownTimeoutRef.current) {
+				clearTimeout(countdownTimeoutRef.current);
+			}
+			scaleAnim.stopAnimation();
+		};
+	}, [scaleAnim]);
 
 	const fetchTopHistory = async () => {
 		try {
@@ -62,7 +90,8 @@ const InitTimeChallengeScreen = () => {
 			const startOfInput = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate());
 
 			const diffMs = startOfToday.getTime() - startOfInput.getTime();
-			const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+			// 서머타임이 있는 지역에서는 자정~자정 간격이 23h/25h 가 되므로 floor 대신 round
+			const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
 			const hour = inputDate.getHours();
 			const minute = inputDate.getMinutes();
@@ -101,12 +130,15 @@ const InitTimeChallengeScreen = () => {
 		setCount(countdown);
 		animateScale();
 
+		if (countdownTimerRef.current) {
+			clearInterval(countdownTimerRef.current);
+		}
 		const timer = setInterval(() => {
 			countdown--;
 
 			if (countdown < 0) {
 				clearInterval(timer);
-				setTimeout(() => {
+				countdownTimeoutRef.current = setTimeout(() => {
 					setIsCountingDown(false);
 					// @ts-ignore
 					navigation.navigate(Paths.TIME_CHANLLENGE);
@@ -117,6 +149,7 @@ const InitTimeChallengeScreen = () => {
 			setCount(countdown);
 			animateScale();
 		}, 1000);
+		countdownTimerRef.current = timer;
 	};
 
 	const handleStartChallenge = () => {
@@ -135,7 +168,7 @@ const InitTimeChallengeScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.container} edges={['bottom']}>
-			<View style={styles.contentWrapper}>
+			<Animated.View style={[styles.contentWrapper, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
 				<ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
 					{/* 🎯 대표 이미지 영역 */}
 					<View style={styles.heroImageContainer}>
@@ -155,11 +188,11 @@ const InitTimeChallengeScreen = () => {
 
 						{showAllRules ? (
 							<>
-								<RuleRow iconType="FontAwesome6" iconName="bullseye" iconColor="#22C55E" chipColor="#DCFCE7" text="180초 안에 속담 의미를 최대한 많이 맞히기" />
-								<RuleRow iconType="FontAwesome6" iconName="heart" iconColor="#F87171" chipColor="#FEE2E2" text="오답 시 하트 1개 감소 (총 5개)" />
-								<RuleRow iconType="FontAwesome6" iconName="forward" iconColor="#3B82F6" chipColor="#DBEAFE" text="스킵 1회 — 어려운 문제 건너뛰기" />
-								<RuleRow iconType="FontAwesome6" iconName="lightbulb" iconColor="#F59E0B" chipColor="#FEF3C7" text="찬스 1회 — 활용 팁·예문 확인" />
-								<RuleRow iconType="FontAwesome6" iconName="ban" iconColor="#94A3B8" chipColor="#F1F5F9" text="중간 종료 시 기록 미저장" />
+								<RuleRow iconType="FontAwesome6" iconName="bullseye" iconColor={COLORS.primary} chipColor={COLORS.primarySoft} text="180초 안에 속담 의미를 최대한 많이 맞히기" />
+								<RuleRow iconType="FontAwesome6" iconName="heart" iconColor="#F87171" chipColor={COLORS.dangerBg} text="오답 시 하트 1개 감소 (총 5개)" />
+								<RuleRow iconType="FontAwesome6" iconName="forward" iconColor={COLORS.secondary} chipColor={COLORS.secondarySoft} text="스킵 1회 — 어려운 문제 건너뛰기" />
+								<RuleRow iconType="FontAwesome6" iconName="lightbulb" iconColor={COLORS.warning} chipColor={COLORS.warningBg} text="찬스 1회 — 활용 팁·예문 확인" />
+								<RuleRow iconType="FontAwesome6" iconName="ban" iconColor={COLORS.textLight} chipColor={COLORS.surfaceAlt} text="중간 종료 시 기록 미저장" />
 
 								<View style={styles.bonusSection}>
 									<Text style={styles.bonusTitle}>💎 점수별 보너스</Text>
@@ -206,24 +239,24 @@ const InitTimeChallengeScreen = () => {
 									<Text style={styles.warningText}>시작 버튼을 누르면 3초 뒤에 퀴즈가 시작됩니다!</Text>
 								</View>
 
-								<TouchableOpacity onPress={() => setShowAllRules(false)} style={styles.toggleButton}>
+								<TouchableOpacity onPress={() => setShowAllRules(false)} style={styles.toggleButton} activeOpacity={0.7}>
 									<Text style={styles.toggleText}>간단히 보기</Text>
-									<IconComponent name="chevron-up" type="Feather" size={scaledSize(16)} color="#22C55E" />
+									<IconComponent name="chevron-up" type="Feather" size={scaledSize(16)} color={COLORS.primary} />
 								</TouchableOpacity>
 							</>
 						) : (
 							<>
-								<RuleRow iconType="FontAwesome6" iconName="bullseye" iconColor="#22C55E" chipColor="#DCFCE7" text="180초 안에 속담 의미를 최대한 많이 맞히기" />
-								<RuleRow iconType="FontAwesome6" iconName="heart" iconColor="#F87171" chipColor="#FEE2E2" text="오답 시 하트 1개 감소 (총 5개)" />
+								<RuleRow iconType="FontAwesome6" iconName="bullseye" iconColor={COLORS.primary} chipColor={COLORS.primarySoft} text="180초 안에 속담 의미를 최대한 많이 맞히기" />
+								<RuleRow iconType="FontAwesome6" iconName="heart" iconColor="#F87171" chipColor={COLORS.dangerBg} text="오답 시 하트 1개 감소 (총 5개)" />
 
 								<View style={styles.warningBox}>
 									<IconComponent name="alert-circle" type="Feather" size={scaledSize(16)} color="#F87171" />
 									<Text style={styles.warningText}>시작 버튼을 누르면 3초 뒤에 퀴즈가 시작됩니다!</Text>
 								</View>
 
-								<TouchableOpacity onPress={() => setShowAllRules(true)} style={styles.toggleButton}>
+								<TouchableOpacity onPress={() => setShowAllRules(true)} style={styles.toggleButton} activeOpacity={0.7}>
 									<Text style={styles.toggleText}>자세히 보기</Text>
-									<IconComponent name="chevron-down" type="Feather" size={scaledSize(16)} color="#22C55E" />
+									<IconComponent name="chevron-down" type="Feather" size={scaledSize(16)} color={COLORS.primary} />
 								</TouchableOpacity>
 							</>
 						)}
@@ -238,7 +271,7 @@ const InitTimeChallengeScreen = () => {
 
 						{top5History.length === 0 ? (
 							<View style={styles.emptyState}>
-								<IconComponent name="emoji-events" type="MaterialIcons" size={scaledSize(48)} color="#E2E8F0" />
+								<IconComponent name="emoji-events" type="MaterialIcons" size={scaledSize(48)} color={COLORS.border} />
 								<Text style={styles.emptyText}>아직 기록이 없습니다</Text>
 								<Text style={styles.emptySubtext}>첫 챌린지를 시작해보세요!</Text>
 							</View>
@@ -246,8 +279,8 @@ const InitTimeChallengeScreen = () => {
 							top5History.slice(0, 3).map((item, index) => {
 								const medals = ['🥇', '🥈', '🥉'];
 								const gradients = [
-									{ from: '#FBBF24', to: '#F59E0B' },
-									{ from: '#CBD5E1', to: '#94A3B8' },
+									{ from: '#FBBF24', to: COLORS.warning },
+									{ from: COLORS.borderDark, to: COLORS.textLight },
 									{ from: '#FB923C', to: '#9A3412' },
 								];
 
@@ -276,18 +309,18 @@ const InitTimeChallengeScreen = () => {
 						)}
 					</View>
 
-					<TouchableOpacity style={styles.startButton} onPress={handleStartChallenge}>
+					<TouchableOpacity style={styles.startButton} onPress={handleStartChallenge} activeOpacity={0.85}>
 						<Text style={styles.startButtonText}>챌린지 시작하기</Text>
 						<IconComponent
 							name="play-circle"
 							type="Feather"
 							size={scaledSize(22)}
-							color="#fff"
-							style={{ marginLeft: scaleWidth(8) }}
+							color={COLORS.textWhite}
+							style={{ marginLeft: SPACING_W.sm }}
 						/>
 					</TouchableOpacity>
 				</ScrollView>
-			</View>
+			</Animated.View>
 			<BottomHomeButton />
 
 			<Modal visible={isCountingDown} transparent animationType="fade" statusBarTranslucent>
@@ -319,15 +352,15 @@ const InitTimeChallengeScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#F8FAFC',
+		backgroundColor: COLORS.background,
 	},
 	contentWrapper: {
 		flex: 1,
 	},
 	scrollContainer: {
-		paddingHorizontal: scaleWidth(20),
-		paddingTop: scaleHeight(16),
-		paddingBottom: scaleHeight(24),
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.lg,
+		paddingBottom: scaleHeight(40),
 	},
 
 	// 카운트다운
@@ -344,15 +377,15 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(80),
 		backgroundColor: 'rgba(20, 184, 166, 0.2)',
 		borderWidth: 4,
-		borderColor: '#22C55E',
+		borderColor: COLORS.primary,
 		justifyContent: 'center',
 		alignItems: 'center',
 		overflow: 'hidden', // ✅ 사각형 그림자 잘라냄
 	},
 	countdownText: {
 		fontSize: scaledSize(72),
-		fontWeight: 'bold',
-		color: '#fff',
+		fontWeight: '700',
+		color: COLORS.textWhite,
 		textAlign: 'center',
 		includeFontPadding: false,
 		textAlignVertical: 'center',
@@ -360,16 +393,16 @@ const styles = StyleSheet.create({
 	},
 	countdownMessageWrapper: {
 		marginTop: scaleHeight(32),
-		paddingHorizontal: scaleWidth(24),
+		paddingHorizontal: SPACING_W.xxl,
 		paddingVertical: scaleHeight(10),
 		backgroundColor: 'rgba(255,255,255,0.12)',
-		borderRadius: scaledSize(20),
+		borderRadius: RADIUS.xl,
 		minWidth: scaleWidth(180),
 		alignItems: 'center',
 	},
 	countdownMessage: {
-		fontSize: scaledSize(17),
-		color: '#fff',
+		fontSize: FONT_SIZES.lg,
+		color: COLORS.textWhite,
 		fontWeight: '700',
 		textAlign: 'center',
 		letterSpacing: 0.3,
@@ -379,12 +412,12 @@ const styles = StyleSheet.create({
 	heroImageContainer: {
 		width: '100%',
 		height: scaleHeight(200),
-		borderRadius: scaledSize(16),
+		borderRadius: RADIUS.lg,
 		overflow: 'hidden',
-		marginBottom: scaleHeight(20),
+		marginBottom: SPACING_H.xl,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.15,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
 		shadowRadius: 8,
 	},
 	heroImage: {
@@ -396,28 +429,29 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		left: 0,
 		right: 0,
-		backgroundColor: 'rgba(0,0,0,0.5)',
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(20),
+		backgroundColor: COLORS.dim,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
 	},
 	heroTitle: {
-		fontSize: scaledSize(24),
-		fontWeight: 'bold',
-		color: '#fff',
-		marginBottom: scaleHeight(4),
+		fontSize: FONT_SIZES.title,
+		fontWeight: '700',
+		color: COLORS.textWhite,
+		marginBottom: SPACING_H.xs,
 	},
 	heroSubtitle: {
-		fontSize: scaledSize(14),
-		color: '#fff',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textWhite,
 		opacity: 0.9,
 	},
 
 	// 규칙 박스
 	challengeRuleBox: {
-		backgroundColor: '#fff',
-		borderRadius: scaledSize(16),
-		padding: scaleWidth(20),
-		marginBottom: scaleHeight(20),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		marginBottom: SPACING_H.xl,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.08,
@@ -426,22 +460,22 @@ const styles = StyleSheet.create({
 	ruleHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: scaleHeight(16),
+		marginBottom: SPACING_H.lg,
 	},
 	ruleHeaderText: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#334155',
-		marginLeft: scaleWidth(8),
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.text,
+		marginLeft: SPACING_W.sm,
 	},
 	ruleItem: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#F8FAFC',
-		borderRadius: scaleWidth(10),
+		backgroundColor: COLORS.background,
+		borderRadius: RADIUS.sm,
 		paddingVertical: scaleHeight(9),
-		paddingHorizontal: scaleWidth(12),
-		marginBottom: scaleHeight(8),
+		paddingHorizontal: SPACING_W.md,
+		marginBottom: SPACING_H.sm,
 	},
 	ruleIcon: {
 		width: scaleWidth(26),
@@ -453,47 +487,47 @@ const styles = StyleSheet.create({
 	},
 	ruleText: {
 		flex: 1,
-		fontSize: scaledSize(13.5),
+		fontSize: FONT_SIZES.smPlus,
 		color: '#475569',
 		fontWeight: '500',
 	},
 
 	// 보너스 섹션
 	bonusSection: {
-		marginTop: scaleHeight(20),
-		paddingTop: scaleHeight(16),
+		marginTop: SPACING_H.xl,
+		paddingTop: SPACING_H.lg,
 		borderTopWidth: 1,
-		borderTopColor: '#E2E8F0',
+		borderTopColor: COLORS.border,
 	},
 	bonusTitle: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#334155',
-		marginBottom: scaleHeight(12),
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.text,
+		marginBottom: SPACING_H.md,
 	},
 	bonusSummaryRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#F0FDF4',
-		borderRadius: scaledSize(10),
-		paddingVertical: scaleHeight(12),
+		backgroundColor: COLORS.primaryBg,
+		borderRadius: RADIUS.sm,
+		paddingVertical: SPACING_H.md,
 		paddingHorizontal: scaleWidth(14),
 		borderWidth: 1,
-		borderColor: '#DCFCE7',
-		marginBottom: scaleHeight(8),
+		borderColor: COLORS.primarySoft,
+		marginBottom: SPACING_H.sm,
 		gap: scaleWidth(10),
 	},
 	bonusSummaryIcon: {
-		fontSize: scaledSize(16),
+		fontSize: FONT_SIZES.lg,
 	},
 	bonusSummaryText: {
 		flex: 1,
-		fontSize: scaledSize(13),
+		fontSize: FONT_SIZES.smPlus,
 		color: '#475569',
 	},
 	bonusSummaryStrong: {
-		fontWeight: 'bold',
-		color: '#15803D',
+		fontWeight: '700',
+		color: COLORS.primaryDeep,
 	},
 
 	// 콤보 리스트
@@ -505,19 +539,19 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		backgroundColor: '#FFF7ED',
-		borderRadius: scaledSize(8),
-		padding: scaleWidth(12),
+		borderRadius: RADIUS.sm,
+		padding: SPACING_W.md,
 		borderWidth: 1,
 		borderColor: '#FFEDD5',
 	},
 	comboCount: {
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 		fontWeight: '600',
 		color: '#F87171',
 	},
 	comboReward: {
-		fontSize: scaledSize(14),
-		fontWeight: 'bold',
+		fontSize: FONT_SIZES.md,
+		fontWeight: '700',
 		color: '#FB923C',
 	},
 
@@ -526,18 +560,18 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		backgroundColor: '#FEF2F2',
-		borderRadius: scaledSize(8),
-		padding: scaleWidth(12),
-		marginTop: scaleHeight(16),
+		borderRadius: RADIUS.sm,
+		padding: SPACING_W.md,
+		marginTop: SPACING_H.lg,
 		borderWidth: 1,
 		borderColor: '#FECACA',
 	},
 	warningText: {
 		flex: 1,
-		fontSize: scaledSize(13),
+		fontSize: FONT_SIZES.smPlus,
 		color: '#F87171',
 		fontWeight: '600',
-		marginLeft: scaleWidth(8),
+		marginLeft: SPACING_W.sm,
 	},
 
 	// 토글 버튼
@@ -545,22 +579,23 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginTop: scaleHeight(12),
-		paddingVertical: scaleHeight(8),
+		marginTop: SPACING_H.md,
+		paddingVertical: SPACING_H.sm,
 	},
 	toggleText: {
-		fontSize: scaledSize(14),
-		color: '#22C55E',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.primary,
 		fontWeight: '600',
-		marginRight: scaleWidth(4),
+		marginRight: SPACING_W.xs,
 	},
 
 	// 랭킹 박스
 	rankingBox: {
-		backgroundColor: '#fff',
-		borderRadius: scaledSize(16),
-		padding: scaleWidth(20),
-		marginBottom: scaleHeight(20),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		marginBottom: SPACING_H.xl,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.08,
@@ -569,13 +604,13 @@ const styles = StyleSheet.create({
 	rankingHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: scaleHeight(16),
+		marginBottom: SPACING_H.lg,
 	},
 	rankingTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#334155',
-		marginLeft: scaleWidth(8),
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.text,
+		marginLeft: SPACING_W.sm,
 	},
 
 	// 빈 상태
@@ -584,15 +619,15 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(32),
 	},
 	emptyText: {
-		fontSize: scaledSize(16),
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '600',
-		color: '#94A3B8',
-		marginTop: scaleHeight(12),
+		color: COLORS.textLight,
+		marginTop: SPACING_H.md,
 	},
 	emptySubtext: {
-		fontSize: scaledSize(13),
-		color: '#94A3B8',
-		marginTop: scaleHeight(4),
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textLight,
+		marginTop: SPACING_H.xs,
 	},
 
 	// 랭킹 카드
@@ -600,12 +635,13 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		backgroundColor: '#F8FAFC',
-		borderRadius: scaledSize(12),
-		padding: scaleWidth(16),
-		marginBottom: scaleHeight(10),
+		backgroundColor: COLORS.background,
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		marginBottom: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 	},
 	rankCardFirst: {
 		backgroundColor: '#FFFBEB',
@@ -613,8 +649,8 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 	},
 	rankCardSecond: {
-		backgroundColor: '#F1F5F9',
-		borderColor: '#CBD5E1',
+		backgroundColor: COLORS.surfaceAlt,
+		borderColor: COLORS.borderDark,
 	},
 	rankCardThird: {
 		backgroundColor: '#FFF7ED',
@@ -626,55 +662,55 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	medalIcon: {
-		fontSize: scaledSize(28),
-		marginRight: scaleWidth(12),
+		fontSize: FONT_SIZES.display,
+		marginRight: SPACING_W.md,
 	},
 	rankInfo: {
 		flex: 1,
 	},
 	rankScore: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#334155',
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.text,
 		marginBottom: scaleHeight(2),
 	},
 	rankScoreFirst: {
-		fontSize: scaledSize(20),
+		fontSize: FONT_SIZES.xxl,
 		color: '#FB923C',
 	},
 	rankDate: {
-		fontSize: scaledSize(12),
-		color: '#94A3B8',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textLight,
 	},
 	rankBadge: {
-		backgroundColor: '#E2E8F0',
-		borderRadius: scaledSize(12),
-		paddingVertical: scaleHeight(4),
-		paddingHorizontal: scaleWidth(12),
+		backgroundColor: COLORS.border,
+		borderRadius: RADIUS.md,
+		paddingVertical: SPACING_H.xs,
+		paddingHorizontal: SPACING_W.md,
 	},
 	rankNumber: {
-		fontSize: scaledSize(12),
+		fontSize: FONT_SIZES.sm,
 		fontWeight: '600',
-		color: '#64748B',
+		color: COLORS.textSecondary,
 	},
 
 	// 시작 버튼
 	startButton: {
 		flexDirection: 'row',
-		backgroundColor: '#3B82F6',
-		paddingVertical: scaleHeight(16),
-		borderRadius: scaledSize(12),
+		backgroundColor: COLORS.secondary,
+		paddingVertical: SPACING_H.lg,
+		borderRadius: RADIUS.md,
 		alignItems: 'center',
 		justifyContent: 'center',
-		shadowColor: '#22C55E',
+		shadowColor: COLORS.secondary,
 		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.3,
+		shadowOpacity: 0.25,
 		shadowRadius: 8,
 	},
 	startButtonText: {
-		color: '#fff',
-		fontSize: scaledSize(17),
-		fontWeight: 'bold',
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
 	},
 
 	// 카운트다운

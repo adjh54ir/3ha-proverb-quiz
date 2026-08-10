@@ -1,8 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react/no-unstable-nested-components */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Modal, Keyboard, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FastImage from 'react-native-fast-image';
@@ -11,14 +9,14 @@ import IconComponent from './common/atomic/IconComponent';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import BadgeListModal from './modal/BadgeListModal';
-import Colors from '@/const/ConstColors';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
+import { LocaleConfig } from 'react-native-calendars';
 import { CONST_MAIN_DATA } from '@/const/ConstMainData';
 import DateUtils from '@/utils/DateUtils';
 import notifee, { EventType } from '@notifee/react-native';
@@ -49,14 +47,80 @@ const greetingMessages = [
 ];
 
 LocaleConfig.locales.kr = {
-	monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '11월'],
-	monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '11월'],
+	monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+	monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
 	dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
 	dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
 };
 
 LocaleConfig.defaultLocale = 'kr';
 moment.locale('ko'); // 로케일 설정
+
+/**
+ * 홈 화면 메인 액션 카드
+ * - Home 내부가 아닌 모듈 스코프에 정의: 리렌더마다 재마운트되어 진입 애니메이션이 반복되는 문제 방지
+ */
+const ActionCard = ({
+	iconName,
+	iconType,
+	label,
+	description,
+	color,
+	onPress,
+	isNew,
+	index = 0,
+}: {
+	iconName: string;
+	iconType: string;
+	label: string;
+	description: string;
+	color: string;
+	onPress: () => void;
+	isNew?: boolean;
+	index?: number;
+}) => {
+	const enterAnim = useRef(new Animated.Value(0)).current;
+
+	useEffect(() => {
+		// 리스트 stagger: 최대 6개까지만 지연을 늘린다
+		const anim = Animated.timing(enterAnim, {
+			toValue: 1,
+			duration: 280,
+			delay: Math.min(index, 5) * 40,
+			easing: Easing.out(Easing.quad),
+			useNativeDriver: true,
+		});
+		anim.start();
+		return () => anim.stop();
+	}, [enterAnim, index]);
+
+	return (
+		<Animated.View
+			style={{
+				opacity: enterAnim,
+				transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
+			}}>
+			<TouchableOpacity style={[styles.actionCard, { borderColor: color }]} activeOpacity={0.85} onPress={onPress}>
+				<View style={[styles.iconCircle, { backgroundColor: color }]}>
+					<IconComponent name={iconName} type={iconType} size={scaledSize(24)} color={COLORS.textWhite} />
+				</View>
+				<View style={styles.cardTextBox}>
+					<Text style={styles.cardTitle}>{label}</Text>
+					<Text style={styles.cardDescription}>{description}</Text>
+				</View>
+
+				{/* ✅ NEW 대각선 배지 */}
+				{isNew && (
+					<View style={styles.newBadgeWrapper}>
+						<View style={styles.newBadge}>
+							<Text style={styles.newBadgeText}>NEW</Text>
+						</View>
+					</View>
+				)}
+			</TouchableOpacity>
+		</Animated.View>
+	);
+};
 
 const Home = () => {
 	const navigation = useNavigation();
@@ -87,7 +151,11 @@ const Home = () => {
 	const TOWER_CHALLENGE_PROGRESS = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
 
 	const hasAutoCheckedIn = useRef(false); // ✅ 중복 방지용
-	const [stampAnim] = useState(new Animated.Value(0));
+	const stampAnim = useRef(new Animated.Value(0)).current;
+	const stampTimer = useRef<NodeJS.Timeout | null>(null);
+	const levelScrollTimer = useRef<NodeJS.Timeout | null>(null);
+	// 화면 진입 fade + slide-up
+	const screenAnim = useRef(new Animated.Value(0)).current;
 	const [isCheckedIn, setIsCheckedIn] = useState(false);
 	const [petLevel, setPetLevel] = useState(-1);
 	const [showStamp, setShowStamp] = useState(false);
@@ -141,6 +209,34 @@ const Home = () => {
 			}, 2200);
 		},
 		[petSpeechAnim],
+	);
+
+	// ✅ 화면 진입 애니메이션 (fade + slide-up)
+	useEffect(() => {
+		const anim = Animated.timing(screenAnim, {
+			toValue: 1,
+			duration: 300,
+			easing: Easing.out(Easing.quad),
+			useNativeDriver: true,
+		});
+		anim.start();
+		return () => anim.stop();
+	}, [screenAnim]);
+
+	// ✅ 언마운트 시 타이머 정리 (말풍선/도장/레벨 스크롤)
+	useEffect(
+		() => () => {
+			if (petSpeechTimer.current) {
+				clearTimeout(petSpeechTimer.current);
+			}
+			if (stampTimer.current) {
+				clearTimeout(stampTimer.current);
+			}
+			if (levelScrollTimer.current) {
+				clearTimeout(levelScrollTimer.current);
+			}
+		},
+		[],
 	);
 
 	// 🏅 뱃지 리스트 은은한 펄스 애니메이션 루프
@@ -246,12 +342,17 @@ const Home = () => {
 	const currentLevelIndex = levelDataForScroll.findIndex((item) => totalScore >= item.score && totalScore < (item.next ?? Infinity));
 	useEffect(() => {
 		if (showLevelModal && levelScrollRef.current) {
-			setTimeout(() => {
+			levelScrollTimer.current = setTimeout(() => {
 				levelScrollRef.current?.scrollTo({
 					y: currentLevelIndex * scaleHeight(150), // 카드 높이 예상값
 					animated: true,
 				});
 			}, 100); // 모달이 나타난 후 살짝 delay
+			return () => {
+				if (levelScrollTimer.current) {
+					clearTimeout(levelScrollTimer.current);
+				}
+			};
 		}
 	}, [showLevelModal]);
 
@@ -293,7 +394,7 @@ const Home = () => {
 				const screen = initialNotification.notification?.data?.moveToScreen;
 				if (screen) {
 					// @ts-ignore
-					navigate(screen);
+					navigation.navigate(screen);
 				}
 			}
 		});
@@ -354,7 +455,7 @@ const Home = () => {
 		}
 
 		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-		const updated = arr.map((item) => (item.quizDate.slice(0, 10) === todayStr ? { ...item, isCheckedIn: true } : item));
+		const updated = arr.map((item) => (DateUtils.toLocalDateKey(item.quizDate) === todayStr ? { ...item, isCheckedIn: true } : item));
 		await AsyncStorage.setItem(TODAY_QUIZ_LIST_KEY, JSON.stringify(updated));
 		setIsCheckedIn(true);
 
@@ -368,7 +469,10 @@ const Home = () => {
 			easing: Easing.out(Easing.exp),
 		}).start(() => {
 			// 애니메이션이 끝나면 잠깐 보여주고 사라지게
-			setTimeout(() => setShowStamp(false), 3000);
+			if (stampTimer.current) {
+				clearTimeout(stampTimer.current);
+			}
+			stampTimer.current = setTimeout(() => setShowStamp(false), 3000);
 		});
 
 		// ✅ 바로 달력에 반영
@@ -377,12 +481,12 @@ const Home = () => {
 			[todayStr]: {
 				customStyles: {
 					container: {
-						backgroundColor: '#27ae60', // ✅ 오늘은 초록색
-						borderRadius: scaleWidth(6),
+						backgroundColor: COLORS.secondary, // ✅ 오늘은 블루 강조 (달력 표기 규칙 통일)
+						borderRadius: RADIUS.sm,
 					},
 					text: {
-						color: '#ffffff',
-						fontWeight: 'bold',
+						color: COLORS.textWhite,
+						fontWeight: '700',
 					},
 				},
 			},
@@ -396,14 +500,14 @@ const Home = () => {
 
 	// 진행도(다음 등급까지 %) — 중앙 헬퍼 사용
 	const progressPercent = getProgressPercent(totalScore);
-	let progressColor = '#82c91e'; // 연두빛 초록 (0~59%)
+	let progressColor: string = COLORS.primary; // 그린 (0~59%)
 
 	if (progressPercent >= 60 && progressPercent < 90) {
-		progressColor = '#f9ca24'; // 밝은 노랑 (60~89%)
+		progressColor = COLORS.warning; // 앰버 (60~89%)
 	}
 
 	if (progressPercent >= 90) {
-		progressColor = '#e74c3c'; // 부드러운 빨강 (90~100%)
+		progressColor = COLORS.danger; // 레드 (90~100%)
 	}
 
 	// 다음 등급까지 남은 문제 수 — 중앙 헬퍼 사용
@@ -444,7 +548,7 @@ const Home = () => {
 			realScore = JSON.parse(quizData).totalScore || 0;
 			if (todayQuiz) {
 				const parsed = JSON.parse(todayQuiz);
-				const todayItem = parsed.find((q: any) => q.quizDate.slice(0, 10) === todayStr);
+				const todayItem = parsed.find((q: any) => DateUtils.toLocalDateKey(q.quizDate) === todayStr);
 				if (todayItem) {
 					setIsCheckedIn(todayItem.isCheckedIn || false);
 				}
@@ -479,8 +583,7 @@ const Home = () => {
 		if (json) {
 			const list: MainDataType.TodayQuizList[] = JSON.parse(json);
 			const exists = list.some((item) => {
-				const itemDateStr = DateUtils.getLocalDateString(new Date(item.quizDate));
-				return itemDateStr === todayStr;
+				return DateUtils.toLocalDateKey(item.quizDate) === todayStr;
 			});
 			if (exists) {
 				console.log('✅ 이미 오늘의 퀴즈 항목이 존재합니다');
@@ -524,7 +627,7 @@ const Home = () => {
 		}
 
 		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-		const todayItem = arr.find((q) => q.quizDate.slice(0, 10) === todayStr);
+		const todayItem = arr.find((q) => DateUtils.toLocalDateKey(q.quizDate) === todayStr);
 
 		if (todayItem) {
 			const checked = todayItem.isCheckedIn || false;
@@ -547,18 +650,18 @@ const Home = () => {
 		const marked: { [date: string]: any } = {};
 		arr.forEach((item) => {
 			if (item.isCheckedIn) {
-				const date = item.quizDate.slice(0, 10);
+				const date = DateUtils.toLocalDateKey(item.quizDate);
 				const isToday = date === todayStr;
 
 				marked[date] = {
 					customStyles: {
 						container: {
-							backgroundColor: isToday ? '#3B82F6' : '#22C55E', // ✅ 블루: 오늘(강조), 그린: 이전 출석
-							borderRadius: scaleWidth(6),
+							backgroundColor: isToday ? COLORS.secondary : COLORS.primary, // ✅ 블루: 오늘(강조), 그린: 이전 출석
+							borderRadius: RADIUS.sm,
 						},
 						text: {
-							color: '#ffffff',
-							fontWeight: 'bold',
+							color: COLORS.textWhite,
+							fontWeight: '700',
 						},
 					},
 				};
@@ -605,7 +708,7 @@ const Home = () => {
 				AsyncStorage.getItem(MainStorageKeyType.DAILY_MISSION_CLAIMED),
 			]);
 			const list: MainDataType.TodayQuizList[] = json ? JSON.parse(json) : [];
-			const todayItem = list.find((q) => q.quizDate.slice(0, 10) === today) ?? null;
+			const todayItem = list.find((q) => DateUtils.toLocalDateKey(q.quizDate) === today) ?? null;
 			const missions = computeDailyMissions(todayItem);
 			const claimedList: string[] = claimedJson ? JSON.parse(claimedJson) : [];
 			setMissionSummary({
@@ -658,43 +761,6 @@ const Home = () => {
 		//@ts-ignore
 		myBook: () => navigation.navigate(Paths.MY_PROVERB_BOOK),
 	};
-	const ActionCard = ({
-		iconName,
-		iconType,
-		label,
-		description,
-		color,
-		onPress,
-		isNew,
-	}: {
-		iconName: string;
-		iconType: string;
-		label: string;
-		description: string;
-		color: string;
-		onPress: () => void;
-		isNew?: boolean;
-	}) => (
-		<TouchableOpacity style={[styles.actionCard, { borderColor: color }]} onPress={onPress}>
-			<View style={[styles.iconCircle, { backgroundColor: color }]}>
-				<IconComponent name={iconName} type={iconType} size={24} color="#ffffff" />
-			</View>
-			<View style={styles.cardTextBox}>
-				<Text style={styles.cardTitle}>{label}</Text>
-				<Text style={styles.cardDescription}>{description}</Text>
-			</View>
-
-			{/* ✅ NEW 대각선 배지 */}
-			{isNew && (
-				<View style={styles.newBadgeWrapper}>
-					<View style={styles.newBadge}>
-						<Text style={styles.newBadgeText}>NEW</Text>
-					</View>
-				</View>
-			)}
-		</TouchableOpacity>
-	);
-
 	return (
 		<SafeAreaView style={styles.main} edges={['top']}>
 			{showConfetti && (
@@ -702,17 +768,24 @@ const Home = () => {
 					<ConfettiCannon count={60} origin={{ x: scaleWidth(180), y: 0 }} fadeOut explosionSpeed={500} fallSpeed={2500} />
 				</View>
 			)}
-			<View style={styles.wrapper}>
+			<Animated.View
+				style={[
+					styles.wrapper,
+					{
+						opacity: screenAnim,
+						transform: [{ translateY: screenAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
+					},
+				]}>
 				<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false} ref={scrollViewRef}>
-					<View style={styles.container}>
+					<View style={styles.heroSection}>
 						<View style={styles.imageContainer}>
-							<View style={{ alignItems: 'center', marginBottom: scaleHeight(8) }}>
+							<View style={styles.streakChipWrapper}>
 								<View style={[styles.streakChip, streakInfo.current > 0 ? styles.streakChipActive : styles.streakChipIdle]}>
 									<IconComponent
 										name="local-fire-department"
 										type="materialIcons"
 										size={scaledSize(14)}
-										color={streakInfo.current > 0 ? '#F97316' : '#94A3B8'}
+										color={streakInfo.current > 0 ? '#F97316' : COLORS.textLight}
 									/>
 									<Text style={[styles.streakChipText, streakInfo.current > 0 && styles.streakChipTextActive]}>
 										{streakInfo.current > 0 ? `${streakInfo.current}일 연속 출석 중` : '오늘 출석하기'}
@@ -770,7 +843,7 @@ const Home = () => {
 								style={[
 									styles.progressBarBackground,
 									{
-										borderColor: progressPercent < 60 ? '#a9dfbf' : progressPercent < 90 ? '#fde3a7' : '#f5b7b1',
+										borderColor: progressPercent < 60 ? COLORS.primarySoft : progressPercent < 90 ? COLORS.warningBg : COLORS.dangerBg,
 									},
 								]}>
 								<Animated.View style={[styles.progressBarFill, { width: `${progressPercent}%`, backgroundColor: progressColor }]} />
@@ -781,40 +854,41 @@ const Home = () => {
 							{questionsToNext > 0 && <Text style={styles.progressBarTextBelow}>다음 레벨까지 {questionsToNext}문제 남음</Text>}
 						</View>
 						<View style={styles.titleContainer}>
-							<View style={{ alignItems: 'center' }}>
+							<View style={styles.titleInnerBox}>
 								{/* 타이틀 라인 */}
 								<View style={styles.innerTitleContainer}>
 									<TouchableOpacity
-										style={{
-											flexDirection: 'row',
-											alignItems: 'center',
-											justifyContent: 'center',
-											marginBottom: scaleHeight(3),
-										}}
+										style={styles.levelTitleTouch}
 										activeOpacity={0.7}
+										hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
 										onPress={() => setShowLevelModal(true)}>
 										<IconComponent
 											type="fontAwesome6"
 											name={icon}
-											size={18}
-											color={label === '속담 마스터' ? '#f1c40f' : '#27ae60'} // ✅ 조건 분기
+											size={scaledSize(18)}
+											color={label === '속담 마스터' ? COLORS.gold : COLORS.primaryDark} // ✅ 조건 분기
 										/>
 										<Text
-											style={{
-												fontSize: scaledSize(16),
-												color: label === '속담 마스터' ? '#f1c40f' : '#27ae60', // ✅ 텍스트 색도 노란색으로
-												fontWeight: '700',
-												marginLeft: scaleWidth(6),
-											}}>
+											style={[
+												styles.levelTitleText,
+												// ✅ 마스터 등급만 골드 강조
+												label === '속담 마스터' && styles.levelTitleTextMaster,
+											]}>
 											{label}
 										</Text>
-										<IconComponent type="materialIcons" name="info-outline" size={18} color="#7f8c8d" style={{ marginLeft: scaleWidth(4) }} />
+										<IconComponent
+											type="materialIcons"
+											name="info-outline"
+											size={scaledSize(18)}
+											color={COLORS.textSecondary}
+											style={styles.levelInfoIcon}
+										/>
 									</TouchableOpacity>
 								</View>
 
 								{/* 점수 뱃지 */}
 								<View style={styles.scoreBadgeItem}>
-									<IconComponent name="leaderboard" type="materialIcons" size={14} color="#ffffff" />
+									<IconComponent name="leaderboard" type="materialIcons" size={scaledSize(14)} color={COLORS.textWhite} />
 									<Text style={styles.scoreBadgeTextItem}>{totalScore.toLocaleString()}점</Text>
 								</View>
 								{/* 설명 */}
@@ -876,22 +950,25 @@ const Home = () => {
 					</View>
 
 					<ActionCard
+						index={0}
 						iconName="play-arrow"
 						iconType="materialIcons"
 						label="시작하기"
 						description="속담 뜻, 속담 찾기, 빈칸 채우기 퀴즈를 선택해서 퀴즈를 풀어봐요"
-						color="#3498db"
+						color={COLORS.secondary}
 						onPress={moveToHandler.quiz}
 					/>
 					<ActionCard
+						index={1}
 						iconName="school"
 						iconType="materialIcons"
 						label="학습 모드"
 						description="카드 형식으로 속담과 속담의 의미를 재미있게 익혀봐요"
-						color="#2ecc71"
+						color={COLORS.primary}
 						onPress={moveToHandler.study}
 					/>
 					<ActionCard
+						index={2}
 						iconName="replay"
 						iconType="materialIcons"
 						label="오답 복습"
@@ -900,6 +977,7 @@ const Home = () => {
 						onPress={moveToHandler.wrongReview}
 					/>
 					<ActionCard
+						index={3}
 						iconName="schedule"
 						iconType="materialIcons"
 						label="타임 챌린지"
@@ -908,6 +986,7 @@ const Home = () => {
 						onPress={moveToHandler.timechalleng}
 					/>
 					<ActionCard
+						index={4}
 						iconName="castle"
 						iconType="materialCommunityIcons"
 						label="타워 챌린지"
@@ -916,15 +995,17 @@ const Home = () => {
 						onPress={moveToHandler.towerchalleng}
 					/>
 					<ActionCard
+						index={5}
 						iconName="star"
 						iconType="materialIcons"
 						label="즐겨찾기"
 						description="자주 보고 싶은 속담을 모아두고 한눈에 다시 확인해요"
-						color="#f59e0b"
+						color={COLORS.warning}
 						onPress={moveToHandler.favorite}
 						isNew
 					/>
 					<ActionCard
+						index={6}
 						iconName="menu-book"
 						iconType="materialIcons"
 						label="나만의 속담집"
@@ -936,8 +1017,8 @@ const Home = () => {
 
 					<View style={styles.quickActionRow}>
 						<TouchableOpacity style={styles.quickActionCard} activeOpacity={0.85} onPress={() => setShowDailyMission(true)}>
-							<View style={[styles.quickActionIconChip, { backgroundColor: '#DCFCE7' }]}>
-								<IconComponent type="materialIcons" name="task-alt" size={scaledSize(20)} color="#22C55E" />
+							<View style={[styles.quickActionIconChip, { backgroundColor: COLORS.primarySoft }]}>
+								<IconComponent type="materialIcons" name="task-alt" size={scaledSize(20)} color={COLORS.primary} />
 								{!missionSummary.allDone && <View style={styles.quickActionDot} />}
 							</View>
 							<Text style={styles.quickActionTitle}>오늘의 미션</Text>
@@ -950,26 +1031,27 @@ const Home = () => {
 							</Text>
 						</TouchableOpacity>
 						<TouchableOpacity style={styles.quickActionCard} activeOpacity={0.85} onPress={() => setShowBadgeModal(true)}>
-							<View style={[styles.quickActionIconChip, { backgroundColor: '#FEF3C7' }]}>
-								<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(20)} color="#F59E0B" />
+							<View style={[styles.quickActionIconChip, { backgroundColor: COLORS.warningBg }]}>
+								<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(20)} color={COLORS.warning} />
 							</View>
 							<Text style={styles.quickActionTitle}>숨겨진 뱃지</Text>
 							<Text style={styles.quickActionDesc}>모아보기</Text>
 						</TouchableOpacity>
 						<TouchableOpacity style={styles.quickActionCard} activeOpacity={0.85} onPress={() => setShowCheckInModal(true)}>
-							<View style={[styles.quickActionIconChip, { backgroundColor: '#DBEAFE' }]}>
-								<IconComponent type="materialIcons" name="event-available" size={scaledSize(20)} color="#3B82F6" />
+							<View style={[styles.quickActionIconChip, { backgroundColor: COLORS.secondarySoft }]}>
+								<IconComponent type="materialIcons" name="event-available" size={scaledSize(20)} color={COLORS.secondary} />
 							</View>
 							<Text style={styles.quickActionTitle}>오늘의 출석</Text>
 							<Text style={styles.quickActionDesc}>확인하기</Text>
 						</TouchableOpacity>
 					</View>
 				</ScrollView>
-			</View>
+			</Animated.View>
 
 			{/* 뱃지 상세 팝업 (나의 활동과 동일 컴포넌트 재사용) */}
+			{/* RN Modal 두 개가 동시에 present 되면 iOS 에서 상세가 안 뜨므로, 목록이 닫힌 뒤에만 띄운다. */}
 			<BadgeDetailPopup
-				visible={!!selectedBadge}
+				visible={!!selectedBadge && !showBadgeModal}
 				badge={selectedBadge}
 				isEarned={!!selectedBadge && earnedBadgeIds.includes(selectedBadge.id)}
 				onClose={() => setSelectedBadge(null)}
@@ -981,7 +1063,10 @@ const Home = () => {
 				badges={CONST_BADGES}
 				earnedIds={earnedBadgeIds}
 				onClose={() => setShowBadgeModal(false)}
-				onSelectBadge={setSelectedBadge}
+				onSelectBadge={(badge) => {
+					setShowBadgeModal(false);
+					setSelectedBadge(badge);
+				}}
 			/>
 
 			<DailyMissionModal
@@ -1021,29 +1106,47 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
-	wrapper: { flex: 1, backgroundColor: '#ffffff', marginTop: scaleHeight(-16) },
-	scrollContainer: { paddingBottom: scaleHeight(40) },
+	main: { flex: 1, backgroundColor: COLORS.surface },
+	wrapper: { flex: 1, backgroundColor: COLORS.surface, marginTop: scaleHeight(-16) },
 	container: {
 		flexGrow: 1,
-		paddingHorizontal: scaleWidth(16),
-		paddingVertical: scaleHeight(12), // ← 이 부분을 줄이거나 0으로
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.md,
+		paddingBottom: scaleHeight(40), // 하단 잘림 방지 여백
+	},
+
+	// ===== 상단 히어로(캐릭터/게이지/등급) 영역 =====
+	heroSection: {
+		marginBottom: SPACING_H.xl,
 	},
 	imageContainer: { alignItems: 'center' },
+	streakChipWrapper: {
+		alignItems: 'center',
+		marginBottom: SPACING_H.sm,
+	},
 	image: {
 		width: scaleWidth(150),
 		height: scaleWidth(150),
 	},
+	mascoteView: {
+		width: scaleWidth(180),
+		height: scaleWidth(158),
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+
+	// ===== 말풍선 =====
 	speechWrapper: { alignItems: 'center', marginBottom: scaleHeight(-10) },
 	speechBubble: {
-		backgroundColor: '#fef9e7',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(20),
-		borderRadius: scaleWidth(20),
+		backgroundColor: '#FEF9E7',
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.xl,
+		borderRadius: RADIUS.xl,
 		maxWidth: '100%',
 		shadowColor: '#000',
-		shadowOpacity: 0.07,
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowRadius: scaleWidth(3),
+		shadowOpacity: 0.06,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 8,
 	},
 	speechTail: {
 		width: 0,
@@ -1053,37 +1156,180 @@ const styles = StyleSheet.create({
 		borderTopWidth: scaleHeight(10),
 		borderLeftColor: 'transparent',
 		borderRightColor: 'transparent',
-		borderTopColor: '#fef9e7',
+		borderTopColor: '#FEF9E7',
 		alignSelf: 'center',
 	},
 	speechText: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textStrong,
 		textAlign: 'center',
 		fontWeight: '600',
-		lineHeight: scaleHeight(22),
+		lineHeight: scaledSize(22),
 	},
-	levelContainer: { alignItems: 'center', marginBottom: scaleHeight(16) },
-	levelText: {
-		fontSize: scaledSize(14),
-		color: '#27ae60',
-		fontWeight: '600',
-		marginLeft: scaleWidth(6),
+
+	// ===== 펫 =====
+	petView: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginTop: SPACING_H.md,
+		marginBottom: SPACING_H.xs,
+		position: 'relative',
 	},
-	badgeScrollWrapper: {
-		height: scaleHeight(70),
+	petContent: {
+		position: 'absolute',
+		right: -scaleWidth(24),
+		top: scaleHeight(38),
+		width: scaleWidth(60),
+		height: scaleWidth(60),
+		borderRadius: scaleWidth(60) / 2,
+		borderWidth: 2,
+		borderColor: COLORS.primaryDark,
+		overflow: 'hidden',
+	},
+	petImage: { width: '100%', height: '100%' },
+	petSpeechBubble: {
+		position: 'absolute',
+		right: -scaleWidth(64),
+		top: SPACING_H.xs,
+		backgroundColor: COLORS.textStrong,
+		paddingVertical: scaleHeight(6),
+		paddingHorizontal: SPACING_W.md,
+		borderRadius: RADIUS.md,
+		zIndex: 20,
+		shadowColor: '#000',
+		shadowOpacity: 0.12,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 8,
+	},
+	petSpeechText: {
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.xs,
+		fontWeight: '700',
+		textAlign: 'center',
+	},
+	mascotHintText: {
+		marginBottom: SPACING_H.sm,
+		fontSize: FONT_SIZES.xs,
+		color: COLORS.textSecondary,
+		fontWeight: '400',
+		textAlign: 'center',
+	},
+
+	// ===== 진행 게이지 =====
+	progressBarWrapper: {
 		width: '100%',
-		marginTop: scaleHeight(8),
+		alignItems: 'center',
+		marginBottom: SPACING_H.sm,
+	},
+	progressBarBackground: {
+		width: '85%',
+		height: scaleHeight(20),
+		borderRadius: RADIUS.round,
+		borderWidth: 1.5,
+		borderColor: COLORS.primaryDark,
+		backgroundColor: COLORS.surface,
+		overflow: 'hidden',
+		alignSelf: 'center',
+	},
+	progressBarFill: {
+		height: '100%',
+		backgroundColor: COLORS.primary,
+		borderRadius: RADIUS.round,
+		position: 'absolute', // ✅ 항상 왼쪽에서부터 차도록
+		left: 0, // ✅ 시작 위치 고정
+	},
+	progressBarTextInside: {
+		position: 'absolute',
+		top: SPACING_H.xs / 2,
+		left: 0,
+		right: 0,
+		textAlign: 'center',
+		textAlignVertical: 'center', // Android 전용
+		fontSize: FONT_SIZES.xs,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+	},
+	progressBarTextBelow: {
+		marginTop: SPACING_H.xs,
+		fontSize: FONT_SIZES.xxs,
+		color: COLORS.textLight,
+		fontWeight: '400',
+		textAlign: 'center',
+	},
+
+	// ===== 등급/점수 =====
+	titleContainer: {
+		alignItems: 'center',
+	},
+	titleInnerBox: { alignItems: 'center' },
+	innerTitleContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING_H.sm },
+	levelTitleTouch: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingVertical: SPACING_H.xs,
+	},
+	levelTitleText: {
+		fontSize: FONT_SIZES.lg,
+		color: COLORS.primaryDark,
+		fontWeight: '700',
+		marginLeft: SPACING_W.sm,
+	},
+	levelTitleTextMaster: {
+		color: COLORS.gold,
+	},
+	levelInfoIcon: { marginLeft: SPACING_W.xs },
+	scoreBadgeItem: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: COLORS.primaryDark,
+		borderRadius: RADIUS.round,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		marginBottom: SPACING_H.sm,
+	},
+	scoreBadgeTextItem: {
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.md,
+		fontWeight: '600',
+		marginLeft: SPACING_W.xs,
+	},
+	levelDescription: {
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
+		fontWeight: '400',
+		textAlign: 'center',
+		marginBottom: SPACING_H.sm,
+		lineHeight: scaledSize(20),
+		paddingHorizontal: SPACING_W.sm,
+	},
+
+	// ===== 획득 뱃지 미리보기 =====
+	badgeView: {
+		width: '100%',
+		marginTop: SPACING_H.sm,
+		minHeight: scaleHeight(60),
+		justifyContent: 'center',
+		overflow: 'visible',
+	},
+	// 일정한 간격(gap)으로 균일 배치 + 적을 때는 가운데 정렬
+	badgeScrollContent: {
+		flexGrow: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		gap: SPACING_W.md,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.sm,
 	},
 	iconBoxActive: {
 		width: scaleWidth(38),
 		height: scaleWidth(38),
-		borderRadius: scaleWidth(19),
-		backgroundColor: '#d0f0dc',
+		borderRadius: scaleWidth(38) / 2,
+		backgroundColor: COLORS.primarySoft,
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderWidth: 1,
-		borderColor: '#27ae60',
+		borderColor: COLORS.primaryDark,
 	},
 	badgeChipTouch: {
 		// 터치 영역을 아이콘 칩 크기로 한정 (빈 공간 오터치 방지)
@@ -1091,714 +1337,54 @@ const styles = StyleSheet.create({
 		height: scaleWidth(38),
 	},
 	badgeMoreChip: {
-		backgroundColor: '#F1F5F9',
-		borderColor: '#CBD5E1',
+		backgroundColor: COLORS.surfaceAlt,
+		borderColor: COLORS.borderDark,
 	},
 	badgeMoreText: {
-		fontSize: scaledSize(12),
-		fontWeight: '800',
-		color: '#64748B',
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '700',
+		color: COLORS.textSecondary,
 	},
-	toggleBadgeText: {
-		color: '#27ae60',
-		fontSize: scaledSize(13),
-		marginTop: scaleHeight(4),
-		textAlign: 'center',
-	},
-	greetingText: {
-		fontSize: scaledSize(20),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		textAlign: 'center',
-	},
-	actionButton: {
-		width: scaleWidth(260),
-		paddingVertical: scaleHeight(14),
-		borderRadius: scaleWidth(12),
-		marginVertical: scaleHeight(8),
-		alignSelf: 'center',
-	},
-	buttonText: {
-		color: '#ffffff',
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-	},
-	buttonContent: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	helpButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginTop: scaleHeight(30),
-		alignSelf: 'center',
-		backgroundColor: '#95a5a6',
-		paddingHorizontal: scaleWidth(18),
-		paddingVertical: scaleHeight(10),
-		borderRadius: scaleWidth(8),
-		opacity: 0.9,
-	},
-	helpButtonText: {
-		color: '#ffffff',
-		fontSize: scaledSize(14),
-		fontWeight: '500',
-		marginLeft: scaleWidth(6),
-	},
-	helpIcon: {
-		marginRight: scaleWidth(4),
-	},
-	modalOverlay: {
-		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	modalContent: {
-		width: '85%',
-		backgroundColor: '#ffffff',
-		padding: scaleWidth(20),
-		borderRadius: scaleWidth(12),
-		alignItems: 'center',
-	},
-	modalCloseButton: {
-		backgroundColor: '#3498db',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(20),
-		borderRadius: scaleWidth(8),
-		marginTop: scaleHeight(20),
-	},
-	modalCloseText: {
-		color: '#ffffff',
-		fontWeight: '600',
-	},
-	modalTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(14),
-		textAlign: 'center',
-	},
-	modalText: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
-		lineHeight: scaleHeight(22),
-		textAlign: 'left',
-		marginTop: scaleHeight(10),
-		marginBottom: scaleHeight(20),
-	},
-	boldText: {
-		fontWeight: 'bold',
-	},
-	badgeModalContent: {
-		width: '90%',
-		backgroundColor: '#ffffff',
-		padding: scaleWidth(20),
-		borderRadius: scaleWidth(12),
-		alignItems: 'center',
-	},
-	badgeCard: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: '#f4f6f8',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(16),
-		marginBottom: scaleHeight(12),
-		shadowColor: '#000',
-		shadowOpacity: 0.05,
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowRadius: scaleWidth(2),
-		width: '100%',
-	},
-	iconBox: {
-		width: scaleWidth(40),
-		height: scaleWidth(40),
-		borderRadius: scaleWidth(20),
-		backgroundColor: '#e0e0e0',
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginRight: scaleWidth(16),
-	},
-	textBox: {
-		flex: 1,
-	},
-	badgeTitle: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-	},
-	badgeDesc: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		marginTop: scaleHeight(4),
-	},
-	pageTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(16),
-		textAlign: 'center',
-	},
-	curiousButton: {
-		marginTop: scaleHeight(16),
-		alignSelf: 'center',
-		paddingHorizontal: scaleWidth(14),
-		paddingVertical: scaleHeight(10),
-		borderRadius: scaleWidth(30),
-		borderWidth: 1,
-		borderColor: '#2ecc71',
-		backgroundColor: '#ffffff',
-		flexDirection: 'row',
-		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOpacity: 0.04,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 3,
-		marginBottom: scaleHeight(24),
-	},
-	curiousButtonText: {
-		color: '#2ecc71',
-		fontWeight: '600',
-		fontSize: scaledSize(14),
-		marginLeft: scaleWidth(8),
-		textAlign: 'center',
-	},
+
+	// ===== 메인 액션 카드 =====
 	actionCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		borderRadius: scaleWidth(16),
-		marginHorizontal: 0,
-		marginBottom: scaleHeight(16),
-		padding: scaleWidth(14),
-		backgroundColor: '#ffffff',
+		borderRadius: RADIUS.lg,
+		marginBottom: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		backgroundColor: COLORS.surface,
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
+		borderColor: COLORS.border,
+		width: '100%',
 		shadowColor: '#000',
-		shadowOpacity: 0.05,
-		alignSelf: 'center',
-		width: '88%',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowRadius: scaleWidth(2),
+		shadowOpacity: 0.06,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 8,
 	},
 	iconCircle: {
 		width: scaleWidth(52),
 		height: scaleWidth(52),
-		borderRadius: scaleWidth(26),
+		borderRadius: scaleWidth(52) / 2,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginRight: scaleWidth(16),
-	},
-	cardTitle: {
-		fontSize: scaledSize(16),
-		fontWeight: '700',
-		color: '#2c3e50',
-	},
-	cardDescription: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		marginTop: scaleHeight(4),
-		lineHeight: scaleHeight(18),
+		marginRight: SPACING_W.lg,
 	},
 	cardTextBox: {
 		flex: 1,
 	},
-	badgeCardActive: {
-		backgroundColor: '#eafaf1',
-		borderColor: '#2ecc71',
-		borderWidth: 1.2,
-	},
-	badgeTitleActive: {
-		color: '#27ae60',
-	},
-	badgeDescActive: {
-		color: '#1e8449',
-	},
-	badgeProgressText: {
-		fontSize: scaledSize(14),
-		fontWeight: '600',
-		color: '#27ae60',
-		marginBottom: scaleHeight(12),
-		textAlign: 'center',
-	},
-	confettiWrapper: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		width: scaleWidth(150),
-		height: scaleHeight(280),
-		zIndex: 10,
-	},
-	tooltipBox: {
-		marginTop: scaleHeight(6),
-		backgroundColor: '#2c3e50',
-		paddingVertical: scaleHeight(6),
-		paddingHorizontal: scaleWidth(10),
-		borderRadius: scaleWidth(8),
-		maxWidth: scaleWidth(180),
-		zIndex: 10,
-	},
-	tooltipText: {
-		color: '#ffffff',
-		fontSize: scaledSize(12),
-		textAlign: 'center',
-		lineHeight: scaleHeight(18),
-	},
-	badgeDetailModal: {
-		backgroundColor: '#ffffff',
-		padding: scaleWidth(24),
-		borderRadius: scaleWidth(16),
-		width: '85%',
-		alignItems: 'center',
-		position: 'relative',
-	},
-	badgeIconWrapper: {
-		width: scaleWidth(80),
-		height: scaleWidth(80),
-		borderRadius: scaleWidth(40),
-		backgroundColor: '#eafaf1',
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginBottom: scaleHeight(16),
-	},
-	badgeDetailTitle: {
-		fontSize: scaledSize(20),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(8),
-		textAlign: 'center',
-	},
-	badgeDetailDescription: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		textAlign: 'center',
-		lineHeight: scaleHeight(22),
-	},
-	modalCloseIcon: {
-		position: 'absolute',
-		top: scaleHeight(10),
-		right: scaleWidth(10),
-		zIndex: 2,
-		padding: scaleWidth(5),
-	},
-	modalConfirmButton: {
-		backgroundColor: '#27ae60',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(20),
-		borderRadius: scaleWidth(8),
-		marginTop: scaleHeight(20),
-		alignSelf: 'center',
-	},
-	modalConfirmText: {
-		color: '#ffffff',
-		fontWeight: '600',
-		fontSize: scaledSize(14),
-		textAlign: 'center',
-	},
-	levelModal: {
-		backgroundColor: '#ffffff',
-		paddingHorizontal: scaleWidth(20),
-		paddingTop: scaleHeight(20),
-		paddingBottom: scaleHeight(12),
-		borderRadius: scaleWidth(16),
-		width: '85%',
-		alignItems: 'center',
-		maxHeight: scaleHeight(600),
-	},
-	levelModalTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(12),
-		color: '#2c3e50',
-	},
-	levelRowItem: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		width: '100%',
-		paddingVertical: scaleHeight(8),
-		borderBottomWidth: 1,
-		borderColor: '#ecf0f1',
-	},
-	levelRowItemActive: {
-		backgroundColor: '#eafaf1',
-		borderColor: '#27ae60',
-	},
-	levelCardBox: {
-		backgroundColor: '#ffffff',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(16),
-		alignItems: 'center',
-		marginBottom: scaleHeight(14),
-		width: '100%',
-		borderWidth: 1,
-		borderColor: '#ecf0f1',
-	},
-	levelCardBoxActive: {
-		backgroundColor: '#eafaf1',
-		borderColor: '#2ecc71',
-		borderWidth: 2,
-	},
-	levelBadge: {
-		backgroundColor: '#27ae60',
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(4),
-		borderRadius: scaleWidth(12),
-		marginBottom: scaleHeight(8),
-	},
-	levelBadgeText: {
-		color: '#ffffff',
-		fontSize: scaledSize(12),
-		fontWeight: 'bold',
-	},
-	levelMascot: {
-		width: scaleWidth(80),
-		height: scaleWidth(80),
-		marginBottom: scaleHeight(10),
-	},
-	levelLabel: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(2),
-		marginLeft: scaleWidth(6),
-	},
-	levelScore: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-	},
-	levelEncourage: {
-		fontSize: scaledSize(12),
-		color: '#27ae60',
-		marginTop: scaleHeight(6),
-		textAlign: 'center',
-		lineHeight: scaleHeight(20),
-	},
-	main: { flex: 1, backgroundColor: '#ffffff' },
-	mascoteView: {
-		width: scaleWidth(180),
-		height: scaleWidth(158),
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	iconView: {
-		alignItems: 'center',
-		marginBottom: scaleHeight(8),
-	},
-	iconViewInner: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: scaleHeight(10),
-	},
-	myScoreLabel: {
-		fontSize: scaledSize(16),
-		color: '#27ae60',
+	cardTitle: {
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
-		marginLeft: scaleWidth(6),
+		color: COLORS.textStrong,
 	},
-	badgeView: { width: '100%', marginTop: scaleHeight(6), minHeight: scaleHeight(60), paddingVertical: scaleHeight(2), justifyContent: 'center', overflow: 'visible' },
-	// 일정한 간격(gap)으로 균일 배치 + 적을 때는 가운데 정렬
-	badgeScrollContent: {
-		flexGrow: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		gap: scaleWidth(10),
-		paddingHorizontal: scaleWidth(12),
-		paddingVertical: scaleHeight(6),
-	},
-	badgeScrollView: {
-		maxHeight: scaleHeight(400),
-		width: '100%',
-	},
-	gradeScrollView: {
-		paddingBottom: scaleHeight(12),
-	},
-	globalConfettiWrapper: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		zIndex: 999,
-		pointerEvents: 'none',
-	},
-	rowCentered: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-	},
-	mascotImage: {
-		width: scaleWidth(48),
-		height: scaleWidth(48),
-		borderRadius: scaleWidth(24),
-		borderWidth: 2,
-		borderColor: '#27ae60',
-		marginRight: scaleWidth(10),
-	},
-	modalText2: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		lineHeight: scaleHeight(20),
-		marginTop: scaleHeight(6),
-		fontWeight: '500',
-	},
-	highlightBox: {
-		padding: scaleHeight(10),
-		backgroundColor: '#fef9e7',
-		borderRadius: scaleWidth(12),
-		borderWidth: 1,
-		borderColor: '#f1c40f',
-	},
-	highlightText: {
-		fontSize: scaledSize(12),
-		color: '#2c3e50',
-		textAlign: 'center',
-		lineHeight: scaleHeight(20),
-		fontWeight: '500',
-	},
-	petScrollContainer: {
-		marginTop: scaleHeight(12),
-		marginBottom: scaleHeight(12),
-	},
-	petScrollContent: {
-		paddingHorizontal: scaleWidth(12),
-	},
-	petItemBox: {
-		width: scaleWidth(90),
-		alignItems: 'center',
-		padding: scaleWidth(6),
-		borderRadius: scaleWidth(8),
-		backgroundColor: '#f8f9fa',
-		borderWidth: 1,
-		borderColor: '#dcdcdc',
-		position: 'relative',
-	},
-	petImage2: {
-		width: scaleWidth(48),
-		height: scaleWidth(48),
-		borderRadius: scaleWidth(24),
-		borderWidth: 2,
-		borderColor: '#27ae60',
-		marginBottom: scaleHeight(6),
-	},
-	petLabelText: {
-		fontSize: scaledSize(11),
-		color: '#2c3e50',
-		fontWeight: '600',
-		textAlign: 'center',
-	},
-	petStageText: {
-		fontSize: scaledSize(10),
-		color: '#7f8c8d',
-		marginTop: scaleHeight(2),
-		textAlign: 'center',
-	},
-	arrowIcon: {
-		position: 'absolute',
-		right: -scaleWidth(8),
-		top: '45%',
-	},
-	calendarContainer: {
-		width: '100%',
-		borderRadius: scaleWidth(8),
-		borderWidth: 1,
-		borderColor: '#27ae60',
-		overflow: 'hidden',
-		marginTop: scaleHeight(4),
-		marginBottom: scaleHeight(4),
-	},
-	calendarHeaderText: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		textAlign: 'center',
-		marginVertical: scaleHeight(10),
-	},
-	stampContainer: {
-		alignItems: 'center',
-	},
-	stampImage: {
-		width: scaleWidth(120),
-		height: scaleWidth(120),
-		marginBottom: scaleHeight(6),
-	},
-	stampText: {
-		fontSize: scaledSize(16),
-		color: '#e74c3c',
-		fontWeight: 'bold',
-		textShadowColor: 'rgba(0,0,0,0.2)',
-		textShadowOffset: { width: 1, height: 1 },
-		textShadowRadius: 2,
-	},
-	checkInCompleteText: {
-		fontSize: scaledSize(14),
-		color: '#27ae60',
-		marginTop: scaleHeight(10),
-		fontWeight: 'bold',
-		textAlign: 'center',
-	},
-	petView: { alignItems: 'center', justifyContent: 'center', marginTop: scaleHeight(14), marginBottom: scaleHeight(2), position: 'relative' },
-	petContent: {
-		position: 'absolute',
-		right: scaleWidth(-24),
-		top: scaleHeight(38),
-		width: scaleWidth(60),
-		height: scaleWidth(60),
-		borderRadius: scaleWidth(30),
-		borderWidth: 2,
-		borderColor: '#27ae60',
-		overflow: 'hidden',
-	},
-	petImage: { width: '100%', height: '100%' },
-	petSpeechBubble: {
-		position: 'absolute',
-		right: scaleWidth(-64),
-		top: scaleHeight(4),
-		backgroundColor: '#1E293B',
-		paddingVertical: scaleHeight(5),
-		paddingHorizontal: scaleWidth(10),
-		borderRadius: scaleWidth(12),
-		zIndex: 20,
-		shadowColor: '#000',
-		shadowOpacity: 0.18,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 4,
-	},
-	petSpeechText: {
-		color: '#fff',
-		fontSize: scaledSize(11),
-		fontWeight: '700',
-		textAlign: 'center',
-	},
-	titleContainer: {
-		alignItems: 'center',
-		marginBottom: scaleHeight(10),
-	},
-	curiousButton2: {
-		alignSelf: 'center',
-		paddingHorizontal: scaleWidth(14),
-		paddingVertical: scaleHeight(10),
-		borderRadius: scaleWidth(30),
-		borderWidth: 1,
-		borderColor: '#2ecc71',
-		backgroundColor: '#ffffff',
-		flexDirection: 'row',
-		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOpacity: 0.04,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 3,
-		marginBottom: scaleHeight(24),
-	},
-	innerTitleContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) },
-	titleText: {
-		fontSize: scaledSize(16),
-		color: '#27ae60',
-		fontWeight: '700',
-		marginLeft: scaleWidth(6),
-		marginBottom: scaleHeight(5),
-	},
-	infoIcon: { marginLeft: scaleWidth(4), marginTop: scaleHeight(-3) },
-	scoreBadgeItem: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: '#27ae60',
-		borderRadius: scaleHeight(12),
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(4),
-		marginBottom: scaleHeight(10),
-	},
-	scoreBadgeTextItem: {
-		color: '#ffffff',
-		fontSize: scaledSize(14),
-		fontWeight: '600',
-		marginLeft: scaleWidth(4),
-	},
-	levelDescription: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		textAlign: 'center',
-		marginTop: scaleHeight(4),
-		marginBottom: scaleHeight(8),
-		lineHeight: scaleHeight(20),
-		paddingHorizontal: scaleWidth(8),
-	},
-	levelDetailDescription: {
-		fontSize: scaledSize(12),
-		color: '#7f8c8d',
-		textAlign: 'center',
-		marginTop: scaleHeight(6),
-		lineHeight: scaleHeight(18),
-	},
-	mascotHintText: {
-		marginBottom: scaleHeight(6),
-		fontSize: scaledSize(11),
-		color: '#7f8c8d',
-		textAlign: 'center',
-	},
-	levelMascotCircle: {
-		width: scaleWidth(80),
-		height: scaleWidth(80),
-		borderRadius: scaleWidth(40),
-		overflow: 'hidden',
-		backgroundColor: '#ffffff',
-		borderWidth: 2,
-		borderColor: '#27ae60',
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginBottom: scaleHeight(10),
-		shadowColor: '#000',
-		shadowOpacity: 0.08,
-		shadowOffset: { width: 0, height: scaleHeight(3) },
-		shadowRadius: 5,
-	},
-	levelMascotImage: {
-		width: '100%',
-		height: '100%',
-		borderRadius: scaleWidth(40),
-	},
-	progressBarWrapper: {
-		width: '100%',
-		alignItems: 'center',
-		marginBottom: scaleHeight(8),
-	},
-
-	progressBarTextBelow: {
-		marginVertical: scaleHeight(3), // 위 여백도 줄여서 붙여줌
-		fontSize: scaledSize(10), // ✅ 아주 작게
-		color: '#95a5a6', // ✅ 흐릿한 회색 (밝은 그레이톤)
-		fontWeight: '400', // ✅ 굵기 줄여서 덜 강조
-		textAlign: 'center',
-		justifyContent: 'center',
-		alignContent: 'center',
-		opacity: 0.7, // ✅ 살짝 흐릿하게
-	},
-	progressBarBackground: {
-		width: '85%',
-		height: scaleHeight(20),
-		borderRadius: scaleHeight(7),
-		borderWidth: 1.5,
-		borderColor: '#27ae60',
-		backgroundColor: '#ffffff',
-		overflow: 'hidden',
-		alignSelf: 'center',
-	},
-	progressBarFill: {
-		height: '100%',
-		marginBottom: scaleHeight(6),
-		backgroundColor: '#27ae60',
-		borderRadius: scaleHeight(7),
-		position: 'absolute', // ✅ 항상 왼쪽에서부터 차도록
-		left: 0, // ✅ 시작 위치 고정
-	},
-	progressBarTextInside: {
-		position: 'absolute',
-		top: scaleHeight(2),
-		left: 0,
-		right: 0,
-		textAlign: 'center',
-		textAlignVertical: 'center', // Android 전용
-		justifyContent: 'center',
-		fontSize: scaledSize(11),
-		fontWeight: '700',
-		color: '#2c3e50',
+	cardDescription: {
+		fontSize: FONT_SIZES.smPlus,
+		fontWeight: '400',
+		color: COLORS.textSecondary,
+		marginTop: SPACING_H.xs,
+		lineHeight: scaledSize(18),
 	},
 	newBadgeWrapper: {
 		position: 'absolute',
@@ -1807,34 +1393,32 @@ const styles = StyleSheet.create({
 		width: scaleWidth(56),
 		height: scaleWidth(56),
 		overflow: 'hidden',
-		borderTopRightRadius: scaleWidth(16), // actionCard borderRadius와 동일
+		borderTopRightRadius: RADIUS.lg, // actionCard borderRadius와 동일
 	},
 	newBadge: {
 		position: 'absolute',
 		top: scaleWidth(10),
 		right: -scaleWidth(14),
 		width: scaleWidth(64),
-		backgroundColor: '#ff4757',
+		backgroundColor: COLORS.danger,
 		paddingVertical: scaleHeight(3),
 		transform: [{ rotate: '45deg' }],
 		alignItems: 'center',
-		shadowColor: '#ff4757',
-		shadowOpacity: 0.4,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 4,
 	},
 	newBadgeText: {
-		color: '#ffffff',
-		fontSize: scaledSize(10),
-		fontWeight: '800',
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.xxs,
+		fontWeight: '700',
 		letterSpacing: 0.8,
 	},
+
+	// ===== 연속 출석 칩 =====
 	streakChip: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		borderRadius: scaleHeight(12),
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(4),
+		borderRadius: RADIUS.round,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
 		borderWidth: 1,
 	},
 	streakChipActive: {
@@ -1842,45 +1426,47 @@ const styles = StyleSheet.create({
 		borderColor: '#FDBA74',
 	},
 	streakChipIdle: {
-		backgroundColor: '#F1F5F9',
-		borderColor: '#E2E8F0',
+		backgroundColor: COLORS.surfaceAlt,
+		borderColor: COLORS.border,
 	},
 	streakChipText: {
-		fontSize: scaledSize(13),
+		fontSize: FONT_SIZES.smPlus,
 		fontWeight: '700',
-		color: '#94A3B8',
-		marginLeft: scaleWidth(4),
+		color: COLORS.textLight,
+		marginLeft: SPACING_W.xs,
 	},
 	streakChipTextActive: {
 		color: '#EA580C',
 	},
+
+	// ===== 하단 퀵 액션 =====
 	quickActionRow: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		marginTop: scaleHeight(16),
-		marginBottom: scaleHeight(24),
-		gap: scaleWidth(10),
+		marginTop: SPACING_H.sm,
+		gap: SPACING_W.md,
 	},
 	quickActionCard: {
 		flex: 1,
 		alignItems: 'center',
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(6),
-		borderRadius: scaleWidth(16),
-		backgroundColor: Colors.surface,
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.sm,
+		borderRadius: RADIUS.lg,
+		backgroundColor: COLORS.surface,
 		borderWidth: 1,
-		borderColor: Colors.surfaceAlt,
+		borderColor: COLORS.border,
 		shadowColor: '#000',
-		shadowOpacity: 0.05,
+		shadowOpacity: 0.06,
 		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 6,	},
+		shadowRadius: 8,
+	},
 	quickActionIconChip: {
 		width: scaleWidth(44),
 		height: scaleWidth(44),
-		borderRadius: scaleWidth(22),
+		borderRadius: scaleWidth(44) / 2,
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.sm,
 	},
 	quickActionDot: {
 		position: 'absolute',
@@ -1888,23 +1474,33 @@ const styles = StyleSheet.create({
 		right: scaleWidth(2),
 		width: scaleWidth(10),
 		height: scaleWidth(10),
-		borderRadius: scaleWidth(5),
-		backgroundColor: '#EF4444',
+		borderRadius: scaleWidth(10) / 2,
+		backgroundColor: COLORS.danger,
 		borderWidth: 1.5,
-		borderColor: '#fff',
+		borderColor: COLORS.surface,
 	},
 	quickActionTitle: {
-		color: Colors.textStrong,
+		color: COLORS.textStrong,
 		fontWeight: '700',
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 		textAlign: 'center',
 	},
 	quickActionDesc: {
-		color: Colors.textMuted,
+		color: COLORS.textSecondary,
 		fontWeight: '500',
-		fontSize: scaledSize(11),
-		marginTop: scaleHeight(2),
+		fontSize: FONT_SIZES.xs,
+		marginTop: SPACING_H.xs,
 		textAlign: 'center',
+	},
+
+	globalConfettiWrapper: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		zIndex: 999,
+		pointerEvents: 'none',
 	},
 });
 

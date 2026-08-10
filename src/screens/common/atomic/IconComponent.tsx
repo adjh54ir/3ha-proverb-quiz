@@ -1,5 +1,5 @@
 // IconComponent.tsx
-import { scaledSize, scaleWidth } from '@/utils';
+import { scaledSize } from '@/utils';
 import React from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -38,10 +38,10 @@ export type IconType =
 interface IconProps {
 	type: string;
 	name: string;
+	/** 최종 렌더 크기(px). 호출부에서 scaledSize() 로 감싸 전달한다. */
 	size?: number;
 	color?: string;
 	style?: StyleProp<TextStyle>;
-	isBottomIcon?: boolean
 }
 /**
  * react-native-vector-icons 를 활용할 수 있는 컴포넌트
@@ -61,7 +61,7 @@ interface IconProps {
  * @param param0
  * @returns
  */
-const IconComponent: React.FC<IconProps> = ({ type, name, size = 24, color = 'black', style, isBottomIcon = false }) => {
+const IconComponent: React.FC<IconProps> = ({ type, name, size = scaledSize(24), color = 'black', style }) => {
 	const normalizedType = type.toLowerCase(); // 소문자 변환
 
 	const iconMap: Record<IconType, any> = {
@@ -89,20 +89,9 @@ const IconComponent: React.FC<IconProps> = ({ type, name, size = 24, color = 'bl
 		return null;
 	}
 
-	return (
-		<>
-
-			{
-				!isBottomIcon ?
-					<Icon name={name} size={scaleWidth(size)} color={color} style={style} />
-					:
-					<Icon name={name} size={scaledSize(size)} color={color} style={style} />
-			}
-		</>
-	)
-
-
-
+	// size 는 이미 스케일이 적용된 최종값으로 취급한다.
+	// 여기서 다시 scaleWidth() 를 걸면 호출부의 scaledSize() 와 겹쳐 이중 스케일이 된다.
+	return <Icon name={name} size={size} color={color} style={style} />;
 };
 
 export default IconComponent;

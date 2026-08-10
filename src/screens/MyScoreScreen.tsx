@@ -31,6 +31,7 @@ import 'moment/locale/ko'; // 한국어 로케일 import
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import Colors from '@/const/ConstColors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
@@ -43,6 +44,7 @@ import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import LevelModal from './modal/LevelModal';
 import { FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
+import DateUtils from '@/utils/DateUtils';
 
 interface TodayQuizList {
 	quizDate: string;
@@ -116,13 +118,38 @@ const STYLE_MAP = {
 };
 
 LocaleConfig.locales.kr = {
-	monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '11월'],
-	monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '11월'],
+	monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+	monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
 	dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
 	dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
 };
 
 LocaleConfig.defaultLocale = 'kr';
+
+/**
+ * 캘린더 셀의 기본(비선택) 마킹.
+ * 날짜 선택을 해제할 때도 이 규칙으로 복원해야 출석 표시가 연파랑으로 덮어써지지 않는다.
+ */
+const buildDateMark = (isCheckedIn: boolean, isToday: boolean) =>
+	isCheckedIn
+		? {
+				// 출석한 날 — 오늘은 앰버, 이전 날은 초록
+				marked: true,
+				dotColor: '#FFFFFF',
+				customStyles: {
+					container: { backgroundColor: isToday ? '#F59E0B' : '#22C55E', borderRadius: scaleWidth(6) },
+					text: { color: '#fff', fontWeight: 'bold' },
+				},
+		  }
+		: {
+				// 퀴즈 기록만 있고 출석은 안 한 날
+				marked: true,
+				dotColor: '#22C55E',
+				customStyles: {
+					container: { backgroundColor: '#EFF6FF' },
+					text: { color: '#22C55E', fontWeight: 'bold' },
+				},
+		  };
 moment.locale('ko'); // 로케일 설정
 
 const STORAGE_KEY_QUIZ = MainStorageKeyType.USER_QUIZ_HISTORY;
@@ -191,6 +218,12 @@ const MyScoreScreen = () => {
 	// 마스코트 진입 애니메이션
 	const mascotFade = useRef(new Animated.Value(0)).current;
 	const mascotScale = useRef(new Animated.Value(0.8)).current;
+
+	// 전체 스코어 대시보드 진입 애니메이션 (fade + slide-up) + 타일 stagger
+	const dashFade = useRef(new Animated.Value(0)).current;
+	const dashSlide = useRef(new Animated.Value(scaleHeight(12))).current;
+	// ponytail: 대시보드 타일 4개 고정 — 지표가 늘어나면 이 배열 길이도 함께 늘릴 것
+	const tileAnims = useRef([0, 1, 2, 3].map(() => new Animated.Value(0))).current;
 
 	const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
 	const [totalScore, setTotalScore] = useState<number>(0);
@@ -275,11 +308,13 @@ const MyScoreScreen = () => {
 
 	useFocusEffect(
 		useCallback(() => {
-			loadData();
-			loadCheckedInDates();
+			loadData(); // 캘린더 마킹 + 펫 레벨까지 여기서 한 번에 계산한다
 			// 마스코트 진입 애니메이션 실행
 			mascotFade.setValue(0);
 			mascotScale.setValue(0.8);
+			dashFade.setValue(0);
+			dashSlide.setValue(scaleHeight(12));
+			tileAnims.forEach((v) => v.setValue(0));
 			const anim = Animated.parallel([
 				Animated.timing(mascotFade, {
 					toValue: 1,
@@ -292,6 +327,26 @@ const MyScoreScreen = () => {
 					tension: 80,
 					useNativeDriver: true,
 				}),
+				Animated.timing(dashFade, {
+					toValue: 1,
+					duration: 300,
+					useNativeDriver: true,
+				}),
+				Animated.timing(dashSlide, {
+					toValue: 0,
+					duration: 300,
+					useNativeDriver: true,
+				}),
+				Animated.stagger(
+					60,
+					tileAnims.map((v) =>
+						Animated.timing(v, {
+							toValue: 1,
+							duration: 260,
+							useNativeDriver: true,
+						}),
+					),
+				),
 			]);
 			anim.start();
 			return () => anim.stop();
@@ -394,85 +449,31 @@ const MyScoreScreen = () => {
 			const todayJson = await AsyncStorage.getItem(STORAGE_KEY_TODAY);
 			const todayData: MainDataType.TodayQuizList[] = todayJson ? JSON.parse(todayJson) : [];
 
+			// 캘린더 마킹은 여기 한 곳에서만 만든다.
+			// (예전에는 loadCheckedInDates() 가 별도 marked 를 만들고도 setMarkedQuizDates 를 호출하지 않아
+			//  출석 표시(초록/앰버)가 화면에 전혀 반영되지 않았다. 두 계산을 합쳐 한 번에 세팅한다.)
+			const todayStr = DateUtils.getLocalDateString();
+
 			const marked = todayData.reduce(
 				(acc, item) => {
-					const dateKey = item.quizDate.slice(0, 10);
-					acc[dateKey] = {
-						marked: true,
-						dotColor: '#22C55E',
-						customStyles: {
-							container: {
-								backgroundColor: '#EFF6FF',
-							},
-							text: {
-								color: '#22C55E',
-								fontWeight: 'bold',
-							},
-						},
-					};
+					const dateKey = DateUtils.toLocalDateKey(item.quizDate);
+					if (!dateKey) {
+						return acc;
+					}
+					acc[dateKey] = buildDateMark(!!item.isCheckedIn, dateKey === todayStr);
 					return acc;
 				},
 				{} as Record<string, any>,
 			);
 
-			const todayStr = moment().format('YYYY-MM-DD');
-
-			marked[todayStr] = {
-				...(marked[todayStr] || {}),
-				customStyles: {
-					container: {
-						backgroundColor: '#3B82F6', // 🎨 밝은 파란색
-					},
-					text: {
-						color: '#fff',
-						fontWeight: 'bold',
-					},
-				},
-			};
-			console.log('todayData :', todayData);
-
-			setTodayQuizDataList(todayData); // todayData를 상태로 저장
-
-			setMarkedQuizDates(marked);
-		} catch (e) {
-			console.error('❌ 데이터 로딩 실패:', e);
-		}
-	};
-
-	// ✅ PET_REWARDS 인덱스 매핑: 1일→0(견습생), 7일→1(훈련생), 14일→2(수련생), 21일→3(졸업생), 28일→4(마스터)
-	const getPetLevel = (checkedIn: { [date: string]: any }) => {
-		const count = Object.keys(checkedIn).length;
-		if (count >= 28) { return 4; }
-		if (count >= 21) { return 3; }
-		if (count >= 14) { return 2; }
-		if (count >= 7) { return 1; }
-		if (count >= 1) { return 0; } // ✅ 1일 이상이면 첫 번째 펫 표시
-		return -1;
-	};
-
-	const loadCheckedInDates = async () => {
-		const json = await AsyncStorage.getItem(STORAGE_KEY_TODAY);
-		if (!json) {
-			return;
-		}
-
-		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-		const todayStr = new Date().toISOString().slice(0, 10);
-
-		console.log('arr : ', arr);
-		console.log('todayStr : ', todayStr);
-
-		const marked: { [date: string]: any } = {};
-		arr.forEach((item) => {
-			if (item.isCheckedIn) {
-				const date = item.quizDate.slice(0, 10);
-				const isToday = date === todayStr;
-
-				marked[date] = {
+			// 오늘 출석 전이면 오늘 날짜를 파란색으로 강조 (출석 앰버 표시는 덮어쓰지 않는다)
+			const isTodayCheckedIn = todayData.some((item) => DateUtils.toLocalDateKey(item.quizDate) === todayStr && item.isCheckedIn);
+			if (!isTodayCheckedIn) {
+				marked[todayStr] = {
+					...(marked[todayStr] || {}),
 					customStyles: {
 						container: {
-							backgroundColor: isToday ? '#F59E0B' : '#22C55E', // ✅ 앰버: 오늘(강조), 블루: 이전 출석
-							borderRadius: scaleWidth(6),
+							backgroundColor: '#3B82F6', // 🎨 밝은 파란색
 						},
 						text: {
 							color: '#fff',
@@ -481,9 +482,26 @@ const MyScoreScreen = () => {
 					},
 				};
 			}
-		});
-		setPetLevel(getPetLevel(marked)); // ✅ 추가
+
+			setTodayQuizDataList(todayData); // todayData를 상태로 저장
+
+			setMarkedQuizDates(marked);
+			setPetLevel(getPetLevel(todayData.filter((item) => item.isCheckedIn).length));
+		} catch (e) {
+			console.error('❌ 데이터 로딩 실패:', e);
+		}
 	};
+
+	// ✅ PET_REWARDS 인덱스 매핑: 1일→0(견습생), 7일→1(훈련생), 14일→2(수련생), 21일→3(졸업생), 28일→4(마스터)
+	const getPetLevel = (count: number) => {
+		if (count >= 28) { return 4; }
+		if (count >= 21) { return 3; }
+		if (count >= 14) { return 2; }
+		if (count >= 7) { return 1; }
+		if (count >= 1) { return 0; } // ✅ 1일 이상이면 첫 번째 펫 표시
+		return -1;
+	};
+
 	// ISO 형식 대응 버전
 	const getRelativeDateLabel = (isoString: string): string => {
 		try {
@@ -559,23 +577,11 @@ const MyScoreScreen = () => {
 		setMarkedQuizDates((prev) => {
 			const updated = { ...prev };
 
-			// 선택된 날짜 마킹이 있으면 제거하거나 기존 마킹만 남김
-			const originalMark = todayQuizDataList.find((item) => moment(item.quizDate).format('YYYY-MM-DD') === selectedDate);
+			// 선택된 날짜 마킹이 있으면 기본 마킹으로 복원, 없으면 삭제
+			const originalMark = todayQuizDataList.find((item) => DateUtils.toLocalDateKey(item.quizDate) === selectedDate);
 
 			if (originalMark) {
-				updated[selectedDate] = {
-					marked: true,
-					dotColor: '#22C55E',
-					customStyles: {
-						container: {
-							backgroundColor: '#EFF6FF',
-						},
-						text: {
-							color: '#22C55E',
-							fontWeight: 'bold',
-						},
-					},
-				};
+				updated[selectedDate] = buildDateMark(!!originalMark.isCheckedIn, selectedDate === DateUtils.getLocalDateString());
 			} else {
 				delete updated[selectedDate]; // 마킹도 없으면 삭제
 			}
@@ -644,24 +650,12 @@ const MyScoreScreen = () => {
 		setMarkedQuizDates((prev) => {
 			const updated = { ...prev };
 
-			// ✅ 이전 선택 날짜 초기화
+			// ✅ 이전 선택 날짜를 기본 마킹으로 복원 (출석 색이 유지되어야 한다)
 			if (prevDate && updated[prevDate]) {
-				const wasChecked = todayQuizDataList.some((item) => moment(item.quizDate).format('YYYY-MM-DD') === prevDate);
+				const prevItem = todayQuizDataList.find((item) => DateUtils.toLocalDateKey(item.quizDate) === prevDate);
 
-				if (wasChecked) {
-					updated[prevDate] = {
-						marked: true,
-						dotColor: '#22C55E',
-						customStyles: {
-							container: {
-								backgroundColor: '#EFF6FF',
-							},
-							text: {
-								color: '#22C55E',
-								fontWeight: 'bold',
-							},
-						},
-					};
+				if (prevItem) {
+					updated[prevDate] = buildDateMark(!!prevItem.isCheckedIn, prevDate === DateUtils.getLocalDateString());
 				} else {
 					delete updated[prevDate];
 				}
@@ -722,6 +716,7 @@ const MyScoreScreen = () => {
 				style={styles.container}
 				contentContainerStyle={{ paddingBottom: scaleHeight(40), flexGrow: 1 }}
 				onScroll={scrollHandler.onScroll}
+				scrollEventThrottle={16}
 				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 				<View style={styles.sectionBox}>
 					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginTop: scaleHeight(14), marginBottom: scaleHeight(-8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
@@ -744,7 +739,7 @@ const MyScoreScreen = () => {
 									height: scaleWidth(60),
 									borderRadius: scaleWidth(30),
 									borderWidth: 2,
-									borderColor: '#22C55E',
+									borderColor: COLORS.primary,
 									overflow: 'hidden',
 								}}>
 								<FastImage source={PET_REWARDS[petLevel].image} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
@@ -752,7 +747,7 @@ const MyScoreScreen = () => {
 						)}
 					</Animated.View>
 					<View style={{ alignItems: 'center' }}>
-						<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(10) }}>
+						<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: SPACING_H.md }}>
 							<TouchableOpacity
 								style={{
 									flexDirection: 'row',
@@ -761,40 +756,42 @@ const MyScoreScreen = () => {
 								}}
 								activeOpacity={0.7}
 								onPress={() => setShowLevelModal(true)}>
-								<IconComponent type="fontAwesome6" name={icon} size={scaledSize(18)} color="#22C55E" />
-								<Text style={{ fontSize: scaledSize(16), color: '#22C55E', fontWeight: '700', marginLeft: scaleWidth(6) }}>
+								<IconComponent type="fontAwesome6" name={icon} size={scaledSize(18)} color={COLORS.primary} />
+								<Text style={{ fontSize: FONT_SIZES.lg, color: COLORS.primary, fontWeight: '700', marginLeft: scaleWidth(6) }}>
 									{label}
 								</Text>
 								<IconComponent
 									type="materialIcons"
 									name="info-outline"
 									size={scaledSize(18)}
-									color="#64748B"
-									style={{ marginLeft: scaleWidth(4), marginTop: scaleHeight(1) }}
+									color={COLORS.textSecondary}
+									style={{ marginLeft: SPACING_W.xs, marginTop: scaleHeight(1) }}
 								/>
 							</TouchableOpacity>
 						</View>
 
 						<View style={styles.scoreBadge}>
-							<IconComponent name="leaderboard" type="materialIcons" size={scaledSize(14)} color="#fff" />
+							<IconComponent name="leaderboard" type="materialIcons" size={scaledSize(14)} color={COLORS.textWhite} />
 							<Text style={styles.scoreBadgeText}>{totalScore.toLocaleString()}점</Text>
 						</View>
 					</View>
 
 					<View style={styles.levelDescriptionCard}>
-						<View style={[styles.levelDescIconChip, { backgroundColor: '#FEF3C7' }]}>
-							<IconComponent type="fontAwesome6" name="trophy" size={scaledSize(14)} color="#F59E0B" />
+						<View style={[styles.levelDescIconChip, { backgroundColor: COLORS.warningBg }]}>
+							<IconComponent type="fontAwesome6" name="trophy" size={scaledSize(14)} color={COLORS.warning} />
 						</View>
-						<Text style={styles.levelDescriptionText} numberOfLines={1} adjustsFontSizeToFit>
-							전체 퀴즈 완료 시 <Text style={[styles.levelHighlight, { color: '#D97706' }]}>'속담 전설'</Text> 등급을 획득해요
+						{/* 카드 높이가 padding 기반이라 유연하다. 중첩 Text + 1줄 축소는 안드로이드에서 과축소되므로 2줄 허용으로 대체 */}
+						<Text style={styles.levelDescriptionText} numberOfLines={2} ellipsizeMode="tail">
+							전체 퀴즈 완료 시 <Text style={[styles.levelHighlight, { color: COLORS.warningDark }]}>'속담 전설'</Text> 등급을 획득해요
 						</Text>
 					</View>
 
 					<View style={styles.levelDescriptionCard}>
-						<View style={[styles.levelDescIconChip, { backgroundColor: '#DCFCE7' }]}>
-							<IconComponent type="fontAwesome6" name="arrow-rotate-right" size={scaledSize(14)} color="#16A34A" />
+						<View style={[styles.levelDescIconChip, { backgroundColor: COLORS.primarySoft }]}>
+							<IconComponent type="fontAwesome6" name="arrow-rotate-right" size={scaledSize(14)} color={COLORS.primaryDark} />
 						</View>
-						<Text style={styles.levelDescriptionText} numberOfLines={1} adjustsFontSizeToFit>
+						{/* 위 카드와 동일: 1줄 강제 축소 대신 2줄 허용 */}
+						<Text style={styles.levelDescriptionText} numberOfLines={2} ellipsizeMode="tail">
 							틀린 문제는 <Text style={styles.levelHighlight}>오답 복습</Text>에서 다시 도전할 수 있어요
 						</Text>
 					</View>
@@ -806,28 +803,43 @@ const MyScoreScreen = () => {
 					const solvedPct = totalCountryCount > 0 ? Math.round((totalSolved / totalCountryCount) * 100) : 0;
 					const badgePct = CONST_BADGES.length > 0 ? Math.round((earnedBadgeIds.length / CONST_BADGES.length) * 100) : 0;
 					const metrics = [
-						{ icon: 'school', color: '#22C55E', soft: '#DCFCE7', label: '학습 진척도', value: `${studyCountries.length}/${totalCountryCount}`, pct: studyPct },
-						{ icon: 'check-circle', color: '#3B82F6', soft: '#DBEAFE', label: '퀴즈 정답률', value: `${accuracy}%`, pct: accuracy },
+						{ icon: 'school', color: COLORS.primary, soft: COLORS.primarySoft, label: '학습 진척도', value: `${studyCountries.length}/${totalCountryCount}`, pct: studyPct },
+						{ icon: 'check-circle', color: COLORS.secondary, soft: COLORS.secondarySoft, label: '퀴즈 정답률', value: `${accuracy}%`, pct: accuracy },
 						{ icon: 'play-circle-filled', color: '#14B8A6', soft: '#CCFBF1', label: '퀴즈 진척도', value: `${totalSolved}/${totalCountryCount}`, pct: solvedPct },
-						{ icon: 'military-tech', color: '#F59E0B', soft: '#FEF3C7', label: '획득 뱃지', value: `${earnedBadgeIds.length}/${CONST_BADGES.length}`, pct: badgePct },
+						{ icon: 'military-tech', color: COLORS.warning, soft: COLORS.warningBg, label: '획득 뱃지', value: `${earnedBadgeIds.length}/${CONST_BADGES.length}`, pct: badgePct },
 					];
 					return (
-						<View style={styles.scoreDashCard}>
+						<Animated.View style={[styles.scoreDashCard, { opacity: dashFade, transform: [{ translateY: dashSlide }] }]}>
 							<View style={styles.scoreDashHeader}>
 								<View style={styles.scoreDashTitleRow}>
 									<View style={styles.scoreDashIconChip}>
-										<IconComponent type="materialIcons" name="insights" size={scaledSize(16)} color="#fff" />
+										<IconComponent type="materialIcons" name="insights" size={scaledSize(16)} color={COLORS.textWhite} />
 									</View>
 									<Text style={styles.scoreDashTitle}>전체 스코어</Text>
 								</View>
 								<View style={styles.scoreDashScorePill}>
-									<IconComponent type="materialIcons" name="stars" size={scaledSize(14)} color="#F59E0B" />
+									<IconComponent type="materialIcons" name="stars" size={scaledSize(14)} color={COLORS.warning} />
 									<Text style={styles.scoreDashScoreText}>{totalScore.toLocaleString()}점</Text>
 								</View>
 							</View>
 							<View style={styles.scoreDashGrid}>
-								{metrics.map((m) => (
-									<View key={m.label} style={styles.scoreDashTile}>
+								{metrics.map((m, mi) => (
+									<Animated.View
+										key={m.label}
+										style={[
+											styles.scoreDashTile,
+											{
+												opacity: tileAnims[mi],
+												transform: [
+													{
+														translateY: tileAnims[mi].interpolate({
+															inputRange: [0, 1],
+															outputRange: [scaleHeight(10), 0],
+														}),
+													},
+												],
+											},
+										]}>
 										<View style={styles.scoreDashTileTop}>
 											<View style={[styles.scoreDashTileIcon, { backgroundColor: m.soft }]}>
 												<IconComponent type="materialIcons" name={m.icon} size={scaledSize(15)} color={m.color} />
@@ -839,10 +851,10 @@ const MyScoreScreen = () => {
 											<View style={[styles.scoreDashBarFill, { width: `${Math.min(m.pct, 100)}%`, backgroundColor: m.color }]} />
 										</View>
 										<Text style={[styles.scoreDashTilePct, { color: m.color }]}>{m.pct}%</Text>
-									</View>
+									</Animated.View>
 								))}
 							</View>
-						</View>
+						</Animated.View>
 					);
 				})()}
 
@@ -863,7 +875,7 @@ const MyScoreScreen = () => {
 									type="materialIcons"
 									name={tab.icon}
 									size={scaledSize(15)}
-									color={isActive ? '#fff' : '#64748B'}
+									color={isActive ? COLORS.textWhite : COLORS.textSecondary}
 								/>
 								<Text style={[styles.activityTabText, isActive && styles.activityTabTextActive]}>{tab.label}</Text>
 							</TouchableOpacity>
@@ -876,7 +888,7 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'study') && (
 				<View style={styles.sectionHeaderStatic}>
 					<View style={styles.iconCircle1}>
-						<IconComponent type="materialIcons" name="school" size={scaledSize(16)} color="#fff" />
+						<IconComponent type="materialIcons" name="school" size={scaledSize(16)} color={COLORS.textWhite} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 학습 활동</Text>
 				</View>
@@ -888,7 +900,7 @@ const MyScoreScreen = () => {
 								percent={totalCountryCount > 0 ? Math.round((studyCountries.length / totalCountryCount) * 100) : 0}
 								size={88}
 								strokeWidth={10}
-								color="#22C55E">
+								color={COLORS.primary}>
 								<AnimatedCounter
 									value={totalCountryCount > 0 ? Math.round((studyCountries.length / totalCountryCount) * 100) : 0}
 									suffix="%"
@@ -899,13 +911,13 @@ const MyScoreScreen = () => {
 							<View style={styles.chartLegend}>
 								<Text style={styles.chartLegendTitle}>나의 학습 진척도</Text>
 								<View style={styles.chartLegendRow}>
-									<View style={[styles.legendDot, { backgroundColor: '#22C55E' }]} />
+									<View style={[styles.legendDot, { backgroundColor: COLORS.primary }]} />
 									<Text style={styles.chartLegendText}>
 										학습한 속담 <Text style={styles.chartLegendStrong}>{studyCountries.length}개</Text>
 									</Text>
 								</View>
 								<View style={styles.chartLegendRow}>
-									<View style={[styles.legendDot, { backgroundColor: '#E2E8F0' }]} />
+									<View style={[styles.legendDot, { backgroundColor: COLORS.border }]} />
 									<Text style={styles.chartLegendText}>
 										남은 속담{' '}
 										<Text style={styles.chartLegendStrong}>{Math.max(totalCountryCount - studyCountries.length, 0)}개</Text>
@@ -915,8 +927,8 @@ const MyScoreScreen = () => {
 						</View>
 						<View style={styles.summaryStatGrid}>
 							<View style={styles.summaryStatCard}>
-								<View style={[styles.statIconChip, { backgroundColor: '#DCFCE7' }]}>
-									<IconComponent type="materialIcons" name="track-changes" size={scaledSize(18)} color="#22C55E" />
+								<View style={[styles.statIconChip, { backgroundColor: COLORS.primarySoft }]}>
+									<IconComponent type="materialIcons" name="track-changes" size={scaledSize(18)} color={COLORS.primary} />
 								</View>
 								<Text style={styles.statValue}>
 									{studyCountries.length} / {totalCountryCount}
@@ -926,8 +938,8 @@ const MyScoreScreen = () => {
 								</Text>
 							</View>
 							<View style={styles.summaryStatCard}>
-								<View style={[styles.statIconChip, { backgroundColor: '#DBEAFE' }]}>
-									<IconComponent type="materialIcons" name="event-note" size={scaledSize(18)} color="#3B82F6" />
+								<View style={[styles.statIconChip, { backgroundColor: COLORS.secondarySoft }]}>
+									<IconComponent type="materialIcons" name="event-note" size={scaledSize(18)} color={COLORS.secondary} />
 								</View>
 								<Text style={styles.statValue}> {lastStudyAt ? moment(lastStudyAt).format('YY.MM.DD') : '없음'} </Text>
 								<Text style={styles.statLabel}> 마지막 학습일 </Text>
@@ -940,7 +952,7 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'quiz') && (
 				<View style={styles.sectionHeaderStatic}>
 					<View style={styles.iconCircle2}>
-						<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(16)} color="#fff" />
+						<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(16)} color={COLORS.textWhite} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 퀴즈 활동</Text>
 				</View>
@@ -948,20 +960,20 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'quiz') && (
 					<View style={styles.activityCardBox}>
 						<View style={styles.chartRow}>
-							<DonutChart percent={accuracy} size={88} strokeWidth={10} color="#3B82F6">
-								<AnimatedCounter value={accuracy} suffix="%" style={[styles.donutCenterValue, { color: '#3B82F6' }]} />
+							<DonutChart percent={accuracy} size={88} strokeWidth={10} color={COLORS.secondary}>
+								<AnimatedCounter value={accuracy} suffix="%" style={[styles.donutCenterValue, { color: COLORS.secondary }]} />
 								<Text style={styles.donutCenterLabel}>정답률</Text>
 							</DonutChart>
 							<View style={styles.chartLegend}>
 								<Text style={styles.chartLegendTitle}>정답 / 오답 비율</Text>
 								<View style={styles.chartLegendRow}>
-									<View style={[styles.legendDot, { backgroundColor: '#22C55E' }]} />
+									<View style={[styles.legendDot, { backgroundColor: COLORS.primary }]} />
 									<Text style={styles.chartLegendText}>
 										정답 <Text style={styles.chartLegendStrong}>{correctCount}개</Text>
 									</Text>
 								</View>
 								<View style={styles.chartLegendRow}>
-									<View style={[styles.legendDot, { backgroundColor: '#EF4444' }]} />
+									<View style={[styles.legendDot, { backgroundColor: COLORS.danger }]} />
 									<Text style={styles.chartLegendText}>
 										오답 <Text style={styles.chartLegendStrong}>{wrongCount}개</Text>
 									</Text>
@@ -973,8 +985,8 @@ const MyScoreScreen = () => {
 							</View>
 						</View>
 						<View style={styles.summaryStatCard}>
-							<View style={[styles.statIconChip, { backgroundColor: '#DBEAFE' }]}>
-								<IconComponent type="materialIcons" name="calculate" size={scaledSize(18)} color="#3B82F6" />
+							<View style={[styles.statIconChip, { backgroundColor: COLORS.secondarySoft }]}>
+								<IconComponent type="materialIcons" name="calculate" size={scaledSize(18)} color={COLORS.secondary} />
 							</View>
 							<Text style={styles.statValue}>
 								{totalSolved} / {totalCountryCount}
@@ -993,8 +1005,8 @@ const MyScoreScreen = () => {
 								<Text style={styles.statLabel}> 최고 콤보 </Text>
 							</View>
 							<View style={styles.summaryStatCard}>
-								<View style={[styles.statIconChip, { backgroundColor: '#DCFCE7' }]}>
-									<IconComponent type="materialIcons" name="check-circle" size={scaledSize(18)} color="#22C55E" />
+								<View style={[styles.statIconChip, { backgroundColor: COLORS.primarySoft }]}>
+									<IconComponent type="materialIcons" name="check-circle" size={scaledSize(18)} color={COLORS.primary} />
 								</View>
 								<Text style={styles.statValue}> {accuracy}% </Text>
 								<Text style={styles.statLabel}> 정답률 </Text>
@@ -1012,8 +1024,8 @@ const MyScoreScreen = () => {
 							<ConquerHeader
 								iconType="fontAwesome6"
 								iconName="medal"
-								tint="#F59E0B"
-								chipBg="#FEF3C7"
+								tint={COLORS.warning}
+								chipBg={COLORS.warningBg}
 								title="정복한 레벨"
 								current={levelMaster.length}
 								total={DIFFICULTIES.length}
@@ -1042,16 +1054,16 @@ const MyScoreScreen = () => {
 													name={item.icon}
 													type="fontAwesome6"
 													size={scaledSize(24)}
-													color={isEarned ? '#fff' : '#94A3B8'}
+													color={isEarned ? COLORS.textWhite : COLORS.textLight}
 													style={{ marginBottom: scaleHeight(6) }}
 												/>
-												<Text style={[styles.levelText, isEarned && { color: '#fff', fontWeight: 'bold' }]}> {item.title} </Text>
-												<Text style={[styles.levelSubText, isEarned && { color: '#fff' }]}> {item.subtitle} </Text>
+												<Text style={[styles.levelText, isEarned && { color: COLORS.textWhite, fontWeight: '700' }]}> {item.title} </Text>
+												<Text style={[styles.levelSubText, isEarned && { color: COLORS.textWhite }]}> {item.subtitle} </Text>
 
 												{/* ✅ 정복 배지 */}
 												{isEarned && (
 													<View style={[styles.conquerTag, { marginTop: scaleHeight(6) }]}>
-														<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color="#16A34A" />
+														<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color={COLORS.primaryDark} />
 														<Text style={styles.conquerTagText}>정복</Text>
 													</View>
 												)}
@@ -1082,7 +1094,7 @@ const MyScoreScreen = () => {
 									const isEarned = categoryMaster.includes(category);
 									const categoryInfo = FIELD_DROPDOWN_ITEMS.find((item) => item.label === category || item.value === category);
 									const meta = {
-										color: categoryInfo?.iconColor ?? CATEGORY_META[category]?.color ?? '#CBD5E1',
+										color: categoryInfo?.iconColor ?? CATEGORY_META[category]?.color ?? COLORS.borderDark,
 										icon: {
 											type: categoryInfo?.iconType ?? 'FontAwesome6',
 											name: categoryInfo?.iconName ?? 'circle-question',
@@ -1110,21 +1122,21 @@ const MyScoreScreen = () => {
 													alignItems: 'center',
 													justifyContent: 'center',
 													marginRight: scaleWidth(10),
-													backgroundColor: isEarned ? 'rgba(255,255,255,0.22)' : '#EEF2F6',
+													backgroundColor: isEarned ? 'rgba(255,255,255,0.22)' : COLORS.surfaceAlt,
 												}}>
 												<IconComponent
 													type={meta.icon.type}
 													name={meta.icon.name}
 													size={scaledSize(18)}
-													color={isEarned ? '#fff' : meta.color}
+													color={isEarned ? COLORS.textWhite : meta.color}
 												/>
 											</View>
 											<Text
 												style={[
 													styles.categoryRowText,
 													isEarned && {
-														color: '#fff',
-														fontWeight: 'bold',
+														color: COLORS.textWhite,
+														fontWeight: '700',
 														textShadowColor: 'rgba(0, 0, 0, 0.15)',
 														textShadowOffset: { width: 1, height: 1 },
 														textShadowRadius: 2,
@@ -1135,7 +1147,7 @@ const MyScoreScreen = () => {
 											{/* ✅ 정복 배지 */}
 											{isEarned && (
 												<View style={[styles.conquerTag, { marginLeft: 'auto' }]}>
-													<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color="#16A34A" />
+													<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color={COLORS.primaryDark} />
 													<Text style={styles.conquerTagText}>정복</Text>
 												</View>
 											)}
@@ -1150,14 +1162,14 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'today') && (
 				<View style={styles.sectionHeaderStatic}>
 					<View style={styles.iconCircle4}>
-						<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(16)} color="#fff" />
+						<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(16)} color={COLORS.textWhite} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 오늘의 퀴즈</Text>
 				</View>
 				)}
 
 				{(activeTab === 'all' || activeTab === 'today') && (
-					<View style={[styles.sectionBox, {}]}>
+					<View style={styles.sectionBox}>
 						<Calendar
 							markedDates={markedQuizDates}
 							markingType="custom"
@@ -1171,21 +1183,21 @@ const MyScoreScreen = () => {
 								updateMarkedQuizDatesOnSelect(date, selectedDate, setMarkedQuizDates, todayQuizDataList);
 							}}
 							theme={{
-								calendarBackground: '#fff',
-								todayTextColor: '#22C55E',
-								textDayFontSize: 14,
-								textMonthFontSize: 16,
-								textDayHeaderFontSize: 13,
+								calendarBackground: COLORS.surface,
+								todayTextColor: COLORS.primary,
+								textDayFontSize: FONT_SIZES.md,
+								textMonthFontSize: FONT_SIZES.lg,
+								textDayHeaderFontSize: FONT_SIZES.smPlus,
 							}}
 						/>
-						<View style={[styles.subtitleRow, { marginTop: scaleHeight(8) }]}>
-							<IconComponent type="materialIcons" name="fiber-manual-record" size={scaledSize(12)} color="#22C55E" />
-							<Text style={{ fontSize: scaledSize(12), color: '#64748B' }}>표시는 오늘의 퀴즈를 모두 푼 날입니다.</Text>
+						<View style={[styles.subtitleRow, { marginTop: SPACING_H.sm }]}>
+							<IconComponent type="materialIcons" name="fiber-manual-record" size={scaledSize(12)} color={COLORS.primary} />
+							<Text style={{ fontSize: FONT_SIZES.sm, color: COLORS.textSecondary }}>표시는 오늘의 퀴즈를 모두 푼 날입니다.</Text>
 						</View>
 
 						{selectedDate === null && (
 							<View style={[styles.subtitleRow, { marginTop: scaleHeight(6), marginBottom: 0 }]}>
-								<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(13)} color="#94A3B8" />
+								<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(13)} color={COLORS.textLight} />
 								<Text style={styles.emptyText}>날짜를 선택해 주세요.</Text>
 							</View>
 						)}
@@ -1194,21 +1206,21 @@ const MyScoreScreen = () => {
 							<View
 								style={{
 									borderWidth: 1,
-									borderColor: '#E2E8F0',
-									backgroundColor: '#F8FAFC',
-									borderRadius: scaleWidth(10),
-									padding: scaleWidth(14),
-									marginTop: scaleHeight(10),
+									borderColor: COLORS.border,
+									backgroundColor: COLORS.background,
+									borderRadius: RADIUS.lg,
+									padding: SPACING_W.lg,
+									marginTop: SPACING_H.md,
 									alignSelf: 'stretch',
 								}}>
-								<Text style={{ fontSize: scaledSize(13), color: '#94A3B8', textAlign: 'left' }}>
+								<Text style={{ fontSize: FONT_SIZES.smPlus, color: COLORS.textLight, textAlign: 'left' }}>
 									선택한 날짜에는 오늘의 퀴즈를 풀지 않았어요
 								</Text>
 							</View>
 						)}
 
 						{selectedDate && selectedQuizData && (
-							<View style={[styles.sectionBox, { marginTop: scaleHeight(10), borderWidth: 0, paddingHorizontal: 0, paddingVertical: scaleHeight(6), backgroundColor: 'transparent' }]}>
+							<View style={[styles.sectionBox, { marginTop: SPACING_H.md, borderWidth: 0, paddingHorizontal: 0, paddingVertical: scaleHeight(6), backgroundColor: 'transparent' }]}>
 								<Text style={styles.sectionSubtitle}>{selectedDate} 퀴즈 결과</Text>
 								{selectedQuizData?.todayQuizIdArr.map((quizId, idx) => {
 									const userAnswer = selectedQuizData.selectedAnswers?.[quizId];
@@ -1227,26 +1239,26 @@ const MyScoreScreen = () => {
 											}}
 											style={{
 												width: '100%', // 👈 추가
-												backgroundColor: '#fff',
-												borderRadius: scaleWidth(12),
-												paddingVertical: scaleHeight(14),
-												paddingHorizontal: scaleWidth(14),
+												backgroundColor: COLORS.surface,
+												borderRadius: RADIUS.lg,
+												paddingVertical: SPACING_H.md,
+												paddingHorizontal: SPACING_W.lg,
 												borderWidth: 0,
-												marginBottom: scaleHeight(12),
+												marginBottom: SPACING_H.md,
 												shadowColor: '#000',
-												shadowOffset: { width: 0, height: 1 },
-												shadowOpacity: 0.05,
-												shadowRadius: 2,
+												shadowOffset: { width: 0, height: 2 },
+												shadowOpacity: 0.06,
+												shadowRadius: 8,
 												alignSelf: 'stretch', // ✅ 전체 너비 확보
 											}}>
-											<View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: scaleWidth(8) }}>
+											<View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: SPACING_W.sm }}>
 												<View style={{ flex: 1 }}>
 													<Text
 														style={{
-															fontSize: scaledSize(14),
-															fontWeight: 'bold',
-															marginBottom: scaleHeight(8),
-															color: '#334155',
+															fontSize: FONT_SIZES.md,
+															fontWeight: '700',
+															marginBottom: SPACING_H.sm,
+															color: COLORS.text,
 														}}>
 														{idx + 1}. {quizItem?.proverb ?? '문제 정보 없음'}
 													</Text>
@@ -1258,31 +1270,31 @@ const MyScoreScreen = () => {
 																alignSelf: 'flex-start',
 																flexDirection: 'row',
 																alignItems: 'center',
-																gap: scaleWidth(4),
-																backgroundColor: isCorrect ? '#DCFCE7' : '#FEE2E2',
-																borderRadius: scaleWidth(8),
-																paddingHorizontal: scaleWidth(9),
+																gap: SPACING_W.xs,
+																backgroundColor: isCorrect ? COLORS.primarySoft : COLORS.dangerBg,
+																borderRadius: RADIUS.round,
+																paddingHorizontal: SPACING_W.sm,
 																paddingVertical: scaleHeight(3),
-																marginBottom: scaleHeight(8),
+																marginBottom: SPACING_H.sm,
 															}}>
 															<IconComponent
 																type="materialIcons"
 																name={isCorrect ? 'check-circle' : 'cancel'}
 																size={scaledSize(13)}
-																color={isCorrect ? '#16A34A' : '#DC2626'}
+																color={isCorrect ? COLORS.primaryDark : COLORS.dangerDark}
 															/>
-															<Text style={{ fontSize: scaledSize(12), fontWeight: '800', color: isCorrect ? '#16A34A' : '#DC2626' }}>
+															<Text style={{ fontSize: FONT_SIZES.sm, fontWeight: '700', color: isCorrect ? COLORS.primaryDark : COLORS.dangerDark }}>
 																{isCorrect ? '정답' : '오답'}
 															</Text>
 														</View>
 													)}
 													{!!(quizItem?.longMeaning || quizItem?.meaning) && (
-														<Text style={{ fontSize: scaledSize(12.5), color: '#64748B', lineHeight: scaleHeight(18) }} numberOfLines={2}>
+														<Text style={{ fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, lineHeight: scaleHeight(18) }} numberOfLines={2}>
 															{quizItem.longMeaning || quizItem.meaning}
 														</Text>
 													)}
 												</View>
-												<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color="#94A3B8" style={{ marginTop: scaleHeight(2) }} />
+												<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.textLight} style={{ marginTop: scaleHeight(2) }} />
 											</View>
 										</TouchableOpacity>
 									);
@@ -1295,13 +1307,13 @@ const MyScoreScreen = () => {
 								onPress={handleClearSelectedDate}
 								style={{
 									alignSelf: 'center',
-									marginTop: scaleHeight(8),
-									paddingHorizontal: scaleWidth(12),
-									paddingVertical: scaleHeight(4),
-									backgroundColor: '#E2E8F0',
+									marginTop: SPACING_H.sm,
+									paddingHorizontal: SPACING_W.md,
+									paddingVertical: SPACING_H.xs,
+									backgroundColor: COLORS.border,
 									borderRadius: scaleWidth(8),
 								}}>
-								<Text style={{ fontSize: scaledSize(12), color: '#334155' }}>선택 해제</Text>
+								<Text style={{ fontSize: FONT_SIZES.sm, color: COLORS.text }}>선택 해제</Text>
 							</TouchableOpacity>
 						)} */}
 					</View>
@@ -1311,7 +1323,7 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'time') && (
 				<View style={styles.sectionHeaderStatic}>
 					<View style={styles.iconCircle3}>
-						<IconComponent type="materialIcons" name="timer" size={scaledSize(16)} color="#fff" />
+						<IconComponent type="materialIcons" name="timer" size={scaledSize(16)} color={COLORS.textWhite} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 타임 챌린지 결과</Text>
 				</View>
@@ -1340,7 +1352,7 @@ const MyScoreScreen = () => {
 														type="FontAwesome"
 														size={scaledSize(24)}
 														color="#FBBF24"
-														style={{ marginRight: scaleWidth(8) }}
+														style={{ marginRight: SPACING_W.sm }}
 													/>
 													<Text style={styles.firstRankLabel}>1등</Text>
 													<Text style={styles.firstRankScore}>
@@ -1354,7 +1366,7 @@ const MyScoreScreen = () => {
 														name="trophy"
 														type="FontAwesome"
 														size={scaledSize(20)}
-														color="#CBD5E1"
+														color={COLORS.borderDark}
 														style={{ marginRight: scaleWidth(13) }}
 													/>
 													<Text style={styles.secondRankLabel}>2등</Text>
@@ -1370,7 +1382,7 @@ const MyScoreScreen = () => {
 														type="FontAwesome"
 														size={scaledSize(18)}
 														color="#FB923C"
-														style={{ marginRight: scaleWidth(16) }}
+														style={{ marginRight: SPACING_W.lg }}
 													/>
 													<Text style={styles.thirdRankLabel}>3등</Text>
 													<Text style={styles.thirdRankScore}>
@@ -1390,7 +1402,7 @@ const MyScoreScreen = () => {
 					<>
 						<View style={styles.sectionHeaderStatic}>
 							<View style={styles.iconCircle5}>
-								<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(16)} color="#fff" />
+								<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(16)} color={COLORS.textWhite} />
 							</View>
 							<Text style={styles.sectionTitle}>나의 뱃지</Text>
 						</View>
@@ -1439,24 +1451,24 @@ const MyScoreScreen = () => {
 													name={earned ? badge.icon : 'lock'}
 													type={earned ? badge.iconType : 'materialIcons'}
 													size={scaledSize(20)}
-													color={earned ? rarity.color : '#94A3B8'}
+													color={earned ? rarity.color : COLORS.textLight}
 												/>
 											</View>
 											<View style={styles.textBox}>
 												<View style={styles.badgeTitleRow}>
 													<Text style={[styles.badgeTitle, earned && styles.badgeTitleActive]} numberOfLines={1}>{badge.name}</Text>
-													<View style={[styles.badgeRarityTag, { backgroundColor: earned ? rarity.soft : '#F1F5F9' }]}>
+													<View style={[styles.badgeRarityTag, { backgroundColor: earned ? rarity.soft : COLORS.surfaceAlt }]}>
 														<IconComponent type="materialIcons" name="auto-awesome" size={scaledSize(9)} color={rarity.color} />
 														<Text style={[styles.badgeRarityTagText, { color: rarity.color }]}>{rarity.label}</Text>
 													</View>
 												</View>
 												<Text style={[styles.badgeDesc, earned && styles.badgeDescActive]} numberOfLines={1}>{badge.description}</Text>
 												<View style={styles.badgeCondRow}>
-													<IconComponent type="materialIcons" name="flag" size={scaledSize(10)} color="#94A3B8" />
+													<IconComponent type="materialIcons" name="flag" size={scaledSize(10)} color={COLORS.textLight} />
 													<Text style={styles.badgeCondText} numberOfLines={1}>{badge.condition}</Text>
 												</View>
 											</View>
-											<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={earned ? '#22C55E' : '#CBD5E1'} style={{ alignSelf: 'center' }} />
+											<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={earned ? COLORS.primary : COLORS.borderDark} style={{ alignSelf: 'center' }} />
 										</TouchableOpacity>
 									);
 								});
@@ -1469,7 +1481,7 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'tower') && (
 				<View style={styles.sectionHeaderStatic}>
 					<View style={[styles.iconCircle3, { backgroundColor: '#0EA5E9' }]}>
-						<IconComponent type="fontAwesome6" name="tower-observation" size={scaledSize(14)} color="#fff" />
+						<IconComponent type="fontAwesome6" name="tower-observation" size={scaledSize(14)} color={COLORS.textWhite} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 타워 챌린지</Text>
 				</View>
@@ -1494,26 +1506,26 @@ const MyScoreScreen = () => {
 									key={tower.level}
 									style={{
 										flexDirection: 'row',
-										borderRadius: scaleWidth(16),
+										borderRadius: RADIUS.lg,
 										overflow: 'hidden',
-										marginBottom: scaleHeight(12),
+										marginBottom: SPACING_H.md,
 										borderWidth: 1.5,
-										borderColor: isCleared ? tower.color : '#E2E8F0',
-										backgroundColor: '#fff',
+										borderColor: isCleared ? tower.color : COLORS.border,
+										backgroundColor: COLORS.surface,
 										opacity: isCleared ? 1 : 0.55,
 										shadowColor: isCleared ? tower.color : '#64748B',
 										shadowOffset: { width: 0, height: 2 },
-										shadowOpacity: isCleared ? 0.18 : 0.06,
-										shadowRadius: 5,
+										shadowOpacity: isCleared ? 0.12 : 0.06,
+										shadowRadius: 8,
 									}}>
 									{/* 왼쪽: 보스 이미지 + 레벨 배지 */}
 									<View
 										style={{
 											width: scaleWidth(80),
-											backgroundColor: isCleared ? tower.backgroundColor : '#F1F5F9',
+											backgroundColor: isCleared ? tower.backgroundColor : COLORS.surfaceAlt,
 											alignItems: 'center',
 											justifyContent: 'center',
-											padding: scaleWidth(8),
+											padding: SPACING_W.sm,
 										}}>
 										<FastImage
 											source={tower.bossImage}
@@ -1522,24 +1534,24 @@ const MyScoreScreen = () => {
 										/>
 										<View
 											style={{
-												marginTop: scaleHeight(4),
-												backgroundColor: isCleared ? tower.color : '#94A3B8',
-												borderRadius: scaleWidth(8),
-												paddingHorizontal: scaleWidth(6),
+												marginTop: SPACING_H.xs,
+												backgroundColor: isCleared ? tower.color : COLORS.textLight,
+												borderRadius: RADIUS.round,
+												paddingHorizontal: SPACING_W.sm,
 												paddingVertical: scaleHeight(2),
 											}}>
-											<Text style={{ color: '#fff', fontSize: scaledSize(10), fontWeight: 'bold' }}>LV.{tower.level}</Text>
+											<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>LV.{tower.level}</Text>
 										</View>
 									</View>
 
 									{/* 오른쪽: 보스 정보 + 보상 */}
-									<View style={{ flex: 1, padding: scaleWidth(12), justifyContent: 'center' }}>
-										<Text style={{ fontSize: scaledSize(10), color: '#94A3B8', marginBottom: scaleHeight(2) }}>{tower.bossTitle}</Text>
-										<Text style={{ fontSize: scaledSize(14), fontWeight: 'bold', color: '#334155', marginBottom: scaleHeight(6) }}>{tower.bossName}</Text>
+									<View style={{ flex: 1, padding: SPACING_W.md, justifyContent: 'center' }}>
+										<Text style={{ fontSize: FONT_SIZES.xxs, color: COLORS.textLight, marginBottom: scaleHeight(2) }}>{tower.bossTitle}</Text>
+										<Text style={{ fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, marginBottom: scaleHeight(6) }}>{tower.bossName}</Text>
 
-										<View style={{ height: 1, backgroundColor: '#F1F5F9', marginBottom: scaleHeight(6) }} />
+										<View style={{ height: 1, backgroundColor: COLORS.surfaceAlt, marginBottom: scaleHeight(6) }} />
 
-										<View style={{ flexDirection: 'row', alignItems: 'center', gap: scaleWidth(8) }}>
+										<View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm }}>
 											<FastImage
 												source={tower.reward.image}
 												style={{
@@ -1547,7 +1559,7 @@ const MyScoreScreen = () => {
 													height: scaleWidth(36),
 													borderRadius: scaleWidth(6),
 													borderWidth: 1,
-													borderColor: '#E2E8F0',
+													borderColor: COLORS.border,
 												}}
 												resizeMode="cover"
 											/>
@@ -1557,23 +1569,23 @@ const MyScoreScreen = () => {
 														type="materialIcons"
 														name={tower.reward.type === 'costume' ? 'checkroom' : 'auto-awesome'}
 														size={scaledSize(11)}
-														color="#94A3B8"
+														color={COLORS.textLight}
 													/>
-													<Text style={{ fontSize: scaledSize(10), color: '#94A3B8' }}>{tower.reward.type === 'costume' ? '코스튬' : '캐릭터'}</Text>
+													<Text style={{ fontSize: FONT_SIZES.xxs, color: COLORS.textLight }}>{tower.reward.type === 'costume' ? '코스튬' : '캐릭터'}</Text>
 												</View>
-												<Text style={{ fontSize: scaledSize(12), fontWeight: 'bold', color: '#334155' }}>{tower.reward.name}</Text>
+												<Text style={{ fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.text }}>{tower.reward.name}</Text>
 											</View>
 
 											{/* 클리어 / 미클리어 배지 */}
 											<View
 												style={{
 													marginLeft: 'auto',
-													backgroundColor: isCleared ? tower.color : '#94A3B8',
-													borderRadius: scaleWidth(10),
-													paddingHorizontal: scaleWidth(8),
+													backgroundColor: isCleared ? tower.color : COLORS.textLight,
+													borderRadius: RADIUS.round,
+													paddingHorizontal: SPACING_W.sm,
 													paddingVertical: scaleHeight(3),
 												}}>
-												<Text style={{ color: '#fff', fontSize: scaledSize(10), fontWeight: 'bold' }}>{isCleared ? '클리어 ✓' : '미클리어 🔒'}</Text>
+												<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>{isCleared ? '클리어 ✓' : '미클리어 🔒'}</Text>
 											</View>
 										</View>
 									</View>
@@ -1599,8 +1611,12 @@ const MyScoreScreen = () => {
 
 			{/* 최하단에 위치할것!! */}
 			{showScrollTop && (
-				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop}>
-					<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color="#fff" />
+				<TouchableOpacity
+					style={styles.scrollTopButton}
+					activeOpacity={0.85}
+					hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+					onPress={scrollHandler.toTop}>
+					<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color={COLORS.textWhite} />
 				</TouchableOpacity>
 			)}
 		</SafeAreaView>
@@ -1612,140 +1628,142 @@ export default MyScoreScreen;
 const styles = StyleSheet.create({
 	safeArea: { flex: 1, backgroundColor: Colors.background },
 	container: {
-		paddingHorizontal: scaleWidth(16),
+		paddingHorizontal: SPACING_W.lg,
 	},
 	pageTitle: {
-		fontSize: scaledSize(20),
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(20),
-		color: '#334155',
+		fontSize: FONT_SIZES.xxl,
+		fontWeight: '700',
+		marginBottom: SPACING_H.xl,
+		color: COLORS.text,
 	},
-	badgeFilterRow: { flexDirection: 'row', gap: scaleWidth(8), marginBottom: scaleHeight(10) },
+	badgeFilterRow: { flexDirection: 'row', gap: SPACING_W.sm, marginBottom: SPACING_H.md },
 	badgeFilterChip: {
 		flex: 1,
 		alignItems: 'center',
-		paddingVertical: scaleHeight(8),
-		borderRadius: scaleWidth(999),
-		backgroundColor: '#F1F5F9',
+		paddingVertical: SPACING_H.sm,
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.surfaceAlt,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 	},
-	badgeFilterChipActive: { backgroundColor: '#DCFCE7', borderColor: '#22C55E' },
-	badgeFilterText: { fontSize: scaledSize(12.5), fontWeight: '700', color: '#64748B' },
-	badgeFilterTextActive: { color: '#16A34A' },
+	badgeFilterChipActive: { backgroundColor: COLORS.primarySoft, borderColor: COLORS.primary },
+	badgeFilterText: { fontSize: FONT_SIZES.smPlus, fontWeight: '700', color: COLORS.textSecondary },
+	badgeFilterTextActive: { color: COLORS.primaryDark },
 
 	badgeCard: {
 		flexDirection: 'row',
 		alignItems: 'flex-start',
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(12),
-		marginBottom: scaleHeight(10),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		marginBottom: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 	},
 	badgeCardActive: {
-		borderColor: '#22C55E',
-		backgroundColor: '#F0FDF4',
+		borderColor: COLORS.primary,
+		backgroundColor: COLORS.primaryBg,
 	},
 	iconBox: {
 		width: scaleWidth(32),
 		height: scaleWidth(32),
 		borderRadius: scaleWidth(16),
-		backgroundColor: '#E2E8F0',
+		backgroundColor: COLORS.border,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginRight: scaleWidth(12),
+		marginRight: SPACING_W.md,
 	},
 	iconBoxActive: {
-		backgroundColor: '#DCFCE7',
+		backgroundColor: COLORS.primarySoft,
 	},
 	badgeTitle: {
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '600',
-		color: '#334155',
+		color: COLORS.text,
 		flexShrink: 1,
 	},
 	badgeTitleActive: {
-		color: '#22C55E',
+		color: COLORS.primary,
 	},
 	badgeTitleRow: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(6) },
 	badgeRarityTag: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: scaleWidth(2),
-		borderRadius: scaleWidth(6),
+		borderRadius: RADIUS.round,
 		paddingHorizontal: scaleWidth(6),
 		paddingVertical: scaleHeight(2),
 	},
-	badgeRarityTagText: { fontSize: scaledSize(10), fontWeight: '800' },
-	badgeCondRow: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(3), marginTop: scaleHeight(4) },
-	badgeCondText: { fontSize: scaledSize(11), color: '#94A3B8', flex: 1 },
+	badgeRarityTagText: { fontSize: FONT_SIZES.xxs, fontWeight: '700' },
+	badgeCondRow: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(3), marginTop: SPACING_H.xs },
+	badgeCondText: { fontSize: FONT_SIZES.xs, color: COLORS.textLight, flex: 1 },
 	badgeDesc: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 		marginTop: scaleHeight(2),
 		lineHeight: scaleHeight(18),
 	},
 	badgeDescActive: {
-		color: '#22C55E',
+		color: COLORS.primary,
 	},
 	sectionBox: {
-		backgroundColor: '#F8FAFC',
-		padding: scaleWidth(16),
-		paddingHorizontal: scaleWidth(12),
-		borderRadius: scaleWidth(12),
-		marginBottom: scaleHeight(24),
+		backgroundColor: COLORS.background,
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.lg,
+		marginBottom: SPACING_H.xxl,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 	},
 	scoreDashCard: {
-		backgroundColor: '#FFFFFF',
-		borderRadius: scaleWidth(18),
-		padding: scaleWidth(16),
-		marginBottom: scaleHeight(16),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		padding: SPACING_W.lg,
+		marginBottom: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: '#EEF2F7',
+		borderColor: COLORS.border,
 		shadowColor: '#0F172A',
-		shadowOffset: { width: 0, height: 4 },
+		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.06,
-		shadowRadius: 12,	},
+		shadowRadius: 8,
+	},
 	scoreDashHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		marginBottom: scaleHeight(14),
+		marginBottom: SPACING_H.md,
 	},
-	scoreDashTitleRow: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(8) },
+	scoreDashTitleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm },
 	scoreDashIconChip: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
 		borderRadius: scaleWidth(9),
-		backgroundColor: '#22C55E',
+		backgroundColor: COLORS.primary,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	scoreDashTitle: { fontSize: scaledSize(15.5), fontWeight: '800', color: '#1E293B' },
+	scoreDashTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong },
 	scoreDashScorePill: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(4),
-		backgroundColor: '#FEF9EC',
-		borderRadius: scaleWidth(20),
-		paddingHorizontal: scaleWidth(10),
+		gap: SPACING_W.xs,
+		backgroundColor: COLORS.warningBg,
+		borderRadius: RADIUS.round,
+		paddingHorizontal: SPACING_W.md,
 		paddingVertical: scaleHeight(5),
 	},
-	scoreDashScoreText: { fontSize: scaledSize(13), fontWeight: '800', color: '#D97706' },
-	scoreDashGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: scaleHeight(10) },
+	scoreDashScoreText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.warningDark },
+	scoreDashGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: SPACING_H.md },
 	scoreDashTile: {
 		width: '48%',
-		backgroundColor: '#F8FAFC',
-		borderRadius: scaleWidth(14),
-		padding: scaleWidth(12),
+		backgroundColor: COLORS.background,
+		borderRadius: RADIUS.md,
+		padding: SPACING_W.md,
 		borderWidth: 1,
-		borderColor: '#EEF2F7',
+		borderColor: COLORS.border,
 	},
-	scoreDashTileTop: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(7), marginBottom: scaleHeight(8) },
+	scoreDashTileTop: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(7), marginBottom: SPACING_H.sm },
 	scoreDashTileIcon: {
 		width: scaleWidth(26),
 		height: scaleWidth(26),
@@ -1753,140 +1771,140 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	scoreDashTileLabel: { fontSize: scaledSize(12), fontWeight: '600', color: '#64748B', flexShrink: 1 },
-	scoreDashTileValue: { fontSize: scaledSize(18), fontWeight: '800', color: '#1E293B', marginBottom: scaleHeight(8) },
+	scoreDashTileLabel: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, flexShrink: 1 },
+	scoreDashTileValue: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
 	scoreDashBarTrack: {
 		height: scaleHeight(6),
 		borderRadius: scaleWidth(3),
-		backgroundColor: '#E2E8F0',
+		backgroundColor: COLORS.border,
 		overflow: 'hidden',
 	},
 	scoreDashBarFill: { height: '100%', borderRadius: scaleWidth(3) },
-	scoreDashTilePct: { fontSize: scaledSize(11), fontWeight: '700', marginTop: scaleHeight(5), textAlign: 'right' },
+	scoreDashTilePct: { fontSize: FONT_SIZES.xs, fontWeight: '700', marginTop: scaleHeight(5), textAlign: 'right' },
 	subSectionBox1: {
-		backgroundColor: '#fff',
-		padding: scaleWidth(16),
-		borderRadius: scaleWidth(12),
-		marginBottom: scaleHeight(24),
+		backgroundColor: COLORS.surface,
+		padding: SPACING_W.lg,
+		borderRadius: RADIUS.lg,
+		marginBottom: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 	},
 	subSectionBox2: {
-		backgroundColor: '#fff',
-		padding: scaleWidth(16),
-		borderRadius: scaleWidth(12),
-		marginBottom: scaleHeight(24),
+		backgroundColor: COLORS.surface,
+		padding: SPACING_W.lg,
+		borderRadius: RADIUS.lg,
+		marginBottom: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 	},
 
 	statItem: {
-		fontSize: scaledSize(14),
-		color: '#334155',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
 		marginBottom: scaleHeight(6),
 	},
 	subTitle: {
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '600',
-		color: '#334155',
+		color: COLORS.text,
 		marginBottom: scaleHeight(6),
 	},
 	tagItem: {
-		fontSize: scaledSize(14),
-		color: '#22C55E',
-		marginBottom: scaleHeight(4),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.primary,
+		marginBottom: SPACING_H.xs,
 	},
 	emptyText: {
-		fontSize: scaledSize(13),
-		color: '#94A3B8',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textLight,
 	},
 	textBox: { flex: 1 },
 	levelRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: scaleHeight(8),
+		marginBottom: SPACING_H.sm,
 	},
 	levelTitle: {
-		fontSize: scaledSize(16),
+		fontSize: FONT_SIZES.lg,
 		marginLeft: scaleWidth(6),
-		color: '#22C55E',
+		color: COLORS.primary,
 		fontWeight: '700',
 	},
 	quizSummaryBox: {
-		backgroundColor: '#F1F5F9',
+		backgroundColor: COLORS.surfaceAlt,
 		borderRadius: scaleWidth(12),
-		padding: scaleWidth(12),
-		marginTop: scaleHeight(8),
-		marginBottom: scaleHeight(16),
+		padding: SPACING_W.md,
+		marginTop: SPACING_H.sm,
+		marginBottom: SPACING_H.lg,
 	},
 	levelIconWrap: {
 		width: scaleWidth(36),
 		height: scaleWidth(36),
 		borderRadius: scaleWidth(18),
 		borderWidth: 2,
-		borderColor: '#22C55E',
-		backgroundColor: '#EFF6FF',
+		borderColor: COLORS.primary,
+		backgroundColor: COLORS.secondaryBg,
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: scaleWidth(8),
+		marginRight: SPACING_W.sm,
 		shadowColor: '#22C55E',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.25,
 		shadowRadius: 2,
 	},
 	levelModal: {
-		backgroundColor: '#fff',
-		paddingHorizontal: scaleWidth(20),
-		paddingTop: scaleHeight(20),
-		paddingBottom: scaleHeight(12),
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.xl,
+		paddingTop: SPACING_H.xl,
+		paddingBottom: SPACING_H.md,
 		borderRadius: scaleWidth(16),
 		width: '85%',
 		alignItems: 'center',
 	},
 	levelModalTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(12),
-		color: '#334155',
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		marginBottom: SPACING_H.md,
+		color: COLORS.text,
 	},
 	levelRowItem: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		width: '100%',
-		paddingVertical: scaleHeight(8),
+		paddingVertical: SPACING_H.sm,
 		borderBottomWidth: 1,
-		borderColor: '#F1F5F9',
+		borderColor: COLORS.border,
 	},
 	levelRowItemActive: {
-		backgroundColor: '#EFF6FF',
-		borderColor: '#22C55E',
+		backgroundColor: COLORS.secondaryBg,
+		borderColor: COLORS.primary,
 	},
 	levelCardBox: {
-		backgroundColor: '#F8FAFC',
+		backgroundColor: COLORS.background,
 		borderRadius: scaleWidth(14),
-		padding: scaleWidth(16),
+		padding: SPACING_W.lg,
 		alignItems: 'center',
 		marginBottom: scaleHeight(14),
 		width: '100%',
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 	},
 	levelCardBoxActive: {
-		backgroundColor: '#EFF6FF',
-		borderColor: '#22C55E',
+		backgroundColor: COLORS.secondaryBg,
+		borderColor: COLORS.primary,
 		borderWidth: 2,
 	},
 	levelBadge: {
-		backgroundColor: '#3B82F6',
+		backgroundColor: COLORS.secondary,
 		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(4),
+		paddingVertical: SPACING_H.xs,
 		borderRadius: scaleWidth(12),
-		marginBottom: scaleHeight(8),
+		marginBottom: SPACING_H.sm,
 	},
 	levelBadgeText: {
-		color: '#fff',
-		fontSize: scaledSize(12),
-		fontWeight: 'bold',
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '700',
 	},
 	levelMascot: {
 		width: scaleWidth(80),
@@ -1894,18 +1912,18 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(10),
 	},
 	levelLabel: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#334155',
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.text,
 		marginBottom: scaleHeight(2),
 	},
 	levelScore: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 	},
 	levelEncourage: {
-		fontSize: scaledSize(12),
-		color: '#22C55E',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.primary,
 		marginTop: scaleHeight(6),
 		textAlign: 'center',
 		lineHeight: scaleHeight(20),
@@ -1914,25 +1932,25 @@ const styles = StyleSheet.create({
 		width: scaleWidth(28),
 		height: scaleWidth(28),
 		borderRadius: scaleWidth(14),
-		backgroundColor: '#DBEAFE',
+		backgroundColor: COLORS.secondarySoft,
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginRight: scaleWidth(10),
 	},
 	levelModalText: {
 		flex: 1,
-		fontSize: scaledSize(14),
-		color: '#334155',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
 	},
 	levelModalScore: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 	},
 	levelNowText: {
 		marginLeft: scaleWidth(6),
-		fontSize: scaledSize(14),
-		color: '#22C55E',
-		fontWeight: 'bold',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.primary,
+		fontWeight: '700',
 	},
 	modalOverlay: {
 		flex: 1,
@@ -1941,49 +1959,49 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	modalConfirmButton: {
-		marginTop: scaleHeight(16),
+		marginTop: SPACING_H.lg,
 		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(24),
-		backgroundColor: '#3B82F6',
+		paddingHorizontal: SPACING_W.xxl,
+		backgroundColor: COLORS.secondary,
 		borderRadius: scaleWidth(8),
 	},
 	modalConfirmText: {
-		color: '#fff',
+		color: COLORS.textWhite,
 		fontWeight: '600',
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 	},
 	levelCenteredRow: {
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginBottom: scaleHeight(12),
+		marginBottom: SPACING_H.md,
 	},
 	levelDescription: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 		textAlign: 'center',
 		lineHeight: scaleHeight(18),
-		marginBottom: scaleHeight(4),
+		marginBottom: SPACING_H.xs,
 	},
 	levelScoreText: {
-		fontSize: scaledSize(15),
-		color: '#64748B',
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.textSecondary,
 		textAlign: 'center',
-		marginTop: scaleHeight(4),
+		marginTop: SPACING_H.xs,
 	},
 	levelScoreHighlight: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#22C55E',
-		marginTop: scaleHeight(4),
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.primary,
+		marginTop: SPACING_H.xs,
 	},
 	activityCardBox: {
-		backgroundColor: '#F1F5F9',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(16),
-		marginBottom: scaleHeight(24),
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.lg,
+		padding: SPACING_W.lg,
+		marginBottom: SPACING_H.xxl,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 	},
 	activityRow: {
 		flexDirection: 'row',
@@ -1992,48 +2010,48 @@ const styles = StyleSheet.create({
 		marginBottom: scaleHeight(10),
 	},
 	activityLabel: {
-		fontSize: scaledSize(14),
-		color: '#334155',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
 	},
 	activityValue: {
-		fontSize: scaledSize(14),
-		fontWeight: 'bold',
-		color: '#334155',
+		fontSize: FONT_SIZES.md,
+		fontWeight: '700',
+		color: COLORS.text,
 	},
 	summaryCard: {
 		backgroundColor: '#FFFBEB',
-		padding: scaleWidth(16),
+		padding: SPACING_W.lg,
 		borderRadius: scaleWidth(12),
-		marginBottom: scaleHeight(16),
+		marginBottom: SPACING_H.lg,
 		borderWidth: 1,
 		borderColor: '#FBBF24',
 	},
 	summaryTitle: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#F59E0B',
-		marginBottom: scaleHeight(8),
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.warning,
+		marginBottom: SPACING_H.sm,
 	},
 	progressRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 	},
 	progressText: {
-		fontSize: scaledSize(14),
-		color: '#334155',
-		marginRight: scaleWidth(12),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		marginRight: SPACING_W.md,
 	},
 	progressBarBackground: {
 		width: '80%',
 		height: scaleHeight(6),
-		backgroundColor: '#F1F5F9',
+		backgroundColor: COLORS.surfaceAlt,
 		borderRadius: scaleHeight(3),
 		marginTop: scaleHeight(6),
 		alignSelf: 'center',
 	},
 	progressBarFill: {
 		height: scaleHeight(6),
-		backgroundColor: '#3B82F6',
+		backgroundColor: COLORS.secondary,
 		borderRadius: scaleHeight(3),
 	},
 	gridRow: {
@@ -2046,77 +2064,79 @@ const styles = StyleSheet.create({
 		width: '28%',
 		height: scaleHeight(100),
 		borderWidth: 1,
-		borderColor: '#CBD5E1',
+		borderColor: COLORS.borderDark,
 		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 		justifyContent: 'center',
 		paddingHorizontal: scaleWidth(6),
-		paddingVertical: scaleHeight(8),
-		backgroundColor: '#fff',
-		marginBottom: scaleHeight(12),
+		paddingVertical: SPACING_H.sm,
+		backgroundColor: COLORS.surface,
+		marginBottom: SPACING_H.md,
 		marginHorizontal: scaleWidth(5),
 	},
 	levelCard: {
 		width: '42%',
 		aspectRatio: 1,
 		borderWidth: 1.5,
-		borderColor: '#E2E8F0',
-		borderRadius: scaleWidth(18),
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.lg,
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#F8FAFC',
-		marginHorizontal: scaleWidth(8),
-		marginBottom: scaleHeight(12),
+		backgroundColor: COLORS.background,
+		marginHorizontal: SPACING_W.sm,
+		marginBottom: SPACING_H.md,
 		shadowColor: '#64748B',
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 5,	},
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
+	},
 	regionText: {
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 		textAlign: 'center',
-		color: '#64748B',
+		color: COLORS.textSecondary,
 	},
 	levelText: {
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.mdPlus,
 		textAlign: 'center',
-		color: '#475569',
+		color: COLORS.text,
 		fontWeight: '700',
 	},
 	cardActive: {
-		backgroundColor: '#EFF6FF',
+		backgroundColor: COLORS.secondaryBg,
 	},
 	summaryStatGrid: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+		columnGap: SPACING_W.xs,
 	},
 	summaryStatCard: {
 		flex: 1,
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(11),
-		marginHorizontal: scaleWidth(3),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingVertical: SPACING_H.md,
+		marginHorizontal: SPACING_W.xs,
 		alignItems: 'center',
 		borderWidth: 1,
-		borderColor: '#F1F5F9',
+		borderColor: COLORS.border,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: 2,
-		marginBottom: scaleHeight(12),
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+		marginBottom: SPACING_H.md,
 	},
 	statIcon: {
-		fontSize: scaledSize(22),
-		marginBottom: scaleHeight(4),
+		fontSize: FONT_SIZES.heading,
+		marginBottom: SPACING_H.xs,
 	},
 	statValue: {
-		fontSize: scaledSize(14),
-		fontWeight: 'bold',
-		color: '#334155',
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
+		color: COLORS.text,
 		marginBottom: scaleHeight(3),
 	},
 	statLabel: {
-		fontSize: scaledSize(11.5),
-		color: '#64748B',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
 	},
 	statIconChip: {
 		width: scaleWidth(30),
@@ -2129,31 +2149,31 @@ const styles = StyleSheet.create({
 	chartRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(14),
-		padding: scaleWidth(16),
-		marginBottom: scaleHeight(16),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		padding: SPACING_W.lg,
+		marginBottom: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: '#F1F5F9',
+		borderColor: COLORS.border,
 	},
 	donutCenterValue: {
-		fontSize: scaledSize(17),
-		fontWeight: '800',
-		color: '#16A34A',
+		fontSize: FONT_SIZES.xxl,
+		fontWeight: '700',
+		color: COLORS.primaryDark,
 	},
 	donutCenterLabel: {
-		fontSize: scaledSize(11),
-		color: '#64748B',
+		fontSize: FONT_SIZES.xs,
+		color: COLORS.textSecondary,
 		marginTop: scaleHeight(2),
 	},
 	chartLegend: {
 		flex: 1,
-		marginLeft: scaleWidth(12),
+		marginLeft: SPACING_W.md,
 	},
 	chartLegendTitle: {
-		fontSize: scaledSize(14),
-		fontWeight: '800',
-		color: '#1E293B',
+		fontSize: FONT_SIZES.md,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 		marginBottom: scaleHeight(10),
 	},
 	chartLegendRow: {
@@ -2165,38 +2185,38 @@ const styles = StyleSheet.create({
 		width: scaleWidth(10),
 		height: scaleWidth(10),
 		borderRadius: scaleWidth(5),
-		marginRight: scaleWidth(8),
+		marginRight: SPACING_W.sm,
 	},
 	chartLegendText: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 	},
 	chartLegendStrong: {
-		fontWeight: '800',
-		color: '#334155',
+		fontWeight: '700',
+		color: COLORS.text,
 	},
 	stackBarTrack: {
 		flexDirection: 'row',
 		height: scaleHeight(8),
 		borderRadius: scaleHeight(4),
 		overflow: 'hidden',
-		marginTop: scaleHeight(8),
-		backgroundColor: '#F1F5F9',
+		marginTop: SPACING_H.sm,
+		backgroundColor: COLORS.surfaceAlt,
 	},
-	stackBarCorrect: { backgroundColor: '#22C55E' },
-	stackBarWrong: { backgroundColor: '#EF4444' },
+	stackBarCorrect: { backgroundColor: COLORS.primary },
+	stackBarWrong: { backgroundColor: COLORS.danger },
 	subtitleRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: scaleWidth(6),
-		marginBottom: scaleHeight(12),
-		marginTop: scaleHeight(8),
+		marginBottom: SPACING_H.md,
+		marginTop: SPACING_H.sm,
 	},
 	conquerHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginTop: scaleHeight(8),
-		marginBottom: scaleHeight(4),
+		marginTop: SPACING_H.sm,
+		marginBottom: SPACING_H.xs,
 	},
 	conquerHeaderIcon: {
 		width: scaleWidth(28),
@@ -2207,105 +2227,105 @@ const styles = StyleSheet.create({
 		marginRight: scaleWidth(9),
 	},
 	conquerHeaderTitle: {
-		fontSize: scaledSize(15),
-		fontWeight: '800',
-		color: '#334155',
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
+		color: COLORS.text,
 	},
 	conquerCountPill: {
 		marginLeft: 'auto',
-		paddingHorizontal: scaleWidth(11),
-		paddingVertical: scaleHeight(4),
-		borderRadius: scaleWidth(12),
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
 	},
 	conquerCountText: {
-		fontSize: scaledSize(12),
-		fontWeight: '800',
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '700',
 	},
 	conquerTag: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: scaleWidth(3),
-		backgroundColor: '#fff',
-		paddingHorizontal: scaleWidth(7),
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: scaleHeight(2),
-		borderRadius: scaleWidth(10),
+		borderRadius: RADIUS.round,
 	},
 	conquerTagText: {
-		fontSize: scaledSize(11),
-		color: '#16A34A',
-		fontWeight: '800',
+		fontSize: FONT_SIZES.xs,
+		color: COLORS.primaryDark,
+		fontWeight: '700',
 	},
 	sectionSubtitleInline: {
-		fontSize: scaledSize(15),
-		color: '#334155',
-		fontWeight: 'bold',
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.text,
+		fontWeight: '700',
 	},
 	topRankingTitleInline: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#334155',
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.text,
 	},
 	regionSubText: {
-		fontSize: scaledSize(10),
-		color: '#94A3B8',
+		fontSize: FONT_SIZES.xxs,
+		color: COLORS.textLight,
 		textAlign: 'center',
 		marginTop: scaleHeight(1),
 		lineHeight: scaleHeight(13),
 		fontWeight: '400',
 	},
 	levelSubText: {
-		fontSize: scaledSize(12),
-		color: '#94A3B8',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textLight,
 		textAlign: 'center',
 		marginTop: scaleHeight(1),
 		lineHeight: scaleHeight(13),
 		fontWeight: '400',
 	},
 	sectionSubtitle: {
-		fontSize: scaledSize(15),
-		color: '#334155',
-		marginBottom: scaleHeight(12),
-		marginTop: scaleHeight(8),
-		fontWeight: 'bold',
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.text,
+		marginBottom: SPACING_H.md,
+		marginTop: SPACING_H.sm,
+		fontWeight: '700',
 	},
 	gridRowNoBottomGap: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
-		marginTop: scaleHeight(12),
+		marginTop: SPACING_H.md,
 		paddingBottom: scaleHeight(6),
 	},
 	regionHelperText: {
-		fontSize: scaledSize(12),
-		color: '#64748B',
-		marginBottom: scaleHeight(16),
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
+		marginBottom: SPACING_H.lg,
 	},
 	levelHelperText: {
-		fontSize: scaledSize(12),
-		color: '#64748B',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
 		marginTop: scaleHeight(3),
 		marginBottom: scaleHeight(15),
 	},
 	adContainer: {
-		backgroundColor: '#fff',
+		backgroundColor: COLORS.surface,
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginTop: scaleHeight(10),
 		paddingVertical: scaleHeight(6),
 	},
 	regionCardActive: {
-		backgroundColor: '#EFF6FF',
-		borderColor: '#22C55E',
+		backgroundColor: COLORS.secondaryBg,
+		borderColor: COLORS.primary,
 	},
 	regionTextActive: {
-		color: '#22C55E',
-		fontWeight: 'bold',
+		color: COLORS.primary,
+		fontWeight: '700',
 	},
 	scrollTopButton: {
 		position: 'absolute',
-		right: scaleWidth(16),
-		bottom: scaleHeight(16),
-		backgroundColor: '#3B82F6',
+		right: SPACING_W.lg,
+		bottom: SPACING_H.lg,
+		backgroundColor: COLORS.secondary,
 		width: scaleWidth(40),
 		height: scaleWidth(40),
 		borderRadius: scaleWidth(20),
@@ -2315,15 +2335,15 @@ const styles = StyleSheet.create({
 	scoreBadge: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#22C55E',
-		borderRadius: scaleWidth(20),
-		paddingHorizontal: scaleWidth(12),
-		paddingVertical: scaleHeight(4),
-		marginBottom: scaleHeight(12),
+		backgroundColor: COLORS.primary,
+		borderRadius: RADIUS.round,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.sm,
+		marginBottom: SPACING_H.md,
 	},
 	scoreBadgeText: {
-		color: '#fff',
-		fontSize: scaledSize(13),
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.title,
 		fontWeight: '700',
 		marginLeft: scaleWidth(6),
 	},
@@ -2331,25 +2351,25 @@ const styles = StyleSheet.create({
 		width: scaleWidth(30),
 		height: scaleWidth(30),
 		marginRight: scaleWidth(6),
-		borderRadius: scaleWidth(20),
+		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#22C55E', // 🎨 학습 모드(홈 버튼) 초록
+		backgroundColor: COLORS.primary, // 🎨 학습 모드(홈 버튼) 초록
 	},
 	iconCircle2: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: scaleWidth(6),
-		backgroundColor: '#3B82F6', // 🎨 밝은 파랑 배경 추가
+		backgroundColor: COLORS.secondary, // 🎨 밝은 파랑 배경 추가
 	},
 
 	iconCircle3: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: scaleWidth(6),
@@ -2359,7 +2379,7 @@ const styles = StyleSheet.create({
 	iconCircle4: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: scaleWidth(6),
@@ -2368,22 +2388,22 @@ const styles = StyleSheet.create({
 	iconCircle5: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: scaleWidth(6),
-		backgroundColor: '#F59E0B',
+		backgroundColor: COLORS.warning,
 	},
 	sectionHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginTop: scaleHeight(16),
+		marginTop: SPACING_H.lg,
 		marginBottom: scaleHeight(10),
-		backgroundColor: '#FFFFFF',
+		backgroundColor: COLORS.surface,
 		borderRadius: scaleWidth(14),
 		borderWidth: 1,
-		borderColor: '#EEF2F6',
-		paddingVertical: scaleHeight(12),
+		borderColor: COLORS.border,
+		paddingVertical: SPACING_H.md,
 		paddingHorizontal: scaleWidth(14),
 		shadowColor: '#0F172A',
 		shadowOffset: { width: 0, height: 1 },
@@ -2392,177 +2412,178 @@ const styles = StyleSheet.create({
 	sectionHeaderStatic: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginTop: scaleHeight(4),
-		marginBottom: scaleHeight(10),
+		marginTop: SPACING_H.sm,
+		marginBottom: SPACING_H.md,
 	},
 	activityGroupBox: {
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		borderRadius: scaleWidth(16),
-		backgroundColor: '#FCFDFE',
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.lg,
+		backgroundColor: COLORS.surface,
 		marginHorizontal: scaleWidth(-8),
-		paddingHorizontal: scaleWidth(8),
-		paddingVertical: scaleHeight(12),
-		marginTop: scaleHeight(8),
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.md,
+		marginTop: SPACING_H.sm,
 	},
 	activityTabBar: {
 		paddingVertical: scaleHeight(6),
-		paddingRight: scaleWidth(8),
-		gap: scaleWidth(8),
+		paddingRight: SPACING_W.sm,
+		gap: SPACING_W.sm,
 		alignItems: 'center',
 		marginBottom: scaleHeight(6),
 	},
 	activityTabChip: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		paddingVertical: scaleHeight(8),
-		paddingHorizontal: scaleWidth(14),
-		borderRadius: scaleWidth(20),
-		backgroundColor: '#F1F5F9',
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.surfaceAlt,
 		gap: scaleWidth(6),
 	},
 	activityTabChipActive: {
-		backgroundColor: '#22C55E',
+		backgroundColor: COLORS.primary,
 	},
 	activityTabText: {
-		fontSize: scaledSize(13),
+		fontSize: FONT_SIZES.smPlus,
 		fontWeight: '600',
-		color: '#64748B',
+		color: COLORS.textSecondary,
 	},
 	activityTabTextActive: {
-		color: '#fff',
+		color: COLORS.textWhite,
 		fontWeight: '700',
 	},
 	sectionTitle: {
-		fontSize: scaledSize(16),
-		fontWeight: '800',
-		color: '#1E293B',
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 	},
 	sectionTitle2: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(12),
-		color: '#334155',
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		marginBottom: SPACING_H.md,
+		color: COLORS.text,
 	},
 	categoryRowCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		paddingVertical: scaleHeight(13),
-		paddingHorizontal: scaleWidth(16),
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
 		borderWidth: 1.5,
-		borderColor: '#E2E8F0',
-		borderRadius: scaleWidth(14),
-		backgroundColor: '#F8FAFC',
-		marginBottom: scaleHeight(10),
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.lg,
+		backgroundColor: COLORS.background,
+		marginBottom: SPACING_H.md,
 		width: '100%',
 		shadowColor: '#64748B',
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 4,	},
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+	},
 	categoryRowText: {
-		fontSize: scaledSize(15),
-		color: '#475569',
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.text,
 		fontWeight: '600',
 	},
 	levelDetailDescription: {
-		fontSize: scaledSize(12),
-		color: '#64748B',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
 		textAlign: 'center',
 		marginTop: scaleHeight(6),
 		lineHeight: scaleHeight(18),
 	},
 	timeResultCard: {
-		marginBottom: scaleHeight(12),
-		padding: scaleWidth(12),
-		backgroundColor: '#F8FAFC',
+		marginBottom: SPACING_H.md,
+		padding: SPACING_W.md,
+		backgroundColor: COLORS.background,
 		borderRadius: scaleWidth(10),
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 	},
 	timeResultDate: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
-		marginBottom: scaleHeight(4),
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
+		marginBottom: SPACING_H.xs,
 	},
 	timeResultScore: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#334155',
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.text,
 		marginBottom: scaleHeight(6),
 	},
 	timeResultRow: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		marginBottom: scaleHeight(4),
+		marginBottom: SPACING_H.xs,
 	},
 	timeResultItem: {
-		fontSize: scaledSize(13),
-		color: '#334155',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.text,
 	},
 	timeResultTime: {
-		fontSize: scaledSize(12),
-		color: '#64748B',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
 		textAlign: 'right',
 	},
 	timeCard: {
-		marginBottom: scaleHeight(12),
-		padding: scaleWidth(12),
-		backgroundColor: '#fff',
+		marginBottom: SPACING_H.md,
+		padding: SPACING_W.md,
+		backgroundColor: COLORS.surface,
 		borderRadius: scaleWidth(10),
 		borderWidth: 1,
-		borderColor: '#CBD5E1',
+		borderColor: COLORS.borderDark,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.08,
 		shadowRadius: 2,
 	},
 	timeCardDate: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 		marginBottom: scaleHeight(2),
 	},
 	timeCardScore: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#334155',
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.text,
 		marginBottom: scaleHeight(6),
 	},
 	timeCardRow: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		marginBottom: scaleHeight(4),
+		marginBottom: SPACING_H.xs,
 	},
 	timeCardItem: {
-		fontSize: scaledSize(13),
-		color: '#334155',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.text,
 	},
 	timeCardUsed: {
-		fontSize: scaledSize(12),
-		color: '#64748B',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
 		textAlign: 'right',
 	},
 	topRankingTitle: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#334155',
-		marginBottom: scaleHeight(12),
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.text,
+		marginBottom: SPACING_H.md,
 	},
 
 	noRecordText: {
-		fontSize: scaledSize(13),
-		color: '#94A3B8',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textLight,
 		textAlign: 'center',
-		marginTop: scaleHeight(12),
+		marginTop: SPACING_H.lg,
 	},
 
 	recordCard: {
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(14),
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(12),
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		marginBottom: scaleHeight(10),
+		borderColor: COLORS.border,
+		marginBottom: SPACING_H.md,
 	},
 
 	rankRow: {
@@ -2571,66 +2592,67 @@ const styles = StyleSheet.create({
 	},
 
 	firstRankLabel: {
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.mdPlus,
 		color: '#FBBF24',
-		fontWeight: 'bold',
-		marginRight: scaleWidth(8),
+		fontWeight: '700',
+		marginRight: SPACING_W.sm,
 	},
 
 	secondRankLabel: {
-		fontSize: scaledSize(14),
-		color: '#64748B',
-		fontWeight: 'bold',
-		marginRight: scaleWidth(8),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		fontWeight: '700',
+		marginRight: SPACING_W.sm,
 	},
 
 	thirdRankLabel: {
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 		color: '#FB923C',
-		fontWeight: 'bold',
-		marginRight: scaleWidth(8),
+		fontWeight: '700',
+		marginRight: SPACING_W.sm,
 	},
 
 	firstRankScore: {
-		fontSize: scaledSize(15),
-		color: '#334155',
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.text,
 	},
 
 	secondRankScore: {
-		fontSize: scaledSize(14),
-		color: '#334155',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
 	},
 
 	thirdRankScore: {
-		fontSize: scaledSize(14),
-		color: '#334155',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
 	},
 
 	rankDate: {
-		fontSize: scaledSize(12),
-		color: '#64748B',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
 	},
 	calendarStyle: {
 		alignSelf: 'stretch', // 또는 width: '100%'
-		borderRadius: scaleWidth(12),
+		borderRadius: RADIUS.lg,
 		overflow: 'hidden',
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.md,
 	},
 	levelDescriptionCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#FFFFFF',
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(12),
-		marginBottom: scaleHeight(8),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		marginBottom: SPACING_H.sm,
 		borderWidth: 1,
-		borderColor: '#EEF2F6',
+		borderColor: COLORS.border,
 		gap: scaleWidth(10),
 		shadowColor: '#0F172A',
 		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.04,
-		shadowRadius: 4,	},
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+	},
 	levelDescIconChip: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
@@ -2640,13 +2662,13 @@ const styles = StyleSheet.create({
 	},
 	levelDescriptionText: {
 		flex: 1,
-		fontSize: scaledSize(13),
-		color: '#334155',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.text,
 		lineHeight: scaleHeight(19),
 		fontWeight: '500',
 	},
 	levelHighlight: {
-		fontWeight: 'bold',
-		color: '#22C55E',
+		fontWeight: '700',
+		color: COLORS.primary,
 	},
 });

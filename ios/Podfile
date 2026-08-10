@@ -14,7 +14,7 @@ $RNFirebaseAsStaticFramework = true
 ######## 권한 설정
 setup_permissions([
   'Notifications',
-  'Camera',
+  'AppTrackingTransparency',
 ])
 
 ######## 메인 타겟

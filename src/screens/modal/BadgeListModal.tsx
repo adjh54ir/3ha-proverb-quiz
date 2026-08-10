@@ -1,10 +1,10 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import IconComponent from '../common/atomic/IconComponent';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import Colors from '@/const/ConstColors';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import ModalCloseButton from '../common/atomic/ModalCloseButton';
 
 const BadgeListModal = ({
 	visible,
@@ -19,18 +19,24 @@ const BadgeListModal = ({
 	onClose: () => void;
 	onSelectBadge?: (badge: (typeof CONST_BADGES)[number]) => void;
 }) => {
-	const scale = useRef(new Animated.Value(0.85)).current;
+	const scale = useRef(new Animated.Value(0.95)).current;
 	const opacity = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
-		if (visible) {
-			scale.setValue(0.85);
+		if (!visible) {
+			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
+			scale.setValue(0.95);
 			opacity.setValue(0);
-			Animated.parallel([
-				Animated.spring(scale, { toValue: 1, useNativeDriver: true, friction: 7, tension: 80 }),
-				Animated.timing(opacity, { toValue: 1, duration: 220, useNativeDriver: true }),
-			]).start();
+			return;
 		}
+		scale.setValue(0.95);
+		opacity.setValue(0);
+		const enter = Animated.parallel([
+			Animated.timing(scale, { toValue: 1, duration: 250, useNativeDriver: true }),
+			Animated.timing(opacity, { toValue: 1, duration: 250, useNativeDriver: true }),
+		]);
+		enter.start();
+		return () => enter.stop();
 	}, [visible, opacity, scale]);
 
 	const total = badges.length;
@@ -67,11 +73,9 @@ const BadgeListModal = ({
 				<Animated.View style={[styles.badgeModalContent, { opacity, transform: [{ scale }] }]}>
 					{/* 헤더 */}
 					<View style={styles.badgeModalHeader}>
-						<TouchableOpacity style={styles.badgeModalClose} onPress={onClose}>
-							<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color="#6B6456" />
-						</TouchableOpacity>
+						<ModalCloseButton onPress={onClose} color={COLORS.textSecondary} />
 						<View style={styles.badgeModalHeaderIcon}>
-							<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(30)} color="#fff" />
+							<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(30)} color={COLORS.textWhite} />
 						</View>
 						<Text style={styles.badgeModalTitle}>획득 가능한 뱃지</Text>
 						<Text style={styles.badgeModalSubtitle}>
@@ -101,12 +105,12 @@ const BadgeListModal = ({
 
 					{/* 목록 */}
 					<ScrollView
-						contentContainerStyle={{ paddingHorizontal: scaleWidth(16), paddingTop: scaleHeight(16), paddingBottom: scaleHeight(20) }}
-						style={{ height: scaleHeight(440), width: '100%', marginTop: scaleHeight(6) }}
+						contentContainerStyle={styles.badgeListContent}
+						style={styles.badgeList}
 						showsVerticalScrollIndicator={false}>
 						{sorted.length === 0 && (
 							<View style={styles.badgeEmptyBox}>
-								<IconComponent type="materialIcons" name="inbox" size={scaledSize(34)} color="#CBD5E1" />
+								<IconComponent type="materialIcons" name="inbox" size={scaledSize(34)} color={COLORS.borderDark} />
 								<Text style={styles.badgeEmptyText}>
 									{filter === 'earned' ? '아직 획득한 뱃지가 없어요.' : '해당하는 뱃지가 없어요.'}
 								</Text>
@@ -121,12 +125,12 @@ const BadgeListModal = ({
 									activeOpacity={0.8}
 									onPress={() => onSelectBadge?.(badge)}
 									style={[styles.badgeCard, isEarned && styles.badgeCardActive]}>
-									<View style={[styles.iconBox, { backgroundColor: isEarned ? rarity.soft : '#F1F5F9' }]}>
+									<View style={[styles.iconBox, { backgroundColor: isEarned ? rarity.soft : COLORS.surfaceAlt }]}>
 										<IconComponent
 											name={isEarned ? badge.icon : 'lock'}
 											type={isEarned ? badge.iconType : 'materialIcons'}
 											size={scaledSize(20)}
-											color={isEarned ? rarity.color : '#94A3B8'}
+											color={isEarned ? rarity.color : COLORS.textLight}
 										/>
 									</View>
 									<View style={styles.textBox}>
@@ -143,12 +147,12 @@ const BadgeListModal = ({
 											{badge.description}
 										</Text>
 										<View style={styles.badgeCondRow}>
-											<IconComponent type="materialIcons" name="flag" size={scaledSize(11)} color="#94A3B8" />
+											<IconComponent type="materialIcons" name="flag" size={scaledSize(11)} color={COLORS.textLight} />
 											<Text style={styles.badgeCondText} numberOfLines={1}>
 												{badge.condition}
 											</Text>
 											<View style={[styles.badgeStatusPill, isEarned ? styles.badgeStatusPillEarned : styles.badgeStatusPillLocked]}>
-												<Text style={[styles.badgeStatusPillText, { color: isEarned ? '#16A34A' : '#94A3B8' }]}>
+												<Text style={[styles.badgeStatusPillText, { color: isEarned ? COLORS.primaryDark : COLORS.textLight }]}>
 													{isEarned ? '획득' : '미획득'}
 												</Text>
 											</View>
@@ -173,201 +177,206 @@ export default BadgeListModal;
 const styles = StyleSheet.create({
 	modalOverlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
+		paddingHorizontal: SPACING_W.lg,
 	},
 	badgeModalContent: {
-		width: '90%',
-		maxHeight: '86%',  // ← 고정 height 대신
-		backgroundColor: '#FFFDF8',
-		borderRadius: scaleWidth(24),
+		width: '100%',
+		maxWidth: scaleWidth(340),
+		maxHeight: '86%',
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
 		alignItems: 'center',
 		overflow: 'hidden',
-		paddingBottom: scaleHeight(18),
+		paddingBottom: SPACING_H.xl,
 		borderWidth: 1,
-		borderColor: '#EFE7D6',
+		borderColor: COLORS.border,
 		shadowColor: '#000',
-		shadowOpacity: 0.12,
-		shadowOffset: { width: 0, height: 10 },
-		shadowRadius: 18,
+		shadowOpacity: 0.08,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 8,
 	},
 	badgeModalHeader: {
 		width: '100%',
-		backgroundColor: '#FBF6EA',
-		paddingTop: scaleHeight(22),
-		paddingBottom: scaleHeight(18),
-		paddingHorizontal: scaleWidth(20),
+		backgroundColor: COLORS.surfaceAlt,
+		paddingTop: SPACING_H.xl,
+		paddingBottom: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.lg,
 		alignItems: 'center',
 		borderBottomWidth: 1,
-		borderBottomColor: '#EFE7D6',
-	},
-	badgeModalClose: {
-		position: 'absolute',
-		top: scaleHeight(12),
-		right: scaleWidth(12),
-		zIndex: 2,
-		padding: scaleWidth(4),
+		borderBottomColor: COLORS.border,
 	},
 	badgeModalHeaderIcon: {
 		width: scaleWidth(58),
 		height: scaleWidth(58),
-		borderRadius: scaleWidth(29),
-		backgroundColor: '#475569',
+		borderRadius: scaleWidth(58) / 2,
+		backgroundColor: COLORS.primary,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.md,
 	},
 	badgeModalTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: '800',
-		color: '#3F3A33',
-		marginBottom: scaleHeight(4),
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.xs,
 	},
 	badgeModalSubtitle: {
-		fontSize: scaledSize(12.5),
-		color: '#8B8475',
-		marginBottom: scaleHeight(12),
-		fontWeight: '600',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		marginBottom: SPACING_H.md,
+		fontWeight: '500',
 	},
 	badgeModalProgressTrack: {
 		width: '100%',
 		height: scaleHeight(8),
-		borderRadius: scaleHeight(4),
-		backgroundColor: '#ECE3D2',
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.border,
 		overflow: 'hidden',
 	},
 	badgeModalProgressFill: {
 		height: '100%',
-		borderRadius: scaleHeight(4),
-		backgroundColor: '#475569',
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.primary,
 	},
 	badgeModalPercent: {
-		marginTop: scaleHeight(6),
-		fontSize: scaledSize(11),
-		color: '#6B6456',
-		fontWeight: '700',
+		marginTop: SPACING_H.sm,
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
+		fontWeight: '600',
 	},
 	badgeFilterRow: {
 		flexDirection: 'row',
-		gap: scaleWidth(8),
-		paddingHorizontal: scaleWidth(16),
-		paddingTop: scaleHeight(14),
+		columnGap: SPACING_W.sm,
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.lg,
 	},
 	badgeFilterChip: {
 		flex: 1,
 		alignItems: 'center',
-		paddingVertical: scaleHeight(8),
-		borderRadius: scaleWidth(10),
-		backgroundColor: '#FFFFFF',
+		justifyContent: 'center',
+		height: scaleHeight(36),
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.surface,
 		borderWidth: 1,
-		borderColor: '#ECE3D2',
+		borderColor: COLORS.border,
 	},
 	badgeFilterChipActive: {
-		backgroundColor: '#475569',
-		borderColor: '#475569',
+		backgroundColor: COLORS.primary,
+		borderColor: COLORS.primary,
 	},
 	badgeFilterChipText: {
-		fontSize: scaledSize(12.5),
-		fontWeight: '700',
-		color: Colors.textSecondary,
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '600',
+		color: COLORS.textSecondary,
 	},
 	badgeFilterChipTextActive: {
-		color: '#fff',
+		color: COLORS.textWhite,
+	},
+	badgeList: {
+		width: '100%',
+		maxHeight: scaleHeight(440),
+		marginTop: SPACING_H.xs,
+	},
+	badgeListContent: {
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.lg,
+		paddingBottom: SPACING_H.xl,
 	},
 	badgeEmptyBox: {
 		alignItems: 'center',
 		justifyContent: 'center',
 		paddingVertical: scaleHeight(40),
-		gap: scaleHeight(10),
+		rowGap: SPACING_H.md,
 	},
 	badgeEmptyText: {
-		fontSize: scaledSize(13),
-		color: Colors.textMuted,
-		fontWeight: '600',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		fontWeight: '500',
 	},
 	badgeCard: {
+		width: '100%',
 		flexDirection: 'row',
 		alignItems: 'center',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(16),
-		marginBottom: scaleHeight(12),
-		width: '100%',
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		marginBottom: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: '#EFE7D6',
-		backgroundColor: '#FFFFFF',
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surface,
 		shadowColor: '#000',
 		shadowOpacity: 0.06,
-		shadowOffset: { width: 0, height: 1 },
-		shadowRadius: 3,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 8,
 	},
 	badgeCardActive: {
-		backgroundColor: '#F7F2E8',
-		borderColor: '#D8CEB8',
+		backgroundColor: COLORS.primaryBg,
+		borderColor: COLORS.primarySoft,
 		borderWidth: 1.5,
-		shadowColor: '#000',
-		shadowOpacity: 0.1,
-		shadowOffset: { width: 0, height: 1 },
-		shadowRadius: 3,
 	},
 	iconBox: {
 		width: scaleWidth(44),
 		height: scaleWidth(44),
-		borderRadius: scaleWidth(22),
-		backgroundColor: '#F3EEE2',
+		borderRadius: scaleWidth(44) / 2,
+		backgroundColor: COLORS.surfaceAlt,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginRight: scaleWidth(14),
+		marginRight: SPACING_W.md,
 	},
 	textBox: { flex: 1 },
-	badgeRowTop: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(6) },
+	badgeRowTop: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
 	badgeTitle: {
 		flexShrink: 1,
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-		color: '#334155',
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
+		color: COLORS.text,
 	},
 	badgeTitleActive: {
-		color: '#3F3A33',
+		color: COLORS.textStrong,
 	},
 	badgeRarityChip: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(3),
-		borderRadius: scaleWidth(7),
-		paddingHorizontal: scaleWidth(7),
+		columnGap: scaleWidth(3),
+		borderRadius: RADIUS.round,
+		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: scaleHeight(2),
 	},
-	badgeRarityChipText: { fontSize: scaledSize(10), fontWeight: '800' },
+	badgeRarityChipText: { fontSize: FONT_SIZES.xxs, fontWeight: '700' },
 	badgeDesc: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
-		marginTop: scaleHeight(4),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		marginTop: SPACING_H.xs,
 	},
 	badgeDescActive: {
-		color: '#5C564B',
+		color: COLORS.text,
 	},
-	badgeCondRow: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(4), marginTop: scaleHeight(6) },
-	badgeCondText: { flex: 1, fontSize: scaledSize(11), color: '#94A3B8' },
+	badgeCondRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.xs, marginTop: SPACING_H.sm },
+	badgeCondText: { flex: 1, fontSize: FONT_SIZES.xs, color: COLORS.textLight },
 	badgeStatusPill: {
-		borderRadius: scaleWidth(8),
-		paddingHorizontal: scaleWidth(8),
+		borderRadius: RADIUS.round,
+		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: scaleHeight(2),
 	},
-	badgeStatusPillEarned: { backgroundColor: '#DCFCE7' },
-	badgeStatusPillLocked: { backgroundColor: '#F3EEE2' },
-	badgeStatusPillText: { fontSize: scaledSize(10), fontWeight: '800' },
+	badgeStatusPillEarned: { backgroundColor: COLORS.primarySoft },
+	badgeStatusPillLocked: { backgroundColor: COLORS.surfaceAlt },
+	badgeStatusPillText: { fontSize: FONT_SIZES.xxs, fontWeight: '700' },
 	badgeModalDoneBtn: {
-		marginTop: scaleHeight(6),
-		backgroundColor: '#475569',
-		paddingVertical: scaleHeight(12),
-		borderRadius: scaleWidth(12),
+		alignSelf: 'stretch',
+		marginHorizontal: SPACING_W.lg,
+		marginTop: SPACING_H.md,
+		height: scaleHeight(48),
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.primary,
+		justifyContent: 'center',
 		alignItems: 'center',
-		width: '88%',
 	},
 	badgeModalDoneText: {
-		color: '#fff',
+		color: COLORS.textWhite,
 		fontWeight: '700',
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.lg,
 	},
 });

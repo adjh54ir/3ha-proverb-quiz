@@ -24,8 +24,10 @@ import CurrentVersionModal from './modal/CurrentVersionModal';
 import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL, APP_NAME as ENV_APP_NAME, APP_DESCRIPTION as ENV_APP_DESCRIPTION } from '@env';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import FadeInView from '@/components/animation/FadeInView';
-import { COLORS, FONT_SIZES } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
 import { SCORE_PER_QUESTION } from '@/const/common/CommonCharacterData';
+import { AppPermissionInfo, loadAppPermissions } from '@/utils/PermissionUtils';
+import DateUtils from '@/utils/DateUtils';
 
 // ─────────────────────────────────────────────
 // 상수
@@ -121,7 +123,6 @@ const SETTINGS_MAP: Record<string, { label: string; icon: { type: IconType; name
 const BASE_SECTIONS = [
 	{
 		titleText: '사용자 정보 초기화',
-		titleColor: COLORS.danger as string | undefined,
 		iconType: 'materialIcons',
 		icon: 'restart-alt',
 		iconColor: COLORS.danger,
@@ -130,7 +131,6 @@ const BASE_SECTIONS = [
 	},
 	{
 		titleText: '문의 및 피드백',
-		titleColor: COLORS.secondaryDark as string | undefined,
 		iconType: 'materialIcons',
 		icon: 'forum',
 		iconColor: COLORS.secondaryDark,
@@ -139,14 +139,33 @@ const BASE_SECTIONS = [
 	},
 	{
 		titleText: '정책 및 라이선스',
-		titleColor: '#059669' as string | undefined,
 		iconType: 'materialIcons',
 		icon: 'gavel',
-		iconColor: '#059669',
-		iconBg: '#D1FAE5',
+		iconColor: COLORS.primaryDark,
+		iconBg: COLORS.primarySoft,
 		data: ['privacyPolicy', 'openSource', 'checkVersion', ...(IS_DEV ? ['completeAllQuiz', 'completeAllStudy', 'completeAllTower'] : [])],
 	},
+	{
+		titleText: '권한 설정',
+		iconType: 'materialIcons',
+		icon: 'lock-outline',
+		iconColor: COLORS.secondaryDark,
+		iconBg: COLORS.secondarySoft,
+		data: ['__permissions__'],
+	},
 ];
+
+// 권한 상태별 뱃지 표기
+const PERMISSION_BADGE: Record<AppPermissionInfo['state'], { text: string; color: string }> = {
+	granted: { text: '허용', color: COLORS.success },
+	blocked: { text: '거부', color: COLORS.danger },
+	undetermined: { text: '미설정', color: COLORS.textSecondary },
+};
+
+const PERMISSION_ICON: Record<AppPermissionInfo['key'], string> = {
+	notifications: 'bell-outline',
+	tracking: 'bullhorn-outline',
+};
 
 // ─────────────────────────────────────────────
 // 카드 버튼 press scale 애니메이션 래퍼
@@ -186,6 +205,7 @@ const SettingScreen = () => {
 	const [resetType, setResetType] = useState<ResetType | null>(null);
 	const [appVersion, setAppVersion] = useState('');
 	const [latestVersion, setLatestVersion] = useState<string | null>(null);
+	const [permissions, setPermissions] = useState<AppPermissionInfo[]>([]);
 
 	// ── 파생 상태 (RESET_CONFIG 기반) ──────────────
 	const resetConfig = resetType ? RESET_CONFIG[resetType] : null;
@@ -194,6 +214,17 @@ const SettingScreen = () => {
 		useCallback(() => {
 			setAppVersion(VersionCheck.getCurrentVersion());
 			scrollToTop();
+
+			// 설정 앱에서 권한을 바꾸고 돌아오는 경우가 있어 포커스마다 다시 읽는다
+			let isActive = true;
+			loadAppPermissions().then((list) => {
+				if (isActive) {
+					setPermissions(list);
+				}
+			});
+			return () => {
+				isActive = false;
+			};
 		}, []),
 	);
 
@@ -211,9 +242,9 @@ const SettingScreen = () => {
 			return;
 		}
 
-		const todayStr = new Date().toISOString().slice(0, 10);
+		const todayStr = DateUtils.getLocalDateString();
 		const updated = (JSON.parse(json) as MainDataType.TodayQuizList[]).map((item) =>
-			item.quizDate.slice(0, 10) === todayStr
+			DateUtils.toLocalDateKey(item.quizDate) === todayStr
 				? {
 						...item,
 						todayQuizIdArr: [],
@@ -368,7 +399,8 @@ const SettingScreen = () => {
 			completedLevels: allLevels,
 			currentQuestion: 0,
 			correctAnswers: 0,
-			lastAttemptDate: new Date().toISOString(),
+			// 읽는 쪽(TowerChallengeScreen/TowerQuizScreen)이 'YYYY-MM-DD' 로컬 키를 기대한다.
+			lastAttemptDate: DateUtils.getLocalDateString(),
 			unlockedRewards: allLevels,
 		};
 		await AsyncStorage.setItem(STORAGE_KEYS.towerChallenge, JSON.stringify(towerProgress));
@@ -426,7 +458,6 @@ const SettingScreen = () => {
 		() =>
 			BASE_SECTIONS.map((s) => ({
 				titleText: s.titleText,
-				titleColor: s.titleColor,
 				iconType: s.iconType,
 				icon: s.icon,
 				iconColor: s.iconColor,
@@ -483,13 +514,14 @@ const SettingScreen = () => {
 											<TouchableOpacity
 												key={subItem.key}
 												style={[styles.accordionSubItem, index === group.items.length - 1 && { borderBottomWidth: 0 }]}
+												activeOpacity={0.8}
 												onPress={() => ITEM_HANDLERS[subItem.key]?.()}>
 												<IconComponent
 													type="MaterialCommunityIcons"
 													name="refresh"
 													size={scaledSize(16)}
 													color={COLORS.danger}
-													style={{ marginRight: scaleWidth(10) }}
+													style={{ marginRight: SPACING_W.md }}
 												/>
 												<Text style={styles.accordionSubText}>{subItem.label}</Text>
 											</TouchableOpacity>
@@ -500,17 +532,66 @@ const SettingScreen = () => {
 						);
 					})}
 
-					<TouchableOpacity style={styles.accordionGroup} onPress={() => ITEM_HANDLERS.resetAll?.()} activeOpacity={0.7}>
+					<TouchableOpacity
+						style={[styles.accordionGroup, styles.accordionGroupDanger]}
+						onPress={() => ITEM_HANDLERS.resetAll?.()}
+						activeOpacity={0.8}>
 						<View style={styles.accordionHeader}>
 							<View style={styles.row}>
 								<View style={[styles.accordionIconChip, { backgroundColor: COLORS.dangerBg }]}>
-									<IconComponent type="materialIcons" name="delete" size={scaledSize(16)} color="#B91C1C" />
+									<IconComponent type="materialIcons" name="delete" size={scaledSize(16)} color={COLORS.danger} />
 								</View>
-								<Text style={[styles.accordionHeaderText, { color: '#B91C1C' }]}>전체 데이터 초기화</Text>
+								<Text style={[styles.accordionHeaderText, { color: COLORS.danger }]}>전체 데이터 초기화</Text>
 							</View>
-							<IconComponent type="MaterialCommunityIcons" name="chevron-right" size={scaledSize(20)} color="#B91C1C" />
+							<IconComponent type="MaterialCommunityIcons" name="chevron-right" size={scaledSize(20)} color={COLORS.danger} />
 						</View>
 					</TouchableOpacity>
+				</View>
+			);
+		}
+
+		// 권한 설정 — 현재 상태 표시 + 미허용 항목은 OS 설정으로 이동
+		if (item === '__permissions__') {
+			if (permissions.length === 0) {
+				return null;
+			}
+			return (
+				<View style={styles.accordionWrapper}>
+					<View style={styles.accordionGroup}>
+						{permissions.map((perm, index) => {
+							const badge = PERMISSION_BADGE[perm.state];
+							const isGranted = perm.state === 'granted';
+
+							return (
+								<TouchableOpacity
+									key={perm.key}
+									style={[styles.permissionRow, index === permissions.length - 1 && { borderBottomWidth: 0 }]}
+									activeOpacity={isGranted ? 1 : 0.7}
+									disabled={isGranted}
+									onPress={() => Linking.openSettings().catch(() => Alert.alert('오류', '설정 화면을 열 수 없습니다.'))}>
+									<View style={styles.itemIconChip}>
+										<IconComponent type="MaterialCommunityIcons" name={PERMISSION_ICON[perm.key]} size={scaledSize(18)} color={COLORS.secondary} />
+									</View>
+									<View style={styles.permissionTextWrap}>
+										<Text style={styles.permissionLabel}>{perm.label}</Text>
+										<Text style={styles.permissionDesc}>{perm.description}</Text>
+									</View>
+									<View style={[styles.permissionBadge, { borderColor: badge.color }]}>
+										<Text style={[styles.permissionBadgeText, { color: badge.color }]}>{badge.text}</Text>
+									</View>
+									{!isGranted && (
+										<IconComponent
+											type="MaterialCommunityIcons"
+											name="chevron-right"
+											size={scaledSize(20)}
+											color={COLORS.textSecondary}
+											style={styles.permissionChevron}
+										/>
+									)}
+								</TouchableOpacity>
+							);
+						})}
+					</View>
 				</View>
 			);
 		}
@@ -569,14 +650,14 @@ const SettingScreen = () => {
 						renderSectionFooter={() => <View style={styles.sectionSpacing} />}
 						renderSectionHeader={({ section }) =>
 							section.titleText ? (
-								<View style={[styles.sectionHeader, section.iconBg ? { backgroundColor: section.iconBg } : undefined]}>
-									<View style={styles.sectionHeaderChip}>
+								<View style={styles.sectionHeader}>
+									<View style={[styles.sectionHeaderChip, section.iconBg ? { backgroundColor: section.iconBg } : undefined]}>
 										<IconComponent type={section.iconType} name={section.icon} size={scaledSize(15)} color={section.iconColor} />
 									</View>
-									<Text style={[styles.sectionHeaderText, section.titleColor ? { color: section.titleColor } : undefined]}>{section.titleText}</Text>
+									<Text style={styles.sectionHeaderText}>{section.titleText}</Text>
 								</View>
 							) : (
-								<View style={{ height: scaleHeight(10) }} />
+								<View style={{ height: SPACING_H.md }} />
 							)
 						}
 						ListHeaderComponent={
@@ -593,9 +674,9 @@ const SettingScreen = () => {
 										<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
 									</View>
 									<View style={styles.storeButtons}>
-										<TouchableOpacity style={[styles.storeButton, { backgroundColor: COLORS.primary }]} onPress={shareApp}>
+										<TouchableOpacity style={[styles.storeButton, { backgroundColor: COLORS.primary }]} onPress={shareApp} activeOpacity={0.8}>
 											<View style={styles.iconRow}>
-												<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color="#fff" />
+												<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color={COLORS.textWhite} />
 												<Text style={styles.storeButtonText}>공유하기</Text>
 											</View>
 										</TouchableOpacity>
@@ -625,7 +706,7 @@ const SettingScreen = () => {
 											supported ? Linking.openURL(storeUrl) : Alert.alert('오류', '스토어 페이지를 열 수 없습니다.');
 										};
 										return (
-											<TouchableOpacity style={styles.footerAppCard} onPress={handlePress}>
+											<TouchableOpacity style={styles.footerAppCard} onPress={handlePress} activeOpacity={0.8}>
 												<View style={{ position: 'relative' }}>
 													<View style={styles.footerAppIconWrapper}>
 														<Image source={item.icon} style={styles.footerAppIcon} resizeMode="contain" />
@@ -657,9 +738,11 @@ const SettingScreen = () => {
 			{showOpenSourceModal && <OpenSourceModal visible={showOpenSourceModal} onClose={() => setShowOpenSourceModal(false)} />}
 
 			{showScrollTop && (
-				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
-					<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color="#fff" />
-				</TouchableOpacity>
+				<FadeInView style={styles.scrollTopWrap} duration={220} offsetY={8}>
+					<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop} activeOpacity={0.8} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+						<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color={COLORS.textWhite} />
+					</TouchableOpacity>
+				</FadeInView>
 			)}
 
 			<CmmDelConfirmModal
@@ -686,47 +769,46 @@ export default SettingScreen;
 
 const styles = StyleSheet.create({
 	container: { flex: 1, backgroundColor: COLORS.background },
-	listContent: { paddingBottom: scaleHeight(24) },
-	headerContainer: { marginBottom: scaleHeight(5) },
-	itemSpacing: { height: scaleHeight(10) },
-	sectionSpacing: { height: scaleHeight(24) },
+	listContent: { paddingBottom: scaleHeight(40) },
+	headerContainer: { marginBottom: SPACING_H.xs },
+	itemSpacing: { height: SPACING_H.md },
+	// 섹션 사이 총 간격 = 이 값 + sectionHeader marginTop(20) ≈ 24
+	sectionSpacing: { height: SPACING_H.xs },
 
 	sectionHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(10),
-		marginTop: scaleHeight(12),
-		marginBottom: scaleHeight(12),
-		marginHorizontal: scaleWidth(16),
-		paddingHorizontal: scaleWidth(14),
-		paddingVertical: scaleHeight(10),
-		borderRadius: scaleWidth(14),
+		gap: SPACING_W.md,
+		marginTop: SPACING_H.xl,
+		marginBottom: SPACING_H.sm,
+		marginHorizontal: SPACING_W.lg,
 	},
 	sectionHeaderChip: {
-		width: scaleWidth(30),
-		height: scaleWidth(30),
-		borderRadius: scaleWidth(10),
-		backgroundColor: '#FFFFFF',
+		width: scaleWidth(28),
+		height: scaleWidth(28),
+		borderRadius: RADIUS.sm,
+		backgroundColor: COLORS.surfaceAlt,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
 	sectionHeaderText: {
-		fontSize: scaledSize(14.5),
-		fontWeight: '800',
-		color: COLORS.text,
+		fontSize: FONT_SIZES.smPlus,
+		fontWeight: '700',
+		color: COLORS.textSecondary,
 		letterSpacing: 0.3,
 	},
 
 	cardButton: {
-		backgroundColor: '#fff',
-		borderRadius: scaledSize(12),
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(16),
-		marginHorizontal: scaleHeight(20),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.md,
+		minHeight: scaleHeight(52),
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		marginHorizontal: SPACING_W.lg,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
+		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.06,
-		shadowRadius: 3,
+		shadowRadius: 8,
 		flexDirection: 'row',
 		alignItems: 'center',
 	},
@@ -734,137 +816,178 @@ const styles = StyleSheet.create({
 	itemIconChip: {
 		width: scaleWidth(34),
 		height: scaleWidth(34),
-		borderRadius: scaleWidth(10),
+		borderRadius: RADIUS.sm,
 		backgroundColor: COLORS.secondaryBg,
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: scaleWidth(10),
+		marginRight: SPACING_W.md,
 	},
-	itemIconChipDanger: { backgroundColor: '#FEF2F2' },
+	itemIconChipDanger: { backgroundColor: COLORS.dangerBg },
 	cardText: { fontSize: FONT_SIZES.mdPlus, color: COLORS.text, fontWeight: '500', letterSpacing: 0.3, flexShrink: 1 },
 
 	// ── 아코디언 ──
-	accordionWrapper: { marginHorizontal: scaleWidth(20), gap: scaleHeight(10) },
+	accordionWrapper: { marginHorizontal: SPACING_W.lg, gap: SPACING_H.md },
 	accordionGroup: {
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(12),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.md,
 		overflow: 'hidden',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
+		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.06,
-		shadowRadius: 3,
+		shadowRadius: 8,
+	},
+	// 파괴적 액션 — 위 그룹들과 한 칸 더 띄운다
+	accordionGroupDanger: {
+		marginTop: SPACING_H.sm,
+		borderWidth: 1,
+		borderColor: COLORS.dangerBg,
 	},
 	accordionHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(16),
+		minHeight: scaleHeight(52),
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
 	},
 	accordionIconChip: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(28) / 2,
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: scaleWidth(10),
+		marginRight: SPACING_W.md,
 	},
 	accordionHeaderText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '600', color: COLORS.text },
-	accordionBody: { borderTopWidth: 1, borderTopColor: COLORS.surfaceAlt, backgroundColor: COLORS.background },
+	accordionBody: { borderTopWidth: 1, borderTopColor: COLORS.border, backgroundColor: COLORS.background },
 	accordionSubItem: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		paddingVertical: scaleHeight(14),
-		paddingHorizontal: scaleWidth(20),
+		minHeight: scaleHeight(52),
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
 		borderBottomWidth: 1,
-		borderBottomColor: COLORS.surfaceAlt,
+		borderBottomColor: COLORS.border,
 	},
 	accordionSubText: { fontSize: FONT_SIZES.md, color: COLORS.danger, fontWeight: '500' },
 
-	scrollTopButton: {
+	// ── 권한 설정 ──
+	permissionRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		minHeight: scaleHeight(52),
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		borderBottomWidth: 1,
+		borderBottomColor: COLORS.border,
+	},
+	permissionTextWrap: { flex: 1, marginRight: SPACING_W.md },
+	permissionLabel: { fontSize: FONT_SIZES.mdPlus, fontWeight: '600', color: COLORS.text, letterSpacing: 0.3 },
+	permissionDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: SPACING_H.xs },
+	permissionBadge: {
+		borderWidth: 1,
+		borderRadius: RADIUS.round,
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.xs,
+	},
+	permissionBadgeText: { fontSize: FONT_SIZES.xs, fontWeight: '700' },
+	permissionChevron: { marginLeft: SPACING_W.xs },
+
+	scrollTopWrap: {
 		position: 'absolute',
-		right: scaleWidth(16),
-		bottom: scaleHeight(16),
+		right: SPACING_W.lg,
+		bottom: SPACING_H.lg,
+	},
+	scrollTopButton: {
 		backgroundColor: COLORS.secondary,
 		width: scaleWidth(48),
 		height: scaleWidth(48),
-		borderRadius: scaleWidth(24),
+		borderRadius: scaleWidth(48) / 2,
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.25,
-		shadowRadius: scaleWidth(4),
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.2,
+		shadowRadius: 8,
 	},
 
-	modalTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: scaleHeight(12) },
-	modalTitleText: { fontSize: FONT_SIZES.xl, lineHeight: scaleHeight(44), fontWeight: 'bold', color: COLORS.text, textAlign: 'center' },
-	iconLeft: { marginRight: scaleWidth(8) },
+	modalTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: SPACING_H.md },
+	modalTitleText: { fontSize: FONT_SIZES.xl, lineHeight: scaledSize(26), fontWeight: '700', color: COLORS.textStrong, textAlign: 'center' },
+	iconLeft: { marginRight: SPACING_W.sm },
 
 	recommendSection: {
-		marginHorizontal: scaleWidth(20),
-		padding: scaleWidth(20),
-		backgroundColor: COLORS.surfaceAlt,
-		borderRadius: scaleWidth(12),
+		marginHorizontal: SPACING_W.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.04,
-		shadowRadius: 4,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
 		alignItems: 'center',
-		marginTop: scaleHeight(12),
+		marginTop: SPACING_H.md,
 	},
-	recommendTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(6) },
+	recommendTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING_H.sm },
 	recommendTitleIconChip: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
-		borderRadius: scaleWidth(14),
+		borderRadius: scaleWidth(28) / 2,
 		backgroundColor: COLORS.secondarySoft,
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: scaleWidth(8),
+		marginRight: SPACING_W.sm,
 	},
-	recommendTitle: { fontSize: scaledSize(17), fontWeight: '700', color: COLORS.text },
-	recommendSubtitle: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', marginBottom: scaleHeight(12) },
+	recommendTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong },
+	recommendSubtitle: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', marginBottom: SPACING_H.md },
 	appIconWrapper: {
 		width: scaleWidth(80),
 		height: scaleWidth(80),
-		marginBottom: scaleHeight(12),
+		marginBottom: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		borderRadius: scaleWidth(16),
+		borderRadius: RADIUS.lg,
 		overflow: 'hidden',
 	},
-	appIcon: { width: '100%', height: '100%', borderRadius: scaleWidth(16) },
-	storeButtons: { marginTop: scaleHeight(6), flexDirection: 'row', gap: scaleWidth(8) },
-	storeButton: { flex: 1, paddingVertical: scaleHeight(12), borderRadius: scaleWidth(8), alignItems: 'center' },
-	storeButtonText: { color: '#fff', fontWeight: 'bold', fontSize: FONT_SIZES.smPlus },
-	iconRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleWidth(6) },
+	appIcon: { width: '100%', height: '100%', borderRadius: RADIUS.lg },
+	storeButtons: { marginTop: SPACING_H.sm, flexDirection: 'row', gap: SPACING_W.sm, alignSelf: 'stretch' },
+	storeButton: {
+		flex: 1,
+		minHeight: scaleHeight(48),
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	storeButtonText: { color: COLORS.textWhite, fontWeight: '700', fontSize: FONT_SIZES.mdPlus },
+	iconRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING_W.sm },
 
-	appVerText: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, textAlign: 'center', marginBottom: scaleHeight(20) },
-	appVerBoldText: { fontWeight: 'bold' },
+	appVerText: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, textAlign: 'center', marginBottom: SPACING_H.lg },
+	appVerBoldText: { fontWeight: '700' },
 
-	footerAppWrapper: { paddingVertical: scaleHeight(12) },
-	footerAppList: { paddingHorizontal: scaleWidth(16), gap: scaleWidth(12), marginBottom: scaleHeight(12) },
+	footerAppWrapper: { paddingVertical: SPACING_H.md },
+	footerAppList: { paddingHorizontal: SPACING_W.lg, gap: SPACING_W.md },
 	footerAppCard: {
 		width: scaleWidth(120),
-		padding: scaleWidth(12),
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#fff',
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.surface,
 		alignItems: 'center',
 		justifyContent: 'flex-start',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 4,
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
 	},
 	footerAppIconWrapper: {
 		width: scaleWidth(64),
 		height: scaleWidth(64),
-		borderRadius: scaleWidth(12),
+		borderRadius: RADIUS.md,
 		overflow: 'hidden',
-		marginBottom: scaleHeight(8),
+		marginBottom: SPACING_H.sm,
 	},
 	footerAppIcon: { width: '100%', height: '100%' },
 	footerNewBadge: {
@@ -883,10 +1006,10 @@ const styles = StyleSheet.create({
 		top: scaleWidth(4),
 		right: scaleWidth(2),
 		fontSize: scaledSize(5),
-		fontWeight: '800',
-		color: '#fff',
+		fontWeight: '700',
+		color: COLORS.textWhite,
 		transform: [{ rotate: '45deg' }],
 	},
-	footerAppTitle: { fontSize: FONT_SIZES.smPlus, fontWeight: '600', color: COLORS.text, textAlign: 'center', marginBottom: scaleHeight(4) },
+	footerAppTitle: { fontSize: FONT_SIZES.smPlus, fontWeight: '600', color: COLORS.text, textAlign: 'center', marginBottom: SPACING_H.xs },
 	footerAppDesc: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, textAlign: 'center' },
 });

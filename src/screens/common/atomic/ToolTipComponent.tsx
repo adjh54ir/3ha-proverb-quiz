@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
 
 interface TooltipProps {
 	text: string;
@@ -52,23 +53,23 @@ export const ToolTipComponent: React.FC<TooltipProps> = ({ text, marginLeft = 0,
 		tooltipContainer: {
 			position: 'relative',
 			marginTop: marginTop,
-			marginBottom: scaleHeight(5),
+			marginBottom: SPACING_H.xs,
 			marginLeft: marginLeft,
 		},
 		tooltip: {
 			position: 'absolute',
 			top: scaleHeight(28), // 🔽 여기서 툴팁 표시 위치를 아래로 내림 (원래는 '100%')
 			backgroundColor: 'rgba(0, 0, 0, 0.85)',
-			padding: scaleWidth(8),
-			borderRadius: scaleWidth(6),
+			padding: SPACING_W.sm,
+			borderRadius: RADIUS.sm,
 			width: scaleWidth(300), // ✅ 고정 너비
 			minWidth: scaleWidth(250),
 			maxWidth: scaleWidth(300),
 			zIndex: 10001, // 툴팁은 위에
 		},
 		tooltipText: {
-			color: '#ffffff',
-			fontSize: scaledSize(12),
+			color: COLORS.textWhite,
+			fontSize: FONT_SIZES.sm,
 			flexWrap: 'wrap',
 		},
 		tooltipLeft: {
@@ -89,8 +90,12 @@ export const ToolTipComponent: React.FC<TooltipProps> = ({ text, marginLeft = 0,
 
 	return (
 		<View style={styles.tooltipContainer}>
-			<TouchableOpacity ref={iconRef} onPress={toggleTooltip}>
-				<FontAwesome6Icon name='circle-question' size={16} color='#7f8c8d' />
+			<TouchableOpacity
+				ref={iconRef}
+				onPress={toggleTooltip}
+				activeOpacity={0.8}
+				hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}>
+				<FontAwesome6Icon name='circle-question' size={scaledSize(16)} color={COLORS.textSecondary} />
 			</TouchableOpacity>
 
 			{showTooltip && (

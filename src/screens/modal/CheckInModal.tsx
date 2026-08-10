@@ -1,10 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
-import { View, Modal, Text, ScrollView, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Modal, Text, ScrollView, StyleSheet, Animated } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { Calendar } from 'react-native-calendars';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
+import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { PET_REWARDS } from '@/const/ConstInfoData';
 
 interface CheckInModalProps {
@@ -19,17 +21,37 @@ interface CheckInModalProps {
 }
 
 const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, checkedInDates, mascot, showStamp, stampStyle, onClose, petLevel = -1 }) => {
+	// 모달 진입 애니메이션 (fade + scale)
+	const fadeAnim = useRef(new Animated.Value(0)).current;
+	const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
+	useEffect(() => {
+		if (!visible) {
+			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
+			fadeAnim.setValue(0);
+			scaleAnim.setValue(0.95);
+			return;
+		}
+		fadeAnim.setValue(0);
+		scaleAnim.setValue(0.95);
+		const anim = Animated.parallel([
+			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+		]);
+		anim.start();
+		// ✅ 정리
+		return () => anim.stop();
+	}, [visible, fadeAnim, scaleAnim]);
+
 	return (
 		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.modalOverlay}>
-				<View style={styles.modalContent}>
-					<TouchableOpacity style={styles.modalCloseIcon} onPress={onClose}>
-						<IconComponent type="materialIcons" name="close" size={scaledSize(24)} color="#64748B" />
-					</TouchableOpacity>
+				<Animated.View style={[styles.modalContent, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+					<ModalCloseButton onPress={onClose} />
 
 					<Text style={styles.modalTitle}>오늘의 출석</Text>
 
-					<ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingBottom: scaleHeight(20) }} showsVerticalScrollIndicator={false}>
+					<ScrollView style={{ width: '100%' }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 						<View style={styles.rowCentered}>
 							<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.cover} />
 							<Text style={[styles.modalText, { flex: 1 }]}>매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어줘요!{'\n'}</Text>
@@ -49,13 +71,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 									const isCurrent = index === petLevel; // ✅ 현재 단계
 									const isLocked = index > petLevel; // ✅ 미획득(잠금)
 									return (
-										<View
-											key={index}
-											style={[
-												styles.petItemBox,
-												{ marginRight: index !== arr.length - 1 ? scaleWidth(10) : 0 },
-												isCurrent && styles.petItemBoxCurrent,
-											]}>
+										<View key={index} style={[styles.petItemBox, isCurrent && styles.petItemBoxCurrent]}>
 											<View>
 												<FastImage
 													source={item.image}
@@ -64,12 +80,12 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 												/>
 												{isEarned && (
 													<View style={styles.petEarnedCheck}>
-														<IconComponent type="materialIcons" name="check" size={scaledSize(10)} color="#fff" />
+														<IconComponent type="materialIcons" name="check" size={scaledSize(10)} color={COLORS.textWhite} />
 													</View>
 												)}
 												{isLocked && (
 													<View style={styles.petLockOverlay}>
-														<IconComponent type="materialIcons" name="lock" size={scaledSize(14)} color="#94A3B8" />
+														<IconComponent type="materialIcons" name="lock" size={scaledSize(14)} color={COLORS.textLight} />
 													</View>
 												)}
 											</View>
@@ -82,7 +98,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 												</View>
 											)}
 
-											{index < arr.length - 1 && <IconComponent name="chevron-right" type="fontAwesome" size={scaledSize(12)} color="#64748B" style={styles.arrowIcon} />}
+											{index < arr.length - 1 && <IconComponent name="chevron-right" type="fontAwesome" size={scaledSize(12)} color={COLORS.textSecondary} style={styles.arrowIcon} />}
 										</View>
 									);
 								})}
@@ -96,21 +112,21 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 								disableAllTouchEventsForDisabledDays={true}
 								enableSwipeMonths={true}
 								theme={{
-									todayTextColor: '#EF4444',
-									todayBackgroundColor: '#FEF2F2',
-									arrowColor: '#22C55E',
-									textDayFontSize: scaledSize(13),
+									todayTextColor: COLORS.danger,
+									todayBackgroundColor: COLORS.dangerBg,
+									arrowColor: COLORS.primary,
+									textDayFontSize: FONT_SIZES.smPlus,
 									textDayFontWeight: '600',
-									textMonthFontSize: scaledSize(15),
-									textMonthFontWeight: '800',
-									textDayHeaderFontSize: scaledSize(11),
+									textMonthFontSize: FONT_SIZES.mdPlus,
+									textMonthFontWeight: '700',
+									textDayHeaderFontSize: FONT_SIZES.xs,
 									textDayHeaderFontWeight: '700',
-									calendarBackground: '#fff',
-									textSectionTitleColor: '#94A3B8',
-									selectedDayBackgroundColor: '#22C55E',
-									selectedDayTextColor: '#fff',
-									dayTextColor: '#334155',
-									textDisabledColor: '#CBD5E1',
+									calendarBackground: COLORS.surface,
+									textSectionTitleColor: COLORS.textLight,
+									selectedDayBackgroundColor: COLORS.primary,
+									selectedDayTextColor: COLORS.textWhite,
+									dayTextColor: COLORS.text,
+									textDisabledColor: COLORS.borderDark,
 								}}
 								renderHeader={(date) => {
 									const year = date.getFullYear();
@@ -120,7 +136,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 								style={styles.calendarContainer}
 							/>
 							<View style={styles.swipeHintRow}>
-								<IconComponent type="materialIcons" name="swipe" size={scaledSize(13)} color="#94A3B8" />
+								<IconComponent type="materialIcons" name="swipe" size={scaledSize(13)} color={COLORS.textLight} />
 								<Text style={styles.swipeHintText}>좌우 화살표 버튼을 눌러서 출석을 확인해보세요!</Text>
 							</View>
 						</View>
@@ -142,7 +158,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 
 						{isCheckedIn && <Text style={styles.checkInCompleteText}>🎉 오늘도 출석 완료! 🎉</Text>}
 					</ScrollView>
-				</View>
+				</Animated.View>
 			</View>
 		</Modal>
 	);
@@ -153,135 +169,138 @@ export default CheckInModal;
 const styles = StyleSheet.create({
 	modalOverlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
+		paddingHorizontal: SPACING_W.lg,
 	},
 	modalContent: {
-		width: '85%',
-		backgroundColor: '#fff',
-		padding: scaleWidth(20),
-		borderRadius: scaleWidth(12),
+		width: '100%',
+		maxWidth: scaleWidth(340),
 		maxHeight: scaleHeight(700),
-	},
-	// modalCloseIcon 스타일 수정
-	modalCloseIcon: {
-		position: 'absolute',
-		top: scaleHeight(16), // ✅ 10 → 16으로 변경
-		right: scaleWidth(10),
-		zIndex: 2,
-		padding: scaleWidth(5),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xl,
+		shadowColor: '#000',
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
+		shadowOffset: { width: 0, height: 2 },
 	},
 	modalTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#334155',
-		marginBottom: scaleHeight(14),
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.md,
 		textAlign: 'center',
-		marginTop: scaleHeight(3), // ✅ 상단 여백 추가
+	},
+	scrollContent: {
+		paddingBottom: SPACING_H.md,
 	},
 	rowCentered: {
 		flexDirection: 'row',
 		justifyContent: 'center',
+		columnGap: SPACING_W.md,
+		marginBottom: SPACING_H.md,
 	},
 	mascotImage: {
 		width: scaleWidth(48),
 		height: scaleWidth(48),
-		borderRadius: scaleWidth(24),
+		borderRadius: scaleWidth(48) / 2,
 		borderWidth: 2,
-		borderColor: '#22C55E',
-		marginRight: scaleWidth(10),
+		borderColor: COLORS.primary,
 	},
 	modalText: {
-		fontSize: scaledSize(13),
-		color: '#334155',
-		lineHeight: scaleHeight(20),
-		marginTop: scaleHeight(6),
-		fontWeight: '500',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		lineHeight: scaledSize(20),
+		fontWeight: '400',
 	},
 	highlightBox: {
-		padding: scaleHeight(10),
-		backgroundColor: '#FFFBEB',
-		borderRadius: scaleWidth(10),
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.md,
+		backgroundColor: COLORS.warningBg,
+		borderRadius: RADIUS.md,
 		borderWidth: 1,
-		borderColor: '#FBBF24',
+		borderColor: COLORS.warning,
 	},
 	highlightText: {
-		fontSize: scaledSize(12),
-		color: '#334155',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.text,
 		textAlign: 'center',
-		lineHeight: scaleHeight(20),
+		lineHeight: scaledSize(20),
 		fontWeight: '500',
 	},
 	petScrollContainer: {
-		marginTop: scaleHeight(12),
-		marginBottom: scaleHeight(12),
+		marginTop: SPACING_H.md,
+		marginBottom: SPACING_H.md,
 	},
 	petScrollContent: {
-		paddingHorizontal: scaleWidth(3),
+		paddingHorizontal: SPACING_W.xs,
+		columnGap: SPACING_W.sm,
 	},
 	petItemBox: {
 		width: scaleWidth(90),
 		alignItems: 'center',
-		padding: scaleWidth(6),
-		borderRadius: scaleWidth(8),
-		backgroundColor: '#F8FAFC',
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.sm,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.background,
 		borderWidth: 1,
-		borderColor: '#CBD5E1',
+		borderColor: COLORS.border,
 		position: 'relative',
 	},
 	petImage: {
 		width: scaleWidth(48),
 		height: scaleWidth(48),
-		borderRadius: scaleWidth(24),
+		borderRadius: scaleWidth(48) / 2,
 		borderWidth: 2,
-		borderColor: '#22C55E',
-		marginBottom: scaleHeight(6),
+		borderColor: COLORS.primary,
+		marginBottom: SPACING_H.xs,
 	},
 	petItemBoxCurrent: {
-		borderColor: '#22C55E',
-		borderWidth: 2,
-		backgroundColor: '#EFF6FF',
+		borderColor: COLORS.primary,
+		backgroundColor: COLORS.primaryBg,
 	},
 	petImageLocked: {
 		opacity: 0.35,
-		borderColor: '#CBD5E1',
+		borderColor: COLORS.borderDark,
 	},
 	petTextLocked: {
-		color: '#94A3B8',
+		color: COLORS.textLight,
 	},
 	petEarnedCheck: {
 		position: 'absolute',
-		top: -scaleHeight(2),
-		right: -scaleWidth(2),
+		top: -SPACING_H.xs / 2,
+		right: -SPACING_W.xs / 2,
 		width: scaleWidth(16),
 		height: scaleWidth(16),
-		borderRadius: scaleWidth(8),
-		backgroundColor: '#3B82F6',
+		borderRadius: scaleWidth(16) / 2,
+		backgroundColor: COLORS.secondary,
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderWidth: 1.5,
-		borderColor: '#fff',
+		borderColor: COLORS.surface,
 	},
 	petLockOverlay: {
 		position: 'absolute',
 		top: 0,
 		left: 0,
 		right: 0,
-		bottom: scaleHeight(6),
+		bottom: SPACING_H.xs,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 	petCurrentBadge: {
-		marginTop: scaleHeight(4),
-		backgroundColor: '#3B82F6',
-		borderRadius: scaleWidth(10),
-		paddingHorizontal: scaleWidth(8),
-		paddingVertical: scaleHeight(2),
+		marginTop: SPACING_H.xs,
+		backgroundColor: COLORS.secondary,
+		borderRadius: RADIUS.round,
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.xs / 2,
 	},
 	petCurrentBadgeText: {
-		fontSize: scaledSize(9),
-		color: '#fff',
+		fontSize: FONT_SIZES.xxs,
+		color: COLORS.textWhite,
 		fontWeight: '700',
 	},
 	stampImageWrap: {
@@ -289,73 +308,74 @@ const styles = StyleSheet.create({
 	},
 	stampPetBadge: {
 		position: 'absolute',
-		right: -scaleWidth(6),
-		bottom: scaleHeight(6),
+		right: -SPACING_W.sm,
+		bottom: SPACING_H.sm,
 		width: scaleWidth(56),
 		height: scaleWidth(56),
-		borderRadius: scaleWidth(28),
+		borderRadius: scaleWidth(56) / 2,
 		borderWidth: 2,
-		borderColor: '#fff',
-		backgroundColor: '#fff',
+		borderColor: COLORS.surface,
+		backgroundColor: COLORS.surface,
 		overflow: 'hidden',
 		shadowColor: '#000',
-		shadowOpacity: 0.15,
+		shadowOpacity: 0.08,
 		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: scaleWidth(4),
+		shadowRadius: 8,
 	},
 	stampPetImage: {
 		width: '100%',
 		height: '100%',
 	},
 	petLabelText: {
-		fontSize: scaledSize(11),
-		color: '#334155',
+		fontSize: FONT_SIZES.xs,
+		color: COLORS.text,
 		fontWeight: '600',
 		textAlign: 'center',
 	},
 	petStageText: {
-		fontSize: scaledSize(10),
-		color: '#64748B',
-		marginTop: scaleHeight(2),
+		fontSize: FONT_SIZES.xxs,
+		color: COLORS.textSecondary,
+		marginTop: SPACING_H.xs / 2,
 		textAlign: 'center',
 	},
 	arrowIcon: {
 		position: 'absolute',
-		right: -scaleWidth(8),
+		right: -SPACING_W.sm,
 		top: '45%',
 	},
 	stampContainer: {
 		alignItems: 'center',
+		marginTop: SPACING_H.md,
 	},
 	stampImage: {
 		width: scaleWidth(160),
 		height: scaleWidth(160),
-		marginBottom: scaleHeight(6),
-		borderRadius: scaleWidth(80),
+		marginBottom: SPACING_H.xs,
+		borderRadius: scaleWidth(160) / 2,
 	},
 	stampText: {
-		fontSize: scaledSize(16),
-		color: '#EF4444',
-		fontWeight: 'bold',
+		fontSize: FONT_SIZES.lg,
+		color: COLORS.danger,
+		fontWeight: '700',
 		textShadowColor: 'rgba(0,0,0,0.2)',
 		textShadowOffset: { width: 1, height: 1 },
 		textShadowRadius: 2,
 	},
 	calendarWrapper: {
 		width: '100%',
-		marginTop: scaleHeight(8),
-		marginBottom: scaleHeight(8),
+		marginTop: SPACING_H.md,
+		marginBottom: SPACING_H.sm,
 	},
 	calendarContainer: {
 		width: '100%',
-		borderRadius: scaleWidth(16),
+		borderRadius: RADIUS.lg,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		paddingVertical: scaleHeight(6),
-		paddingHorizontal: scaleWidth(4),
+		borderColor: COLORS.border,
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.xs,
 		overflow: 'hidden',
-		backgroundColor: '#fff',
-		shadowColor: '#0F172A',
+		backgroundColor: COLORS.surface,
+		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.06,
 		shadowRadius: 8,
@@ -364,26 +384,26 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		gap: scaleWidth(5),
-		marginTop: scaleHeight(8),
+		columnGap: SPACING_W.xs,
+		marginTop: SPACING_H.sm,
 	},
 	swipeHintText: {
-		fontSize: scaledSize(11),
-		color: '#94A3B8',
+		fontSize: FONT_SIZES.xs,
+		color: COLORS.textLight,
 		fontWeight: '600',
 	},
 	calendarHeaderText: {
-		fontSize: scaledSize(15),
-		fontWeight: '800',
-		color: '#334155',
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
+		color: COLORS.text,
 		textAlign: 'center',
-		marginVertical: scaleHeight(10),
+		marginVertical: SPACING_H.sm,
 	},
 	checkInCompleteText: {
-		fontSize: scaledSize(14),
-		color: '#22C55E',
-		marginTop: scaleHeight(10),
-		fontWeight: 'bold',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.primary,
+		marginTop: SPACING_H.md,
+		fontWeight: '700',
 		textAlign: 'center',
 	},
 });

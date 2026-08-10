@@ -5,7 +5,9 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import { MainDataType } from '@/types/MainDataType';
 import { BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
+import ModalCloseButton from '../common/atomic/ModalCloseButton';
 
 interface Props {
 	visible: boolean;
@@ -18,47 +20,64 @@ interface Props {
  * - 여러 화면(퀴즈/오늘의 퀴즈 등)에서 동일한 스타일로 재사용합니다.
  */
 const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
-	const scaleAnim = useRef(new Animated.Value(0)).current;
+	const fadeAnim = useRef(new Animated.Value(0)).current;
+	const scaleAnim = useRef(new Animated.Value(0.95)).current;
+	const iconPopAnim = useRef(new Animated.Value(0)).current;
 	const pulseAnim = useRef(new Animated.Value(0)).current;
 	const confettiKey = useRef(0);
 
 	useEffect(() => {
 		if (!visible) {
+			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
+			fadeAnim.setValue(0);
+			scaleAnim.setValue(0.95);
+			iconPopAnim.setValue(0);
+			pulseAnim.setValue(0);
 			return;
 		}
 		confettiKey.current += 1;
-		scaleAnim.setValue(0);
-		Animated.spring(scaleAnim, {
-			toValue: 1,
-			friction: 6,
-			tension: 60,
-			useNativeDriver: true,
-		}).start();
-
-		// 주목 유도: 헤더 아이콘 글로우 펄스 루프
+		fadeAnim.setValue(0);
+		scaleAnim.setValue(0.95);
+		iconPopAnim.setValue(0);
 		pulseAnim.setValue(0);
+
+		// 진입: fade + scale
+		const enter = Animated.parallel([
+			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+		]);
+		// 축하 포인트: 뱃지 아이콘 spring pop-in (0 → 1.05 → 1)
+		const iconPop = Animated.spring(iconPopAnim, { toValue: 1, friction: 5, tension: 90, useNativeDriver: true });
+		// 주목 유도: 헤더 아이콘 글로우 펄스 루프
 		const pulse = Animated.loop(
 			Animated.sequence([
 				Animated.timing(pulseAnim, { toValue: 1, duration: 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
 				Animated.timing(pulseAnim, { toValue: 0, duration: 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
 			]),
 		);
+		enter.start();
+		iconPop.start();
 		pulse.start();
 		return () => {
+			enter.stop();
+			iconPop.stop();
 			pulse.stop();
 			pulseAnim.stopAnimation();
 		};
-	}, [visible, scaleAnim, pulseAnim]);
+	}, [visible, fadeAnim, scaleAnim, iconPopAnim, pulseAnim]);
 
 	const glowScale = pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1.35] });
 	const glowOpacity = pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0] });
 
 	const handleConfirm = () => {
-		Animated.timing(scaleAnim, {
-			toValue: 0,
-			duration: 200,
-			useNativeDriver: true,
-		}).start(() => {
+		Animated.parallel([
+			Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
+			Animated.timing(scaleAnim, { toValue: 0.95, duration: 200, useNativeDriver: true }),
+		]).start(({ finished }) => {
+			// stop() 으로 중단된 경우에도 콜백이 호출되므로 완료된 경우에만 부모에 알린다
+			if (!finished) {
+				return;
+			}
 			onConfirm();
 		});
 	};
@@ -79,18 +98,19 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 					explosionSpeed={350}
 				/>
 
-				<Animated.View style={[styles.badgeModal, { transform: [{ scale: scaleAnim }] }]}>
+				<Animated.View style={[styles.badgeModal, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+					<ModalCloseButton onPress={handleConfirm} color={COLORS.textSecondary} />
 					<View style={styles.headerIconStage}>
 						<Animated.View style={[styles.headerIconGlow, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]} />
-						<View style={styles.headerIconCircle}>
-							<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(28)} color="#F59E0B" />
-						</View>
+						<Animated.View style={[styles.headerIconCircle, { transform: [{ scale: iconPopAnim }] }]}>
+							<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(28)} color={COLORS.warning} />
+						</Animated.View>
 					</View>
 					<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지 획득!</Text>
 					<Text style={styles.badgeModalSubtitle}>{badges.length}개의 새로운 뱃지를 손에 넣었어요!</Text>
 					<ScrollView
-						style={{ maxHeight: scaleHeight(380), width: '100%' }}
-						contentContainerStyle={{ paddingHorizontal: scaleHeight(4), paddingTop: scaleHeight(8) }}
+						style={styles.badgeScroll}
+						contentContainerStyle={styles.badgeScrollContent}
 						showsVerticalScrollIndicator={false}>
 						{badges.map((badge, index) => {
 							const rarity = BADGE_RARITY_META[badge.rarity] ?? BADGE_RARITY_META.common;
@@ -107,7 +127,7 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 													type="materialIcons"
 													name="star"
 													size={scaledSize(11)}
-													color={i < rarity.stars ? '#fff' : 'rgba(255,255,255,0.4)'}
+													color={i < rarity.stars ? COLORS.textWhite : 'rgba(255,255,255,0.4)'}
 												/>
 											))}
 										</View>
@@ -161,76 +181,78 @@ export default NewBadgeModal;
 const styles = StyleSheet.create({
 	modalOverlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.5)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingTop: scaleHeight(40),
+		paddingHorizontal: SPACING_W.lg,
 	},
 	badgeModal: {
-		backgroundColor: '#fff',
-		padding: scaleWidth(20),
-		borderRadius: scaleWidth(20),
-		width: '85%',
+		width: '100%',
+		maxWidth: scaleWidth(340),
 		maxHeight: '80%',
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xl,
 		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
 	headerIconStage: {
 		width: scaleWidth(56),
 		height: scaleWidth(56),
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.md,
 	},
 	headerIconGlow: {
 		position: 'absolute',
 		width: scaleWidth(56),
 		height: scaleWidth(56),
-		borderRadius: scaleWidth(28),
-		backgroundColor: '#F59E0B',
+		borderRadius: scaleWidth(56) / 2,
+		backgroundColor: COLORS.warning,
 	},
 	headerIconCircle: {
 		width: scaleWidth(56),
 		height: scaleWidth(56),
-		borderRadius: scaleWidth(28),
-		backgroundColor: '#FEF3C7',
+		borderRadius: scaleWidth(56) / 2,
+		backgroundColor: COLORS.warningBg,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
 	badgeModalTitle: {
-		fontSize: scaledSize(19),
-		fontWeight: '800',
-		color: '#1E293B',
-		marginBottom: scaleHeight(4),
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.xs,
 		textAlign: 'center',
 	},
 	badgeModalSubtitle: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
-		marginBottom: scaleHeight(16),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		marginBottom: SPACING_H.lg,
 		textAlign: 'center',
 	},
-	badgeNameRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: scaleWidth(6),
-		marginBottom: scaleHeight(3),
-	},
-	rarityChip: {
-		borderRadius: scaleWidth(7),
-		paddingHorizontal: scaleWidth(7),
-		paddingVertical: scaleHeight(2),
-	},
-	rarityChipText: { fontSize: scaledSize(10), fontWeight: '800' },
-	badgeCard: {
-		borderRadius: scaleWidth(16),
-		paddingTop: scaleHeight(14),
-		paddingBottom: scaleWidth(14),
-		paddingHorizontal: scaleWidth(14),
-		marginBottom: scaleHeight(12),
-		marginTop: scaleHeight(14),
-		borderWidth: 1.5,
-		borderColor: '#E2E8F0',
+	badgeScroll: {
 		width: '100%',
+		maxHeight: scaleHeight(380),
+	},
+	badgeScrollContent: {
+		paddingHorizontal: SPACING_W.xs,
+		paddingTop: SPACING_H.sm,
+		paddingBottom: SPACING_H.xs,
+	},
+	badgeCard: {
+		width: '100%',
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		marginTop: SPACING_H.lg,
+		marginBottom: SPACING_H.md,
+		borderWidth: 1.5,
+		borderColor: COLORS.border,
 		alignItems: 'center',
 	},
 	rarityRibbon: {
@@ -239,165 +261,81 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(4),
-		paddingHorizontal: scaleWidth(12),
-		paddingVertical: scaleHeight(4),
-		borderRadius: scaleWidth(14),
+		columnGap: SPACING_W.xs,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.18,
-		shadowRadius: 3,
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
-	rarityRibbonText: { color: '#fff', fontSize: scaledSize(11), fontWeight: '900', marginRight: scaleWidth(2) },
-	ribbonStarRow: { flexDirection: 'row', gap: scaleWidth(1) },
+	rarityRibbonText: {
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.xs,
+		fontWeight: '700',
+		marginRight: scaleWidth(2),
+	},
+	ribbonStarRow: { flexDirection: 'row', columnGap: scaleWidth(1) },
 	emblemStage: {
-		marginTop: scaleHeight(10),
-		marginBottom: scaleHeight(8),
+		marginTop: SPACING_H.sm,
+		marginBottom: SPACING_H.sm,
 	},
 	emblemRing: {
 		width: scaleWidth(78),
 		height: scaleWidth(78),
-		borderRadius: scaleWidth(39),
+		borderRadius: scaleWidth(78) / 2,
 		borderWidth: 3,
-		backgroundColor: '#fff',
+		backgroundColor: COLORS.surface,
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.15,
-		shadowRadius: 5,
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
 	emblemImage: { width: scaleWidth(60), height: scaleWidth(60) },
 	emblemIconBg: { justifyContent: 'center', alignItems: 'center' },
-	badgeCardTop: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: scaleWidth(12),
-		marginBottom: scaleHeight(10),
-	},
-	badgeThumb: {
-		width: scaleWidth(50),
-		height: scaleWidth(50),
-		borderRadius: scaleWidth(25),
-		borderWidth: 2,
-		backgroundColor: '#fff',
-	},
-	badgeThumbIcon: {
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	badgeMetaRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: scaleWidth(8),
-		marginTop: scaleHeight(4),
-	},
-	starRow: { flexDirection: 'row', gap: scaleWidth(1) },
 	conditionRow: {
+		width: '100%',
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		gap: scaleWidth(6),
-		borderRadius: scaleWidth(10),
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(7),
-		marginTop: scaleHeight(10),
-		backgroundColor: '#fff',
+		columnGap: SPACING_W.xs,
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.sm,
+		marginTop: SPACING_H.md,
+		backgroundColor: COLORS.surface,
 		borderWidth: 1,
-		width: '100%',
 	},
-	conditionText: { fontSize: scaledSize(12), fontWeight: '700', textAlign: 'center', flexShrink: 1 },
-	badgeCardActive: {
-		borderColor: '#22C55E',
-		backgroundColor: '#EFF6FF',
-	},
-	iconBox: {
-		width: scaleWidth(32),
-		height: scaleWidth(32),
-		borderRadius: scaleWidth(16),
-		backgroundColor: '#E2E8F0',
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginRight: scaleWidth(12),
-	},
-	iconBoxActive: {
-		backgroundColor: '#DBEAFE',
-	},
-	badgeTextWrap: {
-		flexShrink: 1,
-		flexGrow: 1,
-		minWidth: 0,
-		maxWidth: '85%',
-	},
+	conditionText: { fontSize: FONT_SIZES.sm, fontWeight: '600', textAlign: 'center', flexShrink: 1 },
 	badgeName: {
-		fontSize: scaledSize(16),
-		fontWeight: '900',
-		color: '#22C55E',
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.primary,
 		textAlign: 'center',
-		marginBottom: scaleHeight(4),
-	},
-	badgeTitleActive: {
-		color: '#22C55E',
+		marginBottom: SPACING_H.xs,
 	},
 	badgeDescription: {
-		fontSize: scaledSize(13),
-		color: '#475569',
-		lineHeight: scaleHeight(19),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		lineHeight: scaledSize(20),
 		textAlign: 'center',
-		paddingHorizontal: scaleWidth(4),
-	},
-	badgeDescActive: {
-		color: '#22C55E',
-	},
-	mascotImageWrapper: {
-		width: '100%',
-		alignItems: 'center',
-		marginBottom: scaleHeight(12),
-	},
-	mascotImageImproved: {
-		width: scaleWidth(80),
-		height: scaleWidth(80),
-		borderRadius: scaleWidth(40),
-		backgroundColor: '#fff',
-		borderWidth: 2,
-		borderColor: '#22C55E',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
-	},
-	badgeTextCenteredWrap: {
-		alignItems: 'center',
-		marginTop: scaleHeight(4),
-		paddingHorizontal: scaleWidth(8),
-	},
-	badgeNameCentered: {
-		fontSize: scaledSize(17),
-		fontWeight: 'bold',
-		color: '#22C55E',
-		textAlign: 'center',
-		marginBottom: scaleHeight(4),
-	},
-	badgeDescriptionCentered: {
-		fontSize: scaledSize(14),
-		color: '#22C55E',
-		textAlign: 'center',
-		lineHeight: scaleHeight(20),
+		paddingHorizontal: SPACING_W.xs,
 	},
 	modalConfirmButton: {
-		backgroundColor: '#3B82F6',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(24),
-		borderRadius: scaleWidth(30),
-		marginTop: scaleHeight(8),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
+		width: '100%',
+		height: scaleHeight(48),
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.primary,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginTop: SPACING_H.lg,
 	},
 	modalConfirmText: {
-		color: '#fff',
-		fontSize: scaledSize(16),
-		fontWeight: '600',
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
 	},
 });

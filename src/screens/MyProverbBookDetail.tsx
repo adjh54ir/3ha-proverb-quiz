@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import AddProverbModal from './modal/AddProverbModal';
@@ -20,6 +21,27 @@ const DEFAULT_COLOR = '#22C55E';
 const DEFAULT_ICON = 'menu-book';
 const STORAGE_KEY = MainStorageKeyType.USER_PROVERB_BOOKS;
 const PRACTICE_RECORD_KEY = MainStorageKeyType.USER_PROVERB_PRACTICE_RECORDS;
+
+/**
+ * FlatList 아이템 fade + slide-up 진입 애니메이션 래퍼
+ */
+const AnimatedListItem = React.memo(({ children, index }: { children: React.ReactNode; index: number }) => {
+	const fadeAnim = useRef(new Animated.Value(0)).current;
+	const translateY = useRef(new Animated.Value(scaleHeight(12))).current;
+
+	useEffect(() => {
+		// 처음 6개만 stagger, 이후는 즉시 표시 (스크롤 성능 보호)
+		const delay = index < 6 ? index * 40 : 0;
+		const anim = Animated.parallel([
+			Animated.timing(fadeAnim, { toValue: 1, duration: 250, delay, useNativeDriver: true }),
+			Animated.timing(translateY, { toValue: 0, duration: 250, delay, useNativeDriver: true }),
+		]);
+		anim.start();
+		return () => anim.stop();
+	}, []);
+
+	return <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY }] }}>{children}</Animated.View>;
+});
 
 const MyProverbBookDetail = () => {
 	const navigation = useNavigation<any>();
@@ -109,37 +131,41 @@ const MyProverbBookDetail = () => {
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
 		const isSelected = selectedForRemove.has(item.id);
 		return (
-			<TouchableOpacity
-				style={[styles.itemCard, removeMode && isSelected && styles.itemCardSelected]}
-				activeOpacity={0.8}
-				onPress={() => {
-					if (removeMode) {
-						toggleRemove(item.id);
-					} else {
-						setSelectedProverb(item);
-						setShowDetailModal(true);
-					}
-				}}>
-				<View style={styles.itemIndexWrap}>
-					{removeMode ? (
-						<View style={[styles.checkbox, isSelected && styles.checkboxChecked]}>{isSelected && <IconComponent type="materialIcons" name="check" size={scaledSize(12)} color="#fff" />}</View>
-					) : (
-						<Text style={styles.itemIndex}>{index + 1}</Text>
-					)}
-				</View>
-				<View style={{ flex: 1 }}>
-					<Text style={styles.itemProverb} numberOfLines={1}>{item.proverb}</Text>
-					<Text style={styles.itemMeaning} numberOfLines={1}>{item.longMeaning || item.meaning}</Text>
-				</View>
-				<View style={styles.itemBadges}>
-					<View style={[styles.miniBadge, { backgroundColor: getLevelColor(item.levelName) }]}>
-						<Text style={styles.miniBadgeText}>{item.levelName}</Text>
+			<AnimatedListItem index={index}>
+				<TouchableOpacity
+					style={[styles.itemCard, removeMode && isSelected && styles.itemCardSelected]}
+					activeOpacity={0.8}
+					onPress={() => {
+						if (removeMode) {
+							toggleRemove(item.id);
+						} else {
+							setSelectedProverb(item);
+							setShowDetailModal(true);
+						}
+					}}>
+					<View style={styles.itemIndexWrap}>
+						{removeMode ? (
+							<View style={[styles.checkbox, isSelected && styles.checkboxChecked]}>
+								{isSelected && <IconComponent type="materialIcons" name="check" size={scaledSize(12)} color={COLORS.textWhite} />}
+							</View>
+						) : (
+							<Text style={styles.itemIndex}>{index + 1}</Text>
+						)}
 					</View>
-					<View style={[styles.miniBadge, { backgroundColor: getCategoryColor(item.category) }]}>
-						<Text style={styles.miniBadgeText}>{item.category}</Text>
+					<View style={{ flex: 1 }}>
+						<Text style={styles.itemProverb} numberOfLines={1}>{item.proverb}</Text>
+						<Text style={styles.itemMeaning} numberOfLines={1}>{item.longMeaning || item.meaning}</Text>
 					</View>
-				</View>
-			</TouchableOpacity>
+					<View style={styles.itemBadges}>
+						<View style={[styles.miniBadge, { backgroundColor: getLevelColor(item.levelName) }]}>
+							<Text style={styles.miniBadgeText}>{item.levelName}</Text>
+						</View>
+						<View style={[styles.miniBadge, { backgroundColor: getCategoryColor(item.category) }]}>
+							<Text style={styles.miniBadgeText}>{item.category}</Text>
+						</View>
+					</View>
+				</TouchableOpacity>
+			</AnimatedListItem>
 		);
 	};
 
@@ -149,12 +175,12 @@ const MyProverbBookDetail = () => {
 				{/* 헤더 */}
 				<View style={styles.header}>
 					<TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-						<IconComponent type="materialIcons" name="arrow-back" size={scaledSize(22)} color="#334155" />
+						<IconComponent type="materialIcons" name="arrow-back" size={scaledSize(22)} color={COLORS.text} />
 					</TouchableOpacity>
 					<Text style={styles.headerTitle} numberOfLines={1}>{book?.title ?? '속담집'}</Text>
 					{proverbs.length > 0 ? (
 						<TouchableOpacity onPress={() => { setRemoveMode((v) => !v); setSelectedForRemove(new Set()); }} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-							<Text style={[styles.headerAction, removeMode && { color: '#64748B' }]}>{removeMode ? '취소' : '편집'}</Text>
+							<Text style={[styles.headerAction, removeMode && { color: COLORS.textSecondary }]}>{removeMode ? '취소' : '편집'}</Text>
 						</TouchableOpacity>
 					) : (
 						<View style={{ width: scaleWidth(28) }} />
@@ -164,11 +190,11 @@ const MyProverbBookDetail = () => {
 				{/* 요약 카드 */}
 				<View style={[styles.summaryCard, { borderColor: bookColor + '40' }]}>
 					<View style={[styles.summaryIcon, { backgroundColor: bookColor }]}>
-						<IconComponent type="materialIcons" name={book?.icon || DEFAULT_ICON} size={scaledSize(24)} color="#fff" />
+						<IconComponent type="materialIcons" name={book?.icon || DEFAULT_ICON} size={scaledSize(24)} color={COLORS.textWhite} />
 					</View>
 					<View style={{ flex: 1 }}>
 						{!!book?.description && <Text style={styles.summaryDesc} numberOfLines={1}>{book.description}</Text>}
-						<Text style={styles.summaryCount}>총 <Text style={{ color: bookColor, fontWeight: '800' }}>{proverbs.length}</Text>개의 속담</Text>
+						<Text style={styles.summaryCount}>총 <Text style={{ color: bookColor, fontWeight: '700' }}>{proverbs.length}</Text>개의 속담</Text>
 						{lastAttempt && (
 							<Text style={styles.summaryRecord}>최근 정답률 {lastAttempt.accuracy}% · {lastAttempt.correctCount}/{lastAttempt.correctCount + lastAttempt.wrongCount}</Text>
 						)}
@@ -177,16 +203,16 @@ const MyProverbBookDetail = () => {
 
 				{/* 액션 버튼 */}
 				<View style={styles.actionRow}>
-					<TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#EFF6FF' }]} onPress={() => setAddModalVisible(true)}>
-						<IconComponent type="materialIcons" name="add" size={scaledSize(18)} color="#3B82F6" />
-						<Text style={[styles.actionBtnText, { color: '#3B82F6' }]}>속담 추가</Text>
+					<TouchableOpacity style={[styles.actionBtn, styles.actionBtnAdd]} onPress={() => setAddModalVisible(true)}>
+						<IconComponent type="materialIcons" name="add" size={scaledSize(18)} color={COLORS.secondary} />
+						<Text style={[styles.actionBtnText, { color: COLORS.secondary }]}>속담 추가</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
-						style={[styles.actionBtn, { backgroundColor: proverbs.length === 0 ? '#F1F5F9' : '#22C55E' }]}
+						style={[styles.actionBtn, { backgroundColor: proverbs.length === 0 ? COLORS.surfaceAlt : COLORS.primary }]}
 						disabled={proverbs.length === 0}
 						onPress={() => book && setQuizModeModal(book)}>
-						<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(18)} color={proverbs.length === 0 ? '#94A3B8' : '#fff'} />
-						<Text style={[styles.actionBtnText, { color: proverbs.length === 0 ? '#94A3B8' : '#fff' }]}>퀴즈 시작</Text>
+						<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(18)} color={proverbs.length === 0 ? COLORS.textLight : COLORS.textWhite} />
+						<Text style={[styles.actionBtnText, { color: proverbs.length === 0 ? COLORS.textLight : COLORS.textWhite }]}>퀴즈 시작</Text>
 					</TouchableOpacity>
 				</View>
 
@@ -197,7 +223,7 @@ const MyProverbBookDetail = () => {
 					contentContainerStyle={styles.listContent}
 					ListEmptyComponent={() => (
 						<View style={styles.emptyView}>
-							<IconComponent type="materialIcons" name="menu-book" size={scaledSize(52)} color="#E2E8F0" />
+							<IconComponent type="materialIcons" name="menu-book" size={scaledSize(52)} color={COLORS.border} />
 							<Text style={styles.emptyTitle}>아직 담은 속담이 없어요</Text>
 							<Text style={styles.emptyDesc}>속담 추가 버튼을 눌러 채워보세요!</Text>
 						</View>
@@ -210,12 +236,12 @@ const MyProverbBookDetail = () => {
 							style={[styles.removeBtn, selectedForRemove.size === 0 && styles.removeBtnDisabled]}
 							disabled={selectedForRemove.size === 0}
 							onPress={() => setRemoveConfirmVisible(true)}>
-							<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(16)} color="#fff" />
+							<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(16)} color={COLORS.textWhite} />
 							<Text style={styles.removeBtnText}>{selectedForRemove.size > 0 ? `${selectedForRemove.size}개 빼기` : '속담을 선택해주세요'}</Text>
 						</TouchableOpacity>
 					</View>
 				)}
-				{!removeMode && <BottomHomeButton backgroundColor="#F1F5F9" skipConfirm />}
+				{!removeMode && <BottomHomeButton backgroundColor={COLORS.surfaceAlt} skipConfirm />}
 			</SafeAreaView>
 
 			<AddProverbModal visible={addModalVisible} book={book} onClose={() => setAddModalVisible(false)} onAdd={handleAddProverbs} />
@@ -225,15 +251,15 @@ const MyProverbBookDetail = () => {
 			<Modal visible={removeConfirmVisible} transparent animationType="fade">
 				<View style={styles.modalOverlay}>
 					<View style={styles.confirmModal}>
-						<IconComponent type="materialIcons" name="remove-circle-outline" size={scaledSize(40)} color="#EF4444" />
+						<IconComponent type="materialIcons" name="remove-circle-outline" size={scaledSize(40)} color={COLORS.danger} />
 						<Text style={styles.confirmTitle}>선택한 속담을 뺄까요?</Text>
 						<Text style={styles.confirmDesc}>선택한 {selectedForRemove.size}개의 속담을{'\n'}이 속담집에서 제거합니다.</Text>
 						<View style={styles.confirmBtnRow}>
-							<TouchableOpacity style={[styles.confirmBtn, { backgroundColor: '#F1F5F9' }]} onPress={() => setRemoveConfirmVisible(false)}>
-								<Text style={[styles.confirmBtnText, { color: '#334155' }]}>취소</Text>
+							<TouchableOpacity style={[styles.confirmBtn, styles.confirmBtnCancel]} onPress={() => setRemoveConfirmVisible(false)}>
+								<Text style={[styles.confirmBtnText, { color: COLORS.text }]}>취소</Text>
 							</TouchableOpacity>
-							<TouchableOpacity style={[styles.confirmBtn, { backgroundColor: '#EF4444' }]} onPress={handleRemoveConfirm}>
-								<Text style={[styles.confirmBtnText, { color: '#fff' }]}>빼기</Text>
+							<TouchableOpacity style={[styles.confirmBtn, styles.confirmBtnDelete]} onPress={handleRemoveConfirm}>
+								<Text style={[styles.confirmBtnText, { color: COLORS.textWhite }]}>빼기</Text>
 							</TouchableOpacity>
 						</View>
 					</View>
@@ -246,42 +272,147 @@ const MyProverbBookDetail = () => {
 export default MyProverbBookDetail;
 
 const styles = StyleSheet.create({
-	main: { flex: 1, backgroundColor: '#F8FAFC' },
-	header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: scaleWidth(16), paddingVertical: scaleHeight(12), backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F1F5F9', gap: scaleWidth(10) },
-	headerTitle: { flex: 1, fontSize: scaledSize(18), fontWeight: '800', color: '#334155', textAlign: 'center' },
-	headerAction: { fontSize: scaledSize(14), fontWeight: '700', color: '#3B82F6' },
-	summaryCard: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(12), margin: scaleWidth(16), marginBottom: scaleHeight(8), padding: scaleWidth(14), backgroundColor: '#fff', borderRadius: scaleWidth(16), borderWidth: 1 },
-	summaryIcon: { width: scaleWidth(46), height: scaleWidth(46), borderRadius: scaleWidth(13), alignItems: 'center', justifyContent: 'center' },
-	summaryDesc: { fontSize: scaledSize(12), color: '#94A3B8', marginBottom: scaleHeight(2) },
-	summaryCount: { fontSize: scaledSize(14), color: '#334155', fontWeight: '600' },
-	summaryRecord: { fontSize: scaledSize(12), color: '#64748B', marginTop: scaleHeight(3) },
-	actionRow: { flexDirection: 'row', gap: scaleWidth(10), paddingHorizontal: scaleWidth(16), marginBottom: scaleHeight(8) },
-	actionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleWidth(6), height: scaleHeight(44), borderRadius: scaleWidth(12) },
-	actionBtnText: { fontSize: scaledSize(14), fontWeight: '700' },
-	listContent: { paddingHorizontal: scaleWidth(16), paddingTop: scaleHeight(4), paddingBottom: scaleHeight(100), flexGrow: 1 },
-	itemCard: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(12), backgroundColor: '#fff', borderRadius: scaleWidth(14), paddingVertical: scaleHeight(12), paddingHorizontal: scaleWidth(14), marginBottom: scaleHeight(10), borderWidth: 1, borderColor: '#F1F5F9' },
-	itemCardSelected: { borderColor: '#EF4444', backgroundColor: '#FEF2F2' },
+	main: { flex: 1, backgroundColor: COLORS.background },
+	header: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		backgroundColor: COLORS.surface,
+		borderBottomWidth: 1,
+		borderBottomColor: COLORS.surfaceAlt,
+		columnGap: SPACING_W.md,
+	},
+	headerTitle: { flex: 1, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, textAlign: 'center' },
+	headerAction: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.secondary },
+	summaryCard: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.md,
+		marginHorizontal: SPACING_W.lg,
+		marginTop: SPACING_H.md,
+		marginBottom: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		borderWidth: 1,
+	},
+	summaryIcon: {
+		width: scaleWidth(48),
+		height: scaleWidth(48),
+		borderRadius: RADIUS.md,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	summaryDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, marginBottom: SPACING_H.xs },
+	summaryCount: { fontSize: FONT_SIZES.md, color: COLORS.text, fontWeight: '600' },
+	summaryRecord: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: SPACING_H.xs },
+	actionRow: { flexDirection: 'row', columnGap: SPACING_W.md, paddingHorizontal: SPACING_W.lg, marginBottom: SPACING_H.md },
+	actionBtnAdd: { backgroundColor: COLORS.secondaryBg },
+	actionBtn: {
+		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		columnGap: SPACING_W.sm,
+		height: scaleHeight(46),
+		borderRadius: RADIUS.md,
+	},
+	actionBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700' },
+	listContent: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.xs, paddingBottom: scaleHeight(100), flexGrow: 1 },
+	itemCard: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.md,
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		marginBottom: SPACING_H.md,
+		borderWidth: 1,
+		borderColor: COLORS.surfaceAlt,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+	},
+	itemCardSelected: { borderColor: COLORS.danger, backgroundColor: COLORS.dangerBg },
 	itemIndexWrap: { width: scaleWidth(24), alignItems: 'center' },
-	itemIndex: { fontSize: scaledSize(13), fontWeight: '700', color: '#94A3B8' },
-	checkbox: { width: scaleWidth(22), height: scaleWidth(22), borderRadius: scaleWidth(6), borderWidth: 2, borderColor: '#CBD5E1', backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
-	checkboxChecked: { backgroundColor: '#EF4444', borderColor: '#EF4444' },
-	itemProverb: { fontSize: scaledSize(15), fontWeight: '700', color: '#1E293B' },
-	itemMeaning: { fontSize: scaledSize(12.5), color: '#64748B', marginTop: scaleHeight(3) },
-	itemBadges: { gap: scaleHeight(4), alignItems: 'flex-end' },
-	miniBadge: { paddingHorizontal: scaleWidth(7), paddingVertical: scaleHeight(2), borderRadius: scaleWidth(8) },
-	miniBadgeText: { color: '#fff', fontSize: scaledSize(9), fontWeight: '700' },
-	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: scaleHeight(80) },
-	emptyTitle: { fontSize: scaledSize(16), fontWeight: '700', color: '#334155', marginTop: scaleHeight(12), marginBottom: scaleHeight(6) },
-	emptyDesc: { fontSize: scaledSize(13), color: '#94A3B8', textAlign: 'center' },
-	removeBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', paddingHorizontal: scaleWidth(16), paddingTop: scaleHeight(12), paddingBottom: scaleHeight(20), borderTopWidth: 1, borderTopColor: '#F1F5F9' },
-	removeBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleWidth(8), height: scaleHeight(50), borderRadius: scaleWidth(12), backgroundColor: '#EF4444' },
-	removeBtnDisabled: { backgroundColor: '#CBD5E1' },
-	removeBtnText: { color: '#fff', fontSize: scaledSize(15), fontWeight: '700' },
-	modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: scaleWidth(32) },
-	confirmModal: { width: '100%', backgroundColor: '#fff', borderRadius: scaleWidth(20), padding: scaleWidth(24), alignItems: 'center' },
-	confirmTitle: { fontSize: scaledSize(17), fontWeight: '800', color: '#334155', marginTop: scaleHeight(12), marginBottom: scaleHeight(8) },
-	confirmDesc: { fontSize: scaledSize(14), color: '#64748B', textAlign: 'center', lineHeight: scaleHeight(21), marginBottom: scaleHeight(20) },
-	confirmBtnRow: { flexDirection: 'row', width: '100%', gap: scaleWidth(10) },
-	confirmBtn: { flex: 1, height: scaleHeight(46), borderRadius: scaleWidth(12), justifyContent: 'center', alignItems: 'center' },
-	confirmBtnText: { fontSize: scaledSize(14), fontWeight: '700' },
+	itemIndex: { fontSize: FONT_SIZES.smPlus, fontWeight: '700', color: COLORS.textLight },
+	checkbox: {
+		width: scaleWidth(24),
+		height: scaleWidth(24),
+		borderRadius: RADIUS.sm,
+		borderWidth: 2,
+		borderColor: COLORS.borderDark,
+		backgroundColor: COLORS.surface,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	checkboxChecked: { backgroundColor: COLORS.danger, borderColor: COLORS.danger },
+	itemProverb: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong },
+	itemMeaning: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, marginTop: SPACING_H.xs },
+	itemBadges: { rowGap: SPACING_H.xs, alignItems: 'flex-end' },
+	miniBadge: { paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs, borderRadius: RADIUS.round },
+	miniBadgeText: { color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' },
+	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: scaleHeight(40) },
+	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
+	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textLight, textAlign: 'center', lineHeight: scaledSize(20) },
+	removeBar: {
+		position: 'absolute',
+		bottom: 0,
+		left: 0,
+		right: 0,
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.md,
+		paddingBottom: SPACING_H.xl,
+		borderTopWidth: 1,
+		borderTopColor: COLORS.surfaceAlt,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: -2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+	},
+	removeBtn: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		columnGap: SPACING_W.sm,
+		height: scaleHeight(52),
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.danger,
+	},
+	removeBtnDisabled: { backgroundColor: COLORS.borderDark },
+	removeBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '700' },
+	modalOverlay: {
+		flex: 1,
+		backgroundColor: COLORS.dim,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: scaleWidth(32),
+	},
+	confirmModal: {
+		width: '100%',
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingHorizontal: SPACING_W.xl,
+		paddingVertical: SPACING_H.xxl,
+		alignItems: 'center',
+	},
+	confirmTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
+	confirmDesc: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		textAlign: 'center',
+		lineHeight: scaledSize(21),
+		marginBottom: SPACING_H.xl,
+	},
+	confirmBtnRow: { flexDirection: 'row', width: '100%', columnGap: SPACING_W.md },
+	confirmBtn: { flex: 1, height: scaleHeight(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
+	confirmBtnCancel: { backgroundColor: COLORS.surfaceAlt },
+	confirmBtnDelete: { backgroundColor: COLORS.danger },
+	confirmBtnText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
 });

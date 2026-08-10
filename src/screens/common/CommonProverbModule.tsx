@@ -1,4 +1,5 @@
 import React from 'react';
+import { scaledSize } from '@/utils';
 import IconComponent from './atomic/IconComponent';
 
 /**
@@ -50,7 +51,7 @@ export const getFieldIconName = (category: string): string => {
 
 /** 카테고리별 아이콘 (배경 위 흰색 표시용) */
 export const getFieldIcon = (category: string): React.ReactNode => {
-	return <IconComponent type="materialIcons" name={getFieldIconName(category)} size={14} color="#ffffff" />;
+	return <IconComponent type="materialIcons" name={getFieldIconName(category)} size={scaledSize(14)} color="#ffffff" />;
 };
 
 /** 난이도(levelName)별 아이콘 이름 (FontAwesome6) — 속담 목록 레벨 배지와 동일 */

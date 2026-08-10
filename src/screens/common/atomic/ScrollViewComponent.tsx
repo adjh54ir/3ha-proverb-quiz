@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Keyboard, RefreshControl, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
 
 const ScrollViewComponent = () => {
 	const scrollViewRef = useRef<ScrollView>(null);
@@ -73,14 +74,14 @@ const ScrollViewComponent = () => {
 					value={inputValue}
 					onChangeText={setInputValue}
 					onPress={scrollHandler.toBottom}
-					placeholderTextColor='#9CA3AF'
+					placeholderTextColor={COLORS.textLight}
 				/>
 			</View>
 
 			{/* 최하단에 위치할것!! */}
 			{showScrollTop && (
-				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop}>
-					<MaterialIcons name='arrow-upward' size={24} color='#ffffff' />
+				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop} activeOpacity={0.8}>
+					<MaterialIcons name='arrow-upward' size={scaledSize(24)} color={COLORS.textWhite} />
 				</TouchableOpacity>
 			)}
 		</ScrollView>
@@ -91,27 +92,27 @@ export default ScrollViewComponent;
 const styles = StyleSheet.create({
 	scrollTopButton: {
 		position: 'absolute',
-		right: scaleWidth(16),
-		bottom: scaleHeight(16),
-		backgroundColor: '#3498db',
+		right: SPACING_W.lg,
+		bottom: SPACING_H.lg,
+		backgroundColor: COLORS.secondary,
 		width: scaleWidth(48),
-		height: scaleHeight(48),
-		borderRadius: scaleWidth(24),
+		height: scaleWidth(48),
+		borderRadius: scaleWidth(48) / 2,
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.25,
-		shadowRadius: 4,
+		shadowOpacity: 0.15,
+		shadowRadius: 8,
 	},
 	customInput: {
 		height: scaleHeight(100),
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		borderRadius: scaleWidth(8),
-		padding: scaleWidth(12),
-		fontSize: scaledSize(14),
-		marginBottom: scaleHeight(5),
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.sm,
+		padding: SPACING_W.md,
+		fontSize: FONT_SIZES.md,
+		marginBottom: SPACING_H.xs,
 		textAlignVertical: 'top',
 	},
 });

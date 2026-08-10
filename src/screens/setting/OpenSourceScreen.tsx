@@ -1,7 +1,9 @@
 import React from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, View, Linking, TouchableOpacity } from 'react-native';
-import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
+import { ScrollView, StyleSheet, Text, View, Linking, TouchableOpacity } from 'react-native';
+import { scaleHeight, scaledSize } from '@/utils/DementionUtils';
 import Icon from 'react-native-vector-icons/Feather';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import FadeInView from '@/components/animation/FadeInView';
 
 const openSourceData = [
 	{ name: 'React Native', license: 'MIT', version: '0.78.0', url: 'https://github.com/facebook/react-native' },
@@ -36,24 +38,31 @@ const openSourceData = [
 
 const OpenSourceScreen = () => {
 	return (
-		<ScrollView contentContainerStyle={styles.content}>
+		<ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 			<View style={styles.wrapperBox}>
 				{openSourceData.map((lib, index) => (
-					<View key={index} style={styles.card}>
-						<View style={styles.cardHeader}>
-							<Icon name="package" size={16} color="#2c3e50" style={styles.icon} />
-							<Text style={styles.libName}>{lib.name}</Text>
+					// 앞쪽 6개까지만 stagger — 그 뒤는 동시에 등장
+					<FadeInView key={index} delay={Math.min(index, 5) * 40} offsetY={10}>
+						<View style={styles.card}>
+							<View style={styles.cardHeader}>
+								<Icon name="package" size={scaledSize(16)} color={COLORS.textStrong} style={styles.icon} />
+								<Text style={styles.libName}>{lib.name}</Text>
+							</View>
+
+							<Text style={styles.license}>
+								License: {lib.license} | Version: {lib.version}
+							</Text>
+
+							<TouchableOpacity
+								onPress={() => Linking.openURL(lib.url)}
+								style={styles.linkWrapper}
+								activeOpacity={0.8}
+								hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+								<Icon name="external-link" size={scaledSize(14)} color={COLORS.secondaryDark} />
+								<Text style={styles.linkText}>GitHub 보기</Text>
+							</TouchableOpacity>
 						</View>
-
-						<Text style={styles.license}>
-							License: {lib.license} | Version: {lib.version}
-						</Text>
-
-						<TouchableOpacity onPress={() => Linking.openURL(lib.url)} style={styles.linkWrapper}>
-							<Icon name="external-link" size={14} color="#2980b9" />
-							<Text style={styles.linkText}>GitHub 보기</Text>
-						</TouchableOpacity>
-					</View>
+					</FadeInView>
 				))}
 
 				<Text style={styles.footer}>🙏 오픈소스 커뮤니티에 감사드립니다.</Text>
@@ -65,68 +74,62 @@ const OpenSourceScreen = () => {
 export default OpenSourceScreen;
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#ffffff',
-	},
 	content: {
-		padding: scaleWidth(15),
-		paddingBottom: scaleHeight(15),
-	},
-	title: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(20),
-		textAlign: 'center',
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.lg,
+		paddingBottom: scaleHeight(40),
+		backgroundColor: COLORS.surface,
 	},
 	card: {
-		backgroundColor: '#f8f9fa',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(16),
-		marginBottom: scaleHeight(16),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		marginBottom: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
+		borderColor: COLORS.border,
 	},
 	cardHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.sm,
 	},
 	icon: {
-		marginRight: scaleWidth(6),
+		marginRight: SPACING_W.sm,
 	},
 	libName: {
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '600',
-		color: '#2c3e50',
+		color: COLORS.textStrong,
 	},
 	license: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		marginBottom: scaleHeight(8),
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
+		marginBottom: SPACING_H.sm,
 	},
 	linkWrapper: {
 		flexDirection: 'row',
 		alignItems: 'center',
 	},
 	linkText: {
-		fontSize: scaledSize(13),
-		color: '#2980b9',
-		marginLeft: scaleWidth(4),
+		fontSize: FONT_SIZES.smPlus,
+		fontWeight: '500',
+		color: COLORS.secondaryDark,
+		marginLeft: SPACING_W.xs,
 		textDecorationLine: 'underline',
 	},
 	footer: {
-		marginTop: scaleHeight(24),
-		fontSize: scaledSize(13),
-		color: '#95a5a6',
+		marginTop: SPACING_H.xl,
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textLight,
 		textAlign: 'center',
 	},
 	wrapperBox: {
-		backgroundColor: '#f4f5f7',
+		backgroundColor: COLORS.background,
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(16),
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
 	},
 });

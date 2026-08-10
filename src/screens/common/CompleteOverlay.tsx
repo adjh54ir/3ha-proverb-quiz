@@ -7,9 +7,10 @@ import Animated, {
     withDelay,
     withSpring,
     withTiming,
-    withSequence,
+    cancelAnimation,
 } from 'react-native-reanimated';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { scaledSize, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H } from '@/const/common/Theme';
 
 const CompleteOverlay = () => {
     const opacity = useSharedValue(0);
@@ -26,6 +27,14 @@ const CompleteOverlay = () => {
         checkScale.value = withDelay(200, withSpring(1, { damping: 8, stiffness: 200 }));
         // 텍스트 fade in + 위로 올라오기
         textOpacity.value = withDelay(350, withTiming(1, { duration: 300 }));
+
+        // 언마운트 시 진행 중인 애니메이션 정리 (메모리 누수 방지)
+        return () => {
+            cancelAnimation(opacity);
+            cancelAnimation(scale);
+            cancelAnimation(checkScale);
+            cancelAnimation(textOpacity);
+        };
     }, []);
 
     const overlayStyle = useAnimatedStyle(() => ({
@@ -42,7 +51,7 @@ const CompleteOverlay = () => {
 
     const textStyle = useAnimatedStyle(() => ({
         opacity: textOpacity.value,
-        transform: [{ translateY: withTiming(textOpacity.value === 0 ? 10 : 0, { duration: 300 }) }],
+        transform: [{ translateY: withTiming(textOpacity.value === 0 ? SPACING_H.md : 0, { duration: 300 }) }],
     }));
 
     return (
@@ -60,35 +69,36 @@ export default CompleteOverlay;
 const styles = StyleSheet.create({
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(39, 174, 96, 0.85)',
-        borderRadius: scaleWidth(20),
+        // 부모 towerCard 와 동일한 라운드(RADIUS.lg) 유지
+        backgroundColor: 'rgba(34, 197, 94, 0.88)',
+        borderRadius: RADIUS.lg,
         justifyContent: 'center',
         alignItems: 'center',
-        gap: scaleHeight(12),
+        gap: SPACING_H.md,
         zIndex: 10,
     },
     circle: {
         width: scaleWidth(72),
         height: scaleWidth(72),
-        borderRadius: scaleWidth(36),
-        backgroundColor: '#fff',
+        borderRadius: scaleWidth(72) / 2,
+        backgroundColor: COLORS.surface,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 8,
     },
     checkIcon: {
         fontSize: scaledSize(36),
-        color: '#22C55E',
-        fontWeight: 'bold',
+        color: COLORS.primary,
+        fontWeight: '700',
         lineHeight: scaledSize(44),
     },
     completeText: {
-        fontSize: scaledSize(22),
-        fontWeight: 'bold',
-        color: '#fff',
+        fontSize: FONT_SIZES.heading,
+        fontWeight: '700',
+        color: COLORS.textWhite,
         letterSpacing: 4,
         textShadowColor: 'rgba(0,0,0,0.2)',
         textShadowOffset: { width: 0, height: 2 },

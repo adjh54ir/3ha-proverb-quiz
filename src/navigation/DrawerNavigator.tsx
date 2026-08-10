@@ -6,7 +6,7 @@ import { Paths } from "./conf/Paths";
 import DrawerContentScreen from "./screens/DrawerContentScreen";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import IconComponent from "@/screens/common/atomic/IconComponent";
-import { scaleWidth } from '@/utils/DementionUtils';
+import { scaleWidth, scaledSize } from '@/utils/DementionUtils';
 
 /**
  * Drawer Navigator : 왼쪽/오른쪽 Aside 메뉴를 구성합니다.
@@ -33,7 +33,7 @@ const DrawerNavigator = () => {
         }}
         style={{ marginRight: scaleWidth(15) }}
       >
-        <IconComponent type="materialIcons" name="refresh" size={24} color="#000" />
+        <IconComponent type="materialIcons" name="refresh" size={scaledSize(24)} color="#000" />
       </TouchableOpacity>
     );
   };

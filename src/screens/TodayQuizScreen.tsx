@@ -10,14 +10,12 @@ import {
 	TouchableOpacity,
 	ScrollView,
 	Modal,
-	NativeSyntheticEvent,
-	NativeScrollEvent,
 	ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import notifee, { TimestampTrigger, TriggerType, AndroidImportance, RepeatFrequency } from '@notifee/react-native';
-import DatePicker from 'react-native-date-picker';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -26,7 +24,6 @@ import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import DateUtils from '@/utils/DateUtils';
-import FastImage from 'react-native-fast-image';
 import ProverbServices from '@/services/ProverbServices';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import ProverbDetailContent from './common/ProverbDetailContent';
@@ -37,8 +34,37 @@ import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import FavoriteToast from './common/FavoriteToast';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import FadeInView from '@/components/animation/FadeInView';
+import { getNextTriggerTimestamp } from '@/utils/NotifactionHelper';
 
 const NOTIFICATION_ID = 'daily-quiz-reminder';
+const DEFAULT_ALARM_HOUR = 15;
+
+/**
+ * 저장된 알림 시각을 로컬 '시(hour)' 로 읽는다.
+ * - 신규 포맷: 'HH:mm' (로컬 시/분. 타임존/날짜가 섞이지 않는다)
+ * - 구버전 포맷: ISO 절대시각 → 기기 로컬 시각으로 환산해서 읽는다(하위 호환)
+ */
+const parseAlarmHour = (stored?: string | null): number => {
+	if (!stored) {
+		return DEFAULT_ALARM_HOUR;
+	}
+	const hhmm = /^(\d{1,2}):(\d{2})$/.exec(stored);
+	if (hhmm) {
+		return Number(hhmm[1]);
+	}
+	const parsed = new Date(stored);
+	return Number.isNaN(parsed.getTime()) ? DEFAULT_ALARM_HOUR : parsed.getHours();
+};
+
+/** 저장 포맷('HH:mm') 으로 변환 */
+const toAlarmTimeString = (hour: number) => `${String(hour).padStart(2, '0')}:00`;
+
+/** 화면 표시용 Date (오늘 날짜 + 지정 시각). 스케줄링은 hour 로만 한다. */
+const hourToDate = (hour: number) => {
+	const date = new Date();
+	date.setHours(hour, 0, 0, 0);
+	return date;
+};
 
 type GroupedPrevQuiz = {
 	date: string;
@@ -54,13 +80,6 @@ const TodayQuizScreen = () => {
 	const scrollRef = useRef<ScrollView>(null); // 전체 스크롤
 	const hourScrollRef = useRef<ScrollView>(null); // 알람 시간 선택 스크롤
 	const modalScrollRef = useRef<ScrollView>(null); // 모달 내부 스크롤
-	// 퀴즈(id)별 랜덤 이미지 매핑
-	const [randImageMap, setRandImageMap] = useState<{ [id: number]: any }>({});
-
-	const [imageModalVisible, setImageModalVisible] = useState(false);
-	const [selectedImage, setSelectedImage] = useState<any>(null);
-	const [selectedDog, setSelectedDog] = useState<MainDataType.Proverb | null>(null);
-
 	const [isTodayUnsolved, setIsTodayUnsolved] = useState(false);
 	const [hasStarted, setHasStarted] = useState(false);
 
@@ -69,8 +88,7 @@ const TodayQuizScreen = () => {
 	const [detailQuiz, setDetailQuiz] = useState<MainDataType.Proverb | null>(null);
 
 	const [isAlarmEnabled, setIsAlarmEnabled] = useState(false);
-	const [alarmTime, setAlarmTime] = useState(new Date(new Date().setHours(15, 0, 0, 0)));
-	const [showPicker, setShowPicker] = useState(false);
+	const [alarmTime, setAlarmTime] = useState(hourToDate(DEFAULT_ALARM_HOUR));
 	const [quizList, setQuizList] = useState<MainDataType.Proverb[]>([]);
 	const [answerResults, setAnswerResults] = useState<{ [id: number]: boolean | null }>({});
 	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
@@ -84,10 +102,7 @@ const TodayQuizScreen = () => {
 	const labelColors = ['#1abc9c', '#3498db', '#16a085', '#e67e22'];
 	const [showAlarmModal, setShowAlarmModal] = useState(false);
 
-	const [showScrollTop, setShowScrollTop] = useState(false);
-
 	const [tempIsAlarmEnabled, setTempIsAlarmEnabled] = useState(false);
-	const [tempAlarmTime, setTempAlarmTime] = useState(new Date());
 
 	const [showPrevQuizModal, setShowPrevQuizModal] = useState(false);
 
@@ -100,7 +115,8 @@ const TodayQuizScreen = () => {
 	const [showTodayReview, setShowTodayReview] = useState(false);
 	const [todayDate, setTodayDate] = useState(new Date());
 
-	const [tempSelectedHour, setTempSelectedHour] = useState(tempAlarmTime.getHours());
+	// 알림 시각의 단일 소스. 절대시각(Date) 이 아니라 '로컬 시' 만 들고 있어야 타임존/날짜가 섞이지 않는다.
+	const [tempSelectedHour, setTempSelectedHour] = useState(DEFAULT_ALARM_HOUR);
 
 	const total = quizList.length;
 	const solved = Object.keys(answerResults).length;
@@ -112,6 +128,18 @@ const TodayQuizScreen = () => {
 	const { getLocalDateString, getLocalParamDateToString } = DateUtils;
 
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
+
+	// ponytail: 타이머 한 곳에 모아 언마운트 시 일괄 정리 (핸들러마다 ref 만들지 않음)
+	const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+	const addTimer = (fn: () => void, ms: number) => {
+		timersRef.current.push(setTimeout(fn, ms));
+	};
+	useEffect(() => {
+		return () => {
+			timersRef.current.forEach(clearTimeout);
+			timersRef.current = [];
+		};
+	}, []);
 
 	const loadFavorites = async () => {
 		const ids = await getFavorites();
@@ -165,19 +193,36 @@ const TodayQuizScreen = () => {
 
 	// 👇 현재 문제 인덱스가 변경되면 ScrollView를 최상단으로 이동
 	useEffect(() => {
-		setTimeout(() => {
+		const timer = setTimeout(() => {
 			scrollRef.current?.scrollTo({ y: 0, animated: true });
 		}, 50);
+		return () => clearTimeout(timer);
 	}, [currentIndex]);
+
+	/** 현재 알림 권한 보유 여부 (알림 '예약' 에만 쓴다) */
+	const hasNotificationPermission = async () => {
+		const settings = await notifee.getNotificationSettings();
+		return settings.authorizationStatus === 1;
+	};
 
 	const loadSetting = async () => {
 		try {
 			const json = await AsyncStorage.getItem(SETTING_KEY);
 
 			if (json !== null) {
-				const parseJson = JSON.parse(json);
+				const parseJson: MainDataType.SettingInfo = JSON.parse(json);
+				const hour = parseAlarmHour(parseJson.alarmTime);
+
 				setIsAlarmEnabled(parseJson.isUseAlarm); // ✅ 수정
-				setAlarmTime(new Date(parseJson.alarmTime));
+				setAlarmTime(hourToDate(hour));
+				setTempIsAlarmEnabled(parseJson.isUseAlarm);
+				setTempSelectedHour(hour);
+
+				// 저장된 시각 기준으로 재예약(고정 ID 라 멱등). 과거 시각으로 잘못 잡혀 있던 예약도 여기서 교정된다.
+				// ⚠️ '예약' 만 권한에 의존한다. 퀴즈 생성/표시(initQuiz)는 권한과 무관하게 항상 동작해야 한다.
+				if (parseJson.isUseAlarm && (await hasNotificationPermission())) {
+					await scheduleDailyQuizNotification(hour);
+				}
 			}
 		} catch (e) {
 			console.error('알림 설정 로딩 실패:', e);
@@ -252,7 +297,7 @@ const TodayQuizScreen = () => {
 			const formatted = formatQuizDate(entry.quizDate);
 			const quizList = ProverbServices.selectProverbByIds(entry.todayQuizIdArr);
 			return {
-				date: entry.quizDate.slice(0, 10),
+				date: DateUtils.toLocalDateKey(entry.quizDate),
 				formattedDate: `${formatted.formattedDate}(${formatted.dayOfWeek})`,
 				quizList,
 				answerResults: entry.answerResults, // ✅ 추가
@@ -263,86 +308,13 @@ const TodayQuizScreen = () => {
 		setShowPrevQuizModal(true);
 	};
 
-	const sendInstantPush = async () => {
-		await notifee.displayNotification({
-			title: '✨ 오늘의 퀴즈가 도착했어요!',
-			body: '속담 퀴즈 풀고 보상도 받아보세요!',
-			android: {
-				channelId: await createAndroidChannel(),
-				pressAction: {
-					id: 'default', // 필수
-				},
-			},
-			data: {
-				moveToScreen: Paths.TODAY_QUIZ, // ✅ 목적지 명시
-			},
-		});
-	};
-	const seedDummyWeeklyQuizzes = async () => {
-		const allProverbs = ProverbServices.selectProverbList();
-		const baseDate = new Date();
-
-		const existingJson = await AsyncStorage.getItem(STORAGE_KEY);
-		const existing: MainDataType.TodayQuizList[] = existingJson ? JSON.parse(existingJson) : [];
-		const existingDateStrs = existing.map((q) => q.quizDate.slice(0, 10));
-
-		const dummyList: MainDataType.TodayQuizList[] = [];
-
-		for (let i = 0; i < 7; i++) {
-			const date = new Date(baseDate);
-			date.setDate(baseDate.getDate() - i);
-
-			const quizDate = date.toISOString();
-			const dateStr = quizDate.slice(0, 10);
-
-			if (existingDateStrs.includes(dateStr)) {
-				continue;
-			} // ❌ 이미 존재하면 skip
-
-			const shuffled = [...allProverbs].sort(() => Math.random() - 0.5).slice(0, 5);
-
-			const answerResults2: { [id: number]: boolean } = {};
-			const selectedAnswers2: MainDataType.TodayQuizList['selectedAnswers'] = {};
-
-			shuffled.forEach((item, idx) => {
-				const isCorrect = idx % 2 === 0;
-				answerResults2[item.id] = isCorrect;
-				selectedAnswers2[item.id] = {
-					value: isCorrect ? item.proverb : '틀린 보기',
-					index: isCorrect ? 1 : 2,
-				};
-			});
-
-			dummyList.push({
-				quizDate,
-				isCheckedIn: true,
-				todayQuizIdArr: shuffled.map((q) => q.id),
-				correctQuizIdArr: Object.entries(answerResults2)
-					.filter(([_, v]) => v)
-					.map(([id]) => Number(id)),
-				worngQuizIdArr: Object.entries(answerResults2)
-					.filter(([_, v]) => !v)
-					.map(([id]) => Number(id)),
-				answerResults: answerResults2,
-				selectedAnswers: selectedAnswers2,
-			});
-		}
-
-		const combined = [...existing, ...dummyList];
-		try {
-			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(combined));
-			console.log(`✅ ${dummyList.length}개 저장됨`);
-			Alert.alert('더미 데이터 저장 완료', `${dummyList.length}개 저장됨`);
-		} catch (err) {
-			console.error('❌ 저장 실패:', err);
-			Alert.alert('저장 실패', '콘솔 확인 요망');
-		}
-	};
-	const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-		const offsetY = event.nativeEvent.contentOffset.y;
-		setShowScrollTop(offsetY > 100);
-	};
-
+	/**
+	 * 오늘의 퀴즈를 생성/복원한다.
+	 * ⚠️ 알림 권한과 무관하게 항상 동작해야 한다.
+	 *    (예전에는 notifee 권한이 없으면 통째로 스킵해서 사용자가 알림을 거부하면
+	 *     quizList 가 영영 비어 "퀴즈를 준비 중입니다..." 화면에 갇혔다.)
+	 *    알림 '예약' 만 권한이 있을 때 수행한다 → loadSetting / handleToggleAlarm.
+	 */
 	const initQuiz = async () => {
 		const todayISO = getLocalDateString();
 
@@ -350,69 +322,64 @@ const TodayQuizScreen = () => {
 			setShowTodayReview(false);
 		} // 👈 이 줄 추가
 
-		const settings = await notifee.getNotificationSettings();
-		const hasPermission = settings.authorizationStatus === 1;
+		const todayStr = getLocalDateString();
+		const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
+		const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
+		// 여기서 KST 기준 비교로 todayData 찾기
+		const todayData = storedArr.find((q) => getLocalParamDateToString(q.quizDate) === todayStr); // ✅ 중요
 
-		if (hasPermission) {
-			const todayStr = getLocalDateString();
-			const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
-			const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
-			// 여기서 KST 기준 비교로 todayData 찾기
-			const todayData = storedArr.find((q) => getLocalParamDateToString(q.quizDate) === todayStr); // ✅ 중요
+		// ✅ 오늘 문제를 아직 안 푼 상태 판별
+		const unsolved = !!todayData && (!todayData.answerResults || Object.keys(todayData.answerResults).length === 0);
 
-			// ✅ 오늘 문제를 아직 안 푼 상태 판별
-			const unsolved = !!todayData && (!todayData.answerResults || Object.keys(todayData.answerResults).length === 0);
+		setIsTodayUnsolved(unsolved);
 
-			setIsTodayUnsolved(unsolved && hasPermission);
+		const shouldGenerateNewQuiz =
+			!todayData || todayData.todayQuizIdArr.length < 5 || getLocalParamDateToString(todayData.quizDate) !== getLocalParamDateToString(todayDate);
 
-			const shouldGenerateNewQuiz =
-				!todayData || todayData.todayQuizIdArr.length < 5 || getLocalParamDateToString(todayData.quizDate) !== getLocalParamDateToString(todayDate);
+		if (shouldGenerateNewQuiz) {
+			// 새로운 퀴즈 생성
+			const finalQuizList = getTodayQuiz(todayData?.todayQuizIdArr ?? []);
+			const newQuizData: MainDataType.TodayQuizList = {
+				quizDate: todayISO, // ✅ 이건 todayDate.toISOString() 기반으로 변경 가능
+				isCheckedIn: false,
+				todayQuizIdArr: finalQuizList.map((q) => q.id),
+				correctQuizIdArr: [],
+				worngQuizIdArr: [],
+				answerResults: {},
+				selectedAnswers: {},
+				prevQuizIdArr: storedArr.length > 0 ? storedArr[storedArr.length - 1].todayQuizIdArr : [],
+			};
+			await saveTodayQuizToStorage(newQuizData);
+			setQuizList(finalQuizList);
+			generateQuizOptions(finalQuizList);
+		} else {
+			// 기존 퀴즈 복원
+			const finalQuizList = ProverbServices.selectProverbByIds(todayData.todayQuizIdArr);
+			// ⚠️ 매칭된 문제 개수가 5개가 아니면 새로 생성
+			if (!finalQuizList || finalQuizList.length < 5) {
+				console.warn('⚠️ 오늘의 퀴즈 데이터 누락 → 새 퀴즈 생성');
+				const newQuiz = getTodayQuiz();
+				setQuizList(newQuiz);
 
-			if (shouldGenerateNewQuiz) {
-				// 새로운 퀴즈 생성
-				const finalQuizList = getTodayQuiz(todayData?.todayQuizIdArr ?? []);
 				const newQuizData: MainDataType.TodayQuizList = {
-					quizDate: todayISO, // ✅ 이건 todayDate.toISOString() 기반으로 변경 가능
-					isCheckedIn: false,
-					todayQuizIdArr: finalQuizList.map((q) => q.id),
+					quizDate: getLocalDateString(),
+					isCheckedIn: todayData?.isCheckedIn ?? false,
+					todayQuizIdArr: newQuiz.map((q) => q.id),
 					correctQuizIdArr: [],
 					worngQuizIdArr: [],
 					answerResults: {},
 					selectedAnswers: {},
-					prevQuizIdArr: storedArr.length > 0 ? storedArr[storedArr.length - 1].todayQuizIdArr : [],
 				};
 				await saveTodayQuizToStorage(newQuizData);
-				setQuizList(finalQuizList);
-				generateQuizOptions(finalQuizList);
+				generateQuizOptions(newQuiz);
 			} else {
-				// 기존 퀴즈 복원
-				const finalQuizList = ProverbServices.selectProverbByIds(todayData.todayQuizIdArr);
-				// ⚠️ 매칭된 문제 개수가 5개가 아니면 새로 생성
-				if (!finalQuizList || finalQuizList.length < 5) {
-					console.warn('⚠️ 오늘의 퀴즈 데이터 누락 → 새 퀴즈 생성');
-					const newQuiz = getTodayQuiz();
-					setQuizList(newQuiz);
-
-					const newQuizData: MainDataType.TodayQuizList = {
-						quizDate: getLocalDateString(),
-						isCheckedIn: todayData?.isCheckedIn ?? false,
-						todayQuizIdArr: newQuiz.map((q) => q.id),
-						correctQuizIdArr: [],
-						worngQuizIdArr: [],
-						answerResults: {},
-						selectedAnswers: {},
-					};
-					await saveTodayQuizToStorage(newQuizData);
-					generateQuizOptions(newQuiz);
-				} else {
-					setQuizList(finalQuizList);
-					generateQuizOptions(finalQuizList);
-				}
-				setAnswerResults(todayData.answerResults ?? {});
-				setSelectedAnswers(todayData.selectedAnswers ?? {});
 				setQuizList(finalQuizList);
 				generateQuizOptions(finalQuizList);
 			}
+			setAnswerResults(todayData.answerResults ?? {});
+			setSelectedAnswers(todayData.selectedAnswers ?? {});
+			setQuizList(finalQuizList);
+			generateQuizOptions(finalQuizList);
 		}
 	};
 
@@ -450,12 +417,19 @@ const TodayQuizScreen = () => {
 		}
 	};
 
-	const scheduleDailyQuizNotification = async (time: Date) => {
+	/**
+	 * 매일 지정한 '로컬 시각' 에 반복 알림을 예약한다.
+	 * @param hour 0-23 (로컬 기준). 저장된 값만 넘길 것 — 현재 시각으로 재계산하지 않는다.
+	 */
+	const scheduleDailyQuizNotification = async (hour: number) => {
 		const trigger: TimestampTrigger = {
 			type: TriggerType.TIMESTAMP,
-			timestamp: getNextTriggerTime(time),
+			timestamp: getNextTriggerTimestamp(hour, 0),
 			repeatFrequency: RepeatFrequency.DAILY,
 		};
+
+		// 재예약 전 항상 기존 예약 취소 (중복 예약 방지)
+		await cancelScheduledNotification();
 
 		await notifee.createTriggerNotification(
 			{
@@ -493,17 +467,6 @@ const TodayQuizScreen = () => {
 		return settings.authorizationStatus === 1;
 	};
 
-	const getNextTriggerTime = (baseTime?: Date) => {
-		const now = new Date();
-		const next = new Date(baseTime ?? alarmTime); // ✅ baseTime 우선 사용
-		next.setSeconds(0);
-		next.setMilliseconds(0);
-		if (next <= now) {
-			next.setDate(next.getDate() + 1);
-		}
-		return next.getTime();
-	};
-
 	/**
 	 * 알림 설정
 	 * @param value
@@ -519,16 +482,12 @@ const TodayQuizScreen = () => {
 				const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
 				const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
 
-				const newAlarmTime = new Date();
-				newAlarmTime.setHours(tempSelectedHour, 0, 0, 0);
-				const todayData = storedArr.find((q) => q.quizDate.slice(0, 10) === todayStr);
+				const todayData = storedArr.find((q) => DateUtils.toLocalDateKey(q.quizDate) === todayStr);
 
-				// KST 보정 후 저장 (UTC 기준에서 9시간 빼기)
-				const offsetFixedISO = new Date(newAlarmTime.getTime() - 9 * 60 * 60 * 1000).toISOString();
-
+				// 사용자가 고른 '로컬 시' 를 그대로 저장한다. (타임존 오프셋 보정 금지 — 읽고 쓸 때마다 시각이 밀린다)
 				await saveSettingInfo({
 					isUseAlarm: true,
-					alarmTime: offsetFixedISO,
+					alarmTime: toAlarmTimeString(tempSelectedHour),
 				});
 
 				if (todayData) {
@@ -561,12 +520,14 @@ const TodayQuizScreen = () => {
 					setHasStarted(true); // ✅ 바로 문제 시작
 				}
 
-				await scheduleDailyQuizNotification(tempAlarmTime);
+				await scheduleDailyQuizNotification(tempSelectedHour);
+				setAlarmTime(hourToDate(tempSelectedHour));
+				setTempIsAlarmEnabled(true);
 				setIsAlarmEnabled(true);
 				await getScheduledAlarmTime();
 
 				// ✅ 알림 설정 완료 팝업 추가
-				const hour = alarmTime.getHours().toString().padStart(2, '0');
+				const hour = tempSelectedHour.toString().padStart(2, '0');
 				Alert.alert('⏰ 알림 설정 완료!', `매일 ${hour}시에 오늘의 퀴즈가 찾아갈게요!\n놓치지 말고 꼭 참여해보세요 😊`);
 			} else {
 				Alert.alert('알림 권한 필요', '설정에서 알림 권한을 허용해주세요.');
@@ -575,18 +536,15 @@ const TodayQuizScreen = () => {
 		} else {
 			await cancelScheduledNotification();
 
-			const defaultTime = new Date();
-			defaultTime.setHours(15, 0, 0, 0);
-
-			setAlarmTime(defaultTime);
-			setTempAlarmTime(defaultTime);
+			setAlarmTime(hourToDate(DEFAULT_ALARM_HOUR));
 			setShowTodayReview(false);
-			setTempSelectedHour(15);
+			setTempSelectedHour(DEFAULT_ALARM_HOUR);
+			setTempIsAlarmEnabled(false);
 			setIsAlarmEnabled(false);
 
 			await saveSettingInfo({
 				isUseAlarm: false,
-				alarmTime: defaultTime.toISOString(),
+				alarmTime: toAlarmTimeString(DEFAULT_ALARM_HOUR),
 			});
 
 			await getScheduledAlarmTime();
@@ -665,7 +623,7 @@ const TodayQuizScreen = () => {
 
 		if (!isCorrect) {
 			setHighlightAnswerId(quizId);
-			setTimeout(() => setHighlightAnswerId(null), 2000);
+			addTimer(() => setHighlightAnswerId(null), 2000);
 		}
 
 		// 저장
@@ -698,7 +656,7 @@ const TodayQuizScreen = () => {
 			}
 		}
 		// handleAnswer 내부 마지막 부분에 추가
-		setTimeout(() => {
+		addTimer(() => {
 			scrollRef.current?.scrollToEnd({ animated: true });
 		}, 200); // 약간의 딜레이 주면 UI 반응이 자연스러워짐
 	};
@@ -756,44 +714,6 @@ const TodayQuizScreen = () => {
 		return `${month}월 ${day}일(${dayOfWeek})`;
 	};
 
-	const handleImagePress = (image: any, item: MainDataType.Proverb) => {
-		setSelectedImage(image);
-		setSelectedDog(item);
-		setImageModalVisible(true);
-	};
-
-	const handleScrollToTop = () => {
-		if (scrollRef.current) {
-			requestAnimationFrame(() => {
-				scrollRef.current?.scrollTo({ y: 0, animated: true });
-			});
-		}
-	};
-	const getFieldColor = (field: string) => {
-		const categoryColorMap: Record<string, string> = {
-			'운/우연': '#16a085', // 청록
-			인간관계: '#16a085', // 보라
-			'세상 이치': '#f4d03f', // 연노랑
-			'근면/검소': '#e17055', // 주황
-			'노력/성공': '#27ae60', // 짙은 청록
-			'경계/조심': '#e74c3c', // 빨강
-			'욕심/탐욕': '#e84393', // 핫핑크
-			'배신/불신': '#2c3e50', // 짙은 회색
-		};
-
-		return categoryColorMap[field] || '#bdc3c7'; // 기본 회색
-	};
-	const getLevelColor = (levelName: string) => {
-		const levelColorMap: Record<string, string> = {
-			'초급': '#ecf0f1',
-			중급: '#74b9ff',
-			고급: '#3498db',
-			특급: '#2c3e50',
-		};
-
-		return levelColorMap[levelName] || '#bdc3c7'; // 기본 회색
-	};
-
 	const renderItem = ({ item }: { item: MainDataType.Proverb }) => {
 		const options = quizOptionsMap[item.id] || [];
 		const result = answerResults[item.id];
@@ -836,10 +756,10 @@ const TodayQuizScreen = () => {
 						{result !== undefined && (
 							<View style={styles.resultBannerWrap}>
 								<View style={[styles.resultBanner, result ? styles.resultBannerCorrect : styles.resultBannerWrong]}>
-									<View style={[styles.resultBannerIcon, { backgroundColor: result ? '#22C55E' : '#EF4444' }]}>
-										<IconComponent type="materialIcons" name={result ? 'check' : 'close'} size={scaledSize(16)} color="#fff" />
+									<View style={[styles.resultBannerIcon, { backgroundColor: result ? COLORS.primary : COLORS.danger }]}>
+										<IconComponent type="materialIcons" name={result ? 'check' : 'close'} size={scaledSize(16)} color={COLORS.textWhite} />
 									</View>
-									<Text style={[styles.resultBannerText, { color: result ? '#15803D' : '#B91C1C' }]}>
+									<Text style={[styles.resultBannerText, { color: result ? COLORS.primaryDeep : COLORS.dangerDark }]}>
 										{result ? '정답이에요!' : '아쉬워요, 오답이에요'}
 									</Text>
 								</View>
@@ -855,6 +775,7 @@ const TodayQuizScreen = () => {
 							return (
 								<TouchableOpacity
 									key={idx}
+									activeOpacity={0.8}
 									onPress={() => handleAnswer(item.id, option, item.longMeaning)}
 									disabled={isAnswered}
 									style={[
@@ -863,7 +784,7 @@ const TodayQuizScreen = () => {
 										shouldHighlight && styles.highlightCorrectBorder,
 									]}>
 									<Text style={[styles.optionTextBase, isUserSelected && (isCorrectOption ? styles.correctText : styles.wrongText)]}>
-										<Text style={{ color: labelColors[idx % labelColors.length], fontWeight: 'bold' }}>{String.fromCharCode(65 + idx)}.</Text> {option}
+										<Text style={{ color: labelColors[idx % labelColors.length], fontWeight: '700' }}>{String.fromCharCode(65 + idx)}.</Text> {option}
 									</Text>
 								</TouchableOpacity>
 							);
@@ -871,6 +792,7 @@ const TodayQuizScreen = () => {
 						{result !== undefined && (
 							<TouchableOpacity
 								style={styles.nextButton}
+								activeOpacity={0.8}
 								onPress={() => {
 									if (currentIndex < quizList.length - 1) {
 										// 👉 다음 문제로 이동
@@ -897,8 +819,6 @@ const TodayQuizScreen = () => {
 			<FadeInView style={{ flex: 1 }}>
 			<ScrollView
 				ref={scrollRef}
-				onScroll={onScroll}
-				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{
 					paddingBottom: scaleHeight(40),
@@ -908,16 +828,16 @@ const TodayQuizScreen = () => {
 						<View style={styles.leftButtonWrapper}>
 							{/* <TouchableOpacity onPress={handleResetTodayQuiz}>
 								<View style={[styles.buttonContent, { marginLeft: scaleWidth(12) }]}>
-									<IconComponent name="rotate-left" type="FontAwesome" size={13} color="#95a5a6" style={styles.iconSpacing} />
+									<IconComponent name="rotate-left" type="FontAwesome" size={scaledSize(13)} color="#95a5a6" style={styles.iconSpacing} />
 									<Text style={styles.buttonText}>오늘 문제 다시 풀기</Text>
 								</View>
 							</TouchableOpacity> */}
 						</View>
 
 						<View style={styles.rightButtonWrapper}>
-							<TouchableOpacity onPress={loadLastTodayQuizList}>
-								<View style={[styles.buttonContent, { marginRight: scaleWidth(12) }]}>
-									<IconComponent name="book" type="FontAwesome" size={13} color="#95a5a6" style={styles.iconSpacing} />
+							<TouchableOpacity onPress={loadLastTodayQuizList} activeOpacity={0.8} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+								<View style={styles.buttonContent}>
+									<IconComponent name="book" type="FontAwesome" size={scaledSize(13)} color={COLORS.textSecondary} style={styles.iconSpacing} />
 									<Text style={styles.buttonText}>지난 오늘의 퀴즈</Text>
 								</View>
 							</TouchableOpacity>
@@ -931,7 +851,7 @@ const TodayQuizScreen = () => {
 					<View style={styles.content}>
 						<Text style={styles.title}>🍀 매일 '오늘의 퀴즈'가 도착해요! 🍀</Text>
 
-						<View style={{ alignSelf: 'flex-start', marginTop: scaleHeight(6) }}>
+						<View style={{ alignSelf: 'stretch', marginTop: SPACING_H.sm }}>
 							<View style={styles.bulletRow}>
 								<Text style={styles.bullet}>•</Text>
 								<Text style={styles.bulletText}>매일 5개의 속담 퀴즈가 도착해요.</Text>
@@ -947,16 +867,16 @@ const TodayQuizScreen = () => {
 						</View>
 
 						<View style={styles.alarmRow}>
-							<View style={{ flexDirection: 'column', marginTop: scaleHeight(8) }}>
+							<View style={{ flexDirection: 'column', width: '100%', marginTop: SPACING_H.sm }}>
 								<View style={styles.alarmRow}>
 									<Text style={styles.switchLabel}>알림 설정/시간</Text>
 									<Text style={styles.selectedHourText}>{tempSelectedHour.toString().padStart(2, '0')}시</Text>
 									<Switch
 										value={isAlarmEnabled}
 										onValueChange={handleToggleAlarm}
-										trackColor={{ false: '#767577', true: '#81b0ff' }}
-										thumbColor={isAlarmEnabled ? '#f5dd4b' : '#f4f3f4'}
-										ios_backgroundColor="#3e3e3e"
+										trackColor={{ false: COLORS.borderDark, true: COLORS.primaryLight }}
+										thumbColor={isAlarmEnabled ? COLORS.primary : COLORS.surface}
+										ios_backgroundColor={COLORS.borderDark}
 									/>
 								</View>
 
@@ -971,12 +891,8 @@ const TodayQuizScreen = () => {
 										return (
 											<TouchableOpacity
 												key={hour}
-												onPress={() => {
-													setTempSelectedHour(hour);
-													const newDate = new Date(tempAlarmTime);
-													newDate.setHours(hour, 0, 0, 0);
-													setTempAlarmTime(newDate);
-												}}
+												activeOpacity={0.8}
+												onPress={() => setTempSelectedHour(hour)}
 												style={[styles.hourButton, isSelected && styles.hourButtonSelected]}>
 												<Text style={[styles.hourText, isSelected && styles.hourTextSelected]}>{hour.toString().padStart(2, '0')}시</Text>
 											</TouchableOpacity>
@@ -995,14 +911,15 @@ const TodayQuizScreen = () => {
 
 							<View style={styles.scoreRightGroup}>
 								<TouchableOpacity
+									activeOpacity={0.8}
+									hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 									onPress={() => {
 										setTempIsAlarmEnabled(isAlarmEnabled);
-										setTempAlarmTime(alarmTime);
+										setTempSelectedHour(alarmTime.getHours());
 										setShowAlarmModal(true);
-									}}
-									style={{ marginLeft: scaleWidth(0) }}>
+									}}>
 									<View style={styles.bellWrapper}>
-										<IconComponent name="bell" type="FontAwesome" size={15} color="#FFC107" />
+										<IconComponent name="bell" type="FontAwesome" size={scaledSize(15)} color={COLORS.warning} />
 									</View>
 								</TouchableOpacity>
 							</View>
@@ -1024,12 +941,13 @@ const TodayQuizScreen = () => {
 							{!hasStarted && isTodayUnsolved ? (
 								// 👉 아직 시작 안 했을 때는 "퀴즈 도착 카드"
 								<View style={styles.emptyQuizBox}>
-									<IconComponent name="envelope" type="FontAwesome" size={48} color="#3498db" />
+									<IconComponent name="envelope" type="FontAwesome" size={scaledSize(48)} color={COLORS.secondary} />
 									<Text style={styles.emptyQuizTitle}>오늘의 퀴즈가 도착했습니다 ✨</Text>
 									<Text style={styles.emptyQuizSubtitle}>지금 바로 시작해 보세요!</Text>
 
 									<TouchableOpacity
 										style={styles.startQuizButton}
+										activeOpacity={0.8}
 										onPress={async () => {
 											if (quizList.length === 0) {
 												await initQuiz();
@@ -1043,62 +961,65 @@ const TodayQuizScreen = () => {
 								</View>
 							) : !isQuizCompleted ? (
 								// 👉 시작했고 아직 안 끝났을 때는 문제 화면
-								<View style={{ paddingBottom: scaleHeight(16) }}>{renderItem({ item: quizList[currentIndex] })}</View>
+								// key 로 문항마다 재마운트 → 문제 전환 시 페이드+슬라이드업
+								<FadeInView key={currentIndex} duration={260} style={{ paddingBottom: SPACING_H.lg }}>
+									{renderItem({ item: quizList[currentIndex] })}
+								</FadeInView>
 							) : (
 								// 👉 다 끝난 후 완료 화면
 								<>
-									<View style={styles.completedCard}>
-										<View style={styles.completedEmojiCircle}>
-											<Text style={styles.completedEmoji}>🎉</Text>
+									<FadeInView>
+										<View style={styles.completedCard}>
+											<View style={styles.completedEmojiCircle}>
+												<Text style={styles.completedEmoji}>🎉</Text>
+											</View>
+											<Text style={styles.completedTitle}>오늘의 문제 끝!</Text>
+											<Text style={styles.completedSubtitle}>내일 또 만나요 👋</Text>
+											<View style={styles.completedScorePill}>
+												<IconComponent type="materialIcons" name="check-circle" size={scaledSize(16)} color={COLORS.primary} />
+												<Text style={styles.completedScoreText}>
+													<Text style={styles.completedScoreNum}>{correct}</Text>
+													<Text style={styles.completedScoreTotal}> / {quizList.length}</Text> 정답
+												</Text>
+											</View>
 										</View>
-										<Text style={styles.completedTitle}>오늘의 문제 끝!</Text>
-										<Text style={styles.completedSubtitle}>내일 또 만나요 👋</Text>
-										<View style={styles.completedScorePill}>
-											<IconComponent type="materialIcons" name="check-circle" size={scaledSize(16)} color="#22C55E" />
-											<Text style={styles.completedScoreText}>
-												<Text style={styles.completedScoreNum}>{correct}</Text>
-												<Text style={styles.completedScoreTotal}> / {quizList.length}</Text> 정답
-											</Text>
-										</View>
-									</View>
+									</FadeInView>
 
-									<TouchableOpacity onPress={() => setShowTodayReview((prev) => !prev)} style={styles.reviewToggleButton}>
+									<TouchableOpacity activeOpacity={0.8} onPress={() => setShowTodayReview((prev) => !prev)} style={styles.reviewToggleButton}>
 										<IconComponent
 											name={showTodayReview ? 'chevron-up' : 'chevron-down'}
 											type="FontAwesome"
-											size={16}
-											color="#2c3e50"
-											style={{ marginRight: scaleWidth(8) }}
+											size={scaledSize(16)}
+											color={COLORS.text}
+											style={{ marginRight: SPACING_W.sm }}
 										/>
 										<Text style={styles.acodianTxt}>{showTodayReview ? '오늘의 퀴즈 접기' : '오늘의 퀴즈 다시 보기'}</Text>
 									</TouchableOpacity>
 
 									{showTodayReview && (
 										<View style={styles.reviewList}>
-											{quizList.map((item) => {
+											{quizList.map((item, idx) => {
 												const itemResult = answerResults[item.id];
 												return (
-													<TouchableOpacity
-														key={item.id}
-														activeOpacity={0.85}
-														style={styles.reviewItemCard}
-														onPress={() => {
-															setDetailQuiz(item);
-															setDetailModalVisible(true);
-														}}>
-														<View style={styles.reviewItemTextWrap}>
-															<Text style={styles.reviewItemTitle}>
-																{item.proverb}
-															</Text>
-															<Text style={styles.reviewItemMeaning}>
-																{item.longMeaning || item.meaning}
-															</Text>
-														</View>
-														<View style={[styles.reviewItemPill, itemResult ? styles.pillCorrect : styles.pillWrong]}>
-															<Text style={styles.resultPillText}>{itemResult ? '정답' : '오답'}</Text>
-														</View>
-														<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color="#94A3B8" />
-													</TouchableOpacity>
+													// 리스트 stagger — 최대 6개까지만 지연
+													<FadeInView key={item.id} delay={Math.min(idx, 5) * 40} duration={260} offsetY={8}>
+														<TouchableOpacity
+															activeOpacity={0.85}
+															style={styles.reviewItemCard}
+															onPress={() => {
+																setDetailQuiz(item);
+																setDetailModalVisible(true);
+															}}>
+															<View style={styles.reviewItemTextWrap}>
+																<Text style={styles.reviewItemTitle}>{item.proverb}</Text>
+																<Text style={styles.reviewItemMeaning}>{item.longMeaning || item.meaning}</Text>
+															</View>
+															<View style={[styles.reviewItemPill, itemResult ? styles.pillCorrect : styles.pillWrong]}>
+																<Text style={styles.resultPillText}>{itemResult ? '정답' : '오답'}</Text>
+															</View>
+															<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.textLight} />
+														</TouchableOpacity>
+													</FadeInView>
 												);
 											})}
 										</View>
@@ -1109,11 +1030,15 @@ const TodayQuizScreen = () => {
 					)}
 					{/* ❗ fallback UI 추가 */}
 					{isAlarmEnabled && quizList.length === 0 && (
-						<View style={{ padding: scaleWidth(20), alignItems: 'center' }}>
-							<Text style={{ color: '#95a5a6', fontSize: scaledSize(14) }}>퀴즈를 준비 중입니다...</Text>
-							<ActivityIndicator size="small" color="#3498db" style={{ marginTop: scaleHeight(10) }} />
-							<TouchableOpacity onPress={initQuiz} style={{ marginTop: scaleHeight(10) }}>
-								<Text style={{ color: '#3498db' }}>🔄 다시 불러오기</Text>
+						<View style={{ paddingVertical: SPACING_H.xl, paddingHorizontal: SPACING_W.xl, alignItems: 'center' }}>
+							<Text style={{ color: COLORS.textSecondary, fontSize: FONT_SIZES.md }}>퀴즈를 준비 중입니다...</Text>
+							<ActivityIndicator size="small" color={COLORS.secondary} style={{ marginTop: SPACING_H.md }} />
+							<TouchableOpacity
+								activeOpacity={0.8}
+								onPress={initQuiz}
+								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+								style={{ marginTop: SPACING_H.md }}>
+								<Text style={{ color: COLORS.secondary, fontSize: FONT_SIZES.md, fontWeight: '600' }}>🔄 다시 불러오기</Text>
 							</TouchableOpacity>
 						</View>
 					)}
@@ -1121,11 +1046,6 @@ const TodayQuizScreen = () => {
 			</ScrollView>
 			</FadeInView>
 
-			{/* {showScrollTop && (
-				<TouchableOpacity style={styles.scrollTopButton} onPress={handleScrollToTop}>
-					<IconComponent type="fontawesome6" name="arrow-up" size={20} color="#ffffff" />
-				</TouchableOpacity>
-			)} */}
 			<Modal visible={showAlarmModal} transparent animationType="fade" onRequestClose={() => setShowAlarmModal(false)}>
 				<View style={styles.modalOverlay}>
 					<View style={styles.alarmModalCard}>
@@ -1137,15 +1057,16 @@ const TodayQuizScreen = () => {
 							<Switch
 								value={tempIsAlarmEnabled}
 								onValueChange={setTempIsAlarmEnabled}
-								trackColor={{ false: '#767577', true: '#81b0ff' }}
-								thumbColor={tempIsAlarmEnabled ? '#f5dd4b' : '#f4f3f4'}
+								trackColor={{ false: COLORS.borderDark, true: COLORS.primaryLight }}
+								thumbColor={tempIsAlarmEnabled ? COLORS.primary : COLORS.surface}
+								ios_backgroundColor={COLORS.borderDark}
 							/>
 						</View>
 
 						{/* 알림 시간은 스위치가 켜졌을 때만 보이게 */}
 						{tempIsAlarmEnabled && (
 							<View style={styles.modalRow}>
-								<View style={{ width: '100%', marginTop: scaleHeight(12) }}>
+								<View style={{ width: '100%', marginTop: SPACING_H.md }}>
 									<View style={styles.timePickerRow}>
 										<Text style={styles.modalLabel}>알림 시간</Text>
 										<Text style={styles.selectedHourText}>{tempSelectedHour.toString().padStart(2, '0')}시</Text>
@@ -1156,20 +1077,16 @@ const TodayQuizScreen = () => {
 										horizontal
 										showsHorizontalScrollIndicator={false}
 										contentContainerStyle={{
-											paddingVertical: scaleHeight(8),
-											paddingHorizontal: scaleWidth(4),
+											paddingVertical: SPACING_H.sm,
+											paddingHorizontal: SPACING_W.xs,
 										}}>
 										{Array.from({ length: 24 }).map((_, hour) => {
 											const isSelected = tempSelectedHour === hour;
 											return (
 												<TouchableOpacity
 													key={hour}
-													onPress={() => {
-														setTempSelectedHour(hour);
-														const newDate = new Date(tempAlarmTime);
-														newDate.setHours(hour, 0, 0, 0);
-														setTempAlarmTime(newDate);
-													}}
+													activeOpacity={0.8}
+													onPress={() => setTempSelectedHour(hour)}
 													style={[styles.hourButton, isSelected && styles.hourButtonSelected]}>
 													<Text style={[styles.hourText, isSelected && styles.hourTextSelected]}>{hour.toString().padStart(2, '0')}시</Text>
 												</TouchableOpacity>
@@ -1183,43 +1100,39 @@ const TodayQuizScreen = () => {
 						<View style={styles.modalButtonRow}>
 							<TouchableOpacity
 								style={styles.cancelButton}
+								activeOpacity={0.8}
 								onPress={() => {
 									setShowAlarmModal(false);
+									// ✅ 임시값 초기화
 									setTempIsAlarmEnabled(isAlarmEnabled);
 									setTempSelectedHour(alarmTime.getHours());
-									// ✅ 임시값 초기화
-									setTempAlarmTime(alarmTime);
 								}}>
 								<Text style={styles.cancelButtonText}>취소</Text>
 							</TouchableOpacity>
 
 							<TouchableOpacity
 								style={styles.saveButton}
+								activeOpacity={0.8}
 								onPress={async () => {
 									setShowAlarmModal(false);
 
-									let finalAlarmTime = tempAlarmTime;
+									const finalHour = tempIsAlarmEnabled ? tempSelectedHour : DEFAULT_ALARM_HOUR;
 
 									if (!tempIsAlarmEnabled) {
-										finalAlarmTime = new Date();
-										finalAlarmTime.setHours(15, 0, 0, 0);
-										setTempSelectedHour(15);
+										setTempSelectedHour(DEFAULT_ALARM_HOUR);
 										await cancelScheduledNotification();
 										// ✅ 알림 끈 경우엔 별도 메시지 없이 저장만
 									} else {
-										await cancelScheduledNotification();
-										await scheduleDailyQuizNotification(finalAlarmTime);
-										const hour = finalAlarmTime.getHours().toString().padStart(2, '0');
-										Alert.alert('⏰ 알림 저장 완료!', `${hour}시에 오늘의 퀴즈 알람이 지정되었습니다.`);
+										await scheduleDailyQuizNotification(finalHour);
+										Alert.alert('⏰ 알림 저장 완료!', `${finalHour.toString().padStart(2, '0')}시에 오늘의 퀴즈 알람이 지정되었습니다.`);
 									}
 
 									await saveSettingInfo({
 										isUseAlarm: tempIsAlarmEnabled,
-										alarmTime: finalAlarmTime.toISOString(),
+										alarmTime: toAlarmTimeString(finalHour),
 									});
 
-									setAlarmTime(finalAlarmTime);
-									setTempAlarmTime(finalAlarmTime);
+									setAlarmTime(hourToDate(finalHour));
 									setIsAlarmEnabled(tempIsAlarmEnabled);
 									setShowTodayReview(false);
 
@@ -1230,30 +1143,21 @@ const TodayQuizScreen = () => {
 						</View>
 					</View>
 				</View>
-
-				{/* 시간 선택 다이얼로그 */}
-				<DatePicker
-					modal
-					mode="time"
-					open={showPicker}
-					date={tempAlarmTime}
-					onConfirm={(date) => {
-						setShowPicker(false);
-						setTempAlarmTime(date);
-					}}
-					onCancel={() => setShowPicker(false)}
-				/>
 			</Modal>
 			<Modal visible={showPrevQuizModal} transparent animationType="fade" onRequestClose={() => setShowPrevQuizModal(false)}>
 				<View style={styles.modalOverlay}>
 					<View style={styles.alarmModalCard}>
 						{/* 닫기 아이콘 */}
-						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowPrevQuizModal(false)}>
-							<IconComponent name="close" type="AntDesign" size={20} color="#2c3e50" />
+						<TouchableOpacity
+							style={styles.modalCloseIcon}
+							activeOpacity={0.8}
+							hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+							onPress={() => setShowPrevQuizModal(false)}>
+							<IconComponent name="close" type="AntDesign" size={scaledSize(20)} color={COLORS.text} />
 						</TouchableOpacity>
 
-						<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scaleHeight(4) }}>
-							<IconComponent name="book" type="FontAwesome" size={20} color="#95a5a6" style={{ marginRight: scaleWidth(7) }} />
+						<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: SPACING_H.xs }}>
+							<IconComponent name="book" type="FontAwesome" size={scaledSize(18)} color={COLORS.textSecondary} style={{ marginRight: SPACING_W.sm }} />
 							<Text style={styles.modalTitle}>지난 오늘의 퀴즈</Text>
 						</View>
 
@@ -1273,7 +1177,7 @@ const TodayQuizScreen = () => {
 											{/* 섹션 헤더 */}
 											<View style={styles.historySectionHeader}>
 												<View style={styles.historySectionHeaderLeft}>
-													<IconComponent name="calendar" type="FontAwesome" size={16} color="#27ae60" style={{ marginRight: scaleWidth(6) }} />
+													<IconComponent name="calendar" type="FontAwesome" size={scaledSize(16)} color={COLORS.primary} style={{ marginRight: SPACING_W.sm }} />
 													<Text style={styles.historySectionTitle}>
 														{formattedDate} ({dayOfWeek}) 퀴즈
 													</Text>
@@ -1307,12 +1211,13 @@ const TodayQuizScreen = () => {
 														<View style={styles.historyActionColumn}>
 															<TouchableOpacity
 																style={styles.historyActionButton}
+																activeOpacity={0.8}
 																onPress={(e) => {
 																	e.stopPropagation();
 																	handleToggleFavorite(item.id);
 																}}
 																hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-																<Icon name="star" solid={isFavorite} size={scaledSize(18)} color={isFavorite ? '#FBBF24' : '#CBD5E1'} />
+																<Icon name="star" solid={isFavorite} size={scaledSize(18)} color={isFavorite ? COLORS.warning : COLORS.borderDark} />
 															</TouchableOpacity>
 														</View>
 													</View>
@@ -1324,7 +1229,7 @@ const TodayQuizScreen = () => {
 							)}
 						</ScrollView>
 
-						<TouchableOpacity style={styles.modalFooterButton} onPress={() => setShowPrevQuizModal(false)}>
+						<TouchableOpacity style={styles.modalFooterButton} activeOpacity={0.8} onPress={() => setShowPrevQuizModal(false)}>
 							<Text style={styles.modalFooterButtonText}>닫기</Text>
 						</TouchableOpacity>
 					</View>
@@ -1351,1567 +1256,780 @@ const TodayQuizScreen = () => {
 export default TodayQuizScreen;
 
 const styles = StyleSheet.create({
-	historyHeaderRight: { flexDirection: 'row', alignItems: 'center' },
-	favoriteOverlayButton: { position: 'absolute', top: scaleHeight(10), right: scaleWidth(10), padding: scaleWidth(4), zIndex: 10 },
-	completedCard: {
-		alignItems: 'center',
-		marginTop: scaleHeight(24),
-		marginHorizontal: scaleWidth(16),
-		paddingVertical: scaleHeight(28),
-		paddingHorizontal: scaleWidth(20),
-		backgroundColor: '#FFFFFF',
-		borderRadius: scaleWidth(20),
-		borderWidth: 1,
-		borderColor: '#EEF2F7',
-		shadowColor: '#0F172A',
-		shadowOffset: { width: 0, height: scaleHeight(4) },
-		shadowOpacity: 0.06,
-		shadowRadius: 12,	},
-	completedEmojiCircle: {
-		width: scaleWidth(64),
-		height: scaleWidth(64),
-		borderRadius: scaleWidth(32),
-		backgroundColor: '#F0FDF4',
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginBottom: scaleHeight(14),
-	},
-	completedEmoji: { fontSize: scaledSize(30) },
-	completedSubtitle: {
-		marginTop: scaleHeight(4),
-		fontSize: scaledSize(14),
-		color: '#64748B',
-		fontWeight: '500',
-		textAlign: 'center',
-	},
-	completedScorePill: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: scaleWidth(6),
-		marginTop: scaleHeight(16),
-		paddingVertical: scaleHeight(8),
-		paddingHorizontal: scaleWidth(16),
-		borderRadius: scaleWidth(999),
-		backgroundColor: '#F0FDF4',
-		borderWidth: 1,
-		borderColor: '#BBF7D0',
-	},
-	completedScoreText: { fontSize: scaledSize(14), color: '#334155', fontWeight: '600' },
-	completedScoreNum: { fontSize: scaledSize(16), color: '#16A34A', fontWeight: '800' },
-	completedScoreTotal: { color: '#94A3B8', fontWeight: '700' },
-	reviewItemCard: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		gap: scaleWidth(10),
-		backgroundColor: '#FFFFFF',
-		borderRadius: scaleWidth(14),
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(14),
-		marginBottom: scaleHeight(10),
-		borderWidth: 1,
-		borderColor: '#E2E8F0',
-	},
-	reviewItemTextWrap: { flex: 1 },
-	reviewItemTitle: { fontSize: scaledSize(15), fontWeight: '700', color: '#1E293B' },
-	reviewItemMeaning: { marginTop: scaleHeight(3), fontSize: scaledSize(12.5), color: '#64748B', lineHeight: scaleHeight(18) },
-	reviewItemPill: { paddingVertical: scaleHeight(3), paddingHorizontal: scaleWidth(9), borderRadius: scaleWidth(999) },
-	resultBannerWrap: {
-		alignItems: 'center',
-		marginTop: scaleHeight(-2),
-		marginBottom: scaleHeight(12),
-	},
-	resultBanner: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		paddingVertical: scaleHeight(8),
-		paddingHorizontal: scaleWidth(14),
-		borderRadius: scaleWidth(24),
-		borderWidth: 1,
-	},
-	resultBannerCorrect: { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' },
-	resultBannerWrong: { backgroundColor: '#FEF2F2', borderColor: '#FECACA' },
-	resultBannerIcon: {
-		width: scaleWidth(22),
-		height: scaleWidth(22),
-		borderRadius: scaleWidth(11),
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: scaleWidth(8),
-	},
-	resultBannerText: { fontSize: scaledSize(14), fontWeight: '800' },
+	/* ===== 화면 기본 ===== */
 	main: {
 		flex: 1,
-		backgroundColor: '#f8f9fa', // ✅ 회색 배경
-	},
-	content: {
-		marginHorizontal: scaleWidth(24),
-		padding: scaleHeight(24),
-		borderRadius: scaledSize(12),
-		backgroundColor: '#ffffff',
-		justifyContent: 'center', // ✅ 수직 가운데 정렬
-		alignItems: 'center', // ✅ 수평 가운데 정렬
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-	},
-	title: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(12),
-		color: '#2c3e50',
-	},
-	description: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		lineHeight: scaleHeight(22),
-		textAlign: 'left',
-		marginBottom: scaleHeight(12),
-	},
-	switchRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: scaleWidth(6),
-	},
-	switchLabel: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
-	},
-	timeRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: scaleWidth(6),
-	},
-	timeText: {
-		fontSize: scaledSize(14),
-		color: '#3498db',
-		paddingVertical: scaleHeight(4),
-		paddingHorizontal: scaleWidth(10),
-		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		borderRadius: scaledSize(6),
-		minWidth: scaleWidth(70),
-		textAlign: 'center',
+		backgroundColor: COLORS.background,
 	},
 	container: {
-		padding: scaleHeight(8),
-	},
-	quizBox: {
-		marginBottom: scaleHeight(12),
-		padding: scaleHeight(16),
-		borderRadius: scaledSize(8),
-		backgroundColor: '#ffffff',
-	},
-	quizSubContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		marginBottom: scaleHeight(20),
+		paddingVertical: SPACING_H.sm,
 	},
 
-	question: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(12),
+	/* ===== 상단 버튼 행 ===== */
+	buttonRow: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		marginHorizontal: SPACING_W.lg,
+		marginTop: SPACING_H.sm,
 	},
-	option: {
-		padding: scaleHeight(10),
-		borderRadius: scaledSize(6),
+	leftButtonWrapper: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	rightButtonWrapper: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	buttonContent: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.md,
+		borderRadius: RADIUS.round,
 		borderWidth: 1,
-		borderColor: '#bdc3c7',
-		marginBottom: scaleHeight(8),
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surface,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
 	},
-	correct: {
-		color: 'green',
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(5),
+	buttonText: {
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.text,
+		fontWeight: '600',
 	},
-	wrong: {
-		color: 'red',
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(5),
+	iconSpacing: {
+		marginRight: SPACING_W.xs,
+	},
+	rightAlignedRow: {
+		flexDirection: 'row',
+		justifyContent: 'flex-end',
+		marginHorizontal: SPACING_W.lg,
+	},
+
+	/* ===== 알림 미설정 안내 카드 ===== */
+	content: {
+		marginTop: SPACING_H.md,
+		marginHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xl,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.lg,
+		backgroundColor: COLORS.surface,
+		justifyContent: 'center',
+		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+	},
+	title: {
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		marginBottom: SPACING_H.md,
+		color: COLORS.textStrong,
+		textAlign: 'center',
+	},
+	bulletRow: {
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+		marginBottom: SPACING_H.sm,
+	},
+	bullet: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.primary,
+		marginRight: SPACING_W.sm,
+		lineHeight: scaledSize(20),
+	},
+	bulletText: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		flexShrink: 1,
+		lineHeight: scaledSize(20),
 	},
 	alarmRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		width: '100%',
-		paddingVertical: scaleHeight(4),
-		marginBottom: scaleHeight(6),
+		paddingVertical: SPACING_H.xs,
+		marginBottom: SPACING_H.sm,
 	},
-	selectedOption: {
-		backgroundColor: '#e0f7fa', // 연한 하늘색
-		borderColor: '#00796b', // 진한 민트 계열
-		borderWidth: 2,
+	switchLabel: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		fontWeight: '500',
 	},
+	selectedHourText: {
+		marginLeft: SPACING_W.sm,
+		fontSize: FONT_SIZES.md,
+		color: COLORS.secondary,
+		fontWeight: '700',
+	},
+	hourScrollContainer: {
+		paddingVertical: SPACING_H.sm,
+	},
+	hourButton: {
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.lg,
+		marginRight: SPACING_W.sm,
+		borderRadius: RADIUS.round,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surfaceAlt,
+	},
+	hourButtonSelected: {
+		backgroundColor: COLORS.primary,
+		borderColor: COLORS.primary,
+	},
+	hourText: {
+		fontSize: FONT_SIZES.md,
+		fontWeight: '600',
+		color: COLORS.text,
+	},
+	hourTextSelected: {
+		color: COLORS.textWhite,
+		fontWeight: '700',
+	},
+
+	/* ===== 점수 / 진행도 ===== */
 	scoreBox: {
-		marginTop: scaleHeight(8),
-		marginHorizontal: scaleWidth(24),
-		padding: scaleHeight(16),
-		borderRadius: scaledSize(10),
-		backgroundColor: '#ffffff',
+		marginTop: SPACING_H.sm,
+		marginHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.lg,
+		backgroundColor: COLORS.surface,
 		alignItems: 'center',
 		justifyContent: 'center',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
 	},
-	scoreText: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-	},
-	feedbackText: {
-		marginTop: scaleHeight(4),
-		fontSize: scaledSize(16),
-		color: '#7f8c8d',
-	},
-	questionGuideCombined: {
-		fontSize: scaledSize(16),
-		color: '#2c3e50',
-		fontWeight: 'bold',
-	},
-	questionCombined: {
-		alignItems: 'center',
-		marginTop: scaleHeight(5),
-		marginBottom: scaleHeight(16),
-	},
-	questionMain: {
-		fontSize: scaledSize(22),
-		fontWeight: 'bold',
-		color: '#3498db', // ✅ 파란색 (DodgerBlue)
-		marginBottom: scaleHeight(8),
-		textAlign: 'center',
-	},
-	questionSub: {
-		fontSize: scaledSize(15),
-		color: '#7f8c8d',
-		textAlign: 'center',
-	},
-
-	characterGridContainer: {
-		flexDirection: 'row',
-		justifyContent: 'space-between', // 또는 'center'
-		flexWrap: 'wrap',
-		backgroundColor: '#ecf0f1',
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(12),
-		marginBottom: scaleHeight(12),
-	},
-
-	characterColumn: {
-		alignItems: 'center',
-		width: scaleWidth(50),
-	},
-
-	charText: {
-		fontSize: scaledSize(22),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-	},
-
-	hangulText: {
-		fontSize: scaledSize(16),
-		color: '#2c3e50',
-		marginTop: scaleHeight(2),
-	},
-
-	meaningText: {
-		fontSize: scaledSize(12),
-		color: '#7f8c8d',
-		marginTop: scaleHeight(2),
-		textAlign: 'center',
-	},
-
-	radicalText: {
-		fontSize: scaledSize(12),
-		color: '#95a5a6',
-		marginTop: scaleHeight(2),
-	},
-
-	quizContainer: {
-		marginHorizontal: scaleWidth(16),
-		marginTop: scaleHeight(12),
-		backgroundColor: '#ffffff',
-		borderRadius: scaledSize(12),
-		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowOpacity: 0.05,
-		shadowRadius: 3,
-	},
-
-	quizContainer2: {
-		marginHorizontal: scaleWidth(16),
-		backgroundColor: '#ffffff',
-		borderRadius: scaledSize(12),
-		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowOpacity: 0.05,
-		shadowRadius: 3,
-	},
-
-	header: {
-		paddingTop: scaleHeight(16),
-		paddingBottom: scaleHeight(12),
-		paddingHorizontal: scaleWidth(20),
-		backgroundColor: '#ffffff',
-		borderBottomWidth: 1,
-		borderBottomColor: '#e0e0e0',
-	},
-
-	headerTitle: {
-		fontSize: scaledSize(20),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		textAlign: 'center',
-	},
-
 	scoreRow: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		width: '100%',
-		paddingHorizontal: scaleWidth(12),
-		marginBottom: scaleHeight(6),
-	},
-
-	scoreValue: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#27ae60',
-	},
-
-	progressContainer: {
-		flexDirection: 'row',
 		alignItems: 'center',
 		width: '100%',
-		paddingHorizontal: scaleWidth(8),
-		marginTop: scaleHeight(6),
 	},
-
-	progressBarBackground: {
+	scoreText: {
 		flex: 1,
-		height: scaleHeight(10),
-		backgroundColor: '#ecf0f1',
-		borderRadius: scaledSize(5),
-		overflow: 'hidden',
-		marginRight: scaleWidth(12),
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 	},
-
-	progressBarFill: {
-		height: '100%',
-		backgroundColor: '#27ae60',
-	},
-
-	progressText: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		fontWeight: '500',
-	},
-
-	explanationBox: {
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-		borderRadius: scaledSize(10),
-		padding: scaleHeight(12),
-		backgroundColor: '#f8f9fa',
-		marginTop: scaleHeight(6),
-	},
-
-	correctMeaning: {
-		fontSize: scaledSize(16),
-		color: '#2c3e50',
-		marginTop: scaleHeight(8),
-		marginBottom: scaleHeight(6),
-	},
-
-	correctMeaningHighlight: {
-		fontWeight: 'bold',
-		color: '#1e8449',
-		fontSize: scaledSize(15),
-	},
-
-	correctMeaningHighlight2: {
-		fontWeight: 'bold',
-		color: '#1e8449',
-		fontSize: scaledSize(15),
-		marginBottom: scaleHeight(6),
-	},
-
-	exampleSentence: {
-		fontSize: scaledSize(14),
-		fontStyle: 'italic',
-		color: '#7f8c8d',
-		marginTop: scaleHeight(6),
-	},
-
-	bellButton: {
-		position: 'absolute',
-		right: scaleWidth(20),
-		top: scaleHeight(16),
-		padding: scaleHeight(4),
-	},
-
-	alarmRowExpanded: {
-		marginHorizontal: scaleWidth(20),
-		marginTop: scaleHeight(12),
-		padding: scaleHeight(16),
-		borderRadius: scaledSize(12),
-		backgroundColor: '#ffffff',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowOpacity: 0.05,
-		shadowRadius: 3,
-	},
-
-	modalOverlay: {
-		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.4)',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-
-	modalContent: {
-		width: '80%',
-		backgroundColor: '#ffffff',
-		borderRadius: scaledSize(12),
-		padding: scaleHeight(24),
-		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
-	},
-
-	modalTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-	},
-	modalTitle2: {
-		fontSize: scaledSize(18),
-		marginBottom: scaleHeight(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-	},
-
-	modalCloseButton: {
-		marginTop: scaleHeight(24),
-		backgroundColor: '#ecf0f1',
-		paddingHorizontal: scaleWidth(16),
-		paddingVertical: scaleHeight(8),
-		borderRadius: scaledSize(8),
-	},
-
-	modalCloseText: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
-	},
-
 	scoreRightGroup: {
 		flexDirection: 'row',
 		alignItems: 'center',
 	},
-
-	alarmModalCard: {
-		width: '85%',
-		backgroundColor: '#ffffff',
-		borderRadius: scaledSize(16),
-		padding: scaleHeight(24),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.2,
-		shadowRadius: 6,
+	bellWrapper: {
+		width: scaleWidth(32),
+		height: scaleWidth(32),
+		borderRadius: scaleWidth(32) / 2,
+		justifyContent: 'center',
 		alignItems: 'center',
+		borderWidth: 1,
+		borderColor: COLORS.warning,
+		backgroundColor: COLORS.warningBg,
+	},
+	progressContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		width: '100%',
+		marginTop: SPACING_H.md,
+	},
+	progressBarBackground: {
+		flex: 1,
+		height: scaleHeight(10),
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.round,
+		overflow: 'hidden',
+		marginRight: SPACING_W.md,
+	},
+	progressBarFill: {
+		height: '100%',
+		backgroundColor: COLORS.primary,
+		borderRadius: RADIUS.round,
+	},
+	progressText: {
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.text,
+		fontWeight: '600',
 	},
 
+	/* ===== 퀴즈 카드 ===== */
+	quizContainer2: {
+		marginHorizontal: SPACING_W.lg,
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+	},
+	quizBox: {
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.lg,
+		backgroundColor: COLORS.surface,
+	},
+	questionCombined: {
+		alignItems: 'center',
+		marginTop: SPACING_H.xs,
+		marginBottom: SPACING_H.lg,
+	},
+	questionMain: {
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.secondary,
+		marginBottom: SPACING_H.sm,
+		lineHeight: scaledSize(30),
+		textAlign: 'center',
+	},
+	questionSub: {
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.textSecondary,
+		textAlign: 'center',
+	},
+
+	/* ===== 정/오답 배너 ===== */
+	resultBannerWrap: {
+		alignItems: 'center',
+		marginBottom: SPACING_H.md,
+	},
+	resultBanner: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.md,
+		borderRadius: RADIUS.round,
+		borderWidth: 1,
+	},
+	resultBannerCorrect: {
+		backgroundColor: COLORS.primaryBg,
+		borderColor: COLORS.primarySoft,
+	},
+	resultBannerWrong: {
+		backgroundColor: COLORS.dangerBg,
+		borderColor: COLORS.danger,
+	},
+	resultBannerIcon: {
+		width: scaleWidth(22),
+		height: scaleWidth(22),
+		borderRadius: scaleWidth(22) / 2,
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginRight: SPACING_W.sm,
+	},
+	resultBannerText: {
+		fontSize: FONT_SIZES.md,
+		fontWeight: '700',
+	},
+
+	/* ===== 보기(선택지) ===== */
+	optionBase: {
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.surfaceAlt,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		marginBottom: SPACING_H.sm,
+	},
+	optionTextBase: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		fontWeight: '500',
+		lineHeight: scaledSize(20),
+		textAlign: 'left',
+	},
+	correctOption: {
+		backgroundColor: COLORS.primaryBg,
+		borderColor: COLORS.primary,
+		borderWidth: 2,
+	},
+	wrongOption: {
+		backgroundColor: COLORS.dangerBg,
+		borderColor: COLORS.danger,
+		borderWidth: 2,
+	},
+	correctText: {
+		color: COLORS.primaryDark,
+		fontWeight: '700',
+	},
+	wrongText: {
+		color: COLORS.dangerDark,
+		fontWeight: '700',
+	},
+	highlightCorrectBorder: {
+		borderColor: COLORS.primary,
+		borderWidth: 2,
+	},
+	nextButton: {
+		marginTop: SPACING_H.lg,
+		alignSelf: 'stretch',
+		alignItems: 'center',
+		justifyContent: 'center',
+		minHeight: scaleHeight(48),
+		backgroundColor: COLORS.secondary,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.xl,
+		borderRadius: RADIUS.md,
+	},
+	nextButtonText: {
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+	},
+
+	/* ===== 퀴즈 시작 카드 ===== */
+	emptyQuizBox: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingVertical: scaleHeight(40),
+		paddingHorizontal: SPACING_W.lg,
+	},
+	emptyQuizTitle: {
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginTop: SPACING_H.lg,
+		textAlign: 'center',
+	},
+	emptyQuizSubtitle: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		marginTop: SPACING_H.sm,
+		marginBottom: SPACING_H.xl,
+		textAlign: 'center',
+	},
+	startQuizButton: {
+		alignSelf: 'stretch',
+		alignItems: 'center',
+		justifyContent: 'center',
+		minHeight: scaleHeight(48),
+		backgroundColor: COLORS.secondary,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.xxl,
+		borderRadius: RADIUS.md,
+	},
+	startQuizButtonText: {
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.textWhite,
+	},
+
+	/* ===== 완료 카드 ===== */
+	completedCard: {
+		alignItems: 'center',
+		marginTop: SPACING_H.xl,
+		marginHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xxl,
+		paddingHorizontal: SPACING_W.lg,
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+	},
+	completedEmojiCircle: {
+		width: scaleWidth(64),
+		height: scaleWidth(64),
+		borderRadius: scaleWidth(64) / 2,
+		backgroundColor: COLORS.primaryBg,
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginBottom: SPACING_H.md,
+	},
+	completedEmoji: {
+		fontSize: scaledSize(30),
+	},
+	completedTitle: {
+		fontSize: FONT_SIZES.xl,
+		color: COLORS.textStrong,
+		fontWeight: '700',
+		marginBottom: SPACING_H.xs,
+		textAlign: 'center',
+	},
+	completedSubtitle: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		fontWeight: '500',
+		textAlign: 'center',
+	},
+	completedScorePill: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.sm,
+		marginTop: SPACING_H.lg,
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.primaryBg,
+		borderWidth: 1,
+		borderColor: COLORS.primarySoft,
+	},
+	completedScoreText: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		fontWeight: '600',
+	},
+	completedScoreNum: {
+		fontSize: FONT_SIZES.lg,
+		color: COLORS.primaryDark,
+		fontWeight: '700',
+	},
+	completedScoreTotal: {
+		color: COLORS.textLight,
+		fontWeight: '700',
+	},
+
+	/* ===== 오늘의 퀴즈 다시 보기 ===== */
+	reviewToggleButton: {
+		marginTop: SPACING_H.md,
+		marginBottom: SPACING_H.md,
+		alignSelf: 'center',
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+	},
+	acodianTxt: {
+		fontSize: FONT_SIZES.md,
+		fontWeight: '600',
+		color: COLORS.text,
+	},
+	reviewList: {
+		marginTop: SPACING_H.xs,
+		paddingHorizontal: SPACING_W.lg,
+		paddingBottom: SPACING_H.md,
+	},
+	reviewItemCard: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.sm,
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.md,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		marginBottom: SPACING_H.md,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+	},
+	reviewItemTextWrap: {
+		flex: 1,
+	},
+	reviewItemTitle: {
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+	},
+	reviewItemMeaning: {
+		marginTop: SPACING_H.xs,
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
+		lineHeight: scaledSize(18),
+	},
+	reviewItemPill: {
+		paddingVertical: SPACING_H.xs,
+		paddingHorizontal: SPACING_W.sm,
+		borderRadius: RADIUS.round,
+		borderWidth: 1,
+	},
+
+	/* ===== 해설 ===== */
+	answerExplainBox: {
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.lg,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.md,
+		backgroundColor: COLORS.background,
+		marginTop: SPACING_H.sm,
+	},
+	answerExplainCorrect: {
+		backgroundColor: COLORS.primaryBg,
+		borderColor: COLORS.primary,
+	},
+	answerExplainWrong: {
+		backgroundColor: COLORS.dangerBg,
+		borderColor: COLORS.danger,
+	},
+	explainHeaderRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		marginBottom: SPACING_H.sm,
+	},
+	explainIdiom: {
+		flexShrink: 1,
+		flexWrap: 'wrap',
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.secondary,
+		lineHeight: scaledSize(26),
+	},
+	explainDetailWrap: {
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		marginTop: SPACING_H.sm,
+	},
+	resultPill: {
+		paddingVertical: SPACING_H.xs,
+		paddingHorizontal: SPACING_W.sm,
+		borderRadius: RADIUS.round,
+		borderWidth: 1,
+	},
+	pillCorrect: {
+		backgroundColor: COLORS.primarySoft,
+		borderColor: COLORS.primary,
+	},
+	pillWrong: {
+		backgroundColor: COLORS.dangerBg,
+		borderColor: COLORS.danger,
+	},
+	resultPillText: {
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '700',
+		color: COLORS.text,
+	},
+
+	/* ===== 모달 공통 ===== */
+	modalOverlay: {
+		flex: 1,
+		backgroundColor: COLORS.dim,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: SPACING_W.lg,
+	},
+	alarmModalCard: {
+		width: '100%',
+		maxWidth: scaleWidth(420),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingVertical: SPACING_H.xl,
+		paddingHorizontal: SPACING_W.lg,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
+		alignItems: 'center',
+	},
+	modalTitle: {
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+	},
+	modalTitle2: {
+		fontSize: FONT_SIZES.xl,
+		marginBottom: SPACING_H.lg,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+	},
+	modalNotice: {
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textLight,
+		marginTop: SPACING_H.xs,
+		marginBottom: SPACING_H.md,
+		textAlign: 'center',
+	},
 	modalRow: {
 		width: '100%',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginVertical: scaleHeight(6),
+		marginVertical: SPACING_H.xs,
 	},
-
 	modalLabel: {
-		fontSize: scaledSize(18),
-		color: '#2c3e50',
-		fontWeight: '500',
-		marginBottom: scaleHeight(10),
-	},
-
-	timeSelector: {
-		paddingVertical: scaleHeight(6),
-		paddingHorizontal: scaleWidth(14),
-		borderRadius: scaledSize(6),
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-		backgroundColor: '#f8f9fa',
-	},
-
-	timeSelectorText: {
-		fontSize: scaledSize(15),
-		color: '#3498db',
-	},
-
-	modalButtonRow: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		marginTop: scaleHeight(24),
-		width: '100%',
-	},
-
-	cancelButton: {
-		flex: 1,
-		padding: scaleHeight(10),
-		borderRadius: scaledSize(8),
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-		marginRight: scaleWidth(8),
-		alignItems: 'center',
-	},
-
-	saveButton: {
-		flex: 1,
-		padding: scaleHeight(10),
-		borderRadius: scaledSize(8),
-		backgroundColor: '#27ae60',
-		alignItems: 'center',
-	},
-
-	cancelButtonText: {
-		color: '#7f8c8d',
-		fontSize: scaledSize(15),
-	},
-
-	saveButtonText: {
-		color: '#ffffff',
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-	},
-
-	prevQuizButton: {
-		marginTop: scaleHeight(10),
-		paddingVertical: scaleHeight(6),
-		paddingHorizontal: scaleWidth(14),
-		backgroundColor: '#ecf0f1',
-		borderRadius: scaledSize(8),
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-	},
-
-	prevQuizButtonText: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
-		textAlign: 'center',
-	},
-
-	prevQuizFloatingButton: {
-		padding: scaleHeight(4),
-	},
-
-	prevQuizFloatingText: {
-		fontSize: scaledSize(12),
-		color: '#95a5a6',
-		textDecorationLine: 'underline',
-	},
-
-	modalCloseIcon: {
-		position: 'absolute',
-		top: scaleHeight(18),
-		right: scaleWidth(18),
-		padding: scaleHeight(4),
-		zIndex: 10,
-	},
-
-	modalFooterButton: {
-		marginTop: scaleHeight(16),
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-		backgroundColor: '#f8f9fa',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(20),
-		borderRadius: scaledSize(8),
-	},
-
-	modalFooterButtonText: {
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-	},
-
-	highlightCorrectBorder: {
-		borderColor: '#27ae60',
-		borderWidth: 3,
-	},
-
-	quizSectionHeader: {
-		borderBottomWidth: 1,
-		borderBottomColor: '#e0e0e0',
-		paddingBottom: scaleHeight(6),
-		marginBottom: scaleHeight(12),
-	},
-
-	quizSectionHeaderText: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2a2a2a',
-	},
-
-	quizCard: {
-		backgroundColor: '#ffffff',
-		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		borderRadius: scaledSize(10),
-		padding: scaleHeight(12),
-		marginBottom: scaleHeight(12),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowOpacity: 0.05,
-		shadowRadius: 2,
-	},
-
-	quizTitle: {
-		fontSize: scaledSize(16),
+		fontSize: FONT_SIZES.lg,
+		color: COLORS.text,
 		fontWeight: '600',
-		color: '#2c3e50',
 	},
-
-	quizMeaning: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
-		marginBottom: scaleHeight(2),
-	},
-
-	quizExample: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		fontStyle: 'italic',
-	},
-
-	optionText: {
-		fontSize: scaledSize(14), // 기존보다 약간 크게 (기본 13~14 예상)
-		color: '#2c3e50',
-	},
-
-	calendarContainer: {
-		borderRadius: scaledSize(10),
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-		padding: scaleHeight(8),
-		marginBottom: scaleHeight(16),
-		backgroundColor: '#ffffff',
-	},
-
-	buttonContainer: {
-		alignItems: 'flex-end',
-		marginHorizontal: scaleWidth(16),
-		marginTop: scaleHeight(3),
-	},
-
-	resetButton: {
-		backgroundColor: '#ecf0f1',
-		paddingVertical: scaleHeight(4),
-		paddingHorizontal: scaleWidth(10),
-		borderRadius: scaledSize(6),
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-	},
-
-	iconSpacing: {
-		marginRight: scaleWidth(4),
-	},
-
-	rightAlignedRow: {
-		flexDirection: 'row',
-		justifyContent: 'flex-end',
-		marginHorizontal: scaleWidth(16),
-	},
-
-	completedTextWrapper: {
-		alignItems: 'center',
-		marginTop: scaleHeight(24),
-	},
-
-	completedTitle: {
-		fontSize: scaledSize(16),
-		color: '#2c3e50',
-		fontWeight: '600',
-		marginBottom: scaleHeight(6),
-		textAlign: 'center',
-	},
-
-	completedScore: {
-		marginTop: scaleHeight(8),
-		fontSize: scaledSize(15),
-		color: '#1e8449',
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(6),
-		textAlign: 'center',
-	},
-
-	underline: {
-		textDecorationLine: 'underline',
-	},
-
-	reviewToggleButton: {
-		marginTop: scaleHeight(10),
-		marginBottom: scaleHeight(10),
-		alignSelf: 'center',
-		flexDirection: 'row',
-		alignItems: 'center',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(16),
-		borderRadius: scaledSize(20),
-		backgroundColor: '#ffffff',
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
-	},
-
-	acodianTxt: { fontSize: scaledSize(14), fontWeight: '600', color: '#2c3e50' },
-
-	reviewList: {
-		marginTop: scaleHeight(12),
-		paddingHorizontal: scaleWidth(14),
-		paddingBottom: scaleHeight(6),
-	},
-
-	modalNotice: {
-		fontSize: scaledSize(13),
-		color: '#95a5a6',
-		marginTop: scaleHeight(4),
-		marginBottom: scaleHeight(15),
-		textAlign: 'center',
-	},
-
-	quizGroup: {
-		marginBottom: scaleHeight(24),
-	},
-
-	dayOfWeekText: {
-		color: '#3498db',
-	},
-
-	scrollView: {
-		maxHeight: scaleHeight(540),
-		width: '100%',
-	},
-
-	scrollContent: {
-		paddingBottom: scaleHeight(20),
-	},
-
-	emptyView: {
-		paddingVertical: scaleHeight(40),
-		alignItems: 'center',
-	},
-
-	emptyText: {
-		fontSize: scaledSize(15),
-		color: '#95a5a6',
-	},
-	bellWrapper: {
-		width: scaleWidth(28),
-		height: scaleWidth(28),
-		borderRadius: scaleWidth(12),
-		justifyContent: 'center',
-		alignItems: 'center',
-		borderWidth: 1,
-		borderColor: '#DAA520', // 골드 테두리 (GoldenRod)
-	},
-	bulletRow: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		marginBottom: scaleHeight(6),
-	},
-	bullet: {
-		fontSize: scaledSize(14),
-		color: '#27ae60',
-		marginRight: scaleWidth(8),
-		lineHeight: scaledSize(20),
-	},
-	bulletText: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		flexShrink: 1,
-		lineHeight: scaledSize(20),
-	},
-	alarmRow2: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-	},
-	selectedHourText: {
-		marginLeft: scaleWidth(20),
-		fontSize: scaledSize(14),
-		color: '#3498db',
-		fontWeight: 'bold',
-	},
-	hourScrollContainer: {
-		paddingVertical: scaleHeight(8),
-	},
-	hourButton: {
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(16),
-		marginRight: scaleWidth(8),
-		borderRadius: scaledSize(20),
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-		backgroundColor: '#ecf0f1',
-	},
-	hourButtonSelected: {
-		backgroundColor: '#27ae60',
-		borderColor: '#27ae60',
-	},
-	hourText: {
-		fontSize: scaledSize(14),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-	},
-	hourTextSelected: {
-		color: '#ffffff',
-	},
-
 	timePickerRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
+		marginBottom: SPACING_H.xs,
 	},
-	buttonRow: {
+	modalButtonRow: {
 		flexDirection: 'row',
-		justifyContent: 'space-between', // 좌우 끝으로 배치
-		alignItems: 'center',
-		marginHorizontal: scaleWidth(16),
-		marginTop: scaleHeight(4),
-	},
-
-	leftButton: {
-		padding: scaleHeight(4),
-	},
-
-	rightButton: {
-		padding: scaleHeight(4),
-	},
-	leftButtonWrapper: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-
-	rightButtonWrapper: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-
-	buttonContent: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		paddingVertical: scaleHeight(6),
-		paddingHorizontal: scaleWidth(12),
-		borderRadius: scaleWidth(8),
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-		backgroundColor: '#ffffff',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: 2,
-	},
-	buttonText: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		fontWeight: '600',
-	},
-	todayReviewBox: {
-		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		borderRadius: scaleWidth(12),
-		padding: scaleHeight(12),
-		marginHorizontal: scaleWidth(16),
-		backgroundColor: '#ffffff',
-	},
-	continent: {
-		fontSize: scaledSize(12),
-		color: '#16a085',
-		marginTop: 2,
-	},
-	imageWrapper: {
-		position: 'relative',
-	},
-
-	image: {
-		width: scaleWidth(90), // 기존 70 → 확대
-		height: scaleHeight(90), // 기존 70 → 확대
-		borderRadius: scaleWidth(12),
-		marginRight: scaleWidth(10),
-	},
-
-	zoomIconContainer: {
-		position: 'absolute',
-		bottom: scaleHeight(4),
-		right: scaleWidth(8),
-		backgroundColor: 'rgba(255, 255, 255, 0.85)',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(3),
-	},
-	fullscreenOverlay: {
-		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.95)',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	fullscreenImage: {
-		width: '100%',
-		height: '100%',
-	},
-	fullscreenCloseButton: {
-		position: 'absolute',
-		top: scaleHeight(40),
-		right: scaleWidth(20),
-		backgroundColor: 'rgba(0,0,0,0.5)',
-		padding: scaleWidth(8),
-		borderRadius: scaleWidth(20),
-	},
-	imageSourceContainer: {
-		position: 'absolute',
-		bottom: scaleHeight(20),
-		left: scaleWidth(16),
-		right: scaleWidth(16),
-		alignItems: 'center',
-	},
-
-	imageSourceText: {
-		color: '#bdc3c7',
-		fontSize: scaledSize(11),
-		textAlign: 'center',
-	},
-
-	imageSourceLink: {
-		color: '#3498db',
-		textDecorationLine: 'underline',
-	},
-	imageHintText: {
-		fontSize: scaledSize(10),
-		color: '#95a5a6',
-		marginBottom: scaleHeight(12),
-	},
-
-	dogNameText: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(6),
-	},
-	optionBase: {
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(16),
-		borderRadius: scaleWidth(24), // ✅ 둥근 버튼
-		backgroundColor: '#ecf0f1',
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-		marginBottom: scaleHeight(10),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.08,
-		shadowRadius: 2,
-	},
-
-	optionTextBase: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
-		fontWeight: '500',
-		textAlign: 'left',
-	},
-
-	// 변경 → 테두리만 강조
-	correctOption: {
-		backgroundColor: '#ecf0f1', // 기본 배경 유지
-		borderColor: '#27ae60',
-		borderWidth: 3, // 테두리 두께 강조
-	},
-	wrongOption: {
-		backgroundColor: '#ecf0f1', // 기본 배경 유지
-		borderColor: '#e74c3c',
-		borderWidth: 3,
-	},
-
-	correctText: {
-		color: '#27ae60',
-		fontWeight: 'bold',
-	},
-	wrongText: {
-		color: '#e74c3c',
-		fontWeight: 'bold',
-	},
-	hintText: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		marginTop: scaleHeight(2),
-	},
-	hintHighlight: {
-		fontWeight: 'bold',
-		color: '#2c3e50',
-	},
-	dogInfoBox: {
-		backgroundColor: '#f8f9fa',
-		padding: scaleHeight(14),
-		borderRadius: scaleWidth(12),
-		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		marginBottom: scaleHeight(12),
-	},
-	dogInfoTitle: {
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(10),
-	},
-	dogInfoRow: {
-		flexDirection: 'row',
-		marginBottom: scaleHeight(6),
-		flexWrap: 'wrap',
-	},
-	dogInfoLabel: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		width: scaleWidth(60),
-		fontWeight: 'bold',
-	},
-	dogInfoValue: {
-		fontSize: scaledSize(14),
-		marginBottom: scaleHeight(8),
-		color: '#2c3e50',
-		flexShrink: 1,
-	},
-	questionResultInline: {
-		textAlign: 'center',
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-		marginLeft: scaleWidth(6),
-		lineHeight: scaledSize(20), // ✅ fontSize보다 조금 크게
-	},
-	scrollTopButton: {
-		position: 'absolute',
-		right: scaleWidth(16),
-		bottom: scaleHeight(16),
-		backgroundColor: '#3498db',
-		width: scaleWidth(40),
-		height: scaleWidth(40),
-		borderRadius: scaleWidth(20),
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	catInfoBox: {
-		width: '100%',
-		backgroundColor: '#ffffff',
-		padding: scaleHeight(12),
-		borderRadius: scaleWidth(12),
-		borderWidth: 1,
-		borderColor: '#ecf0f1',
-		marginBottom: scaleHeight(6),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.05,
-		shadowRadius: 3,
-	},
-	catInfoTitle: {
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(10),
-	},
-	catInfoRow: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		marginVertical: scaleHeight(3),
-		flexWrap: 'nowrap', // ✅ 줄바꿈 방지 (라벨+값을 같은 줄에 고정)
-	},
-	catInfoIcon: {
-		marginRight: scaleWidth(6),
-		marginTop: scaleHeight(2),
-	},
-	catInfoLabel: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		fontWeight: '600',
-		width: scaleWidth(70),
-	},
-	catInfoValue: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		flexShrink: 1,
-	},
-	circleImageWrapper: {
-		alignItems: 'center',
-		marginBottom: scaleHeight(10),
-	},
-	circleImage: {
-		width: scaleWidth(88), // 크기는 취향에 맞게 조절
-		height: scaleWidth(88),
-		borderRadius: scaleWidth(44),
-		borderWidth: 2,
-		borderColor: '#ecf0f1',
-		// 살짝 그림자
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.12,
-		shadowRadius: 3,
-	},
-	answerExplainBox: {
-		borderWidth: 1,
-		borderColor: '#bdc3c7',
-		borderRadius: scaledSize(10),
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(14),
-		backgroundColor: '#f8f9fa',
-		marginTop: scaleHeight(6),
-	},
-	explainDetailWrap: {
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(14),
-		paddingHorizontal: scaleWidth(16),
-		paddingVertical: scaleHeight(14),
-		marginTop: scaleHeight(4),
-	},
-	answerExplainCorrect: {
-		backgroundColor: 'rgba(76, 175, 80, 0.12)', // 연한 초록
-		borderColor: '#27ae60',
-	},
-
-	answerExplainWrong: {
-		backgroundColor: 'rgba(244, 67, 54, 0.12)', // 연한 빨강
-		borderColor: '#e74c3c',
-	},
-
-	answerBadge: {
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-	},
-	// 해설 헤더: 속담 + 배지
-	explainHeaderRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
 		justifyContent: 'space-between',
-		marginBottom: scaleHeight(8),
+		columnGap: SPACING_W.md,
+		marginTop: SPACING_H.xl,
+		width: '100%',
 	},
-
-	explainIdiom: {
-		flexShrink: 1,
-		flexWrap: 'wrap', // 👉 줄바꿈 허용
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#3498db',
-		lineHeight: scaledSize(24),
-	},
-
-	correctInline: {
-		color: '#1e8449',
-		fontWeight: 'bold',
-		fontSize: scaledSize(14),
-	},
-
-	wrongInline: {
-		color: '#c62828',
-		fontWeight: 'bold',
-		fontSize: scaledSize(14),
-	},
-
-	// 정오답 배지(오른쪽)
-	resultPill: {
-		paddingVertical: scaleHeight(4),
-		paddingHorizontal: scaleWidth(10),
-		borderRadius: scaleWidth(16),
+	cancelButton: {
+		flex: 1,
+		minHeight: scaleHeight(48),
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
 		borderWidth: 1,
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surfaceAlt,
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
-	pillCorrect: {
-		backgroundColor: 'rgba(76, 175, 80, 0.12)', // 연녹
-		borderColor: '#27ae60',
+	cancelButtonText: {
+		color: COLORS.textSecondary,
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '600',
 	},
-	pillWrong: {
-		backgroundColor: 'rgba(244, 67, 54, 0.12)', // 연빨
-		borderColor: '#e74c3c',
+	saveButton: {
+		flex: 1,
+		minHeight: scaleHeight(48),
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.primary,
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
-	resultPillText: {
-		fontSize: scaledSize(13),
-		fontWeight: 'bold',
-		color: '#2a2a2a',
+	saveButtonText: {
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
+	},
+	modalCloseIcon: {
+		position: 'absolute',
+		top: SPACING_H.lg,
+		right: SPACING_W.lg,
+		padding: scaleWidth(4),
+		zIndex: 10,
+	},
+	modalFooterButton: {
+		width: '100%',
+		marginTop: SPACING_H.lg,
+		minHeight: scaleHeight(48),
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surfaceAlt,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.xl,
+		borderRadius: RADIUS.md,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	modalFooterButtonText: {
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
+		color: COLORS.text,
+	},
+	scrollView: {
+		maxHeight: scaleHeight(520),
+		width: '100%',
+	},
+	scrollContent: {
+		paddingBottom: SPACING_H.xl,
+	},
+	emptyView: {
+		paddingVertical: scaleHeight(40),
+		alignItems: 'center',
+	},
+	emptyText: {
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.textLight,
 	},
 
-	// 구분선(선택)
-	explainDivider: {
-		height: 1,
-		backgroundColor: '#eaeaea',
-		marginVertical: scaleHeight(8),
+	/* ===== 지난 오늘의 퀴즈(히스토리) ===== */
+	quizGroup: {
+		marginBottom: SPACING_H.xl,
 	},
-
-	// 정답 의미 라벨/값
-	correctMeaningLabel: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		marginBottom: scaleHeight(4),
-	},
-	correctMeaningValue: {
-		fontSize: scaledSize(15),
-		color: '#1e8449',
-		fontWeight: 'bold',
-		lineHeight: scaledSize(22),
-	},
-	// ✅ 추가 스타일
 	historySectionHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingVertical: scaleHeight(6),
-		marginBottom: scaleHeight(10),
+		paddingVertical: SPACING_H.sm,
+		marginBottom: SPACING_H.md,
 		borderBottomWidth: 1,
-		borderBottomColor: '#ecf0f1',
+		borderBottomColor: COLORS.border,
 	},
 	historySectionHeaderLeft: {
 		flexDirection: 'row',
 		alignItems: 'center',
 	},
 	historySectionTitle: {
-		fontSize: scaledSize(16),
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
-		color: '#2a2a2a',
+		color: COLORS.textStrong,
 	},
 	historyDateChip: {
-		paddingVertical: scaleHeight(3),
-		paddingHorizontal: scaleWidth(8),
-		backgroundColor: '#F5F7FA',
+		paddingVertical: SPACING_H.xs,
+		paddingHorizontal: SPACING_W.sm,
+		backgroundColor: COLORS.surfaceAlt,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		borderRadius: scaleWidth(12),
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.round,
 	},
 	historyDateChipText: {
-		fontSize: scaledSize(11),
-		color: '#667085',
+		fontSize: FONT_SIZES.xs,
+		fontWeight: '600',
+		color: COLORS.textSecondary,
 	},
-
 	historyCard: {
 		flexDirection: 'row',
-		backgroundColor: '#ffffff',
+		backgroundColor: COLORS.surface,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		borderRadius: scaledSize(12),
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.lg,
 		overflow: 'hidden',
-		marginBottom: scaleHeight(12),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: 2,
-	},
-	historyActionColumn: {
-		width: scaleWidth(42),
-		alignItems: 'center',
-		justifyContent: 'center',
-		paddingVertical: scaleHeight(10),
-		paddingRight: scaleWidth(8),
-	},
-	historyActionButton: {
-		width: scaleWidth(30),
-		height: scaleWidth(30),
-		alignItems: 'center',
-		justifyContent: 'center',
+		marginBottom: SPACING_H.md,
 	},
 	historyCardBody: {
 		flex: 1,
-		padding: scaleHeight(12),
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
 	},
-
 	historyHeaderRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 	},
+	historyHeaderRight: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
 	historyIdiom: {
 		flex: 1,
-		fontSize: scaledSize(16),
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
-		color: '#0F172A',
-		paddingRight: scaleWidth(10),
+		color: COLORS.textStrong,
+		lineHeight: scaledSize(22),
+		paddingRight: SPACING_W.sm,
 	},
-
 	historyMeaningBox: {
-		marginTop: scaleHeight(6),
-		paddingVertical: scaleHeight(6),
-		paddingHorizontal: scaleWidth(10),
-		borderRadius: scaleWidth(8),
-		backgroundColor: '#F8FAFC',
+		marginTop: SPACING_H.sm,
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.md,
+		borderRadius: RADIUS.sm,
+		backgroundColor: COLORS.background,
 		borderWidth: 1,
-		borderColor: '#F1F5F9',
-	},
-	historyMeaningLabel: {
-		fontSize: scaledSize(12),
-		color: '#7f8c8d',
-		marginBottom: scaleHeight(4),
+		borderColor: COLORS.border,
 	},
 	historyMeaningValue: {
-		fontSize: scaledSize(14),
-		color: '#334155',
-		fontWeight: 'bold',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		fontWeight: '500',
 		lineHeight: scaledSize(20),
 	},
-
-	historySubTitleRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	historySubTitle: {
-		marginLeft: scaleWidth(6),
-		fontSize: scaledSize(13),
-		fontWeight: '700',
-		color: '#2c3e50',
-	},
-
-	phraseRow: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		marginBottom: scaleHeight(4),
-		flexWrap: 'wrap',
-	},
-	phraseKr: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		fontWeight: '600',
-	},
-	phraseMean: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		flexShrink: 1,
-	},
-
-	exampleList: {
-		marginTop: scaleHeight(4),
-	},
-	bulletItem: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		marginBottom: scaleHeight(4),
-	},
-	bulletDot: {
-		fontSize: scaledSize(14),
-		lineHeight: scaledSize(18),
-		color: '#27ae60',
-		marginRight: scaleWidth(6),
-	},
-	exampleText: {
-		flex: 1,
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		lineHeight: scaledSize(18),
-	},
-
-	// 작은 점(정오답 배지 왼쪽)
-	resultDot: {
-		width: scaleWidth(8),
-		height: scaleWidth(8),
-		borderRadius: scaleWidth(4),
-		marginRight: scaleWidth(6),
-	},
-	dotCorrect: { backgroundColor: '#27ae60' },
-	dotWrong: { backgroundColor: '#e74c3c' },
-	sectionCard: {
-		marginTop: scaleHeight(10),
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(12),
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#FFFFFF',
-		borderWidth: 1,
-		borderColor: '#EAEAEA',
-	},
-	sectionHeaderRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: scaleHeight(6),
-	},
-	sectionHeaderIcon: {
-		marginRight: scaleWidth(6),
-	},
-	sectionHeaderText: {
-		fontSize: scaledSize(14),
-		fontWeight: '700',
-		color: '#2c3e50',
-	},
-	sectionTag: {
-		marginLeft: 'auto',
-		paddingVertical: scaleHeight(2),
-		paddingHorizontal: scaleWidth(8),
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#F0FDF4',
-		borderWidth: 1,
-		borderColor: '#DCFCE7',
-	},
-	sectionTagText: {
-		fontSize: scaledSize(11),
-		fontWeight: '700',
-		color: '#166534',
-	},
-
-	// 어절 행
-	sectionItemRow: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		marginBottom: scaleHeight(4),
-		flexWrap: 'wrap',
-	},
-	sectionItemIndex: {
-		fontSize: scaledSize(13),
-		color: '#64748B',
-		textAlign: 'left',
-		marginRight: scaleWidth(6),
-	},
-	sectionItemKey: {
-		fontSize: scaledSize(13),
-		color: '#111827',
-		fontWeight: '700',
-	},
-	sectionItemDash: {
-		fontSize: scaledSize(13),
-		color: '#95a5a6',
-	},
-	sectionItemValue: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		flexShrink: 1,
-	},
-
-	// 예문 불릿
-	sectionBulletRow: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		marginBottom: scaleHeight(4),
-	},
-	sectionBulletDot: {
-		fontSize: scaledSize(14),
-		lineHeight: scaledSize(18),
-		color: '#27ae60',
-		marginRight: scaleWidth(6),
-	},
-	sectionBulletText: {
-		flex: 1,
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		lineHeight: scaledSize(18),
-	},
-	detailButton: {
-		flexDirection: 'row',
+	historyActionColumn: {
+		width: scaleWidth(44),
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginTop: scaleHeight(12),
-		paddingVertical: scaleHeight(8),
-		borderRadius: scaleWidth(8),
-		backgroundColor: '#ecf0f1',
-		borderWidth: 1,
-		borderColor: '#e0e0e0',
+		paddingVertical: SPACING_H.sm,
+		paddingRight: SPACING_W.sm,
 	},
-	detailButtonText: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		fontWeight: '600',
-	},
-	detailModalCard: {
-		width: '85%',
-		backgroundColor: '#ffffff',
-		borderRadius: scaleWidth(12),
-		padding: scaleHeight(20),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.15,
-		shadowRadius: 4,
-	},
-	detailTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(10),
-	},
-	detailMeaning: {
-		fontSize: scaledSize(15),
-		color: '#1e8449',
-		fontWeight: '600',
-	},
-	detailSubTitle: {
-		fontSize: scaledSize(14),
-		fontWeight: '700',
-		marginBottom: scaleHeight(4),
-		color: '#2c3e50',
-	},
-	detailPhrase: {
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
-		marginBottom: scaleHeight(3),
-	},
-	detailExample: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		marginBottom: scaleHeight(3),
-	},
-	emptyQuizBox: {
+	historyActionButton: {
+		width: scaleWidth(32),
+		height: scaleWidth(32),
 		alignItems: 'center',
 		justifyContent: 'center',
-		paddingVertical: scaleHeight(40),
-		paddingHorizontal: scaleWidth(16),
-	},
-	emptyQuizTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginTop: scaleHeight(16),
-	},
-	emptyQuizSubtitle: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		marginTop: scaleHeight(6),
-		marginBottom: scaleHeight(20),
-		textAlign: 'center',
-	},
-	startQuizButton: {
-		backgroundColor: '#3498db',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(24),
-		borderRadius: scaleWidth(24),
-	},
-	startQuizButtonText: {
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-		color: '#ffffff',
-	},
-	centerStartButton: {
-		alignSelf: 'center',
-		marginBottom: scaleHeight(8),
-		backgroundColor: '#3498db',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(20),
-		borderRadius: scaleWidth(24),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.15,
-		shadowRadius: 4,
-	},
-	centerStartButtonText: {
-		color: '#ffffff',
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-	},
-	nextButton: {
-		marginTop: scaleHeight(12),
-		alignSelf: 'center',
-		backgroundColor: '#3498db',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(20),
-		borderRadius: scaleWidth(20),
-	},
-	nextButtonText: {
-		color: '#ffffff',
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
 	},
 });

@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, Dimensions, ScrollView } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 
 const { width, height } = Dimensions.get('window');
@@ -101,10 +102,10 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 	}, [visible, isVictory]);
 
 	const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
-	const accentColor = isVictory ? '#FBBF24' : '#F87171';
+	const accentColor = isVictory ? COLORS.gold : '#F87171';
 	const bgColor = isVictory ? '#064E3B' : '#7F1D1D';
-	const headerBgColor = isVictory ? '#22C55E' : '#B91C1C';
-	const borderColor = isVictory ? '#22C55E' : '#EF4444';
+	const headerBgColor = isVictory ? COLORS.primary : '#B91C1C';
+	const borderColor = isVictory ? COLORS.primary : COLORS.danger;
 
 	const renderScoreDots = () =>
 		Array.from({ length: totalQuestions }).map((_, i) => (
@@ -211,7 +212,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 												},
 											],
 										}}>
-										<IconComponent type="materialIcons" name="star" size={scaledSize(36)} color="#FBBF24" />
+										<IconComponent type="materialIcons" name="star" size={scaledSize(36)} color={COLORS.gold} />
 									</Animated.View>
 								))}
 							</View>
@@ -223,7 +224,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 								<View
 									style={[
 										styles.rewardHeader,
-										{ backgroundColor: 'rgba(241,196,15,0.15)', borderBottomColor: 'rgba(241,196,15,0.3)' },
+										{ backgroundColor: 'rgba(250,204,21,0.15)', borderBottomColor: 'rgba(250,204,21,0.3)' },
 									]}>
 									<Text style={styles.rewardHeaderText}>🎁 REWARD UNLOCKED</Text>
 								</View>
@@ -248,22 +249,22 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 
 					{/* 버튼 - 항상 하단 고정 */}
 					<View style={styles.buttonsContainer}>
-						<TouchableOpacity onPress={onHome} style={styles.btnSecondary}>
-							<IconComponent type="materialIcons" name="home" size={scaledSize(20)} color="#fff" />
+						<TouchableOpacity onPress={onHome} style={styles.btnSecondary} activeOpacity={0.8}>
+							<IconComponent type="materialIcons" name="home" size={scaledSize(20)} color={COLORS.textWhite} />
 							<Text style={styles.btnSecondaryText}>홈</Text>
 						</TouchableOpacity>
 
 						{isVictory ? (
 							onNext && (
-								<TouchableOpacity onPress={onNext} style={[styles.btnPrimary, { backgroundColor: '#F59E0B' }]}>
+								<TouchableOpacity onPress={onNext} style={[styles.btnPrimary, { backgroundColor: COLORS.warning }]} activeOpacity={0.8}>
 									<Text style={[styles.btnPrimaryText, { color: '#0F172A' }]}>NEXT LEVEL</Text>
 									<IconComponent type="materialIcons" name="arrow-forward" size={scaledSize(20)} color="#0F172A" />
 								</TouchableOpacity>
 							)
 						) : (
-							<TouchableOpacity onPress={onRetry} style={[styles.btnPrimary, { backgroundColor: '#EF4444' }]}>
-								<IconComponent type="materialIcons" name="refresh" size={scaledSize(20)} color="#fff" />
-								<Text style={[styles.btnPrimaryText, { color: '#fff' }]}>RETRY</Text>
+							<TouchableOpacity onPress={onRetry} style={[styles.btnPrimary, { backgroundColor: COLORS.danger }]} activeOpacity={0.8}>
+								<IconComponent type="materialIcons" name="refresh" size={scaledSize(20)} color={COLORS.textWhite} />
+								<Text style={[styles.btnPrimaryText, { color: COLORS.textWhite }]}>RETRY</Text>
 							</TouchableOpacity>
 						)}
 					</View>
@@ -286,21 +287,22 @@ const styles = StyleSheet.create({
 		width: width * 0.9,
 		// 화면 높이의 80%로 고정 → 버튼이 항상 화면 안에 들어옴
 		height: height * 0.8,
-		borderRadius: scaleWidth(20),
+		borderRadius: RADIUS.xl,
 		overflow: 'hidden',
 		borderWidth: 1.5,
 		// flex 구조: 헤더(고정) + 보스(고정) + 스크롤 + 버튼(고정)
 		flexDirection: 'column',
 	},
 	titleBanner: {
-		paddingVertical: scaleHeight(14),
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
 		alignItems: 'center',
 		// flex 없음 → 컨텐츠 크기만큼만 차지
 	},
 	resultTitle: {
-		fontSize: scaledSize(22),
-		fontWeight: '900',
-		color: '#fff',
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.textWhite,
 		letterSpacing: 3,
 		textShadowColor: 'rgba(0,0,0,0.4)',
 		textShadowOffset: { width: 0, height: 2 },
@@ -308,21 +310,21 @@ const styles = StyleSheet.create({
 	},
 	bossContainer: {
 		alignItems: 'center',
-		paddingVertical: scaleHeight(16),
+		paddingVertical: SPACING_H.lg,
 		// flex 없음 → 고정 높이
 	},
 	bossGlowRing: {
 		position: 'absolute',
-		top: scaleHeight(10),
+		top: SPACING_H.md,
 		width: scaleWidth(110),
 		height: scaleWidth(110),
-		borderRadius: scaleWidth(55),
+		borderRadius: scaleWidth(110) / 2,
 		borderWidth: 2,
 	},
 	bossImageWrapper: {
 		width: scaleWidth(90),
 		height: scaleWidth(90),
-		borderRadius: scaleWidth(45),
+		borderRadius: scaleWidth(90) / 2,
 		borderWidth: 3,
 		overflow: 'hidden',
 		backgroundColor: 'rgba(0,0,0,0.3)',
@@ -342,20 +344,20 @@ const styles = StyleSheet.create({
 	},
 	defeatOverlayText: {
 		fontSize: scaledSize(42),
-		color: '#EF4444',
-		fontWeight: 'bold',
+		color: COLORS.danger,
+		fontWeight: '700',
 	},
 	crownBadge: {
 		position: 'absolute',
-		top: scaleHeight(6),
+		top: SPACING_H.xs,
 	},
 	crownText: {
-		fontSize: scaledSize(22),
+		fontSize: FONT_SIZES.heading,
 	},
 	levelName: {
-		marginTop: scaleHeight(8),
+		marginTop: SPACING_H.sm,
 		textAlign: 'center',
-		fontSize: scaledSize(12),
+		fontSize: FONT_SIZES.sm,
 		color: 'rgba(255,255,255,0.5)',
 		letterSpacing: 2,
 		textTransform: 'uppercase',
@@ -365,22 +367,24 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	scrollContent: {
-		paddingHorizontal: scaleWidth(20),
-		paddingBottom: scaleHeight(8),
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.xs,
+		paddingBottom: SPACING_H.lg,
 	},
 	scoreMainBox: {
 		backgroundColor: 'rgba(0,0,0,0.3)',
-		borderRadius: scaleWidth(16),
-		padding: scaleWidth(16),
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
 		alignItems: 'center',
 		borderWidth: 1,
 		borderColor: 'rgba(255,255,255,0.08)',
 	},
 	scoreLabel: {
-		fontSize: scaledSize(11),
+		fontSize: FONT_SIZES.xs,
 		color: 'rgba(255,255,255,0.4)',
 		letterSpacing: 3,
-		marginBottom: scaleHeight(4),
+		marginBottom: SPACING_H.xs,
 	},
 	scoreRow: {
 		flexDirection: 'row',
@@ -388,12 +392,12 @@ const styles = StyleSheet.create({
 	},
 	scoreCorrect: {
 		fontSize: scaledSize(52),
-		fontWeight: '900',
+		fontWeight: '700',
 	},
 	scoreSlash: {
-		fontSize: scaledSize(28),
+		fontSize: FONT_SIZES.display,
 		color: 'rgba(255,255,255,0.3)',
-		fontWeight: '300',
+		fontWeight: '400',
 	},
 	scoreTotal: {
 		fontSize: scaledSize(32),
@@ -402,14 +406,14 @@ const styles = StyleSheet.create({
 	},
 	scoreDotsRow: {
 		flexDirection: 'row',
-		gap: scaleWidth(6),
-		marginTop: scaleHeight(10),
-		marginBottom: scaleHeight(10),
+		gap: SPACING_W.sm,
+		marginTop: SPACING_H.md,
+		marginBottom: SPACING_H.md,
 	},
 	scoreDot: {
 		width: scaleWidth(24),
 		height: scaleWidth(24),
-		borderRadius: scaleWidth(12),
+		borderRadius: scaleWidth(24) / 2,
 		borderWidth: 1.5,
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -418,89 +422,91 @@ const styles = StyleSheet.create({
 		width: '100%',
 		height: scaleHeight(6),
 		backgroundColor: 'rgba(255,255,255,0.1)',
-		borderRadius: scaleWidth(3),
+		borderRadius: RADIUS.round,
 		overflow: 'hidden',
 	},
 	percentBarFill: {
 		height: '100%',
-		borderRadius: scaleWidth(3),
+		borderRadius: RADIUS.round,
 	},
 	percentText: {
-		fontSize: scaledSize(13),
+		fontSize: FONT_SIZES.smPlus,
 		fontWeight: '700',
-		marginTop: scaleHeight(6),
+		marginTop: SPACING_H.xs,
 		letterSpacing: 1,
 	},
 	starsContainer: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		gap: scaleWidth(10),
-		marginTop: scaleHeight(12),
+		gap: SPACING_W.md,
+		marginTop: SPACING_H.md,
 	},
 	rewardSection: {
-		marginTop: scaleHeight(12),
-		borderRadius: scaleWidth(14),
+		marginTop: SPACING_H.md,
+		borderRadius: RADIUS.lg,
 		overflow: 'hidden',
 		borderWidth: 1,
-		borderColor: 'rgba(241,196,15,0.35)',
+		borderColor: 'rgba(250,204,21,0.35)',
 		backgroundColor: 'rgba(0,0,0,0.2)',
 	},
 	rewardHeader: {
-		paddingVertical: scaleHeight(8),
+		paddingVertical: SPACING_H.sm,
 		alignItems: 'center',
 		borderBottomWidth: 1,
 	},
 	rewardHeaderText: {
-		fontSize: scaledSize(11),
-		fontWeight: '800',
-		color: '#FBBF24',
+		fontSize: FONT_SIZES.xs,
+		fontWeight: '700',
+		color: COLORS.gold,
 		letterSpacing: 2,
 	},
 	rewardBody: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		padding: scaleWidth(14),
-		gap: scaleWidth(14),
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		gap: SPACING_W.lg,
 	},
 	rewardImage: {
 		width: scaleWidth(52),
 		height: scaleWidth(52),
-		borderRadius: scaleWidth(26),
+		borderRadius: scaleWidth(52) / 2,
 		borderWidth: 2,
-		borderColor: 'rgba(241,196,15,0.4)',
+		borderColor: 'rgba(250,204,21,0.4)',
 	},
 	rewardInfo: {
 		flex: 1,
 	},
 	rewardName: {
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 		fontWeight: '700',
-		color: '#fff',
-		marginBottom: scaleHeight(4),
+		color: COLORS.textWhite,
+		marginBottom: SPACING_H.xs,
 	},
 	rewardDescription: {
-		fontSize: scaledSize(12),
+		fontSize: FONT_SIZES.sm,
 		color: 'rgba(255,255,255,0.6)',
 		lineHeight: scaledSize(18),
 	},
 	failSection: {
-		marginTop: scaleHeight(12),
+		marginTop: SPACING_H.md,
 		backgroundColor: 'rgba(0,0,0,0.25)',
-		borderRadius: scaleWidth(14),
-		padding: scaleWidth(16),
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
 		borderWidth: 1,
 		borderColor: 'rgba(255,100,100,0.25)',
 		alignItems: 'center',
 	},
 	failLabel: {
-		fontSize: scaledSize(11),
-		fontWeight: '800',
+		fontSize: FONT_SIZES.xs,
+		fontWeight: '700',
 		color: '#F87171',
 		letterSpacing: 3,
-		marginBottom: scaleHeight(8),
+		marginBottom: SPACING_H.sm,
 	},
 	failText: {
-		fontSize: scaledSize(13),
+		fontSize: FONT_SIZES.smPlus,
 		color: 'rgba(255,255,255,0.65)',
 		textAlign: 'center',
 		lineHeight: scaledSize(22),
@@ -508,9 +514,9 @@ const styles = StyleSheet.create({
 	// 버튼: flex 없음 → 항상 하단에 고정
 	buttonsContainer: {
 		flexDirection: 'row',
-		gap: scaleWidth(10),
-		paddingHorizontal: scaleWidth(20),
-		paddingVertical: scaleHeight(16),
+		gap: SPACING_W.md,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
 		borderTopWidth: 1,
 		borderTopColor: 'rgba(255,255,255,0.08)',
 	},
@@ -519,30 +525,32 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		gap: scaleWidth(6),
-		paddingVertical: scaleHeight(14),
-		borderRadius: scaleWidth(12),
+		gap: SPACING_W.sm,
+		minHeight: scaleHeight(48),
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
 		backgroundColor: 'rgba(255,255,255,0.08)',
 		borderWidth: 1,
 		borderColor: 'rgba(255,255,255,0.12)',
 	},
 	btnSecondaryText: {
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 		fontWeight: '700',
-		color: '#fff',
+		color: COLORS.textWhite,
 	},
 	btnPrimary: {
 		flex: 2,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		gap: scaleWidth(8),
-		paddingVertical: scaleHeight(14),
-		borderRadius: scaleWidth(12),
+		gap: SPACING_W.sm,
+		minHeight: scaleHeight(48),
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
 	},
 	btnPrimaryText: {
-		fontSize: scaledSize(15),
-		fontWeight: '900',
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
 		letterSpacing: 1,
 	},
 });

@@ -1,7 +1,8 @@
-import React from 'react';
-import { Modal, View, Text, Image, StyleSheet, TouchableOpacity, Linking, ScrollView } from 'react-native';
-import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Modal, View, Text, Image, StyleSheet, TouchableOpacity, Linking, ScrollView } from 'react-native';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import IconComponent from '../atomic/IconComponent';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
 
 interface Props {
 	visible: boolean;
@@ -73,79 +74,70 @@ interface Props {
  * @returns 
  */
 
+/** 프로필 링크 행 — 행 디자인 통일을 위해 데이터로 관리 */
+const LINK_ROWS = [
+	{ label: '🏠 공식 홈페이지', iconType: 'materialIcons', icon: 'home', action: '바로가기', url: 'https://www.ecodelab.im' },
+	{
+		label: '📱 개발자가 만든 앱 소개',
+		iconType: 'materialIcons',
+		icon: 'apps',
+		action: '바로가기',
+		url: 'https://adjh54.notion.site/1e816d47b05b80d08c29d5a039846dd6?pvs=4',
+	},
+	{ label: '📝 개발자 블로그', iconType: 'materialIcons', icon: 'language', action: '방문하기', url: 'https://adjh54.tistory.com/' },
+	{ label: '💻 GitHub', iconType: 'materialCommunityIcons', icon: 'github', action: '둘러보기', url: 'https://github.com/adjh54ir' },
+	{ label: '📩 메일 문의', iconType: 'materialIcons', icon: 'email', action: '보내기', url: 'mailto:adjh54ir@gmail.com' },
+];
+
 const Contributor9Modal = ({ visible, onClose }: Props) => {
 	const handleOpenUrl = (url: string) => Linking.openURL(url);
 
+	// 진입 애니메이션 (fade + slide-up)
+	const enterAnim = useRef(new Animated.Value(0)).current;
+
+	useEffect(() => {
+		if (!visible) {
+			enterAnim.setValue(0);
+			return;
+		}
+		const enter = Animated.timing(enterAnim, { toValue: 1, duration: 260, useNativeDriver: true });
+		enter.start();
+		return () => enter.stop();
+	}, [visible, enterAnim]);
+
+	const enterStyle = {
+		opacity: enterAnim,
+		transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
+	};
+
 	return (
-		<Modal animationType='slide' transparent visible={visible} onRequestClose={onClose}>
+		<Modal animationType="fade" transparent visible={visible} onRequestClose={onClose}>
 			<View style={styles.overlay}>
-				<View style={styles.container}>
-					<ScrollView contentContainerStyle={styles.scroll}>
+				<Animated.View style={[styles.container, enterStyle]}>
+					<ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 						<View style={styles.profileSection}>
 							<Image source={require('@/assets/images/developer.png')} style={styles.image} />
 							<Text style={styles.name}>EcodeLab</Text>
 							<Text style={styles.subName}>Contributor9</Text>
 						</View>
-						<View style={styles.rowItem}>
-							<Text style={styles.labelText}>🏠 공식 홈페이지</Text>
-							<TouchableOpacity
-								style={styles.rightButton}
-								activeOpacity={0.85}
-								onPress={() => handleOpenUrl('https://www.ecodelab.im')}>
-								<IconComponent type='materialIcons' name='home' size={scaledSize(16)} color='#3498db' />
-								<Text style={styles.buttonText}>바로가기</Text>
-							</TouchableOpacity>
-						</View>
-						<View style={styles.rowItem}>
-							<Text style={styles.labelText}>📱 개발자가 만든 앱 소개</Text>
-							<TouchableOpacity
-								style={styles.rightButton}
-								activeOpacity={0.85}
-								onPress={() => handleOpenUrl('https://adjh54.notion.site/1e816d47b05b80d08c29d5a039846dd6?pvs=4')}>
-								<IconComponent type="materialIcons" name="apps" size={scaledSize(16)} color="#3498db" />
-								<Text style={styles.buttonText}>바로가기</Text>
-							</TouchableOpacity>
-						</View>
-						<View style={styles.rowItem}>
-							<Text style={styles.labelText}>📝 개발자 블로그</Text>
-							<TouchableOpacity
-								style={styles.rightButton}
-								activeOpacity={0.85}
-								onPress={() => handleOpenUrl('https://adjh54.tistory.com/')}>
-								<IconComponent type='materialIcons' name='language' size={scaledSize(16)} color='#3498db' />
-								<Text style={styles.buttonText}>방문하기</Text>
-							</TouchableOpacity>
-						</View>
 
-						<View style={styles.rowItem}>
-							<Text style={styles.labelText}>💻 GitHub</Text>
-							<TouchableOpacity
-								style={styles.rightButton}
-								activeOpacity={0.85}
-								onPress={() => handleOpenUrl('https://github.com/adjh54ir')}>
-								<IconComponent type='materialCommunityIcons' name='github' size={scaledSize(16)} color='#3498db' />
-								<Text style={styles.buttonText}>둘러보기</Text>
-							</TouchableOpacity>
-						</View>
-
-						<View style={styles.rowItem}>
-							<Text style={styles.labelText}>📩 메일 문의</Text>
-							<TouchableOpacity
-								style={styles.rightButton}
-								activeOpacity={0.85}
-								onPress={() => handleOpenUrl('mailto:adjh54ir@gmail.com')}>
-								<IconComponent type='materialIcons' name='email' size={scaledSize(16)} color='#3498db' />
-								<Text style={styles.buttonText}>보내기</Text>
-							</TouchableOpacity>
-						</View>
+						{LINK_ROWS.map((row, index) => (
+							<View key={row.label} style={[styles.rowItem, index === LINK_ROWS.length - 1 && styles.rowItemLast]}>
+								<Text style={styles.labelText}>{row.label}</Text>
+								<TouchableOpacity style={styles.rightButton} activeOpacity={0.8} onPress={() => handleOpenUrl(row.url)}>
+									<IconComponent type={row.iconType} name={row.icon} size={scaledSize(16)} color={COLORS.secondary} />
+									<Text style={styles.buttonText}>{row.action}</Text>
+								</TouchableOpacity>
+							</View>
+						))}
 
 						<Text style={styles.footerText}>항상 더 좋은 앱을 만들기 위해 노력 중입니다. {'\n'}🙇‍♂️ 감사합니다! 🙇‍♂️</Text>
 
-						<TouchableOpacity onPress={onClose} style={styles.closeButton}>
+						<TouchableOpacity onPress={onClose} style={styles.closeButton} activeOpacity={0.8}>
 							<Text style={styles.closeText}>닫기</Text>
 						</TouchableOpacity>
 					</ScrollView>
-				</View>
+				</Animated.View>
 			</View>
 		</Modal>
 	);
@@ -154,184 +146,106 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 const styles = StyleSheet.create({
 	overlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.4)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(20),
+		paddingHorizontal: SPACING_W.lg,
 	},
 	container: {
 		width: '100%',
-		maxHeight: scaleHeight(680), // ✅ 기존 580 → 680 (또는 더 크게 조정 가능)
-		backgroundColor: '#ffffff',
-		borderRadius: moderateScale(16),
-		paddingVertical: scaleHeight(24),
-		paddingHorizontal: scaleWidth(20),
+		maxHeight: scaleHeight(680),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.lg,
 		shadowColor: '#000',
 		shadowOpacity: 0.1,
-		shadowOffset: { width: 0, height: scaleHeight(4) },
+		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 8,
 	},
 	scroll: {
 		alignItems: 'center',
+		paddingBottom: SPACING_H.sm,
 	},
-	subtext: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		marginBottom: scaleHeight(20),
-	},
-	section: {
-		fontSize: scaledSize(15),
-		fontWeight: '600',
-		alignSelf: 'flex-start',
-		marginTop: scaleHeight(14),
-		marginBottom: scaleHeight(20),
-		color: '#2c3e50',
-	},
-	link: {
-		fontSize: scaledSize(14),
-		color: '#3498db',
-		alignSelf: 'flex-start',
-		marginBottom: scaleHeight(10),
-		textDecorationLine: 'underline',
-	},
-	closeButton: {
-		marginTop: scaleHeight(24),
-		backgroundColor: '#3498db',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(24),
-		borderRadius: moderateScale(12),
-		alignSelf: 'center', // ✅ 중앙 정렬
-		minWidth: scaleWidth(120), // ✅ 크기 제한
-	},
-	closeText: {
-		color: '#ffffff',
-		fontSize: scaledSize(15),
-		fontWeight: '600',
-		textAlign: 'center',
-	},
-	linkButton: {
-		backgroundColor: '#f0f4ff',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(16),
-		borderRadius: moderateScale(10),
-		marginBottom: scaleHeight(10),
-		alignSelf: 'stretch',
-	},
-	linkButtonText: {
-		color: '#3498db',
-		fontSize: scaledSize(14),
-		fontWeight: '500',
-		textAlign: 'center',
-	},
-	iconButton: {
-		flexDirection: 'row',
+	profileSection: {
 		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#f0f4ff',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(16),
-		borderRadius: moderateScale(10),
-		marginBottom: scaleHeight(10),
-		alignSelf: 'center',
-		minWidth: scaleWidth(220),
+		marginBottom: SPACING_H.xl,
 	},
-	iconButtonText: {
-		color: '#3498db',
-		fontSize: scaledSize(14),
-		fontWeight: '500',
-		marginLeft: scaleWidth(8),
+	image: {
+		width: scaleWidth(100),
+		height: scaleWidth(100),
+		borderRadius: scaleWidth(100) / 2,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		marginBottom: SPACING_H.sm,
 	},
-	icon: {
-		marginRight: scaleWidth(4),
+	name: {
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.xs,
 	},
-	footerText: {
-		fontSize: scaledSize(13),
-		color: '#95a5a6',
-		textAlign: 'center',
-		marginTop: scaleHeight(16),
-		lineHeight: scaleHeight(20),
+	subName: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
 	},
-	inlineSection: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginTop: scaleHeight(14),
-		marginBottom: scaleHeight(20),
-	},
-	inlineButton: {
-		marginLeft: scaleWidth(8),
-	},
-	inlineButtonText: {
-		color: '#3498db',
-		fontSize: scaledSize(15),
-		fontWeight: '500',
-		textDecorationLine: 'underline',
-	},
+	// ── 링크 행 (설정 행 규격과 동일: 최소 높이 52) ──
 	rowItem: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		width: '100%',
-		paddingVertical: scaleHeight(10),
+		minHeight: scaleHeight(52),
+		paddingVertical: SPACING_H.sm,
 		borderBottomWidth: 1,
-		borderBottomColor: '#ecf0f1',
-		marginBottom: scaleHeight(15),
+		borderBottomColor: COLORS.border,
+	},
+	rowItemLast: {
+		borderBottomWidth: 0,
 	},
 	labelText: {
-		fontSize: scaledSize(15),
-		color: '#2c3e50',
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.text,
 		fontWeight: '500',
+		flexShrink: 1,
+		marginRight: SPACING_W.md,
 	},
 	rightButton: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#f0f4ff',
-		paddingVertical: scaleHeight(6),
-		paddingHorizontal: scaleWidth(12),
-		borderRadius: moderateScale(10),
+		backgroundColor: COLORS.secondaryBg,
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.md,
+		borderRadius: RADIUS.md,
 	},
 	buttonText: {
-		color: '#3498db',
-		fontSize: scaledSize(14),
-		fontWeight: '500',
-		marginLeft: scaleWidth(6),
+		color: COLORS.secondary,
+		fontSize: FONT_SIZES.md,
+		fontWeight: '600',
+		marginLeft: SPACING_W.xs,
 	},
-	profileSection: {
-		alignItems: 'center',
-		marginBottom: scaleHeight(30),
+	footerText: {
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textLight,
+		textAlign: 'center',
+		marginTop: SPACING_H.lg,
+		lineHeight: scaledSize(20),
 	},
-	image: {
-		width: scaleWidth(100),
-		height: scaleWidth(100),
-		borderRadius: scaleWidth(50),
-		borderWidth: 2,
-		borderColor: '#ecf0f1',
-		marginBottom: scaleHeight(8), // 기존보다 살짝 조정
+	closeButton: {
+		marginTop: SPACING_H.xl,
+		backgroundColor: COLORS.secondary,
+		minHeight: scaleHeight(48),
+		justifyContent: 'center',
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.xxl,
+		borderRadius: RADIUS.md,
+		alignSelf: 'stretch',
 	},
-	fixedCloseButton: {
-		marginTop: scaleHeight(12),
-		backgroundColor: '#3498db',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(24),
-		borderRadius: moderateScale(12),
-		alignSelf: 'center',
-		minWidth: scaleWidth(120),
-		position: 'absolute',
-		bottom: scaleHeight(20),
-		zIndex: 10,
-		shadowColor: '#000',
-		shadowOpacity: 0.1,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 4,
-	},
-	name: {
-		fontSize: scaledSize(18),
+	closeText: {
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
-		color: '#2c3e50', // 짙은 네이비 계열
-		marginBottom: scaleHeight(3),
-	},
-	subName: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d', // 차분한 회색 계열
+		textAlign: 'center',
 	},
 });
 

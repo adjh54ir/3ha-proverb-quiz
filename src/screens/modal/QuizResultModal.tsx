@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, ScrollView, StyleSheet, Animated, Easing } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import SuccessToast from '../SuccessToast';
@@ -39,14 +40,19 @@ const QuizResultModal = ({
 	const [toastMessage, setToastMessage] = useState('');
 	const toastTimer = useRef<NodeJS.Timeout | null>(null);
 
+	// ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
+	const cardFade = useRef(new Animated.Value(0)).current;
+	const cardScale = useRef(new Animated.Value(0.95)).current;
+
 	// ✅ 정답 카드 / 해설 카드 등장 애니메이션
 	const answerAnim = useRef(new Animated.Value(0)).current;
 	const explainAnim = useRef(new Animated.Value(0)).current;
 
-	const themeColor = resultType === 'correct' ? '#22C55E' : resultType === 'wrong' ? '#EF4444' : '#F59E0B';
-	const cardBg = resultType === 'correct' ? '#F0FDF4' : resultType === 'wrong' ? '#FEF2F2' : '#FFFBEB';
+	// ✅ 정답/오답 색상은 시맨틱 토큰으로 통일
+	const themeColor = resultType === 'correct' ? COLORS.success : resultType === 'wrong' ? COLORS.danger : COLORS.warning;
+	const cardBg = resultType === 'correct' ? COLORS.successBg : resultType === 'wrong' ? COLORS.dangerBg : COLORS.warningBg;
 	const cardBorder = resultType === 'correct' ? '#86EFAC' : resultType === 'wrong' ? '#FECACA' : '#FDE68A';
-	const subTextColor = resultType === 'correct' ? '#15803D' : resultType === 'wrong' ? '#DC2626' : '#D97706';
+	const subTextColor = resultType === 'correct' ? COLORS.primaryDeep : resultType === 'wrong' ? COLORS.dangerDark : COLORS.warningDark;
 
 	const mascotSource =
 		resultType === 'correct'
@@ -54,31 +60,61 @@ const QuizResultModal = ({
 			: require('@/assets/images/wrong_mascote.png');
 
 	useEffect(() => {
-		if (visible) {
-			// ✅ 정답 카드 먼저, 해설은 약간의 딜레이 후 슬라이드 업 + 페이드 인
-			answerAnim.setValue(0);
-			explainAnim.setValue(0);
-			Animated.sequence([
-				Animated.timing(answerAnim, {
-					toValue: 1,
-					duration: 350,
-					easing: Easing.out(Easing.back(1.2)),
-					useNativeDriver: true,
-				}),
-				Animated.timing(explainAnim, {
-					toValue: 1,
-					duration: 400,
-					easing: Easing.out(Easing.cubic),
-					useNativeDriver: true,
-				}),
-			]).start();
-		} else {
+		if (!visible) {
 			setToastVisible(false);
 			if (toastTimer.current) {
 				clearTimeout(toastTimer.current);
 			}
+			// 닫힐 때 초기화해야 다음 문제에서 열릴 때 첫 프레임이 opacity 0 으로 그려진다(이전 문제 잔상 방지)
+			cardFade.setValue(0);
+			cardScale.setValue(0.95);
+			answerAnim.setValue(0);
+			explainAnim.setValue(0);
+			return;
 		}
-	}, [visible]);
+
+		cardFade.setValue(0);
+		cardScale.setValue(0.95);
+		answerAnim.setValue(0);
+		explainAnim.setValue(0);
+
+		// ✅ 카드 진입 → 정답 카드 → 해설 카드 순서로 등장
+		const enterAnim = Animated.parallel([
+			Animated.timing(cardFade, { toValue: 1, duration: 250, useNativeDriver: true }),
+			Animated.timing(cardScale, { toValue: 1, duration: 250, useNativeDriver: true }),
+		]);
+		const contentAnim = Animated.sequence([
+			Animated.timing(answerAnim, {
+				toValue: 1,
+				duration: 350,
+				easing: Easing.out(Easing.back(1.2)),
+				useNativeDriver: true,
+			}),
+			Animated.timing(explainAnim, {
+				toValue: 1,
+				duration: 400,
+				easing: Easing.out(Easing.cubic),
+				useNativeDriver: true,
+			}),
+		]);
+		enterAnim.start();
+		contentAnim.start();
+
+		// ✅ 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
+		return () => {
+			enterAnim.stop();
+			contentAnim.stop();
+		};
+	}, [visible, cardFade, cardScale, answerAnim, explainAnim]);
+
+	// ✅ 타이머 정리 (언마운트 시)
+	useEffect(() => {
+		return () => {
+			if (toastTimer.current) {
+				clearTimeout(toastTimer.current);
+			}
+		};
+	}, []);
 
 	// ✅ 즐겨찾기 토글 + Toast (타이머로 자동 숨김)
 	const handleToggleFavoriteWithToast = async () => {
@@ -117,9 +153,9 @@ const QuizResultModal = ({
 	return (
 		<Modal visible={visible} transparent animationType="fade">
 			<View style={styles.overlay}>
-				<View style={styles.modal}>
+				<Animated.View style={[styles.card, { opacity: cardFade, transform: [{ scale: cardScale }] }]}>
 					{/* 상단 결과 영역 */}
-					<View style={[styles.resultHeader, { backgroundColor: cardBg }]}>
+					<View style={[styles.resultHeader, { backgroundColor: cardBg, borderColor: cardBorder }]}>
 						<FastImage source={mascotSource} style={styles.mascot} resizeMode={FastImage.resizeMode.contain} />
 						<View style={styles.resultHeaderTextBox}>
 							<Text style={[styles.title, { color: themeColor }]}>{resultTitle}</Text>
@@ -130,12 +166,14 @@ const QuizResultModal = ({
 						{question && (
 							<TouchableOpacity
 								style={[styles.favoriteButton, isFavorited && styles.favoriteButtonActive]}
+								activeOpacity={0.8}
+								hitSlop={{ top: scaleHeight(6), bottom: scaleHeight(6), left: scaleWidth(6), right: scaleWidth(6) }}
 								onPress={handleToggleFavoriteWithToast}>
 								<IconComponent
 									type="MaterialIcons"
 									name={isFavorited ? 'star' : 'star-border'}
 									size={scaledSize(22)}
-									color={isFavorited ? '#F59E0B' : '#64748B'}
+									color={isFavorited ? COLORS.warning : COLORS.textSecondary}
 								/>
 							</TouchableOpacity>
 						)}
@@ -170,7 +208,7 @@ const QuizResultModal = ({
 								},
 							]}>
 							<View style={[styles.answerBadge, { backgroundColor: themeColor }]}>
-								<IconComponent type="MaterialIcons" name="check-circle" size={scaledSize(14)} color="#fff" />
+								<IconComponent type="MaterialIcons" name="check-circle" size={scaledSize(14)} color={COLORS.textWhite} />
 								<Text style={styles.answerBadgeText}>정답</Text>
 							</View>
 
@@ -201,7 +239,7 @@ const QuizResultModal = ({
 							]}>
 							<View style={styles.explainHeader}>
 								<View style={[styles.explainHeaderIcon, { backgroundColor: themeColor }]}>
-									<IconComponent type="MaterialIcons" name="menu-book" size={scaledSize(14)} color="#fff" />
+									<IconComponent type="MaterialIcons" name="menu-book" size={scaledSize(14)} color={COLORS.textWhite} />
 								</View>
 								<Text style={styles.explainTitle}>속담 해설</Text>
 							</View>
@@ -217,7 +255,7 @@ const QuizResultModal = ({
 
 							{examples.length > 0 && (
 								<View style={styles.exampleBlock}>
-									<Text style={[styles.explainLabel, { color: '#1D4ED8' }]}>예제</Text>
+									<Text style={[styles.explainLabel, { color: COLORS.secondaryDark }]}>예제</Text>
 									{examples.map((ex, idx) => (
 										<Text key={idx} style={styles.explainExampleText}>
 											• {ex}
@@ -239,13 +277,12 @@ const QuizResultModal = ({
 						</Animated.View>
 					</ScrollView>
 
-					<TouchableOpacity
-						style={[styles.nextButton, { backgroundColor: themeColor, shadowColor: themeColor }]}
-						onPress={onNext}>
-						<Text style={styles.nextButtonText}>다음 퀴즈</Text>
+					{/* 하단 버튼 */}
+					<TouchableOpacity style={styles.primaryButton} onPress={onNext} activeOpacity={0.8}>
+						<Text style={styles.primaryButtonText}>다음 퀴즈</Text>
 					</TouchableOpacity>
 					<SuccessToast visible={toastVisible} message={toastMessage} onHide={() => setToastVisible(false)} />
-				</View>
+				</Animated.View>
 			</View>
 		</Modal>
 	);
@@ -254,43 +291,53 @@ const QuizResultModal = ({
 export default QuizResultModal;
 
 const styles = StyleSheet.create({
+	// ===== 모달 공통 껍데기 =====
 	overlay: {
 		flex: 1,
-		backgroundColor: 'rgba(15,23,42,0.55)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(20),
-		paddingTop: scaleHeight(40),
+		paddingHorizontal: SPACING_W.lg,
 	},
-	modal: {
+	card: {
 		width: '100%',
-		maxWidth: scaleWidth(380),
-		borderRadius: scaleWidth(20),
-		backgroundColor: '#fff',
-		padding: scaleWidth(16),
+		maxWidth: scaleWidth(340),
+		maxHeight: '86%',
+		borderRadius: RADIUS.xl,
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xl,
 		alignItems: 'center',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 6 },
-		shadowOpacity: 0.15,
-		shadowRadius: 12,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
+	// ===== 결과 헤더 =====
 	resultHeader: {
 		width: '100%',
 		flexDirection: 'row',
 		alignItems: 'center',
-		borderRadius: scaleWidth(14),
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(12),
-		marginBottom: scaleHeight(12),
+		borderRadius: RADIUS.lg,
+		borderWidth: 1,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.md,
+		marginBottom: SPACING_H.md,
 	},
 	resultHeaderTextBox: {
 		flex: 1,
-		marginLeft: scaleWidth(10),
+		marginLeft: SPACING_W.md,
 	},
 	title: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(2),
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		marginBottom: SPACING_H.xs,
+	},
+	messageBig: {
+		fontSize: FONT_SIZES.md,
+		fontWeight: '500',
+		color: COLORS.text,
+		lineHeight: scaledSize(19),
 	},
 	mascot: {
 		width: scaleWidth(56),
@@ -298,164 +345,153 @@ const styles = StyleSheet.create({
 	},
 	scroll: {
 		width: '100%',
-		maxHeight: scaleHeight(460),
+		flexShrink: 1,
 	},
 	scrollContent: {
-		paddingBottom: scaleHeight(4),
-	},
-	messageBig: {
-		fontSize: scaledSize(13),
-		fontWeight: '600',
-		color: '#475569',
-		lineHeight: scaleHeight(19),
+		paddingBottom: SPACING_H.xs,
 	},
 	// ✅ 정답 카드
 	answerCard: {
 		width: '100%',
-		borderRadius: scaleWidth(14),
-		borderWidth: 1.2,
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(14),
+		borderRadius: RADIUS.lg,
+		borderWidth: 1,
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.lg,
 		alignItems: 'center',
 	},
 	answerBadge: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(4),
-		borderRadius: scaleWidth(20),
-		paddingVertical: scaleHeight(4),
-		paddingHorizontal: scaleWidth(12),
-		marginBottom: scaleHeight(10),
+		columnGap: SPACING_W.xs,
+		borderRadius: RADIUS.round,
+		paddingVertical: SPACING_H.xs,
+		paddingHorizontal: SPACING_W.md,
+		marginBottom: SPACING_H.sm,
 	},
 	answerBadgeText: {
-		color: '#fff',
-		fontSize: scaledSize(12),
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.sm,
 		fontWeight: '700',
 	},
 	answerMain: {
-		fontSize: scaledSize(20),
-		fontWeight: 'bold',
-		color: '#0F172A',
+		fontSize: FONT_SIZES.xxl,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 		textAlign: 'center',
-		lineHeight: scaleHeight(28),
+		lineHeight: scaledSize(28),
 	},
 	answerBlankText: {
-		fontSize: scaledSize(13),
-		color: '#475569',
-		fontWeight: '600',
-		marginTop: scaleHeight(8),
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
+		fontWeight: '500',
+		marginTop: SPACING_H.sm,
 	},
 	answerBlankHighlight: {
-		fontWeight: 'bold',
-		fontSize: scaledSize(14),
+		fontWeight: '700',
+		fontSize: FONT_SIZES.md,
 	},
 	// ✅ 해설 카드
 	explainCard: {
 		width: '100%',
-		backgroundColor: '#FFFFFF',
-		borderRadius: scaleWidth(16),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		padding: scaleWidth(16),
-		paddingVertical: scaleHeight(18),
-		marginTop: scaleHeight(12),
-		minHeight: scaleHeight(120),
-		shadowColor: '#0F172A',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.05,
-		shadowRadius: 6,
+		borderColor: COLORS.border,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		marginTop: SPACING_H.md,
 	},
 	explainHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(8),
-		marginBottom: scaleHeight(12),
+		columnGap: SPACING_W.sm,
+		marginBottom: SPACING_H.md,
 	},
 	explainHeaderIcon: {
 		width: scaleWidth(24),
 		height: scaleWidth(24),
-		borderRadius: scaleWidth(8),
+		borderRadius: RADIUS.sm,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 	explainTitle: {
-		fontSize: scaledSize(14),
-		fontWeight: '800',
-		color: '#1E293B',
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 	},
 	meaningBlock: {
-		backgroundColor: '#F8FAFC',
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(14),
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.md,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.md,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
+		borderColor: COLORS.border,
 	},
 	explainLabel: {
-		fontSize: scaledSize(12),
-		fontWeight: '800',
-		color: '#64748B',
-		marginBottom: scaleHeight(4),
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '700',
+		color: COLORS.textSecondary,
+		marginBottom: SPACING_H.xs,
 	},
 	proverbInExplain: {
-		fontSize: scaledSize(15),
-		fontWeight: '800',
-		color: '#1E293B',
-		lineHeight: scaleHeight(22),
-		marginBottom: scaleHeight(10),
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		lineHeight: scaledSize(22),
+		marginBottom: SPACING_H.sm,
 	},
 	explainText: {
-		fontSize: scaledSize(14),
-		color: '#0F172A',
-		fontWeight: '600',
-		lineHeight: scaleHeight(21),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		fontWeight: '500',
+		lineHeight: scaledSize(21),
 	},
 	exampleBlock: {
-		backgroundColor: '#F0F7FF',
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(12),
-		marginTop: scaleHeight(10),
+		backgroundColor: COLORS.secondaryBg,
+		borderRadius: RADIUS.md,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.md,
+		marginTop: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: '#BFDBFE',
 	},
 	explainExampleText: {
-		fontSize: scaledSize(14),
-		color: '#334155',
-		fontWeight: '500',
-		lineHeight: scaleHeight(21),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		fontWeight: '400',
+		lineHeight: scaledSize(21),
 		fontStyle: 'italic',
-		marginTop: scaleHeight(2),
+		marginTop: SPACING_H.xs,
 	},
 	sameBlock: {
 		backgroundColor: '#FAF5FF',
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(12),
-		marginTop: scaleHeight(10),
+		borderRadius: RADIUS.md,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.md,
+		marginTop: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: '#E9D5FF',
 	},
 	sameText: {
-		fontSize: scaledSize(14),
-		color: '#334155',
-		fontWeight: '500',
-		lineHeight: scaleHeight(21),
-		marginTop: scaleHeight(2),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		fontWeight: '400',
+		lineHeight: scaledSize(21),
+		marginTop: SPACING_H.xs,
 	},
-	nextButton: {
-		marginTop: scaleHeight(14),
+	// ===== 하단 버튼 =====
+	primaryButton: {
 		width: '100%',
-		paddingVertical: scaleHeight(13),
-		borderRadius: scaleWidth(14),
+		height: scaleHeight(48),
+		marginTop: SPACING_H.xl,
+		backgroundColor: COLORS.primary,
+		borderRadius: RADIUS.md,
 		alignItems: 'center',
-		shadowOffset: { width: 0, height: 3 },
-		shadowOpacity: 0.25,
-		shadowRadius: 6,
+		justifyContent: 'center',
 	},
-	nextButtonText: {
-		color: '#fff',
-		fontSize: scaledSize(15),
+	primaryButtonText: {
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 	},
 	favoriteButton: {
@@ -463,13 +499,13 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		width: scaleWidth(38),
 		height: scaleWidth(38),
-		borderRadius: scaleWidth(19),
+		borderRadius: scaleWidth(38) / 2,
 		borderWidth: 1,
-		borderColor: '#CBD5E1',
-		backgroundColor: '#fff',
+		borderColor: COLORS.borderDark,
+		backgroundColor: COLORS.surface,
 	},
 	favoriteButtonActive: {
-		borderColor: '#F59E0B',
-		backgroundColor: '#FFFBEB',
+		borderColor: COLORS.warning,
+		backgroundColor: COLORS.warningBg,
 	},
 });

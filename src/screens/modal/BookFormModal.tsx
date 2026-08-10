@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import React, { useEffect, useRef, useState } from 'react';
+import { Modal, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Animated, KeyboardAvoidingView, Platform } from 'react-native';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { BOOK_COLORS, BOOK_ICONS } from '../common/CommonProverbModule';
@@ -12,7 +13,7 @@ type PickerProps = {
 	onIconChange: (i: string) => void;
 };
 
-const DEFAULT_COLOR = '#22C55E';
+const DEFAULT_COLOR: string = COLORS.primary;
 const DEFAULT_ICON = 'menu-book';
 
 type Props = {
@@ -37,8 +38,9 @@ const ColorIconPicker = ({ selectedColor, selectedIcon, onColorChange, onIconCha
 								<TouchableOpacity
 									key={icon}
 									style={[pickerStyles.iconDot, selectedIcon === icon && [pickerStyles.iconDotSelected, { borderColor: selectedColor, backgroundColor: selectedColor + '15' }]]}
+									activeOpacity={0.8}
 									onPress={() => onIconChange(icon)}>
-									<IconComponent type="materialIcons" name={icon} size={scaledSize(20)} color={selectedIcon === icon ? selectedColor : '#94A3B8'} />
+									<IconComponent type="materialIcons" name={icon} size={scaledSize(20)} color={selectedIcon === icon ? selectedColor : COLORS.textLight} />
 								</TouchableOpacity>
 							))}
 						</View>
@@ -54,8 +56,9 @@ const ColorIconPicker = ({ selectedColor, selectedIcon, onColorChange, onIconCha
 								<TouchableOpacity
 									key={color}
 									style={[pickerStyles.colorDot, { backgroundColor: color }, selectedColor === color && pickerStyles.colorDotSelected]}
+									activeOpacity={0.8}
 									onPress={() => onColorChange(color)}>
-									{selectedColor === color && <IconComponent type="materialIcons" name="check" size={scaledSize(14)} color="#fff" />}
+									{selectedColor === color && <IconComponent type="materialIcons" name="check" size={scaledSize(14)} color={COLORS.textWhite} />}
 								</TouchableOpacity>
 							))}
 						</View>
@@ -67,18 +70,18 @@ const ColorIconPicker = ({ selectedColor, selectedIcon, onColorChange, onIconCha
 };
 
 const pickerStyles = StyleSheet.create({
-	container: { width: '100%', marginTop: scaleHeight(14) },
-	preview: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(10), borderWidth: 1, borderRadius: scaleWidth(12), padding: scaleWidth(12), marginBottom: scaleHeight(12) },
-	previewIcon: { width: scaleWidth(44), height: scaleWidth(44), borderRadius: scaleWidth(12), justifyContent: 'center', alignItems: 'center' },
-	previewLabel: { fontSize: scaledSize(15), fontWeight: '700' },
-	sectionLabel: { fontSize: scaledSize(12), fontWeight: '600', color: '#64748B', marginBottom: scaleHeight(8), marginTop: scaleHeight(4) },
-	scrollArea: { marginBottom: scaleHeight(6) },
-	row: { flexDirection: 'row', marginBottom: scaleHeight(7) },
-	colorDot: { width: scaleWidth(30), height: scaleWidth(30), borderRadius: scaleWidth(15), marginRight: scaleWidth(7), justifyContent: 'center', alignItems: 'center' },
-	colorDotSelected: { borderWidth: 2.5, borderColor: '#fff', shadowColor: '#000', shadowOpacity: 0.25, shadowOffset: { width: 0, height: 1 }, shadowRadius: 3 },
-	iconDot: { width: scaleWidth(38), height: scaleWidth(38), borderRadius: scaleWidth(10), marginRight: scaleWidth(7), justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#F1F5F9', backgroundColor: '#F8FAFC' },
+	container: { width: '100%', marginTop: SPACING_H.md },
+	preview: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.md, borderWidth: 1, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md, marginBottom: SPACING_H.md },
+	previewIcon: { width: scaleWidth(44), height: scaleWidth(44), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
+	previewLabel: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
+	sectionLabel: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, marginBottom: SPACING_H.sm, marginTop: SPACING_H.xs },
+	scrollArea: { marginBottom: SPACING_H.xs },
+	row: { flexDirection: 'row', marginBottom: SPACING_H.sm },
+	colorDot: { width: scaleWidth(30), height: scaleWidth(30), borderRadius: scaleWidth(30) / 2, marginRight: SPACING_W.sm, justifyContent: 'center', alignItems: 'center' },
+	colorDotSelected: { borderWidth: 2.5, borderColor: COLORS.surface, shadowColor: '#000', shadowOpacity: 0.25, shadowOffset: { width: 0, height: 1 }, shadowRadius: 3 },
+	iconDot: { width: scaleWidth(38), height: scaleWidth(38), borderRadius: RADIUS.md, marginRight: SPACING_W.sm, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.background },
 	iconDotSelected: { borderWidth: 1.5 },
-	previewDesc: { fontSize: scaledSize(11), color: '#94A3B8', marginTop: scaleHeight(2) },
+	previewDesc: { fontSize: FONT_SIZES.xs, color: COLORS.textLight, marginTop: SPACING_H.xs },
 });
 
 const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
@@ -88,6 +91,10 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 	const [desc, setDesc] = useState('');
 	const [color, setColor] = useState(DEFAULT_COLOR);
 	const [icon, setIcon] = useState(DEFAULT_ICON);
+	const [focusedField, setFocusedField] = useState<'title' | 'desc' | null>(null);
+
+	const fadeAnim = useRef(new Animated.Value(0)).current;
+	const scaleAnim = useRef(new Animated.Value(0.95)).current;
 
 	useEffect(() => {
 		if (visible) {
@@ -95,8 +102,23 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 			setDesc(editTarget?.description ?? '');
 			setColor(editTarget?.color ?? DEFAULT_COLOR);
 			setIcon(editTarget?.icon ?? DEFAULT_ICON);
+			setFocusedField(null);
 		}
 	}, [visible, editTarget]);
+
+	useEffect(() => {
+		if (!visible) {
+			fadeAnim.setValue(0);
+			scaleAnim.setValue(0.95);
+			return;
+		}
+		const anim = Animated.parallel([
+			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+		]);
+		anim.start();
+		return () => anim.stop();
+	}, [visible, fadeAnim, scaleAnim]);
 
 	const handleSubmit = () => {
 		if (!title.trim()) {
@@ -107,19 +129,19 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 
 	return (
 		<Modal visible={visible} transparent animationType="fade">
-			<View style={styles.overlay}>
+			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.overlay}>
 				<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
-					<View style={styles.modal}>
-						<TouchableOpacity style={styles.closeIcon} onPress={onClose}>
-							<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color="#64748B" />
+					<Animated.View style={[styles.modal, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+						<TouchableOpacity style={styles.closeIcon} onPress={onClose} activeOpacity={0.7} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+							<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
 						</TouchableOpacity>
 
 						<Text style={styles.modalTitle}>{isEdit ? '속담집 편집' : '새 속담집 만들기'}</Text>
 						{!isEdit && <Text style={styles.modalSubtitle}>이름을 정하고, 속담집에서 속담을 추가해봐요</Text>}
 
-						<View style={[pickerStyles.preview, { backgroundColor: color + '20', borderColor: color + '40', width: '100%', marginTop: scaleHeight(12) }]}>
+						<View style={[pickerStyles.preview, { backgroundColor: color + '20', borderColor: color + '40', width: '100%', marginTop: SPACING_H.md }]}>
 							<View style={[pickerStyles.previewIcon, { backgroundColor: color }]}>
-								<IconComponent type="materialIcons" name={icon} size={scaledSize(26)} color="#fff" />
+								<IconComponent type="materialIcons" name={icon} size={scaledSize(26)} color={COLORS.textWhite} />
 							</View>
 							<View style={{ flex: 1 }}>
 								<Text style={[pickerStyles.previewLabel, { color }]} numberOfLines={1}>{title.trim() || '속담집 이름'}</Text>
@@ -128,26 +150,46 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 						</View>
 
 						<Text style={styles.fieldLabel}>이름</Text>
-						<View style={[styles.inputWrap, { marginTop: scaleHeight(4) }]}>
-							<TextInput style={styles.input} placeholder="속담집 이름 *" placeholderTextColor="#9CA3AF" value={title} onChangeText={setTitle} maxLength={20} autoFocus={!isEdit} />
+						<View style={[styles.inputWrap, focusedField === 'title' && styles.inputWrapFocused]}>
+							<TextInput
+								style={styles.input}
+								placeholder="속담집 이름 *"
+								placeholderTextColor={COLORS.textLight}
+								value={title}
+								onChangeText={setTitle}
+								onFocus={() => setFocusedField('title')}
+								onBlur={() => setFocusedField(null)}
+								maxLength={20}
+								autoFocus={!isEdit}
+							/>
 						</View>
 
 						<Text style={styles.fieldLabel}>설명</Text>
-						<View style={[styles.inputWrap, { marginTop: scaleHeight(4) }]}>
-							<TextInput style={styles.input} placeholder="설명 (선택)" placeholderTextColor="#9CA3AF" value={desc} onChangeText={setDesc} maxLength={40} />
+						<View style={[styles.inputWrap, focusedField === 'desc' && styles.inputWrapFocused]}>
+							<TextInput
+								style={styles.input}
+								placeholder="설명 (선택)"
+								placeholderTextColor={COLORS.textLight}
+								value={desc}
+								onChangeText={setDesc}
+								onFocus={() => setFocusedField('desc')}
+								onBlur={() => setFocusedField(null)}
+								maxLength={40}
+							/>
 						</View>
 
 						<ColorIconPicker selectedColor={color} selectedIcon={icon} onColorChange={setColor} onIconChange={setIcon} />
 
 						<TouchableOpacity
-							style={[styles.submitBtn, { backgroundColor: '#3B82F6', marginTop: scaleHeight(16) }, !title.trim() && styles.submitBtnDisabled]}
+							style={[styles.submitBtn, !title.trim() && styles.submitBtnDisabled]}
 							onPress={handleSubmit}
+							activeOpacity={0.85}
 							disabled={!title.trim()}>
 							<Text style={styles.submitBtnText}>{isEdit ? '저장' : '생성'}</Text>
 						</TouchableOpacity>
-					</View>
+					</Animated.View>
 				</ScrollView>
-			</View>
+			</KeyboardAvoidingView>
 		</Modal>
 	);
 };
@@ -155,16 +197,17 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 export default BookFormModal;
 
 const styles = StyleSheet.create({
-	overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-	scrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: scaleHeight(20), width: '100%' },
-	modal: { width: '88%', backgroundColor: '#fff', borderRadius: scaleWidth(20), padding: scaleWidth(24) },
-	closeIcon: { position: 'absolute', top: scaleHeight(12), right: scaleWidth(12), zIndex: 2, padding: scaleWidth(4) },
-	modalTitle: { fontSize: scaledSize(18), fontWeight: '700', color: '#334155' },
-	modalSubtitle: { fontSize: scaledSize(12), color: '#94A3B8', textAlign: 'left', marginTop: scaleHeight(6) },
-	inputWrap: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#E2E8F0', borderRadius: scaleWidth(12), paddingHorizontal: scaleWidth(12), marginBottom: scaleHeight(14), backgroundColor: '#fff' },
-	input: { flex: 1, paddingVertical: scaleHeight(12), fontSize: moderateScale(13), color: '#334155' },
-	submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: scaleHeight(14), borderRadius: scaleWidth(14), gap: scaleWidth(8) },
-	submitBtnDisabled: { backgroundColor: '#94A3B8' },
-	submitBtnText: { color: '#fff', fontWeight: '700', fontSize: scaledSize(15) },
-	fieldLabel: { fontSize: scaledSize(12), fontWeight: '600', color: '#64748B', marginBottom: scaleHeight(0), marginTop: scaleHeight(4) },
+	overlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'center', alignItems: 'center' },
+	scrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: SPACING_H.xl, width: '100%' },
+	modal: { width: '88%', backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.xl },
+	closeIcon: { position: 'absolute', top: SPACING_H.md, right: SPACING_W.md, zIndex: 2, padding: SPACING_W.xs },
+	modalTitle: { fontSize: FONT_SIZES.heading, fontWeight: '700', color: COLORS.textStrong },
+	modalSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'left', marginTop: SPACING_H.xs },
+	inputWrap: { flexDirection: 'row', alignItems: 'center', height: scaleHeight(48), borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, marginTop: SPACING_H.xs, marginBottom: SPACING_H.md, backgroundColor: COLORS.surface },
+	inputWrapFocused: { borderColor: COLORS.primary },
+	input: { flex: 1, paddingVertical: 0, fontSize: FONT_SIZES.md, color: COLORS.text },
+	submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: scaleHeight(48), marginTop: SPACING_H.lg, borderRadius: RADIUS.md, gap: SPACING_W.sm, backgroundColor: COLORS.primary },
+	submitBtnDisabled: { backgroundColor: COLORS.borderDark },
+	submitBtnText: { color: COLORS.textWhite, fontWeight: '700', fontSize: FONT_SIZES.lg },
+	fieldLabel: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, marginTop: SPACING_H.xs },
 });

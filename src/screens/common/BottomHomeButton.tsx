@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import IconComponent from './atomic/IconComponent';
 
+/** 터치 영역 최소 44 확보 */
+const MIN_TOUCH = 44;
+
 const BottomHomeButton = ({
 	paddingBottom,
-	backgroundColor = '#fff',
-	borderColor = '#E2E8F0',
-	textColor = '#334155',
+	backgroundColor = COLORS.surface,
+	borderColor = COLORS.border,
+	textColor = COLORS.text,
 	iconColor = '#475569',
 	confirmTitle = '퀴즈를 종료할까요?',
 	confirmMessage = '진행 중인 내용은 저장되지 않아요.',
@@ -27,29 +31,41 @@ const BottomHomeButton = ({
 	const navigation = useNavigation<any>();
 	const [showConfirm, setShowConfirm] = useState(false);
 
-	const styles = StyleSheet.create({
-		wrapper: {
-			alignItems: 'center',
-			backgroundColor,
-			paddingVertical: scaleHeight(10),
-		},
-		button: {
-			borderColor,
-			flexDirection: 'row',
-			alignItems: 'center',
-			gap: scaleWidth(6),
-			borderWidth: 1,
-			borderRadius: scaleWidth(22),
-			paddingVertical: scaleHeight(9),
-			paddingHorizontal: scaleWidth(22),
-			backgroundColor,
-		},
-		text: {
-			fontSize: scaledSize(12),
-			fontWeight: '600',
-			color: textColor,
-		},
-	});
+	// 색상 prop 이 바뀔 때만 재생성 (매 렌더 StyleSheet.create 방지)
+	const styles = useMemo(
+		() =>
+			StyleSheet.create({
+				wrapper: {
+					alignItems: 'center',
+					backgroundColor,
+					paddingHorizontal: SPACING_W.lg,
+					paddingTop: SPACING_H.md,
+					// 부모 화면들이 SafeAreaView edges={['bottom']} 로 safe-area 를 이미 소비하므로
+					// 여기서 inset 을 다시 더하지 않고, 하단에 최소 여백만 확보한다.
+					paddingBottom: SPACING_H.md,
+				},
+				button: {
+					borderColor,
+					flexDirection: 'row',
+					alignItems: 'center',
+					justifyContent: 'center',
+					gap: SPACING_W.sm,
+					borderWidth: 1,
+					borderRadius: RADIUS.round,
+					minHeight: scaleHeight(MIN_TOUCH),
+					minWidth: scaleWidth(120),
+					paddingVertical: SPACING_H.sm,
+					paddingHorizontal: SPACING_W.xxl,
+					backgroundColor,
+				},
+				text: {
+					fontSize: FONT_SIZES.sm,
+					fontWeight: '600',
+					color: textColor,
+				},
+			}),
+		[backgroundColor, borderColor, textColor],
+	);
 
 	const goHome = () => {
 		setShowConfirm(false);
@@ -58,8 +74,12 @@ const BottomHomeButton = ({
 
 	return (
 		<View style={[styles.wrapper, paddingBottom !== undefined && { paddingBottom: scaleHeight(paddingBottom) }]}>
-			<TouchableOpacity style={styles.button} onPress={() => (skipConfirm ? goHome() : setShowConfirm(true))} activeOpacity={0.85}>
-				<IconComponent type="MaterialIcons" name="home" size={14} color={iconColor} />
+			<TouchableOpacity
+				style={styles.button}
+				onPress={() => (skipConfirm ? goHome() : setShowConfirm(true))}
+				activeOpacity={0.8}
+				hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+				<IconComponent type="MaterialIcons" name="home" size={scaledSize(16)} color={iconColor} />
 				<Text style={styles.text}>HOME</Text>
 			</TouchableOpacity>
 
@@ -67,15 +87,15 @@ const BottomHomeButton = ({
 				<View style={modalStyles.overlay}>
 					<View style={modalStyles.card}>
 						<View style={modalStyles.iconCircle}>
-							<IconComponent type="materialIcons" name="logout" size={scaledSize(26)} color="#EF4444" />
+							<IconComponent type="materialIcons" name="logout" size={scaledSize(26)} color={COLORS.danger} />
 						</View>
 						<Text style={modalStyles.title}>{confirmTitle}</Text>
 						<Text style={modalStyles.message}>{confirmMessage}</Text>
 						<View style={modalStyles.buttonRow}>
-							<TouchableOpacity style={modalStyles.cancelBtn} onPress={() => setShowConfirm(false)} activeOpacity={0.85}>
+							<TouchableOpacity style={modalStyles.cancelBtn} onPress={() => setShowConfirm(false)} activeOpacity={0.8}>
 								<Text style={modalStyles.cancelText}>취소</Text>
 							</TouchableOpacity>
-							<TouchableOpacity style={modalStyles.confirmBtn} onPress={goHome} activeOpacity={0.85}>
+							<TouchableOpacity style={modalStyles.confirmBtn} onPress={goHome} activeOpacity={0.8}>
 								<Text style={modalStyles.confirmText}>나가기</Text>
 							</TouchableOpacity>
 						</View>
@@ -94,59 +114,64 @@ const modalStyles = StyleSheet.create({
 		backgroundColor: 'rgba(15,23,42,0.5)',
 		justifyContent: 'center',
 		alignItems: 'center',
-		padding: scaleWidth(24),
+		paddingHorizontal: SPACING_W.xxl,
+		paddingVertical: SPACING_H.xxl,
 	},
 	card: {
 		width: '100%',
 		maxWidth: scaleWidth(320),
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(20),
-		paddingVertical: scaleHeight(22),
-		paddingHorizontal: scaleWidth(20),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingVertical: SPACING_H.xl,
+		paddingHorizontal: SPACING_W.xl,
 		alignItems: 'center',
-		shadowColor: '#0F172A',
-		shadowOffset: { width: 0, height: 8 },
-		shadowOpacity: 0.18,
-		shadowRadius: 20,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
 	iconCircle: {
 		width: scaleWidth(52),
 		height: scaleWidth(52),
-		borderRadius: scaleWidth(26),
-		backgroundColor: '#FEF2F2',
+		borderRadius: scaleWidth(52) / 2,
+		backgroundColor: COLORS.dangerBg,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginBottom: scaleHeight(12),
+		marginBottom: SPACING_H.md,
 	},
 	title: {
-		fontSize: scaledSize(17),
-		fontWeight: '800',
-		color: '#1E293B',
-		marginBottom: scaleHeight(6),
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.xs,
 		textAlign: 'center',
 	},
 	message: {
-		fontSize: scaledSize(13.5),
-		color: '#64748B',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 		textAlign: 'center',
-		lineHeight: scaleHeight(19),
-		marginBottom: scaleHeight(18),
+		lineHeight: scaledSize(20),
+		marginBottom: SPACING_H.xl,
 	},
-	buttonRow: { flexDirection: 'row', gap: scaleWidth(10), width: '100%' },
+	buttonRow: { flexDirection: 'row', gap: SPACING_W.md, width: '100%' },
 	cancelBtn: {
 		flex: 1,
-		backgroundColor: '#F1F5F9',
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(13),
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.md,
+		minHeight: scaleHeight(MIN_TOUCH),
+		paddingVertical: SPACING_H.md,
 		alignItems: 'center',
+		justifyContent: 'center',
 	},
-	cancelText: { fontSize: scaledSize(14), fontWeight: '800', color: '#64748B' },
+	cancelText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.textSecondary },
 	confirmBtn: {
 		flex: 1,
-		backgroundColor: '#EF4444',
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(13),
+		backgroundColor: COLORS.danger,
+		borderRadius: RADIUS.md,
+		minHeight: scaleHeight(MIN_TOUCH),
+		paddingVertical: SPACING_H.md,
 		alignItems: 'center',
+		justifyContent: 'center',
 	},
-	confirmText: { fontSize: scaledSize(14), fontWeight: '800', color: '#fff' },
+	confirmText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.textWhite },
 });

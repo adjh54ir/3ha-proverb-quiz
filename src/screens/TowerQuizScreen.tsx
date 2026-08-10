@@ -10,12 +10,14 @@ import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import { Paths } from '@/navigation/conf/Paths';
 import { generateTowerQuiz, TowerQuizQuestion } from '@/const/ConstTowerQuizData';
 import { MainDataType } from '@/types/MainDataType';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import TowerResultModal from './modal/TowerResultModal';
+import DateUtils from '@/utils/DateUtils';
 
 const TOWER_STORAGE_KEY = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
 
@@ -55,7 +57,13 @@ const TowerQuizScreen = () => {
 	const effectTextTranslateY = useRef(new Animated.Value(0)).current;
 	const effectTextScale = useRef(new Animated.Value(0.5)).current;
 	const [effectText, setEffectText] = useState('');
-	const [effectColor, setEffectColor] = useState('#22C55E');
+	const [effectColor, setEffectColor] = useState<string>(COLORS.primary);
+
+	// 문제 전환 시 fade + slide-up
+	const questionAnim = useRef(new Animated.Value(0)).current;
+	// 지연 실행 타이머 (언마운트 시 정리)
+	const completeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const hasCompletedRef = useRef(false);
 
 	const towerLevel = TOWER_LEVELS.find((t) => t.level === level);
 	const currentQuestion = quizData[currentQuestionIndex];
@@ -70,6 +78,26 @@ const TowerQuizScreen = () => {
 		loadProgress();
 	}, [level]);
 
+	// 문제가 바뀔 때마다 카드/보기 영역 진입 애니메이션
+	useEffect(() => {
+		questionAnim.setValue(0);
+		const anim = Animated.timing(questionAnim, { toValue: 1, duration: 260, useNativeDriver: true });
+		anim.start();
+		return () => anim.stop();
+	}, [currentQuestionIndex, quizData.length]);
+
+	// 언마운트 시 실행 중인 애니메이션/타이머 정리
+	useEffect(() => {
+		return () => {
+			[bossShakeAnim, bossScaleAnim, bossOpacityAnim, effectTextAnim, effectTextTranslateY, effectTextScale, questionAnim].forEach((v) =>
+				v.stopAnimation(),
+			);
+			if (completeTimerRef.current) {
+				clearTimeout(completeTimerRef.current);
+			}
+		};
+	}, []);
+
 	useEffect(() => {
 		if (isAnswered && currentQuestionIndex === totalQuestions - 1) {
 			const timer = setTimeout(() => {
@@ -79,23 +107,12 @@ const TowerQuizScreen = () => {
 		}
 	}, [isAnswered, currentQuestionIndex, totalQuestions]);
 
-	const getLocalDateString = (date: Date = new Date()): string => {
-		const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-		const formatter = new Intl.DateTimeFormat('en-CA', {
-			timeZone,
-			year: 'numeric',
-			month: '2-digit',
-			day: '2-digit',
-		});
-		return formatter.format(date);
-	};
-
 	const CORRECT_TEXTS = ['PERFECT! ⚔️', 'CRITICAL HIT! 💥', 'EXCELLENT! 🌟', 'COMBO! ⚡', 'MIGHTY BLOW! 🔥'];
 	const WRONG_TEXTS = ['MISS! 💨', 'BLOCKED! 🛡️', 'WEAK POINT! ❌', 'GUARD BREAK! 😵', 'FAILED! 💀'];
 
 	const playEffectText = (isCorrect: boolean) => {
 		const texts = isCorrect ? CORRECT_TEXTS : WRONG_TEXTS;
-		const color = isCorrect ? '#22C55E' : '#EF4444';
+		const color = isCorrect ? COLORS.primary : COLORS.danger;
 		const text = texts[Math.floor(Math.random() * texts.length)];
 
 		setEffectText(text);
@@ -161,8 +178,9 @@ const TowerQuizScreen = () => {
 			const saved = await AsyncStorage.getItem(TOWER_STORAGE_KEY);
 			if (saved) {
 				const parsed = JSON.parse(saved);
-				const today = getLocalDateString();
-				if (parsed.lastAttemptDate !== today) {
+				const today = DateUtils.getLocalDateString();
+				// SettingScreen 초기화가 ISO 타임스탬프로 저장하는 경우가 있어 로컬 날짜 키로 정규화 후 비교
+				if (DateUtils.toLocalDateKey(parsed.lastAttemptDate) !== today) {
 					parsed.attempts = 1;
 					parsed.adRewardUsed = 0;
 					parsed.lastAttemptDate = today;
@@ -197,7 +215,7 @@ const TowerQuizScreen = () => {
 					setIsAnswered(true);
 					setSelectedAnswer(currentQuestion.correctAnswer);
 
-					setTimeout(() => {
+					completeTimerRef.current = setTimeout(() => {
 						if (!progress || !towerLevel) {
 							return;
 						}
@@ -241,7 +259,7 @@ const TowerQuizScreen = () => {
 		} else {
 			setIsAnswered(true);
 			requestAnimationFrame(() => {
-				setTimeout(() => {
+				completeTimerRef.current = setTimeout(() => {
 					handleQuizComplete();
 				}, 300);
 			});
@@ -252,6 +270,12 @@ const TowerQuizScreen = () => {
 		if (!progress || !towerLevel) {
 			return;
 		}
+		// 마지막 문제에서는 isAnswered useEffect(500ms)와 handleNext(300ms)가 모두 이 함수를 부른다.
+		// 여기서 한 번만 통과시켜야 attempts 가 2회 차감되지 않는다.
+		if (hasCompletedRef.current) {
+			return;
+		}
+		hasCompletedRef.current = true;
 
 		const isPassed = correctCount === totalQuestions;
 
@@ -316,7 +340,7 @@ const TowerQuizScreen = () => {
 			<View style={styles.container}>
 				<LinearGradient colors={['#2B2D3A', '#21222C', '#191A21']} style={StyleSheet.absoluteFillObject} />
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
-					<Text style={{ color: '#fff', fontSize: scaledSize(16) }}>퀴즈 생성 중...</Text>
+					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>퀴즈 생성 중...</Text>
 				</SafeAreaView>
 			</View>
 		);
@@ -327,9 +351,9 @@ const TowerQuizScreen = () => {
 			<View style={styles.container}>
 				<LinearGradient colors={['#2B2D3A', '#21222C', '#191A21']} style={StyleSheet.absoluteFillObject} />
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
-					<Text style={{ color: '#fff', fontSize: scaledSize(16) }}>타워 정보를 찾을 수 없습니다.</Text>
-					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: scaleHeight(20) }}>
-						<Text style={{ color: '#22C55E', fontSize: scaledSize(14) }}>뒤로 가기</Text>
+					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>타워 정보를 찾을 수 없습니다.</Text>
+					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: SPACING_H.xl }}>
+						<Text style={{ color: COLORS.primary, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
 					</TouchableOpacity>
 				</SafeAreaView>
 			</View>
@@ -341,9 +365,9 @@ const TowerQuizScreen = () => {
 			<View style={styles.container}>
 				<LinearGradient colors={['#2B2D3A', '#21222C', '#191A21']} style={StyleSheet.absoluteFillObject} />
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
-					<Text style={{ color: '#fff', fontSize: scaledSize(16) }}>레벨 {level}에 해당하는 단어가 없습니다.</Text>
-					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: scaleHeight(20) }}>
-						<Text style={{ color: '#22C55E', fontSize: scaledSize(14) }}>뒤로 가기</Text>
+					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>레벨 {level}에 해당하는 단어가 없습니다.</Text>
+					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: SPACING_H.xl }}>
+						<Text style={{ color: COLORS.primary, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
 					</TouchableOpacity>
 				</SafeAreaView>
 			</View>
@@ -359,7 +383,7 @@ const TowerQuizScreen = () => {
 			<SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
 				<View style={styles.header}>
 					<TouchableOpacity onPress={handleExit} style={styles.exitButton}>
-						<IconComponent type="materialIcons" name="close" size={scaledSize(28)} color="#fff" />
+						<IconComponent type="materialIcons" name="close" size={scaledSize(28)} color={COLORS.textWhite} />
 					</TouchableOpacity>
 
 					<View style={styles.headerCenter}>
@@ -372,7 +396,7 @@ const TowerQuizScreen = () => {
 					<View style={styles.headerRight}>
 						{__DEV__ && (
 							<TouchableOpacity onPress={handleAutoPass} style={styles.devButton}>
-								<IconComponent type="materialIcons" name="flash-on" size={scaledSize(20)} color="#F59E0B" />
+								<IconComponent type="materialIcons" name="flash-on" size={scaledSize(20)} color={COLORS.warning} />
 							</TouchableOpacity>
 						)}
 						<View style={styles.scoreContainer}>
@@ -382,7 +406,7 @@ const TowerQuizScreen = () => {
 									type="materialIcons"
 									name={i < correctCount ? 'star' : 'star-border'}
 									size={scaledSize(18)}
-									color={i < correctCount ? '#FBBF24' : 'rgba(255,255,255,0.35)'}
+									color={i < correctCount ? COLORS.gold : 'rgba(255,255,255,0.35)'}
 								/>
 							))}
 						</View>
@@ -409,7 +433,10 @@ const TowerQuizScreen = () => {
 					</View>
 				</View>
 
-				<ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+				<ScrollView
+					style={styles.content}
+					contentContainerStyle={styles.contentContainer}
+					showsVerticalScrollIndicator={false}>
 					<View style={styles.bossSection}>
 						<View style={[styles.bossGlow, { backgroundColor: towerLevel.color + '40' }]} />
 						<Animated.View
@@ -432,16 +459,21 @@ const TowerQuizScreen = () => {
 						</Animated.Text>
 					</View>
 
-					<View style={styles.questionCard}>
-						<View style={styles.questionCardGradient}>
+					<Animated.View
+						style={{
+							opacity: questionAnim,
+							transform: [{ translateY: questionAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
+						}}>
+						<View style={styles.questionCard}>
+							<View style={styles.questionCardGradient}>
 							<Text style={styles.questionText}>
 								<Text style={styles.questionProverb}>'{currentQuestion.proverb}'</Text>
 								<Text style={styles.questionAsk}>의 뜻은 무엇일까요?</Text>
 							</Text>
 						</View>
-					</View>
+						</View>
 
-					<View style={styles.answersContainer}>
+						<View style={styles.answersContainer}>
 						{currentQuestion.options.map((option, index) => {
 							const isSelected = selectedAnswer === index;
 							const isCorrect = index === currentQuestion.correctAnswer;
@@ -450,9 +482,9 @@ const TowerQuizScreen = () => {
 
 							let backgroundColor = 'rgba(255, 255, 255, 0.1)';
 							if (showCorrect) {
-								backgroundColor = '#22C55E';
+								backgroundColor = COLORS.primary;
 							} else if (showWrong) {
-								backgroundColor = '#EF4444';
+								backgroundColor = COLORS.danger;
 							} else if (isSelected) {
 								backgroundColor = towerLevel.color;
 							}
@@ -469,30 +501,31 @@ const TowerQuizScreen = () => {
 												<Text style={styles.answerNumberText}>{index + 1}</Text>
 											</View>
 											<Text style={styles.answerText}>{option}</Text>
-											{showCorrect && <IconComponent type="materialIcons" name="check-circle" size={scaledSize(24)} color="#fff" />}
-											{showWrong && <IconComponent type="materialIcons" name="cancel" size={scaledSize(24)} color="#fff" />}
+											{showCorrect && <IconComponent type="materialIcons" name="check-circle" size={scaledSize(24)} color={COLORS.textWhite} />}
+											{showWrong && <IconComponent type="materialIcons" name="cancel" size={scaledSize(24)} color={COLORS.textWhite} />}
 										</View>
 									</View>
 								</TouchableOpacity>
 							);
 						})}
-					</View>
+						</View>
+					</Animated.View>
 
 					{isAnswered && (
 						<View style={styles.explanationCard}>
 							<View
 								style={[
 									styles.explanationGradient,
-									{ backgroundColor: isCorrectAnswer ? 'rgba(39, 174, 96, 0.2)' : 'rgba(231, 76, 60, 0.2)' },
+									{ backgroundColor: isCorrectAnswer ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)' },
 								]}>
 								<View style={styles.explanationHeader}>
 									<IconComponent
 										type="materialIcons"
 										name={isCorrectAnswer ? 'check-circle' : 'info'}
 										size={scaledSize(24)}
-										color={isCorrectAnswer ? '#22C55E' : '#EF4444'}
+										color={isCorrectAnswer ? COLORS.primary : COLORS.danger}
 									/>
-									<Text style={[styles.explanationTitle, { color: isCorrectAnswer ? '#22C55E' : '#EF4444' }]}>
+									<Text style={[styles.explanationTitle, { color: isCorrectAnswer ? COLORS.primary : COLORS.danger }]}>
 										{isCorrectAnswer ? '정답입니다!' : '틀렸습니다'}
 									</Text>
 								</View>
@@ -513,7 +546,7 @@ const TowerQuizScreen = () => {
 									type="materialIcons"
 									name={currentQuestionIndex < totalQuestions - 1 ? 'arrow-forward' : 'check'}
 									size={scaledSize(24)}
-									color="#fff"
+									color={COLORS.textWhite}
 								/>
 							</View>
 						</TouchableOpacity>
@@ -544,36 +577,37 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingHorizontal: scaleWidth(16),
-		paddingVertical: scaleHeight(12),
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
 	},
 	exitButton: {
-		width: scaleWidth(40),
-		height: scaleWidth(40),
+		width: scaleWidth(44),
+		height: scaleWidth(44),
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
 	headerCenter: { flex: 1, alignItems: 'center' },
-	levelTitle: { fontSize: scaledSize(18), fontWeight: 'bold', color: '#fff' },
-	questionCount: { fontSize: scaledSize(14), color: '#CBD5E1', marginTop: scaleHeight(4) },
-	scoreText: { fontSize: scaledSize(16), fontWeight: 'bold', color: '#fff' },
-	progressBarContainer: { paddingHorizontal: scaleWidth(16), paddingBottom: scaleHeight(16) },
+	levelTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
+	questionCount: { fontSize: FONT_SIZES.md, color: '#CBD5E1', marginTop: SPACING_H.xs },
+	progressBarContainer: { paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.lg },
 	progressLabelRow: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xs,
 	},
-	progressLabelText: { fontSize: scaledSize(11.5), fontWeight: '700', color: 'rgba(255,255,255,0.75)' },
+	progressLabelText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: 'rgba(255,255,255,0.75)' },
 	progressBarBackground: {
 		height: scaleHeight(10),
 		backgroundColor: 'rgba(255, 255, 255, 0.15)',
-		borderRadius: scaleWidth(999),
+		borderRadius: RADIUS.round,
 		overflow: 'hidden',
 	},
-	progressBarFill: { height: '100%', borderRadius: scaleWidth(999) },
-	content: { flex: 1, paddingHorizontal: scaleWidth(16) },
-	bossSection: { alignItems: 'center', marginVertical: scaleHeight(20) },
+	progressBarFill: { height: '100%', borderRadius: RADIUS.round },
+	content: { flex: 1, paddingHorizontal: SPACING_W.lg },
+	// 하단 고정 '다음 문제' 버튼에 컨텐츠가 가리지 않도록 여백 확보
+	contentContainer: { paddingBottom: scaleHeight(40) },
+	bossSection: { alignItems: 'center', marginVertical: SPACING_H.xl },
 	bossGlow: {
 		position: 'absolute',
 		width: scaleWidth(120),
@@ -581,73 +615,74 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(60),
 	},
 	bossImage: { width: scaleWidth(120), height: scaleWidth(120), borderRadius: scaleWidth(60) },
-	questionCard: { marginBottom: scaleHeight(24) },
-	questionCardGradient: { padding: scaleWidth(20) },
+	questionCard: { marginBottom: SPACING_H.xxl },
+	questionCardGradient: { paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg },
 	questionText: {
-		fontSize: scaledSize(18),
+		fontSize: FONT_SIZES.xl,
 		fontWeight: '600',
-		color: '#fff',
+		color: COLORS.textWhite,
 		lineHeight: scaledSize(26),
 		textAlign: 'center',
 	},
 	questionProverb: {
 		color: '#60A5FA', // ✅ 속담 부분만 파란색 강조
-		fontWeight: '800',
+		fontWeight: '700',
 	},
 	questionAsk: {
-		color: '#fff', // 질문 문구는 흰색
+		color: COLORS.textWhite, // 질문 문구는 흰색
 		fontWeight: '600',
 	},
-	answersContainer: { gap: scaleHeight(12) },
-	answerButton: { borderRadius: scaleWidth(12), overflow: 'hidden' },
-	answerGradient: { padding: scaleWidth(16) },
-	answerContent: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(12) },
+	answersContainer: { gap: SPACING_H.md },
+	answerButton: { borderRadius: RADIUS.md, overflow: 'hidden' },
+	answerGradient: { paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg },
+	answerContent: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.md },
 	answerNumber: {
 		width: scaleWidth(32),
 		height: scaleWidth(32),
-		borderRadius: scaleWidth(16),
+		borderRadius: scaleWidth(32) / 2,
 		backgroundColor: 'rgba(255, 255, 255, 0.2)',
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-	answerNumberText: { fontSize: scaledSize(16), fontWeight: 'bold', color: '#fff' },
-	answerText: { flex: 1, fontSize: scaledSize(16), color: '#fff', lineHeight: scaledSize(22) },
+	answerNumberText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textWhite },
+	answerText: { flex: 1, fontSize: FONT_SIZES.lg, color: COLORS.textWhite, lineHeight: scaledSize(22) },
 	explanationCard: {
-		marginTop: scaleHeight(20),
-		marginBottom: scaleHeight(20),
-		borderRadius: scaleWidth(12),
+		marginTop: SPACING_H.xl,
+		marginBottom: SPACING_H.xl,
+		borderRadius: RADIUS.md,
 		overflow: 'hidden',
 	},
-	explanationGradient: { padding: scaleWidth(16) },
-	explanationHeader: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(8), marginBottom: scaleHeight(8) },
-	explanationTitle: { fontSize: scaledSize(16), fontWeight: 'bold' },
-	explanationText: { fontSize: scaledSize(14), color: '#F1F5F9', lineHeight: scaledSize(20) },
-	nextButtonContainer: { padding: scaleWidth(16), paddingBottom: scaleHeight(24) },
-	nextButton: { borderRadius: scaleWidth(12), overflow: 'hidden' },
+	explanationGradient: { paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg },
+	explanationHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm, marginBottom: SPACING_H.sm },
+	explanationTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700' },
+	explanationText: { fontSize: FONT_SIZES.md, color: '#F1F5F9', lineHeight: scaledSize(20) },
+	nextButtonContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, paddingBottom: SPACING_H.lg },
+	nextButton: { borderRadius: RADIUS.md, overflow: 'hidden' },
 	nextButtonGradient: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		gap: scaleWidth(8),
-		paddingVertical: scaleHeight(16),
+		gap: SPACING_W.sm,
+		minHeight: scaleHeight(48),
+		paddingVertical: SPACING_H.lg,
 	},
-	nextButtonText: { fontSize: scaledSize(18), fontWeight: 'bold', color: '#fff' },
-	headerRight: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(8) },
+	nextButtonText: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
+	headerRight: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm },
 	devButton: {
 		width: scaleWidth(36),
 		height: scaleWidth(36),
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: 'rgba(245, 158, 11, 0.2)',
-		borderRadius: scaleWidth(18),
+		borderRadius: scaleWidth(36) / 2,
 		borderWidth: 1,
 		borderColor: 'rgba(245, 158, 11, 0.5)',
 	},
-	scoreContainer: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(2) },
+	scoreContainer: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.xs },
 	effectText: {
 		position: 'absolute',
 		fontSize: scaledSize(28),
-		fontWeight: 'bold',
+		fontWeight: '700',
 		textShadowColor: 'rgba(0,0,0,0.5)',
 		textShadowOffset: { width: 1, height: 1 },
 		textShadowRadius: 4,

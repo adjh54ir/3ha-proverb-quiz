@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useRef, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Animated } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import BookFormModal from './modal/BookFormModal';
@@ -27,8 +28,30 @@ const SORT_OPTIONS: { key: SortType; label: string }[] = [
 	{ key: 'count', label: '많은 순' },
 ];
 
+/**
+ * 리스트 아이템 fade + slide-up 진입 애니메이션 래퍼
+ */
+const AnimatedListItem = React.memo(({ children, index }: { children: React.ReactNode; index: number }) => {
+	const fadeAnim = useRef(new Animated.Value(0)).current;
+	const translateY = useRef(new Animated.Value(scaleHeight(12))).current;
+
+	useEffect(() => {
+		// 처음 6개만 stagger, 이후는 즉시 표시 (스크롤 성능 보호)
+		const delay = index < 6 ? index * 40 : 0;
+		const anim = Animated.parallel([
+			Animated.timing(fadeAnim, { toValue: 1, duration: 250, delay, useNativeDriver: true }),
+			Animated.timing(translateY, { toValue: 0, duration: 250, delay, useNativeDriver: true }),
+		]);
+		anim.start();
+		return () => anim.stop();
+	}, []);
+
+	return <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY }] }}>{children}</Animated.View>;
+});
+
 const MyProverbBook = () => {
 	const navigation = useNavigation<any>();
+	const insets = useSafeAreaInsets();
 	const ALL_PROVERBS = ProverbServices.selectProverbList();
 
 	const [books, setBooks] = useState<MainDataType.ProverbBook[]>([]);
@@ -141,7 +164,7 @@ const MyProverbBook = () => {
 				{/* 헤더 */}
 				<View style={styles.header}>
 					<TouchableOpacity onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME })} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-						<IconComponent type="materialIcons" name="arrow-back" size={scaledSize(22)} color="#334155" />
+						<IconComponent type="materialIcons" name="arrow-back" size={scaledSize(22)} color={COLORS.text} />
 					</TouchableOpacity>
 					<Text style={styles.headerTitle}>나만의 속담집</Text>
 					{books.length > 0 ? (
@@ -156,11 +179,11 @@ const MyProverbBook = () => {
 				{books.length > 0 && (
 					<View style={styles.filterContainer}>
 						<View style={styles.searchBox}>
-							<IconComponent type="materialIcons" name="search" size={scaledSize(18)} color="#94A3B8" />
-							<TextInput style={styles.searchInput} placeholder="속담집 검색..." placeholderTextColor="#9CA3AF" value={searchQuery} onChangeText={setSearchQuery} returnKeyType="search" />
+							<IconComponent type="materialIcons" name="search" size={scaledSize(18)} color={COLORS.textLight} />
+							<TextInput style={styles.searchInput} placeholder="속담집 검색..." placeholderTextColor={COLORS.textLight} value={searchQuery} onChangeText={setSearchQuery} returnKeyType="search" />
 							{!!searchQuery && (
 								<TouchableOpacity onPress={() => setSearchQuery('')}>
-									<IconComponent type="materialIcons" name="cancel" size={scaledSize(16)} color="#94A3B8" />
+									<IconComponent type="materialIcons" name="cancel" size={scaledSize(16)} color={COLORS.textLight} />
 								</TouchableOpacity>
 							)}
 						</View>
@@ -177,7 +200,7 @@ const MyProverbBook = () => {
 				<Animated.ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ opacity: fadeAnim }} contentContainerStyle={styles.booksContainer} showsVerticalScrollIndicator={false}>
 					{books.length === 0 ? (
 						<View style={styles.emptyView}>
-							<IconComponent type="materialIcons" name="menu-book" size={scaledSize(56)} color="#E2E8F0" />
+							<IconComponent type="materialIcons" name="menu-book" size={scaledSize(56)} color={COLORS.border} />
 							<Text style={styles.emptyTitle}>아직 만든 속담집이 없습니다</Text>
 							<Text style={styles.emptyDesc}>지금 만들기 버튼을 눌러서 추가해보세요!</Text>
 							<TouchableOpacity style={styles.emptyBtn} onPress={() => setFormTarget(null)}>
@@ -186,7 +209,7 @@ const MyProverbBook = () => {
 						</View>
 					) : filteredBooks.length === 0 ? (
 						<View style={styles.emptyView}>
-							<IconComponent type="materialIcons" name="search-off" size={scaledSize(52)} color="#E2E8F0" />
+							<IconComponent type="materialIcons" name="search-off" size={scaledSize(52)} color={COLORS.border} />
 							<Text style={styles.emptyTitle}>검색 결과가 없어요</Text>
 							<Text style={styles.emptyDesc}>{`'${searchQuery}'와 일치하는\n속담집이 없습니다.`}</Text>
 							<TouchableOpacity style={styles.emptyBtn} onPress={() => setSearchQuery('')}>
@@ -194,26 +217,27 @@ const MyProverbBook = () => {
 							</TouchableOpacity>
 						</View>
 					) : (
-						filteredBooks.map((book) => {
+						filteredBooks.map((book, index) => {
 							const bookColor = book.color || DEFAULT_COLOR;
 							const bookIcon = book.icon || DEFAULT_ICON;
 							const proverbs = ALL_PROVERBS.filter((p) => book.proverbIds.includes(p.id));
 							const preview = proverbs.slice(0, 4);
 							return (
-								<TouchableOpacity key={book.id} style={styles.bookCard} activeOpacity={0.9} onPress={() => navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: book.id })}>
+								<AnimatedListItem key={book.id} index={index}>
+								<TouchableOpacity style={styles.bookCard} activeOpacity={0.8} onPress={() => navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: book.id })}>
 									<View style={styles.bookCardPreviewHeader}>
 										<View style={[styles.bookCardIconWrap, { backgroundColor: bookColor, shadowColor: bookColor, shadowOpacity: 0.4, shadowOffset: { width: 0, height: 3 }, shadowRadius: 6 }]}>
-											<IconComponent type="materialIcons" name={bookIcon} size={scaledSize(26)} color="#fff" />
+											<IconComponent type="materialIcons" name={bookIcon} size={scaledSize(26)} color={COLORS.textWhite} />
 										</View>
 										<View style={{ flex: 1 }}>
-											<View style={{ flexDirection: 'row', alignItems: 'center', gap: scaleWidth(3), overflow: 'hidden' }}>
-												<Text style={[styles.bookCardTitle, { color: '#334155', flexShrink: 1 }]} numberOfLines={1}>{book.title}</Text>
-												<Text style={[styles.bookCardBadgeText, { color: '#94A3B8' }]} numberOfLines={1}>({book.proverbIds.length}개)</Text>
+											<View style={{ flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.xs, overflow: 'hidden' }}>
+												<Text style={[styles.bookCardTitle, { flexShrink: 1 }]} numberOfLines={1}>{book.title}</Text>
+												<Text style={styles.bookCardBadgeText} numberOfLines={1}>({book.proverbIds.length}개)</Text>
 											</View>
 											{!!book.description && <Text style={styles.bookCardDesc} numberOfLines={1}>{book.description}</Text>}
 										</View>
 										<TouchableOpacity style={styles.moreBtn} onPress={(e) => { e.stopPropagation(); setActionSheet(book); }} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-											<IconComponent type="materialIcons" name="more-vert" size={scaledSize(22)} color="#94A3B8" />
+											<IconComponent type="materialIcons" name="more-vert" size={scaledSize(22)} color={COLORS.textLight} />
 										</TouchableOpacity>
 									</View>
 									{proverbs.length > 0 ? (
@@ -235,19 +259,20 @@ const MyProverbBook = () => {
 										</View>
 									)}
 									<TouchableOpacity style={[styles.quizBtn, book.proverbIds.length === 0 && styles.quizBtnDisabled]} disabled={book.proverbIds.length === 0} onPress={(e) => { e.stopPropagation(); setQuizModeModal(book); }}>
-										<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(16)} color="#fff" />
+										<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(16)} color={COLORS.textWhite} />
 										<Text style={styles.quizBtnText}>퀴즈 시작</Text>
 									</TouchableOpacity>
 								</TouchableOpacity>
+								</AnimatedListItem>
 							);
 						})
 					)}
 				</Animated.ScrollView>
 
 				<TouchableOpacity style={styles.fab} onPress={() => setFormTarget(null)}>
-					<IconComponent type="materialIcons" name="add" size={scaledSize(28)} color="#fff" />
+					<IconComponent type="materialIcons" name="add" size={scaledSize(28)} color={COLORS.textWhite} />
 				</TouchableOpacity>
-				<BottomHomeButton backgroundColor="#F1F5F9" skipConfirm />
+				<BottomHomeButton backgroundColor={COLORS.surfaceAlt} skipConfirm />
 			</SafeAreaView>
 
 			{/* 생성/편집 모달 */}
@@ -265,17 +290,17 @@ const MyProverbBook = () => {
 			<Modal visible={!!deleteConfirm} transparent animationType="fade">
 				<View style={styles.modalOverlay}>
 					<View style={styles.confirmModal}>
-						<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(40)} color="#EF4444" />
+						<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(40)} color={COLORS.danger} />
 						<Text style={styles.confirmTitle}>속담집을 삭제할까요?</Text>
 						<Text style={styles.confirmDesc}>
 							<Text style={{ fontWeight: '700' }}>{deleteConfirm?.title}</Text>을 삭제하면{'\n'}복구할 수 없어요.
 						</Text>
 						<View style={styles.confirmBtnRow}>
-							<TouchableOpacity style={[styles.confirmBtn, { backgroundColor: '#F1F5F9' }]} onPress={() => setDeleteConfirm(null)}>
-								<Text style={[styles.confirmBtnText, { color: '#334155' }]}>취소</Text>
+							<TouchableOpacity style={[styles.confirmBtn, styles.confirmBtnCancel]} onPress={() => setDeleteConfirm(null)}>
+								<Text style={[styles.confirmBtnText, { color: COLORS.text }]}>취소</Text>
 							</TouchableOpacity>
-							<TouchableOpacity style={[styles.confirmBtn, { backgroundColor: '#EF4444' }]} onPress={() => deleteConfirm && handleDeleteBook(deleteConfirm)}>
-								<Text style={[styles.confirmBtnText, { color: '#fff' }]}>삭제</Text>
+							<TouchableOpacity style={[styles.confirmBtn, styles.confirmBtnDelete]} onPress={() => deleteConfirm && handleDeleteBook(deleteConfirm)}>
+								<Text style={[styles.confirmBtnText, { color: COLORS.textWhite }]}>삭제</Text>
 							</TouchableOpacity>
 						</View>
 					</View>
@@ -285,7 +310,7 @@ const MyProverbBook = () => {
 			{/* 액션시트 */}
 			<Modal visible={!!actionSheet} transparent animationType="slide">
 				<TouchableOpacity style={styles.actionSheetOverlay} activeOpacity={1} onPress={() => setActionSheet(null)}>
-					<TouchableOpacity activeOpacity={1} style={styles.actionSheet}>
+					<TouchableOpacity activeOpacity={1} style={[styles.actionSheet, { paddingBottom: Math.max(insets.bottom, SPACING_H.xxl) }]}>
 						<View style={styles.actionSheetHandle} />
 						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; setActionSheet(null); b && navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: b.id }); }}>
 							<View style={[styles.actionItemIcon, { backgroundColor: (actionSheet?.color || DEFAULT_COLOR) + '20' }]}>
@@ -295,40 +320,40 @@ const MyProverbBook = () => {
 								<Text style={styles.actionItemLabel} numberOfLines={1}>{actionSheet?.title}</Text>
 								{!!actionSheet?.description && <Text style={styles.actionItemDesc} numberOfLines={1}>{actionSheet.description}</Text>}
 							</View>
-							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color="#E2E8F0" />
+							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.border} />
 						</TouchableOpacity>
 						<View style={styles.actionDivider} />
 						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; setActionSheet(null); setAddProverbModal(b); }}>
-							<View style={[styles.actionItemIcon, { backgroundColor: '#EFF6FF' }]}>
-								<IconComponent type="materialIcons" name="add-circle-outline" size={scaledSize(18)} color="#22C55E" />
+							<View style={[styles.actionItemIcon, { backgroundColor: COLORS.primaryBg }]}>
+								<IconComponent type="materialIcons" name="add-circle-outline" size={scaledSize(18)} color={COLORS.primary} />
 							</View>
 							<View style={{ flex: 1 }}>
 								<Text style={styles.actionItemLabel}>속담 추가</Text>
 								<Text style={styles.actionItemDesc}>속담집에 속담 추가하기</Text>
 							</View>
-							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color="#E2E8F0" />
+							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.border} />
 						</TouchableOpacity>
 						<View style={styles.actionDivider} />
 						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; setActionSheet(null); setFormTarget(b); }}>
-							<View style={[styles.actionItemIcon, { backgroundColor: '#EFF6FF' }]}>
-								<IconComponent type="materialIcons" name="edit" size={scaledSize(18)} color="#22C55E" />
+							<View style={[styles.actionItemIcon, { backgroundColor: COLORS.primaryBg }]}>
+								<IconComponent type="materialIcons" name="edit" size={scaledSize(18)} color={COLORS.primary} />
 							</View>
 							<View style={{ flex: 1 }}>
 								<Text style={styles.actionItemLabel}>수정</Text>
 								<Text style={styles.actionItemDesc}>이름, 색상, 아이콘 변경하기</Text>
 							</View>
-							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color="#E2E8F0" />
+							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.border} />
 						</TouchableOpacity>
 						<View style={styles.actionDivider} />
 						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; setActionSheet(null); setDeleteConfirm(b); }}>
-							<View style={[styles.actionItemIcon, { backgroundColor: '#FEF2F2' }]}>
-								<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(18)} color="#EF4444" />
+							<View style={[styles.actionItemIcon, { backgroundColor: COLORS.dangerBg }]}>
+								<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(18)} color={COLORS.danger} />
 							</View>
 							<View style={{ flex: 1 }}>
-								<Text style={[styles.actionItemLabel, { color: '#EF4444' }]}>삭제</Text>
+								<Text style={[styles.actionItemLabel, { color: COLORS.danger }]}>삭제</Text>
 								<Text style={styles.actionItemDesc}>속담집을 영구적으로 삭제</Text>
 							</View>
-							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color="#E2E8F0" />
+							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.border} />
 						</TouchableOpacity>
 						<TouchableOpacity style={styles.actionCancelBtn} onPress={() => setActionSheet(null)}>
 							<Text style={styles.actionCancelText}>취소</Text>
@@ -343,56 +368,198 @@ const MyProverbBook = () => {
 export default MyProverbBook;
 
 const styles = StyleSheet.create({
-	main: { flex: 1, backgroundColor: '#F8FAFC' },
-	header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: scaleWidth(16), paddingVertical: scaleHeight(12), backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
-	headerTitle: { fontSize: scaledSize(18), fontWeight: '800', color: '#334155' },
-	headerCountBadge: { minWidth: scaleWidth(22), paddingHorizontal: scaleWidth(8), paddingVertical: scaleHeight(3), borderRadius: scaleWidth(12), backgroundColor: '#EFF6FF', alignItems: 'center' },
-	headerCountBadgeText: { fontSize: scaledSize(12), fontWeight: '700', color: '#3B82F6' },
-	filterContainer: { paddingHorizontal: scaleWidth(16), paddingTop: scaleHeight(12), backgroundColor: '#F8FAFC' },
-	searchBox: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(8), backgroundColor: '#fff', borderRadius: scaleWidth(12), paddingHorizontal: scaleWidth(12), height: scaleHeight(42), borderWidth: 1, borderColor: '#E2E8F0' },
-	searchInput: { flex: 1, fontSize: scaledSize(14), color: '#334155', paddingVertical: 0 },
-	sortRow: { flexDirection: 'row', gap: scaleWidth(8), marginTop: scaleHeight(10), marginBottom: scaleHeight(4) },
-	sortChip: { paddingHorizontal: scaleWidth(14), paddingVertical: scaleHeight(6), borderRadius: scaleWidth(20), backgroundColor: '#fff', borderWidth: 1, borderColor: '#E2E8F0' },
-	sortChipActive: { backgroundColor: '#3B82F6', borderColor: '#3B82F6' },
-	sortChipText: { fontSize: scaledSize(12), fontWeight: '600', color: '#64748B' },
-	sortChipTextActive: { color: '#fff' },
-	booksContainer: { padding: scaleWidth(16), paddingBottom: scaleHeight(120), flexGrow: 1 },
-	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: scaleHeight(80) },
-	emptyTitle: { fontSize: scaledSize(16), fontWeight: '700', color: '#334155', marginTop: scaleHeight(14), marginBottom: scaleHeight(6) },
-	emptyDesc: { fontSize: scaledSize(13), color: '#94A3B8', textAlign: 'center', lineHeight: scaleHeight(20) },
-	emptyBtn: { marginTop: scaleHeight(20), paddingHorizontal: scaleWidth(24), paddingVertical: scaleHeight(12), borderRadius: scaleWidth(12), backgroundColor: '#3B82F6' },
-	emptyBtnText: { color: '#fff', fontSize: scaledSize(14), fontWeight: '700' },
-	bookCard: { backgroundColor: '#fff', borderRadius: scaleWidth(18), padding: scaleWidth(16), marginBottom: scaleHeight(14), borderWidth: 1, borderColor: '#F1F5F9', shadowColor: '#000', shadowOffset: { width: 0, height: scaleHeight(2) }, shadowOpacity: 0.05, shadowRadius: scaleWidth(8) },
-	bookCardPreviewHeader: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(12) },
-	bookCardIconWrap: { width: scaleWidth(48), height: scaleWidth(48), borderRadius: scaleWidth(14), alignItems: 'center', justifyContent: 'center' },
-	bookCardTitle: { fontSize: scaledSize(16), fontWeight: '800' },
-	bookCardBadgeText: { fontSize: scaledSize(12), fontWeight: '600' },
-	bookCardDesc: { fontSize: scaledSize(12), color: '#94A3B8', marginTop: scaleHeight(3) },
-	moreBtn: { padding: scaleWidth(2) },
-	previewRow: { flexDirection: 'row', flexWrap: 'wrap', gap: scaleWidth(6), marginTop: scaleHeight(12) },
-	previewTag: { maxWidth: '46%', backgroundColor: '#F1F5F9', borderRadius: scaleWidth(8), paddingHorizontal: scaleWidth(10), paddingVertical: scaleHeight(5) },
-	previewTagText: { fontSize: scaledSize(12), color: '#475569', fontWeight: '600' },
-	emptyPreview: { marginTop: scaleHeight(12), paddingVertical: scaleHeight(14), borderRadius: scaleWidth(10), backgroundColor: '#F8FAFC', borderWidth: 1, borderStyle: 'dashed', borderColor: '#E2E8F0', alignItems: 'center' },
-	emptyPreviewText: { fontSize: scaledSize(12), color: '#94A3B8' },
-	quizBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleWidth(6), marginTop: scaleHeight(14), paddingVertical: scaleHeight(11), borderRadius: scaleWidth(12), backgroundColor: '#22C55E' },
-	quizBtnDisabled: { backgroundColor: '#CBD5E1' },
-	quizBtnText: { color: '#fff', fontSize: scaledSize(14), fontWeight: '700' },
-	fab: { position: 'absolute', right: scaleWidth(20), bottom: scaleHeight(90), width: scaleWidth(56), height: scaleWidth(56), borderRadius: scaleWidth(28), backgroundColor: '#3B82F6', alignItems: 'center', justifyContent: 'center', shadowColor: '#3B82F6', shadowOffset: { width: 0, height: scaleHeight(4) }, shadowOpacity: 0.35, shadowRadius: scaleWidth(8) },
-	modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: scaleWidth(32) },
-	confirmModal: { width: '100%', backgroundColor: '#fff', borderRadius: scaleWidth(20), padding: scaleWidth(24), alignItems: 'center' },
-	confirmTitle: { fontSize: scaledSize(17), fontWeight: '800', color: '#334155', marginTop: scaleHeight(12), marginBottom: scaleHeight(8) },
-	confirmDesc: { fontSize: scaledSize(14), color: '#64748B', textAlign: 'center', lineHeight: scaleHeight(21), marginBottom: scaleHeight(20) },
-	confirmBtnRow: { flexDirection: 'row', width: '100%', gap: scaleWidth(10) },
-	confirmBtn: { flex: 1, height: scaleHeight(46), borderRadius: scaleWidth(12), justifyContent: 'center', alignItems: 'center' },
-	confirmBtnText: { fontSize: scaledSize(14), fontWeight: '700' },
-	actionSheetOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-	actionSheet: { backgroundColor: '#fff', borderTopLeftRadius: scaleWidth(24), borderTopRightRadius: scaleWidth(24), paddingHorizontal: scaleWidth(16), paddingTop: scaleHeight(10), paddingBottom: scaleHeight(24) },
-	actionSheetHandle: { width: scaleWidth(40), height: scaleHeight(4), borderRadius: scaleWidth(2), backgroundColor: '#E2E8F0', alignSelf: 'center', marginBottom: scaleHeight(14) },
-	actionItem: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(12), paddingVertical: scaleHeight(12) },
-	actionItemIcon: { width: scaleWidth(38), height: scaleWidth(38), borderRadius: scaleWidth(11), alignItems: 'center', justifyContent: 'center' },
-	actionItemLabel: { fontSize: scaledSize(15), fontWeight: '700', color: '#334155' },
-	actionItemDesc: { fontSize: scaledSize(12), color: '#94A3B8', marginTop: scaleHeight(2) },
-	actionDivider: { height: 1, backgroundColor: '#F1F5F9' },
-	actionCancelBtn: { marginTop: scaleHeight(10), paddingVertical: scaleHeight(14), borderRadius: scaleWidth(12), backgroundColor: '#F1F5F9', alignItems: 'center' },
-	actionCancelText: { fontSize: scaledSize(15), fontWeight: '700', color: '#64748B' },
+	main: { flex: 1, backgroundColor: COLORS.background },
+	header: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		backgroundColor: COLORS.surface,
+		borderBottomWidth: 1,
+		borderBottomColor: COLORS.surfaceAlt,
+	},
+	headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong },
+	headerCountBadge: {
+		minWidth: scaleWidth(24),
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.secondaryBg,
+		alignItems: 'center',
+	},
+	headerCountBadgeText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.secondary },
+	filterContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, backgroundColor: COLORS.background },
+	searchBox: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.sm,
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.md,
+		height: scaleHeight(44),
+		borderWidth: 1,
+		borderColor: COLORS.border,
+	},
+	searchInput: { flex: 1, fontSize: FONT_SIZES.md, color: COLORS.text, paddingVertical: 0 },
+	sortRow: { flexDirection: 'row', columnGap: SPACING_W.sm, marginTop: SPACING_H.md },
+	sortChip: {
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.sm,
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+	},
+	sortChipActive: { backgroundColor: COLORS.secondary, borderColor: COLORS.secondary },
+	sortChipText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary },
+	sortChipTextActive: { color: COLORS.textWhite },
+	booksContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, paddingBottom: scaleHeight(120), flexGrow: 1 },
+	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: scaleHeight(40) },
+	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
+	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textLight, textAlign: 'center', lineHeight: scaledSize(20) },
+	emptyBtn: {
+		marginTop: SPACING_H.xl,
+		paddingHorizontal: SPACING_W.xxl,
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.secondary,
+	},
+	emptyBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '700' },
+	bookCard: {
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		marginBottom: SPACING_H.md,
+		borderWidth: 1,
+		borderColor: COLORS.surfaceAlt,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+	},
+	bookCardPreviewHeader: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.md },
+	bookCardIconWrap: {
+		width: scaleWidth(48),
+		height: scaleWidth(48),
+		borderRadius: RADIUS.md,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	bookCardTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong },
+	bookCardBadgeText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textLight },
+	bookCardDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, marginTop: SPACING_H.xs },
+	moreBtn: { padding: scaleWidth(4) },
+	previewRow: { flexDirection: 'row', flexWrap: 'wrap', columnGap: SPACING_W.xs, rowGap: SPACING_H.xs, marginTop: SPACING_H.md },
+	previewTag: {
+		maxWidth: '46%',
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.sm,
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.xs,
+	},
+	previewTagText: { fontSize: FONT_SIZES.sm, color: COLORS.text, fontWeight: '600' },
+	emptyPreview: {
+		marginTop: SPACING_H.md,
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.background,
+		borderWidth: 1,
+		borderStyle: 'dashed',
+		borderColor: COLORS.border,
+		alignItems: 'center',
+	},
+	emptyPreviewText: { fontSize: FONT_SIZES.sm, color: COLORS.textLight },
+	quizBtn: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		columnGap: SPACING_W.sm,
+		marginTop: SPACING_H.md,
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.primary,
+	},
+	quizBtnDisabled: { backgroundColor: COLORS.borderDark },
+	quizBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '700' },
+	fab: {
+		position: 'absolute',
+		right: SPACING_W.xl,
+		bottom: scaleHeight(90),
+		width: scaleWidth(56),
+		height: scaleWidth(56),
+		borderRadius: scaleWidth(56) / 2,
+		backgroundColor: COLORS.secondary,
+		alignItems: 'center',
+		justifyContent: 'center',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.2,
+		shadowRadius: 8,
+	},
+	modalOverlay: {
+		flex: 1,
+		backgroundColor: COLORS.dim,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: scaleWidth(32),
+	},
+	confirmModal: {
+		width: '100%',
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingHorizontal: SPACING_W.xl,
+		paddingVertical: SPACING_H.xxl,
+		alignItems: 'center',
+	},
+	confirmTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
+	confirmDesc: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		textAlign: 'center',
+		lineHeight: scaledSize(21),
+		marginBottom: SPACING_H.xl,
+	},
+	confirmBtnRow: { flexDirection: 'row', width: '100%', columnGap: SPACING_W.md },
+	confirmBtn: { flex: 1, height: scaleHeight(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
+	confirmBtnCancel: { backgroundColor: COLORS.surfaceAlt },
+	confirmBtnDelete: { backgroundColor: COLORS.danger },
+	confirmBtnText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
+	actionSheetOverlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'flex-end' },
+	actionSheet: {
+		backgroundColor: COLORS.surface,
+		borderTopLeftRadius: RADIUS.xl,
+		borderTopRightRadius: RADIUS.xl,
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.md,
+		// paddingBottom 은 useSafeAreaInsets 로 런타임 주입 (하단 시스템 네비게이션 바 회피)
+	},
+	actionSheetHandle: {
+		width: scaleWidth(40),
+		height: scaleHeight(4),
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.border,
+		alignSelf: 'center',
+		marginBottom: SPACING_H.md,
+	},
+	actionItem: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.md, paddingVertical: SPACING_H.md },
+	actionItemIcon: {
+		width: scaleWidth(40),
+		height: scaleWidth(40),
+		borderRadius: RADIUS.md,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	actionItemLabel: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong },
+	actionItemDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, marginTop: SPACING_H.xs },
+	actionDivider: { height: 1, backgroundColor: COLORS.surfaceAlt },
+	actionCancelBtn: {
+		marginTop: SPACING_H.md,
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.surfaceAlt,
+		alignItems: 'center',
+	},
+	actionCancelText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textSecondary },
 });

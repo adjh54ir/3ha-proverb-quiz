@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal, Pressable,
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { TOWER_LEVELS } from '@/const/ConstTowerData';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 
 interface Props {
     unlockedRewards: number[];
@@ -146,9 +147,26 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
 
 const TowerRewardSection = ({ unlockedRewards }: Props) => {
     const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
+    // 팝업 진입 애니메이션 (fade + slide-up)
+    const popupAnim = useRef(new Animated.Value(0)).current;
 
     const towerRewards = TOWER_LEVELS.filter((t) => unlockedRewards.includes(t.level));
     const selectedTower = TOWER_LEVELS.find((t) => t.level === selectedLevel);
+
+    useEffect(() => {
+        if (selectedLevel === null) {
+            popupAnim.setValue(0);
+            return;
+        }
+        const anim = Animated.timing(popupAnim, {
+            toValue: 1,
+            duration: 260,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+        });
+        anim.start();
+        return () => anim.stop();
+    }, [selectedLevel, popupAnim]);
 
     if (towerRewards.length === 0) return null;
 
@@ -158,7 +176,7 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: scaleWidth(10) }}>
+                    contentContainerStyle={styles.towerRewardScrollContent}>
                     {towerRewards.map((tower) => (
                         <TouchableOpacity
                             key={tower.level}
@@ -189,8 +207,15 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
                 animationType="fade"
                 onRequestClose={() => setSelectedLevel(null)}>
                 <Pressable style={styles.overlay} onPress={() => setSelectedLevel(null)}>
-                    <Pressable style={styles.popup} onPress={() => { }}>
-                        {selectedTower && (
+                    <Animated.View
+                        style={{
+                            opacity: popupAnim,
+                            transform: [
+                                { translateY: popupAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) },
+                            ],
+                        }}>
+                        <Pressable style={styles.popup} onPress={() => { }}>
+                            {selectedTower && (
                             <>
                                 <View style={[styles.popupHeader, { backgroundColor: selectedTower.backgroundColor }]}>
                                     <FastImage
@@ -233,12 +258,14 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
 
                                 <TouchableOpacity
                                     style={[styles.closeBtn, { backgroundColor: selectedTower.color }]}
+                                    activeOpacity={0.85}
                                     onPress={() => setSelectedLevel(null)}>
                                     <Text style={styles.closeBtnText}>확인</Text>
                                 </TouchableOpacity>
                             </>
-                        )}
-                    </Pressable>
+                            )}
+                        </Pressable>
+                    </Animated.View>
                 </Pressable>
             </Modal>
         </>
@@ -249,23 +276,26 @@ export default TowerRewardSection;
 
 const styles = StyleSheet.create({
     towerRewardView: {
-        width: '105%',
-        marginTop: scaleHeight(6),
-        marginBottom: scaleHeight(4),
+        width: '100%',
+        marginTop: SPACING_H.sm,
+        marginBottom: SPACING_H.xs,
+    },
+    towerRewardScrollContent: {
+        paddingHorizontal: SPACING_W.md,
     },
     towerRewardItem: {
         alignItems: 'center',
-        marginRight: scaleWidth(12),
+        marginRight: SPACING_W.md,
         width: scaleWidth(60),
     },
     towerRewardImageWrap: {
         position: 'relative',
-        marginBottom: scaleHeight(4),
+        marginBottom: SPACING_H.xs,
     },
     towerRewardImage: {
         width: scaleWidth(48),
         height: scaleWidth(48),
-        borderRadius: scaleWidth(24),
+        borderRadius: scaleWidth(48) / 2,
         borderWidth: 2,
         borderColor: '#16a085',
     },
@@ -273,18 +303,18 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: -scaleHeight(4),
         right: -scaleWidth(4),
-        borderRadius: scaleWidth(8),
-        paddingHorizontal: scaleWidth(4),
+        borderRadius: RADIUS.round,
+        paddingHorizontal: SPACING_W.xs,
         paddingVertical: scaleHeight(1),
     },
     towerRewardBadgeText: {
         fontSize: scaledSize(8),
-        color: '#ffffff',
-        fontWeight: 'bold',
+        color: COLORS.textWhite,
+        fontWeight: '700',
     },
     towerRewardName: {
-        fontSize: scaledSize(10),
-        color: '#2c3e50',
+        fontSize: FONT_SIZES.xxs,
+        color: COLORS.textStrong,
         textAlign: 'center',
         fontWeight: '500',
         lineHeight: scaledSize(14),
@@ -293,51 +323,56 @@ const styles = StyleSheet.create({
     // 팝업
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: COLORS.dim,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: SPACING_W.lg,
     },
     popup: {
         width: scaleWidth(300),
-        backgroundColor: '#ffffff',
-        borderRadius: scaleWidth(16),
+        maxWidth: '100%',
+        backgroundColor: COLORS.surface,
+        borderRadius: RADIUS.xl,
         overflow: 'hidden',
     },
     popupHeader: {
         flexDirection: 'row',
-        padding: scaleWidth(16),
+        paddingHorizontal: SPACING_W.lg,
+        paddingVertical: SPACING_H.lg,
         alignItems: 'center',
-        gap: scaleWidth(12),
+        gap: SPACING_W.md,
     },
     bossImage: {
         width: scaleWidth(72),
         height: scaleWidth(72),
-        borderRadius: scaleWidth(8),
+        borderRadius: RADIUS.md,
     },
     popupHeaderInfo: {
         flex: 1,
     },
     bossTitle: {
-        fontSize: scaledSize(11),
-        color: '#7f8c8d',
-        marginBottom: scaleHeight(2),
+        fontSize: FONT_SIZES.xs,
+        fontWeight: '500',
+        color: COLORS.textSecondary,
+        marginBottom: SPACING_H.xs,
     },
     bossName: {
-        fontSize: scaledSize(14),
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        marginBottom: scaleHeight(4),
+        fontSize: FONT_SIZES.lg,
+        fontWeight: '700',
+        color: COLORS.textStrong,
+        marginBottom: SPACING_H.xs,
     },
     bossDesc: {
-        fontSize: scaledSize(10),
-        color: '#7f8c8d',
-        lineHeight: scaledSize(14),
+        fontSize: FONT_SIZES.xxs,
+        fontWeight: '400',
+        color: COLORS.textSecondary,
+        lineHeight: scaledSize(15),
     },
 
     // ✅ 중복 제거 후 단일 정의
     clearBadge: {
-        paddingVertical: scaleHeight(16),
-        paddingHorizontal: scaleWidth(20),
+        paddingVertical: SPACING_H.lg,
+        paddingHorizontal: SPACING_W.xl,
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
@@ -347,7 +382,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: scaleWidth(80),
         height: scaleWidth(80),
-        borderRadius: scaleWidth(40),
+        borderRadius: scaleWidth(80) / 2,
         backgroundColor: 'rgba(255,255,255,0.08)',
         left: -scaleWidth(20),
         top: -scaleWidth(20),
@@ -356,35 +391,35 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: scaleWidth(60),
         height: scaleWidth(60),
-        borderRadius: scaleWidth(30),
+        borderRadius: scaleWidth(60) / 2,
         backgroundColor: 'rgba(255,255,255,0.08)',
         right: -scaleWidth(10),
         bottom: -scaleWidth(10),
     },
     clearStar: {
         position: 'absolute',
-        fontSize: scaledSize(16),
+        fontSize: FONT_SIZES.lg,
         color: 'rgba(255,255,255,0.6)',
     },
     clearStarLeft: {
-        left: scaleWidth(20),
-        top: scaleHeight(10),
+        left: SPACING_W.xl,
+        top: SPACING_H.md,
     },
     clearStarRight: {
-        right: scaleWidth(20),
-        bottom: scaleHeight(10),
+        right: SPACING_W.xl,
+        bottom: SPACING_H.md,
     },
     clearBadgeInner: {
         alignItems: 'center',
-        gap: scaleHeight(4),
+        gap: SPACING_H.xs,
     },
     clearBadgeTrophy: {
-        fontSize: scaledSize(28),
+        fontSize: FONT_SIZES.display,
     },
     clearBadgeText: {
-        color: '#ffffff',
-        fontSize: scaledSize(18),
-        fontWeight: 'bold',
+        color: COLORS.textWhite,
+        fontSize: FONT_SIZES.xl,
+        fontWeight: '700',
         letterSpacing: 1.5,
         textShadowColor: 'rgba(0,0,0,0.35)',
         textShadowOffset: { width: 0, height: 1 },
@@ -392,64 +427,70 @@ const styles = StyleSheet.create({
     },
     clearBadgeSubText: {
         color: 'rgba(255,255,255,0.75)',
-        fontSize: scaledSize(11),
+        fontSize: FONT_SIZES.xs,
         letterSpacing: 4,
     },
 
     popupBody: {
-        padding: scaleWidth(16),
+        paddingHorizontal: SPACING_W.lg,
+        paddingVertical: SPACING_H.lg,
     },
     sectionTitle: {
-        fontSize: scaledSize(12),
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        marginBottom: scaleHeight(6),
+        fontSize: FONT_SIZES.md,
+        fontWeight: '700',
+        color: COLORS.textStrong,
+        marginBottom: SPACING_H.sm,
     },
     infoText: {
-        fontSize: scaledSize(12),
-        color: '#7f8c8d',
+        fontSize: FONT_SIZES.smPlus,
+        fontWeight: '400',
+        color: COLORS.textSecondary,
+        lineHeight: scaledSize(20),
     },
     highlight: {
-        fontWeight: 'bold',
+        fontWeight: '700',
         color: '#e67e22',
     },
     divider: {
         height: 1,
-        backgroundColor: '#ecf0f1',
-        marginVertical: scaleHeight(12),
+        backgroundColor: COLORS.border,
+        marginVertical: SPACING_H.lg,
     },
     rewardRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: scaleWidth(12),
+        gap: SPACING_W.md,
     },
     rewardThumb: {
         width: scaleWidth(48),
         height: scaleWidth(48),
-        borderRadius: scaleWidth(8),
+        borderRadius: RADIUS.md,
         borderWidth: 1,
-        borderColor: '#e0e0e0',
+        borderColor: COLORS.border,
     },
     rewardType: {
-        fontSize: scaledSize(10),
-        color: '#95a5a6',
-        marginBottom: scaleHeight(2),
+        fontSize: FONT_SIZES.xxs,
+        fontWeight: '500',
+        color: COLORS.textSecondary,
+        marginBottom: SPACING_H.xs,
     },
     rewardName: {
-        fontSize: scaledSize(13),
-        fontWeight: 'bold',
-        color: '#2c3e50',
+        fontSize: FONT_SIZES.mdPlus,
+        fontWeight: '700',
+        color: COLORS.textStrong,
     },
     closeBtn: {
-        margin: scaleWidth(16),
-        marginTop: 0,
-        paddingVertical: scaleHeight(10),
-        borderRadius: scaleWidth(8),
+        marginHorizontal: SPACING_W.lg,
+        marginBottom: SPACING_H.lg,
+        paddingVertical: SPACING_H.md,
+        borderRadius: RADIUS.md,
         alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: scaleHeight(44), // 터치 영역 최소 44
     },
     closeBtnText: {
-        color: '#ffffff',
-        fontWeight: 'bold',
-        fontSize: scaledSize(13),
+        color: COLORS.textWhite,
+        fontWeight: '700',
+        fontSize: FONT_SIZES.lg,
     },
 });

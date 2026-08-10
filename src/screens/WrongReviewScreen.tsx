@@ -1,5 +1,5 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Modal } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
@@ -8,6 +8,7 @@ import IconComponent from './common/atomic/IconComponent';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,12 +24,17 @@ const WrongReviewScreen = () => {
 	const scrollViewRef = useRef<ScrollView>(null);
 	const [wrongProverbIds, setWrongProverbIds] = useState<MainDataType.Proverb[]>([]);
 	const [showScrollTop, setShowScrollTop] = useState(false);
-	const [showGuideModal, setShowGuideModal] = useState(false);
 	const [totalSolvedCount, setTotalSolvedCount] = useState(0);
 	const [correctCount, setCorrectCount] = useState(0);
 	const [showWrongList, setShowWrongList] = useState(false);
 	const [detailProverb, setDetailProverb] = useState<MainDataType.Proverb | null>(null);
 	const [detailVisible, setDetailVisible] = useState(false);
+
+	// ✅ 화면 진입 애니메이션 (fade + slide-up)
+	const contentFade = useRef(new Animated.Value(0)).current;
+	const contentSlide = useRef(new Animated.Value(scaleHeight(12))).current;
+	// ✅ 오답 목록 펼침 애니메이션
+	const listFade = useRef(new Animated.Value(0)).current;
 
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
@@ -38,6 +44,30 @@ const WrongReviewScreen = () => {
 		}
 		fetchWrongData();
 	}, [isFocused]);
+
+	useEffect(() => {
+		if (loading) {
+			return;
+		}
+		contentFade.setValue(0);
+		contentSlide.setValue(scaleHeight(12));
+		const anim = Animated.parallel([
+			Animated.timing(contentFade, { toValue: 1, duration: 280, useNativeDriver: true }),
+			Animated.timing(contentSlide, { toValue: 0, duration: 280, useNativeDriver: true }),
+		]);
+		anim.start();
+		return () => anim.stop();
+	}, [loading, contentFade, contentSlide]);
+
+	useEffect(() => {
+		if (!showWrongList) {
+			listFade.setValue(0);
+			return;
+		}
+		const anim = Animated.timing(listFade, { toValue: 1, duration: 250, useNativeDriver: true });
+		anim.start();
+		return () => anim.stop();
+	}, [showWrongList, listFade]);
 
 	const fetchWrongData = async () => {
 		setLoading(true);
@@ -55,7 +85,6 @@ const WrongReviewScreen = () => {
 
 			const fullList = ProverbServices.selectProverbList();
 			const result = fullList.filter((c) => wrongCca3List.includes(c.id));
-			console.log('result : ', result);
 			setWrongProverbIds(result);
 		} catch (e) {
 			console.error('오답 로딩 실패:', e);
@@ -74,14 +103,6 @@ const WrongReviewScreen = () => {
 	};
 
 	const startWrongReview = () => {
-		const titleMap = {
-			all: '전체 퀴즈',
-			beginner: '초급 퀴즈',
-			intermediate: '중급 퀴즈',
-			advanced: '고급 퀴즈',
-			expert: '특급 퀴즈',
-		};
-
 		if (wrongProverbIds.length === 0) {
 			return;
 		}
@@ -100,7 +121,7 @@ const WrongReviewScreen = () => {
 	if (loading) {
 		return (
 			<View style={styles.center}>
-				<ActivityIndicator size="large" color="#22C55E" />
+				<ActivityIndicator size="large" color={COLORS.primary} />
 			</View>
 		);
 	}
@@ -108,7 +129,7 @@ const WrongReviewScreen = () => {
 	if (wrongProverbIds.length === 0) {
 		return (
 			<View style={styles.emptyWrap}>
-				<View style={styles.emptyCard}>
+				<Animated.View style={[styles.emptyCard, { opacity: contentFade, transform: [{ translateY: contentSlide }] }]}>
 					<FastImage
 						source={require('@/assets/images/correct_mascote.png')}
 						style={styles.emptyMascot}
@@ -120,7 +141,7 @@ const WrongReviewScreen = () => {
 						퀴즈를 풀다가 틀린 문제가 생기면{'\n'}
 						이곳에서 모아 다시 복습할 수 있어요.
 					</Text>
-				</View>
+				</Animated.View>
 			</View>
 		);
 	}
@@ -128,9 +149,14 @@ const WrongReviewScreen = () => {
 	const accuracy = totalSolvedCount > 0 ? Math.round((correctCount / totalSolvedCount) * 100) : 0;
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff', marginTop: scaleHeight(-15) }} edges={['bottom']}>
-			<ScrollView contentContainerStyle={styles.scrollContainer} ref={scrollViewRef} onScroll={handleScroll}>
-				<View style={styles.activityCardBox}>
+		<SafeAreaView style={styles.safeArea} edges={['bottom']}>
+			<ScrollView
+				contentContainerStyle={styles.scrollContainer}
+				ref={scrollViewRef}
+				onScroll={handleScroll}
+				scrollEventThrottle={16}
+				showsVerticalScrollIndicator={false}>
+				<Animated.View style={{ width: '100%', opacity: contentFade, transform: [{ translateY: contentSlide }] }}>
 					{/* ✅ 컴팩트 통계 카드 */}
 					<View style={styles.statsCard}>
 						<View style={styles.statsItem}>
@@ -139,12 +165,12 @@ const WrongReviewScreen = () => {
 						</View>
 						<View style={styles.statsDivider} />
 						<View style={styles.statsItem}>
-							<Text style={[styles.statsValue, { color: '#EF4444' }]}>{wrongProverbIds.length}</Text>
+							<Text style={[styles.statsValue, { color: COLORS.danger }]}>{wrongProverbIds.length}</Text>
 							<Text style={styles.statsLabel}>오답</Text>
 						</View>
 						<View style={styles.statsDivider} />
 						<View style={styles.statsItem}>
-							<Text style={[styles.statsValue, { color: '#16A34A' }]}>{accuracy}%</Text>
+							<Text style={[styles.statsValue, { color: COLORS.success }]}>{accuracy}%</Text>
 							<Text style={styles.statsLabel}>정답률</Text>
 						</View>
 					</View>
@@ -165,16 +191,16 @@ const WrongReviewScreen = () => {
 						</Text>
 					</View>
 
-					<TouchableOpacity style={styles.startButton} onPress={startWrongReview} activeOpacity={0.85}>
-						<IconComponent type="MaterialIcons" name="refresh" size={scaledSize(18)} color="#fff" style={{ marginRight: scaleWidth(6) }} />
+					<TouchableOpacity style={styles.startButton} onPress={startWrongReview} activeOpacity={0.8}>
+						<IconComponent type="MaterialIcons" name="refresh" size={scaledSize(18)} color={COLORS.textWhite} />
 						<Text style={styles.buttonText}>오답 다시 풀기</Text>
 					</TouchableOpacity>
-				</View>
+				</Animated.View>
 
 				{/* ✅ 펼치기/접기 */}
 				<TouchableOpacity style={styles.toggleButton} onPress={() => setShowWrongList((prev) => !prev)} activeOpacity={0.8}>
 					<View style={styles.toggleLeft}>
-						<IconComponent type="MaterialIcons" name="format-list-bulleted" size={scaledSize(18)} color="#334155" />
+						<IconComponent type="MaterialIcons" name="format-list-bulleted" size={scaledSize(18)} color={COLORS.text} />
 						<Text style={styles.toggleButtonText}>오답 목록</Text>
 						<View style={styles.toggleCountBadge}>
 							<Text style={styles.toggleCountText}>{wrongProverbIds.length}</Text>
@@ -184,63 +210,44 @@ const WrongReviewScreen = () => {
 						type="MaterialIcons"
 						name={showWrongList ? 'expand-less' : 'expand-more'}
 						size={scaledSize(22)}
-						color="#64748B"
+						color={COLORS.textSecondary}
 					/>
 				</TouchableOpacity>
 
 				{showWrongList && (
-					<View style={styles.reviewCardList}>
+					<Animated.View style={[styles.reviewCardList, { opacity: listFade }]}>
 						{wrongProverbIds.map((proverb, idx) => (
 							<TouchableOpacity
 								key={proverb.id}
-								style={[styles.reviewCard, { flexDirection: 'row', alignItems: 'center' }]}
+								style={styles.reviewCard}
 								activeOpacity={0.8}
 								onPress={() => {
 									setDetailProverb(proverb);
 									setDetailVisible(true);
 								}}>
-								<View style={{ flex: 1 }}>
+								<View style={styles.reviewCardBody}>
 									<View style={styles.reviewCardHeader}>
 										<View style={styles.reviewIndexBadge}>
 											<Text style={styles.reviewIndexText}>{idx + 1}</Text>
 										</View>
-										<Text style={styles.reviewProverbText}>
-											{proverb.proverb}
-										</Text>
+										<Text style={styles.reviewProverbText}>{proverb.proverb}</Text>
 									</View>
 									<Text style={styles.reviewMeaningText}>{proverb.longMeaning || proverb.meaning}</Text>
 								</View>
-								<IconComponent type="MaterialIcons" name="chevron-right" size={scaledSize(22)} color="#CBD5E1" />
+								<IconComponent type="MaterialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.borderDark} />
 							</TouchableOpacity>
 						))}
-					</View>
+					</Animated.View>
 				)}
-
-				{/* {showWrongList && (
-					<View style={{ paddingHorizontal: scaleWidth(12), width: '100%' }}>
-						<View style={styles.reviewTable}>
-							<View style={[styles.reviewRow, styles.reviewHeader]}>
-								<Text style={[styles.reviewCell, styles.headerCell]}>오답 속담</Text>
-								<Text style={[styles.reviewCell, styles.headerCell]}>정답</Text>
-							</View>
-							{wrongProverbIds.map((item) => (
-								<View key={item.id} style={styles.reviewRow}>
-									<Text style={styles.reviewCell}>
-										{item.proverb}
-									</Text>
-									<Text style={styles.reviewCell}>{item.meaning}</Text>
-								</View>
-							))}
-						</View>
-					</View>
-				)} */}
 			</ScrollView>
+
 			{/* 최하단에 위치할것!! */}
 			{showScrollTop && (
 				<TouchableOpacity
 					style={styles.scrollTopButton}
+					activeOpacity={0.8}
 					onPress={() => scrollViewRef.current?.scrollTo({ y: 0, animated: true })}>
-					<IconComponent type="MaterialIcons" name="arrow-upward" size={scaledSize(24)} color="#fff" />
+					<IconComponent type="MaterialIcons" name="arrow-upward" size={scaledSize(24)} color={COLORS.textWhite} />
 				</TouchableOpacity>
 			)}
 
@@ -252,414 +259,258 @@ const WrongReviewScreen = () => {
 export default WrongReviewScreen;
 
 const styles = StyleSheet.create({
-	card: {
-		backgroundColor: '#fff',
-		paddingVertical: scaleHeight(28),
-		paddingHorizontal: scaleWidth(24),
-		borderRadius: scaleWidth(16),
-		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		marginBottom: scaleHeight(16),
-		width: '100%',
-		alignItems: 'center',
+	safeArea: {
+		flex: 1,
+		backgroundColor: COLORS.background,
 	},
-	title: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#334155',
-		textAlign: 'center',
-		marginBottom: scaleHeight(10),
-	},
-	highlight: {
-		color: '#EF4444',
-		fontWeight: 'bold',
-	},
-	highlight2: {
-		fontWeight: 'bold',
-	},
-	subText: {
-		fontSize: scaledSize(15),
-		color: '#64748B',
-		textAlign: 'center',
-	},
-	startButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
+	center: {
+		flex: 1,
 		justifyContent: 'center',
-		backgroundColor: '#F59E0B',
-		paddingVertical: scaleHeight(14),
-		paddingHorizontal: scaleWidth(40),
-		marginBottom: scaleHeight(6),
-		borderRadius: scaleWidth(14),
-		marginTop: scaleHeight(12),
-		width: '100%',
+		alignItems: 'center',
+		backgroundColor: COLORS.background,
 	},
-	buttonText: {
-		color: '#fff',
-		fontSize: scaledSize(15),
-		fontWeight: '700',
-		textAlign: 'center',
+	scrollContainer: {
+		paddingTop: SPACING_H.xl,
+		paddingHorizontal: SPACING_W.lg,
+		paddingBottom: scaleHeight(40),
+		alignItems: 'center',
+		backgroundColor: COLORS.background,
 	},
+	// ===== 통계 카드 =====
 	statsCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(16),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(8),
+		borderColor: COLORS.border,
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.lg,
 		width: '100%',
-		marginBottom: scaleHeight(12),
-	},
-	encourageText: {
-		fontSize: scaledSize(14),
-		color: '#475569',
-		textAlign: 'center',
-		lineHeight: scaleHeight(21),
-		fontWeight: '600',
-		marginBottom: scaleHeight(12),
-	},
-	encourageHighlight: {
-		color: '#EF4444',
-		fontWeight: '800',
+		marginBottom: SPACING_H.md,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
 	},
 	statsItem: {
 		flex: 1,
 		alignItems: 'center',
 	},
 	statsValue: {
-		fontSize: scaledSize(20),
-		fontWeight: '800',
-		color: '#334155',
-		marginBottom: scaleHeight(2),
+		fontSize: FONT_SIZES.xxl,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.xs,
 	},
 	statsLabel: {
-		fontSize: scaledSize(12),
-		color: '#94A3B8',
-		fontWeight: '600',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
+		fontWeight: '500',
 	},
 	statsDivider: {
 		width: 1,
 		height: scaleHeight(28),
-		backgroundColor: '#E2E8F0',
+		backgroundColor: COLORS.border,
 	},
+	// ===== 격려 문구 =====
+	encourageText: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		textAlign: 'center',
+		lineHeight: scaledSize(21),
+		fontWeight: '500',
+		marginBottom: SPACING_H.lg,
+	},
+	encourageHighlight: {
+		color: COLORS.danger,
+		fontWeight: '700',
+	},
+	// ===== 안내 카드 =====
+	guideCard: {
+		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		marginBottom: SPACING_H.lg,
+		width: '100%',
+	},
+	guideCardTitle: {
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.sm,
+	},
+	guideCardContent: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		lineHeight: scaledSize(21),
+	},
+	guideHighlight: {
+		fontWeight: '700',
+		color: COLORS.primaryDark,
+	},
+	// ===== 주요 액션 =====
+	startButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		columnGap: SPACING_W.sm,
+		backgroundColor: COLORS.primary,
+		height: scaleHeight(48),
+		borderRadius: RADIUS.md,
+		marginBottom: SPACING_H.lg,
+		width: '100%',
+	},
+	buttonText: {
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		textAlign: 'center',
+	},
+	// ===== 오답 목록 토글 =====
 	toggleButton: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(16),
-		borderRadius: scaleWidth(14),
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.md,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		backgroundColor: '#fff',
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surface,
 		width: '100%',
 	},
 	toggleLeft: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(8),
+		columnGap: SPACING_W.sm,
 	},
 	toggleButtonText: {
-		color: '#334155',
-		fontSize: scaledSize(15),
-		fontWeight: '700',
+		color: COLORS.textStrong,
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '600',
 	},
 	toggleCountBadge: {
 		minWidth: scaleWidth(22),
 		height: scaleWidth(22),
-		borderRadius: scaleWidth(11),
-		backgroundColor: '#FEE2E2',
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.dangerBg,
 		alignItems: 'center',
 		justifyContent: 'center',
-		paddingHorizontal: scaleWidth(6),
+		paddingHorizontal: SPACING_W.sm,
 	},
 	toggleCountText: {
-		fontSize: scaledSize(12),
-		fontWeight: '800',
-		color: '#EF4444',
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '700',
+		color: COLORS.danger,
+	},
+	// ===== 오답 카드 =====
+	reviewCardList: {
+		width: '100%',
+		marginTop: SPACING_H.md,
+	},
+	reviewCard: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.lg,
+		marginBottom: SPACING_H.md,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+	},
+	reviewCardBody: {
+		flex: 1,
 	},
 	reviewCardHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(8),
-		marginBottom: scaleHeight(8),
+		columnGap: SPACING_W.sm,
+		marginBottom: SPACING_H.sm,
 	},
 	reviewIndexBadge: {
 		width: scaleWidth(24),
 		height: scaleWidth(24),
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#F1F5F9',
+		borderRadius: scaleWidth(24) / 2,
+		backgroundColor: COLORS.surfaceAlt,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 	reviewIndexText: {
-		fontSize: scaledSize(12),
-		fontWeight: '800',
-		color: '#64748B',
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '700',
+		color: COLORS.textSecondary,
 	},
-	reviewTable: {
-		marginTop: scaleHeight(24),
-		width: '100%',
-		borderWidth: 1,
-		borderColor: '#CBD5E1',
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#F8FAFC',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: 2,
-	},
-	reviewRow: {
-		flexDirection: 'row',
-		borderBottomWidth: 1,
-		borderBottomColor: '#F1F5F9',
-	},
-	reviewHeader: {
-		backgroundColor: '#F1F5F9',
-	},
-	reviewCell: {
+	reviewProverbText: {
 		flex: 1,
-		paddingVertical: scaleHeight(14),
-		paddingHorizontal: scaleWidth(12),
-		fontSize: scaledSize(15),
-		color: '#334155',
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 	},
-	headerCell: {
-		fontWeight: 'bold',
-		color: '#22C55E',
+	reviewMeaningText: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		lineHeight: scaledSize(20),
 	},
-	center: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: '#fff',
-	},
-	emptyText: {
-		fontSize: scaledSize(16),
-		color: '#64748B',
-	},
+	// ===== 빈 상태 =====
 	emptyWrap: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: '#F8FAFC',
-		paddingHorizontal: scaleWidth(28),
+		backgroundColor: COLORS.background,
+		paddingHorizontal: SPACING_W.lg,
 	},
 	emptyCard: {
 		width: '100%',
 		alignItems: 'center',
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(20),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
 		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		paddingVertical: scaleHeight(28),
-		paddingHorizontal: scaleWidth(20),
+		borderColor: COLORS.border,
+		paddingVertical: SPACING_H.xxl,
+		paddingHorizontal: SPACING_W.lg,
 	},
 	emptyMascot: {
 		width: scaleWidth(96),
 		height: scaleWidth(96),
-		marginBottom: scaleHeight(14),
+		marginBottom: SPACING_H.md,
 	},
 	emptyTitle: {
-		fontSize: scaledSize(17),
-		fontWeight: '800',
-		color: '#1E293B',
-		marginBottom: scaleHeight(10),
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.sm,
 		textAlign: 'center',
 	},
 	emptyDesc: {
-		fontSize: scaledSize(13.5),
-		color: '#64748B',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
 		textAlign: 'center',
-		lineHeight: scaleHeight(20),
+		lineHeight: scaledSize(21),
 	},
-	scrollContainer: {
-		paddingVertical: scaleHeight(40),
-		paddingHorizontal: scaleWidth(12),
-		paddingBottom: scaleWidth(12),
-		alignItems: 'center',
-		backgroundColor: '#F8FAFC',
-	},
-	activityCardBox: {
-		backgroundColor: 'transparent',
-		borderRadius: scaleWidth(16),
-		padding: scaleWidth(4),
-		marginBottom: scaleHeight(12),
-		width: '100%',
-		alignItems: 'center', // 내부 요소 정렬용
-	},
-	modalOverlay: {
-		flex: 1,
+	// ===== 최상단 이동 버튼 =====
+	scrollTopButton: {
+		position: 'absolute',
+		right: SPACING_W.xl,
+		bottom: scaleHeight(32),
+		backgroundColor: COLORS.secondary,
+		width: scaleWidth(48),
+		height: scaleWidth(48),
+		borderRadius: scaleWidth(48) / 2,
 		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-		padding: scaleWidth(20),
-	},
-	modalContent: {
-		backgroundColor: '#fff',
-		padding: scaleWidth(24),
-		borderRadius: scaleWidth(16),
-		width: '100%',
-		maxWidth: scaleWidth(320),
-		alignItems: 'center',
-	},
-	modalTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#334155',
-		marginBottom: scaleHeight(12),
-	},
-	modalText: {
-		fontSize: scaledSize(15),
-		color: '#64748B',
-		textAlign: 'left',
-	},
-	modalButton: {
-		marginTop: scaleHeight(20),
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(24),
-		backgroundColor: '#3B82F6',
-		borderRadius: scaleWidth(8),
-	},
-	modalButtonText: {
-		color: '#fff',
-		fontWeight: 'bold',
-		fontSize: scaledSize(15),
-	},
-	headerRow: {
-		width: '100%',
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginBottom: scaleHeight(12),
-	},
-	headerTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#334155',
-		marginRight: scaleWidth(5),
-	},
-	guideModal: {
-		backgroundColor: '#fff',
-		padding: scaleWidth(24),
-		borderRadius: scaleWidth(20),
-		width: '90%',
-		maxWidth: scaleWidth(340),
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.15,
-		shadowRadius: 5,
-	},
-	guideHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: scaleHeight(16),
-	},
-	guideTitle: {
-		fontSize: scaledSize(20),
-		fontWeight: 'bold',
-		color: '#334155',
-		marginLeft: scaleWidth(8),
-	},
-	guideDescription: {
-		fontSize: scaledSize(15),
-		color: '#334155',
-		textAlign: 'left',
-		lineHeight: scaleHeight(22),
-		marginBottom: scaleHeight(20),
-	},
-	guideHighlight: {
-		fontWeight: 'bold',
-		color: '#F97316',
-	},
-	guideConfirmButton: {
-		backgroundColor: '#3B82F6',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(40),
-		borderRadius: scaleWidth(30),
-		width: '100%',
-		alignItems: 'center',
-	},
-	guideConfirmText: {
-		color: '#fff',
-		fontWeight: '600',
-		fontSize: scaledSize(16),
-	},
-	guideDescriptionBox: {
-		backgroundColor: '#F8FAFC',
-		borderWidth: 1,
-		borderColor: '#F1F5F9',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(16),
-		width: '100%',
-		marginBottom: scaleHeight(20),
-	},
-	mascotImage: {
-		width: scaleWidth(120),
-		height: scaleWidth(120),
-		marginBottom: scaleHeight(10),
-	},
-	guideCard: {
-		backgroundColor: '#fff',
-		borderWidth: 1,
-		borderColor: '#E2E8F0',
-		borderRadius: scaleWidth(14),
-		padding: scaleWidth(16),
-		marginBottom: scaleHeight(20),
-		width: '100%',
-	},
-	guideCardTitle: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#334155',
-		marginBottom: scaleHeight(12),
-	},
-	guideCardContent: {
-		fontSize: scaledSize(13),
-		color: '#334155',
-		lineHeight: scaleHeight(20),
-	},
-	reviewCardList: {
-		width: '100%',
-		marginTop: scaleHeight(16),
-	},
-	reviewCard: {
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(14),
-		paddingVertical: scaleHeight(14),
-		paddingHorizontal: scaleWidth(16),
-		marginBottom: scaleHeight(12),
-		borderWidth: 1,
-		borderColor: '#F1F5F9',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: scaleWidth(2),
-	},
-	reviewProverbText: {
-		flex: 1,
-		fontSize: scaledSize(15),
-		fontWeight: 'bold',
-		color: '#334155',
-	},
-	reviewMeaningText: {
-		fontSize: scaledSize(14),
-		color: '#64748B',
-		lineHeight: scaleHeight(20),
-	},
-	scrollTopButton: {
-		position: 'absolute',
-		right: scaleWidth(32),
-		bottom: scaleHeight(32),
-		backgroundColor: '#3B82F6',
-		width: scaleWidth(45),
-		height: scaleWidth(45),
-		borderRadius: scaleWidth(25),
-		justifyContent: 'center',
-		alignItems: 'center',
+		shadowRadius: 8,
 	},
 });

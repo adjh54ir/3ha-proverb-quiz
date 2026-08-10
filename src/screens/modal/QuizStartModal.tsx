@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Modal, View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 
 export type QuizStartMode = 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' | 'arrange';
@@ -39,20 +40,26 @@ const QuizStartModal = ({
 	onStart,
 	onBack,
 }: Props) => {
-	const scaleAnim = useRef(new Animated.Value(0.9)).current;
+	// ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
+	const scaleAnim = useRef(new Animated.Value(0.95)).current;
 	const opacityAnim = useRef(new Animated.Value(0)).current;
 	const meta = MODE_META[mode] ?? MODE_META.meaning;
 
 	useEffect(() => {
 		if (!visible) {
+			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
+			scaleAnim.setValue(0.95);
+			opacityAnim.setValue(0);
 			return;
 		}
-		scaleAnim.setValue(0.9);
+		scaleAnim.setValue(0.95);
 		opacityAnim.setValue(0);
-		Animated.parallel([
-			Animated.spring(scaleAnim, { toValue: 1, friction: 7, tension: 80, useNativeDriver: true }),
-			Animated.timing(opacityAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
-		]).start();
+		const anim = Animated.parallel([
+			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+			Animated.timing(opacityAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+		]);
+		anim.start();
+		return () => anim.stop();
 	}, [visible, scaleAnim, opacityAnim]);
 
 	if (!visible) {
@@ -76,8 +83,13 @@ const QuizStartModal = ({
 		<Modal visible transparent animationType="fade">
 			<View style={styles.overlay}>
 				<Animated.View style={[styles.card, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
-					<View style={[styles.iconCircle, isPracticeMode && { backgroundColor: '#FFEDD5' }]}>
-						<IconComponent type="materialIcons" name={meta.icon} size={scaledSize(30)} color={isPracticeMode ? '#F97316' : '#3B82F6'} />
+					<View style={[styles.iconCircle, isPracticeMode && { backgroundColor: COLORS.warningBg }]}>
+						<IconComponent
+							type="materialIcons"
+							name={meta.icon}
+							size={scaledSize(30)}
+							color={isPracticeMode ? COLORS.warning : COLORS.primary}
+						/>
 					</View>
 
 					<Text style={styles.title}>{meta.title}</Text>
@@ -85,7 +97,7 @@ const QuizStartModal = ({
 
 					{isPracticeMode && (
 						<View style={styles.practiceBanner}>
-							<IconComponent type="materialIcons" name="info" size={scaledSize(14)} color="#F97316" />
+							<IconComponent type="materialIcons" name="info" size={scaledSize(14)} color={COLORS.warningDark} />
 							<Text style={styles.practiceText}>연습 모드 · 점수와 뱃지가 기록되지 않아요.</Text>
 						</View>
 					)}
@@ -94,7 +106,7 @@ const QuizStartModal = ({
 						{infoRows.map((row, i) => (
 							<View key={i} style={[styles.infoRow, i === infoRows.length - 1 && { marginBottom: 0 }]}>
 								<View style={styles.infoIconChip}>
-									<IconComponent type="materialIcons" name={row.icon} size={scaledSize(15)} color="#3B82F6" />
+									<IconComponent type="materialIcons" name={row.icon} size={scaledSize(15)} color={COLORS.primary} />
 								</View>
 								<Text style={styles.infoText}>{row.text}</Text>
 							</View>
@@ -102,12 +114,12 @@ const QuizStartModal = ({
 					</View>
 
 					<View style={styles.buttonRow}>
-						<TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.85}>
-							<Text style={styles.backButtonText}>돌아가기</Text>
+						<TouchableOpacity style={styles.secondaryButton} onPress={onBack} activeOpacity={0.8}>
+							<Text style={styles.secondaryButtonText}>돌아가기</Text>
 						</TouchableOpacity>
-						<TouchableOpacity style={styles.startButton} onPress={onStart} activeOpacity={0.85}>
-							<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(18)} color="#fff" />
-							<Text style={styles.startButtonText}>시작하기</Text>
+						<TouchableOpacity style={styles.primaryButton} onPress={onStart} activeOpacity={0.8}>
+							<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(18)} color={COLORS.textWhite} />
+							<Text style={styles.primaryButtonText}>시작하기</Text>
 						</TouchableOpacity>
 					</View>
 				</Animated.View>
@@ -119,94 +131,101 @@ const QuizStartModal = ({
 export default QuizStartModal;
 
 const styles = StyleSheet.create({
+	// ===== 모달 공통 껍데기 =====
 	overlay: {
 		flex: 1,
-		backgroundColor: 'rgba(15,23,42,0.5)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		padding: scaleWidth(24),
+		paddingHorizontal: SPACING_W.lg,
 	},
 	card: {
 		width: '100%',
-		maxWidth: scaleWidth(360),
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(24),
-		paddingVertical: scaleHeight(24),
-		paddingHorizontal: scaleWidth(22),
+		maxWidth: scaleWidth(340),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xl,
 		alignItems: 'center',
-		shadowColor: '#0F172A',
-		shadowOffset: { width: 0, height: 10 },
-		shadowOpacity: 0.18,
-		shadowRadius: 24,	},
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
+	},
+	// ===== 헤더 =====
 	iconCircle: {
 		width: scaleWidth(60),
 		height: scaleWidth(60),
-		borderRadius: scaleWidth(30),
-		backgroundColor: '#EFF6FF',
+		borderRadius: scaleWidth(60) / 2,
+		backgroundColor: COLORS.primaryBg,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginBottom: scaleHeight(14),
+		marginBottom: SPACING_H.md,
 	},
 	title: {
-		fontSize: scaledSize(20),
-		fontWeight: '800',
-		color: '#1E293B',
-		marginBottom: scaleHeight(6),
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.sm,
 		textAlign: 'center',
 	},
 	desc: {
-		fontSize: scaledSize(14),
-		color: '#64748B',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
 		textAlign: 'center',
-		lineHeight: scaleHeight(20),
-		marginBottom: scaleHeight(16),
+		lineHeight: scaledSize(20),
+		marginBottom: SPACING_H.lg,
 	},
 	practiceBanner: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(6),
-		backgroundColor: '#FFF7ED',
-		borderRadius: scaleWidth(10),
-		paddingVertical: scaleHeight(8),
-		paddingHorizontal: scaleWidth(12),
-		marginBottom: scaleHeight(14),
+		columnGap: SPACING_W.sm,
+		backgroundColor: COLORS.warningBg,
+		borderRadius: RADIUS.sm,
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.md,
+		marginBottom: SPACING_H.md,
 	},
-	practiceText: { fontSize: scaledSize(12), color: '#F97316', fontWeight: '700', flexShrink: 1 },
+	practiceText: { fontSize: FONT_SIZES.sm, color: COLORS.warningDark, fontWeight: '600', flexShrink: 1 },
+	// ===== 안내 박스 =====
 	infoBox: {
 		width: '100%',
-		backgroundColor: '#F8FAFC',
-		borderRadius: scaleWidth(16),
-		padding: scaleWidth(14),
-		marginBottom: scaleHeight(20),
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.md,
+		marginBottom: SPACING_H.xl,
 	},
-	infoRow: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(10), marginBottom: scaleHeight(10) },
+	infoRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm, marginBottom: SPACING_H.md },
 	infoIconChip: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
-		borderRadius: scaleWidth(9),
-		backgroundColor: '#EFF6FF',
+		borderRadius: RADIUS.sm,
+		backgroundColor: COLORS.primaryBg,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-	infoText: { flex: 1, fontSize: scaledSize(13), color: '#334155', lineHeight: scaleHeight(18) },
-	buttonRow: { flexDirection: 'row', gap: scaleWidth(10), width: '100%' },
-	backButton: {
+	infoText: { flex: 1, fontSize: FONT_SIZES.md, color: COLORS.text, lineHeight: scaledSize(18) },
+	// ===== 하단 버튼 =====
+	buttonRow: { flexDirection: 'row', columnGap: SPACING_W.md, width: '100%' },
+	secondaryButton: {
 		flex: 1,
-		backgroundColor: '#F1F5F9',
-		borderRadius: scaleWidth(14),
-		paddingVertical: scaleHeight(14),
-		alignItems: 'center',
-	},
-	backButtonText: { fontSize: scaledSize(15), fontWeight: '800', color: '#64748B' },
-	startButton: {
-		flex: 1.5,
-		flexDirection: 'row',
-		gap: scaleWidth(4),
-		backgroundColor: '#3B82F6',
-		borderRadius: scaleWidth(14),
-		paddingVertical: scaleHeight(14),
+		height: scaleHeight(48),
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.md,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	startButtonText: { fontSize: scaledSize(15), fontWeight: '800', color: '#fff' },
+	secondaryButtonText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textSecondary },
+	primaryButton: {
+		flex: 1,
+		flexDirection: 'row',
+		columnGap: SPACING_W.xs,
+		height: scaleHeight(48),
+		backgroundColor: COLORS.primary,
+		borderRadius: RADIUS.md,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	primaryButtonText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textWhite },
 });

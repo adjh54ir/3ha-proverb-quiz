@@ -13,7 +13,7 @@ const InfoModal = () => {
         navigation.setOptions({
             headerRight: () => (
                 <TouchableOpacity onPress={() => setShowGuideModal(true)} style={{ marginRight: scaleWidth(16) }}>
-                    <IconComponent type="materialIcons" name="info-outline" size={24} color="#3498db" />
+                    <IconComponent type="materialIcons" name="info-outline" size={scaledSize(24)} color="#3498db" />
                 </TouchableOpacity>
             ),
         });
@@ -28,7 +28,7 @@ const InfoModal = () => {
                         <View style={styles.modalOverlay}>
                             <View style={styles.modalContent}>
                                 <TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowGuideModal(false)}>
-                                    <IconComponent type="materialIcons" name="close" size={24} color="#7f8c8d" />
+                                    <IconComponent type="materialIcons" name="close" size={scaledSize(24)} color="#7f8c8d" />
                                 </TouchableOpacity>
                                 <Text style={styles.modalTitle}>🏠 홈 화면 안내</Text>
                                 <Text style={styles.modalText}>

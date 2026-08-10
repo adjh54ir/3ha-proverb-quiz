@@ -1,6 +1,7 @@
 // 추가 모달 컴포넌트 두 개 생성
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
+  Animated,
   Modal,
   View,
   Text,
@@ -8,16 +9,36 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
-  Platform,
 } from 'react-native';
-import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { scaledSize, scaleHeight } from '@/utils/DementionUtils';
 import Markdown from 'react-native-markdown-display';
 import IconComponent from '../atomic/IconComponent';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+
+/** 모달 진입 애니메이션 (fade + slide-up) — 두 모달에서 공용 */
+const useModalEnterAnim = (visible: boolean) => {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (!visible) {
+      anim.setValue(0);
+      return;
+    }
+    const enter = Animated.timing(anim, { toValue: 1, duration: 260, useNativeDriver: true });
+    enter.start();
+    return () => enter.stop();
+  }, [visible, anim]);
+
+  return {
+    opacity: anim,
+    transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
+  };
+};
 
 const markdown = `
 # 1) 개인정보처리방침
 
-본 개인정보처리방침은 모바일 기기용 **‘속픽: 속담 퀴즈’** 애플리케이션(이하 "애플리케이션")에 적용되며, 해당 애플리케이션은 **EcodeLab**(이하 "서비스 제공자")에 의해 **무료 서비스**로 제작되었습니다. 본 서비스는 "있는 그대로(AS IS)" 제공됩니다.
+본 개인정보처리방침은 모바일 기기용 **'속픽: 속담 퀴즈'** 애플리케이션(이하 "애플리케이션")에 적용되며, 해당 애플리케이션은 **EcodeLab**(이하 "서비스 제공자")에 의해 **무료 서비스**로 제작되었습니다. 본 서비스는 "있는 그대로(AS IS)" 제공됩니다.
 
 ---
 
@@ -112,7 +133,7 @@ const markdown = `
 
 # 2) 이용약관
 
-본 이용약관은 모바일 기기용 애플리케이션인 **‘속픽: 속담 퀴즈’**(이하 “애플리케이션”)에 적용되며, 본 애플리케이션은 **EcodeLab**(이하 “서비스 제공자”)에 의해 **무료 서비스**로 제공됩니다.
+본 이용약관은 모바일 기기용 애플리케이션인 **'속픽: 속담 퀴즈'**(이하 "애플리케이션")에 적용되며, 본 애플리케이션은 **EcodeLab**(이하 "서비스 제공자")에 의해 **무료 서비스**로 제공됩니다.
 
 ---
 
@@ -216,29 +237,37 @@ Wi-Fi 외 환경에서 사용 시 발생하는 데이터 요금 및 로밍 요�
 
 
 
-export const TermsOfServiceModal = ({ visible, onClose }) => (
-  <Modal visible={visible} transparent animationType="slide">
-    <View style={modalStyles.overlay}>
-      <View style={modalStyles.container}>
-        <View style={modalStyles.header2}>
-          <View style={modalStyles.spacer} />
-          <Text style={modalStyles.modalTitle}>개인정보처리방침 및 이용약관</Text>
-          <TouchableOpacity style={modalStyles.closeIcon} onPress={onClose}>
-            <IconComponent type="materialIcons" name="close" size={22} color="#7f8c8d" />
-          </TouchableOpacity>
-        </View>
+export const TermsOfServiceModal = ({ visible, onClose }) => {
+  const enterStyle = useModalEnterAnim(visible);
 
-        <ScrollView contentContainerStyle={modalStyles.scrollContainer}>
-          <View style={modalStyles.markdownBox}>
-            <Markdown style={markdownStyles}>
-              {markdown}
-            </Markdown>
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <View style={modalStyles.overlay}>
+        <Animated.View style={[modalStyles.container, enterStyle]}>
+          <View style={modalStyles.header}>
+            <View style={modalStyles.spacer} />
+            <Text style={modalStyles.modalTitle}>개인정보처리방침 및 이용약관</Text>
+            <TouchableOpacity
+              style={modalStyles.closeIcon}
+              onPress={onClose}
+              activeOpacity={0.8}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+              <IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
+            </TouchableOpacity>
           </View>
-        </ScrollView>
+
+          <ScrollView contentContainerStyle={modalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
+            <View style={modalStyles.markdownBox}>
+              <Markdown style={markdownStyles}>
+                {markdown}
+              </Markdown>
+            </View>
+          </ScrollView>
+        </Animated.View>
       </View>
-    </View>
-  </Modal>
-);
+    </Modal>
+  );
+};
 
 const openSourceData = [
   {
@@ -291,239 +320,213 @@ const openSourceData = [
   },
 ];
 
-export const OpenSourceModal = ({ visible, onClose }) => (
-  <Modal visible={visible} transparent animationType="slide">
-    <View style={modalStyles.overlay}>
-      <View style={modalStyles.container}>
+export const OpenSourceModal = ({ visible, onClose }) => {
+  const enterStyle = useModalEnterAnim(visible);
 
-        <View style={modalStyles.header}>
-          <View style={modalStyles.spacer} />
-          <Text style={modalStyles.modalTitle}>오픈소스 라이선스</Text>
-          <TouchableOpacity style={modalStyles.closeIcon} onPress={onClose}>
-            <IconComponent type="materialIcons" name="close" size={22} color="#7f8c8d" />
-          </TouchableOpacity>
-        </View>
-
-
-        <ScrollView contentContainerStyle={modalStyles.scrollContainer}>
-          <View style={styles.wrapperBox}>
-            {openSourceData.map((lib, index) => (
-              <View key={index} style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <IconComponent
-                    type="Feather"
-                    name="package"
-                    size={16}
-                    color="#2c3e50"
-                    style={styles.icon}
-                  />
-                  <Text style={styles.libName}>{lib.name}</Text>
-                </View>
-                <Text style={styles.license}>
-                  License: {lib.license} | Version: {lib.version}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => Linking.openURL(lib.url)}
-                  style={styles.linkWrapper}
-                >
-                  <IconComponent
-                    type="Feather"
-                    name="external-link"
-                    size={14}
-                    color="#2980b9"
-                  />
-                  <Text style={styles.linkText}>GitHub 보기</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-            <Text style={styles.footer}>
-              🙏 오픈소스 커뮤니티에 감사드립니다.
-            </Text>
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <View style={modalStyles.overlay}>
+        <Animated.View style={[modalStyles.container, enterStyle]}>
+          <View style={modalStyles.header}>
+            <View style={modalStyles.spacer} />
+            <Text style={modalStyles.modalTitle}>오픈소스 라이선스</Text>
+            <TouchableOpacity
+              style={modalStyles.closeIcon}
+              onPress={onClose}
+              activeOpacity={0.8}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+              <IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
+            </TouchableOpacity>
           </View>
-        </ScrollView>
+
+          <ScrollView contentContainerStyle={modalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
+            <View style={styles.wrapperBox}>
+              {openSourceData.map((lib, index) => (
+                <View key={index} style={styles.card}>
+                  <View style={styles.cardHeader}>
+                    <IconComponent
+                      type="Feather"
+                      name="package"
+                      size={scaledSize(16)}
+                      color={COLORS.textStrong}
+                      style={styles.icon}
+                    />
+                    <Text style={styles.libName}>{lib.name}</Text>
+                  </View>
+                  <Text style={styles.license}>
+                    License: {lib.license} | Version: {lib.version}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => Linking.openURL(lib.url)}
+                    style={styles.linkWrapper}
+                    activeOpacity={0.8}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <IconComponent
+                      type="Feather"
+                      name="external-link"
+                      size={scaledSize(14)}
+                      color={COLORS.secondaryDark}
+                    />
+                    <Text style={styles.linkText}>GitHub 보기</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+              <Text style={styles.footer}>
+                🙏 오픈소스 커뮤니티에 감사드립니다.
+              </Text>
+            </View>
+          </ScrollView>
+        </Animated.View>
       </View>
-    </View>
-  </Modal>
-);
+    </Modal>
+  );
+};
 const modalStyles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: COLORS.dim,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: scaleWidth(20),
+    paddingHorizontal: SPACING_W.lg,
   },
   container: {
     width: '100%',
-    maxHeight: scaleHeight(680), // ✅ 기존 580 → 680 (또는 더 크게 조정 가능)
-    backgroundColor: '#ffffff',
-    borderRadius: moderateScale(16),
-    paddingVertical: scaleHeight(24),
-    paddingHorizontal: scaleWidth(20),
+    maxHeight: scaleHeight(680),
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.xl,
+    paddingVertical: SPACING_H.lg,
+    paddingHorizontal: SPACING_W.lg,
     shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: scaleHeight(4) },
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: scaleHeight(20),
+    paddingBottom: SPACING_H.lg,
   },
   markdownBox: {
-    backgroundColor: '#f4f5f7',
-    borderRadius: scaleWidth(12),
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    padding: scaleWidth(16),
-  },
-  title: {
-    fontSize: scaledSize(18),
-    fontWeight: '700',
-    color: '#3498db',
-    marginBottom: scaleHeight(10),
-  },
-  contentBox: {
-    marginBottom: scaleHeight(20),
-  },
-  content: {
-    fontSize: scaledSize(14),
-    color: '#2c3e50',
-    lineHeight: scaleHeight(22),
-  },
-  closeButton: {
-    alignSelf: 'center',
-    backgroundColor: '#3498db',
-    paddingVertical: scaleHeight(10),
-    paddingHorizontal: scaleWidth(24),
-    borderRadius: scaleWidth(8),
-  },
-  closeText: {
-    color: '#ffffff',
-    fontWeight: '600',
-    fontSize: scaledSize(14),
+    borderColor: COLORS.border,
+    paddingHorizontal: SPACING_W.lg,
+    paddingVertical: SPACING_H.lg,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  header2: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: scaleHeight(16),
+    minHeight: scaleHeight(44),
+    marginBottom: SPACING_H.md,
   },
   modalTitle: {
     flex: 1,
-    fontSize: scaledSize(18),
-    fontWeight: 'bold',
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '700',
     textAlign: 'center',
-    color: '#2c3e50',
+    color: COLORS.textStrong,
   },
   spacer: {
-    width: 22 + scaleWidth(10), // 닫기 아이콘 크기 + 여백만큼 확보
+    width: scaledSize(22) + SPACING_W.sm, // 닫기 아이콘 크기 + 여백만큼 확보
   },
   closeIcon: {
-    padding: scaleWidth(5),
+    padding: SPACING_W.xs,
   },
 });
 const styles = StyleSheet.create({
   wrapperBox: {
-    backgroundColor: '#ffffff',
-    borderRadius: scaleWidth(12),
-    padding: scaleWidth(16),
+    backgroundColor: COLORS.background,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.lg,
+    paddingHorizontal: SPACING_W.lg,
+    paddingVertical: SPACING_H.lg,
   },
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: scaleWidth(12),
-    padding: scaleWidth(14),
-    marginBottom: scaleHeight(12),
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING_W.md,
+    paddingVertical: SPACING_H.md,
+    marginBottom: SPACING_H.md,
     borderWidth: 1,
-    borderColor: '#ecf0f1',
-    shadowColor: '#bdc3c7',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 3,
+    borderColor: COLORS.border,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: scaleHeight(4),
+    marginBottom: SPACING_H.xs,
   },
   icon: {
-    marginRight: scaleWidth(6),
+    marginRight: SPACING_W.sm,
   },
   libName: {
-    fontSize: scaledSize(15),
+    fontSize: FONT_SIZES.mdPlus,
     fontWeight: '600',
-    color: '#2c3e50',
+    color: COLORS.textStrong,
   },
   license: {
-    fontSize: scaledSize(13),
-    color: '#7f8c8d',
-    marginBottom: scaleHeight(6),
+    fontSize: FONT_SIZES.smPlus,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING_H.sm,
   },
   linkWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   linkText: {
-    fontSize: scaledSize(13),
-    color: '#2980b9',
-    marginLeft: scaleWidth(4),
+    fontSize: FONT_SIZES.smPlus,
+    fontWeight: '500',
+    color: COLORS.secondaryDark,
+    marginLeft: SPACING_W.xs,
     textDecorationLine: 'underline',
   },
   footer: {
-    marginTop: scaleHeight(20),
-    fontSize: scaledSize(13),
-    color: '#95a5a6',
+    marginTop: SPACING_H.lg,
+    fontSize: FONT_SIZES.smPlus,
+    color: COLORS.textLight,
     textAlign: 'center',
-  },
-  modalTitle: {
-    fontSize: scaledSize(18),
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#2c3e50',
-    marginTop: scaleHeight(10),
-    marginBottom: scaleHeight(10),
   },
 });
 
 const markdownStyles = {
   body: {
-    color: '#2c3e50',
-    fontSize: scaledSize(14),
-    lineHeight: scaleHeight(24),
+    color: COLORS.text,
+    fontSize: FONT_SIZES.md,
+    lineHeight: scaledSize(24),
   },
   heading1: {
-    fontSize: scaledSize(22),
-    fontWeight: 'bold',
-    marginBottom: scaleHeight(16),
+    fontSize: FONT_SIZES.heading,
+    fontWeight: '700',
+    color: COLORS.textStrong,
+    marginBottom: SPACING_H.lg,
   },
   heading2: {
-    fontSize: scaledSize(18),
-    fontWeight: 'bold',
-    marginTop: scaleHeight(24),
-    marginBottom: scaleHeight(12),
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '700',
+    color: COLORS.textStrong,
+    marginTop: SPACING_H.xxl,
+    marginBottom: SPACING_H.md,
   },
   heading3: {
-    fontSize: scaledSize(16),
-    fontWeight: 'bold',
-    marginTop: scaleHeight(20),
-    marginBottom: scaleHeight(8),
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.textStrong,
+    marginTop: SPACING_H.xl,
+    marginBottom: SPACING_H.sm,
   },
   bullet_list: {
-    marginBottom: scaleHeight(16),
+    marginBottom: SPACING_H.lg,
   },
   blockquote: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: scaleWidth(8),
-    paddingHorizontal: scaleWidth(12),
-    paddingVertical: scaleHeight(8),
-    color: '#7f8c8d',
+    backgroundColor: COLORS.surfaceAlt,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: SPACING_W.md,
+    paddingVertical: SPACING_H.sm,
+    color: COLORS.textSecondary,
   },
   link: {
-    color: '#3498db',
+    color: COLORS.secondary,
   },
-
 };

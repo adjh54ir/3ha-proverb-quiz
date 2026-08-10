@@ -1,7 +1,9 @@
 // CommonConfirmModal.tsx
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import React, { FC } from 'react';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import React, { FC, useEffect, useRef } from 'react';
 import {
+    Animated,
     Modal,
     View,
     Text,
@@ -48,21 +50,41 @@ const CmmDelConfirmModal: FC<Props> = ({
 }) => {
     const _onRequestClose = onRequestClose ?? onCancel;
 
+    // 진입 애니메이션 (fade + slide-up)
+    const enterAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (!visible) {
+            enterAnim.setValue(0);
+            return;
+        }
+        const enter = Animated.timing(enterAnim, { toValue: 1, duration: 240, useNativeDriver: true });
+        enter.start();
+        return () => enter.stop();
+    }, [visible, enterAnim]);
+
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={_onRequestClose}>
             <View style={styles.modalBackdrop}>
-                <View style={styles.modalContainer}>
+                <Animated.View
+                    style={[
+                        styles.modalContainer,
+                        {
+                            opacity: enterAnim,
+                            transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
+                        },
+                    ]}>
                     {renderTitle && renderTitle()}
                     <Text style={styles.modalSummary}>{summary}</Text>
                     <View style={styles.modalButtons}>
-                        <TouchableOpacity style={[styles.modalButton, styles.modalCancel]} onPress={onCancel}>
-                            <Text style={styles.modalButtonText}>취소</Text>
+                        <TouchableOpacity style={[styles.modalButton, styles.modalCancel]} onPress={onCancel} activeOpacity={0.8}>
+                            <Text style={[styles.modalButtonText, styles.modalCancelText]}>취소</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[styles.modalButton, styles.modalDelete]} onPress={onConfirm}>
+                        <TouchableOpacity style={[styles.modalButton, styles.modalDelete]} onPress={onConfirm} activeOpacity={0.8}>
                             <Text style={styles.modalButtonText}>삭제</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
+                </Animated.View>
             </View>
         </Modal>
     );
@@ -71,63 +93,52 @@ const CmmDelConfirmModal: FC<Props> = ({
 const styles = StyleSheet.create({
     modalBackdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: COLORS.dim,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: SPACING_W.lg,
     },
     modalContainer: {
-        width: '85%', // 기존 80% → 90%로 변경
-        backgroundColor: '#ffffff',
-        borderRadius: scaleWidth(12),
-        padding: scaleWidth(24), // 패딩도 조금 더 여유 있게
-    },
-    modalTitle: {
-        fontSize: scaledSize(18),
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        textAlign: 'center',
-        marginBottom: scaleHeight(12),
+        width: '100%',
+        maxWidth: scaleWidth(360),
+        backgroundColor: COLORS.surface,
+        borderRadius: RADIUS.xl,
+        paddingHorizontal: SPACING_W.lg,
+        paddingVertical: SPACING_H.xl,
     },
     modalSummary: {
-        fontSize: scaledSize(14), // 기존 12 → 14로 증가
-        color: '#7f8c8d',
-        textAlign: 'center', // 중앙정렬에서 왼쪽 정렬로 변경 (더 자연스러운 느낌)
-        lineHeight: scaleHeight(24), // 기존 22 → 24로 증가
-        marginBottom: scaleHeight(24),
+        fontSize: FONT_SIZES.md,
+        color: COLORS.textSecondary,
+        textAlign: 'center',
+        lineHeight: scaledSize(22),
+        marginBottom: SPACING_H.xl,
     },
     modalButtons: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        gap: SPACING_W.md,
     },
     modalButton: {
         flex: 1,
-        padding: scaleHeight(12),
-        borderRadius: scaleWidth(8),
+        minHeight: scaleHeight(48),
+        justifyContent: 'center',
+        paddingVertical: SPACING_H.md,
+        borderRadius: RADIUS.md,
         alignItems: 'center',
-        marginHorizontal: scaleWidth(5),
     },
     modalCancel: {
-        backgroundColor: '#9E9E9E',
+        backgroundColor: COLORS.surfaceAlt,
     },
+    // 파괴적 액션 — 취소 버튼과 색/간격으로 확실히 구분
     modalDelete: {
-        backgroundColor: '#D32F2F',
+        backgroundColor: COLORS.danger,
     },
     modalButtonText: {
-        color: '#ffffff',
-        fontWeight: 'bold',
+        color: COLORS.textWhite,
+        fontSize: FONT_SIZES.mdPlus,
+        fontWeight: '700',
     },
-    modalTitleRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: scaleHeight(12), // ← 간격 여기로
-    },
-    modalTitleText: {
-        fontSize: scaledSize(18),
-        lineHeight: scaleHeight(44),
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        textAlign: 'center',
+    modalCancelText: {
+        color: COLORS.textSecondary,
     },
 });
 

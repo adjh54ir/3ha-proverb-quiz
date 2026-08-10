@@ -1,8 +1,10 @@
 // screens/TermsScreen.tsx
 import React from 'react';
-import { Platform, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import Markdown from 'react-native-markdown-display';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { scaledSize, scaleHeight } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import FadeInView from '@/components/animation/FadeInView';
 
 const markdown = `
 
@@ -204,11 +206,13 @@ Wi-Fi가 아닌 환경에서 사용할 경우, 사용자의 이동통신사 요�
 const TermsScreen = () => {
 	return (
 		<SafeAreaView style={styles.container}>
-			<ScrollView contentContainerStyle={styles.scrollContainer}>
-				<View style={styles.markdownBox}>
-					<Markdown style={markdownStyles}>{markdown}</Markdown>
-				</View>
-			</ScrollView>
+			<FadeInView style={styles.flex}>
+				<ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+					<View style={styles.markdownBox}>
+						<Markdown style={markdownStyles}>{markdown}</Markdown>
+					</View>
+				</ScrollView>
+			</FadeInView>
 		</SafeAreaView>
 	);
 };
@@ -216,57 +220,65 @@ const TermsScreen = () => {
 export default TermsScreen;
 
 const styles = StyleSheet.create({
+	flex: {
+		flex: 1,
+	},
 	container: {
 		flex: 1,
-		backgroundColor: '#ffffff',
+		backgroundColor: COLORS.surface,
 	},
 	scrollContainer: {
-		paddingVertical: scaleHeight(24),
-		paddingHorizontal: scaleWidth(20),
+		paddingTop: SPACING_H.xl,
+		paddingBottom: scaleHeight(40),
+		paddingHorizontal: SPACING_W.lg,
 	},
 	markdownBox: {
-		backgroundColor: '#f4f5f7',
-		borderRadius: scaleWidth(12),
+		backgroundColor: COLORS.background,
+		borderRadius: RADIUS.lg,
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		padding: scaleWidth(16),
+		borderColor: COLORS.border,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
 	},
 });
 
 const markdownStyles = {
 	body: {
-		color: '#2c3e50',
-		fontSize: scaledSize(14),
-		lineHeight: scaleHeight(24),
+		color: COLORS.text,
+		fontSize: FONT_SIZES.md,
+		lineHeight: scaledSize(24),
 	},
 	heading1: {
-		fontSize: scaledSize(22),
-		fontWeight: 'bold',
-		marginBottom: scaleHeight(16),
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.lg,
 	},
 	heading2: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		marginTop: scaleHeight(24),
-		marginBottom: scaleHeight(12),
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginTop: SPACING_H.xxl,
+		marginBottom: SPACING_H.md,
 	},
 	heading3: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		marginTop: scaleHeight(20),
-		marginBottom: scaleHeight(8),
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginTop: SPACING_H.xl,
+		marginBottom: SPACING_H.sm,
 	},
 	bullet_list: {
-		marginBottom: scaleHeight(16),
+		marginBottom: SPACING_H.lg,
 	},
 	blockquote: {
-		backgroundColor: '#f8f9fa',
-		borderRadius: scaleWidth(8),
-		paddingHorizontal: scaleWidth(12),
-		paddingVertical: scaleHeight(8),
-		color: '#7f8c8d',
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.sm,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.sm,
+		color: COLORS.textSecondary,
 	},
 	link: {
-		color: '#3498db',
+		color: COLORS.secondary,
 	},
 };

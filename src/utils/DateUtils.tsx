@@ -75,5 +75,23 @@ class DateUtils {
         return formatter.format(targetDate); // YYYY-MM-DD
     };
 
+    /**
+     * 저장된 날짜 값(ISO 타임스탬프 또는 'YYYY-MM-DD')을 로컬 날짜 키로 변환합니다.
+     * - 'YYYY-MM-DD' 는 이미 로컬 날짜 키이므로 그대로 반환합니다.
+     *   (new Date('YYYY-MM-DD') 는 UTC 자정으로 파싱되어 UTC- 지역에서 하루 밀립니다)
+     * - ISO 타임스탬프는 로컬 기준 날짜로 환산합니다.
+     *   (quizDate.slice(0, 10) 은 UTC 날짜라 KST 오전 9시 이전 항목이 어제로 잡힙니다)
+     */
+    toLocalDateKey = (value?: string | Date | null): string => {
+        if (!value) {
+            return '';
+        }
+        if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return value;
+        }
+        const parsed = new Date(value);
+        return Number.isNaN(parsed.getTime()) ? '' : this.getLocalDateString(parsed);
+    };
+
 }
 export default new DateUtils();

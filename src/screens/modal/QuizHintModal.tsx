@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Animated, ScrollView } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
@@ -14,34 +15,28 @@ interface QuizHintModalProps {
 }
 
 const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, questionText, onClose }) => {
-	const scaleAnim = useRef(new Animated.Value(0)).current;
+	// ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
+	const scaleAnim = useRef(new Animated.Value(0.95)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
-		if (visible) {
-			scaleAnim.setValue(0.92);
+		if (!visible) {
+			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
+			scaleAnim.setValue(0.95);
 			fadeAnim.setValue(0);
-
-			Animated.parallel([
-				Animated.spring(scaleAnim, {
-					toValue: 1,
-					useNativeDriver: true,
-					tension: 60,
-					friction: 8,
-				}),
-				Animated.timing(fadeAnim, {
-					toValue: 1,
-					duration: 200,
-					useNativeDriver: true,
-				}),
-			]).start();
+			return;
 		}
+		scaleAnim.setValue(0.95);
+		fadeAnim.setValue(0);
+
+		const anim = Animated.parallel([
+			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+		]);
+		anim.start();
 		// ✅ 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
-		return () => {
-			scaleAnim.stopAnimation();
-			fadeAnim.stopAnimation();
-		};
-	}, [visible]);
+		return () => anim.stop();
+	}, [visible, scaleAnim, fadeAnim]);
 
 	// 현재 화면에 출제된 문제 프롬프트를 그대로 보여줘 추론을 돕는다.
 	const questionPrompt = !question
@@ -57,16 +52,15 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 	const hasAnyHint = similar.length > 0 || examples.length > 0 || !!question?.usageTip;
 
 	return (
-		<Modal visible={visible} transparent animationType="none">
-			<Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
-				<Animated.View style={[styles.modal, { transform: [{ scale: scaleAnim }] }]}>
+		<Modal visible={visible} transparent animationType="fade">
+			<View style={styles.overlay}>
+				<Animated.View style={[styles.card, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
 					<ModalCloseButton onPress={onClose} />
+
 					{/* 헤더 */}
 					<View style={styles.header}>
-						<View style={styles.iconGlow}>
-							<View style={styles.iconCircle}>
-								<IconComponent type="MaterialIcons" name="lightbulb" size={scaledSize(26)} color="#fff" />
-							</View>
+						<View style={styles.iconCircle}>
+							<IconComponent type="MaterialIcons" name="lightbulb" size={scaledSize(26)} color={COLORS.textWhite} />
 						</View>
 						<Text style={styles.title}>힌트</Text>
 						<Text style={styles.subtitle}>이런 단서들을 참고해보세요!</Text>
@@ -78,7 +72,7 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 						{!!questionPrompt && (
 							<View style={styles.section}>
 								<View style={styles.sectionLabelRow}>
-									<IconComponent type="materialIcons" name="quiz" size={scaledSize(14)} color="#D97706" />
+									<IconComponent type="materialIcons" name="quiz" size={scaledSize(14)} color={COLORS.warningDark} />
 									<Text style={styles.sectionLabel}>문제</Text>
 								</View>
 								<View style={styles.questionBox}>
@@ -91,7 +85,7 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 						{similar.length > 0 && (
 							<View style={styles.section}>
 								<View style={styles.sectionLabelRow}>
-									<IconComponent type="materialIcons" name="tag" size={scaledSize(14)} color="#D97706" />
+									<IconComponent type="materialIcons" name="tag" size={scaledSize(14)} color={COLORS.warningDark} />
 									<Text style={styles.sectionLabel}>동의속담</Text>
 								</View>
 								<View style={styles.tagRow}>
@@ -108,7 +102,7 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 						{!!question?.usageTip && (
 							<View style={styles.section}>
 								<View style={styles.sectionLabelRow}>
-									<IconComponent type="materialIcons" name="emoji-objects" size={scaledSize(15)} color="#D97706" />
+									<IconComponent type="materialIcons" name="emoji-objects" size={scaledSize(15)} color={COLORS.warningDark} />
 									<Text style={styles.sectionLabel}>활용 팁</Text>
 								</View>
 								<View style={styles.exampleBox}>
@@ -121,7 +115,7 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 						{examples.length > 0 && (
 							<View style={styles.section}>
 								<View style={styles.sectionLabelRow}>
-									<IconComponent type="materialIcons" name="format-quote" size={scaledSize(15)} color="#D97706" />
+									<IconComponent type="materialIcons" name="format-quote" size={scaledSize(15)} color={COLORS.warningDark} />
 									<Text style={styles.sectionLabel}>사용 예시</Text>
 								</View>
 								<View style={styles.exampleBox}>
@@ -136,21 +130,19 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 
 						{!hasAnyHint && (
 							<View style={styles.emptyHint}>
-								<IconComponent type="materialIcons" name="search" size={scaledSize(22)} color="#CBD5E1" />
+								<IconComponent type="materialIcons" name="search" size={scaledSize(22)} color={COLORS.borderDark} />
 								<Text style={styles.emptyHintText}>이 문제는 제공되는 힌트가 없어요.</Text>
 							</View>
 						)}
 					</ScrollView>
 
-					{/* 버튼 */}
-					<View style={styles.footer}>
-						<TouchableOpacity style={styles.confirmButton} onPress={onClose} activeOpacity={0.85}>
-							<IconComponent type="materialIcons" name="check" size={scaledSize(18)} color="#fff" />
-							<Text style={styles.confirmButtonText}>확인했어요</Text>
-						</TouchableOpacity>
-					</View>
+					{/* 하단 버튼 */}
+					<TouchableOpacity style={styles.primaryButton} onPress={onClose} activeOpacity={0.8}>
+						<IconComponent type="materialIcons" name="check" size={scaledSize(18)} color={COLORS.textWhite} />
+						<Text style={styles.primaryButtonText}>확인했어요</Text>
+					</TouchableOpacity>
 				</Animated.View>
-			</Animated.View>
+			</View>
 		</Modal>
 	);
 };
@@ -158,156 +150,147 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 export default QuizHintModal;
 
 const styles = StyleSheet.create({
+	// ===== 모달 공통 껍데기 =====
 	overlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.5)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
+		paddingHorizontal: SPACING_W.lg,
 	},
-	modal: {
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(20),
-		width: '88%',
+	card: {
+		width: '100%',
+		maxWidth: scaleWidth(340),
 		maxHeight: '80%',
-		overflow: 'hidden',
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xl,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
+	// ===== 헤더 =====
 	header: {
 		alignItems: 'center',
-		gap: scaleHeight(6),
-		paddingHorizontal: scaleWidth(24),
-		paddingTop: scaleHeight(26),
-		paddingBottom: scaleHeight(18),
-		backgroundColor: '#FFFBEB',
-		borderBottomWidth: 1,
-		borderBottomColor: '#FDE68A',
-	},
-	iconGlow: {
-		width: scaleWidth(64),
-		height: scaleWidth(64),
-		borderRadius: scaleWidth(32),
-		backgroundColor: '#FEF3C7',
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginBottom: scaleHeight(4),
+		rowGap: SPACING_H.xs,
+		marginBottom: SPACING_H.lg,
 	},
 	iconCircle: {
-		width: scaleWidth(48),
-		height: scaleWidth(48),
-		borderRadius: scaleWidth(24),
-		backgroundColor: '#F59E0B',
+		width: scaleWidth(56),
+		height: scaleWidth(56),
+		borderRadius: scaleWidth(56) / 2,
+		backgroundColor: COLORS.warning,
 		alignItems: 'center',
 		justifyContent: 'center',
-		shadowColor: '#F59E0B',
-		shadowOffset: { width: 0, height: 3 },
-		shadowOpacity: 0.4,
-		shadowRadius: 6,
+		marginBottom: SPACING_H.sm,
 	},
 	title: {
-		fontSize: scaledSize(19),
-		fontWeight: '800',
-		color: '#92400E',
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 	},
 	subtitle: {
-		fontSize: scaledSize(12.5),
+		fontSize: FONT_SIZES.md,
 		fontWeight: '500',
-		color: '#B45309',
+		color: COLORS.textSecondary,
+	},
+	// ===== 컨텐츠 =====
+	scrollView: {
+		flexGrow: 0,
+		flexShrink: 1,
+	},
+	content: {
+		rowGap: SPACING_H.xl,
+		paddingBottom: SPACING_H.xs,
+	},
+	section: {
+		rowGap: SPACING_H.sm,
 	},
 	sectionLabelRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(5),
-	},
-	emptyHint: {
-		alignItems: 'center',
-		paddingVertical: scaleHeight(20),
-		gap: scaleHeight(8),
-	},
-	emptyHintText: {
-		fontSize: scaledSize(13),
-		color: '#94A3B8',
-	},
-	scrollView: {
-		flexGrow: 0,
-	},
-	content: {
-		padding: scaleWidth(24),
-		gap: scaleHeight(22),
-	},
-	section: {
-		gap: scaleHeight(10),
+		columnGap: SPACING_W.xs,
 	},
 	sectionLabel: {
-		fontSize: scaledSize(11),
+		fontSize: FONT_SIZES.xs,
 		fontWeight: '600',
-		color: '#94A3B8',
+		color: COLORS.textSecondary,
 		letterSpacing: 0.8,
 		textTransform: 'uppercase',
 	},
 	tagRow: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		gap: scaleWidth(7),
+		columnGap: SPACING_W.sm,
+		rowGap: SPACING_H.sm,
 	},
 	tag: {
-		paddingHorizontal: scaleWidth(12),
-		paddingVertical: scaleHeight(6),
-		backgroundColor: '#FEF3C7',
-		borderRadius: scaleWidth(30),
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		backgroundColor: COLORS.warningBg,
+		borderRadius: RADIUS.round,
 		borderWidth: 1,
 		borderColor: '#FDE68A',
 	},
 	tagText: {
-		fontSize: scaledSize(13),
+		fontSize: FONT_SIZES.smPlus,
 		fontWeight: '600',
-		color: '#92400E',
+		color: COLORS.warningDark,
 	},
 	exampleBox: {
-		backgroundColor: '#F8FAFC',
-		borderRadius: scaleWidth(10),
-		paddingHorizontal: scaleWidth(16),
-		paddingVertical: scaleHeight(14),
-		borderWidth: 0.5,
-		borderColor: 'rgba(0,0,0,0.08)',
-		gap: scaleHeight(6),
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		rowGap: SPACING_H.xs,
 	},
 	questionBox: {
-		backgroundColor: '#FFFBEB',
-		borderRadius: scaleWidth(10),
-		paddingHorizontal: scaleWidth(16),
-		paddingVertical: scaleHeight(14),
+		backgroundColor: COLORS.warningBg,
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: '#FDE68A',
 	},
 	questionText: {
-		fontSize: scaledSize(15),
-		fontWeight: '700',
-		color: '#1E293B',
-		lineHeight: scaleHeight(23),
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '600',
+		color: COLORS.textStrong,
+		lineHeight: scaledSize(23),
 	},
 	exampleText: {
-		fontSize: scaledSize(14),
-		color: '#334155',
-		lineHeight: scaleHeight(22),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		lineHeight: scaledSize(22),
 		fontStyle: 'italic',
 	},
-	footer: {
-		paddingHorizontal: scaleWidth(24),
-		paddingVertical: scaleHeight(16),
-		borderTopWidth: 0.5,
-		borderTopColor: 'rgba(0,0,0,0.08)',
+	emptyHint: {
+		alignItems: 'center',
+		paddingVertical: SPACING_H.xl,
+		rowGap: SPACING_H.sm,
 	},
-	confirmButton: {
+	emptyHintText: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textLight,
+	},
+	// ===== 하단 버튼 =====
+	primaryButton: {
 		flexDirection: 'row',
-		gap: scaleWidth(6),
-		backgroundColor: '#F59E0B',
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(14),
+		columnGap: SPACING_W.xs,
+		height: scaleHeight(48),
+		backgroundColor: COLORS.primary,
+		borderRadius: RADIUS.md,
 		alignItems: 'center',
 		justifyContent: 'center',
+		marginTop: SPACING_H.xl,
 	},
-	confirmButtonText: {
-		fontSize: scaledSize(15),
+	primaryButtonText: {
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
-		color: '#fff',
+		color: COLORS.textWhite,
 	},
 });

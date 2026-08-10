@@ -1,10 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated, Easing } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainDataType } from '@/types/MainDataType';
@@ -59,9 +60,22 @@ const QuizModeScreen = () => {
 		color: item.iconColor ?? '#bdc3c7',
 	}));
 
+	// 🎞 화면 진입 / 탭 전환 시 페이드 + 슬라이드 업
+	const enterAnim = useRef(new Animated.Value(0)).current;
+
 	useEffect(() => {
 		initData();
 	}, []);
+
+	useEffect(() => {
+		enterAnim.setValue(0);
+		const animation = Animated.timing(enterAnim, { toValue: 1, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: true });
+		animation.start();
+		return () => {
+			animation.stop();
+			enterAnim.stopAnimation();
+		};
+	}, [tab, enterAnim]);
 
 	const initData = async () => {
 		const allProverbs = ProverbServices.selectProverbList();
@@ -146,23 +160,24 @@ const QuizModeScreen = () => {
 	const selectedMode = QUIZ_MODES.find((mode) => mode.key === passedMode);
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }} edges={['top', 'bottom']}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: COLORS.surface }} edges={['top', 'bottom']}>
 			<View style={styles.container}>
 				<View style={styles.centerWrapper}>
-					<View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: scaleHeight(20) }}>
-						<TouchableOpacity onPress={() => setTab('level')} style={[styles.tabButton, tab === 'level' && styles.tabActive]}>
+					<View style={styles.tabRow}>
+						<TouchableOpacity activeOpacity={0.8} onPress={() => setTab('level')} style={[styles.tabButton, tab === 'level' && styles.tabActive]}>
 							<Text style={[styles.tabText, tab === 'level' && styles.tabTextActive]}>난이도</Text>
 						</TouchableOpacity>
-						<TouchableOpacity onPress={() => setTab('category')} style={[styles.tabButton, tab === 'category' && styles.tabActive]}>
+						<TouchableOpacity activeOpacity={0.8} onPress={() => setTab('category')} style={[styles.tabButton, tab === 'category' && styles.tabActive]}>
 							<Text style={[styles.tabText, tab === 'category' && styles.tabTextActive]}>카테고리</Text>
 						</TouchableOpacity>
 					</View>
-					<ScrollView
-						contentContainerStyle={{
-							paddingHorizontal: scaleWidth(2),
-							rowGap: scaleHeight(12),
-							paddingBottom: scaleHeight(30),
-						}}>
+					<Animated.ScrollView
+						style={{
+							opacity: enterAnim,
+							transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
+						}}
+						showsVerticalScrollIndicator={false}
+						contentContainerStyle={styles.scrollContent}>
 						<View style={styles.titleRow}>
 							<View style={styles.titleWithIcon}>
 								<Text style={styles.title}>
@@ -173,13 +188,7 @@ const QuizModeScreen = () => {
 						{selectedMode && (
 							<View style={[styles.selectedModeBoxEnhanced, { backgroundColor: selectedMode.color + '20' }]}>
 								<View style={styles.selectedModeRow}>
-									<IconComponent
-										type={selectedMode.type}
-										name={selectedMode.icon}
-										size={20}
-										color={selectedMode.color}
-										style={{ marginRight: scaleWidth(8) }}
-									/>
+									<IconComponent type={selectedMode.type} name={selectedMode.icon} size={scaledSize(20)} color={selectedMode.color} style={{ marginRight: SPACING_W.sm }} />
 									<Text style={styles.selectedModeTextEnhanced}>
 										현재 선택한 모드: <Text style={[styles.selectedModeHighlight, { color: selectedMode.color }]}>{selectedMode.label}</Text>
 									</Text>
@@ -200,18 +209,18 @@ const QuizModeScreen = () => {
 												onPress={() => {
 													Alert.alert('준비중..', '새로운 문제를 준비 중입니다. 조금만 기다려 주세요!');
 												}}>
-												<View style={[styles.levelIconChip, { backgroundColor: '#CBD5E1' }]}>
-													<IconComponent type={item.type} name={item.icon} size={scaledSize(24)} color="#fff" />
+												<View style={[styles.levelIconChip, { backgroundColor: COLORS.borderDark }]}>
+													<IconComponent type={item.type} name={item.icon} size={scaledSize(24)} color={COLORS.textWhite} />
 												</View>
 												<View style={styles.levelTextWrap}>
-													<Text style={[styles.levelLabelFull, { color: '#94A3B8' }]} numberOfLines={1}>
+													<Text style={[styles.levelLabelFull, { color: COLORS.textLight }]} numberOfLines={1}>
 														{item.label}
 													</Text>
 													<Text style={styles.levelDescFull} numberOfLines={2}>
 														Coming Soon
 													</Text>
 												</View>
-												<IconComponent type="materialIcons" name="lock" size={scaledSize(22)} color="#CBD5E1" />
+												<IconComponent type="materialIcons" name="lock" size={scaledSize(22)} color={COLORS.borderDark} />
 											</TouchableOpacity>
 										);
 									}
@@ -241,7 +250,7 @@ const QuizModeScreen = () => {
 												}
 											}}>
 											<View style={[styles.levelIconChip, { backgroundColor: item.color }]}>
-												<IconComponent type={item.type} name={item.icon} size={scaledSize(24)} color="#fff" />
+												<IconComponent type={item.type} name={item.icon} size={scaledSize(24)} color={COLORS.textWhite} />
 											</View>
 											<View style={styles.levelTextWrap}>
 												<Text style={[styles.levelLabelFull, { color: item.color }]} numberOfLines={1}>
@@ -254,12 +263,12 @@ const QuizModeScreen = () => {
 											<View style={styles.levelProgressPill}>
 												<Text style={[styles.levelProgressText, { color: item.color }]}>{`${solved}/${total}`}</Text>
 											</View>
-											<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color="#CBD5E1" />
+											<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.borderDark} />
 										</TouchableOpacity>
 									);
 								})}
 						</View>
-						<View style={{ marginTop: scaleHeight(-10) }}>
+						<View>
 							{tab === 'category' && (
 								<View style={styles.categoryGridWrap}>
 									{CATEGORIES.map((item) => {
@@ -276,6 +285,7 @@ const QuizModeScreen = () => {
 											<TouchableOpacity
 												key={item.key}
 												style={[styles.categoryRowButton, { backgroundColor: item.color }]}
+												activeOpacity={0.85}
 												onPress={() => {
 													if (shouldShowAd) {
 														setSelectedCategory(item.label);
@@ -285,13 +295,13 @@ const QuizModeScreen = () => {
 													}
 												}}>
 												<View style={styles.categoryCardTitleRow}>
-													<IconComponent type={item.type} name={item.icon} size={22} color="#ffffff" />
+													<IconComponent type={item.type} name={item.icon} size={scaledSize(22)} color={COLORS.textWhite} />
 													<Text style={styles.categoryRowText}>{item.label}</Text>
 												</View>
 
 												<View style={styles.progressWrapper}>
 													<View style={styles.progressBarBackground}>
-														<View style={[styles.progressBarFill, { width: `${(solved / total) * 100}%` }]} />
+														<View style={[styles.progressBarFill, { width: `${total > 0 ? (solved / total) * 100 : 0}%` }]} />
 													</View>
 													<Text style={styles.categoryRowProgress}>{`${solved}/${total}`}</Text>
 												</View>
@@ -301,20 +311,20 @@ const QuizModeScreen = () => {
 								</View>
 							)}
 						</View>
-					</ScrollView>
+					</Animated.ScrollView>
 				</View>
 			</View>
-			<BottomHomeButton backgroundColor="#ffffff" />
+			<BottomHomeButton backgroundColor={COLORS.surface} />
 
 			{showInfoModal && (
 				<View style={styles.modalOverlay}>
 					<View style={styles.modalContent}>
-						<TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowInfoModal(false)}>
-							<IconComponent type="materialIcons" name="close" size={24} color="#7f8c8d" />
+						<TouchableOpacity style={styles.modalCloseIcon} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} onPress={() => setShowInfoModal(false)}>
+							<IconComponent type="materialIcons" name="close" size={scaledSize(24)} color={COLORS.textSecondary} />
 						</TouchableOpacity>
 						<Text style={styles.modalTitle}>난이도별 퀴즈 안내</Text>
 						<Text style={styles.modalText}>전체, 초급, 중급, 고급, 특급으로 나뉘며 난이도에 따라 퀴즈 문제가 달라집니다.</Text>
-						<TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowInfoModal(false)}>
+						<TouchableOpacity style={styles.modalCloseButton} activeOpacity={0.85} onPress={() => setShowInfoModal(false)}>
 							<Text style={styles.modalCloseText}>닫기</Text>
 						</TouchableOpacity>
 					</View>
@@ -342,275 +352,163 @@ const QuizModeScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#ffffff',
+		backgroundColor: COLORS.surface,
 	},
 	centerWrapper: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(12),
+		paddingHorizontal: SPACING_W.lg,
+	},
+	// ===== 탭 =====
+	tabRow: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+		marginBottom: SPACING_H.xl,
+	},
+	tabButton: {
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.xl,
+		// ponytail: 터치 영역 44 이상 보장을 위한 고정 최소 높이
+		minHeight: 44,
+		justifyContent: 'center',
+		borderBottomWidth: 2,
+		borderBottomColor: 'transparent',
+		marginHorizontal: SPACING_W.sm,
+	},
+	tabActive: {
+		borderBottomColor: COLORS.primary,
+	},
+	tabText: {
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.textSecondary,
+		fontWeight: '500',
+		textAlign: 'center',
+	},
+	tabTextActive: {
+		color: COLORS.primary,
+		fontWeight: '700',
+	},
+	// ===== 스크롤 영역 =====
+	scrollContent: {
+		rowGap: SPACING_H.md,
+		paddingBottom: scaleHeight(40),
 	},
 	titleRow: {
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginTop: scaleHeight(16),
-	},
-	title: {
-		fontSize: scaledSize(20),
-		lineHeight: scaleHeight(30),
-		color: '#2c3e50',
-		fontWeight: '700',
-		textAlign: 'center',
+		marginTop: SPACING_H.lg,
 	},
 	titleWithIcon: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	gridWrap: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'center',
-		gap: scaleWidth(12),
-		paddingHorizontal: scaleWidth(20),
-	},
-	gridButtonHalf: {
-		width: '46%',
-		height: scaleHeight(130),
-		borderRadius: scaleWidth(12),
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginBottom: scaleHeight(10),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 3,
-	},
-	// ✅ 난이도 카드 (퀴즈 모드 페이지의 모드 카드와 동일한 가로 배치 디자인)
-	levelListWrap: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-		width: '100%',
-		rowGap: 12,
-		paddingHorizontal: scaleWidth(6),
-	},
-	levelCardFull: {
-		width: '100%',
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: scaleWidth(10),
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(16),
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(12),
-		borderWidth: 1,
-		borderColor: '#EEF2F7',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(2) },
-		shadowOpacity: 0.05,
-		shadowRadius: scaleWidth(8),
-	},
-	levelCardDisabled: { opacity: 0.7 },
-	levelIconChip: {
-		width: scaleWidth(48),
-		height: scaleWidth(48),
-		borderRadius: scaleWidth(14),
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	levelTextWrap: { flex: 1 },
-	levelLabelFull: { fontSize: scaledSize(16), fontWeight: '800', marginBottom: scaleHeight(3) },
-	levelDescFull: { color: '#64748B', fontSize: scaledSize(12.5), lineHeight: scaleHeight(17) },
-	levelProgressPill: {
-		backgroundColor: '#F1F5F9',
-		borderRadius: scaleWidth(10),
-		paddingHorizontal: scaleWidth(8),
-		paddingVertical: scaleHeight(3),
-	},
-	levelProgressText: { fontSize: scaledSize(12), fontWeight: '800' },
-	modeLabel: {
-		color: '#ffffff',
-		fontSize: scaledSize(16),
-		fontWeight: '600',
-		marginLeft: scaleWidth(5),
-	},
-	icon: {
-		marginRight: scaleWidth(6),
-	},
-	modalOverlay: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-		justifyContent: 'center',
-		alignItems: 'center',
-		zIndex: 99,
-	},
-	modalContent: {
-		width: '85%',
-		backgroundColor: '#ffffff',
-		padding: scaleWidth(20),
-		borderRadius: scaleWidth(12),
-	},
-	modalCloseButton: {
-		marginTop: scaleHeight(20),
-		alignSelf: 'center',
-		backgroundColor: '#3498db',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(30),
-		borderRadius: scaleWidth(8),
-	},
-	modalCloseText: {
-		color: '#ffffff',
-		fontWeight: '600',
-		fontSize: scaledSize(15),
-	},
-	modalTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(14),
-		textAlign: 'center',
-	},
-	modalText: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
-		lineHeight: scaleHeight(22),
-		textAlign: 'left',
-		marginTop: scaleHeight(10),
-		marginBottom: scaleHeight(20),
-	},
-	modalCloseIcon: {
-		position: 'absolute',
-		top: scaleHeight(10),
-		right: scaleWidth(10),
-		zIndex: 2,
-		padding: scaleWidth(5),
-	},
-	bottomExitWrapper: {
-		width: '100%',
-		alignItems: 'center',
-		paddingVertical: scaleHeight(4),
-		borderColor: '#ecf0f1',
-	},
-	homeButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#28a745',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(28),
-		borderRadius: scaleWidth(30),
-	},
-	buttonText: {
-		color: '#ffffff',
-		fontSize: scaledSize(14),
-		fontWeight: 'bold',
-	},
-	disabledButton: {
-		backgroundColor: '#ecf0f1',
-		borderRadius: scaleWidth(16),
-		justifyContent: 'center',
-		alignItems: 'center',
-		width: '46%',
-		height: scaleHeight(130),
-		marginBottom: scaleHeight(10),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 3,
-	},
-	disabledText: {
-		color: '#95a5a6',
-		fontSize: scaledSize(15),
+	title: {
+		fontSize: FONT_SIZES.xxl,
+		lineHeight: scaledSize(30),
+		color: COLORS.textStrong,
 		fontWeight: '700',
 		textAlign: 'center',
-		lineHeight: scaleHeight(20),
 	},
-	comingSoon: {
-		fontSize: scaledSize(12),
-		color: '#bdc3c7',
-		fontWeight: '500',
-		marginTop: scaleHeight(2),
-	},
-	iconTextRow: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		gap: scaleHeight(6),
-	},
-	progressInlineText: {
-		color: '#ffffff',
-		fontSize: scaledSize(14),
-		marginLeft: scaleWidth(6),
-		fontWeight: '700',
-	},
+	// ===== 선택된 모드 안내 =====
 	selectedModeBoxEnhanced: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		borderRadius: scaleWidth(12),
-		marginVertical: scaleHeight(12),
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(16),
+		borderRadius: RADIUS.md,
+		marginVertical: SPACING_H.sm,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
+		borderColor: COLORS.border,
 	},
 	selectedModeRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 	},
 	selectedModeTextEnhanced: {
-		fontSize: scaledSize(15),
-		color: '#2c3e50',
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.text,
 		fontWeight: '500',
-		marginVertical: scaleHeight(6),
 	},
 	selectedModeHighlight: {
-		fontWeight: 'bold',
-	},
-	tabButton: {
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(20),
-		borderBottomWidth: 2,
-		borderBottomColor: 'transparent',
-		marginHorizontal: scaleWidth(10),
-	},
-	tabActive: {
-		borderBottomColor: '#2ecc71',
-	},
-	tabText: {
-		fontSize: scaledSize(15),
-		color: '#7f8c8d',
-		fontWeight: '500',
-	},
-	tabTextActive: {
-		color: '#2ecc71',
 		fontWeight: '700',
 	},
-	categoryRowButton: {
-		width: '48%',
-		minHeight: scaleHeight(92),
-		justifyContent: 'space-between',
-		paddingVertical: scaleHeight(13),
-		paddingHorizontal: scaleWidth(12),
-		borderRadius: scaleWidth(12),
-		marginBottom: scaleHeight(12),
-		backgroundColor: '#16a085',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(3) },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
+	// ===== 난이도 카드 =====
+	levelListWrap: {
+		width: '100%',
+		rowGap: SPACING_H.md,
 	},
+	levelCardFull: {
+		width: '100%',
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.md,
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.lg,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+	},
+	levelCardDisabled: {
+		opacity: 0.7,
+	},
+	levelIconChip: {
+		width: scaleWidth(48),
+		height: scaleWidth(48),
+		borderRadius: RADIUS.md,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	levelTextWrap: {
+		flex: 1,
+	},
+	levelLabelFull: {
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		marginBottom: SPACING_H.xs,
+	},
+	levelDescFull: {
+		color: COLORS.textSecondary,
+		fontSize: FONT_SIZES.sm,
+		lineHeight: scaledSize(18),
+	},
+	levelProgressPill: {
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.round,
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.xs,
+	},
+	levelProgressText: {
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '700',
+	},
+	// ===== 카테고리 카드 =====
 	categoryGridWrap: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
 		width: '100%',
-		paddingHorizontal: scaleWidth(4),
+		rowGap: SPACING_H.md,
+	},
+	categoryRowButton: {
+		width: '48%',
+		minHeight: scaleHeight(92),
+		justifyContent: 'space-between',
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.md,
+		borderRadius: RADIUS.lg,
+		backgroundColor: COLORS.primary,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
 	},
 	categoryCardTitleRow: {
 		flexDirection: 'row',
@@ -618,34 +516,92 @@ const styles = StyleSheet.create({
 	},
 	categoryRowText: {
 		flex: 1,
-		color: '#ffffff',
-		fontSize: scaledSize(14),
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.md,
 		fontWeight: '700',
-		marginLeft: scaleWidth(8),
+		marginLeft: SPACING_W.sm,
 	},
 	progressWrapper: {
 		flexDirection: 'column',
 		alignItems: 'stretch',
 		width: '100%',
-		marginTop: scaleHeight(10),
+		marginTop: SPACING_H.sm,
 	},
 	progressBarBackground: {
 		width: '100%',
 		height: scaleHeight(10),
 		backgroundColor: 'rgba(255,255,255,0.25)',
-		borderRadius: scaleHeight(5),
+		borderRadius: RADIUS.round,
 		overflow: 'hidden',
-		marginBottom: scaleHeight(4),
+		marginBottom: SPACING_H.xs,
 	},
 	progressBarFill: {
 		height: '100%',
-		borderRadius: scaleHeight(5),
-		backgroundColor: '#ffffff',
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.textWhite,
 	},
 	categoryRowProgress: {
-		color: '#ffffff',
-		fontSize: scaledSize(12),
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.sm,
 		fontWeight: '600',
+	},
+	// ===== 안내 모달 =====
+	modalOverlay: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: COLORS.dim,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: SPACING_W.lg,
+		zIndex: 99,
+	},
+	modalContent: {
+		width: '100%',
+		maxWidth: scaleWidth(420),
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.xl,
+		paddingVertical: SPACING_H.xl,
+		borderRadius: RADIUS.xl,
+	},
+	modalCloseIcon: {
+		position: 'absolute',
+		top: SPACING_H.md,
+		right: SPACING_W.md,
+		zIndex: 2,
+		padding: scaleWidth(4),
+	},
+	modalTitle: {
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.md,
+		textAlign: 'center',
+	},
+	modalText: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		lineHeight: scaledSize(22),
+		textAlign: 'left',
+		marginBottom: SPACING_H.xl,
+	},
+	modalCloseButton: {
+		alignSelf: 'center',
+		backgroundColor: COLORS.secondary,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.xxl,
+		// ponytail: 터치 영역 44 이상 보장을 위한 고정 최소 높이
+		minHeight: 48,
+		justifyContent: 'center',
+		alignItems: 'center',
+		borderRadius: RADIUS.md,
+	},
+	modalCloseText: {
+		color: COLORS.textWhite,
+		fontWeight: '600',
+		fontSize: FONT_SIZES.lg,
 	},
 });
 export default QuizModeScreen;

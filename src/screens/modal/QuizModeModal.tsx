@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import React, { useEffect, useRef } from 'react';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { scaledSize, scaleWidth, scaleHeight } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 
@@ -14,38 +15,65 @@ type Props = {
 };
 
 const MODES: { key: QuizMode; label: string; desc: string; icon: string; color: string; bg: string }[] = [
-	{ key: 'meaning', label: '뜻 맞추기', desc: '속담을 보고 의미를 골라요', icon: 'lightbulb', color: '#3B82F6', bg: '#EFF6FF' },
-	{ key: 'proverb', label: '속담 맞추기', desc: '의미를 보고 속담을 골라요', icon: 'menu-book', color: '#22C55E', bg: '#F0FDF4' },
-	{ key: 'blank', label: '빈칸 채우기', desc: '속담의 빈칸을 채워요', icon: 'edit', color: '#F59E0B', bg: '#FFFBEB' },
+	{ key: 'meaning', label: '뜻 맞추기', desc: '속담을 보고 의미를 골라요', icon: 'lightbulb', color: COLORS.secondary, bg: COLORS.secondaryBg },
+	{ key: 'proverb', label: '속담 맞추기', desc: '의미를 보고 속담을 골라요', icon: 'menu-book', color: COLORS.primary, bg: COLORS.primaryBg },
+	{ key: 'blank', label: '빈칸 채우기', desc: '속담의 빈칸을 채워요', icon: 'edit', color: COLORS.warning, bg: '#FFFBEB' },
 	{ key: 'example', label: '예문 속담', desc: '예문에 어울리는 속담을 골라요', icon: 'forum', color: '#9333EA', bg: '#FAF5FF' },
 ];
 
 const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
+	// ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
+	const fadeAnim = useRef(new Animated.Value(0)).current;
+	const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
+	useEffect(() => {
+		if (!book) {
+			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
+			fadeAnim.setValue(0);
+			scaleAnim.setValue(0.95);
+			return;
+		}
+		fadeAnim.setValue(0);
+		scaleAnim.setValue(0.95);
+		const anim = Animated.parallel([
+			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+		]);
+		anim.start();
+		return () => anim.stop();
+	}, [book, fadeAnim, scaleAnim]);
+
 	return (
 		<Modal visible={!!book} transparent animationType="fade" onRequestClose={onClose}>
 			<TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
-				<TouchableOpacity activeOpacity={1} style={styles.sheet}>
-					<View style={styles.headerRow}>
-						<Text style={styles.title} numberOfLines={1}>{book?.title ? `${book.title} 퀴즈` : '퀴즈 모드 선택'}</Text>
-						<TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-							<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color="#64748B" />
-						</TouchableOpacity>
-					</View>
-					<Text style={styles.subtitle}>원하는 퀴즈 모드를 선택해주세요</Text>
+				<Animated.View style={{ width: '100%', alignItems: 'center', opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
+					<TouchableOpacity activeOpacity={1} style={styles.card}>
+						<View style={styles.headerRow}>
+							<Text style={styles.title} numberOfLines={1}>{book?.title ? `${book.title} 퀴즈` : '퀴즈 모드 선택'}</Text>
+							<TouchableOpacity onPress={onClose} hitSlop={{ top: scaleHeight(10), bottom: scaleHeight(10), left: scaleWidth(10), right: scaleWidth(10) }}>
+								<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
+							</TouchableOpacity>
+						</View>
+						<Text style={styles.subtitle}>원하는 퀴즈 모드를 선택해주세요</Text>
 
-					{MODES.map((m) => (
-						<TouchableOpacity key={m.key} style={styles.modeItem} activeOpacity={0.85} onPress={() => book && onSelect(book, m.key)}>
-							<View style={[styles.modeIcon, { backgroundColor: m.bg }]}>
-								<IconComponent type="materialIcons" name={m.icon} size={scaledSize(20)} color={m.color} />
-							</View>
-							<View style={{ flex: 1 }}>
-								<Text style={styles.modeLabel}>{m.label}</Text>
-								<Text style={styles.modeDesc}>{m.desc}</Text>
-							</View>
-							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(20)} color="#CBD5E1" />
-						</TouchableOpacity>
-					))}
-				</TouchableOpacity>
+						{MODES.map((m, i) => (
+							<TouchableOpacity
+								key={m.key}
+								style={[styles.modeItem, i === MODES.length - 1 && { marginBottom: 0 }]}
+								activeOpacity={0.8}
+								onPress={() => book && onSelect(book, m.key)}>
+								<View style={[styles.modeIcon, { backgroundColor: m.bg }]}>
+									<IconComponent type="materialIcons" name={m.icon} size={scaledSize(20)} color={m.color} />
+								</View>
+								<View style={{ flex: 1 }}>
+									<Text style={styles.modeLabel}>{m.label}</Text>
+									<Text style={styles.modeDesc}>{m.desc}</Text>
+								</View>
+								<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(20)} color={COLORS.borderDark} />
+							</TouchableOpacity>
+						))}
+					</TouchableOpacity>
+				</Animated.View>
 			</TouchableOpacity>
 		</Modal>
 	);
@@ -54,25 +82,61 @@ const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
 export default QuizModeModal;
 
 const styles = StyleSheet.create({
-	overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: scaleWidth(24) },
-	sheet: {
-		width: '100%',
-		maxWidth: scaleWidth(420),
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(24),
-		paddingHorizontal: scaleWidth(20),
-		paddingTop: scaleHeight(20),
-		paddingBottom: scaleHeight(20),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 8 },
-		shadowOpacity: 0.18,
-		shadowRadius: 16,
+	// ===== 모달 공통 껍데기 =====
+	overlay: {
+		flex: 1,
+		backgroundColor: COLORS.dim,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: SPACING_W.lg,
 	},
+	card: {
+		width: '100%',
+		maxWidth: scaleWidth(340),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xl,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
+	},
+	// ===== 헤더 =====
 	headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-	title: { fontSize: scaledSize(18), fontWeight: '800', color: '#334155', flex: 1, marginRight: scaleWidth(10) },
-	subtitle: { fontSize: scaledSize(13), color: '#94A3B8', marginTop: scaleHeight(4), marginBottom: scaleHeight(14) },
-	modeItem: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(12), paddingVertical: scaleHeight(12), paddingHorizontal: scaleWidth(12), borderRadius: scaleWidth(14), borderWidth: 1, borderColor: '#F1F5F9', backgroundColor: '#fff', marginBottom: scaleHeight(10) },
-	modeIcon: { width: scaleWidth(42), height: scaleWidth(42), borderRadius: scaleWidth(12), alignItems: 'center', justifyContent: 'center' },
-	modeLabel: { fontSize: scaledSize(15), fontWeight: '700', color: '#334155' },
-	modeDesc: { fontSize: scaledSize(12), color: '#94A3B8', marginTop: scaleHeight(2) },
+	title: {
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		flex: 1,
+		marginRight: SPACING_W.md,
+	},
+	subtitle: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		marginTop: SPACING_H.xs,
+		marginBottom: SPACING_H.lg,
+	},
+	// ===== 모드 리스트 =====
+	modeItem: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.md,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.md,
+		borderRadius: RADIUS.md,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surface,
+		marginBottom: SPACING_H.md,
+	},
+	modeIcon: {
+		width: scaleWidth(42),
+		height: scaleWidth(42),
+		borderRadius: RADIUS.md,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	modeLabel: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.text },
+	modeDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: SPACING_H.xs },
 });

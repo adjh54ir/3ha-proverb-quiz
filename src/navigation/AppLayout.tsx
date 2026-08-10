@@ -4,7 +4,8 @@ import { View, StyleSheet, Platform, Dimensions } from 'react-native';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { scaleHeight, scaleWidth } from '@/utils';
+import { scaleHeight } from '@/utils';
+import { COLORS, SPACING_H, SPACING_W } from '@/const/common/Theme';
 import DeviceInfo from 'react-native-device-info';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
@@ -35,15 +36,15 @@ const AppLayout = () => {
 	const backgroundColor = useMemo(() => {
 		switch (currentRoute) {
 			case Paths.SETTING:
-				return '#f8f9fa';
+				return COLORS.background;
 			case Paths.MY_SCORE:
-				return '#ffffff';
+				return COLORS.surface;
 			case Paths.TODAY_QUIZ:
-				return '#f8f9fa';
+				return COLORS.background;
 			case Paths.PROVERB_LIST:
-				return '#f8f9fa';
+				return COLORS.background;
 			default:
-				return '#ffffff'; // 기본값
+				return COLORS.surface; // 기본값
 		}
 	}, [currentRoute]);
 
@@ -64,7 +65,7 @@ const AppLayout = () => {
 			return scaleHeight(50); // 안드로이드
 		}
 		if (screenHeight < DESIGN_HEIGHT) {
-			return 40; // 작은 화면
+			return scaleHeight(40); // 작은 화면
 		}
 		return 0; // 기본
 	};
@@ -131,7 +132,7 @@ const AppLayout = () => {
 const styles = StyleSheet.create({
 	safeArea: {
 		flex: 1,
-		backgroundColor: '#ffffff',
+		backgroundColor: COLORS.surface,
 	},
 	adWrapperAbsolute: {
 		position: 'absolute',
@@ -139,8 +140,8 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		zIndex: 10,
-		paddingVertical: scaleHeight(4),
-		marginHorizontal: scaleWidth(16),
+		paddingVertical: SPACING_H.xs,
+		marginHorizontal: SPACING_W.lg,
 		alignItems: 'center',
 		// borderWidth: 1,
 		// borderColor: '#bdc3c7',

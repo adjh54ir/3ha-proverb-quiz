@@ -1,11 +1,12 @@
-/* eslint-disable react-native/no-inline-styles */
 // ProverbDetailModal.tsx
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Modal, StyleSheet } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Modal, StyleSheet, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
+import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import SuccessToast from '../SuccessToast';
 
@@ -20,26 +21,48 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 	const [showToast, setShowToast] = useState(false);
 	const [isFavorite, setIsFavorite] = useState(false);
 	const [toastMessage, setToastMessage] = useState('');
+	const [toastSubMessage, setToastSubMessage] = useState('');
+	const fadeAnim = useRef(new Animated.Value(0)).current;
+	const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
+	// ✅ 즐겨찾기 상태 로드 (early return 위에서 선언해야 아래 useEffect 가 안전하게 참조한다)
+	const loadFavoriteStatus = useCallback(async () => {
+		if (!proverb) {
+			return;
+		}
+		const favorites = await getFavorites();
+		setIsFavorite(favorites.includes(proverb.id));
+	}, [proverb]);
 
 	// ✅ useEffect를 early return 위로 올림
 	useEffect(() => {
 		if (visible && proverb) {
 			loadFavoriteStatus();
 		}
-	}, [visible, proverb]);
+	}, [visible, proverb, loadFavoriteStatus]);
+
+	// 진입: fade + scale
+	useEffect(() => {
+		if (!visible) {
+			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
+			fadeAnim.setValue(0);
+			scaleAnim.setValue(0.95);
+			return;
+		}
+		fadeAnim.setValue(0);
+		scaleAnim.setValue(0.95);
+		const enter = Animated.parallel([
+			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+		]);
+		enter.start();
+		return () => enter.stop();
+	}, [visible, fadeAnim, scaleAnim]);
 
 	// ✅ early return은 모든 Hook 선언 이후에
 	if (!proverb) {
 		return null;
 	}
-	// ✅ 즐겨찾기 상태 로드
-	const loadFavoriteStatus = async () => {
-		if (!proverb) {
-			return;
-		}
-		const favorites = await getFavorites();
-		setIsFavorite(favorites.includes(proverb.id));
-	};
 
 	const getFieldColor = (field: string) => {
 		const categoryColorMap: Record<string, string> = {
@@ -69,13 +92,13 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type="FontAwesome6" name="seedling" size={14} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={COLORS.textWhite} />;
 			case 2:
-				return <IconComponent type="FontAwesome6" name="leaf" size={14} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={COLORS.textWhite} />;
 			case 3:
-				return <IconComponent type="FontAwesome6" name="tree" size={14} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={COLORS.textWhite} />;
 			case 4:
-				return <IconComponent type="FontAwesome6" name="trophy" size={14} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={COLORS.textWhite} />;
 			default:
 				return null;
 		}
@@ -84,23 +107,23 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 	const getFieldIcon = (field: string) => {
 		switch (field) {
 			case '운/우연':
-				return <IconComponent type="FontAwesome6" name="dice" size={12} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="dice" size={scaledSize(12)} color={COLORS.textWhite} />;
 			case '인간관계':
-				return <IconComponent type="FontAwesome6" name="users" size={12} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="users" size={scaledSize(12)} color={COLORS.textWhite} />;
 			case '세상 이치':
-				return <IconComponent type="fontawesome5" name="globe" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="globe" size={scaledSize(12)} color={COLORS.textWhite} />;
 			case '근면/검소':
-				return <IconComponent type="fontawesome5" name="hammer" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="hammer" size={scaledSize(12)} color={COLORS.textWhite} />;
 			case '노력/성공':
-				return <IconComponent type="fontawesome5" name="medal" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="medal" size={scaledSize(12)} color={COLORS.textWhite} />;
 			case '경계/조심':
-				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={scaledSize(12)} color={COLORS.textWhite} />;
 			case '욕심/탐욕':
-				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={scaledSize(12)} color={COLORS.textWhite} />;
 			case '배신/불신':
-				return <IconComponent type="fontawesome5" name="user-slash" size={12} color="#fff" />;
+				return <IconComponent type="fontawesome5" name="user-slash" size={scaledSize(12)} color={COLORS.textWhite} />;
 			default:
-				return <IconComponent type="FontAwesome6" name="tag" size={12} color="#fff" />;
+				return <IconComponent type="FontAwesome6" name="tag" size={scaledSize(12)} color={COLORS.textWhite} />;
 		}
 	};
 	const handleToggleFavorite = async () => {
@@ -115,117 +138,95 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 		// ✅ 부모에게 즐겨찾기 변경 알림
 		onFavoriteChange?.();
 
-		if (isNowFavorite) {
-			setToastMessage('즐겨찾기 추가!');
-			setShowToast(true);
-		}
+		// 추가/해제 양쪽 모두 토스트로 알린다.
+		setToastMessage(isNowFavorite ? '즐겨찾기 추가' : '즐겨찾기 해제');
+		setToastSubMessage(isNowFavorite ? '속담 사전에서 확인 할 수 있습니다.' : '즐겨찾기 목록에서 제거되었습니다.');
+		setShowToast(true);
 	};
 
 	return (
-		<>
-			<Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-				<View style={styles.modalOverlay}>
-					<View style={styles.modalContainer}>
-						<SuccessToast visible={showToast} message={toastMessage} onHide={() => setShowToast(false)} />
-						{/* ───────────── 헤더 (그대로 유지) ───────────── */}
-						<View style={styles.modalHeader}>
-							<Text style={styles.modalHeaderTitle}>속담 상세</Text>
-							<TouchableOpacity style={styles.modalCloseIcon} onPress={onClose}>
-								<Icon name="xmark" size={20} color="#0984e3" />
-							</TouchableOpacity>
+		<Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
+			<View style={styles.modalOverlay}>
+				<Animated.View style={[styles.modalContainer, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+					{/* ───────────── 헤더 ───────────── */}
+					<View style={styles.modalHeader}>
+						<Text style={styles.modalHeaderTitle}>속담 상세</Text>
+						<ModalCloseButton onPress={onClose} color={COLORS.textSecondary} />
+					</View>
+
+					<ScrollView contentContainerStyle={styles.modalBody} showsVerticalScrollIndicator={false}>
+						{/* 배지 영역 */}
+						<View style={styles.badgeRow}>
+							<View style={[styles.badge, { backgroundColor: getLevelColor(proverb.level) }]}>
+								{getLevelIcon(proverb.level)}
+								<Text style={styles.badgeText}>
+									{{ 1: '초급', 2: '중급', 3: '고급', 4: '특급' }[proverb.level] || '알 수 없음'}
+								</Text>
+							</View>
+							<View style={[styles.badge, { backgroundColor: getFieldColor(proverb.category) }]}>
+								{getFieldIcon(proverb.category)}
+								<Text style={styles.badgeText}>{proverb.category || '미지정'}</Text>
+							</View>
 						</View>
 
-						<ScrollView contentContainerStyle={styles.modalBody} showsVerticalScrollIndicator={false}>
-							{/* 배지 영역 */}
-							<View style={styles.badgeRow}>
-								<View
-									style={[
-										styles.badge,
-										{
-											backgroundColor: getLevelColor(proverb.level),
-											flexDirection: 'row',
-											alignItems: 'center',
-											paddingHorizontal: scaleWidth(8),
-											paddingVertical: scaleHeight(4),
-										},
-									]}>
-									{getLevelIcon(proverb.level)}
-									<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>
-										{{ 1: '초급', 2: '중급', 3: '고급', 4: '특급' }[proverb.level] || '알 수 없음'}
-									</Text>
-								</View>
-								<View
-									style={[
-										styles.badge2,
-										{
-											backgroundColor: getFieldColor(proverb.category),
-											flexDirection: 'row',
-											alignItems: 'center',
-											paddingHorizontal: scaleWidth(8),
-										},
-									]}>
-									{getFieldIcon(proverb.category)}
-									<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>{proverb.category || '미지정'}</Text>
+						{/* 속담 본문 강조 박스 */}
+						<Text style={styles.modalProverbText}>{proverb.proverb}</Text>
+
+						<TouchableOpacity
+							style={styles.favoriteIconButton}
+							onPress={handleToggleFavorite}
+							activeOpacity={0.7}
+							hitSlop={{ top: scaleHeight(8), bottom: scaleHeight(8), left: scaleWidth(8), right: scaleWidth(8) }}>
+							<Icon name="star" solid={isFavorite} size={scaledSize(20)} color={isFavorite ? COLORS.gold : COLORS.borderDark} />
+						</TouchableOpacity>
+
+						{/* 의미 */}
+						{Boolean(proverb.longMeaning) && (
+							<View style={styles.meaningHighlight}>
+								<View style={styles.meaningQuoteBox}>
+									<Icon name="quote-left" size={scaledSize(28)} color={COLORS.primary} style={styles.meaningQuoteIcon} />
+									<Text style={styles.meaningQuoteText}>{proverb.longMeaning}</Text>
 								</View>
 							</View>
+						)}
 
-							{/* 속담 본문 강조 박스 */}
-							<Text style={styles.modalProverbText}>{proverb.proverb}</Text>
-
-							<TouchableOpacity style={styles.favoriteIconButton} onPress={handleToggleFavorite} activeOpacity={0.7}>
-								<Icon
-									name={isFavorite ? 'star' : 'star'}
-									solid={isFavorite}
-									size={20} // 28 → 20
-									color={isFavorite ? '#FFD700' : '#ccc'}
-								/>
-							</TouchableOpacity>
-
-							{/* 의미 */}
-							{Boolean(proverb.longMeaning) && (
-								<View style={styles.meaningHighlight}>
-									<View style={styles.meaningQuoteBox}>
-										<Icon name="quote-left" size={28} color="#58D68D" style={{ marginBottom: scaleHeight(8) }} />
-										<Text style={styles.meaningQuoteText}>{proverb.longMeaning}</Text>
+						{/* 예시 */}
+						{Array.isArray(proverb.example) && proverb.example.length > 0 && (
+							<View style={styles.sectionBox}>
+								<Text style={styles.sectionTitle}>✍️ 예시</Text>
+								{proverb.example.map((ex, idx) => (
+									<View key={idx} style={styles.sameProverbBox}>
+										<Text key={idx} style={styles.exampleText}>
+											• {ex}
+										</Text>
 									</View>
-								</View>
-							)}
+								))}
+							</View>
+						)}
 
-							{/* 예시 */}
-							{Array.isArray(proverb.example) && proverb.example.length > 0 && (
-								<View style={styles.sectionBox}>
-									<Text style={styles.sectionTitle}>✍️ 예시</Text>
-									{proverb.example.map((ex, idx) => (
-										<View key={idx} style={styles.sameProverbBox}>
-											<Text key={idx} style={styles.exampleText}>
-												• {ex}
-											</Text>
-										</View>
-									))}
-								</View>
-							)}
+						{Array.isArray(proverb.sameProverb) && proverb.sameProverb.filter((p) => p.trim()).length > 0 && (
+							<View style={styles.sectionBox}>
+								<Text style={styles.sectionTitle}>💬 동의 속담</Text>
+								{proverb.sameProverb.map((p, idx) => (
+									<View key={idx} style={styles.sameProverbBox}>
+										<Text style={styles.sameProverbText}>• {p}</Text>
+									</View>
+								))}
+							</View>
+						)}
+					</ScrollView>
 
-							{Array.isArray(proverb.sameProverb) && proverb.sameProverb.filter((p) => p.trim()).length > 0 && (
-								<View style={styles.sectionBox}>
-									<Text style={styles.sectionTitle}>💬 동의 속담</Text>
-									{proverb.sameProverb.map((p, idx) => (
-										<View key={idx} style={styles.sameProverbBox}>
-											<Text style={styles.sameProverbText}>• {p}</Text>
-										</View>
-									))}
-								</View>
-							)}
-						</ScrollView>
-
-						{/* 닫기 버튼 */}
-						<TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
+					{/* 닫기 버튼 */}
+					<View style={styles.modalFooter}>
+						<TouchableOpacity style={styles.modalCloseButton} onPress={onClose} activeOpacity={0.85}>
 							<Text style={styles.modalCloseButtonText}>닫기</Text>
 						</TouchableOpacity>
 					</View>
-				</View>
-			</Modal>
-			<SuccessToast visible={showToast} message={toastMessage} onHide={() => setShowToast(false)} />
-		</>
+				</Animated.View>
+				{/* 토스트는 Modal 안 + overflow:hidden 카드 밖에 둔다. 카드 안이면 잘리고, Modal 밖이면 모달에 가려진다. */}
+				<SuccessToast visible={showToast} message={toastMessage} subMessage={toastSubMessage} onHide={() => setShowToast(false)} />
+			</View>
+		</Modal>
 	);
 };
 
@@ -234,182 +235,172 @@ export default ProverbDetailModal;
 const styles = StyleSheet.create({
 	modalOverlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.5)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
+		paddingHorizontal: SPACING_W.lg,
 	},
 	modalContainer: {
-		width: '90%',
-		backgroundColor: '#fff',
-		borderRadius: scaleWidth(20),
-		overflow: 'hidden',
+		width: '100%',
+		maxWidth: scaleWidth(340),
 		maxHeight: '85%',
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		overflow: 'hidden',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
 
-	/* ✅ 헤더는 기존 스타일 유지 */
 	modalHeader: {
-		backgroundColor: '#fff',
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(20),
+		backgroundColor: COLORS.surface,
+		paddingTop: SPACING_H.xl,
+		paddingBottom: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
 		justifyContent: 'center',
 		alignItems: 'center',
 		position: 'relative',
 	},
 	modalHeaderTitle: {
-		fontSize: scaledSize(22),
-		fontWeight: 'bold',
-		color: '#2d3436',
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 		textAlign: 'center',
-	},
-	modalCloseIcon: {
-		position: 'absolute',
-		top: scaleHeight(16),
-		right: scaleWidth(16),
-		padding: scaleWidth(4),
-		zIndex: 10,
 	},
 
 	/* ✅ 본문 스타일 개선 */
 	modalBody: {
-		paddingHorizontal: scaleWidth(16),
-		paddingTop: scaleHeight(8),
-		paddingBottom: scaleHeight(20),
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.sm,
+		paddingBottom: SPACING_H.xl,
 	},
 
 	badgeRow: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		gap: scaleWidth(8),
+		columnGap: SPACING_W.sm,
+		rowGap: SPACING_H.sm,
 		justifyContent: 'center',
-		marginBottom: scaleHeight(16),
+		marginBottom: SPACING_H.lg,
 	},
 	badge: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(12),
-		paddingVertical: scaleHeight(6),
-		borderRadius: scaleWidth(14),
+		columnGap: SPACING_W.xs,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
 	},
 	badgeText: {
-		color: '#fff',
-		fontSize: scaledSize(12),
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.sm,
 		fontWeight: '600',
 	},
 
-	highlightSection: {
-		borderWidth: 1.5,
-		borderColor: '#A5D8FF',
-		backgroundColor: '#EAF4FF',
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(14),
-		borderRadius: scaleWidth(14),
-		marginBottom: scaleHeight(16),
-		alignItems: 'center',
-	},
 	modalProverbText: {
-		fontSize: scaledSize(20),
+		fontSize: FONT_SIZES.xxl,
 		fontWeight: '700',
-		color: '#1E6BB8', // 파란색 강조
+		color: COLORS.secondaryDark, // 파란색 강조
 		textAlign: 'center',
-		lineHeight: scaleHeight(28),
-		marginBottom: scaleHeight(16), // 아래 요소와 간격만 추가
+		lineHeight: scaledSize(28),
+		marginBottom: SPACING_H.md,
 	},
 
 	sectionBox: {
 		borderWidth: 1,
-		borderColor: '#E6EEF5',
-		backgroundColor: '#FDFEFE',
-		padding: scaleWidth(12),
-		borderRadius: scaleWidth(12),
-		marginBottom: scaleHeight(12),
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.lg,
+		marginBottom: SPACING_H.md,
 		shadowColor: '#000',
-		shadowOpacity: 0.05,
+		shadowOpacity: 0.06,
 		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 4,
+		shadowRadius: 8,
 	},
 	sectionTitle: {
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(12),
-	},
-	sectionText: {
-		fontSize: scaledSize(14),
-		color: '#444',
-		lineHeight: scaleHeight(20),
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.md,
 	},
 	exampleText: {
-		fontSize: scaledSize(13),
-		color: '#555',
-		lineHeight: 20,
-		backgroundColor: '#FAFAFA',
-		padding: scaleWidth(6),
-		borderRadius: scaleWidth(8),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		lineHeight: scaledSize(20),
 	},
 
 	/* ✅ 닫기 버튼 */
+	modalFooter: {
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.sm,
+		paddingBottom: SPACING_H.xl,
+	},
 	modalCloseButton: {
-		backgroundColor: '#0984e3',
-		paddingVertical: scaleHeight(14),
+		height: scaleHeight(48),
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.primary,
 		alignItems: 'center',
-		borderBottomLeftRadius: scaleWidth(20),
-		borderBottomRightRadius: scaleWidth(20),
+		justifyContent: 'center',
 	},
 	modalCloseButtonText: {
-		color: '#fff',
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
 	},
 	meaningHighlight: {
 		borderWidth: 1.5,
-		borderColor: '#A5D8FF',
-		backgroundColor: '#EAF4FF',
-		padding: scaleWidth(14),
-		borderRadius: scaleWidth(14),
-		marginBottom: scaleHeight(16),
+		borderColor: COLORS.secondarySoft,
+		backgroundColor: COLORS.secondaryBg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		borderRadius: RADIUS.lg,
+		marginBottom: SPACING_H.lg,
 		shadowColor: '#000',
-		shadowOpacity: 0.08,
+		shadowOpacity: 0.06,
 		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 4,
+		shadowRadius: 8,
 	},
 	meaningQuoteBox: {
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
+	meaningQuoteIcon: {
+		marginBottom: SPACING_H.sm,
+	},
 	meaningQuoteText: {
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '600',
-		color: '#2c3e50',
-		lineHeight: scaleHeight(22),
+		color: COLORS.textStrong,
+		lineHeight: scaledSize(22),
 		textAlign: 'center',
 	},
-	badge2: {
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(4),
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#f1f2f6',
-	},
 	sameProverbBox: {
-		backgroundColor: '#FAFAFA',
+		backgroundColor: COLORS.background,
 		borderWidth: 1,
-		borderColor: '#E6EEF5',
-		padding: scaleWidth(8),
-		borderRadius: scaleWidth(8),
-		marginBottom: scaleHeight(6),
+		borderColor: COLORS.border,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.sm,
+		borderRadius: RADIUS.sm,
+		marginBottom: SPACING_H.sm,
 	},
 	sameProverbText: {
-		fontSize: scaledSize(13),
-		padding: scaleWidth(6),
-		color: '#444',
-		lineHeight: scaleHeight(20),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		lineHeight: scaledSize(20),
 	},
 	favoriteIconButton: {
 		alignSelf: 'center',
-		padding: scaleWidth(10), // 12 → 10
-		marginBottom: scaleHeight(8),
-		borderRadius: scaleWidth(50),
-		backgroundColor: '#f8f9fa',
+		width: scaleWidth(44),
+		height: scaleWidth(44),
+		borderRadius: scaleWidth(44) / 2,
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginBottom: SPACING_H.lg,
+		backgroundColor: COLORS.background,
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
+		borderColor: COLORS.border,
 	},
 });

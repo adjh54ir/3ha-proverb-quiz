@@ -66,7 +66,8 @@ export declare namespace MainDataType {
 	 */
 	export interface SettingInfo {
 		isUseAlarm: boolean; // 알람 여부
-		alarmTime: string; // 예: '2025-06-17T10:15:00' (ISO 형식의 문자열)
+		// 로컬 시각 'HH:mm' (예: '10:15'). 구버전은 ISO 문자열로 저장돼 있어 parseAlarmHour 가 함께 처리한다.
+		alarmTime: string;
 	}
 	interface TodayQuizList {
 		quizDate: string;

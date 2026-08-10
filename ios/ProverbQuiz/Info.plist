@@ -28,10 +28,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>사진 촬영을 위해 카메라 접근 권한이 필요합니다.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>사진 저장 및 불러오기를 위해 사진 라이브러리 접근 권한이 필요합니다.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>사용자님께 더 관련성 높은 광고를 제공하기 위해 기기의 광고 식별자 사용 권한이 필요합니다.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

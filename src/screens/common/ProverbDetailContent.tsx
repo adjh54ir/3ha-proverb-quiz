@@ -2,7 +2,8 @@
 // 속담 상세 인라인 컨텐츠 (오늘의 퀴즈 해설 / 상세 모달 공통 사용)
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { scaledSize, scaleWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './atomic/IconComponent';
 
@@ -44,13 +45,13 @@ const LEVEL_COLOR: Record<number, string> = {
 const getLevelIcon = (level: number) => {
 	switch (level) {
 		case 1:
-			return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(13)} color="#fff" />;
+			return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(13)} color={COLORS.textWhite} />;
 		case 2:
-			return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(13)} color="#fff" />;
+			return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(13)} color={COLORS.textWhite} />;
 		case 3:
-			return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(13)} color="#fff" />;
+			return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(13)} color={COLORS.textWhite} />;
 		case 4:
-			return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(13)} color="#fff" />;
+			return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(13)} color={COLORS.textWhite} />;
 		default:
 			return null;
 	}
@@ -77,21 +78,21 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 
 			{/* 배지: 난이도 + 카테고리 */}
 			<View style={styles.badgeRow}>
-				<View style={[styles.levelBadge, { backgroundColor: LEVEL_COLOR[proverb.level] || '#bdc3c7' }]}>
+				<View style={[styles.levelBadge, { backgroundColor: LEVEL_COLOR[proverb.level] || COLORS.textLight }]}>
 					{getLevelIcon(proverb.level)}
 					<Text style={styles.levelBadgeText}>{proverb.levelName}</Text>
 				</View>
-				<View style={[styles.badge2, { backgroundColor: CATEGORY_COLOR[proverb.category] || '#bdc3c7' }]}>
-					{categoryIcon && <IconComponent type={categoryIcon.type} name={categoryIcon.name} size={scaledSize(13)} color="#fff" />}
-					<Text style={[styles.badgeText, { marginLeft: scaleWidth(4) }]}>{proverb.category}</Text>
+				<View style={[styles.badge2, { backgroundColor: CATEGORY_COLOR[proverb.category] || COLORS.textLight }]}>
+					{categoryIcon && <IconComponent type={categoryIcon.type} name={categoryIcon.name} size={scaledSize(13)} color={COLORS.textWhite} />}
+					<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{proverb.category}</Text>
 				</View>
 			</View>
 
 			{/* 의미 (강조 카드) */}
 			<View style={[styles.modalSection, styles.modalSectionPrimary]}>
 				<View style={styles.sectionLabelRow}>
-					<View style={[styles.sectionIconChip, { backgroundColor: '#DBEAFE' }]}>
-						<IconComponent type="materialIcons" name="lightbulb" size={scaledSize(15)} color="#3B82F6" />
+					<View style={[styles.sectionIconChip, { backgroundColor: COLORS.secondarySoft }]}>
+						<IconComponent type="materialIcons" name="lightbulb" size={scaledSize(15)} color={COLORS.secondary} />
 					</View>
 					<Text style={styles.modalLabel}>의미</Text>
 				</View>
@@ -102,13 +103,13 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 			{examples.length > 0 && (
 				<View style={styles.modalSection}>
 					<View style={styles.sectionLabelRow}>
-						<View style={[styles.sectionIconChip, { backgroundColor: '#DCFCE7' }]}>
-							<IconComponent type="materialIcons" name="format-quote" size={scaledSize(15)} color="#22C55E" />
+						<View style={[styles.sectionIconChip, { backgroundColor: COLORS.primarySoft }]}>
+							<IconComponent type="materialIcons" name="format-quote" size={scaledSize(15)} color={COLORS.primary} />
 						</View>
 						<Text style={styles.modalLabel}>예시</Text>
 					</View>
 					{examples.map((ex, idx) => (
-						<Text key={idx} style={[styles.modalText2, idx > 0 && { marginTop: scaleHeight(6) }]}>
+						<Text key={idx} style={[styles.modalText2, idx > 0 && { marginTop: SPACING_H.sm }]}>
 							• {ex}
 						</Text>
 					))}
@@ -119,8 +120,8 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 			{sameProverbs.length > 0 && (
 				<View style={styles.modalSection}>
 					<View style={styles.sectionLabelRow}>
-						<View style={[styles.sectionIconChip, { backgroundColor: '#FEF3C7' }]}>
-							<IconComponent type="materialIcons" name="swap-horiz" size={scaledSize(15)} color="#F59E0B" />
+						<View style={[styles.sectionIconChip, { backgroundColor: COLORS.warningBg }]}>
+							<IconComponent type="materialIcons" name="swap-horiz" size={scaledSize(15)} color={COLORS.warning} />
 						</View>
 						<Text style={styles.modalLabel}>동의 속담</Text>
 					</View>
@@ -168,105 +169,105 @@ export default ProverbDetailContent;
 const styles = StyleSheet.create({
 	titleWrap: {
 		alignItems: 'center',
-		marginBottom: scaleHeight(14),
+		marginBottom: SPACING_H.md,
 	},
 	titleProverb: {
-		fontSize: scaledSize(19),
-		fontWeight: 'bold',
-		color: '#1E293B',
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 		textAlign: 'center',
-		lineHeight: scaleHeight(27),
+		lineHeight: scaledSize(27),
 	},
 	badgeRow: {
 		flexDirection: 'row',
-		gap: scaleWidth(8),
+		gap: SPACING_W.sm,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginBottom: scaleHeight(16),
+		marginBottom: SPACING_H.lg,
 		flexWrap: 'wrap',
 	},
 	levelBadge: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		borderRadius: scaleWidth(16),
-		paddingVertical: scaleHeight(5),
-		paddingHorizontal: scaleWidth(12),
+		borderRadius: RADIUS.round,
+		paddingVertical: SPACING_H.xs,
+		paddingHorizontal: SPACING_W.md,
 	},
 	levelBadgeText: {
-		fontSize: scaledSize(13),
-		color: '#fff',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textWhite,
 		fontWeight: '700',
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.xs,
 	},
 	badge2: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(12),
-		paddingVertical: scaleHeight(5),
-		borderRadius: scaleWidth(16),
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
 	},
 	badgeText: {
-		color: '#fff',
-		fontSize: scaledSize(12),
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.sm,
 		fontWeight: '700',
 	},
 	modalSection: {
-		marginBottom: scaleHeight(12),
-		backgroundColor: '#F8FAFC',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(14),
-		borderRadius: scaleWidth(14),
+		marginBottom: SPACING_H.md,
+		backgroundColor: COLORS.background,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.lg,
 		borderWidth: 1,
-		borderColor: '#EEF2F7',
+		borderColor: COLORS.border,
 	},
 	modalSectionPrimary: {
-		backgroundColor: '#EFF6FF',
-		borderColor: '#DBEAFE',
+		backgroundColor: COLORS.secondaryBg,
+		borderColor: COLORS.secondarySoft,
 	},
 	sectionLabelRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: scaleHeight(8),
+		marginBottom: SPACING_H.sm,
 	},
 	sectionIconChip: {
 		width: scaleWidth(26),
 		height: scaleWidth(26),
-		borderRadius: scaleWidth(8),
+		borderRadius: RADIUS.sm,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginRight: scaleWidth(8),
+		marginRight: SPACING_W.sm,
 	},
 	modalLabel: {
-		fontSize: scaledSize(15),
-		fontWeight: '800',
-		color: '#1E293B',
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 	},
 	modalTextStrong: {
-		fontSize: scaledSize(16),
-		color: '#1E293B',
+		fontSize: FONT_SIZES.lg,
+		color: COLORS.textStrong,
 		fontWeight: '700',
-		lineHeight: scaleHeight(25),
+		lineHeight: scaledSize(25),
 	},
 	modalText2: {
-		fontSize: scaledSize(14),
-		color: '#475569',
-		lineHeight: scaleHeight(23),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		lineHeight: scaledSize(23),
 	},
 	tagsWrapper: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		gap: scaleWidth(8),
-		marginTop: scaleHeight(2),
+		gap: SPACING_W.sm,
+		marginTop: SPACING_H.xs,
 	},
 	tagItem: {
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(5),
-		borderRadius: scaleWidth(14),
-		backgroundColor: '#FEF3C7',
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.warningBg,
 	},
 	tagText: {
 		color: '#B45309',
-		fontSize: scaledSize(12),
+		fontSize: FONT_SIZES.sm,
 		fontWeight: '700',
 	},
 });

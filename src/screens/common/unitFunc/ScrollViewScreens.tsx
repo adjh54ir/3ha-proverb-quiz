@@ -4,7 +4,7 @@ import { NativeScrollEvent, NativeSyntheticEvent, RefreshControl, ScrollView, St
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome6Icon from "react-native-vector-icons/FontAwesome6";
 import IconComponent from "../atomic/IconComponent";
-import { scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
 
 const ScrollViewScreens = () => {
 
@@ -78,7 +78,7 @@ const ScrollViewScreens = () => {
             {/* 최하단에 위치할것!! */}
             {showScrollTop && (
                 <TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop}>
-                    <IconComponent type="MaterialIcons" name="arrow-upward" size={24} color="#ffffff" />
+                    <IconComponent type="MaterialIcons" name="arrow-upward" size={scaledSize(24)} color="#ffffff" />
                 </TouchableOpacity>
             )}
 

@@ -81,7 +81,7 @@ export const PET_REWARDS = [
 export const COMMON_ALL_OPTION = {
 	label: '전체',
 	value: 0,
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={16} color="#555" />,
+	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#555" />,
 	labelStyle: {
 		fontSize: scaledSize(14),
 		color: '#2c3e50',
@@ -96,22 +96,22 @@ export const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '초급',
 		value: 1,
-		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={16} color="#34D399" />,
+		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color="#34D399" />,
 	},
 	{
 		label: '중급',
 		value: 2,
-		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={16} color="#F59E0B" />,
+		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color="#F59E0B" />,
 	},
 	{
 		label: '고급',
 		value: 3,
-		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#EA580C" />,
+		icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color="#EA580C" />,
 	},
 	{
 		label: '특급',
 		value: 4,
-		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={16} color="#B91C1C" />,
+		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color="#B91C1C" />,
 	},
 ];
 
@@ -126,7 +126,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'mountain-sun',
 		iconColor: '#2ecc71',
-		icon: () => <IconComponent type="FontAwesome6" name="mountain-sun" size={16} color="#2ecc71" />,
+		icon: () => <IconComponent type="FontAwesome6" name="mountain-sun" size={scaledSize(16)} color="#2ecc71" />,
 	},
 	{
 		label: '시간/때',
@@ -134,7 +134,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'clock',
 		iconColor: '#3498db',
-		icon: () => <IconComponent type="FontAwesome6" name="clock" size={16} color="#3498db" />,
+		icon: () => <IconComponent type="FontAwesome6" name="clock" size={scaledSize(16)} color="#3498db" />,
 	},
 	{
 		label: '감정/마음',
@@ -142,7 +142,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'heart',
 		iconColor: '#e74c3c',
-		icon: () => <IconComponent type="FontAwesome6" name="heart" size={16} color="#e74c3c" />,
+		icon: () => <IconComponent type="FontAwesome6" name="heart" size={scaledSize(16)} color="#e74c3c" />,
 	},
 	{
 		label: '사람/성격',
@@ -150,7 +150,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'user-gear',
 		iconColor: '#f1c40f',
-		icon: () => <IconComponent type="FontAwesome6" name="user-gear" size={16} color="#f1c40f" />,
+		icon: () => <IconComponent type="FontAwesome6" name="user-gear" size={scaledSize(16)} color="#f1c40f" />,
 	},
 	{
 		label: '사물/현상',
@@ -158,7 +158,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'cube',
 		iconColor: '#16a085',
-		icon: () => <IconComponent type="FontAwesome6" name="cube" size={16} color="#16a085" />,
+		icon: () => <IconComponent type="FontAwesome6" name="cube" size={scaledSize(16)} color="#16a085" />,
 	},
 	{
 		label: '행동/태도',
@@ -166,7 +166,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'person-walking',
 		iconColor: '#e67e22',
-		icon: () => <IconComponent type="FontAwesome6" name="person-walking" size={16} color="#e67e22" />,
+		icon: () => <IconComponent type="FontAwesome6" name="person-walking" size={scaledSize(16)} color="#e67e22" />,
 	},
 	{
 		label: '모양/소리',
@@ -174,7 +174,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'wave-square',
 		iconColor: '#1abc9c',
-		icon: () => <IconComponent type="FontAwesome6" name="wave-square" size={16} color="#1abc9c" />,
+		icon: () => <IconComponent type="FontAwesome6" name="wave-square" size={scaledSize(16)} color="#1abc9c" />,
 	},
 	{
 		label: '기타',
@@ -182,7 +182,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'ellipsis',
 		iconColor: '#95a5a6',
-		icon: () => <IconComponent type="FontAwesome6" name="ellipsis" size={16} color="#95a5a6" />,
+		icon: () => <IconComponent type="FontAwesome6" name="ellipsis" size={scaledSize(16)} color="#95a5a6" />,
 	},
 ];
 export const QUIZ_MODES = [

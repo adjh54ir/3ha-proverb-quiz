@@ -11,8 +11,10 @@ import {
 	Alert,
 	Linking,
 	TextInput,
+	KeyboardAvoidingView,
 } from 'react-native';
-import { moderateScale, scaleHeight, scaleWidth, scaledSize } from '@/utils';
+import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { COMMON_APPS_DATA } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
@@ -47,6 +49,7 @@ interface Props {
 const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 	const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
 	const [searchQuery, setSearchQuery] = useState('');
+	const [searchFocused, setSearchFocused] = useState(false);
 
 	const filteredApps = useMemo(() => {
 		return COMMON_APPS_DATA.Apps.filter((app) => {
@@ -99,35 +102,38 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-			<View style={styles.overlay}>
+			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.overlay}>
 				<PopInView visible={visible} style={styles.container}>
 					{/* 헤더 */}
 					<View style={styles.header}>
 						<View style={styles.headerTop}>
 							<Text style={styles.titleText}>📱 제작자의 다른 앱</Text>
-							<TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+							<TouchableOpacity style={styles.closeButton} onPress={handleClose} activeOpacity={0.7} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
 								<Text style={styles.closeText}>✕</Text>
 							</TouchableOpacity>
 						</View>
 
 						{/* 검색 */}
-						<View style={styles.searchBox}>
-							<IconComponent type="Feather" name="search" size={scaledSize(14)} color="#95a5a6" style={styles.searchIcon} />
+						<View style={[styles.searchBox, searchFocused && styles.searchBoxFocused]}>
+							<IconComponent type="Feather" name="search" size={scaledSize(14)} color={COLORS.textLight} style={styles.searchIcon} />
 							<TextInput
 								style={styles.searchInput}
 								placeholder="앱 검색..."
-								placeholderTextColor="#9CA3AF"
+								placeholderTextColor={COLORS.textLight}
 								value={searchQuery}
 								onChangeText={setSearchQuery}
+								onFocus={() => setSearchFocused(true)}
+								onBlur={() => setSearchFocused(false)}
 							/>
 						</View>
 
 						{/* 카테고리 필터 */}
-						<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContainer}>
+						<ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.tabsContainer}>
 							{CATEGORY_TABS.map((tab) => (
 								<TouchableOpacity
 									key={tab.key}
 									style={[styles.tabButton, selectedCategory === tab.key && styles.tabButtonActive]}
+									activeOpacity={0.8}
 									onPress={() => setSelectedCategory(tab.key)}>
 									<Text style={[styles.tabButtonText, selectedCategory === tab.key && styles.tabButtonTextActive]}>
 										{tab.label}
@@ -173,8 +179,8 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 												<View style={[styles.categoryBadge, { backgroundColor: catColor.bg }]}>
 													<Text style={[styles.categoryBadgeText, { color: catColor.text }]}>{CATEGORY_LABEL[app.category]}</Text>
 												</View>
-												<TouchableOpacity style={styles.downloadButton} onPress={() => onDownloadApp(app)}>
-													<IconComponent type="Feather" name="download" size={scaledSize(12)} color="#2980b9" />
+												<TouchableOpacity style={styles.downloadButton} activeOpacity={0.8} onPress={() => onDownloadApp(app)}>
+													<IconComponent type="Feather" name="download" size={scaledSize(12)} color={COLORS.secondaryDark} />
 													<Text style={styles.downloadText}>다운로드</Text>
 												</TouchableOpacity>
 											</View>
@@ -185,7 +191,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 						)}
 					</ScrollView>
 				</PopInView>
-			</View>
+			</KeyboardAvoidingView>
 		</Modal>
 	);
 };
@@ -195,125 +201,134 @@ export default DeveloperAppsModal;
 const styles = StyleSheet.create({
 	overlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.45)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(20),
+		paddingHorizontal: SPACING_W.xl,
 	},
 	container: {
 		width: '100%',
 		maxHeight: scaleHeight(660),
-		backgroundColor: '#ffffff',
-		borderRadius: moderateScale(20),
+		flexShrink: 1, // 키보드로 화면이 줄어들 때 모달이 넘치지 않도록
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
 		overflow: 'hidden',
 		shadowColor: '#000',
-		shadowOpacity: 0.12,
-		shadowOffset: { width: 0, height: scaleHeight(8) },
-		shadowRadius: 20,
+		shadowOpacity: 0.08,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 8,
 	},
 	header: {
-		paddingTop: scaleHeight(20),
-		paddingHorizontal: scaleWidth(20),
+		paddingTop: SPACING_H.xl,
+		paddingHorizontal: SPACING_W.lg,
 	},
 	headerTop: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		marginBottom: scaleHeight(14),
+		marginBottom: SPACING_H.md,
 	},
 	titleText: {
-		fontSize: scaledSize(16),
-		fontWeight: '600',
-		color: '#2c3e50',
+		fontSize: FONT_SIZES.heading,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 	},
 	closeButton: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
-		borderRadius: scaleWidth(12),
-		borderWidth: 0.5,
-		borderColor: '#e0e0e0',
+		borderRadius: scaleWidth(28) / 2,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 	closeText: {
-		fontSize: scaledSize(13),
-		color: '#95a5a6',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 		fontWeight: '500',
 	},
 	searchBox: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#f8f9fa',
-		borderRadius: moderateScale(10),
-		paddingHorizontal: scaleWidth(10),
-		marginBottom: scaleHeight(12),
-		height: scaleHeight(38),
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.md,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		paddingHorizontal: SPACING_W.md,
+		marginBottom: SPACING_H.md,
+		height: scaleHeight(48),
+	},
+	searchBoxFocused: {
+		borderColor: COLORS.primary,
+		backgroundColor: COLORS.surface,
 	},
 	searchIcon: {
-		marginRight: scaleWidth(6),
+		marginRight: SPACING_W.sm,
 	},
 	searchInput: {
 		flex: 1,
-		fontSize: scaledSize(13),
-		color: '#2c3e50',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
 		paddingVertical: 0,
 	},
 	tabsContainer: {
 		flexDirection: 'row',
-		gap: scaleWidth(6),
-		paddingBottom: scaleHeight(14),
+		gap: SPACING_W.sm,
+		paddingBottom: SPACING_H.md,
 	},
 	tabButton: {
-		paddingHorizontal: scaleWidth(14),
-		paddingVertical: scaleHeight(6),
-		borderRadius: scaleWidth(100),
-		borderWidth: 0.5,
-		borderColor: '#e0e0e0',
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.sm,
+		borderRadius: RADIUS.round,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		backgroundColor: 'transparent',
 	},
 	tabButtonActive: {
-		backgroundColor: '#E6F1FB',
-		borderColor: 'transparent',
+		backgroundColor: COLORS.secondaryBg,
+		borderColor: COLORS.secondary,
 	},
 	tabButtonText: {
-		fontSize: scaledSize(12),
-		color: '#95a5a6',
-		fontWeight: '400',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
+		fontWeight: '500',
 	},
 	tabButtonTextActive: {
-		color: '#2980b9',
+		color: COLORS.secondaryDark,
 		fontWeight: '600',
 	},
 	divider: {
-		height: 0.5,
-		backgroundColor: '#ecf0f1',
+		height: 1,
+		backgroundColor: COLORS.border,
 	},
 	countLabel: {
-		fontSize: scaledSize(12),
-		color: '#95a5a6',
-		paddingHorizontal: scaleWidth(16),
-		paddingTop: scaleHeight(10),
-		paddingBottom: scaleHeight(4),
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.md,
+		paddingBottom: SPACING_H.xs,
 	},
 	scroll: {
-		padding: scaleWidth(12),
-		paddingBottom: scaleHeight(20),
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.xs,
+		paddingBottom: scaleHeight(40),
 	},
 	appCard: {
 		flexDirection: 'row',
 		alignItems: 'flex-start',
-		gap: scaleWidth(12),
-		padding: scaleWidth(12),
-		borderRadius: moderateScale(14),
-		borderWidth: 0.5,
-		borderColor: '#ecf0f1',
-		backgroundColor: '#ffffff',
-		marginBottom: scaleHeight(8),
+		gap: SPACING_W.md,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.lg,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surface,
+		marginBottom: SPACING_H.md,
 	},
 	image: {
 		width: scaleWidth(52),
 		height: scaleWidth(52),
-		borderRadius: scaleWidth(12),
+		borderRadius: RADIUS.md,
 		flexShrink: 0,
 	},
 	appInfo: {
@@ -321,16 +336,16 @@ const styles = StyleSheet.create({
 		minWidth: 0,
 	},
 	appTitle: {
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 		fontWeight: '600',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(3),
+		color: COLORS.textStrong,
+		marginBottom: SPACING_H.xs,
 	},
 	appDesc: {
-		fontSize: scaledSize(12),
-		color: '#95a5a6',
-		lineHeight: scaleHeight(18),
-		marginBottom: scaleHeight(8),
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textSecondary,
+		lineHeight: scaledSize(18),
+		marginBottom: SPACING_H.sm,
 	},
 	appFooter: {
 		flexDirection: 'row',
@@ -338,58 +353,51 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 	},
 	categoryBadge: {
-		paddingHorizontal: scaleWidth(8),
-		paddingVertical: scaleHeight(3),
-		borderRadius: scaleWidth(100),
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
 	},
 	categoryBadgeText: {
-		fontSize: scaledSize(11),
-		fontWeight: '500',
+		fontSize: FONT_SIZES.xs,
+		fontWeight: '600',
 	},
 	downloadButton: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(4),
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(5),
-		borderRadius: moderateScale(8),
-		borderWidth: 0.5,
-		borderColor: '#2980b9',
+		gap: SPACING_W.xs,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.sm,
+		borderRadius: RADIUS.sm,
+		borderWidth: 1,
+		borderColor: COLORS.secondaryDark,
 	},
 	downloadText: {
-		fontSize: scaledSize(12),
-		color: '#2980b9',
-		fontWeight: '500',
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.secondaryDark,
+		fontWeight: '600',
 	},
 	emptyState: {
 		paddingVertical: scaleHeight(40),
 		alignItems: 'center',
 	},
 	emptyText: {
-		fontSize: scaledSize(13),
-		color: '#bdc3c7',
-	},
-	imageWrapper: {
-		width: scaleWidth(52),
-		height: scaleWidth(52),
-		flexShrink: 0,
-		overflow: 'hidden',
-		borderRadius: scaleWidth(12),
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textLight,
 	},
 	newBadge: {
 		position: 'absolute',
 		top: -scaleWidth(4),
 		left: -scaleWidth(4),
-		backgroundColor: '#e74c3c',
-		borderRadius: scaleWidth(4),
-		paddingHorizontal: scaleWidth(4),
-		paddingVertical: scaleHeight(2),
+		backgroundColor: COLORS.danger,
+		borderRadius: RADIUS.sm,
+		paddingHorizontal: SPACING_W.xs,
+		paddingVertical: SPACING_H.xs,
 		zIndex: 1,
 	},
 	newBadgeText: {
-		color: '#ffffff',
-		fontSize: scaledSize(8),
-		fontWeight: '800',
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.xxs,
+		fontWeight: '700',
 		letterSpacing: 0.5,
 	},
 });

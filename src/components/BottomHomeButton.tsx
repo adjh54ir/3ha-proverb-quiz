@@ -16,7 +16,7 @@ const BottomHomeButton = ({ marginBottom = 0 }: { marginBottom?: number }) => {
 	return (
 		<View style={[styles.wrapper, { marginBottom }]}>
 			<TouchableOpacity style={styles.button} onPress={goHome} activeOpacity={0.85}>
-				<IconComponent type="MaterialIcons" name="home" size={14} color="#4b5563" />
+				<IconComponent type="MaterialIcons" name="home" size={scaledSize(14)} color="#4b5563" />
 				<Text style={styles.text}>HOME</Text>
 			</TouchableOpacity>
 		</View>

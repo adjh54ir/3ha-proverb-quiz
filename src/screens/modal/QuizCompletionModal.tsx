@@ -1,6 +1,7 @@
 // QuizCompletionModal.tsx 수정
 
 import { scaleWidth, scaleHeight, scaledSize, screenWidth } from '@/utils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import React, { useRef, useEffect } from 'react';
 import {
     View,
@@ -36,54 +37,64 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
     onConfirm,
     onRetry, // ✅ 추가
 }) => {
-    const scaleAnim = useRef(new Animated.Value(0)).current;
+    // ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
+    const scaleAnim = useRef(new Animated.Value(0.95)).current;
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const mascotBounce = useRef(new Animated.Value(0)).current;
     const confettiKey = useRef(Math.random()).current;
+    // ✅ 루프 애니메이션 핸들 (cleanup 에서 stop)
+    const loopRef = useRef<Animated.CompositeAnimation | null>(null);
 
     useEffect(() => {
-        if (visible) {
-            scaleAnim.setValue(0);
+        if (!visible) {
+            // 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
+            scaleAnim.setValue(0.95);
             fadeAnim.setValue(0);
-            Animated.parallel([
-                Animated.spring(scaleAnim, {
-                    toValue: 1,
-                    useNativeDriver: true,
-                    bounciness: 8,
-                    speed: 12,
-                }),
-                Animated.timing(fadeAnim, {
-                    toValue: 1,
-                    duration: 400,
-                    useNativeDriver: true,
-                }),
-            ]).start(({ finished }) => {
-                if (!finished) {
-                    return;
-                }
-                Animated.loop(
-                    Animated.sequence([
-                        Animated.timing(mascotBounce, {
-                            toValue: -10,
-                            duration: 600,
-                            useNativeDriver: true,
-                        }),
-                        Animated.timing(mascotBounce, {
-                            toValue: 0,
-                            duration: 600,
-                            useNativeDriver: true,
-                        }),
-                    ])
-                ).start();
-            });
+            return;
         }
+        scaleAnim.setValue(0.95);
+        fadeAnim.setValue(0);
+        const enterAnim = Animated.parallel([
+            Animated.timing(scaleAnim, {
+                toValue: 1,
+                duration: 250,
+                useNativeDriver: true,
+            }),
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 250,
+                useNativeDriver: true,
+            }),
+        ]);
+        enterAnim.start(({ finished }) => {
+            if (!finished) {
+                return;
+            }
+            loopRef.current = Animated.loop(
+                Animated.sequence([
+                    Animated.timing(mascotBounce, {
+                        toValue: -scaleHeight(10),
+                        duration: 600,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(mascotBounce, {
+                        toValue: 0,
+                        duration: 600,
+                        useNativeDriver: true,
+                    }),
+                ])
+            );
+            loopRef.current.start();
+        });
+
         // ✅ 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
         return () => {
-            scaleAnim.stopAnimation();
-            fadeAnim.stopAnimation();
-            mascotBounce.stopAnimation();
+            enterAnim.stop();
+            loopRef.current?.stop();
+            loopRef.current = null;
+            mascotBounce.setValue(0);
         };
-    }, [visible]);
+    }, [visible, scaleAnim, fadeAnim, mascotBounce]);
 
     const getPerformanceMessage = () => {
         if (accuracy >= 90) return '완벽해요!';
@@ -101,18 +112,17 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
         return '💪';
     };
 
-    // ✅ 정확도에 따른 색상 결정
+    // ✅ 정확도에 따른 색상 결정 (성공/경고/실패 시맨틱 토큰으로 통일)
     const getAccuracyColor = () => {
-        if (accuracy >= 90) return '#22C55E';
-        if (accuracy >= 80) return '#22C55E';
-        if (accuracy >= 70) return '#F59E0B';
-        return '#EF4444';
+        if (accuracy >= 80) return COLORS.success;
+        if (accuracy >= 70) return COLORS.warning;
+        return COLORS.danger;
     };
 
     if (!isPracticeMode) {
         return (
             <Modal visible={visible} transparent animationType="fade">
-                <View style={styles.modalOverlay}>
+                <View style={styles.overlay}>
                     <ConfettiCannon
                         key={confettiKey}
                         count={150}
@@ -124,7 +134,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
 
                     <Animated.View
                         style={[
-                            styles.completionModal,
+                            styles.card,
                             {
                                 transform: [{ scale: scaleAnim }],
                                 opacity: fadeAnim,
@@ -148,10 +158,10 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                                 </View>
                             </Animated.View>
 
-                            <Text style={styles.completionTitle}>
-                                완벽해요! 🎉
+                            <Text style={styles.title}>
+                                {getPerformanceMessage()} {getPerformanceEmoji()}
                             </Text>
-                            <Text style={styles.completionSubtitle}>
+                            <Text style={styles.subtitle}>
                                 모든 퀴즈를 정복했어요
                             </Text>
 
@@ -163,10 +173,10 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                         </View>
 
                         <TouchableOpacity
-                            style={styles.confirmButton}
+                            style={styles.primaryButton}
                             onPress={onConfirm}
                             activeOpacity={0.8}>
-                            <Text style={styles.confirmButtonText}>홈으로 가기</Text>
+                            <Text style={styles.primaryButtonText}>홈으로 가기</Text>
                         </TouchableOpacity>
                     </Animated.View>
                 </View>
@@ -177,7 +187,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
     // ✅ 연습 모드 - AnimatedCircularProgress 적용
     return (
         <Modal visible={visible} transparent animationType="fade">
-            <View style={styles.modalOverlay}>
+            <View style={styles.overlay}>
                 {accuracy >= 80 && (
                     <ConfettiCannon
                         key={confettiKey}
@@ -191,14 +201,12 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
 
                 <Animated.View
                     style={[
-                        styles.practiceModal,
+                        styles.card,
                         {
                             transform: [{ scale: scaleAnim }],
                             opacity: fadeAnim,
                         },
                     ]}>
-
-                    <View style={styles.practiceBgGradient} />
 
                     <View style={styles.practiceHeader}>
                         <Animated.View
@@ -212,10 +220,10 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                             </View>
                         </Animated.View>
 
-                        <Text style={styles.practiceTitle}>
+                        <Text style={styles.title}>
                             {getPerformanceMessage()}
                         </Text>
-                        <Text style={styles.practiceSubtitle}>
+                        <Text style={styles.subtitle}>
                             연습 완료!
                         </Text>
                     </View>
@@ -227,7 +235,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                             width={scaleWidth(10)}
                             fill={accuracy}
                             tintColor={getAccuracyColor()}
-                            backgroundColor="#F1F5F9"
+                            backgroundColor={COLORS.surfaceAlt}
                             duration={1500}
                             rotation={0}
                         >
@@ -243,13 +251,13 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                     </View>
 
                     <View style={styles.scoreCardsContainer}>
-                        <View style={[styles.scoreCard, styles.scoreCardTotal]}>
+                        <View style={styles.scoreCard}>
                             <View style={styles.scoreCardIcon}>
                                 <IconComponent
                                     type="FontAwesome6"
                                     name="book-open"
                                     size={scaledSize(20)}
-                                    color="#22C55E"
+                                    color={COLORS.textSecondary}
                                 />
                             </View>
                             <Text style={styles.scoreCardLabel}>총 문제</Text>
@@ -262,11 +270,11 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                                     type="MaterialIcons"
                                     name="check-circle"
                                     size={scaledSize(20)}
-                                    color="#22C55E"
+                                    color={COLORS.success}
                                 />
                             </View>
                             <Text style={styles.scoreCardLabel}>정답</Text>
-                            <Text style={[styles.scoreCardValue, { color: '#22C55E' }]}>
+                            <Text style={[styles.scoreCardValue, { color: COLORS.success }]}>
                                 {correct}
                             </Text>
                         </View>
@@ -277,11 +285,11 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                                     type="MaterialIcons"
                                     name="cancel"
                                     size={scaledSize(20)}
-                                    color="#EF4444"
+                                    color={COLORS.danger}
                                 />
                             </View>
                             <Text style={styles.scoreCardLabel}>오답</Text>
-                            <Text style={[styles.scoreCardValue, { color: '#EF4444' }]}>
+                            <Text style={[styles.scoreCardValue, { color: COLORS.danger }]}>
                                 {wrong}
                             </Text>
                         </View>
@@ -292,27 +300,28 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                             type="MaterialIcons"
                             name="info-outline"
                             size={scaledSize(16)}
-                            color="#64748B"
-                            style={{ marginRight: scaleWidth(6) }}
+                            color={COLORS.textSecondary}
+                            style={{ marginRight: SPACING_W.sm }}
                         />
                         <Text style={styles.practiceInfoText}>
                             연습 모드는 점수와 뱃지가 기록되지 않습니다
                         </Text>
                     </View>
-                    <View style={styles.practiceButtonRow}>
+
+                    <View style={styles.buttonRow}>
                         {onRetry && (
                             <TouchableOpacity
-                                style={styles.retryButton}
+                                style={styles.secondaryButton}
                                 onPress={onRetry}
                                 activeOpacity={0.8}>
-                                <Text style={styles.retryButtonText}>다시 풀기</Text>
+                                <Text style={styles.secondaryButtonText}>다시 풀기</Text>
                             </TouchableOpacity>
                         )}
                         <TouchableOpacity
-                            style={styles.practiceConfirmButton}
+                            style={[styles.primaryButton, styles.primaryButtonInRow]}
                             onPress={onConfirm}
                             activeOpacity={0.8}>
-                            <Text style={styles.practiceConfirmText}>확인</Text>
+                            <Text style={styles.primaryButtonText}>확인</Text>
                         </TouchableOpacity>
                     </View>
                 </Animated.View>
@@ -324,304 +333,227 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
 export default QuizCompletionModal;
 
 const styles = StyleSheet.create({
-    modalOverlay: {
+    // ===== 모달 공통 껍데기 =====
+    overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.6)',
+        backgroundColor: COLORS.dim,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: SPACING_W.lg,
     },
-
-    completionModal: {
-        backgroundColor: '#fff',
-        borderRadius: scaleWidth(32),
-        width: '88%',
-        maxWidth: scaleWidth(380),
-        paddingVertical: scaleHeight(48),
-        paddingHorizontal: scaleWidth(28),
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
+    card: {
+        width: '100%',
+        maxWidth: scaleWidth(340),
+        backgroundColor: COLORS.surface,
+        borderRadius: RADIUS.xl,
+        paddingHorizontal: SPACING_W.lg,
+        paddingVertical: SPACING_H.xl,
         alignItems: 'center',
         overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
     },
+    // ===== 공통 타이포 =====
+    title: {
+        fontSize: FONT_SIZES.heading,
+        fontWeight: '700',
+        color: COLORS.textStrong,
+        marginBottom: SPACING_H.xs,
+        textAlign: 'center',
+    },
+    subtitle: {
+        fontSize: FONT_SIZES.md,
+        color: COLORS.textSecondary,
+        textAlign: 'center',
+        fontWeight: '500',
+    },
+    // ===== 배경 장식 =====
     bgCircle1: {
         position: 'absolute',
-        top: -scaleWidth(60),
+        top: -scaleHeight(60),
         right: -scaleWidth(60),
         width: scaleWidth(200),
         height: scaleWidth(200),
-        borderRadius: scaleWidth(100),
-        backgroundColor: '#FFF7ED',
-        opacity: 0.6,
+        borderRadius: scaleWidth(200) / 2,
+        backgroundColor: COLORS.warningBg,
+        opacity: 0.4,
     },
     bgCircle2: {
         position: 'absolute',
-        bottom: -scaleWidth(80),
+        bottom: -scaleHeight(80),
         left: -scaleWidth(80),
         width: scaleWidth(240),
         height: scaleWidth(240),
-        borderRadius: scaleWidth(120),
-        backgroundColor: '#EFF6FF',
+        borderRadius: scaleWidth(240) / 2,
+        backgroundColor: COLORS.secondaryBg,
         opacity: 0.5,
     },
+    // ===== 완료(정식) 모드 =====
     completionHeader: {
         alignItems: 'center',
-        marginBottom: scaleHeight(36),
+        marginBottom: SPACING_H.xl,
         zIndex: 1,
     },
     mascotContainer: {
         width: scaleWidth(120),
         height: scaleWidth(120),
-        borderRadius: scaleWidth(60),
-        backgroundColor: '#FEF3C7',
+        borderRadius: scaleWidth(120) / 2,
+        backgroundColor: COLORS.warningBg,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: scaleHeight(24),
-        shadowColor: '#FCD34D',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.4,
-        shadowRadius: 12,
+        marginBottom: SPACING_H.lg,
     },
     completionMascot: {
         width: scaleWidth(90),
         height: scaleWidth(90),
     },
-    completionTitle: {
-        fontSize: scaledSize(32),
-        fontWeight: '800',
-        color: '#0F172A',
-        marginBottom: scaleHeight(8),
-        textAlign: 'center',
-        letterSpacing: -0.5,
-    },
-    completionSubtitle: {
-        fontSize: scaledSize(17),
-        color: '#64748B',
-        textAlign: 'center',
-        fontWeight: '500',
-        marginBottom: scaleHeight(20),
-    },
-    achievementBadge: {
-        backgroundColor: '#FCD34D',
-        paddingHorizontal: scaleWidth(24),
-        paddingVertical: scaleHeight(10),
-        borderRadius: scaleWidth(20),
-        marginTop: scaleHeight(8),
-        shadowColor: '#FCD34D',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-    },
-    achievementText: {
-        fontSize: scaledSize(16),
-        fontWeight: '700',
-        color: '#F97316',
-    },
     celebrateRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: scaleWidth(8),
-        marginTop: scaleHeight(10),
+        columnGap: SPACING_W.sm,
+        marginTop: SPACING_H.md,
     },
     celebrateEmoji: {
-        fontSize: scaledSize(18),
+        fontSize: FONT_SIZES.lg,
     },
     celebrateText: {
-        fontSize: scaledSize(15),
-        fontWeight: '800',
-        color: '#22C55E',
+        fontSize: FONT_SIZES.md,
+        fontWeight: '600',
+        color: COLORS.primary,
     },
-    confirmButton: {
-        backgroundColor: '#F87171',
-        borderRadius: scaleWidth(28),
-        paddingVertical: scaleHeight(16),
-        paddingHorizontal: scaleWidth(56),
-        shadowColor: '#F87171',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.4,
-        shadowRadius: 12,
-        zIndex: 1,
-    },
-    confirmButtonText: {
-        fontSize: scaledSize(18),
-        fontWeight: '700',
-        color: '#fff',
-        letterSpacing: 0.3,
-    },
-
-    practiceModal: {
-        backgroundColor: '#fff',
-        borderRadius: scaleWidth(28),
-        width: '90%',
-        maxWidth: scaleWidth(400),
-        paddingVertical: scaleHeight(40),
-        paddingHorizontal: scaleWidth(24),
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.25,
-        shadowRadius: 16,
-        alignItems: 'center',
-        overflow: 'hidden',
-    },
-    practiceBgGradient: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: scaleHeight(180),
-        backgroundColor: '#F8FAFC',
-        opacity: 0.5,
-    },
+    // ===== 연습 모드 =====
     practiceHeader: {
         alignItems: 'center',
-        marginBottom: scaleHeight(24),
+        marginBottom: SPACING_H.lg,
         zIndex: 1,
     },
     practiceMascotContainer: {
         width: scaleWidth(90),
         height: scaleWidth(90),
-        borderRadius: scaleWidth(45),
-        backgroundColor: '#fff',
+        borderRadius: scaleWidth(90) / 2,
+        backgroundColor: COLORS.surfaceAlt,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: scaleHeight(16),
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
+        marginBottom: SPACING_H.md,
     },
     practiceEmoji: {
         fontSize: scaledSize(50),
     },
-    practiceTitle: {
-        fontSize: scaledSize(28),
-        fontWeight: '800',
-        color: '#334155',
-        marginBottom: scaleHeight(4),
-        textAlign: 'center',
-    },
-    practiceSubtitle: {
-        fontSize: scaledSize(16),
-        color: '#64748B',
-        textAlign: 'center',
-        fontWeight: '600',
-    },
     accuracyCircleContainer: {
-        marginVertical: scaleHeight(20),
+        marginBottom: SPACING_H.xl,
         zIndex: 1,
     },
-    // ✅ 내부 텍스트용 스타일 추가
     accuracyInner: {
         justifyContent: 'center',
         alignItems: 'center',
     },
     accuracyPercentage: {
-        fontSize: scaledSize(42),
-        fontWeight: '800',
-        marginBottom: scaleHeight(4),
+        fontSize: FONT_SIZES.display,
+        fontWeight: '700',
+        marginBottom: SPACING_H.xs,
     },
     accuracyLabel: {
-        fontSize: scaledSize(13),
-        color: '#64748B',
-        fontWeight: '600',
+        fontSize: FONT_SIZES.sm,
+        color: COLORS.textSecondary,
+        fontWeight: '500',
     },
     scoreCardsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        columnGap: SPACING_W.sm,
         width: '100%',
-        marginBottom: scaleHeight(20),
+        marginBottom: SPACING_H.lg,
         zIndex: 1,
     },
     scoreCard: {
         flex: 1,
-        marginHorizontal: scaleWidth(4),
-        backgroundColor: '#F8FAFC',
-        borderRadius: scaleWidth(16),
-        paddingVertical: scaleHeight(16),
-        paddingHorizontal: scaleWidth(8),
+        backgroundColor: COLORS.surfaceAlt,
+        borderRadius: RADIUS.lg,
+        paddingVertical: SPACING_H.md,
+        paddingHorizontal: SPACING_W.sm,
         alignItems: 'center',
-        borderWidth: 1.5,
-        borderColor: '#E2E8F0',
-    },
-    scoreCardTotal: {
-        borderColor: '#22C55E',
-        backgroundColor: '#EFF6FF',
+        borderWidth: 1,
+        borderColor: COLORS.border,
     },
     scoreCardCorrect: {
-        borderColor: '#22C55E',
-        backgroundColor: '#EFF6FF',
+        borderColor: COLORS.successSoft,
+        backgroundColor: COLORS.successBg,
     },
     scoreCardWrong: {
-        borderColor: '#EF4444',
-        backgroundColor: '#FEF2F2',
+        borderColor: COLORS.dangerBg,
+        backgroundColor: COLORS.dangerBg,
     },
     scoreCardIcon: {
-        marginBottom: scaleHeight(8),
+        marginBottom: SPACING_H.sm,
     },
     scoreCardLabel: {
-        fontSize: scaledSize(12),
-        color: '#64748B',
-        fontWeight: '600',
-        marginBottom: scaleHeight(4),
+        fontSize: FONT_SIZES.sm,
+        color: COLORS.textSecondary,
+        fontWeight: '500',
+        marginBottom: SPACING_H.xs,
     },
     scoreCardValue: {
-        fontSize: scaledSize(24),
-        fontWeight: '800',
-        color: '#334155',
+        fontSize: FONT_SIZES.xxl,
+        fontWeight: '700',
+        color: COLORS.textStrong,
     },
     practiceInfoBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F8FAFC',
-        paddingVertical: scaleHeight(12),
-        paddingHorizontal: scaleWidth(16),
-        borderRadius: scaleWidth(12),
-        marginBottom: scaleHeight(20),
+        backgroundColor: COLORS.surfaceAlt,
+        paddingVertical: SPACING_H.md,
+        paddingHorizontal: SPACING_W.lg,
+        borderRadius: RADIUS.md,
+        marginBottom: SPACING_H.xl,
         width: '100%',
         borderWidth: 1,
-        borderColor: '#E2E8F0',
+        borderColor: COLORS.border,
+        zIndex: 1,
     },
     practiceInfoText: {
-        fontSize: scaledSize(13),
-        color: '#64748B',
-        fontWeight: '500',
+        fontSize: FONT_SIZES.smPlus,
+        color: COLORS.textSecondary,
+        fontWeight: '400',
         flex: 1,
     },
-    practiceConfirmText: {
-        fontSize: scaledSize(17),
-        fontWeight: '700',
-        color: '#fff',
-    },
-    practiceButtonRow: {
+    // ===== 하단 버튼 =====
+    buttonRow: {
         flexDirection: 'row',
-        gap: scaleWidth(10),
+        columnGap: SPACING_W.md,
         width: '100%',
+        zIndex: 1,
     },
-    retryButton: {
-        flex: 1,
-        backgroundColor: '#EFF6FF',
-        borderRadius: scaleWidth(24),
-        paddingVertical: scaleHeight(14),
+    primaryButton: {
+        width: '100%',
+        height: scaleHeight(48),
+        backgroundColor: COLORS.primary,
+        borderRadius: RADIUS.md,
         alignItems: 'center',
-        borderWidth: 1.5,
-        borderColor: '#E2E8F0',
+        justifyContent: 'center',
+        zIndex: 1,
     },
-    retryButtonText: {
-        fontSize: scaledSize(16),
+    primaryButtonInRow: {
+        flex: 1,
+        width: undefined,
+    },
+    primaryButtonText: {
+        fontSize: FONT_SIZES.lg,
         fontWeight: '700',
-        color: '#334155',
+        color: COLORS.textWhite,
     },
-    // practiceConfirmButton도 flex: 1 추가
-    practiceConfirmButton: {
-        flex: 1,                          // ✅ 추가
-        backgroundColor: '#3B82F6',
-        borderRadius: scaleWidth(24),
-        paddingVertical: scaleHeight(14),
-        alignItems: 'center',             // ✅ center로 변경
-        shadowColor: '#22C55E',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
+    secondaryButton: {
+        flex: 1,
+        height: scaleHeight(48),
+        backgroundColor: COLORS.surfaceAlt,
+        borderRadius: RADIUS.md,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    secondaryButtonText: {
+        fontSize: FONT_SIZES.lg,
+        fontWeight: '700',
+        color: COLORS.textSecondary,
     },
 });

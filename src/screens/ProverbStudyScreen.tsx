@@ -24,9 +24,9 @@ import IconComponent from './common/atomic/IconComponent';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
-import ConfettiCannon from 'react-native-confetti-cannon';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
@@ -44,10 +44,10 @@ const COMMON_ALL_OPTION = {
 	badgeId: '',
 	iconName: 'clipboard-list',
 	iconColor: '#3498db',
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={16} color="#7f8c8d" />,
+	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />,
 	labelStyle: {
-		marginLeft: scaleWidth(6),
-		fontSize: scaledSize(14),
+		marginLeft: SPACING_W.xs,
+		fontSize: FONT_SIZES.md,
 	},
 };
 const LEVEL_DROPDOWN_ITEMS = [
@@ -55,22 +55,22 @@ const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '초급',
 		value: '초급',
-		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={16} color="#85C1E9" />,
+		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color="#85C1E9" />,
 	},
 	{
 		label: '중급',
 		value: '중급',
-		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={16} color="#F4D03F" />,
+		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color="#F4D03F" />,
 	},
 	{
 		label: '고급',
 		value: '고급',
-		icon: () => <IconComponent type="FontAwesome6" name="tree" size={16} color="#e67e22" />,
+		icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color="#e67e22" />,
 	},
 	{
 		label: '특급',
 		value: '특급',
-		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={16} color="#E74C3C" />,
+		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color="#E74C3C" />,
 	},
 ];
 export const FIELD_DROPDOWN_ITEMS = [
@@ -82,7 +82,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'dice',
 		iconColor: '#76d7c4',
-		icon: () => <IconComponent type="FontAwesome6" name="dice" size={16} color="#76d7c4" />,
+		icon: () => <IconComponent type="FontAwesome6" name="dice" size={scaledSize(16)} color="#76d7c4" />,
 	},
 	{
 		label: '인간관계',
@@ -91,7 +91,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome6',
 		iconName: 'users',
 		iconColor: '#76d7c4',
-		icon: () => <IconComponent type="FontAwesome6" name="users" size={16} color="#76d7c4" />,
+		icon: () => <IconComponent type="FontAwesome6" name="users" size={scaledSize(16)} color="#76d7c4" />,
 	},
 	{
 		label: '세상 이치',
@@ -100,7 +100,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'globe',
 		iconColor: '#f4d03f',
-		icon: () => <IconComponent type="FontAwesome5" name="globe" size={16} color="#f4d03f" />,
+		icon: () => <IconComponent type="FontAwesome5" name="globe" size={scaledSize(16)} color="#f4d03f" />,
 	},
 	{
 		label: '근면/검소',
@@ -109,7 +109,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'hammer',
 		iconColor: '#fab1a0',
-		icon: () => <IconComponent type="FontAwesome5" name="hammer" size={16} color="#fab1a0" />,
+		icon: () => <IconComponent type="FontAwesome5" name="hammer" size={scaledSize(16)} color="#fab1a0" />,
 	},
 	{
 		label: '노력/성공',
@@ -118,7 +118,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'medal',
 		iconColor: '#76d7c4',
-		icon: () => <IconComponent type="FontAwesome5" name="medal" size={16} color="#76d7c4" />,
+		icon: () => <IconComponent type="FontAwesome5" name="medal" size={scaledSize(16)} color="#76d7c4" />,
 	},
 	{
 		label: '경계/조심',
@@ -127,7 +127,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'exclamation-triangle',
 		iconColor: '#e74c3c',
-		icon: () => <IconComponent type="FontAwesome5" name="exclamation-triangle" size={16} color="#e74c3c" />,
+		icon: () => <IconComponent type="FontAwesome5" name="exclamation-triangle" size={scaledSize(16)} color="#e74c3c" />,
 	},
 	{
 		label: '욕심/탐욕',
@@ -136,7 +136,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'hand-holding-usd',
 		iconColor: '#fd79a8',
-		icon: () => <IconComponent type="FontAwesome5" name="hand-holding-usd" size={16} color="#fd79a8" />,
+		icon: () => <IconComponent type="FontAwesome5" name="hand-holding-usd" size={scaledSize(16)} color="#fd79a8" />,
 	},
 	{
 		label: '배신/불신',
@@ -145,7 +145,7 @@ export const FIELD_DROPDOWN_ITEMS = [
 		iconType: 'FontAwesome5',
 		iconName: 'user-slash',
 		iconColor: '#bdc3c7',
-		icon: () => <IconComponent type="FontAwesome5" name="user-slash" size={16} color="#bdc3c7" />,
+		icon: () => <IconComponent type="FontAwesome5" name="user-slash" size={scaledSize(16)} color="#bdc3c7" />,
 	},
 ];
 const mascotImages = [
@@ -193,7 +193,7 @@ const reviewPraiseMessages = [
 	'한 번 더 보면 더 오래 기억돼요! 🧱',
 	'꾸준한 복습, 최고예요! 🌟',
 ];
-const DETAIL_FILTER_HEIGHT = 60;
+const DETAIL_FILTER_HEIGHT = scaleHeight(60);
 const IMAGE_HEIGHT = isAndroid ? scaleHeight(220) : scaleHeight(200);
 const QuizStudyScreen = () => {
 	const STORAGE_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
@@ -209,12 +209,23 @@ const QuizStudyScreen = () => {
 	const toastAnimRef = useRef<Animated.CompositeAnimation | null>(null);
 	const scaleAnim = useRef(new Animated.Value(0)).current;
 	const detailFilterHeightAnim = useRef(new Animated.Value(0)).current;
+	const screenFadeAnim = useRef(new Animated.Value(0)).current;
 	const flipAnimRefs = useRef<Record<string, Animated.Value>>({});
 	const pressAnimRefs = useRef<Record<string, Animated.Value>>({});
 	const glowAnimRefs = useRef<Record<string, Animated.Value>>({});
 	const buttonAnimRefs = useRef<Record<string, Animated.Value>>({});
+	// ✅ 화면 안에서 예약되는 모든 setTimeout 을 모아두고 언마운트 시 일괄 정리
+	const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+	const runLater = (fn: () => void, ms: number) => {
+		const timer = setTimeout(fn, ms);
+		timersRef.current.push(timer);
+		return timer;
+	};
 
-	const [mascotImagesQueue, setMascotImagesQueue] = useState<number[]>([]);
+	// ✅ 첫 렌더부터 채워진 상태로 시작 (빈 배열이면 index % 0 = NaN → source undefined 가 됨)
+	const [mascotImagesQueue, setMascotImagesQueue] = useState<number[]>(() =>
+		Array.from({ length: 10 }, () => mascotImages[Math.floor(Math.random() * mascotImages.length)]),
+	);
 	const [isLoading, setIsLoading] = useState(true);
 	const [flippedCard, setFlippedCard] = useState<number | null>(null);
 	const [completedCardId, setCompletedCardId] = useState<number | null>(null);
@@ -236,16 +247,21 @@ const QuizStudyScreen = () => {
 	const [isDetailFilterOpen, setIsDetailFilterOpen] = useState(false);
 	const [levelOpen, setLevelOpen] = useState(false);
 	const [regionOpen, setRegionOpen] = useState(false);
-	const [confettiKey, setConfettiKey] = useState(0);
 	const [showExitModal, setShowExitModal] = useState(false);
 
 	const progress = proverbList.length > 0 ? (studyHistory.studyProverbes ?? []).length / proverbList.length : 0;
 
+	// ✅ 화면 진입 애니메이션 (fade + slide-up)
 	useEffect(() => {
-		// 앱 시작할 때 미리 10개 랜덤 뽑기
-		const randomMascots = Array.from({ length: 10 }, () => mascotImages[Math.floor(Math.random() * mascotImages.length)]);
-		setMascotImagesQueue(randomMascots);
-	}, []);
+		const anim = Animated.timing(screenFadeAnim, {
+			toValue: 1,
+			duration: 300,
+			easing: Easing.out(Easing.quad),
+			useNativeDriver: true,
+		});
+		anim.start();
+		return () => anim.stop();
+	}, [screenFadeAnim]);
 
 	/**
 	 * Info 팝업 업데이트
@@ -259,8 +275,9 @@ const QuizStudyScreen = () => {
 						setLevelOpen(false); // ✅ 드롭다운 닫기
 						setRegionOpen(false); // ✅ 드롭다운 닫기
 					}}
-					style={{ marginRight: scaleWidth(16) }}>
-					<IconComponent type="materialIcons" name="info-outline" size={24} color="#3498db" />
+					hitSlop={{ top: scaleHeight(10), bottom: scaleHeight(10), left: SPACING_W.sm, right: SPACING_W.sm }}
+					style={{ marginRight: SPACING_W.lg }}>
+					<IconComponent type="materialIcons" name="info-outline" size={scaledSize(24)} color={COLORS.secondary} />
 				</TouchableOpacity>
 			),
 		});
@@ -276,24 +293,28 @@ const QuizStudyScreen = () => {
 	}, [proverbList, filter]);
 
 	useEffect(() => {
-		Animated.timing(detailFilterHeightAnim, {
+		const anim = Animated.timing(detailFilterHeightAnim, {
 			toValue: isDetailFilterOpen ? DETAIL_FILTER_HEIGHT : 0,
 			duration: 300,
 			useNativeDriver: false,
-		}).start();
+		});
+		anim.start();
+		return () => anim.stop();
 	}, [isDetailFilterOpen]);
 
 	useEffect(() => {
-		// 뱃지 모달 열릴 때 애니메이션 및 빵빠레 실행
-		if (badgeModalVisible) {
-			setConfettiKey(Math.random());
-			scaleAnim.setValue(0);
-			Animated.spring(scaleAnim, {
-				toValue: 1,
-				bounciness: 12,
-				useNativeDriver: true,
-			}).start();
+		// 뱃지 모달 열릴 때 애니메이션 실행
+		if (!badgeModalVisible) {
+			return;
 		}
+		scaleAnim.setValue(0);
+		const anim = Animated.spring(scaleAnim, {
+			toValue: 1,
+			bounciness: 12,
+			useNativeDriver: true,
+		});
+		anim.start();
+		return () => anim.stop();
 	}, [badgeModalVisible]);
 
 	useEffect(() => {
@@ -304,11 +325,12 @@ const QuizStudyScreen = () => {
 		}
 	}, [levelFilter, regionFilter]);
 
+	// ✅ 화면 재진입 시마다 재조회 (설정 화면에서 학습 기록 초기화/주입이 가능하므로 최신 상태가 필요)
 	useEffect(() => {
 		if (isFocused) {
 			fetchData();
 		}
-	}, []);
+	}, [isFocused]);
 
 	// 레벨 이름/숫자 매핑(재사용용)
 	const LEVEL_NAME_MAP: Record<number, '초급' | '중급' | '고급' | '특급'> = {
@@ -347,13 +369,13 @@ const QuizStudyScreen = () => {
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type="FontAwesome6" name="seedling" size={14} color="#ffffff" />;
+				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={COLORS.textWhite} />;
 			case 2:
-				return <IconComponent type="FontAwesome6" name="leaf" size={14} color="#ffffff" />;
+				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={COLORS.textWhite} />;
 			case 3:
-				return <IconComponent type="FontAwesome6" name="tree" size={14} color="#ffffff" />;
+				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={COLORS.textWhite} />;
 			case 4:
-				return <IconComponent type="FontAwesome6" name="trophy" size={14} color="#ffffff" />;
+				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={COLORS.textWhite} />;
 			default:
 				return null;
 		}
@@ -365,7 +387,7 @@ const QuizStudyScreen = () => {
 			return null;
 		}
 		const matched = FIELD_DROPDOWN_ITEMS.find((i) => i.value === category) as { iconType: string; iconName: string } | undefined;
-		return matched ? <IconComponent type={matched.iconType} name={matched.iconName} size={14} color="#ffffff" /> : null;
+		return matched ? <IconComponent type={matched.iconType} name={matched.iconName} size={scaledSize(14)} color={COLORS.textWhite} /> : null;
 	};
 
 	const fetchData = async () => {
@@ -425,7 +447,7 @@ const QuizStudyScreen = () => {
 			const newQueue = [...prevQueue];
 			const filteredData = getFilteredData();
 			const currentIndex = filteredData.findIndex((p) => p.id === id);
-			if (currentIndex !== -1) {
+			if (currentIndex !== -1 && newQueue.length > 0) {
 				newQueue[currentIndex % newQueue.length] = mascotImages[Math.floor(Math.random() * mascotImages.length)];
 			}
 			return newQueue;
@@ -475,7 +497,7 @@ const QuizStudyScreen = () => {
 		// 또는 조건부 실행
 		const AUTO_SCROLL_ENABLED = false;
 		if (AUTO_SCROLL_ENABLED) {
-			setTimeout(() => {
+			runLater(() => {
 				carouselRef.current?.scrollTo({ index: nextIndex, animated: true });
 				InteractionManager.runAfterInteractions(() => {
 					setCompletedCardId(null);
@@ -507,16 +529,18 @@ const QuizStudyScreen = () => {
 		const newBadgeIds = StudyBadgeInterceptor(updatedHistory);
 		const newBadges = newBadgeIds.filter((id) => !currentBadges.includes(id));
 
+		// ✅ 인자로 받은 객체를 직접 변이하면 setState 가 같은 참조를 받아 리렌더가 스킵된다 → 새 객체로 교체
+		let nextHistory = updatedHistory;
 		if (newBadges.length > 0) {
 			const earnedBadges = CONST_BADGES.filter((b) => newBadges.includes(b.id));
 			setNewlyEarnedBadges(earnedBadges);
 			setBadgeModalVisible(true);
 
-			updatedHistory.badges = [...new Set([...currentBadges, ...newBadges])];
+			nextHistory = { ...updatedHistory, badges: [...new Set([...currentBadges, ...newBadges])] };
 		}
 
-		AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
-		setter(updatedHistory);
+		AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(nextHistory));
+		setter(nextHistory);
 	};
 
 	const showEncourageToast = () => {
@@ -538,7 +562,13 @@ const QuizStudyScreen = () => {
 			useNativeDriver: true,
 		});
 		toastAnimRef.current = inAnim;
-		inAnim.start(() => {
+		inAnim.start(({ finished }) => {
+			// stop() 으로 중단된 경우에도 이 콜백은 finished:false 로 호출된다.
+			// 여기서 걸러내지 않으면 중단된 애니메이션이 숨김 타이머를 남겨,
+			// 뒤이어 뜬 토스트가 예정보다 일찍 사라진다.
+			if (!finished) {
+				return;
+			}
 			// 일정 시간 노출 후 페이드 아웃
 			toastHideTimerRef.current = setTimeout(() => {
 				const outAnim = Animated.timing(toastAnim, {
@@ -557,16 +587,26 @@ const QuizStudyScreen = () => {
 		});
 	};
 
-	// ✅ 언마운트 시 토스트 타이머/애니메이션 정리 (메모리 누수 방지)
+	// ✅ 언마운트 시 토스트/카드/필터 애니메이션 및 예약 타이머 정리 (메모리 누수 방지)
 	useEffect(
 		() => () => {
 			if (toastHideTimerRef.current) {
 				clearTimeout(toastHideTimerRef.current);
+				toastHideTimerRef.current = null;
 			}
 			toastAnimRef.current?.stop();
 			toastAnim.stopAnimation();
+			screenFadeAnim.stopAnimation();
+			scaleAnim.stopAnimation();
+			detailFilterHeightAnim.stopAnimation();
+			[flipAnimRefs, pressAnimRefs, glowAnimRefs, buttonAnimRefs].forEach((store) => {
+				Object.values(store.current).forEach((value) => value.stopAnimation());
+				store.current = {};
+			});
+			timersRef.current.forEach(clearTimeout);
+			timersRef.current = [];
 		},
-		[toastAnim],
+		[toastAnim, screenFadeAnim, scaleAnim, detailFilterHeightAnim],
 	);
 
 	const flipCard = (id: number) => {
@@ -630,7 +670,7 @@ const QuizStudyScreen = () => {
 		setRegionFilter('전체');
 
 		// ✅ 추가: 캐러셀 첫 번째로 이동
-		setTimeout(() => {
+		runLater(() => {
 			const data = getFilteredData();
 			if (carouselRef.current && data.length > 0) {
 				carouselRef.current?.scrollTo({ index: 0, animated: false });
@@ -661,7 +701,7 @@ const QuizStudyScreen = () => {
 	};
 
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
-		const mascot = mascotImagesQueue[index % mascotImagesQueue.length];
+		const mascot = mascotImagesQueue.length > 0 ? mascotImagesQueue[index % mascotImagesQueue.length] : mascotImages[0];
 
 		const proverbId = item.id;
 		const isLearned = studyHistory.studyProverbes.includes(proverbId);
@@ -746,23 +786,24 @@ const QuizStudyScreen = () => {
 						{flippedCard !== proverbId && (
 							// JSX 내부
 							<View style={styles.cardMiddle}>
-								<Text style={styles.hanjaText} numberOfLines={3} adjustsFontSizeToFit>
+								{/* 대표 속담: 가독성이 핵심이라 축소 하한(0.85)을 둬 안드로이드 과축소를 막는다 */}
+								<Text style={styles.hanjaText} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.85}>
 									{item.proverb}
 								</Text>
 
-								<View style={{ alignItems: 'center', justifyContent: 'center', marginBottom: scaleHeight(12) }}>
+								<View style={styles.badgeSection}>
 									{/* 배지 + 태그 한 줄 */}
 									<View style={styles.badgeInlineRow}>
 										{/* 레벨 뱃지 */}
 										<View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.level) }]}>
 											{getLevelIcon(item.level)}
-											<Text style={[styles.badgeText, { marginLeft: scaleWidth(6) }]}>{LEVEL_NAME_MAP[item.level] || '알 수 없음'}</Text>
+											<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{LEVEL_NAME_MAP[item.level] || '알 수 없음'}</Text>
 										</View>
 
 										{/* 카테고리 뱃지 */}
 										<View style={[styles.categoryBadge, { backgroundColor: getFieldColor(item.category) }]}>
 											{getCategoryIcon(item.category)}
-											<Text style={[styles.badgeText, { marginLeft: scaleWidth(4) }]}>{item.category || '미지정'}</Text>
+											<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{item.category || '미지정'}</Text>
 										</View>
 
 										{/* 태그 */}
@@ -790,6 +831,7 @@ const QuizStudyScreen = () => {
 								isLearned ? styles.learnedButton : styles.learningButton,
 								{ opacity: isButtonDisabled ? 0.6 : 1 },
 							]}
+							activeOpacity={0.8}
 							onPress={(e) => {
 								e.stopPropagation(); // ✅ 여기서 이벤트 버블링 차단
 								if (isButtonDisabled) {
@@ -798,7 +840,7 @@ const QuizStudyScreen = () => {
 								setIsButtonDisabled(true); // ✅ 중복 방지
 								handleAnimatedButtonPress(proverbId, () => {
 									completeStudy(proverbId);
-									setTimeout(() => setIsButtonDisabled(false), 1000); // 1초 후 재활성화
+									runLater(() => setIsButtonDisabled(false), 1000); // 1초 후 재활성화
 								});
 							}}
 							disabled={isButtonDisabled}
@@ -815,32 +857,27 @@ const QuizStudyScreen = () => {
 								opacity: backOpacity,
 								transform: [{ scale: backScale }],
 								borderWidth: 1,
-								borderColor: '#E2E8F0',
+								borderColor: COLORS.border,
 								zIndex: flippedCard === proverbId ? 1 : 0, // 보이는 면이 위로
 								position: 'absolute',
 							},
 						]}>
-						<View style={{ flex: 1, backgroundColor: '#ffffff', borderRadius: scaleWidth(16), overflow: 'hidden' }}>
+						<View style={styles.cardBackSurface}>
 							<ScrollView
 								ref={scrollViewRef}
-								style={{ flex: 1, backgroundColor: '#ffffff' }}
+								style={styles.cardBackScroll}
 								onScrollBeginDrag={() => {
 									isBackCardScrollingRef.current = true;
 								}}
 								onScrollEndDrag={() => {
-									setTimeout(() => {
+									runLater(() => {
 										isBackCardScrollingRef.current = false;
 									}, 120);
 								}}
 								onMomentumScrollEnd={() => {
 									isBackCardScrollingRef.current = false;
 								}}
-								contentContainerStyle={{
-									paddingTop: scaleHeight(4),
-									paddingHorizontal: 0,
-									paddingBottom: scaleHeight(80),
-									flexGrow: 1,
-								}}
+								contentContainerStyle={styles.cardBackScrollContent}
 								nestedScrollEnabled
 								removeClippedSubviews={false}
 								showsVerticalScrollIndicator={true}>
@@ -854,7 +891,13 @@ const QuizStudyScreen = () => {
 
 									{/* 뜻 풀이 강조 박스 */}
 									<View style={styles.meaningQuoteBox}>
-										<IconComponent type="fontAwesome6" name="quote-left" size={28} color="#2ecc71" style={{ marginBottom: scaleHeight(8) }} />
+										<IconComponent
+											type="fontAwesome6"
+											name="quote-left"
+											size={scaledSize(24)}
+											color={COLORS.primary}
+											style={{ marginBottom: SPACING_H.sm }}
+										/>
 										<Text style={styles.meaningQuoteText}>{item.longMeaning}</Text>
 									</View>
 									{/* 예문 */}
@@ -912,6 +955,7 @@ const QuizStudyScreen = () => {
 						<View style={styles.fixedBottomButton}>
 							<TouchableOpacity
 								style={[styles.button, isLearned ? styles.learnedButton : styles.learningButton, { opacity: isButtonDisabled ? 0.6 : 1 }]}
+								activeOpacity={0.8}
 								onPress={(e) => {
 									e.stopPropagation(); // 필수!
 									if (isButtonDisabled) {
@@ -920,7 +964,7 @@ const QuizStudyScreen = () => {
 									setIsButtonDisabled(true);
 									handleAnimatedButtonPress(proverbId, () => {
 										completeStudy(proverbId);
-										setTimeout(() => setIsButtonDisabled(false), 1000);
+										runLater(() => setIsButtonDisabled(false), 1000);
 									});
 								}}
 								disabled={isButtonDisabled}
@@ -939,7 +983,21 @@ const QuizStudyScreen = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.main} edges={['top']}>
-				<View style={styles.container}>
+				<Animated.View
+					style={[
+						styles.container,
+						{
+							opacity: screenFadeAnim,
+							transform: [
+								{
+									translateY: screenFadeAnim.interpolate({
+										inputRange: [0, 1],
+										outputRange: [scaleHeight(12), 0],
+									}),
+								},
+							],
+						},
+					]}>
 					<View style={styles.progressHeader}>
 						<View style={styles.progressTopRow}>
 							<Text style={styles.progressTitle}>학습 현황</Text>
@@ -951,7 +1009,12 @@ const QuizStudyScreen = () => {
 						</View>
 
 						<View style={styles.progressBarWrapper}>
-							<View style={[styles.progressBarFill, { width: isLoading ? '0%' : `${progress * 100}%`, backgroundColor: isLoading ? '#bdc3c7' : '#4a90e2' }]} />
+							<View
+								style={[
+									styles.progressBarFill,
+									{ width: isLoading ? '0%' : `${progress * 100}%`, backgroundColor: isLoading ? COLORS.textLight : COLORS.secondary },
+								]}
+							/>
 						</View>
 
 						{/* 기본 필터: 전체 / 학습 중 / 학습 완료 */}
@@ -960,7 +1023,11 @@ const QuizStudyScreen = () => {
 								const value = i === 0 ? 'all' : i === 1 ? 'learning' : 'learned';
 								const isActive = filter === value;
 								return (
-									<TouchableOpacity key={label} onPress={() => setFilter(value)} style={[styles.filterButton, isActive && styles.filterButtonActive]}>
+									<TouchableOpacity
+										key={label}
+										onPress={() => setFilter(value)}
+										activeOpacity={0.8}
+										style={[styles.filterButton, isActive && styles.filterButtonActive]}>
 										<Text style={[styles.filterText, isActive && styles.filterTextActive]}>{label}</Text>
 									</TouchableOpacity>
 								);
@@ -982,12 +1049,16 @@ const QuizStudyScreen = () => {
 										return newState;
 									});
 								}}
+								hitSlop={{ top: scaleHeight(8), bottom: scaleHeight(8), left: SPACING_W.sm, right: SPACING_W.sm }}
 								style={styles.detailToggleButton}>
-								<IconComponent type="materialIcons" name={isDetailFilterOpen ? 'expand-less' : 'expand-more'} size={24} />
+								<IconComponent type="materialIcons" name={isDetailFilterOpen ? 'expand-less' : 'expand-more'} size={scaledSize(24)} />
 							</TouchableOpacity>
 							{/* 🔻 초기화 버튼 추가 */}
-							<TouchableOpacity onPress={resetCard} style={styles.resetButton}>
-								<IconComponent type="materialIcons" name="restart-alt" size={24} color="#e74c3c" />
+							<TouchableOpacity
+								onPress={resetCard}
+								hitSlop={{ top: scaleHeight(8), bottom: scaleHeight(8), left: SPACING_W.sm, right: SPACING_W.sm }}
+								style={styles.resetButton}>
+								<IconComponent type="materialIcons" name="restart-alt" size={scaledSize(24)} color={COLORS.danger} />
 							</TouchableOpacity>
 						</View>
 
@@ -1007,11 +1078,11 @@ const QuizStudyScreen = () => {
 											placeholder="난이도"
 											style={styles.dropdown}
 											textStyle={{
-												fontSize: scaledSize(14), // 더 작게
-												color: '#2c3e50',
+												fontSize: FONT_SIZES.md,
+												color: COLORS.textStrong,
 												fontWeight: '500',
 											}}
-											placeholderStyle={{ color: '#95a5a6', fontSize: scaledSize(14) }}
+											placeholderStyle={{ color: COLORS.textLight, fontSize: FONT_SIZES.md }}
 											dropDownContainerStyle={styles.dropdownList}
 											containerStyle={{ zIndex: 3000 }}
 											zIndex={9999} // 높게 설정
@@ -1019,7 +1090,7 @@ const QuizStudyScreen = () => {
 											listMode="SCROLLVIEW" /* 스크롤뷰 모드로 변경 */
 										/>
 									</View>
-									<View style={{ width: scaleWidth(8) }} />
+									<View style={{ width: SPACING_W.sm }} />
 									<View style={{ flex: 1, zIndex: levelOpen ? 1000 : 2000 }}>
 										<DropDownPicker
 											listMode="MODAL"
@@ -1041,26 +1112,27 @@ const QuizStudyScreen = () => {
 											zIndex={5000}
 											zIndexInverse={4000}
 											containerStyle={{ zIndex: 5000 }}
-											labelStyle={{ fontSize: scaledSize(14), color: '#2c3e50' }}
-											iconContainerStyle={{ marginRight: scaleWidth(8) }}
+											labelStyle={{ fontSize: FONT_SIZES.md, color: COLORS.textStrong }}
+											iconContainerStyle={{ marginRight: SPACING_W.sm }}
 											showArrowIcon={true}
 											showTickIcon={false}
 											renderListItem={({ item, onPress }) => (
 												<TouchableOpacity
 													//@ts-ignore
 													onPress={() => onPress(item)}
+													activeOpacity={0.8}
 													style={{
 														flexDirection: 'row',
 														alignItems: 'center',
-														paddingVertical: scaleHeight(14),
-														paddingHorizontal: scaleWidth(16),
+														paddingVertical: SPACING_H.md,
+														paddingHorizontal: SPACING_W.lg,
 														borderBottomWidth: 1,
-														borderBottomColor: '#ecf0f1',
+														borderBottomColor: COLORS.border,
 													}}>
-													<View style={{ width: scaleWidth(28), alignItems: 'center', marginRight: scaleWidth(12) }}>
+													<View style={{ width: scaleWidth(28), alignItems: 'center', marginRight: SPACING_W.md }}>
 														{typeof item.icon === 'function' ? item.icon() : item.icon}
 													</View>
-													<Text style={{ fontSize: scaledSize(15), color: '#2c3e50', flex: 1 }}>{item.label}</Text>
+													<Text style={{ fontSize: FONT_SIZES.mdPlus, color: COLORS.textStrong, flex: 1 }}>{item.label}</Text>
 												</TouchableOpacity>
 											)}
 											modalProps={{
@@ -1073,25 +1145,25 @@ const QuizStudyScreen = () => {
 												width: '85%',
 												alignSelf: 'center',
 												maxHeight: scaleHeight(500),
-												backgroundColor: '#ffffff',
+												backgroundColor: COLORS.surface,
 												borderWidth: 1,
-												borderColor: '#bdc3c7',
-												borderRadius: scaleWidth(20),
+												borderColor: COLORS.border,
+												borderRadius: RADIUS.xl,
 												paddingHorizontal: 0,
-												paddingVertical: scaleHeight(20),
+												paddingVertical: SPACING_H.xl,
 												shadowColor: '#000',
-												shadowOpacity: 0.15,
-												shadowOffset: { width: 0, height: scaleHeight(6) },
-												shadowRadius: scaleWidth(8),
+												shadowOpacity: 0.08,
+												shadowOffset: { width: 0, height: 2 },
+												shadowRadius: 8,
 												position: 'relative',
 											}}
 											modalTitleStyle={{
-												fontSize: scaledSize(16),
-												fontWeight: 'bold',
-												color: '#2c3e50',
+												fontSize: FONT_SIZES.lg,
+												fontWeight: '700',
+												color: COLORS.textStrong,
 												textAlign: 'center',
-												paddingVertical: scaleHeight(12),
-												paddingHorizontal: scaleWidth(16),
+												paddingVertical: SPACING_H.md,
+												paddingHorizontal: SPACING_W.lg,
 												paddingRight: scaleWidth(40),
 											}}
 											closeIconStyle={{
@@ -1101,8 +1173,8 @@ const QuizStudyScreen = () => {
 											}}
 											closeIconContainerStyle={{
 												position: 'absolute',
-												right: scaleWidth(12),
-												top: scaleHeight(12),
+												right: SPACING_W.md,
+												top: SPACING_H.md,
 												padding: scaleWidth(4),
 												zIndex: 1,
 											}}
@@ -1115,7 +1187,7 @@ const QuizStudyScreen = () => {
 
 					{isLoading ? (
 						<View style={styles.loadingContainer}>
-							<ActivityIndicator size="large" color="#4a90e2" />
+							<ActivityIndicator size="large" color={COLORS.secondary} />
 							<Text style={styles.loadingText}>속담 정보를 불러오는 중...</Text>
 						</View>
 					) : getFilteredData().length === 0 ? (
@@ -1168,17 +1240,18 @@ const QuizStudyScreen = () => {
 					<View style={styles.studyEndWrapper}>
 						<TouchableOpacity
 							style={styles.studyEndButton}
+							activeOpacity={0.8}
 							onPress={() => {
 								setLevelOpen(false);
 								setRegionOpen(false);
-								setTimeout(() => {
+								runLater(() => {
 									setShowExitModal(true); // ✅ 약간의 delay를 주면 Modal 정상 출력
 								}, 200);
 							}}>
 							<Text style={styles.studyEndText}>학습 종료</Text>
 						</TouchableOpacity>
 					</View>
-				</View>
+				</Animated.View>
 			</SafeAreaView>
 
 			<Modal visible={showExitModal} transparent animationType="fade">
@@ -1186,22 +1259,34 @@ const QuizStudyScreen = () => {
 					<View style={styles.exitModalBox}>
 						{/* 헤더 아이콘 + 타이틀 */}
 						<View style={styles.exitHeader}>
-							<IconComponent type="FontAwesome6" name="circle-xmark" size={isTablet ? 42 : 32} color="#e74c3c" style={{ marginBottom: scaleHeight(8) }} />
-							<Text style={[styles.exitTitle, isTablet && { fontSize: scaledSize(22) }]}>진행 중인 학습을 종료하시겠어요?</Text>
+							<IconComponent
+								type="FontAwesome6"
+								name="circle-xmark"
+								size={scaledSize(isTablet ? 42 : 32)}
+								color={COLORS.danger}
+								style={{ marginBottom: SPACING_H.sm }}
+							/>
+							<Text style={[styles.exitTitle, isTablet && { fontSize: FONT_SIZES.heading, lineHeight: scaledSize(32) }]}>
+								진행 중인 학습을 종료하시겠어요?
+							</Text>
 						</View>
 
 						{/* 본문 */}
-						<Text style={[styles.exitSub, isTablet && { fontSize: scaledSize(16), lineHeight: scaleHeight(24) }]}>
+						<Text style={[styles.exitSub, isTablet && { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(24) }]}>
 							학습 기록은 저장되지 않으며, 홈 화면으로 이동합니다.
 						</Text>
 
 						{/* 버튼 */}
 						<View style={styles.exitButtonRow}>
-							<TouchableOpacity style={[styles.exitButton, { backgroundColor: '#95a5a6' }]} onPress={() => setShowExitModal(false)}>
-								<Text style={styles.exitButtonText}>취소</Text>
+							<TouchableOpacity
+								style={[styles.exitButton, { backgroundColor: COLORS.surfaceAlt }]}
+								activeOpacity={0.8}
+								onPress={() => setShowExitModal(false)}>
+								<Text style={[styles.exitButtonText, { color: COLORS.text }]}>취소</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
-								style={[styles.exitButton, { backgroundColor: '#e74c3c' }]}
+								style={[styles.exitButton, { backgroundColor: COLORS.danger }]}
+								activeOpacity={0.8}
 								onPress={() => {
 									setShowExitModal(false);
 									navigation.goBack();
@@ -1216,8 +1301,8 @@ const QuizStudyScreen = () => {
 			{showToast &&
 				(() => {
 					const isComplete = typeof completedCardId === 'number' && (studyHistory.studyProverbes ?? []).includes(completedCardId);
-					const accent = isComplete ? '#22C55E' : '#3B82F6';
-					const accentSoft = isComplete ? '#DCFCE7' : '#DBEAFE';
+					const accent = isComplete ? COLORS.primary : COLORS.secondary;
+					const accentSoft = isComplete ? COLORS.primarySoft : COLORS.secondarySoft;
 					const learnedCount = (studyHistory.studyProverbes ?? []).length;
 					const totalCount = proverbList.length;
 					const pct = totalCount > 0 ? Math.min(Math.round((learnedCount / totalCount) * 100), 100) : 0;
@@ -1246,12 +1331,7 @@ const QuizStudyScreen = () => {
 								]}>
 								{/* 상단 상태 칩 */}
 								<View style={[styles.toastPill, { backgroundColor: accentSoft }]}>
-									<IconComponent
-										type="materialIcons"
-										name={isComplete ? 'check-circle' : 'menu-book'}
-										size={scaledSize(13)}
-										color={accent}
-									/>
+									<IconComponent type="materialIcons" name={isComplete ? 'check-circle' : 'menu-book'} size={scaledSize(13)} color={accent} />
 									<Text style={[styles.toastPillText, { color: accent }]}>{isComplete ? '학습 완료' : '복습 시작'}</Text>
 								</View>
 
@@ -1288,120 +1368,120 @@ const QuizStudyScreen = () => {
 const styles = StyleSheet.create({
 	main: {
 		flex: 1,
-		backgroundColor: '#ffffff',
+		backgroundColor: COLORS.surface,
 	},
 	container: {
 		flex: 1,
-		backgroundColor: '#ffffff',
+		backgroundColor: COLORS.surface,
 	},
 	cardWrapper: {
 		height: scaleHeight(812 * 0.7),
 		width: '100%',
 		alignItems: 'center',
 		justifyContent: 'flex-start',
-		paddingTop: scaleHeight(-10), // 위로 땡기기
 	},
 	cardFront: {
 		width: scaleWidth(370), // ✅ 내부 카드(cardFace)와 같은 크기로
 		height: CARD_HEIGHT, // ✅ 앞/뒷면(cardFace)과 동일 높이로 맞춰 크로스페이드 중 빈 영역 방지
-		borderRadius: scaleWidth(20),
-		backgroundColor: '#ffffff', // ✅ 플립 전환 중에도 카드 영역이 항상 흰색으로 가득 채워지도록
+		borderRadius: RADIUS.lg,
+		backgroundColor: COLORS.surface, // ✅ 플립 전환 중에도 카드 영역이 항상 흰색으로 가득 채워지도록
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 	flagContainer: {
 		width: isTablet ? scaleWidth(180) : scaleWidth(260),
 		height: isTablet ? scaleWidth(160) : scaleWidth(260),
-		backgroundColor: '#f8f9fa',
-		borderRadius: scaleWidth(12),
+		backgroundColor: COLORS.background,
+		borderRadius: RADIUS.md,
 		overflow: 'hidden',
-		borderColor: '#e0e0e0',
+		borderColor: COLORS.border,
 		borderWidth: 1,
 	},
 	progressHeader: {
-		paddingTop: scaleHeight(12),
-		backgroundColor: '#ffffff',
+		paddingTop: SPACING_H.md,
+		backgroundColor: COLORS.surface,
 		alignItems: 'center',
 		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		borderRadius: scaleWidth(16),
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.lg,
 		paddingBottom: 0,
-		marginHorizontal: scaleWidth(12),
+		marginHorizontal: SPACING_W.lg,
 	},
 	progressTopRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginBottom: scaleHeight(3),
+		marginBottom: SPACING_H.xs,
 	},
 	progressTitle: {
-		fontSize: scaledSize(16),
-		fontWeight: '600',
-		color: '#2c3e50',
-		marginRight: scaleWidth(10),
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		marginRight: SPACING_W.sm,
 	},
 	progressBadge: {
-		backgroundColor: '#4a90e2',
-		paddingVertical: scaleHeight(4),
-		paddingHorizontal: scaleWidth(10),
-		borderRadius: scaleWidth(12),
+		backgroundColor: COLORS.secondary,
+		paddingVertical: SPACING_H.xs,
+		paddingHorizontal: SPACING_W.md,
+		borderRadius: RADIUS.round,
 	},
 	progressBadgeText: {
-		color: '#ffffff',
-		fontSize: scaledSize(14),
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.md,
 		fontWeight: '600',
 	},
 	filterContainer: {
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: scaleHeight(12),
+		marginTop: SPACING_H.md,
 	},
 	filterButton: {
 		borderWidth: 1,
-		borderColor: '#4a90e2',
-		borderRadius: scaleWidth(16),
-		paddingVertical: scaleHeight(6), // 기존보다 약간 증가
-		paddingHorizontal: scaleWidth(14), // 기존보다 증가
-		marginHorizontal: scaleWidth(4),
-		backgroundColor: '#ffffff',
-		minHeight: scaleHeight(24), // 기존보다 높게
+		borderColor: COLORS.secondary,
+		borderRadius: RADIUS.round,
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.md,
+		marginHorizontal: SPACING_W.xs,
+		backgroundColor: COLORS.surface,
+		minHeight: scaleHeight(32),
 		justifyContent: 'center',
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.md,
 	},
 
 	filterText: {
-		fontSize: scaledSize(13), // 기존보다 크게
-		color: '#4a90e2',
-		lineHeight: scaleHeight(20),
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.secondary,
+		fontWeight: '600',
+		lineHeight: scaledSize(18),
 		textAlign: 'center',
 	},
 	filterButtonActive: {
-		backgroundColor: '#4a90e2',
+		backgroundColor: COLORS.secondary,
 	},
 	filterTextActive: {
-		color: '#ffffff',
+		color: COLORS.textWhite,
 	},
 	button: {
 		height: scaleHeight(50),
-		marginTop: scaleHeight(16),
-		borderRadius: scaleWidth(30),
-		backgroundColor: '#3498db',
+		marginTop: SPACING_H.lg,
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.secondary,
 		justifyContent: 'center',
 		alignItems: 'center', // ✅ 변경 (기존 `alignContent` → `alignItems`)
 		width: '100%', // ✅ 항상 100% 사용
 		alignSelf: 'center', // ✅ 중앙 정렬
 	},
 	learnedButton: {
-		backgroundColor: '#f39c12',
+		backgroundColor: COLORS.warning,
 	},
 	learningButton: {
-		backgroundColor: '#2ecc71',
+		backgroundColor: COLORS.primary,
 	},
 	buttonText: {
-		color: 'white',
-		fontSize: scaledSize(18),
-		fontWeight: '600',
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.lg,
+		fontWeight: '700',
 		letterSpacing: 0.5,
 		textAlign: 'center',
 	},
@@ -1412,22 +1492,23 @@ const styles = StyleSheet.create({
 		paddingVertical: scaleHeight(40),
 	},
 	loadingText: {
-		marginTop: scaleHeight(10),
-		fontSize: scaledSize(16),
-		color: '#7f8c8d',
+		marginTop: SPACING_H.md,
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		lineHeight: scaledSize(21),
 	},
 	progressBarWrapper: {
 		width: '80%',
 		height: scaleHeight(10),
-		borderRadius: scaleWidth(5),
-		backgroundColor: '#e0e0e0',
-		marginTop: scaleHeight(10),
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.surfaceAlt,
+		marginTop: SPACING_H.sm,
 		overflow: 'hidden',
 	},
 	progressBarFill: {
 		height: '100%',
-		borderRadius: scaleWidth(5),
-		backgroundColor: '#4a90e2',
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.secondary,
 	},
 	carouselContainer: {
 		flex: 1,
@@ -1437,35 +1518,53 @@ const styles = StyleSheet.create({
 	cardFace: {
 		width: scaleWidth(370),
 		height: CARD_HEIGHT, // ✅ 여기 반영
-		backgroundColor: '#ffffff',
-		borderRadius: scaleWidth(20),
-		padding: scaleWidth(20),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(6) },
-		shadowOpacity: 0.15,
-		shadowRadius: 10,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 		justifyContent: 'space-between',
 		alignSelf: 'center',
 		borderWidth: 1,
-		borderColor: '#e0e0e0', // ✅ 테두리 추가
+		borderColor: COLORS.border, // ✅ 테두리 추가
 	},
 
 	cardFace2: {
 		width: scaleWidth(370),
 		height: CARD_HEIGHT, // ✅ 여기 반영
-		backgroundColor: '#ffffff',
-		borderRadius: scaleWidth(20),
-		padding: scaleWidth(10),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.sm,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(6) },
-		shadowOpacity: 0.15,
-		shadowRadius: 10,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 		justifyContent: 'space-between',
 		alignSelf: 'center',
 	},
+	cardBackSurface: {
+		flex: 1,
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.md,
+		overflow: 'hidden',
+	},
+	cardBackScroll: {
+		flex: 1,
+		backgroundColor: COLORS.surface,
+	},
+	cardBackScrollContent: {
+		paddingTop: SPACING_H.xs,
+		paddingHorizontal: 0,
+		paddingBottom: scaleHeight(80),
+		flexGrow: 1,
+	},
 	modalOverlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.4)', // 어두운 배경 복원
+		backgroundColor: COLORS.dim, // 어두운 배경 복원
 		justifyContent: 'center',
 		alignItems: 'center',
 		zIndex: 99999,
@@ -1475,158 +1574,57 @@ const styles = StyleSheet.create({
 		width: '100%',
 		height: IMAGE_HEIGHT, // ✅ 조건부 높이 적용
 		alignItems: 'center',
-		marginBottom: scaleHeight(12), // 👈 이미지 아래 공간 확보
-	},
-	flipIconOutside: {
-		position: 'absolute',
-		top: scaleHeight(-12),
-		right: scaleWidth(20),
-		backgroundColor: '#ffffff',
-		borderRadius: scaleWidth(20),
-		padding: scaleWidth(6),
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.2,
-		shadowRadius: 2,
-	},
-	capitalInfo: {
-		marginBottom: scaleHeight(40),
-	},
-
-	capitalWrapper: {
-		alignItems: 'center',
-		marginTop: scaleHeight(40),
-		marginBottom: scaleHeight(20),
-		paddingHorizontal: scaleWidth(30),
-	},
-
-	sectionLabel: {
-		fontSize: scaledSize(18),
-		color: '#ffeaa7',
-		fontWeight: '600',
-		marginBottom: scaleHeight(6),
-		textAlign: 'center',
+		marginBottom: SPACING_H.md, // 👈 이미지 아래 공간 확보
 	},
 	cardHint: {
-		fontSize: scaledSize(16),
-		color: '#7f8c8d',
-		marginTop: scaleHeight(20),
-	},
-	modalCloseIcon: {
-		position: 'absolute',
-		top: scaleHeight(12),
-		right: scaleWidth(12),
-		padding: scaleWidth(8),
-		zIndex: 10,
-	},
-
-	closeButtonText: {
-		color: 'white',
-		fontWeight: '600',
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		lineHeight: scaledSize(21),
+		textAlign: 'center',
+		marginTop: SPACING_H.lg,
 	},
 	toastCard: {
 		width: scaleWidth(300),
 		maxWidth: '88%',
-		backgroundColor: '#FFFFFF',
-		borderRadius: scaleWidth(24),
-		paddingTop: scaleHeight(14),
-		paddingBottom: scaleHeight(18),
-		paddingHorizontal: scaleWidth(22),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
+		paddingTop: SPACING_H.lg,
+		paddingBottom: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.lg,
 		borderWidth: 1,
-		borderColor: '#EEF2F7',
+		borderColor: COLORS.border,
 		alignItems: 'center',
-		shadowColor: '#0F172A',
-		shadowOffset: { width: 0, height: scaleHeight(10) },
-		shadowOpacity: 0.16,
-		shadowRadius: scaleWidth(22),
-		elevation: 10,
-	},
-	badgeModal: {
-		backgroundColor: '#ffffff',
-		padding: scaleWidth(20),
-		borderRadius: scaleWidth(20),
-		width: '85%',
-		maxHeight: '80%',
-		alignItems: 'center',
-	},
-	badgeModalTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(16),
-		textAlign: 'center',
-	},
-	badgeItem: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(12),
-		marginBottom: scaleHeight(12),
-		width: '100%',
-		borderRadius: scaleWidth(12),
-		borderWidth: 1.2,
-		borderColor: '#d1f2eb',
-		backgroundColor: '#f9fefc',
-	},
-	badgeIconWrap: {
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginRight: scaleWidth(6),
-	},
-	badgeName: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#27ae60',
-		marginBottom: scaleHeight(2),
-	},
-	badgeTextWrap: {
-		flexShrink: 1,
-		flexGrow: 1,
-		minWidth: 0,
-		maxWidth: '85%',
-	},
-	badgeDescription: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		lineHeight: scaleHeight(20),
-	},
-	modalConfirmButton2: {
-		backgroundColor: '#2980b9',
-		paddingVertical: scaleHeight(14),
-		paddingHorizontal: scaleWidth(36),
-		borderRadius: scaleWidth(30),
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
 	toastPill: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(4),
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(4),
-		borderRadius: scaleWidth(999),
+		columnGap: SPACING_W.xs,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
 	},
 	toastPillText: {
-		fontSize: scaledSize(11.5),
-		fontWeight: '800',
+		fontSize: FONT_SIZES.xs,
+		fontWeight: '700',
 	},
 	toastHalo: {
 		width: scaleWidth(88),
 		height: scaleWidth(88),
-		borderRadius: scaleWidth(44),
+		borderRadius: scaleWidth(88) / 2,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: scaleHeight(12),
-		marginBottom: scaleHeight(12),
+		marginTop: SPACING_H.md,
+		marginBottom: SPACING_H.md,
 	},
 	toastHaloInner: {
 		width: scaleWidth(70),
 		height: scaleWidth(70),
-		borderRadius: scaleWidth(35),
-		backgroundColor: '#FFFFFF',
+		borderRadius: scaleWidth(70) / 2,
+		backgroundColor: COLORS.surface,
 		borderWidth: 2,
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -1634,51 +1632,50 @@ const styles = StyleSheet.create({
 	toastMascot: {
 		width: scaleWidth(52),
 		height: scaleWidth(52),
-		borderRadius: scaleWidth(14),
+		borderRadius: RADIUS.md,
 	},
 	toastPraise: {
 		alignSelf: 'stretch', // ✅ 카드 폭에 맞춰 줄바꿈 (긴 문구 오른쪽 잘림 방지)
 		width: '100%',
 		flexShrink: 1,
-		fontSize: scaledSize(13.5),
-		color: '#334155',
-		lineHeight: scaleHeight(20),
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.text,
+		lineHeight: scaledSize(20),
 		fontWeight: '700',
 		textAlign: 'center',
-		paddingHorizontal: scaleWidth(2),
-		marginBottom: scaleHeight(14),
+		marginBottom: SPACING_H.md,
 	},
 	toastProgressRow: {
 		width: '100%',
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xs,
 	},
 	toastProgressLabel: {
-		fontSize: scaledSize(11.5),
+		fontSize: FONT_SIZES.xs,
 		fontWeight: '700',
-		color: '#94A3B8',
+		color: COLORS.textLight,
 	},
 	toastProgressValue: {
-		fontSize: scaledSize(12.5),
-		fontWeight: '800',
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '700',
 	},
 	toastProgressPct: {
-		fontSize: scaledSize(11.5),
+		fontSize: FONT_SIZES.xs,
 		fontWeight: '700',
-		color: '#94A3B8',
+		color: COLORS.textLight,
 	},
 	toastProgressTrack: {
 		width: '100%',
 		height: scaleHeight(7),
-		borderRadius: scaleHeight(4),
-		backgroundColor: '#EEF2F7',
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.surfaceAlt,
 		overflow: 'hidden',
 	},
 	toastProgressFill: {
 		height: '100%',
-		borderRadius: scaleHeight(4),
+		borderRadius: RADIUS.round,
 	},
 	toastWrapper: {
 		// 전체화면 중앙 오버레이 (퍼센트 top 제거 → 위치 어긋남/잘림 방지)
@@ -1690,213 +1687,152 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		zIndex: 999,
-		elevation: 999,
 	},
 	emptyWrapper: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(24),
-		backgroundColor: '#f5f6fa',
+		paddingHorizontal: SPACING_W.lg,
+		backgroundColor: COLORS.background,
 	},
 	emptyImage: {
 		width: scaleWidth(140),
 		height: scaleWidth(140),
-		marginBottom: scaleHeight(20),
+		marginBottom: SPACING_H.xl,
 		opacity: 0.6,
 	},
 	emptyText: {
-		fontSize: scaledSize(16),
-		color: '#7f8c8d',
+		fontSize: FONT_SIZES.lg,
+		color: COLORS.textSecondary,
 		textAlign: 'center',
-		lineHeight: scaleHeight(24),
-	},
-	filterSection: {
-		paddingTop: scaleHeight(10),
-		backgroundColor: '#ffffff',
-	},
-	basicFilterRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
+		lineHeight: scaledSize(24),
 	},
 	detailToggleButton: {
-		marginLeft: scaleWidth(8),
+		marginLeft: SPACING_W.sm,
 		padding: scaleWidth(4),
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.md,
 	},
 	detailFilterWrapper: {
 		width: '100%',
-		backgroundColor: '#ffffff',
+		backgroundColor: COLORS.surface,
 		paddingTop: 0,
-		paddingHorizontal: scaleWidth(20),
+		paddingHorizontal: SPACING_W.lg,
 		zIndex: 9999,
 	},
 	subFilterRow: {
 		flexDirection: 'row',
-		paddingHorizontal: scaleWidth(5),
 	},
 	resetButton: {
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.sm,
 		padding: scaleWidth(4),
-		marginBottom: scaleHeight(10),
-	},
-	badgeCardActive: {
-		borderColor: '#27ae60',
-		backgroundColor: '#eafaf1',
-	},
-	iconBox: {
-		width: scaleWidth(32),
-		height: scaleWidth(32),
-		borderRadius: scaleWidth(16),
-		backgroundColor: '#e0e0e0',
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginRight: scaleWidth(12),
-	},
-	iconBoxActive: {
-		backgroundColor: '#d0f0dc',
-	},
-	badgeTitleActive: {
-		color: '#27ae60',
-	},
-	badgeDescActive: {
-		color: '#1e8449',
-	},
-	statusCardValue: {
-		fontSize: scaledSize(16),
-		fontWeight: 'bold',
-		color: '#2c3e50',
-	},
-	badgeCard: {
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		backgroundColor: '#f8f9fa',
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(12),
-		marginBottom: scaleHeight(10),
-		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		width: '100%',
+		marginBottom: SPACING_H.md,
 	},
 	dropdown: {
-		backgroundColor: '#ffffff',
-		borderColor: '#ecf0f1',
+		backgroundColor: COLORS.surface,
+		borderColor: COLORS.border,
 		borderWidth: 1,
-		borderRadius: scaleWidth(8),
-		paddingHorizontal: scaleWidth(8), // 여백도 줄임
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.md,
 	},
 	dropdownList: {
-		backgroundColor: '#ffffff',
-		borderColor: '#ecf0f1',
+		backgroundColor: COLORS.surface,
+		borderColor: COLORS.border,
 		borderWidth: 1,
-		borderRadius: scaleWidth(12),
+		borderRadius: RADIUS.md,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(1) },
+		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.06,
-		shadowRadius: scaleWidth(2),
+		shadowRadius: 8,
 		paddingBottom: 0,
 		marginBottom: 0,
 	},
 	studyEndWrapper: {
 		width: '100%',
 		alignItems: 'center',
-		paddingVertical: scaleHeight(12),
+		paddingVertical: SPACING_H.md,
 		paddingBottom: scaleHeight(Platform.OS === 'android' ? 30 : 20), // ← 이 부분을 조정
 		borderTopWidth: 1,
-		borderColor: '#ecf0f1',
+		borderColor: COLORS.border,
 	},
 	studyEndButton: {
-		backgroundColor: '#7f8c8d',
-		paddingVertical: scaleHeight(12),
-		paddingHorizontal: scaleWidth(24),
-		borderRadius: scaleWidth(24),
+		backgroundColor: COLORS.surfaceAlt,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.xxl,
+		borderRadius: RADIUS.md,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 	},
 	studyEndText: {
-		color: '#ffffff',
-		fontSize: scaledSize(14),
-		fontWeight: 'bold',
+		color: COLORS.textSecondary,
+		fontSize: FONT_SIZES.md,
+		fontWeight: '700',
 	},
 	exitModalBox: {
 		width: '80%',
-		backgroundColor: '#ffffff',
-		padding: scaleWidth(24),
-		borderRadius: scaleWidth(16),
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.xl,
+		paddingVertical: SPACING_H.xl,
+		borderRadius: RADIUS.xl,
 		alignItems: 'center',
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: scaleHeight(4) },
-		shadowOpacity: 0.15,
-		shadowRadius: 6,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
 	},
 	exitHeader: {
 		alignItems: 'center',
-		marginBottom: scaleHeight(12),
+		marginBottom: SPACING_H.md,
 	},
 	exitTitle: {
-		fontSize: scaledSize(18),
-		fontWeight: 'bold',
-		color: '#2c3e50',
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 		textAlign: 'center',
+		lineHeight: scaledSize(26),
 	},
 	exitSub: {
-		fontSize: scaledSize(14),
-		color: '#7f8c8d',
-		marginBottom: scaleHeight(20),
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		marginBottom: SPACING_H.xl,
 		textAlign: 'center',
-		lineHeight: scaleHeight(20),
+		lineHeight: scaledSize(21),
 	},
 	exitButtonRow: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+		columnGap: SPACING_W.sm,
 		width: '100%',
-		marginTop: scaleHeight(4),
+		marginTop: SPACING_H.xs,
 	},
 	exitButton: {
 		flex: 1,
-		marginHorizontal: scaleWidth(4),
-		paddingVertical: scaleHeight(12),
-		borderRadius: scaleWidth(8),
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 3,
+		justifyContent: 'center',
+		minHeight: scaleHeight(44),
 	},
 	exitButtonText: {
-		color: '#ffffff',
-		fontWeight: 'bold',
-		fontSize: scaledSize(15),
-	},
-	flagImage: {
-		width: '100%',
-		aspectRatio: 1.6,
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#f8f9fa',
-		borderColor: '#e0e0e0',
-		borderWidth: 1,
+		color: COLORS.textWhite,
+		fontWeight: '700',
+		fontSize: FONT_SIZES.mdPlus,
 	},
 	cardMiddle: {
 		flex: 1,
 		marginTop: scaleHeight(70),
 		alignItems: 'center',
 		justifyContent: 'center',
-		paddingHorizontal: scaleWidth(10), // ✅ 좌우 여백
+		paddingHorizontal: 0, // ✅ 좌우 여백은 cardFace(SPACING_W.lg)에서 일괄 처리
 		width: '100%', // ✅ 부모 크기에 맞추기
 	},
 
 	fixedBottomButton: {
 		position: 'absolute',
-		bottom: scaleHeight(20),
+		bottom: SPACING_H.xl,
 		left: 0,
 		right: 0,
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(20), // ➕ 여백만큼 padding으로 처리
-	},
-	subMascotImage: {
-		width: '100%',
-		aspectRatio: 1,
-		resizeMode: 'contain',
-		alignSelf: 'center',
+		paddingHorizontal: SPACING_W.lg, // ➕ 앞면 카드와 동일한 좌우 여백
 	},
 	flagImageSquare: {
 		// width: '100%',
@@ -1905,221 +1841,159 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 	},
 	hanjaText: {
-		fontSize: scaledSize(28),
-		fontWeight: 'bold',
-		color: '#2c3e50',
+		fontSize: FONT_SIZES.display,
+		fontWeight: '700',
+		color: COLORS.textStrong,
 		textAlign: 'center',
-		marginBottom: scaleHeight(12),
-		letterSpacing: 2, // ✅ 기존보다 줄임
+		lineHeight: scaledSize(38),
+		marginBottom: SPACING_H.md,
+		letterSpacing: 1, // ✅ 기존보다 줄임
 		flexShrink: 1, // ✅ 넘칠 경우 줄이도록
 		width: '100%', // ✅ 부모 영역 꽉 차게
 	},
 
 	hangulText: {
-		fontSize: scaledSize(18),
-		color: '#7f8c8d',
+		fontSize: FONT_SIZES.lg,
+		color: COLORS.textSecondary,
 		fontWeight: '500',
 		textAlign: 'center',
-		marginBottom: scaleHeight(8),
+		lineHeight: scaledSize(24),
+		marginBottom: SPACING_H.sm,
+	},
+	badgeSection: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		width: '100%',
+		marginBottom: SPACING_H.md,
 	},
 	cardBackContainer: {
 		flexGrow: 1,
-		paddingHorizontal: scaleWidth(12),
-		paddingTop: scaleHeight(12),
-		paddingBottom: scaleHeight(30),
-		backgroundColor: '#ffffff', // 더 깔끔한 흰색 배경
-		borderRadius: scaleWidth(20),
+		paddingHorizontal: SPACING_W.sm,
+		paddingTop: SPACING_H.md,
+		paddingBottom: SPACING_H.xl,
+		backgroundColor: COLORS.surface, // 더 깔끔한 흰색 배경
+		borderRadius: RADIUS.md,
 		width: '100%',
 	},
 
-	cardTitle: {
-		fontSize: scaledSize(20),
-		fontWeight: '700',
-		color: '#2980b9',
-		textAlign: 'center',
-		marginBottom: scaleHeight(14),
-	},
-
 	sectionTitle: {
-		fontSize: scaledSize(15),
+		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
-		color: '#2c3e50',
-		marginBottom: scaleHeight(12),
+		color: COLORS.textStrong,
+		lineHeight: scaledSize(22),
+		marginBottom: SPACING_H.sm,
 	},
 
 	meaningBox: {
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#fef9e7', // 밝은 크림색
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.warningBg, // 밝은 크림색
 		borderWidth: 1,
-		borderColor: '#f4d03f', // 옅은 옐로 보더
-		padding: scaleWidth(14),
-		marginBottom: scaleHeight(12),
+		borderColor: COLORS.warning, // 옅은 옐로 보더
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		marginBottom: SPACING_H.md,
 	},
 
 	exampleBox: {
-		backgroundColor: '#e3f2fd', // 연한 하늘색
-		borderRadius: scaleWidth(12),
-		padding: scaleWidth(14),
-		marginBottom: scaleHeight(6),
+		backgroundColor: COLORS.secondaryBg, // 연한 하늘색
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		marginBottom: SPACING_H.md,
 	},
 
 	sectionContent: {
-		fontSize: scaledSize(15),
-		color: '#2c3e50',
-		lineHeight: scaleHeight(22),
+		fontSize: FONT_SIZES.mdPlus,
+		color: COLORS.text,
+		lineHeight: scaledSize(23),
 		textAlign: 'left',
 	},
 
 	cardBackTitle: {
-		fontSize: scaledSize(24),
-		fontWeight: 'bold',
-		color: '#2980b9',
+		fontSize: FONT_SIZES.title,
+		fontWeight: '700',
+		color: COLORS.secondaryDark,
 		textAlign: 'center',
-		marginBottom: scaleHeight(16),
+		lineHeight: scaledSize(34),
+		marginBottom: SPACING_H.lg,
 	},
 	dropdownField: {
-		backgroundColor: '#ffffff',
-		borderColor: '#ecf0f1',
+		backgroundColor: COLORS.surface,
+		borderColor: COLORS.border,
 		borderWidth: 1,
-		borderRadius: scaleWidth(8),
-		paddingHorizontal: scaleWidth(8), // 여백도 줄임
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.md,
 	},
 	dropdownListField: {
-		backgroundColor: '#ffffff',
-		borderColor: '#bdc3c7',
+		backgroundColor: COLORS.surface,
+		borderColor: COLORS.border,
 		borderWidth: 1,
-		borderRadius: scaleWidth(12),
+		borderRadius: RADIUS.md,
 	},
 	sectionBox: {
 		borderWidth: 1,
-		borderColor: '#E6EEF5',
-		backgroundColor: '#ffffff',
-		padding: scaleWidth(12),
-		borderRadius: scaleWidth(12),
-		marginTop: scaleHeight(5),
-		marginBottom: scaleHeight(6),
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surface,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.md,
+		borderRadius: RADIUS.md,
+		marginBottom: SPACING_H.md,
 		shadowColor: '#000',
-		shadowOpacity: 0.05,
+		shadowOpacity: 0.06,
 		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 4,
+		shadowRadius: 8,
 	},
 	sectionText: {
-		fontSize: scaledSize(14),
-		color: '#2c3e50',
-		lineHeight: scaleHeight(20),
-	},
-	sectionHeader: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-	},
-	phraseRow: {
-		marginBottom: scaleHeight(6),
-		paddingVertical: scaleHeight(4),
-		paddingHorizontal: scaleWidth(8),
-		backgroundColor: '#F9FBFF',
-		borderRadius: scaleWidth(8),
-	},
-	inlineLabel: {
-		fontSize: scaledSize(13),
-		marginBottom: scaleHeight(3),
-		fontWeight: '700',
-		color: '#2c3e50',
-	},
-	inlineValue: {
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
-		marginTop: scaleHeight(2),
-	},
-	highlightSection: {
-		borderWidth: 1.5,
-		borderColor: '#A5D8FF',
-		backgroundColor: '#EAF4FF',
-		padding: scaleWidth(14),
-		borderRadius: scaleWidth(12),
-		marginBottom: scaleHeight(6),
-		shadowColor: '#000',
-		shadowOpacity: 0.08,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 4,
-	},
-	highlightHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: scaleHeight(8),
-	},
-	highlightTitle: {
-		fontSize: scaledSize(15),
-		fontWeight: '700',
-		color: '#2980b9',
-		marginLeft: scaleWidth(6),
-	},
-	highlightText: {
-		fontSize: scaledSize(15),
-		fontWeight: '600',
-		color: '#2c3e50',
-		lineHeight: scaleHeight(22),
-	},
-	metaWrap: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		gap: scaleWidth(8),
-		marginTop: scaleHeight(16),
-		justifyContent: 'center',
-	},
-	metaChip: {
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(6),
-		borderRadius: scaleWidth(12),
-	},
-	metaText: {
-		fontSize: scaledSize(13),
-		fontWeight: '600',
+		fontSize: FONT_SIZES.md,
+		color: COLORS.text,
+		lineHeight: scaledSize(21),
+		marginBottom: SPACING_H.xs,
 	},
 	meaningQuoteBox: {
 		alignItems: 'center', // 중앙 정렬
 		justifyContent: 'center',
-		backgroundColor: '#EAF4FF', // 파란색 계열 배경
-		borderRadius: scaleWidth(12),
-		paddingVertical: scaleHeight(16),
-		paddingHorizontal: scaleWidth(14),
-		marginBottom: scaleHeight(16),
+		backgroundColor: COLORS.secondaryBg, // 파란색 계열 배경
+		borderRadius: RADIUS.md,
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.lg,
+		marginBottom: SPACING_H.md,
 	},
 
 	meaningQuoteText: {
-		fontSize: scaledSize(16),
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '600',
-		color: '#2c3e50',
-		lineHeight: scaleHeight(22),
+		color: COLORS.text,
+		lineHeight: scaledSize(24),
 		textAlign: 'center', // 텍스트도 중앙 정렬
 	},
 	badgeInlineRow: {
 		flexDirection: 'row',
 		alignItems: 'center', // 세로 중앙
-		gap: scaleWidth(6),
-		marginTop: scaleHeight(8),
-		marginBottom: scaleHeight(8),
+		justifyContent: 'center',
+		flexWrap: 'wrap',
+		columnGap: SPACING_W.sm,
+		rowGap: SPACING_H.sm,
 		width: '100%',
 	},
 	levelBadge: {
 		flexDirection: 'row',
 		alignItems: 'center', // 세로 중앙 고정
 		justifyContent: 'center',
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(6),
-		borderRadius: scaleWidth(12),
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
 	},
 	categoryBadge: {
 		flexDirection: 'row',
 		alignItems: 'center', // 세로 중앙 고정
 		justifyContent: 'center',
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(6),
-		borderRadius: scaleWidth(12),
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
 	},
 	badgeText: {
-		color: '#ffffff',
-		fontSize: scaledSize(13),
+		color: COLORS.textWhite,
+		fontSize: FONT_SIZES.smPlus,
 		fontWeight: '600',
 	},
 	tagWrap: {
@@ -2127,30 +2001,18 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap', // ✅ 태그도 여러 줄
 		justifyContent: 'center', // ✅ 중앙 모으기
 	},
-	// 태그 가로 스크롤 영역
-	tagScroll: {
-		flex: 1, // 남는 공간을 태그가 차지
-		marginLeft: scaleWidth(6), // 배지와 간격
-		maxHeight: scaleHeight(30), // 라인 높이 안정화
-	},
-
-	tagScrollContent: {
-		alignItems: 'center',
-		justifyContent: 'center', // ✅ 태그도 가운데 정렬
-	},
-
 	tagChip: {
-		paddingHorizontal: scaleWidth(10),
-		paddingVertical: scaleHeight(6),
-		borderRadius: scaleWidth(12),
-		backgroundColor: '#ecf0f1',
-		marginRight: scaleWidth(6),
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.surfaceAlt,
+		marginRight: SPACING_W.xs,
 	},
 
 	tagText: {
-		fontSize: scaledSize(13),
+		fontSize: FONT_SIZES.smPlus,
 		fontWeight: '600',
-		color: '#2c3e50',
+		color: COLORS.text,
 	},
 });
 

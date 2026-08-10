@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
+    Animated,
     View,
     Text,
     Modal,
@@ -11,8 +12,9 @@ import {
     Alert,
     Linking,
 } from 'react-native';
-import { moderateScale, scaleHeight, scaleWidth, scaledSize } from '@/utils';
+import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
 import IconComponent from '../atomic/IconComponent';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
 
 interface Props {
     visible: boolean;
@@ -83,11 +85,29 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
             id: '오흡: 오늘 흡연 기록',
             icon: require('@/assets/appicons/main_todaycigarette.png'),
             title: '오흡: 오늘 흡연 기록',
-            desc: '“작은 기록이 만든 큰 변화, 오늘부터 시작하세요!” 흡연 습관을 정확하게 파악하고, 금연의 첫 걸음을 도와주는 앱입니다.',
+            desc: '"작은 기록이 만든 큰 변화, 오늘부터 시작하세요!" 흡연 습관을 정확하게 파악하고, 금연의 첫 걸음을 도와주는 앱입니다.',
             android: '',
             ios: 'https://apps.apple.com/us/app/%EC%98%A4%ED%9D%A1-%EC%98%A4%EB%8A%98-%ED%9D%A1%EC%97%B0-%EA%B8%B0%EB%A1%9D/id6749576206',
         },
     ];
+
+    // 진입 애니메이션 (fade + slide-up)
+    const enterAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (!visible) {
+            enterAnim.setValue(0);
+            return;
+        }
+        const enter = Animated.timing(enterAnim, { toValue: 1, duration: 260, useNativeDriver: true });
+        enter.start();
+        return () => enter.stop();
+    }, [visible, enterAnim]);
+
+    const enterStyle = {
+        opacity: enterAnim,
+        transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
+    };
 
     const getDownloadUrl = (app: AppItem) => {
         const primary = Platform.OS === 'android' ? app.android : app.ios;
@@ -116,13 +136,17 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay}>
-                <View style={styles.container}>
+                <Animated.View style={[styles.container, enterStyle]}>
                     {/* 헤더 */}
                     <View style={styles.headerRow}>
-                        <View style={{ flex: 1, alignItems: 'center' }}>
+                        <View style={styles.headerTitleWrap}>
                             <Text style={styles.titleText}>📱 제작자의 다른 앱</Text>
                         </View>
-                        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                        <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={onClose}
+                            activeOpacity={0.8}
+                            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
                             <Text style={styles.closeText}>✕</Text>
                         </TouchableOpacity>
                     </View>
@@ -142,12 +166,12 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 
                                 {/* 단일 다운로드 버튼 */}
                                 <View style={styles.buttonRow}>
-                                    <TouchableOpacity style={styles.downloadButton} onPress={() => onDownloadApp(app)}>
+                                    <TouchableOpacity style={styles.downloadButton} onPress={() => onDownloadApp(app)} activeOpacity={0.8}>
                                         <IconComponent
                                             type="MaterialCommunityIcons"
                                             name="download"
                                             size={scaledSize(16)}
-                                            color="#ffffff"
+                                            color={COLORS.textWhite}
                                         />
                                         <Text style={styles.buttonText}>다운로드</Text>
                                     </TouchableOpacity>
@@ -155,7 +179,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
                             </View>
                         ))}
                     </ScrollView>
-                </View>
+                </Animated.View>
             </View>
         </Modal>
     );
@@ -166,84 +190,89 @@ export default DeveloperAppsModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.4)',
+        backgroundColor: COLORS.dim,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: scaleWidth(20),
+        paddingHorizontal: SPACING_W.lg,
     },
     container: {
         width: '100%',
         maxHeight: scaleHeight(680),
-        backgroundColor: '#ffffff',
-        borderRadius: moderateScale(16),
-        paddingVertical: scaleHeight(24),
-        paddingHorizontal: scaleWidth(20),
+        backgroundColor: COLORS.surface,
+        borderRadius: RADIUS.xl,
+        paddingVertical: SPACING_H.lg,
+        paddingHorizontal: SPACING_W.lg,
         shadowColor: '#000',
         shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: scaleHeight(4) },
+        shadowOffset: { width: 0, height: 2 },
         shadowRadius: 8,
     },
     scroll: {
         alignItems: 'center',
+        paddingBottom: SPACING_H.sm,
     },
     headerRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: scaleHeight(12),
+        minHeight: scaleHeight(44),
+        marginBottom: SPACING_H.md,
+    },
+    headerTitleWrap: {
+        flex: 1,
+        alignItems: 'center',
+        paddingLeft: SPACING_W.xl, // 우상단 닫기 버튼 폭만큼 보정해 타이틀을 중앙에
     },
     titleText: {
-        fontSize: scaledSize(20),
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        textAlign: 'left',
+        fontSize: FONT_SIZES.xl,
+        fontWeight: '700',
+        color: COLORS.textStrong,
+        textAlign: 'center',
         flexShrink: 1,
     },
     closeButton: {
-        padding: scaleWidth(6),
+        padding: SPACING_W.xs,
     },
     closeText: {
-        fontSize: scaledSize(22),
-        color: '#7f8c8d',
-        fontWeight: 'bold',
+        fontSize: FONT_SIZES.heading,
+        color: COLORS.textSecondary,
+        fontWeight: '700',
     },
     appCard: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         alignItems: 'flex-start',
-        padding: scaleWidth(12),
-        borderRadius: scaleWidth(12),
-        backgroundColor: '#f8f9fa',
-        marginBottom: scaleHeight(14),
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 6,
+        paddingHorizontal: SPACING_W.md,
+        paddingVertical: SPACING_H.md,
+        borderRadius: RADIUS.lg,
+        backgroundColor: COLORS.background,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        marginBottom: SPACING_H.md,
     },
     image: {
         width: scaleWidth(64),
         height: scaleWidth(64),
-        borderRadius: scaleWidth(12),
-        marginRight: scaleWidth(12),
+        borderRadius: RADIUS.md,
+        marginRight: SPACING_W.md,
     },
     textArea: {
         flex: 1,
-        marginBottom: scaleHeight(8),
     },
     appTitle: {
-        fontSize: scaledSize(18),
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        marginBottom: scaleHeight(4),
+        fontSize: FONT_SIZES.lg,
+        fontWeight: '700',
+        color: COLORS.textStrong,
+        marginBottom: SPACING_H.xs,
     },
     appDesc: {
-        fontSize: scaledSize(13),
-        color: '#7f8c8d',
-        marginBottom: scaleHeight(10),
+        fontSize: FONT_SIZES.smPlus,
+        color: COLORS.textSecondary,
+        lineHeight: scaledSize(19),
     },
     buttonRow: {
         flexDirection: 'row',
-        marginTop: scaleHeight(10),
+        marginTop: SPACING_H.md,
         width: '100%',
         justifyContent: 'center',
     },
@@ -252,16 +281,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         width: '60%',
-        paddingHorizontal: scaleWidth(17),
-        paddingVertical: scaleHeight(10),
-        borderRadius: scaleWidth(8),
-        backgroundColor: '#0D96F6', // 다운로드 버튼 색상 (블루)
+        minHeight: scaleHeight(44),
+        paddingHorizontal: SPACING_W.lg,
+        paddingVertical: SPACING_H.sm,
+        borderRadius: RADIUS.md,
+        backgroundColor: COLORS.secondary,
     },
     buttonText: {
-        color: '#ffffff',
+        color: COLORS.textWhite,
         fontWeight: '600',
-        marginLeft: scaleWidth(6),
-        fontSize: scaledSize(13),
+        marginLeft: SPACING_W.sm,
+        fontSize: FONT_SIZES.md,
         textAlign: 'center',
     },
 });

@@ -63,6 +63,7 @@ moment.locale('ko'); // 로케일 설정
 const ActionCard = ({
 	iconName,
 	iconType,
+	image,
 	label,
 	description,
 	color,
@@ -72,6 +73,7 @@ const ActionCard = ({
 }: {
 	iconName: string;
 	iconType: string;
+	image?: number;
 	label: string;
 	description: string;
 	color: string;
@@ -101,9 +103,17 @@ const ActionCard = ({
 				transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
 			}}>
 			<TouchableOpacity style={[styles.actionCard, { borderColor: color }]} activeOpacity={0.85} onPress={onPress}>
-				<View style={[styles.iconCircle, { backgroundColor: color }]}>
-					<IconComponent name={iconName} type={iconType} size={scaledSize(24)} color={COLORS.textWhite} />
-				</View>
+				{image ? (
+					<View
+						style={[styles.actionImageShell, { backgroundColor: color }]}>
+						<FastImage source={image} style={styles.actionImage} resizeMode="contain" />
+					</View>
+				) : (
+					<View
+						style={[styles.iconCircle, { backgroundColor: color }]}>
+						<IconComponent name={iconName} type={iconType} size={scaledSize(24)} color={COLORS.textWhite} />
+					</View>
+				)}
 				<View style={styles.cardTextBox}>
 					<Text style={styles.cardTitle}>{label}</Text>
 					<Text style={styles.cardDescription}>{description}</Text>
@@ -121,6 +131,30 @@ const ActionCard = ({
 		</Animated.View>
 	);
 };
+
+const MascotMoment = ({
+	image,
+	title,
+	description,
+	backgroundColor,
+	accentColor,
+	imageOnRight = false,
+}: {
+	image: number;
+	title: string;
+	description: string;
+	backgroundColor: string;
+	accentColor: string;
+	imageOnRight?: boolean;
+}) => (
+	<View style={[styles.mascotMoment, imageOnRight && styles.mascotMomentRight, { backgroundColor, borderTopColor: accentColor }]}>
+		<FastImage source={image} style={[styles.mascotMomentImage, imageOnRight && styles.mascotMomentImageRight]} resizeMode="contain" />
+		<View style={[styles.mascotMomentCopy, imageOnRight && styles.mascotMomentCopyLeft]}>
+			<Text style={[styles.mascotMomentTitle, imageOnRight && styles.mascotMomentTextRight]}>{title}</Text>
+			<Text style={[styles.mascotMomentDescription, imageOnRight && styles.mascotMomentTextRight]}>{description}</Text>
+		</View>
+	</View>
+);
 
 const Home = () => {
 	const navigation = useNavigation();
@@ -953,6 +987,7 @@ const Home = () => {
 						index={0}
 						iconName="play-arrow"
 						iconType="materialIcons"
+						image={require('@/assets/images/home-actions/action-quiz.png')}
 						label="시작하기"
 						description="속담 뜻, 속담 찾기, 빈칸 채우기 퀴즈를 선택해서 퀴즈를 풀어봐요"
 						color={COLORS.secondary}
@@ -962,15 +997,24 @@ const Home = () => {
 						index={1}
 						iconName="school"
 						iconType="materialIcons"
+						image={require('@/assets/images/home-actions/action-study.png')}
 						label="학습 모드"
 						description="카드 형식으로 속담과 속담의 의미를 재미있게 익혀봐요"
 						color={COLORS.primary}
 						onPress={moveToHandler.study}
 					/>
+					<MascotMoment
+						image={require('@/assets/images/home-mascot-moments/mascot-study.png')}
+						title="속담은 뜻을 알면 더 오래 남아요"
+						description="천천히 읽고, 오늘의 지혜를 하나씩 익혀봐요."
+						backgroundColor="#FFF8E8"
+						accentColor="#D9A441"
+					/>
 					<ActionCard
 						index={2}
 						iconName="replay"
 						iconType="materialIcons"
+						image={require('@/assets/images/home-actions/action-wrong-review.png')}
 						label="오답 복습"
 						description="틀린 퀴즈를 다시 풀면서 기억을 더 확실히 다져봐요"
 						color="#f1c40f"
@@ -980,6 +1024,7 @@ const Home = () => {
 						index={3}
 						iconName="schedule"
 						iconType="materialIcons"
+						image={require('@/assets/images/home-actions/action-time.png')}
 						label="타임 챌린지"
 						description="180초 제한 시간 안에 5개의 하트로 문제를 최대한 많이 풀어보세요!"
 						color="#e67e22"
@@ -989,15 +1034,25 @@ const Home = () => {
 						index={4}
 						iconName="castle"
 						iconType="materialCommunityIcons"
+						image={require('@/assets/images/home-actions/action-tower.png')}
 						label="타워 챌린지"
 						description="레벨별 보스를 차례로 도전하고 특별한 보상을 획득하세요!"
 						color="#16a085"
 						onPress={moveToHandler.towerchalleng}
 					/>
+					<MascotMoment
+						image={require('@/assets/images/home-mascot-moments/mascot-challenge-final.png')}
+						title="준비됐다면 기록에 도전!"
+						description="빠르게 풀어도, 한 문제씩 정확하게 풀어도 좋아요."
+						backgroundColor="#FFF4E6"
+						accentColor="#EA8C2F"
+						imageOnRight
+					/>
 					<ActionCard
 						index={5}
 						iconName="star"
 						iconType="materialIcons"
+						image={require('@/assets/images/home-actions/action-favorite.png')}
 						label="즐겨찾기"
 						description="자주 보고 싶은 속담을 모아두고 한눈에 다시 확인해요"
 						color={COLORS.warning}
@@ -1008,11 +1063,19 @@ const Home = () => {
 						index={6}
 						iconName="menu-book"
 						iconType="materialIcons"
+						image={require('@/assets/images/home-actions/action-my-book.png')}
 						label="나만의 속담집"
 						description="원하는 속담을 모아 나만의 속담집을 만들고 퀴즈로 풀어봐요"
-						color="#8e44ad"
+						color="#0F766E"
 						onPress={moveToHandler.myBook}
 						isNew
+					/>
+					<MascotMoment
+						image={require('@/assets/images/home-mascot-moments/mascot-collection.png')}
+						title="나만의 지혜 창고를 채워봐요"
+						description="좋아하는 속담과 뱃지를 차곡차곡 모을 수 있어요."
+						backgroundColor="#FFF7ED"
+						accentColor="#F59E0B"
 					/>
 
 					<View style={styles.quickActionRow}>
@@ -1371,6 +1434,19 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginRight: SPACING_W.lg,
 	},
+	actionImageShell: {
+		width: scaleWidth(58),
+		height: scaleWidth(58),
+		borderRadius: RADIUS.md,
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginRight: SPACING_W.lg,
+		overflow: 'hidden',
+	},
+	actionImage: {
+		width: scaleWidth(54),
+		height: scaleWidth(54),
+	},
 	cardTextBox: {
 		flex: 1,
 	},
@@ -1410,6 +1486,54 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.xxs,
 		fontWeight: '700',
 		letterSpacing: 0.8,
+	},
+
+	// ===== 스크롤 구간 마스코트 =====
+	mascotMoment: {
+		minHeight: scaleHeight(104),
+		flexDirection: 'row',
+		alignItems: 'center',
+		borderTopWidth: 3,
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.sm,
+		marginBottom: SPACING_H.md,
+		overflow: 'hidden',
+	},
+	mascotMomentRight: {
+		flexDirection: 'row-reverse',
+	},
+	mascotMomentImage: {
+		width: scaleWidth(94),
+		height: scaleWidth(94),
+		marginRight: SPACING_W.md,
+	},
+	mascotMomentImageRight: {
+		marginRight: 0,
+		marginLeft: SPACING_W.md,
+	},
+	mascotMomentCopy: {
+		flex: 1,
+		alignItems: 'flex-start',
+	},
+	mascotMomentCopyLeft: {
+		alignItems: 'flex-end',
+	},
+	mascotMomentTextRight: {
+		textAlign: 'right',
+	},
+	mascotMomentTitle: {
+		fontSize: FONT_SIZES.mdPlus,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+		lineHeight: scaledSize(21),
+	},
+	mascotMomentDescription: {
+		marginTop: SPACING_H.xs,
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '400',
+		color: COLORS.textSecondary,
+		lineHeight: scaledSize(18),
 	},
 
 	// ===== 연속 출석 칩 =====

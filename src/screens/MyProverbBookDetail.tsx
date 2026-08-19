@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, Animated, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -223,7 +223,7 @@ const MyProverbBookDetail = () => {
 					contentContainerStyle={styles.listContent}
 					ListEmptyComponent={() => (
 						<View style={styles.emptyView}>
-							<IconComponent type="materialIcons" name="menu-book" size={scaledSize(52)} color={COLORS.border} />
+							<Image source={require('@/assets/images/feature-states/empty-proverb-book.png')} style={styles.emptyImage} resizeMode="contain" />
 							<Text style={styles.emptyTitle}>아직 담은 속담이 없어요</Text>
 							<Text style={styles.emptyDesc}>속담 추가 버튼을 눌러 채워보세요!</Text>
 						</View>
@@ -358,6 +358,7 @@ const styles = StyleSheet.create({
 	miniBadge: { paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs, borderRadius: RADIUS.round },
 	miniBadgeText: { color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' },
 	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: scaleHeight(40) },
+	emptyImage: { width: scaleWidth(164), height: scaleWidth(164) },
 	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textLight, textAlign: 'center', lineHeight: scaledSize(20) },
 	removeBar: {

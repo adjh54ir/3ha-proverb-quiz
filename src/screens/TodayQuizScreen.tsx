@@ -11,6 +11,7 @@ import {
 	ScrollView,
 	Modal,
 	ActivityIndicator,
+	Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import notifee, { TimestampTrigger, TriggerType, AndroidImportance, RepeatFrequency } from '@notifee/react-native';
@@ -941,7 +942,7 @@ const TodayQuizScreen = () => {
 							{!hasStarted && isTodayUnsolved ? (
 								// 👉 아직 시작 안 했을 때는 "퀴즈 도착 카드"
 								<View style={styles.emptyQuizBox}>
-									<IconComponent name="envelope" type="FontAwesome" size={scaledSize(48)} color={COLORS.secondary} />
+								<Image source={require('@/assets/images/feature-states/today-quiz-arrival.png')} style={styles.todayQuizArrivalImage} resizeMode="contain" />
 									<Text style={styles.emptyQuizTitle}>오늘의 퀴즈가 도착했습니다 ✨</Text>
 									<Text style={styles.emptyQuizSubtitle}>지금 바로 시작해 보세요!</Text>
 
@@ -1592,6 +1593,10 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		paddingVertical: scaleHeight(40),
 		paddingHorizontal: SPACING_W.lg,
+	},
+	todayQuizArrivalImage: {
+		width: scaleWidth(168),
+		height: scaleWidth(168),
 	},
 	emptyQuizTitle: {
 		fontSize: FONT_SIZES.xl,

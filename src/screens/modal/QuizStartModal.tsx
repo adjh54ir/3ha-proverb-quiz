@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Modal, View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, Animated, StyleSheet, Image } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
@@ -83,14 +83,7 @@ const QuizStartModal = ({
 		<Modal visible transparent animationType="fade">
 			<View style={styles.overlay}>
 				<Animated.View style={[styles.card, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
-					<View style={[styles.iconCircle, isPracticeMode && { backgroundColor: COLORS.warningBg }]}>
-						<IconComponent
-							type="materialIcons"
-							name={meta.icon}
-							size={scaledSize(30)}
-							color={isPracticeMode ? COLORS.warning : COLORS.primary}
-						/>
-					</View>
+					<Image source={require('@/assets/images/home-mascot-moments/mascot-challenge-final.png')} style={styles.headerMascot} resizeMode="contain" />
 
 					<Text style={styles.title}>{meta.title}</Text>
 					<Text style={styles.desc}>{meta.desc}</Text>
@@ -161,6 +154,11 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: SPACING_H.md,
+	},
+	headerMascot: {
+		width: scaleWidth(96),
+		height: scaleWidth(96),
+		marginBottom: SPACING_H.sm,
 	},
 	title: {
 		fontSize: FONT_SIZES.heading,

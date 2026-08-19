@@ -35,7 +35,7 @@ const LEVEL_ICON_MAP: Record<string, string> = {
 };
 
 const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
-	const emptyImage = require('@/assets/images/no-data.png');
+	const emptyImage = require('@/assets/images/feature-states/empty-search.png');
 	const insets = useSafeAreaInsets();
 
 	const [keyword, setKeyword] = useState('');

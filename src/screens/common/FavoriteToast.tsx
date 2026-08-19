@@ -63,7 +63,7 @@ const FavoriteToast = ({ visible, message = '즐겨찾기 추가', subMessage = 
 
 	return (
 		<Animated.View pointerEvents="none" style={[styles.toast, { bottom, opacity, transform: [{ translateY }] }]}>
-			<Image source={require('@/assets/images/favorite.jpg')} style={styles.icon} resizeMode="contain" />
+			<Image source={require('@/assets/images/home-actions/action-favorite.png')} style={styles.icon} resizeMode="contain" />
 			<View style={styles.textWrapper}>
 				<Text style={styles.text}>{message}</Text>
 				<Text style={styles.subText}>{subMessage}</Text>
@@ -94,7 +94,6 @@ const styles = StyleSheet.create({
 	icon: {
 		width: scaleWidth(40),
 		height: scaleWidth(40),
-		borderRadius: RADIUS.md,
 	},
 	textWrapper: {
 		flexDirection: 'column',

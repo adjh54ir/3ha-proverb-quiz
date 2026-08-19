@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Modal, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Animated, KeyboardAvoidingView, Platform } from 'react-native';
+import { Modal, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Animated, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
@@ -137,6 +137,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 						</TouchableOpacity>
 
 						<Text style={styles.modalTitle}>{isEdit ? '속담집 편집' : '새 속담집 만들기'}</Text>
+						{!isEdit && <Image source={require('@/assets/images/home-actions/action-my-book.png')} style={styles.headerImage} resizeMode="contain" />}
 						{!isEdit && <Text style={styles.modalSubtitle}>이름을 정하고, 속담집에서 속담을 추가해봐요</Text>}
 
 						<View style={[pickerStyles.preview, { backgroundColor: color + '20', borderColor: color + '40', width: '100%', marginTop: SPACING_H.md }]}>
@@ -197,6 +198,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 export default BookFormModal;
 
 const styles = StyleSheet.create({
+	headerImage: { width: scaleWidth(72), height: scaleWidth(72), alignSelf: 'center', marginTop: SPACING_H.sm },
 	overlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'center', alignItems: 'center' },
 	scrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: SPACING_H.xl, width: '100%' },
 	modal: { width: '88%', backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.xl },

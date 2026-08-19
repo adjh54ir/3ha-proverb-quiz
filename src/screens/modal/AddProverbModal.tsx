@@ -30,7 +30,7 @@ const LEVEL_ITEMS = [
 const LEVEL_ICON_MAP: Record<string, string> = { '초급': 'seedling', 중급: 'leaf', 고급: 'tree', 특급: 'trophy' };
 
 const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
-	const emptyImage = require('@/assets/images/no-data.png');
+	const emptyImage = require('@/assets/images/feature-states/empty-search.png');
 	const insets = useSafeAreaInsets();
 
 	const [keyword, setKeyword] = useState('');

@@ -116,7 +116,7 @@ const ProverbListScreen = () => {
 	const headerAnim = useRef(new Animated.Value(0)).current;
 	const scrollTopAnim = useRef(new Animated.Value(0)).current;
 
-	const emptyImage = require('@/assets/images/no-data.png');
+	const emptyImage = require('@/assets/images/feature-states/empty-search.png');
 	const [refreshing, setRefreshing] = useState(false);
 	const [keyword, setKeyword] = useState('');
 	const [mainList, setMainList] = useState<MainDataType.Proverb[]>([]);

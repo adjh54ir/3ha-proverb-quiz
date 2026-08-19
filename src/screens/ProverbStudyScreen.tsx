@@ -1192,7 +1192,7 @@ const QuizStudyScreen = () => {
 						</View>
 					) : getFilteredData().length === 0 ? (
 						<View style={styles.emptyWrapper}>
-							<Image source={require('@/assets/images/no-data.png')} style={styles.emptyImage} />
+							<Image source={require('@/assets/images/feature-states/empty-search.png')} style={styles.emptyImage} resizeMode="contain" />
 							<Text style={styles.emptyText}>
 								{filter === 'learned'
 									? '완료한 속담이 아직 없어요.\n학습 후 완료 버튼을 눌러보세요!'

@@ -70,7 +70,8 @@ const AnimatedListItem = React.memo(({ children, index }: { children: React.Reac
 });
 
 const FavoriteScreen = () => {
-	const emptyImage = require('@/assets/images/no-data.png');
+	const emptyFavoritesImage = require('@/assets/images/feature-states/empty-favorites.png');
+	const emptySearchImage = require('@/assets/images/feature-states/empty-search.png');
 	const flatListRef = useRef<FlatList>(null);
 	const headerAnim = useRef(new Animated.Value(0)).current;
 
@@ -501,7 +502,7 @@ const FavoriteScreen = () => {
 								<View style={styles.emptyWrapper}>
 									{allFavorites.length === 0 ? (
 										<>
-											<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
+											<FastImage source={emptyFavoritesImage} style={styles.emptyImage} resizeMode="contain" />
 											<Text style={styles.emptyTitle}>아직 즐겨찾기가 없어요</Text>
 											<Text style={styles.emptyDesc}>속담 목록에서 ★를 눌러{'\n'}원하는 속담을 저장해보세요!</Text>
 											<TouchableOpacity style={styles.emptyAddBtn} onPress={() => setShowAddModal(true)} activeOpacity={0.85}>
@@ -511,7 +512,7 @@ const FavoriteScreen = () => {
 										</>
 									) : (
 										<>
-											<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
+											<FastImage source={emptySearchImage} style={styles.emptyImage} resizeMode="contain" />
 											<Text style={styles.emptyTitle}>검색 결과가 없어요</Text>
 											<Text style={styles.emptyDesc}>다른 검색어나 필터를 사용해보세요</Text>
 										</>

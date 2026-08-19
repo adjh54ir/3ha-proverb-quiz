@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Animated, Image } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -200,7 +200,7 @@ const MyProverbBook = () => {
 				<Animated.ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ opacity: fadeAnim }} contentContainerStyle={styles.booksContainer} showsVerticalScrollIndicator={false}>
 					{books.length === 0 ? (
 						<View style={styles.emptyView}>
-							<IconComponent type="materialIcons" name="menu-book" size={scaledSize(56)} color={COLORS.border} />
+							<Image source={require('@/assets/images/feature-states/empty-proverb-book.png')} style={styles.emptyImage} resizeMode="contain" />
 							<Text style={styles.emptyTitle}>아직 만든 속담집이 없습니다</Text>
 							<Text style={styles.emptyDesc}>지금 만들기 버튼을 눌러서 추가해보세요!</Text>
 							<TouchableOpacity style={styles.emptyBtn} onPress={() => setFormTarget(null)}>
@@ -209,7 +209,7 @@ const MyProverbBook = () => {
 						</View>
 					) : filteredBooks.length === 0 ? (
 						<View style={styles.emptyView}>
-							<IconComponent type="materialIcons" name="search-off" size={scaledSize(52)} color={COLORS.border} />
+							<Image source={require('@/assets/images/feature-states/empty-search.png')} style={styles.emptyImage} resizeMode="contain" />
 							<Text style={styles.emptyTitle}>검색 결과가 없어요</Text>
 							<Text style={styles.emptyDesc}>{`'${searchQuery}'와 일치하는\n속담집이 없습니다.`}</Text>
 							<TouchableOpacity style={styles.emptyBtn} onPress={() => setSearchQuery('')}>
@@ -416,6 +416,7 @@ const styles = StyleSheet.create({
 	sortChipTextActive: { color: COLORS.textWhite },
 	booksContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, paddingBottom: scaleHeight(120), flexGrow: 1 },
 	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: scaleHeight(40) },
+	emptyImage: { width: scaleWidth(176), height: scaleWidth(176) },
 	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textLight, textAlign: 'center', lineHeight: scaledSize(20) },
 	emptyBtn: {

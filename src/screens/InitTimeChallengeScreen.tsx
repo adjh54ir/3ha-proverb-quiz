@@ -172,7 +172,7 @@ const InitTimeChallengeScreen = () => {
 				<ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
 					{/* 🎯 대표 이미지 영역 */}
 					<View style={styles.heroImageContainer}>
-						<Image source={require('@/assets/images/timeChanllenge.jpg')} style={styles.heroImage} resizeMode="cover" />
+						<Image source={require('@/assets/images/feature-states/time-challenge-hero.png')} style={styles.heroImage} resizeMode="contain" />
 						<View style={styles.heroOverlay}>
 							<Text style={styles.heroTitle}>⏱️ 타임 챌린지</Text>
 							<Text style={styles.heroSubtitle}>180초 안에 최대한 많이 맞혀보세요!</Text>
@@ -419,10 +419,11 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.08,
 		shadowRadius: 8,
+		backgroundColor: '#FFF7ED',
 	},
 	heroImage: {
 		width: '100%',
-		height: '100%',
+		height: '78%',
 	},
 	heroOverlay: {
 		position: 'absolute',

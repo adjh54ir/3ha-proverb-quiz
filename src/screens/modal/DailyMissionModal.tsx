@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Modal, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, Modal, StyleSheet, Animated, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
@@ -125,6 +125,13 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 
 					{/* 미션 목록 */}
 					<View style={styles.list}>
+						{allDone && (
+							<Image
+								source={require('@/assets/images/feature-states/daily-mission-complete.png')}
+								style={styles.completeImage}
+								resizeMode="contain"
+							/>
+						)}
 						{missions.map((m) => (
 							<View key={m.id} style={[styles.missionRow, m.done && styles.missionRowDone]}>
 								<View style={[styles.missionIcon, { backgroundColor: m.done ? COLORS.primary : COLORS.border }]}>
@@ -236,6 +243,12 @@ const styles = StyleSheet.create({
 	list: {
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.lg,
+	},
+	completeImage: {
+		width: scaleWidth(84),
+		height: scaleWidth(84),
+		alignSelf: 'center',
+		marginBottom: SPACING_H.md,
 	},
 	missionRow: {
 		flexDirection: 'row',

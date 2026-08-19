@@ -4,6 +4,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { scaledSize, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { getCategoryColor, getLevelColor } from './CommonProverbModule';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './atomic/IconComponent';
 
@@ -12,17 +13,6 @@ import IconComponent from './atomic/IconComponent';
  * - ProverbDetailModal 과 오늘의 퀴즈 해설에서 공통으로 사용해 표시를 일치시킵니다.
  * - 헤더 밴드/즐겨찾기/닫기 등 컨테이너 요소는 호출하는 쪽에서 감쌉니다.
  */
-
-const CATEGORY_COLOR: Record<string, string> = {
-	'운/우연': '#16a085',
-	인간관계: '#8e44ad',
-	'세상 이치': '#f4a259',
-	'근면/검소': '#e17055',
-	'노력/성공': '#27ae60',
-	'경계/조심': '#e74c3c',
-	'욕심/탐욕': '#e84393',
-	'배신/불신': '#2c3e50',
-};
 
 const CATEGORY_ICON: Record<string, { type: string; name: string }> = {
 	'운/우연': { type: 'FontAwesome6', name: 'dice' },
@@ -35,12 +25,8 @@ const CATEGORY_ICON: Record<string, { type: string; name: string }> = {
 	'배신/불신': { type: 'FontAwesome5', name: 'user-slash' },
 };
 
-const LEVEL_COLOR: Record<number, string> = {
-	1: '#74b9ff',
-	2: '#3498db',
-	3: '#2980b9',
-	4: '#2c3e50',
-};
+/** 레벨 번호 → 난이도 이름 (공통 난이도 램프 조회용) */
+const LEVEL_NAME_BY_NUMBER: Record<number, string> = { 1: '초급', 2: '중급', 3: '고급', 4: '특급' };
 
 const getLevelIcon = (level: number) => {
 	switch (level) {
@@ -78,11 +64,11 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 
 			{/* 배지: 난이도 + 카테고리 */}
 			<View style={styles.badgeRow}>
-				<View style={[styles.levelBadge, { backgroundColor: LEVEL_COLOR[proverb.level] || COLORS.textLight }]}>
+				<View style={[styles.levelBadge, { backgroundColor: getLevelColor(LEVEL_NAME_BY_NUMBER[proverb.level] ?? '') }]}>
 					{getLevelIcon(proverb.level)}
 					<Text style={styles.levelBadgeText}>{proverb.levelName}</Text>
 				</View>
-				<View style={[styles.badge2, { backgroundColor: CATEGORY_COLOR[proverb.category] || COLORS.textLight }]}>
+				<View style={[styles.badge2, { backgroundColor: getCategoryColor(proverb.category) }]}>
 					{categoryIcon && <IconComponent type={categoryIcon.type} name={categoryIcon.name} size={scaledSize(13)} color={COLORS.textWhite} />}
 					<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{proverb.category}</Text>
 				</View>
@@ -139,8 +125,8 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 			{!!proverb.origin && (
 				<View style={styles.modalSection}>
 					<View style={styles.sectionLabelRow}>
-						<View style={[styles.sectionIconChip, { backgroundColor: '#FFEDD5' }]}>
-							<IconComponent type="materialIcons" name="auto-stories" size={scaledSize(15)} color="#F97316" />
+						<View style={[styles.sectionIconChip, { backgroundColor: COLORS.accentOrangeSoft }]}>
+							<IconComponent type="materialIcons" name="auto-stories" size={scaledSize(15)} color={COLORS.accentFlame} />
 						</View>
 						<Text style={styles.modalLabel}>유래</Text>
 					</View>
@@ -152,8 +138,8 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 			{!!proverb.usageTip && (
 				<View style={styles.modalSection}>
 					<View style={styles.sectionLabelRow}>
-						<View style={[styles.sectionIconChip, { backgroundColor: '#CCFBF1' }]}>
-							<IconComponent type="materialIcons" name="tips-and-updates" size={scaledSize(15)} color="#14B8A6" />
+						<View style={[styles.sectionIconChip, { backgroundColor: COLORS.accentTealBg }]}>
+							<IconComponent type="materialIcons" name="tips-and-updates" size={scaledSize(15)} color={COLORS.accentTeal} />
 						</View>
 						<Text style={styles.modalLabel}>활용 팁</Text>
 					</View>
@@ -266,7 +252,7 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.warningBg,
 	},
 	tagText: {
-		color: '#B45309',
+		color: COLORS.warningDeep,
 		fontSize: FONT_SIZES.sm,
 		fontWeight: '700',
 	},

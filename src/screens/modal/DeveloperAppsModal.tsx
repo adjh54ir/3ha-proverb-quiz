@@ -38,9 +38,9 @@ const CATEGORY_LABEL: Record<CommonType.AppCategory, string> = {
 };
 
 const CATEGORY_COLORS: Record<CommonType.AppCategory, { bg: string; text: string }> = {
-	quiz: { bg: '#E6F1FB', text: '#2980b9' },
-	calculator: { bg: '#EAF3DE', text: '#3B6D11' },
-	utility: { bg: '#FAEEDA', text: '#854F0B' },
+	quiz: { bg: COLORS.secondaryBg, text: COLORS.secondaryDark },
+	calculator: { bg: COLORS.primaryBg, text: COLORS.primaryDeep },
+	utility: { bg: COLORS.accentOrangeBg, text: COLORS.warningDeep },
 };
 
 interface Props {

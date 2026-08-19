@@ -59,7 +59,7 @@ const QuizModeScreen = () => {
 		label: item.label,
 		icon: item.iconName ?? '', // 혹은 기본값
 		type: item.iconType ?? 'FontAwesome6',
-		color: item.iconColor ?? '#bdc3c7',
+		color: item.iconColor ?? COLORS.borderDark,
 	}));
 
 	// 🎞 화면 진입 / 탭 전환 시 페이드 + 슬라이드 업

@@ -183,14 +183,14 @@ const InitTimeChallengeScreen = () => {
 					{/* 📋 규칙 박스 */}
 					<View style={styles.challengeRuleBox}>
 						<View style={styles.ruleHeader}>
-							<IconComponent name="info-circle" type="FontAwesome" size={scaledSize(20)} color="#F87171" />
+							<IconComponent name="info-circle" type="FontAwesome" size={scaledSize(20)} color={COLORS.dangerLight} />
 							<Text style={styles.ruleHeaderText}>게임 규칙</Text>
 						</View>
 
 						{showAllRules ? (
 							<>
 								<RuleRow iconType="FontAwesome6" iconName="bullseye" iconColor={COLORS.primary} chipColor={COLORS.primarySoft} text="180초 안에 속담 의미를 최대한 많이 맞히기" />
-								<RuleRow iconType="FontAwesome6" iconName="heart" iconColor="#F87171" chipColor={COLORS.dangerBg} text="오답 시 하트 1개 감소 (총 5개)" />
+								<RuleRow iconType="FontAwesome6" iconName="heart" iconColor={COLORS.dangerLight} chipColor={COLORS.dangerBg} text="오답 시 하트 1개 감소 (총 5개)" />
 								<RuleRow iconType="FontAwesome6" iconName="forward" iconColor={COLORS.secondary} chipColor={COLORS.secondarySoft} text="스킵 1회 — 어려운 문제 건너뛰기" />
 								<RuleRow iconType="FontAwesome6" iconName="lightbulb" iconColor={COLORS.warning} chipColor={COLORS.warningBg} text="찬스 1회 — 활용 팁·예문 확인" />
 								<RuleRow iconType="FontAwesome6" iconName="ban" iconColor={COLORS.textLight} chipColor={COLORS.surfaceAlt} text="중간 종료 시 기록 미저장" />
@@ -236,7 +236,7 @@ const InitTimeChallengeScreen = () => {
 								</View>
 
 								<View style={styles.warningBox}>
-									<IconComponent name="alert-circle" type="Feather" size={scaledSize(16)} color="#F87171" />
+									<IconComponent name="alert-circle" type="Feather" size={scaledSize(16)} color={COLORS.dangerLight} />
 									<Text style={styles.warningText}>시작 버튼을 누르면 3초 뒤에 퀴즈가 시작됩니다!</Text>
 								</View>
 
@@ -248,10 +248,10 @@ const InitTimeChallengeScreen = () => {
 						) : (
 							<>
 								<RuleRow iconType="FontAwesome6" iconName="bullseye" iconColor={COLORS.primary} chipColor={COLORS.primarySoft} text="180초 안에 속담 의미를 최대한 많이 맞히기" />
-								<RuleRow iconType="FontAwesome6" iconName="heart" iconColor="#F87171" chipColor={COLORS.dangerBg} text="오답 시 하트 1개 감소 (총 5개)" />
+								<RuleRow iconType="FontAwesome6" iconName="heart" iconColor={COLORS.dangerLight} chipColor={COLORS.dangerBg} text="오답 시 하트 1개 감소 (총 5개)" />
 
 								<View style={styles.warningBox}>
-									<IconComponent name="alert-circle" type="Feather" size={scaledSize(16)} color="#F87171" />
+									<IconComponent name="alert-circle" type="Feather" size={scaledSize(16)} color={COLORS.dangerLight} />
 									<Text style={styles.warningText}>시작 버튼을 누르면 3초 뒤에 퀴즈가 시작됩니다!</Text>
 								</View>
 
@@ -266,7 +266,7 @@ const InitTimeChallengeScreen = () => {
 					{/* 🏆 TOP 3 랭킹 */}
 					<View style={styles.rankingBox}>
 						<View style={styles.rankingHeader}>
-							<IconComponent name="trophy" type="FontAwesome" size={scaledSize(20)} color="#FBBF24" />
+							<IconComponent name="trophy" type="FontAwesome" size={scaledSize(20)} color={COLORS.gold} />
 							<Text style={styles.rankingTitle}>나의 베스트 기록</Text>
 						</View>
 
@@ -280,9 +280,9 @@ const InitTimeChallengeScreen = () => {
 							top5History.slice(0, 3).map((item, index) => {
 								const medals = ['🥇', '🥈', '🥉'];
 								const gradients = [
-									{ from: '#FBBF24', to: COLORS.warning },
+									{ from: COLORS.gold, to: COLORS.warning },
 									{ from: COLORS.borderDark, to: COLORS.textLight },
-									{ from: '#FB923C', to: '#9A3412' },
+									{ from: COLORS.accentOrangeLight, to: COLORS.accentOrangeText },
 								];
 
 								return (
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
 	ruleText: {
 		flex: 1,
 		fontSize: FONT_SIZES.smPlus,
-		color: '#475569',
+		color: COLORS.textMuted,
 		fontWeight: '500',
 	},
 
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
 	bonusSummaryText: {
 		flex: 1,
 		fontSize: FONT_SIZES.smPlus,
-		color: '#475569',
+		color: COLORS.textMuted,
 	},
 	bonusSummaryStrong: {
 		fontWeight: '700',
@@ -538,34 +538,34 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.sm,
 		padding: SPACING_W.md,
 		borderWidth: 1,
-		borderColor: '#FFEDD5',
+		borderColor: COLORS.accentOrangeSoft,
 	},
 	comboCount: {
 		fontSize: FONT_SIZES.md,
 		fontWeight: '600',
-		color: '#F87171',
+		color: COLORS.dangerLight,
 	},
 	comboReward: {
 		fontSize: FONT_SIZES.md,
 		fontWeight: '700',
-		color: '#FB923C',
+		color: COLORS.accentOrangeLight,
 	},
 
 	// 경고 박스
 	warningBox: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#FEF2F2',
+		backgroundColor: COLORS.dangerSoftBg,
 		borderRadius: RADIUS.sm,
 		padding: SPACING_W.md,
 		marginTop: SPACING_H.lg,
 		borderWidth: 1,
-		borderColor: '#FECACA',
+		borderColor: COLORS.dangerBorderSoft,
 	},
 	warningText: {
 		flex: 1,
 		fontSize: FONT_SIZES.smPlus,
-		color: '#F87171',
+		color: COLORS.dangerLight,
 		fontWeight: '600',
 		marginLeft: SPACING_W.sm,
 	},
@@ -639,7 +639,7 @@ const styles = StyleSheet.create({
 	},
 	rankCardFirst: {
 		backgroundColor: COLORS.warningSoft,
-		borderColor: '#FBBF24',
+		borderColor: COLORS.gold,
 		borderWidth: 2,
 	},
 	rankCardSecond: {
@@ -648,7 +648,7 @@ const styles = StyleSheet.create({
 	},
 	rankCardThird: {
 		backgroundColor: COLORS.accentOrangeBg,
-		borderColor: '#FB923C',
+		borderColor: COLORS.accentOrangeLight,
 	},
 	rankLeft: {
 		flexDirection: 'row',
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
 	},
 	rankScoreFirst: {
 		fontSize: FONT_SIZES.xxl,
-		color: '#FB923C',
+		color: COLORS.accentOrangeLight,
 	},
 	rankDate: {
 		fontSize: FONT_SIZES.sm,

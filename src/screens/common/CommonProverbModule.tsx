@@ -10,7 +10,7 @@ import IconComponent from './atomic/IconComponent';
 /** 카테고리별 색상 */
 export const getCategoryColor = (category: string): string => {
 	const map: Record<string, string> = {
-		'운/우연': '#8B5CF6',
+		'운/우연': '#06B6D4',
 		인간관계: '#3B82F6',
 		'세상 이치': '#14B8A6',
 		'근면/검소': '#22C55E',

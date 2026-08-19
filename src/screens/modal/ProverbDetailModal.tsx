@@ -4,6 +4,10 @@ import { View, Text, TouchableOpacity, ScrollView, Modal, StyleSheet, Animated }
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
+
+/** 레벨 번호 → 난이도 이름 (공통 난이도 램프 조회용) */
+const LEVEL_NAME_BY_NUMBER: Record<number, string> = { 1: '초급', 2: '중급', 3: '고급', 4: '특급' };
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
@@ -64,30 +68,9 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 		return null;
 	}
 
-	const getFieldColor = (field: string) => {
-		const categoryColorMap: Record<string, string> = {
-			'운/우연': '#00cec9', // 청록
-			인간관계: '#6c5ce7', // 보라
-			'세상 이치': '#fdcb6e', // 연노랑
-			'근면/검소': '#e17055', // 주황
-			'노력/성공': '#00b894', // 짙은 청록
-			'경계/조심': '#d63031', // 빨강
-			'욕심/탐욕': '#e84393', // 핫핑크
-			'배신/불신': '#2d3436', // 짙은 회색
-		};
-
-		return categoryColorMap[field] || '#b2bec3'; // 기본 회색
-	};
-	const getLevelColor = (levelName: number) => {
-		const levelColorMap: Record<string, string> = {
-			1: '#2ecc71',
-			2: '#F4D03F',
-			3: '#EB984E',
-			4: '#E74C3C',
-		};
-
-		return levelColorMap[levelName] || '#b2bec3'; // 기본 회색
-	};
+	// 카테고리/난이도 색 — 공통 팔레트(CommonProverbModule) 단일 소스 사용
+	const getFieldColor = (field: string) => getCategoryColor(field);
+	const getLevelColor = (level: number) => getLevelNameColor(LEVEL_NAME_BY_NUMBER[level] ?? '');
 
 	const getLevelIcon = (level: number) => {
 		switch (level) {

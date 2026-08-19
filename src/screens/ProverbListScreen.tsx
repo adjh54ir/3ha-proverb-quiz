@@ -37,29 +37,19 @@ const PAGE_SIZE = 30;
 const COMMON_ALL_OPTION = {
 	label: '전체',
 	value: '전체',
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#64748B" />,
-	labelStyle: {
-		marginLeft: SPACING_W.xsPlus,
-		fontSize: scaledSize(14),
-	},
-};
-
-const COMMON_ALL_OPTION2 = {
-	label: '전체',
-	value: '전체',
 	iconType: 'FontAwesome6',
 	iconName: 'clipboard-list',
 	iconColor: COLORS.textSecondary,
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#64748B" />,
+	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />,
 	labelStyle: {
 		marginLeft: SPACING_W.xsPlus,
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 	},
 };
 
 // 공통 아이콘(CommonProverbModule)을 실제 데이터 값 기준으로 불러와 드롭다운 좌측 아이콘 구성
 const buildLevelItems = (levels: string[]) => [
-	COMMON_ALL_OPTION2,
+	COMMON_ALL_OPTION,
 	...levels.map((lv) => ({
 		label: lv,
 		value: lv,
@@ -380,7 +370,7 @@ const ProverbListScreen = () => {
 											onChangeValue={(value) => {
 												scrollToTop();
 											}}
-											listItemLabelStyle={{ marginLeft: SPACING_W.xsPlus, fontSize: scaledSize(14) }}
+											listItemLabelStyle={{ marginLeft: SPACING_W.xsPlus, fontSize: FONT_SIZES.md }}
 											labelStyle={{ fontSize: FONT_SIZES.md, color: COLORS.text }}
 											iconContainerStyle={{ marginRight: SPACING_W.sm }}
 											showArrowIcon={true} // 드롭다운 화살표
@@ -489,7 +479,7 @@ const ProverbListScreen = () => {
 											setShowFavoritesOnly(!showFavoritesOnly);
 											scrollToTop();
 										}}>
-										<Icon name="star" solid={showFavoritesOnly} size={scaledSize(14)} color={showFavoritesOnly ? '#FBBF24' : COLORS.textLight} />
+										<Icon name="star" solid={showFavoritesOnly} size={scaledSize(14)} color={showFavoritesOnly ? COLORS.gold : COLORS.textLight} />
 										<Text style={[styles.favoriteFilterText, showFavoritesOnly && styles.favoriteFilterTextActive]}>
 											즐겨찾기
 										</Text>
@@ -559,7 +549,7 @@ const ProverbListScreen = () => {
 															name="star"
 															solid={favoriteIds.includes(item.id)}
 															size={scaledSize(18)}
-															color={favoriteIds.includes(item.id) ? '#FBBF24' : COLORS.borderDark}
+															color={favoriteIds.includes(item.id) ? COLORS.gold : COLORS.borderDark}
 														/>
 													</TouchableOpacity>
 												</View>
@@ -892,7 +882,7 @@ const styles = StyleSheet.create({
 	},
 	favoriteFilterButtonActive: {
 		backgroundColor: HERO.bg,
-		borderColor: '#FBBF24',
+		borderColor: COLORS.gold,
 	},
 	favoriteFilterText: {
 		fontSize: FONT_SIZES.smPlus,
@@ -900,6 +890,6 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 	},
 	favoriteFilterTextActive: {
-		color: '#F97316',
+		color: COLORS.accentFlame,
 	},
 });

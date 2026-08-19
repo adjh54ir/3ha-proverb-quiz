@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from "react";
 import { Keyboard, KeyboardAvoidingView, Modal, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import IconComponent from "../atomic/IconComponent";
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
-import { SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, SPACING_W, SPACING_H } from '@/const/common/Theme';
 
 const InfoModal = () => {
 
@@ -14,7 +14,7 @@ const InfoModal = () => {
         navigation.setOptions({
             headerRight: () => (
                 <TouchableOpacity onPress={() => setShowGuideModal(true)} style={{ marginRight: SPACING_W.lg }}>
-                    <IconComponent type="materialIcons" name="info-outline" size={scaledSize(24)} color="#3498db" />
+                    <IconComponent type="materialIcons" name="info-outline" size={scaledSize(24)} color={COLORS.secondary} />
                 </TouchableOpacity>
             ),
         });
@@ -29,7 +29,7 @@ const InfoModal = () => {
                         <View style={styles.modalOverlay}>
                             <View style={styles.modalContent}>
                                 <TouchableOpacity style={styles.modalCloseIcon} onPress={() => setShowGuideModal(false)}>
-                                    <IconComponent type="materialIcons" name="close" size={scaledSize(24)} color="#7f8c8d" />
+                                    <IconComponent type="materialIcons" name="close" size={scaledSize(24)} color={COLORS.textSecondary} />
                                 </TouchableOpacity>
                                 <Text style={styles.modalTitle}>🏠 홈 화면 안내</Text>
                                 <Text style={styles.modalText}>
@@ -63,7 +63,7 @@ export default InfoModal;
 const styles = StyleSheet.create({
     wrapper: {
         flex: 1,
-        backgroundColor: '#ffffff',
+        backgroundColor: COLORS.surface,
     },
     container: {
         flexGrow: 1,
@@ -79,31 +79,31 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         width: '85%',
-        backgroundColor: '#ffffff',
+        backgroundColor: COLORS.surface,
         padding: SPACING_W.xl,
         borderRadius: scaleWidth(12),
         alignItems: 'center',
     },
     modalCloseButton: {
-        backgroundColor: '#3498db',
+        backgroundColor: COLORS.secondary,
         paddingVertical: SPACING_H.smPlus,
         paddingHorizontal: SPACING_W.xl,
         borderRadius: scaleWidth(8),
     },
     modalCloseText: {
-        color: '#ffffff',
+        color: COLORS.textWhite,
         fontWeight: '600',
     },
     modalTitle: {
-        fontSize: scaledSize(18),
+        fontSize: FONT_SIZES.xl,
         fontWeight: 'bold',
-        color: '#2c3e50',
+        color: COLORS.textStrong,
         marginBottom: SPACING_H.mdPlus,
         textAlign: 'center',
     },
     modalText: {
-        fontSize: scaledSize(14),
-        color: '#2c3e50',
+        fontSize: FONT_SIZES.md,
+        color: COLORS.textStrong,
         lineHeight: scaleHeight(22),
         textAlign: 'left',
         marginTop: SPACING_H.smPlus,

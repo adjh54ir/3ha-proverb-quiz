@@ -101,7 +101,7 @@ const TodayQuizScreen = () => {
 	const [quizOptionsMap, setQuizOptionsMap] = useState<{ [id: number]: string[] }>({});
 	const [currentIndex, setCurrentIndex] = useState(0); // 현재 문제 번호
 	const [progressPercent, setProgressPercent] = useState(quizList.length > 0 ? (currentIndex / quizList.length) * 100 : 0);
-	const labelColors = ['#1abc9c', '#3498db', '#16a085', '#e67e22'];
+	const labelColors = [COLORS.secondary, COLORS.primary, COLORS.accentTeal, COLORS.accentFlame]; // A, B, C, D 보기 라벨
 	const [showAlarmModal, setShowAlarmModal] = useState(false);
 
 	const [tempIsAlarmEnabled, setTempIsAlarmEnabled] = useState(false);
@@ -815,7 +815,7 @@ const TodayQuizScreen = () => {
 						<View style={styles.leftButtonWrapper}>
 							{/* <TouchableOpacity onPress={handleResetTodayQuiz}>
 								<View style={[styles.buttonContent, { marginLeft: SPACING_W.md }]}>
-									<IconComponent name="rotate-left" type="FontAwesome" size={scaledSize(13)} color="#95a5a6" style={styles.iconSpacing} />
+									<IconComponent name="rotate-left" type="FontAwesome" size={scaledSize(13)} color={COLORS.textLight} style={styles.iconSpacing} />
 									<Text style={styles.buttonText}>오늘 문제 다시 풀기</Text>
 								</View>
 							</TouchableOpacity> */}

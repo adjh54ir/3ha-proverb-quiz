@@ -31,8 +31,8 @@ interface Props {
 	},
 
 	devText: {
-		fontSize: scaledSize(12),
-		color: '#95a5a6', // 흐릿한 회색
+		fontSize: FONT_SIZES.sm,
+		color: COLORS.textLight,
 		textAlign: 'center',
 	},
 
@@ -53,14 +53,14 @@ interface Props {
 		width: scaleWidth(80),
 		height: scaleWidth(30),
 		borderRadius: scaleWidth(28), // 반지름도 줄임
-		backgroundColor: '#F8F8F8', // 연한 회색 배경
+		backgroundColor: COLORS.surfaceAlt,
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: SPACING_H.xxxl,
 	},
 	devText: {
-		fontSize: scaledSize(13),
-		color: '#95a5a6', // 조금 더 진한 회색
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 		textAlign: 'center',
 		fontWeight: '500',
 	},

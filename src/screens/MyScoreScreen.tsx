@@ -32,7 +32,6 @@ import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
-import Colors from '@/const/ConstColors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
@@ -44,6 +43,7 @@ import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import LevelModal from './modal/LevelModal';
 import { FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
+import { getLevelColor } from '@/screens/common/CommonProverbModule';
 import DateUtils from '@/utils/DateUtils';
 
 interface TodayQuizList {
@@ -69,48 +69,27 @@ const DIFFICULTIES = [
 	{ key: 'Level 4', title: 'Level 4', subtitle: '특급', icon: 'trophy' },
 ];
 
-const CATEGORY_META: Record<string, { color: string; icon: { type: string; name: string } }> = {
-	'감정/심리': { color: '#F87171', icon: { type: 'FontAwesome6', name: 'heart' } },
-	인간관계: { color: '#93C5FD', icon: { type: 'FontAwesome6', name: 'users' } },
-	'도덕/교훈': { color: '#93C5FD', icon: { type: 'FontAwesome6', name: 'scale-balanced' } },
-	'지혜/판단': { color: '#FCD34D', icon: { type: 'FontAwesome6', name: 'brain' } },
-	'성공/의지': { color: '#BFDBFE', icon: { type: 'FontAwesome6', name: 'medal' } },
-	'위기/고난': { color: '#F87171', icon: { type: 'FontAwesome', name: 'exclamation-triangle' } },
-	'언어/표현': { color: '#BFDBFE', icon: { type: 'FontAwesome6', name: 'comment-dots' } },
-	'생활/사회': { color: '#FCA5A5', icon: { type: 'FontAwesome6', name: 'globe' } },
-	'성격/결함': { color: '#94A3B8', icon: { type: 'FontAwesome6', name: 'user-slash' } },
-	'성격/덕목': { color: '#22C55E', icon: { type: 'FontAwesome6', name: 'handshake' } },
-	'인생/운명': { color: '#FDE68A', icon: { type: 'FontAwesome6', name: 'dice' } },
-	'학습/성장': { color: '#22C55E', icon: { type: 'FontAwesome6', name: 'book-open' } },
-	'결단/선택': { color: '#22C55E', icon: { type: 'FontAwesome6', name: 'toggle-on' } },
-	'전략/경쟁': { color: '#DC2626', icon: { type: 'FontAwesome6', name: 'chess-knight' } },
-	'생존/현실': { color: '#22C55E', icon: { type: 'FontAwesome6', name: 'person-digging' } },
-	'사랑/가정': { color: '#F87171', icon: { type: 'FontAwesome6', name: 'people-roof' } },
-	기타: { color: '#E2E8F0', icon: { type: 'FontAwesome6', name: 'circle-question' } },
-};
-
-
 const STYLE_MAP = {
 	초급: {
-		color: '#BFDBFE',
+		color: getLevelColor('초급'),
 		icon: { type: 'fontAwesome5', name: 'seedling' },
 		badgeId: 'level_easy_1',
 		type: 'level',
 	},
 	중급: {
-		color: '#FCD34D',
+		color: getLevelColor('중급'),
 		icon: { type: 'fontAwesome5', name: 'leaf' },
 		badgeId: 'level_easy_2',
 		type: 'level',
 	},
 	고급: {
-		color: '#FB923C',
+		color: getLevelColor('고급'),
 		icon: { type: 'fontAwesome5', name: 'tree' },
 		badgeId: 'level_medium',
 		type: 'level',
 	},
 	특급: {
-		color: COLORS.danger,
+		color: getLevelColor('특급'),
 		icon: { type: 'fontAwesome5', name: 'trophy' },
 		badgeId: 'level_hard',
 		type: 'level',
@@ -157,26 +136,13 @@ const STORAGE_KEY_STUDY = MainStorageKeyType.USER_STUDY_HISTORY;
 const STORAGE_KEY_TIME = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 const STORAGE_KEY_TODAY = MainStorageKeyType.TODAY_QUIZ_LIST;
 
-// 카테고리 뱃지 매핑
-const categoryMap2: { [key: string]: string } = {
-	'감정/심리': 'category_emotion',
-	인간관계: 'category_relation',
-	'도덕/교훈': 'category_ethics',
-	'지혜/판단': 'category_judgement',
-	'성공/의지': 'category_will',
-	'위기/고난': 'category_crisis',
-	'언어/표현': 'category_expression',
-	'생활/사회': 'category_life',
-	'성격/결함': 'category_flaw',
-	'성격/덕목': 'category_virtue',
-	'인생/운명': 'category_fate',
-	'학습/성장': 'category_growth',
-	'결단/선택': 'category_decision',
-	'전략/경쟁': 'category_strategy',
-	'생존/현실': 'category_survival',
-	'사랑/가정': 'category_love',
-	기타: 'category_etc',
-};
+// 카테고리 뱃지 매핑 — 드롭다운 단일 소스(FIELD_DROPDOWN_ITEMS)에서 파생
+const CATEGORY_BADGE_MAP: Record<string, string> = FIELD_DROPDOWN_ITEMS.reduce((acc, item) => {
+	if (item.badgeId) {
+		acc[item.label] = item.badgeId;
+	}
+	return acc;
+}, {} as Record<string, string>);
 
 // 정복/클리어 섹션 공통 헤더 (아이콘 칩 + 타이틀 + 진행 카운트 pill)
 const ConquerHeader = ({
@@ -288,14 +254,13 @@ const MyScoreScreen = () => {
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
 	const allCategories = ProverbServices.selectCategoryList(); // 전체 카테고리 (8개)
-	console.log('allCategories : ', allCategories);
 	// TOOD: 해당 부분에서 데이터를 불러 와야 함
 	// const allCategories = []; // 전체 카테고리 (8개)
 
 	const getLevelStyle = (subtitle: string) => {
 		const entry = STYLE_MAP[subtitle];
 		if (!entry) {
-			return { bg: '#fff', border: '#CBD5E1' };
+			return { bg: COLORS.surface, border: COLORS.borderDark };
 		}
 		return { bg: entry.color, border: entry.color };
 	};
@@ -416,10 +381,8 @@ const MyScoreScreen = () => {
 			const allBadges = [...new Set([...studyBadges, ...quizBadges])];
 			setEarnedBadgeIds(allBadges);
 
-			console.log(allCategories);
-
 			// 정복한 카테고리만 추출
-			const conqueredCategories = Object.entries(categoryMap2)
+			const conqueredCategories = Object.entries(CATEGORY_BADGE_MAP)
 				.filter(([_, badgeId]) => allBadges.includes(badgeId))
 				.map(([label]) => label);
 
@@ -476,7 +439,7 @@ const MyScoreScreen = () => {
 							backgroundColor: COLORS.secondary,
 						},
 						text: {
-							color: '#fff',
+							color: COLORS.textWhite,
 							fontWeight: 'bold',
 						},
 					},
@@ -816,7 +779,7 @@ const MyScoreScreen = () => {
 					const metrics = [
 						{ icon: 'school', color: COLORS.primary, soft: COLORS.primarySoft, label: '학습 진척도', value: `${studyCountries.length}/${totalCountryCount}`, pct: studyPct },
 						{ icon: 'check-circle', color: COLORS.secondary, soft: COLORS.secondarySoft, label: '퀴즈 정답률', value: `${accuracy}%`, pct: accuracy },
-						{ icon: 'play-circle-filled', color: '#14B8A6', soft: '#CCFBF1', label: '퀴즈 진척도', value: `${totalSolved}/${totalCountryCount}`, pct: solvedPct },
+						{ icon: 'play-circle-filled', color: COLORS.accentTeal, soft: COLORS.accentTealBg, label: '퀴즈 진척도', value: `${totalSolved}/${totalCountryCount}`, pct: solvedPct },
 						{ icon: 'military-tech', color: COLORS.warning, soft: COLORS.warningBg, label: '획득 뱃지', value: `${earnedBadgeIds.length}/${CONST_BADGES.length}`, pct: badgePct },
 					];
 					return (
@@ -909,8 +872,8 @@ const MyScoreScreen = () => {
 						<View style={styles.chartRow}>
 							<DonutChart
 								percent={totalCountryCount > 0 ? Math.round((studyCountries.length / totalCountryCount) * 100) : 0}
-								size={88}
-								strokeWidth={10}
+								size={scaledSize(88)}
+								strokeWidth={scaledSize(10)}
 								color={COLORS.primary}>
 								<AnimatedCounter
 									value={totalCountryCount > 0 ? Math.round((studyCountries.length / totalCountryCount) * 100) : 0}
@@ -971,7 +934,7 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'quiz') && (
 					<View style={styles.activityCardBox}>
 						<View style={styles.chartRow}>
-							<DonutChart percent={accuracy} size={88} strokeWidth={10} color={COLORS.secondary}>
+							<DonutChart percent={accuracy} size={scaledSize(88)} strokeWidth={scaledSize(10)} color={COLORS.secondary}>
 								<AnimatedCounter value={accuracy} suffix="%" style={[styles.donutCenterValue, { color: COLORS.secondary }]} />
 								<Text style={styles.donutCenterLabel}>정답률</Text>
 							</DonutChart>
@@ -1009,8 +972,8 @@ const MyScoreScreen = () => {
 						</View>
 						<View style={styles.summaryStatGrid}>
 							<View style={styles.summaryStatCard}>
-								<View style={[styles.statIconChip, { backgroundColor: '#FFEDD5' }]}>
-									<IconComponent type="fontAwesome6" name="fire" size={scaledSize(16)} color="#F97316" />
+								<View style={[styles.statIconChip, { backgroundColor: COLORS.accentOrangeSoft }]}>
+									<IconComponent type="fontAwesome6" name="fire" size={scaledSize(16)} color={COLORS.accentFlame} />
 								</View>
 								<Text style={styles.statValue}> {bestCombo} Combo </Text>
 								<Text style={styles.statLabel}> 최고 콤보 </Text>
@@ -1023,8 +986,8 @@ const MyScoreScreen = () => {
 								<Text style={styles.statLabel}> 정답률 </Text>
 							</View>
 							<View style={styles.summaryStatCard}>
-								<View style={[styles.statIconChip, { backgroundColor: '#CCFBF1' }]}>
-									<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(16)} color="#14B8A6" />
+								<View style={[styles.statIconChip, { backgroundColor: COLORS.accentTealBg }]}>
+									<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(16)} color={COLORS.accentTeal} />
 								</View>
 								<Text style={styles.statValue}> {lastAnsweredAt ? moment(lastAnsweredAt).format('YY.MM.DD') : '없음'} </Text>
 								<Text style={styles.statLabel}> 마지막 퀴즈일 </Text>
@@ -1090,8 +1053,8 @@ const MyScoreScreen = () => {
 							<ConquerHeader
 								iconType="fontAwesome6"
 								iconName="brain"
-								tint="#0EA5E9"
-								chipBg="#E0F2FE"
+								tint={COLORS.accentSky}
+								chipBg={COLORS.accentSkyBg}
 								title="정복한 카테고리"
 								current={categoryMaster.length}
 								total={allCategories.length}
@@ -1105,7 +1068,7 @@ const MyScoreScreen = () => {
 									const isEarned = categoryMaster.includes(category);
 									const categoryInfo = FIELD_DROPDOWN_ITEMS.find((item) => item.label === category || item.value === category);
 									const meta = {
-										color: categoryInfo?.iconColor ?? CATEGORY_META[category]?.color ?? COLORS.borderDark,
+										color: categoryInfo?.iconColor ?? COLORS.borderDark,
 										icon: {
 											type: categoryInfo?.iconType ?? 'FontAwesome6',
 											name: categoryInfo?.iconName ?? 'circle-question',
@@ -1335,7 +1298,7 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'time') && (
 					<View style={styles.sectionBox}>
 						<View style={styles.subtitleRow}>
-							<IconComponent type="materialIcons" name="leaderboard" size={scaledSize(16)} color="#F97316" />
+							<IconComponent type="materialIcons" name="leaderboard" size={scaledSize(16)} color={COLORS.accentFlame} />
 							<Text style={styles.topRankingTitleInline}>나의 랭킹 TOP 3</Text>
 						</View>
 
@@ -1354,7 +1317,7 @@ const MyScoreScreen = () => {
 														name="trophy"
 														type="FontAwesome"
 														size={scaledSize(24)}
-														color="#FBBF24"
+														color={COLORS.gold}
 														style={{ marginRight: SPACING_W.sm }}
 													/>
 													<Text style={styles.firstRankLabel}>1등</Text>
@@ -1384,7 +1347,7 @@ const MyScoreScreen = () => {
 														name="trophy"
 														type="FontAwesome"
 														size={scaledSize(18)}
-														color="#FB923C"
+														color={COLORS.accentOrangeLight}
 														style={{ marginRight: SPACING_W.lg }}
 													/>
 													<Text style={styles.thirdRankLabel}>3등</Text>
@@ -1483,7 +1446,7 @@ const MyScoreScreen = () => {
 				{/* 나의 타워 챌린지 내역 */}
 				{(activeTab === 'all' || activeTab === 'tower') && (
 				<View style={styles.sectionHeaderStatic}>
-					<View style={[styles.iconCircle3, { backgroundColor: '#0EA5E9' }]}>
+					<View style={[styles.iconCircle3, { backgroundColor: COLORS.accentSky }]}>
 						<IconComponent type="fontAwesome6" name="tower-observation" size={scaledSize(14)} color={COLORS.textWhite} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 타워 챌린지</Text>
@@ -1495,8 +1458,8 @@ const MyScoreScreen = () => {
 						<ConquerHeader
 							iconType="fontAwesome6"
 							iconName="tower-observation"
-							tint="#0EA5E9"
-							chipBg="#E0F2FE"
+							tint={COLORS.accentSky}
+							chipBg={COLORS.accentSkyBg}
 							title="클리어한 타워"
 							current={unlockedRewards.length}
 							total={TOWER_LEVELS.length}
@@ -1625,7 +1588,7 @@ const MyScoreScreen = () => {
 export default MyScoreScreen;
 
 const styles = StyleSheet.create({
-	safeArea: { flex: 1, backgroundColor: Colors.background },
+	safeArea: { flex: 1, backgroundColor: COLORS.background },
 	container: {
 		paddingHorizontal: SPACING_W.lg,
 	},
@@ -2031,7 +1994,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(12),
 		marginBottom: SPACING_H.lg,
 		borderWidth: 1,
-		borderColor: '#FBBF24',
+		borderColor: COLORS.gold,
 	},
 	summaryTitle: {
 		fontSize: FONT_SIZES.lg,
@@ -2372,7 +2335,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: SPACING_W.xsPlus,
-		backgroundColor: '#F97316', // 🎨 밝은 파랑 배경 추가
+		backgroundColor: COLORS.accentFlame,
 	},
 
 	iconCircle4: {
@@ -2382,7 +2345,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: SPACING_W.xsPlus,
-		backgroundColor: '#14B8A6', // 오늘의 퀴즈 — 비중복 틸 컬러
+		backgroundColor: COLORS.accentTeal, // 오늘의 퀴즈 — 비중복 틸 컬러
 	},
 	iconCircle5: {
 		width: scaleWidth(30),
@@ -2581,7 +2544,7 @@ const styles = StyleSheet.create({
 
 	firstRankLabel: {
 		fontSize: FONT_SIZES.mdPlus,
-		color: '#FBBF24',
+		color: COLORS.gold,
 		fontWeight: '700',
 		marginRight: SPACING_W.sm,
 	},
@@ -2595,7 +2558,7 @@ const styles = StyleSheet.create({
 
 	thirdRankLabel: {
 		fontSize: FONT_SIZES.md,
-		color: '#FB923C',
+		color: COLORS.accentOrangeLight,
 		fontWeight: '700',
 		marginRight: SPACING_W.sm,
 	},

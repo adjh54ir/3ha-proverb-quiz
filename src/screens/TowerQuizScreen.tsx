@@ -350,7 +350,7 @@ const TowerQuizScreen = () => {
 	if (isLoading) {
 		return (
 			<View style={styles.container}>
-				<LinearGradient colors={['#2B2D3A', '#21222C', '#191A21']} style={StyleSheet.absoluteFillObject} />
+				<LinearGradient colors={COLORS.darkGradient} style={StyleSheet.absoluteFillObject} />
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
 					<FastImage source={require('@/assets/images/screen-heroes/tower-quiz-coach.png')} style={styles.loadingCoachImage} resizeMode="contain" />
 					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>퀴즈 생성 중...</Text>
@@ -362,8 +362,9 @@ const TowerQuizScreen = () => {
 	if (!towerLevel) {
 		return (
 			<View style={styles.container}>
-				<LinearGradient colors={['#2B2D3A', '#21222C', '#191A21']} style={StyleSheet.absoluteFillObject} />
+				<LinearGradient colors={COLORS.darkGradient} style={StyleSheet.absoluteFillObject} />
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
+					<FastImage source={require('@/assets/images/screen-heroes/data-retry.png')} style={styles.errorStateImage} resizeMode="contain" />
 					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>타워 정보를 찾을 수 없습니다.</Text>
 					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: SPACING_H.xl }}>
 						<Text style={{ color: COLORS.primary, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
@@ -376,8 +377,9 @@ const TowerQuizScreen = () => {
 	if (quizData.length === 0 || !currentQuestion) {
 		return (
 			<View style={styles.container}>
-				<LinearGradient colors={['#2B2D3A', '#21222C', '#191A21']} style={StyleSheet.absoluteFillObject} />
+				<LinearGradient colors={COLORS.darkGradient} style={StyleSheet.absoluteFillObject} />
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
+					<FastImage source={require('@/assets/images/screen-heroes/data-retry.png')} style={styles.errorStateImage} resizeMode="contain" />
 					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>레벨 {level}에 해당하는 단어가 없습니다.</Text>
 					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: SPACING_H.xl }}>
 						<Text style={{ color: COLORS.primary, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
@@ -391,7 +393,7 @@ const TowerQuizScreen = () => {
 
 	return (
 		<View style={styles.container}>
-			<LinearGradient colors={['#2B2D3A', '#21222C', '#191A21']} style={StyleSheet.absoluteFillObject} />
+			<LinearGradient colors={COLORS.darkGradient} style={StyleSheet.absoluteFillObject} />
 
 			<SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
 				<View style={styles.header}>
@@ -606,8 +608,9 @@ const styles = StyleSheet.create({
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.xs },
 	headerCrest: { width: scaleWidth(28), height: scaleWidth(28) },
 	loadingCoachImage: { width: scaleWidth(150), height: scaleHeight(150), marginBottom: SPACING_H.lg },
+	errorStateImage: { width: scaleWidth(150), height: scaleHeight(100), marginBottom: SPACING_H.lg },
 	levelTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
-	questionCount: { fontSize: FONT_SIZES.md, color: '#CBD5E1', marginTop: SPACING_H.xs },
+	questionCount: { fontSize: FONT_SIZES.md, color: COLORS.darkTextSecondary, marginTop: SPACING_H.xs },
 	progressBarContainer: { paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.lg },
 	progressLabelRow: {
 		flexDirection: 'row',
@@ -644,7 +647,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	questionProverb: {
-		color: '#60A5FA', // ✅ 속담 부분만 파란색 강조
+		color: COLORS.darkAccent, // ✅ 속담 부분만 파란색 강조
 		fontWeight: '700',
 	},
 	questionAsk: {
@@ -674,7 +677,7 @@ const styles = StyleSheet.create({
 	explanationGradient: { paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg },
 	explanationHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm, marginBottom: SPACING_H.sm },
 	explanationTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700' },
-	explanationText: { fontSize: FONT_SIZES.md, color: '#F1F5F9', lineHeight: scaledSize(20) },
+	explanationText: { fontSize: FONT_SIZES.md, color: COLORS.darkText, lineHeight: scaledSize(20) },
 	nextButtonContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, paddingBottom: SPACING_H.lg },
 	nextButton: { borderRadius: RADIUS.md, overflow: 'hidden' },
 	nextButtonGradient: {
@@ -700,7 +703,7 @@ const styles = StyleSheet.create({
 	scoreContainer: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.xs },
 	effectText: {
 		position: 'absolute',
-		fontSize: scaledSize(28),
+		fontSize: FONT_SIZES.display,
 		fontWeight: '700',
 		textShadowColor: 'rgba(0,0,0,0.5)',
 		textShadowOffset: { width: 1, height: 1 },

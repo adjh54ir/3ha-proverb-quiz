@@ -144,7 +144,7 @@ const InitQuizModeScreen = () => {
 							<View style={styles.accordionContent}>
 								<View style={styles.accordionDescBox}>
 									<View style={styles.accordionRow}>
-										<IconComponent type="FontAwesome5" name="book" size={scaledSize(16)} color="#F97316" />
+										<IconComponent type="FontAwesome5" name="book" size={scaledSize(16)} color={COLORS.accentFlame} />
 										<Text style={styles.accordionText}>틀린 문제는 오답 복습에서 다시 확인할 수 있어요.</Text>
 									</View>
 									<View style={styles.accordionRow}>
@@ -154,7 +154,7 @@ const InitQuizModeScreen = () => {
 								</View>
 								<View style={styles.accordionButtonsRow}>
 									<TouchableOpacity
-										style={[styles.accordionButton, { backgroundColor: '#F97316' }]}
+										style={[styles.accordionButton, { backgroundColor: COLORS.accentFlame }]}
 										activeOpacity={0.85}
 										// @ts-ignore
 										onPress={() => navigation.navigate(Paths.QUIZ_WRONG_REVIEW)}>
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.warningBorder,
 	},
-	levelBadgeText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#B45309' },
+	levelBadgeText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.warningDeep },
 
 	// ===== 타이틀 =====
 	titleWrap: { marginBottom: SPACING_H.xl, alignItems: 'center' },

@@ -119,6 +119,10 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
         return COLORS.danger;
     };
 
+    const completionImageSource = accuracy === 100
+        ? require('@/assets/images/screen-heroes/quiz-perfect.png')
+        : require('@/assets/images/screen-heroes/quiz-complete.png');
+
     if (!isPracticeMode) {
         return (
             <Modal visible={visible} transparent animationType="fade">
@@ -151,7 +155,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                                 }}>
                                 <View style={styles.mascotContainer}>
                                     <FastImage
-                                        source={require('@/assets/images/mascote_done.png')}
+                                        source={completionImageSource}
                                         style={styles.completionMascot}
                                         resizeMode={FastImage.resizeMode.contain}
                                     />
@@ -214,9 +218,11 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                                 transform: [{ translateY: mascotBounce }],
                             }}>
                             <View style={styles.practiceMascotContainer}>
-                                <Text style={styles.practiceEmoji}>
-                                    {getPerformanceEmoji()}
-                                </Text>
+                                <FastImage
+                                    source={completionImageSource}
+                                    style={styles.practiceCompletionImage}
+                                    resizeMode={FastImage.resizeMode.contain}
+                                />
                             </View>
                         </Animated.View>
 
@@ -395,17 +401,17 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     mascotContainer: {
-        width: scaleWidth(120),
-        height: scaleWidth(120),
-        borderRadius: scaleWidth(120) / 2,
+        width: scaleWidth(190),
+        height: scaleHeight(132),
+        borderRadius: RADIUS.xl,
         backgroundColor: COLORS.warningBg,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: SPACING_H.lg,
     },
     completionMascot: {
-        width: scaleWidth(90),
-        height: scaleWidth(90),
+        width: scaleWidth(176),
+        height: scaleHeight(126),
     },
     celebrateRow: {
         flexDirection: 'row',
@@ -428,16 +434,17 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     practiceMascotContainer: {
-        width: scaleWidth(90),
-        height: scaleWidth(90),
-        borderRadius: scaleWidth(90) / 2,
+		width: scaleWidth(142),
+		height: scaleHeight(100),
+		borderRadius: RADIUS.lg,
         backgroundColor: COLORS.surfaceAlt,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: SPACING_H.md,
     },
-    practiceEmoji: {
-        fontSize: scaledSize(50),
+	practiceCompletionImage: {
+		width: scaleWidth(134),
+		height: scaleHeight(94),
     },
     accuracyCircleContainer: {
         marginBottom: SPACING_H.xl,

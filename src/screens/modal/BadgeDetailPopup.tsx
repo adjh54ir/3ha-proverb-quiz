@@ -128,7 +128,9 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 								</View>
 							</View>
 
-							<Text style={styles.badgeName}>{badge.name}</Text>
+							<Text style={styles.badgeName} numberOfLines={2} ellipsizeMode="tail">
+								{badge.name}
+							</Text>
 							<View style={styles.typeChip}>
 								<Text style={styles.typeChipText}>{TYPE_LABEL[badge.type] ?? '뱃지'}</Text>
 							</View>

@@ -20,6 +20,7 @@ import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import StartModal from './modal/QuizStartModal';
@@ -32,7 +33,8 @@ import { startBgm, stopBgm } from '@/utils/BgmUtils';
 import { toggleFavorite } from '@/utils/favoriteUtils';
 import DateUtils from '@/utils/DateUtils';
 
-const labelColors = ['#1abc9c', '#3498db', '#16a085', '#e67e22'];
+const labelColors = [COLORS.secondary, COLORS.primary, COLORS.accentTeal, COLORS.accentFlame]; // A, B, C, D 보기 라벨
+const LEVEL_NAME_BY_NUMBER: Record<number, string> = { 1: '초급', 2: '중급', 3: '고급', 4: '특급' };
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
@@ -531,17 +533,8 @@ const QuizScreen = () => {
 			setIsAnswerLocked(false); // 🔓 다시 풀기 (다음 문제로 넘어갈 때)
 		}, 600); // 약간
 	};
-	const getLevelColor = (level: number) => {
-		// 퀴즈 모드 선택 화면(LEVELS)과 동일한 색상 사용 (난이도가 올라갈수록 어두워짐)
-		const levelColorMap: Record<string, string> = {
-			1: '#34D399', // 초급
-			2: '#F59E0B', // 중급
-			3: '#EA580C', // 고급
-			4: '#B91C1C', // 특급
-		};
-
-		return levelColorMap[level] || COLORS.textLight; // 기본 회색
-	};
+	// 난이도 색상 — 공통 난이도 램프(CommonProverbModule) 단일 소스 사용
+	const getLevelColor = (level: number) => getLevelNameColor(LEVEL_NAME_BY_NUMBER[level] ?? '');
 
 	const triggerComboEffect = (comboValue: number) => {
 		let bonus = 0;
@@ -754,20 +747,8 @@ const QuizScreen = () => {
 		}
 	};
 
-	const getFieldColor = (field: string) => {
-		const categoryColorMap: Record<string, string> = {
-			'운/우연': '#16a085', // 청록
-			인간관계: '#16a085', // 보라
-			'세상 이치': '#f4d03f', // 연노랑
-			'근면/검소': '#e17055', // 주황
-			'노력/성공': '#27ae60', // 짙은 청록
-			'경계/조심': '#e74c3c', // 빨강
-			'욕심/탐욕': '#e84393', // 핫핑크
-			'배신/불신': '#2c3e50', // 짙은 회색
-		};
-
-		return categoryColorMap[field] || COLORS.textLight; // 기본 회색
-	};
+	// 카테고리 색상 — 공통 팔레트(CommonProverbModule) 단일 소스 사용
+	const getFieldColor = (field: string) => getCategoryColor(field);
 
 	const getLevelIcon = (level: number) => {
 		switch (level) {

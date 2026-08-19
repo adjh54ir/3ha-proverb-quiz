@@ -102,9 +102,9 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 	}, [visible, isVictory]);
 
 	const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
-	const accentColor = isVictory ? COLORS.gold : '#F87171';
-	const bgColor = isVictory ? '#064E3B' : '#7F1D1D';
-	const headerBgColor = isVictory ? COLORS.primary : '#B91C1C';
+	const accentColor = isVictory ? COLORS.gold : COLORS.dangerLight;
+	const bgColor = isVictory ? COLORS.towerVictoryBg : COLORS.towerDefeatBg;
+	const headerBgColor = isVictory ? COLORS.primary : COLORS.dangerDeep;
 	const borderColor = isVictory ? COLORS.primary : COLORS.danger;
 
 	const renderScoreDots = () =>
@@ -118,7 +118,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 						borderColor: i < correctCount ? accentColor : 'rgba(255,255,255,0.1)',
 					},
 				]}>
-				{i < correctCount && <IconComponent type="materialIcons" name="check" size={scaledSize(10)} color="#0F172A" />}
+				{i < correctCount && <IconComponent type="materialIcons" name="check" size={scaledSize(10)} color={COLORS.textDeep} />}
 			</View>
 		));
 
@@ -257,8 +257,8 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 						{isVictory ? (
 							onNext && (
 								<TouchableOpacity onPress={onNext} style={[styles.btnPrimary, { backgroundColor: COLORS.warning }]} activeOpacity={0.8}>
-									<Text style={[styles.btnPrimaryText, { color: '#0F172A' }]}>NEXT LEVEL</Text>
-									<IconComponent type="materialIcons" name="arrow-forward" size={scaledSize(20)} color="#0F172A" />
+									<Text style={[styles.btnPrimaryText, { color: COLORS.textDeep }]}>NEXT LEVEL</Text>
+									<IconComponent type="materialIcons" name="arrow-forward" size={scaledSize(20)} color={COLORS.textDeep} />
 								</TouchableOpacity>
 							)
 						) : (
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
 	failLabel: {
 		fontSize: FONT_SIZES.xs,
 		fontWeight: '700',
-		color: '#F87171',
+		color: COLORS.dangerLight,
 		letterSpacing: 3,
 		marginBottom: SPACING_H.sm,
 	},

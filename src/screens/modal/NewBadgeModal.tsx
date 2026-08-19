@@ -104,8 +104,12 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 					<ModalCloseButton onPress={handleConfirm} color={COLORS.textSecondary} />
 					<View style={styles.headerIconStage}>
 						<Animated.View style={[styles.headerIconGlow, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]} />
-						<Animated.View style={[styles.headerIconCircle, { transform: [{ scale: iconPopAnim }] }]}>
-							<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(28)} color={COLORS.warning} />
+						<Animated.View style={{ transform: [{ scale: iconPopAnim }] }}>
+							<FastImage
+								source={require('@/assets/images/screen-heroes/new-badge-reward.png')}
+								style={styles.rewardImage}
+								resizeMode={FastImage.resizeMode.contain}
+							/>
 						</Animated.View>
 					</View>
 					<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지 획득!</Text>
@@ -120,7 +124,7 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 								<View key={index} style={[styles.badgeCard, { backgroundColor: rarity.soft, borderColor: rarity.color }]}>
 									{/* 희귀도 리본 (등급 + 별점) */}
 									<View style={[styles.rarityRibbon, { backgroundColor: rarity.color }]}>
-										<IconComponent type="materialIcons" name="military-tech" size={scaledSize(13)} color="#fff" />
+										<IconComponent type="materialIcons" name="military-tech" size={scaledSize(13)} color={COLORS.textWhite} />
 										<Text style={styles.rarityRibbonText}>{rarity.label}</Text>
 										<View style={styles.ribbonStarRow}>
 											{Array.from({ length: 4 }).map((_, i) => (
@@ -201,26 +205,22 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	headerIconStage: {
-		width: scaleWidth(56),
-		height: scaleWidth(56),
+		width: scaleWidth(118),
+		height: scaleHeight(94),
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: SPACING_H.md,
 	},
 	headerIconGlow: {
 		position: 'absolute',
-		width: scaleWidth(56),
-		height: scaleWidth(56),
-		borderRadius: scaleWidth(56) / 2,
+		width: scaleWidth(70),
+		height: scaleWidth(70),
+		borderRadius: scaleWidth(70) / 2,
 		backgroundColor: COLORS.warning,
 	},
-	headerIconCircle: {
-		width: scaleWidth(56),
-		height: scaleWidth(56),
-		borderRadius: scaleWidth(56) / 2,
-		backgroundColor: COLORS.warningBg,
-		justifyContent: 'center',
-		alignItems: 'center',
+	rewardImage: {
+		width: scaleWidth(118),
+		height: scaleHeight(94),
 	},
 	badgeModalTitle: {
 		fontSize: FONT_SIZES.heading,

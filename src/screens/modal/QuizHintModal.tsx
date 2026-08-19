@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Animated, ScrollView } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
@@ -59,9 +60,11 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 
 					{/* 헤더 */}
 					<View style={styles.header}>
-						<View style={styles.iconCircle}>
-							<IconComponent type="MaterialIcons" name="lightbulb" size={scaledSize(26)} color={COLORS.textWhite} />
-						</View>
+						<FastImage
+							source={require('@/assets/images/screen-heroes/quiz-hint.png')}
+							style={styles.hintImage}
+							resizeMode={FastImage.resizeMode.contain}
+						/>
 						<Text style={styles.title}>힌트</Text>
 						<Text style={styles.subtitle}>이런 단서들을 참고해보세요!</Text>
 					</View>
@@ -175,13 +178,9 @@ const styles = StyleSheet.create({
 		rowGap: SPACING_H.xs,
 		marginBottom: SPACING_H.lg,
 	},
-	iconCircle: {
-		width: scaleWidth(56),
-		height: scaleWidth(56),
-		borderRadius: scaleWidth(56) / 2,
-		backgroundColor: COLORS.warning,
-		alignItems: 'center',
-		justifyContent: 'center',
+	hintImage: {
+		width: scaleWidth(132),
+		height: scaleHeight(92),
 		marginBottom: SPACING_H.sm,
 	},
 	title: {

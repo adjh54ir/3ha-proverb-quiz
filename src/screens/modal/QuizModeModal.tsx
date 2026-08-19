@@ -18,7 +18,7 @@ const MODES: { key: QuizMode; label: string; desc: string; icon: string; color: 
 	{ key: 'meaning', label: '뜻 맞추기', desc: '속담을 보고 의미를 골라요', icon: 'lightbulb', color: COLORS.secondary, bg: COLORS.secondaryBg },
 	{ key: 'proverb', label: '속담 맞추기', desc: '의미를 보고 속담을 골라요', icon: 'menu-book', color: COLORS.primary, bg: COLORS.primaryBg },
 	{ key: 'blank', label: '빈칸 채우기', desc: '속담의 빈칸을 채워요', icon: 'edit', color: COLORS.warning, bg: COLORS.warningSoft },
-	{ key: 'example', label: '예문 속담', desc: '예문에 어울리는 속담을 골라요', icon: 'forum', color: '#9333EA', bg: '#FAF5FF' },
+	{ key: 'example', label: '예문 속담', desc: '예문에 어울리는 속담을 골라요', icon: 'forum', color: COLORS.accentTeal, bg: COLORS.accentTealBg },
 ];
 
 const QuizModeModal = ({ book, onClose, onSelect }: Props) => {

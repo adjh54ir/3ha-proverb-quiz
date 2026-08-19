@@ -51,13 +51,13 @@ const QuizResultModal = ({
 	// ✅ 정답/오답 색상은 시맨틱 토큰으로 통일
 	const themeColor = resultType === 'correct' ? COLORS.success : resultType === 'wrong' ? COLORS.danger : COLORS.warning;
 	const cardBg = resultType === 'correct' ? COLORS.successBg : resultType === 'wrong' ? COLORS.dangerBg : COLORS.warningBg;
-	const cardBorder = resultType === 'correct' ? '#86EFAC' : resultType === 'wrong' ? '#FECACA' : '#FDE68A';
+	const cardBorder = resultType === 'correct' ? COLORS.successBorder : resultType === 'wrong' ? COLORS.dangerBorderSoft : COLORS.warningBorder;
 	const subTextColor = resultType === 'correct' ? COLORS.primaryDeep : resultType === 'wrong' ? COLORS.dangerDark : COLORS.warningDark;
 
 	const mascotSource =
 		resultType === 'correct'
-			? require('@/assets/images/correct_mascote.png')
-			: require('@/assets/images/wrong_mascote.png');
+			? require('@/assets/images/screen-heroes/quiz-result-correct.png')
+			: require('@/assets/images/screen-heroes/quiz-result-retry.png');
 
 	useEffect(() => {
 		if (!visible) {
@@ -266,7 +266,7 @@ const QuizResultModal = ({
 
 							{sameProverbs.length > 0 && (
 								<View style={styles.sameBlock}>
-									<Text style={[styles.explainLabel, { color: '#9333EA' }]}>동의 속담</Text>
+									<Text style={[styles.explainLabel, { color: COLORS.accentTealDeep }]}>동의 속담</Text>
 									{sameProverbs.map((p, idx) => (
 										<Text key={idx} style={styles.sameText}>
 											• {p}
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.md,
 		marginTop: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: '#BFDBFE',
+		borderColor: COLORS.secondaryBorder,
 	},
 	explainExampleText: {
 		fontSize: FONT_SIZES.md,
@@ -462,13 +462,13 @@ const styles = StyleSheet.create({
 		marginTop: SPACING_H.xs,
 	},
 	sameBlock: {
-		backgroundColor: '#FAF5FF',
+		backgroundColor: COLORS.accentTealBg,
 		borderRadius: RADIUS.md,
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.md,
 		marginTop: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: '#E9D5FF',
+		borderColor: COLORS.accentTeal,
 	},
 	sameText: {
 		fontSize: FONT_SIZES.md,

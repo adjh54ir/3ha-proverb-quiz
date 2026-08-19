@@ -123,7 +123,7 @@ const InfinityQuizScreen = () => {
 	const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
 	const [showScrollTop, setShowScrollTop] = useState(false);
-	const labelColors = [COLORS.secondary, COLORS.primary, '#F97316', '#EC4899']; // A, B, C, D 색상 (각각 다르게)
+	const labelColors = [COLORS.secondary, COLORS.primary, COLORS.accentFlame, COLORS.accentPink]; // A, B, C, D 색상 (각각 다르게)
 	const solvedProverbs = questionList.slice(0, currentIndex + 1).filter((q) => resultMap[q.id]);
 
 	const [bonusHistory, setBonusHistory] = useState<number[]>([]);
@@ -790,14 +790,14 @@ const InfinityQuizScreen = () => {
 									<>
 										{/* ✅ 정답 / 오답 강조 카드 */}
 										<View style={styles.resultScoreCardRow}>
-											<View style={[styles.resultScoreCard, { backgroundColor: COLORS.primaryBg, borderColor: '#BBF7D0' }]}>
+											<View style={[styles.resultScoreCard, { backgroundColor: COLORS.primaryBg, borderColor: COLORS.successBorder }]}>
 												<View style={[styles.resultScoreIcon, { backgroundColor: COLORS.primary }]}>
 													<IconComponent name="check" type="materialIcons" color={COLORS.textWhite} size={scaledSize(16)} />
 												</View>
 												<Text style={[styles.resultScoreValue, { color: COLORS.primaryDark }]}>{gameResult.correctCount}</Text>
 												<Text style={styles.resultScoreLabel}>정답</Text>
 											</View>
-											<View style={[styles.resultScoreCard, { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }]}>
+											<View style={[styles.resultScoreCard, { backgroundColor: COLORS.dangerSoftBg, borderColor: COLORS.dangerBorderSoft }]}>
 												<View style={[styles.resultScoreIcon, { backgroundColor: COLORS.danger }]}>
 													<IconComponent name="close" type="materialIcons" color={COLORS.textWhite} size={scaledSize(16)} />
 												</View>
@@ -814,7 +814,7 @@ const InfinityQuizScreen = () => {
 											<View style={styles.statLineDivider} />
 											<View style={styles.statLine}>
 												<Text style={styles.statLineLabel}>최대 콤보</Text>
-												<Text style={[styles.statLineValue, { color: '#F97316' }]}>{gameResult.maxCombo} Combo</Text>
+												<Text style={[styles.statLineValue, { color: COLORS.accentFlame }]}>{gameResult.maxCombo} Combo</Text>
 											</View>
 											<View style={styles.statLineDivider} />
 											<View style={styles.statLine}>
@@ -921,7 +921,7 @@ const InfinityQuizScreen = () => {
 												setSelectedProverb(q);
 												setDetailModalVisible(true);
 											}}
-											style={[styles.feedbackItem, { backgroundColor: isCorrect ? COLORS.secondaryBg : '#FEF2F2' }]}>
+											style={[styles.feedbackItem, { backgroundColor: isCorrect ? COLORS.secondaryBg : COLORS.dangerSoftBg }]}>
 											<View style={styles.feedbackContent}>
 												<View style={{ flex: 1 }}>
 													<View style={styles.feedbackTitleRow}>
@@ -1209,7 +1209,7 @@ const InfinityQuizScreen = () => {
 							fontSize: scaledSize(36),
 							fontWeight: '700',
 							color: COLORS.danger,
-							textShadowColor: '#000',
+							textShadowColor: COLORS.textDeep,
 							textShadowOffset: { width: 1, height: 1 },
 							textShadowRadius: 2,
 						}}>
@@ -1305,7 +1305,7 @@ const styles = StyleSheet.create({
 	},
 
 	correct: { backgroundColor: COLORS.secondarySoft },
-	wrong: { backgroundColor: '#FECACA' },
+	wrong: { backgroundColor: COLORS.dangerBorderSoft },
 	gameOverBox: {
 		flex: 1,
 		justifyContent: 'center',
@@ -1588,7 +1588,7 @@ const styles = StyleSheet.create({
 		fontWeight: '800',
 	},
 	choiceTextWrong: {
-		color: '#B91C1C',
+		color: COLORS.dangerDeep,
 		fontWeight: '700',
 	},
 	skipTopRightButton: {
@@ -1616,7 +1616,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		borderRadius: RADIUS.round,
 		borderWidth: 1,
-		borderColor: '#BFDBFE',
+		borderColor: COLORS.secondaryBorder,
 	},
 
 	timeText: {
@@ -1782,7 +1782,7 @@ const styles = StyleSheet.create({
 
 	skipText: {
 		fontSize: FONT_SIZES.xs,
-		color: '#115E59',
+		color: COLORS.accentTealDeep,
 		fontWeight: '700',
 		lineHeight: scaleHeight(13),
 	},
@@ -1916,7 +1916,7 @@ const styles = StyleSheet.create({
 	chanceCharChar: {
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '800',
-		color: '#0F172A',
+		color: COLORS.textDeep,
 		marginBottom: SPACING_H.xs,
 	},
 	chanceCharReading: {
@@ -1945,7 +1945,7 @@ const styles = StyleSheet.create({
 	chanceKeywordBox: { width: '100%', marginBottom: SPACING_H.smPlus },
 	chanceKeywordWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING_W.xsPlus, marginTop: SPACING_H.xsPlus },
 	chanceKeywordChip: { backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.sm, paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs },
-	chanceKeywordText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#475569' },
+	chanceKeywordText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textMuted },
 
 	chanceExampleBox: {
 		width: '100%',
@@ -1986,12 +1986,12 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.warningSoft,
 		borderRadius: RADIUS.md,
 		borderWidth: 1,
-		borderColor: '#FCD34D',
+		borderColor: COLORS.warningBorder,
 	},
 	animatedScore: {
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
-		color: '#F97316',
+		color: COLORS.accentFlame,
 	},
 	quizScrollContent: {
 		paddingBottom: SPACING_H.xxxxl,
@@ -2124,7 +2124,7 @@ const styles = StyleSheet.create({
 	},
 	scoreHeroMsg: {
 		fontSize: FONT_SIZES.smPlus,
-		color: '#475569',
+		color: COLORS.textMuted,
 		textAlign: 'center',
 		fontWeight: '600',
 		lineHeight: scaleHeight(20),
@@ -2196,7 +2196,7 @@ const styles = StyleSheet.create({
 	resultBtnSecondary: {
 		backgroundColor: COLORS.secondaryBg,
 		borderWidth: 1,
-		borderColor: '#BFDBFE',
+		borderColor: COLORS.secondaryBorder,
 	},
 	resultBtnSecondaryText: {
 		fontSize: FONT_SIZES.md,

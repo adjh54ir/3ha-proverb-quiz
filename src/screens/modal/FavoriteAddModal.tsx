@@ -6,6 +6,7 @@ import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconComponent from '../common/atomic/IconComponent';
+import FadeInView from '@/components/animation/FadeInView';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
@@ -21,10 +22,10 @@ interface Props {
 
 const LEVEL_ITEMS = [
 	{ label: '전체', value: '전체', icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} /> },
-	{ label: '초급', value: '초급', icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color="#34D399" /> },
+	{ label: '초급', value: '초급', icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color={getLevelColor('초급')} /> },
 	{ label: '중급', value: '중급', icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color={COLORS.warning} /> },
-	{ label: '고급', value: '고급', icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color="#EA580C" /> },
-	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color="#B91C1C" /> },
+	{ label: '고급', value: '고급', icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color={getLevelColor('고급')} /> },
+	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelColor('특급')} /> },
 ];
 
 const LEVEL_ICON_MAP: Record<string, string> = {
@@ -144,6 +145,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 		const isSelected = selectedIds.includes(item.id);
 
 		return (
+			<FadeInView delay={index < 6 ? index * 40 : 0} duration={240} offsetY={10}>
 			<TouchableOpacity
 				style={[styles.itemCard, { marginBottom: isLast ? SPACING_H.xl : SPACING_H.md }, isSelected && styles.itemCardSelected]}
 				activeOpacity={0.75}
@@ -168,6 +170,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 					{item.longMeaning || item.meaning}
 				</Text>
 			</TouchableOpacity>
+			</FadeInView>
 		);
 	};
 

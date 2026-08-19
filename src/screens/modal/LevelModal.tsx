@@ -100,7 +100,9 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 									<FastImage source={item.mascot} style={styles.levelMascot} resizeMode={FastImage.resizeMode.contain} />
 									<View style={styles.levelLabelRow}>
 										<IconComponent name={item.icon} type="fontAwesome6" size={scaledSize(16)} color={COLORS.primary} />
-										<Text style={styles.levelLabel}>{item.label}</Text>
+										<Text style={styles.levelLabel} numberOfLines={1} ellipsizeMode="tail">
+											{item.label}
+										</Text>
 									</View>
 									<Text style={styles.levelScore}>{item.score === 0 ? '기본 등급' : `${item.score.toLocaleString()}점 이상`}</Text>
 									{isCurrent && <Text style={styles.levelEncourage}>{item.encouragement}</Text>}

@@ -26,7 +26,8 @@ import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
@@ -45,7 +46,7 @@ const COMMON_ALL_OPTION = {
 	iconType: 'FontAwesome6',
 	badgeId: '',
 	iconName: 'clipboard-list',
-	iconColor: '#3498db',
+	iconColor: COLORS.textSecondary,
 	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />,
 	labelStyle: {
 		marginLeft: SPACING_W.xs,
@@ -57,22 +58,22 @@ const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '초급',
 		value: '초급',
-		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color="#85C1E9" />,
+		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color={getLevelNameColor('초급')} />,
 	},
 	{
 		label: '중급',
 		value: '중급',
-		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color="#F4D03F" />,
+		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color={getLevelNameColor('중급')} />,
 	},
 	{
 		label: '고급',
 		value: '고급',
-		icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color="#e67e22" />,
+		icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color={getLevelNameColor('고급')} />,
 	},
 	{
 		label: '특급',
 		value: '특급',
-		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color="#E74C3C" />,
+		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelNameColor('특급')} />,
 	},
 ];
 export const FIELD_DROPDOWN_ITEMS = [
@@ -83,8 +84,8 @@ export const FIELD_DROPDOWN_ITEMS = [
 		badgeId: 'category_luck',
 		iconType: 'FontAwesome6',
 		iconName: 'dice',
-		iconColor: '#76d7c4',
-		icon: () => <IconComponent type="FontAwesome6" name="dice" size={scaledSize(16)} color="#76d7c4" />,
+		iconColor: getCategoryColor('운/우연'),
+		icon: () => <IconComponent type="FontAwesome6" name="dice" size={scaledSize(16)} color={getCategoryColor('운/우연')} />,
 	},
 	{
 		label: '인간관계',
@@ -92,8 +93,8 @@ export const FIELD_DROPDOWN_ITEMS = [
 		badgeId: 'category_relation',
 		iconType: 'FontAwesome6',
 		iconName: 'users',
-		iconColor: '#76d7c4',
-		icon: () => <IconComponent type="FontAwesome6" name="users" size={scaledSize(16)} color="#76d7c4" />,
+		iconColor: getCategoryColor('인간관계'),
+		icon: () => <IconComponent type="FontAwesome6" name="users" size={scaledSize(16)} color={getCategoryColor('인간관계')} />,
 	},
 	{
 		label: '세상 이치',
@@ -101,8 +102,8 @@ export const FIELD_DROPDOWN_ITEMS = [
 		badgeId: 'category_world',
 		iconType: 'FontAwesome5',
 		iconName: 'globe',
-		iconColor: '#f4d03f',
-		icon: () => <IconComponent type="FontAwesome5" name="globe" size={scaledSize(16)} color="#f4d03f" />,
+		iconColor: getCategoryColor('세상 이치'),
+		icon: () => <IconComponent type="FontAwesome5" name="globe" size={scaledSize(16)} color={getCategoryColor('세상 이치')} />,
 	},
 	{
 		label: '근면/검소',
@@ -110,8 +111,8 @@ export const FIELD_DROPDOWN_ITEMS = [
 		badgeId: 'category_diligence',
 		iconType: 'FontAwesome5',
 		iconName: 'hammer',
-		iconColor: '#fab1a0',
-		icon: () => <IconComponent type="FontAwesome5" name="hammer" size={scaledSize(16)} color="#fab1a0" />,
+		iconColor: getCategoryColor('근면/검소'),
+		icon: () => <IconComponent type="FontAwesome5" name="hammer" size={scaledSize(16)} color={getCategoryColor('근면/검소')} />,
 	},
 	{
 		label: '노력/성공',
@@ -119,8 +120,8 @@ export const FIELD_DROPDOWN_ITEMS = [
 		badgeId: 'category_success',
 		iconType: 'FontAwesome5',
 		iconName: 'medal',
-		iconColor: '#76d7c4',
-		icon: () => <IconComponent type="FontAwesome5" name="medal" size={scaledSize(16)} color="#76d7c4" />,
+		iconColor: getCategoryColor('노력/성공'),
+		icon: () => <IconComponent type="FontAwesome5" name="medal" size={scaledSize(16)} color={getCategoryColor('노력/성공')} />,
 	},
 	{
 		label: '경계/조심',
@@ -128,8 +129,8 @@ export const FIELD_DROPDOWN_ITEMS = [
 		badgeId: 'category_caution',
 		iconType: 'FontAwesome5',
 		iconName: 'exclamation-triangle',
-		iconColor: '#e74c3c',
-		icon: () => <IconComponent type="FontAwesome5" name="exclamation-triangle" size={scaledSize(16)} color="#e74c3c" />,
+		iconColor: getCategoryColor('경계/조심'),
+		icon: () => <IconComponent type="FontAwesome5" name="exclamation-triangle" size={scaledSize(16)} color={getCategoryColor('경계/조심')} />,
 	},
 	{
 		label: '욕심/탐욕',
@@ -137,8 +138,8 @@ export const FIELD_DROPDOWN_ITEMS = [
 		badgeId: 'category_greed',
 		iconType: 'FontAwesome5',
 		iconName: 'hand-holding-usd',
-		iconColor: '#fd79a8',
-		icon: () => <IconComponent type="FontAwesome5" name="hand-holding-usd" size={scaledSize(16)} color="#fd79a8" />,
+		iconColor: getCategoryColor('욕심/탐욕'),
+		icon: () => <IconComponent type="FontAwesome5" name="hand-holding-usd" size={scaledSize(16)} color={getCategoryColor('욕심/탐욕')} />,
 	},
 	{
 		label: '배신/불신',
@@ -146,8 +147,8 @@ export const FIELD_DROPDOWN_ITEMS = [
 		badgeId: 'category_betrayal',
 		iconType: 'FontAwesome5',
 		iconName: 'user-slash',
-		iconColor: '#bdc3c7',
-		icon: () => <IconComponent type="FontAwesome5" name="user-slash" size={scaledSize(16)} color="#bdc3c7" />,
+		iconColor: getCategoryColor('배신/불신'),
+		icon: () => <IconComponent type="FontAwesome5" name="user-slash" size={scaledSize(16)} color={getCategoryColor('배신/불신')} />,
 	},
 ];
 const mascotImages = [
@@ -341,31 +342,8 @@ const QuizStudyScreen = () => {
 		3: '고급',
 		4: '특급',
 	};
-	// 레벨 색상
-	const getLevelColor = (level: number) => {
-		const levelColorMap: Record<number, string> = {
-			1: '#2ecc71', // 초급
-			2: '#F4D03F', // 중급
-			3: '#e67e22', // 고급
-			4: '#E74C3C', // 특급
-		};
-		return levelColorMap[level] || '#bdc3c7';
-	};
-
-	// 카테고리 색상
-	const getFieldColor = (field?: string) => {
-		const categoryColorMap: Record<string, string> = {
-			신체: '#e74c3c',
-			음식: '#f4d03f',
-			동물: '#76d7c4',
-			'언어/표현': '#74b9ff',
-			'감정/분위기': '#e17055',
-			'행동/태도': '#16a085',
-			'재물/비유': '#fab1a0',
-			기타: '#bdc3c7',
-		};
-		return field ? categoryColorMap[field] || '#bdc3c7' : '#bdc3c7';
-	};
+	// 레벨 색상 — 공통 난이도 램프 재사용
+	const getLevelColor = (level: number) => getLevelNameColor(LEVEL_NAME_MAP[level]);
 
 	// 레벨 아이콘
 	const getLevelIcon = (level: number) => {
@@ -809,7 +787,7 @@ const QuizStudyScreen = () => {
 										</View>
 
 										{/* 카테고리 뱃지 */}
-										<View style={[styles.categoryBadge, { backgroundColor: getFieldColor(item.category) }]}>
+										<View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(item.category) }]}>
 											{getCategoryIcon(item.category)}
 											<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{item.category || '미지정'}</Text>
 										</View>
@@ -1202,6 +1180,11 @@ const QuizStudyScreen = () => {
 
 					{isLoading ? (
 						<View style={styles.loadingContainer}>
+							<FastImage
+								source={require('@/assets/images/screen-heroes/data-loading.png')}
+								style={styles.dataLoadingImage}
+								resizeMode={FastImage.resizeMode.contain}
+							/>
 							<ActivityIndicator size="large" color={COLORS.secondary} />
 							<Text style={styles.loadingText}>속담 정보를 불러오는 중...</Text>
 						</View>
@@ -1427,17 +1410,17 @@ const styles = StyleSheet.create({
 		minHeight: scaleHeight(92),
 		paddingLeft: SPACING_W.lg,
 		marginBottom: SPACING_H.md,
-		backgroundColor: '#EFF6FF',
+		backgroundColor: HERO.bg,
 		borderTopWidth: 3,
-		borderTopColor: COLORS.secondary,
+		borderTopColor: HERO.accent,
 		borderRadius: RADIUS.md,
 		flexDirection: 'row',
 		alignItems: 'center',
 		overflow: 'hidden',
 	},
 	studyHeroCopy: { flex: 1, paddingVertical: SPACING_H.md, zIndex: 1 },
-	studyHeroTitle: { fontSize: FONT_SIZES.mdPlus, fontWeight: '800', color: '#1E3A8A', marginBottom: SPACING_H.xs },
-	studyHeroDescription: { fontSize: FONT_SIZES.xs, lineHeight: scaledSize(17), color: '#1D4ED8' },
+	studyHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
+	studyHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
 	studyHeroImage: { width: scaleWidth(124), height: scaleHeight(88), marginRight: scaleWidth(-6) },
 	progressTopRow: {
 		flexDirection: 'row',
@@ -1522,6 +1505,11 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		paddingVertical: SPACING_H.xxxxl,
+	},
+	dataLoadingImage: {
+		width: scaleWidth(150),
+		height: scaleHeight(100),
+		marginBottom: SPACING_H.sm,
 	},
 	loadingText: {
 		marginTop: SPACING_H.md,

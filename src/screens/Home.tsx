@@ -9,7 +9,7 @@ import IconComponent from './common/atomic/IconComponent';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import BadgeListModal from './modal/BadgeListModal';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
@@ -821,7 +821,7 @@ const Home = () => {
 										name="local-fire-department"
 										type="materialIcons"
 										size={scaledSize(14)}
-										color={streakInfo.current > 0 ? '#F97316' : COLORS.textLight}
+										color={streakInfo.current > 0 ? COLORS.accentFlame : COLORS.textLight}
 									/>
 									<Text style={[styles.streakChipText, streakInfo.current > 0 && styles.streakChipTextActive]}>
 										{streakInfo.current > 0 ? `${streakInfo.current}일 연속 출석 중` : '오늘 출석하기'}
@@ -1009,8 +1009,8 @@ const Home = () => {
 						image={require('@/assets/images/home-mascot-moments/mascot-study.png')}
 						title="속담은 뜻을 알면 더 오래 남아요"
 						description="천천히 읽고, 오늘의 지혜를 하나씩 익혀봐요."
-						backgroundColor="#FFF8E8"
-						accentColor="#D9A441"
+						backgroundColor={HERO.bg}
+						accentColor={HERO.accent}
 					/>
 					<ActionCard
 						index={2}
@@ -1019,7 +1019,7 @@ const Home = () => {
 						image={require('@/assets/images/home-actions/action-wrong-review.png')}
 						label="오답 복습"
 						description="틀린 퀴즈를 다시 풀면서 기억을 더 확실히 다져봐요"
-						color="#f1c40f"
+						color={COLORS.warning}
 						onPress={moveToHandler.wrongReview}
 					/>
 					<ActionCard
@@ -1029,7 +1029,7 @@ const Home = () => {
 						image={require('@/assets/images/home-actions/action-time.png')}
 						label="타임 챌린지"
 						description="180초 제한 시간 안에 5개의 하트로 문제를 최대한 많이 풀어보세요!"
-						color="#e67e22"
+						color={COLORS.accentFlame}
 						onPress={moveToHandler.timechalleng}
 					/>
 					<ActionCard
@@ -1039,15 +1039,15 @@ const Home = () => {
 						image={require('@/assets/images/home-actions/action-tower.png')}
 						label="타워 챌린지"
 						description="레벨별 보스를 차례로 도전하고 특별한 보상을 획득하세요!"
-						color="#16a085"
+						color={COLORS.accentTeal}
 						onPress={moveToHandler.towerchalleng}
 					/>
 					<MascotMoment
 						image={require('@/assets/images/home-mascot-moments/mascot-challenge-final.png')}
 						title="준비됐다면 기록에 도전!"
 						description="빠르게 풀어도, 한 문제씩 정확하게 풀어도 좋아요."
-						backgroundColor="#FFF4E6"
-						accentColor="#EA8C2F"
+						backgroundColor={HERO.bg}
+						accentColor={HERO.accent}
 						imageOnRight
 					/>
 					<ActionCard
@@ -1057,7 +1057,7 @@ const Home = () => {
 						image={require('@/assets/images/home-actions/action-favorite.png')}
 						label="즐겨찾기"
 						description="자주 보고 싶은 속담을 모아두고 한눈에 다시 확인해요"
-						color={COLORS.warning}
+						color={COLORS.gold}
 						onPress={moveToHandler.favorite}
 						isNew
 					/>
@@ -1068,7 +1068,7 @@ const Home = () => {
 						image={require('@/assets/images/home-actions/action-my-book.png')}
 						label="나만의 속담집"
 						description="원하는 속담을 모아 나만의 속담집을 만들고 퀴즈로 풀어봐요"
-						color="#0F766E"
+						color={COLORS.secondary}
 						onPress={moveToHandler.myBook}
 						isNew
 					/>
@@ -1076,8 +1076,8 @@ const Home = () => {
 						image={require('@/assets/images/home-mascot-moments/mascot-collection.png')}
 						title="나만의 지혜 창고를 채워봐요"
 						description="좋아하는 속담과 뱃지를 차곡차곡 모을 수 있어요."
-						backgroundColor="#FFF7ED"
-						accentColor="#F59E0B"
+						backgroundColor={HERO.bg}
+						accentColor={HERO.accent}
 					/>
 
 					<View style={styles.quickActionRow}>
@@ -1203,7 +1203,7 @@ const styles = StyleSheet.create({
 	// ===== 말풍선 =====
 	speechWrapper: { alignItems: 'center', marginBottom: scaleHeight(-10) },
 	speechBubble: {
-		backgroundColor: '#FEF9E7',
+		backgroundColor: COLORS.warningSoft,
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.xl,
 		borderRadius: RADIUS.xl,
@@ -1217,7 +1217,7 @@ const styles = StyleSheet.create({
 		borderTopWidth: scaleHeight(10),
 		borderLeftColor: 'transparent',
 		borderRightColor: 'transparent',
-		borderTopColor: '#FEF9E7',
+		borderTopColor: COLORS.warningSoft,
 		alignSelf: 'center',
 	},
 	speechText: {

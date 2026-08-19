@@ -42,10 +42,10 @@ const COMMON_ALL_OPTION = {
 
 const LEVEL_DROPDOWN_ITEMS = [
 	COMMON_ALL_OPTION,
-	{ label: '초급', value: '초급', icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color="#22C55E" /> },
-	{ label: '중급', value: '중급', icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color="#FCD34D" /> },
-	{ label: '고급', value: '고급', icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color="#FB923C" /> },
-	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color="#EF4444" /> },
+	{ label: '초급', value: '초급', icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color={getLevelColor('초급')} /> },
+	{ label: '중급', value: '중급', icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color={getLevelColor('중급')} /> },
+	{ label: '고급', value: '고급', icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color={getLevelColor('고급')} /> },
+	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelColor('특급')} /> },
 ];
 
 /**
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
 		borderColor: COLORS.warningBorder,
 	},
 	headerActionText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.warning },
-	headerActionBtnDelete: { backgroundColor: COLORS.dangerBg, borderColor: '#FCA5A5' },
+	headerActionBtnDelete: { backgroundColor: COLORS.dangerBg, borderColor: COLORS.dangerBorder },
 	headerActionTextDelete: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.danger },
 	cancelBtn: {
 		paddingHorizontal: SPACING_W.md,

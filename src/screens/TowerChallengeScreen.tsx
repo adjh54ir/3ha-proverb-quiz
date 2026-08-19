@@ -258,7 +258,7 @@ const TowerChallengeScreen = () => {
 	return (
 		<View style={styles.container}>
 			{/* 배경 그라디언트 (드라큘라 컨셉) */}
-			<LinearGradient colors={['#2B2D3A', '#21222C', '#191A21']} style={StyleSheet.absoluteFillObject} />
+			<LinearGradient colors={COLORS.darkGradient} style={StyleSheet.absoluteFillObject} />
 
 			<SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
 				{/* 타워 메인 헤더 */}
@@ -349,8 +349,8 @@ const TowerChallengeScreen = () => {
 				<BottomHomeButton
 					backgroundColor="transparent"
 					borderColor="rgba(255,255,255,0.1)"
-					textColor="#F1F5F9"
-					iconColor="#CBD5E1"
+					textColor={COLORS.darkText}
+					iconColor={COLORS.darkTextSecondary}
 				/>
 
 				{showAd && (
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
 	},
 	subTitle: {
 		fontSize: FONT_SIZES.xs,
-		color: '#CBD5E1',
+		color: COLORS.darkTextSecondary,
 		marginTop: SPACING_H.xs,
 		letterSpacing: 1,
 	},
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
 	},
 	attemptLabel: {
 		fontSize: FONT_SIZES.xs,
-		color: '#CBD5E1',
+		color: COLORS.darkTextSecondary,
 		fontWeight: '500',
 	},
 	attemptCount: {
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
 	attemptUnit: {
 		fontSize: FONT_SIZES.md,
 		fontWeight: '600',
-		color: '#CBD5E1',
+		color: COLORS.darkTextSecondary,
 	},
 	carouselContainer: {
 		flex: 1,
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
 	},
 	rewardLabel: {
 		fontSize: FONT_SIZES.sm,
-		color: '#CBD5E1',
+		color: COLORS.darkTextSecondary,
 		marginBottom: SPACING_H.xs,
 		fontWeight: '600',
 	},
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
 	},
 	descriptionBullet: {
 		fontSize: FONT_SIZES.sm,
-		color: '#F1F5F9',
+		color: COLORS.darkText,
 		lineHeight: scaledSize(18),
 		marginBottom: SPACING_H.xs,
 	},

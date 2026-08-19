@@ -1,7 +1,8 @@
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import { scaledSize, scaleWidth } from '@/utils/DementionUtils';
 import React, { JSX } from 'react';
-import { SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, SPACING_W } from '@/const/common/Theme';
+import { getCategoryColor, getLevelColor } from '@/screens/common/CommonProverbModule';
 // 공통 타입 정의
 export interface CategoryItem {
 	label: string;
@@ -87,125 +88,63 @@ const COMMON_ALL_OPTION = {
 	iconType: 'FontAwesome6',
 	badgeId: '',
 	iconName: 'clipboard-list',
-	iconColor: '#3498db',
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#555" />,
+	iconColor: COLORS.textSecondary,
+	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />,
 	labelStyle: {
 		marginLeft: SPACING_W.xsPlus,
-		fontSize: scaledSize(14),
-	},
-};
-
-const COMMON_ALL_OPTION2 = {
-	label: '전체',
-	value: '전체',
-	iconType: 'FontAwesome6',
-	iconName: 'clipboard-list',
-	iconColor: '#555',
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#555" />,
-	labelStyle: {
-		marginLeft: SPACING_W.xsPlus,
-		fontSize: scaledSize(14),
+		fontSize: FONT_SIZES.md,
 	},
 };
 
 export const LEVEL_DROPDOWN_ITEMS = [
-	COMMON_ALL_OPTION2,
+	COMMON_ALL_OPTION,
 	{
 		label: '초급',
 		value: '초급',
-		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color="#34D399" />,
+		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color={getLevelColor('초급')} />,
 	},
 	{
 		label: '중급',
 		value: '중급',
-		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color="#F59E0B" />,
+		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color={getLevelColor('중급')} />,
 	},
 	{
 		label: '고급',
 		value: '고급',
-		icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color="#EA580C" />,
+		icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color={getLevelColor('고급')} />,
 	},
 	{
 		label: '특급',
 		value: '특급',
-		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color="#B91C1C" />,
+		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelColor('특급')} />,
 	},
 ];
+
+/** 카테고리 드롭다운 — 색상은 공통 팔레트(getCategoryColor) 단일 소스를 사용한다. */
+const FIELD_ITEMS: { label: string; badgeId: string; iconType: string; iconName: string }[] = [
+	{ label: '운/우연', badgeId: 'category_luck', iconType: 'FontAwesome6', iconName: 'dice' },
+	{ label: '인간관계', badgeId: 'category_relation', iconType: 'FontAwesome6', iconName: 'users' },
+	{ label: '세상 이치', badgeId: 'category_life', iconType: 'FontAwesome5', iconName: 'globe' },
+	{ label: '근면/검소', badgeId: 'category_diligence', iconType: 'FontAwesome5', iconName: 'hammer' },
+	{ label: '노력/성공', badgeId: 'category_effort', iconType: 'FontAwesome5', iconName: 'medal' },
+	{ label: '경계/조심', badgeId: 'category_caution', iconType: 'FontAwesome5', iconName: 'exclamation-triangle' },
+	{ label: '욕심/탐욕', badgeId: 'category_greed', iconType: 'FontAwesome5', iconName: 'hand-holding-usd' },
+	{ label: '배신/불신', badgeId: 'category_betrayal', iconType: 'FontAwesome5', iconName: 'user-slash' },
+];
+
 export const FIELD_DROPDOWN_ITEMS = [
 	COMMON_ALL_OPTION,
-	{
-		label: '운/우연',
-		value: '운/우연',
-		badgeId: 'category_luck',
-		iconType: 'FontAwesome6',
-		iconName: 'dice',
-		iconColor: '#81ecec',
-		icon: () => <IconComponent type="FontAwesome6" name="dice" size={scaledSize(16)} color="#81ecec" />,
-	},
-	{
-		label: '인간관계',
-		value: '인간관계',
-		badgeId: 'category_relationship',
-		iconType: 'FontAwesome6',
-		iconName: 'users',
-		iconColor: '#76d7c4',
-		icon: () => <IconComponent type="FontAwesome6" name="users" size={scaledSize(16)} color="#76d7c4" />,
-	},
-	{
-		label: '세상 이치',
-		value: '세상 이치',
-		badgeId: 'category_world',
-		iconType: 'FontAwesome5',
-		iconName: 'globe',
-		iconColor: '#fdcb6e',
-		icon: () => <IconComponent type="FontAwesome5" name="globe" size={scaledSize(16)} color="#fdcb6e" />,
-	},
-	{
-		label: '근면/검소',
-		value: '근면/검소',
-		badgeId: 'category_diligence',
-		iconType: 'FontAwesome5',
-		iconName: 'hammer',
-		iconColor: '#fab1a0',
-		icon: () => <IconComponent type="FontAwesome5" name="hammer" size={scaledSize(16)} color="#fab1a0" />,
-	},
-	{
-		label: '노력/성공',
-		value: '노력/성공',
-		badgeId: 'category_success',
-		iconType: 'FontAwesome5',
-		iconName: 'medal',
-		iconColor: '#55efc4',
-		icon: () => <IconComponent type="FontAwesome5" name="medal" size={scaledSize(16)} color="#55efc4" />,
-	},
-	{
-		label: '경계/조심',
-		value: '경계/조심',
-		badgeId: 'category_caution',
-		iconType: 'FontAwesome5',
-		iconName: 'exclamation-triangle',
-		iconColor: '#ff7675',
-		icon: () => <IconComponent type="FontAwesome5" name="exclamation-triangle" size={scaledSize(16)} color="#ff7675" />,
-	},
-	{
-		label: '욕심/탐욕',
-		value: '욕심/탐욕',
-		badgeId: 'category_greed',
-		iconType: 'FontAwesome5',
-		iconName: 'hand-holding-usd',
-		iconColor: '#fd79a8',
-		icon: () => <IconComponent type="FontAwesome5" name="hand-holding-usd" size={scaledSize(16)} color="#fd79a8" />,
-	},
-	{
-		label: '배신/불신',
-		value: '배신/불신',
-		badgeId: 'category_betrayal',
-		iconType: 'FontAwesome5',
-		iconName: 'user-slash',
-		iconColor: '#b2bec3',
-		icon: () => <IconComponent type="FontAwesome5" name="user-slash" size={scaledSize(16)} color="#b2bec3" />,
-	},
+	...FIELD_ITEMS.map((item) => ({
+		label: item.label,
+		value: item.label,
+		badgeId: item.badgeId,
+		iconType: item.iconType,
+		iconName: item.iconName,
+		iconColor: getCategoryColor(item.label),
+		icon: () => <IconComponent type={item.iconType} name={item.iconName} size={scaledSize(16)} color={getCategoryColor(item.label)} />,
+	})),
 ];
+
 export const QUIZ_MODES = [
 	{
 		key: 'meaning',

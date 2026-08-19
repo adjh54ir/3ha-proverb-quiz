@@ -28,6 +28,8 @@ export const COLORS = {
 	textStrong: '#1E293B', // 강한 제목
 	textSecondary: '#64748B', // 보조 텍스트
 	textLight: '#94A3B8', // 비활성/캡션
+	textMuted: '#475569', // 본문보다 한 톤 진한 보조 텍스트
+	textDeep: '#0F172A', // 가장 진한 텍스트
 	textWhite: '#FFFFFF',
 
 	// ===== Background / Surface =====
@@ -39,6 +41,7 @@ export const COLORS = {
 	border: '#E2E8F0',
 	borderLight: '#E2E8F0',
 	borderDark: '#CBD5E1',
+	secondaryBorder: '#BFDBFE', // 블루 보더
 
 	// ===== Accent (Orange/Amber) — 히어로 배너·연속 출석·선택 강조 =====
 	accentOrange: '#EA580C', // 강한 주황 (텍스트/포인트)
@@ -47,11 +50,21 @@ export const COLORS = {
 	accentOrangeText: '#9A3412', // 주황 배경 위 본문
 	accentOrangeBg: '#FFF7ED', // 주황 배경 틴트
 	accentOrangeBorder: '#FDBA74', // 주황 보더
+	accentFlame: '#F97316', // 불꽃/연속 도전 포인트 (밝은 주황)
+	accentOrangeLight: '#FB923C', // 옅은 주황 (3위/보조 포인트)
+	accentOrangeSoft: '#FFEDD5', // 주황 칩 배경
+	accentTeal: '#14B8A6', // 틸 포인트 (오늘의 퀴즈)
+	accentTealBg: '#CCFBF1', // 틸 칩 배경
+	accentSky: '#0EA5E9', // 스카이 포인트 (정복 섹션)
+	accentSkyBg: '#E0F2FE', // 스카이 칩 배경
+	accentTealDeep: '#115E59', // 틸 배경 위 진한 텍스트
+	accentPink: '#EC4899', // 보기 라벨/카테고리 구분용 핑크 포인트
 
 	// ===== Semantic =====
 	success: '#22C55E',
 	successBg: '#F0FDF4',
 	successSoft: '#DCFCE7',
+	successBorder: '#BBF7D0', // 그린 보더
 	info: '#3B82F6',
 	infoDark: '#2563EB',
 	infoBg: '#EFF6FF',
@@ -59,9 +72,15 @@ export const COLORS = {
 	warningDark: '#D97706',
 	warningBg: '#FEF3C7',
 	warningSoft: '#FFFBEB', // 옅은 앰버 틴트 (선택된 카드/힌트 버튼 배경)
+	warningDeep: '#B45309', // 앰버 배경 위 진한 텍스트
 	warningBorder: '#FDE68A', // 옅은 앰버 보더
 	danger: '#EF4444',
+	dangerLight: '#F87171', // 옅은 레드 (패배/오답 강조 배경 위 텍스트)
+	dangerSoftBg: '#FEF2F2', // 가장 옅은 레드 배경 (오답 카드)
+	dangerBorder: '#FCA5A5', // 레드 보더
+	dangerBorderSoft: '#FECACA', // 옅은 레드 보더
 	dangerDark: '#DC2626',
+	dangerDeep: '#B91C1C', // 가장 진한 레드 (특급/실패 강조)
 	dangerBg: '#FEE2E2',
 	gold: '#FACC15',
 	goldLight: '#FDE047',
@@ -70,6 +89,13 @@ export const COLORS = {
 	darkBg: '#1a1a2e',
 	darkBgAlt: '#16213e',
 	darkSurface: '#0f3460',
+	// 타워 화면 그라디언트/텍스트 (다크 배경 위)
+	darkGradient: ['#2B2D3A', '#21222C', '#191A21'] as [string, string, string],
+	darkText: '#F1F5F9',
+	darkTextSecondary: '#CBD5E1',
+	darkAccent: '#60A5FA',
+	towerVictoryBg: '#064E3B', // 타워 승리 결과 배경
+	towerDefeatBg: '#7F1D1D', // 타워 패배 결과 배경
 
 	// ===== Dim =====
 	dim: 'rgba(0, 0, 0, 0.5)',

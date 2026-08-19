@@ -125,10 +125,16 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 
 					{/* 미션 목록 */}
 					<View style={styles.list}>
-						{allDone && (
+						{allDone ? (
 							<Image
 								source={require('@/assets/images/feature-states/daily-mission-complete.png')}
 								style={styles.completeImage}
+								resizeMode="contain"
+							/>
+						) : (
+							<Image
+								source={require('@/assets/images/screen-heroes/daily-mission-progress.png')}
+								style={styles.progressImage}
 								resizeMode="contain"
 							/>
 						)}
@@ -138,7 +144,9 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 									<IconComponent type={m.iconType} name={m.icon} size={scaledSize(18)} color={m.done ? COLORS.textWhite : COLORS.textLight} />
 								</View>
 								<View style={styles.missionTextWrap}>
-									<Text style={[styles.missionLabel, m.done && styles.missionLabelDone]}>{m.label}</Text>
+									<Text style={[styles.missionLabel, m.done && styles.missionLabelDone]} numberOfLines={2} ellipsizeMode="tail">
+										{m.label}
+									</Text>
 									<Text style={styles.missionProgress}>
 										{m.current} / {m.target}
 									</Text>
@@ -245,6 +253,12 @@ const styles = StyleSheet.create({
 	completeImage: {
 		width: scaleWidth(84),
 		height: scaleWidth(84),
+		alignSelf: 'center',
+		marginBottom: SPACING_H.md,
+	},
+	progressImage: {
+		width: scaleWidth(116),
+		height: scaleHeight(84),
 		alignSelf: 'center',
 		marginBottom: SPACING_H.md,
 	},

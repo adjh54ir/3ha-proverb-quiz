@@ -1,6 +1,7 @@
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import { scaledSize, scaleWidth } from '@/utils/DementionUtils';
 import React, { JSX } from 'react';
+import { SPACING_W } from '@/const/common/Theme';
 // 공통 타입 정의
 export interface CategoryItem {
 	label: string;
@@ -89,7 +90,7 @@ const COMMON_ALL_OPTION = {
 	iconColor: '#3498db',
 	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#555" />,
 	labelStyle: {
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.xsPlus,
 		fontSize: scaledSize(14),
 	},
 };
@@ -102,7 +103,7 @@ const COMMON_ALL_OPTION2 = {
 	iconColor: '#555',
 	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#555" />,
 	labelStyle: {
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.xsPlus,
 		fontSize: scaledSize(14),
 	},
 };

@@ -193,10 +193,6 @@ const styles = StyleSheet.create({
 		paddingBottom: SPACING_H.xl,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		shadowColor: '#000',
-		shadowOpacity: 0.08,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	badgeModalHeader: {
 		width: '100%',
@@ -288,7 +284,7 @@ const styles = StyleSheet.create({
 	badgeEmptyBox: {
 		alignItems: 'center',
 		justifyContent: 'center',
-		paddingVertical: scaleHeight(40),
+		paddingVertical: SPACING_H.xxxxl,
 		rowGap: SPACING_H.md,
 	},
 	badgeEmptyText: {
@@ -307,10 +303,6 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		backgroundColor: COLORS.surface,
-		shadowColor: '#000',
-		shadowOpacity: 0.06,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	badgeCardActive: {
 		backgroundColor: COLORS.primaryBg,
@@ -340,10 +332,10 @@ const styles = StyleSheet.create({
 	badgeRarityChip: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		columnGap: scaleWidth(3),
+		columnGap: SPACING_W.xs,
 		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.sm,
-		paddingVertical: scaleHeight(2),
+		paddingVertical: SPACING_H.xxs,
 	},
 	badgeRarityChipText: { fontSize: FONT_SIZES.xxs, fontWeight: '700' },
 	badgeDesc: {
@@ -359,7 +351,7 @@ const styles = StyleSheet.create({
 	badgeStatusPill: {
 		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.sm,
-		paddingVertical: scaleHeight(2),
+		paddingVertical: SPACING_H.xxs,
 	},
 	badgeStatusPillEarned: { backgroundColor: COLORS.primarySoft },
 	badgeStatusPillLocked: { backgroundColor: COLORS.surfaceAlt },

@@ -25,8 +25,8 @@ interface Props {
 	
 	hiddenDevTouchArea: {
 		alignItems: 'center',
-		marginTop: scaleHeight(10),
-		marginBottom: scaleHeight(30),
+		marginTop: SPACING_H.smPlus,
+		marginBottom: SPACING_H.xxxl,
 		backgroundColor: 'transparent',
 	},
 
@@ -56,11 +56,7 @@ interface Props {
 		backgroundColor: '#F8F8F8', // 연한 회색 배경
 		justifyContent: 'center',
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOpacity: 0.05,
-		shadowOffset: { width: 0, height: 1 },
-		shadowRadius: 2,
-		marginBottom: scaleHeight(30),
+		marginBottom: SPACING_H.xxxl,
 	},
 	devText: {
 		fontSize: scaledSize(13),
@@ -155,13 +151,11 @@ const styles = StyleSheet.create({
 		width: '100%',
 		maxHeight: scaleHeight(680),
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		paddingVertical: SPACING_H.lg,
 		paddingHorizontal: SPACING_W.lg,
-		shadowColor: '#000',
-		shadowOpacity: 0.1,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	scroll: {
 		alignItems: 'center',

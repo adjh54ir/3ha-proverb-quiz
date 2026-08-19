@@ -11,6 +11,7 @@ import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import BottomHomeButton from './common/BottomHomeButton';
+import DateUtils from '@/utils/DateUtils';
 
 // 규칙 한 줄 행 (아이콘 + 한 줄 텍스트)
 const RuleRow = ({ iconType, iconName, iconColor, chipColor, text }: { iconType: string; iconName: string; iconColor: string; chipColor: string; text: string }) => (
@@ -84,7 +85,7 @@ const InitTimeChallengeScreen = () => {
 	const getRelativeDateLabel = (isoString: string): string => {
 		try {
 			const inputDate = new Date(isoString);
-			const now = new Date();
+			const now = DateUtils.now();
 
 			const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 			const startOfInput = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate());
@@ -360,7 +361,7 @@ const styles = StyleSheet.create({
 	scrollContainer: {
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.lg,
-		paddingBottom: scaleHeight(40),
+		paddingBottom: SPACING_H.xxxxl,
 	},
 
 	// 카운트다운
@@ -392,9 +393,9 @@ const styles = StyleSheet.create({
 		lineHeight: scaledSize(80),
 	},
 	countdownMessageWrapper: {
-		marginTop: scaleHeight(32),
+		marginTop: SPACING_H.xxxl,
 		paddingHorizontal: SPACING_W.xxl,
-		paddingVertical: scaleHeight(10),
+		paddingVertical: SPACING_H.smPlus,
 		backgroundColor: 'rgba(255,255,255,0.12)',
 		borderRadius: RADIUS.xl,
 		minWidth: scaleWidth(180),
@@ -415,11 +416,7 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		overflow: 'hidden',
 		marginBottom: SPACING_H.xl,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
-		backgroundColor: '#FFF7ED',
+		backgroundColor: COLORS.accentOrangeBg,
 	},
 	heroImage: {
 		width: '100%',
@@ -449,14 +446,12 @@ const styles = StyleSheet.create({
 	// 규칙 박스
 	challengeRuleBox: {
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.lg,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.lg,
 		marginBottom: SPACING_H.xl,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	ruleHeader: {
 		flexDirection: 'row',
@@ -474,7 +469,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: COLORS.background,
 		borderRadius: RADIUS.sm,
-		paddingVertical: scaleHeight(9),
+		paddingVertical: SPACING_H.sm,
 		paddingHorizontal: SPACING_W.md,
 		marginBottom: SPACING_H.sm,
 	},
@@ -484,7 +479,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(13),
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: scaleWidth(10),
+		marginRight: SPACING_W.smPlus,
 	},
 	ruleText: {
 		flex: 1,
@@ -512,11 +507,11 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.primaryBg,
 		borderRadius: RADIUS.sm,
 		paddingVertical: SPACING_H.md,
-		paddingHorizontal: scaleWidth(14),
+		paddingHorizontal: SPACING_W.mdPlus,
 		borderWidth: 1,
 		borderColor: COLORS.primarySoft,
 		marginBottom: SPACING_H.sm,
-		gap: scaleWidth(10),
+		gap: SPACING_W.smPlus,
 	},
 	bonusSummaryIcon: {
 		fontSize: FONT_SIZES.lg,
@@ -533,13 +528,13 @@ const styles = StyleSheet.create({
 
 	// 콤보 리스트
 	comboList: {
-		gap: scaleHeight(8),
+		gap: SPACING_H.sm,
 	},
 	comboItem: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		backgroundColor: '#FFF7ED',
+		backgroundColor: COLORS.accentOrangeBg,
 		borderRadius: RADIUS.sm,
 		padding: SPACING_W.md,
 		borderWidth: 1,
@@ -593,14 +588,12 @@ const styles = StyleSheet.create({
 	// 랭킹 박스
 	rankingBox: {
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.lg,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.lg,
 		marginBottom: SPACING_H.xl,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	rankingHeader: {
 		flexDirection: 'row',
@@ -617,7 +610,7 @@ const styles = StyleSheet.create({
 	// 빈 상태
 	emptyState: {
 		alignItems: 'center',
-		paddingVertical: scaleHeight(32),
+		paddingVertical: SPACING_H.xxxl,
 	},
 	emptyText: {
 		fontSize: FONT_SIZES.lg,
@@ -645,7 +638,7 @@ const styles = StyleSheet.create({
 		borderColor: COLORS.border,
 	},
 	rankCardFirst: {
-		backgroundColor: '#FFFBEB',
+		backgroundColor: COLORS.warningSoft,
 		borderColor: '#FBBF24',
 		borderWidth: 2,
 	},
@@ -654,7 +647,7 @@ const styles = StyleSheet.create({
 		borderColor: COLORS.borderDark,
 	},
 	rankCardThird: {
-		backgroundColor: '#FFF7ED',
+		backgroundColor: COLORS.accentOrangeBg,
 		borderColor: '#FB923C',
 	},
 	rankLeft: {
@@ -673,7 +666,7 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
 		color: COLORS.text,
-		marginBottom: scaleHeight(2),
+		marginBottom: SPACING_H.xxs,
 	},
 	rankScoreFirst: {
 		fontSize: FONT_SIZES.xxl,
@@ -703,10 +696,6 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.md,
 		alignItems: 'center',
 		justifyContent: 'center',
-		shadowColor: COLORS.secondary,
-		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.25,
-		shadowRadius: 8,
 	},
 	startButtonText: {
 		color: COLORS.textWhite,

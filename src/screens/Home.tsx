@@ -32,6 +32,7 @@ import { computeDailyMissions, countDoneMissions, allMissionsDone } from '@/util
 import { LEVEL_DATA, PET_REWARDS, SCORE_PER_QUESTION, getLevelByScore, getNextLevel, getProgressPercent, getQuestionsToNext } from '@/const/ConstInfoData';
 import TowerRewardSection from '@/components/TowerRewardSection';
 import { TowerProgress } from '@/const/ConstTowerData';
+import { playFinish } from '@/utils/SoundUtils';
 
 const greetingMessages = [
 	'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
@@ -309,7 +310,7 @@ const Home = () => {
 				'불금이에요! 오늘도 똑똑해지고 가요 🎉',
 				'토요일이에요~ 여유롭게 한 문제 풀어요 ☕',
 			];
-			const firstGreeting = dayGreetings[new Date().getDay()] ?? '안녕하세요! 오늘도 함께 공부해요 😊';
+			const firstGreeting = dayGreetings[DateUtils.now().getDay()] ?? '안녕하세요! 오늘도 함께 공부해요 😊';
 			const t = setTimeout(() => showPetSpeech(firstGreeting), 900);
 			return () => clearTimeout(t);
 		}
@@ -492,6 +493,7 @@ const Home = () => {
 		const updated = arr.map((item) => (DateUtils.toLocalDateKey(item.quizDate) === todayStr ? { ...item, isCheckedIn: true } : item));
 		await AsyncStorage.setItem(TODAY_QUIZ_LIST_KEY, JSON.stringify(updated));
 		setIsCheckedIn(true);
+		playFinish(); // 🎉 출석 완료 축하 사운드
 
 		setShowStamp(true); // 애니메이션용 플래그
 
@@ -1147,7 +1149,7 @@ const Home = () => {
 				}}
 			/>
 
-			<LevelUpModal visible={showLevelUp} level={levelUpData} onClose={() => setShowLevelUp(false)} />
+			<LevelUpModal visible={showLevelUp && !!levelUpData} level={levelUpData} onClose={() => setShowLevelUp(false)} />
 
 			<LevelModal visible={showLevelModal} totalScore={totalScore} onClose={() => setShowLevelModal(false)} />
 			<CheckInModal
@@ -1175,7 +1177,7 @@ const styles = StyleSheet.create({
 		flexGrow: 1,
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.md,
-		paddingBottom: scaleHeight(40), // 하단 잘림 방지 여백
+		paddingBottom: SPACING_H.xxxxl, // 하단 잘림 방지 여백
 	},
 
 	// ===== 상단 히어로(캐릭터/게이지/등급) 영역 =====
@@ -1206,10 +1208,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.xl,
 		borderRadius: RADIUS.xl,
 		maxWidth: '100%',
-		shadowColor: '#000',
-		shadowOpacity: 0.06,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	speechTail: {
 		width: 0,
@@ -1255,14 +1253,10 @@ const styles = StyleSheet.create({
 		right: -scaleWidth(64),
 		top: SPACING_H.xs,
 		backgroundColor: COLORS.textStrong,
-		paddingVertical: scaleHeight(6),
+		paddingVertical: SPACING_H.xsPlus,
 		paddingHorizontal: SPACING_W.md,
 		borderRadius: RADIUS.md,
 		zIndex: 20,
-		shadowColor: '#000',
-		shadowOpacity: 0.12,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	petSpeechText: {
 		color: COLORS.textWhite,
@@ -1421,10 +1415,6 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		width: '100%',
-		shadowColor: '#000',
-		shadowOpacity: 0.06,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	iconCircle: {
 		width: scaleWidth(52),
@@ -1477,7 +1467,7 @@ const styles = StyleSheet.create({
 		right: -scaleWidth(14),
 		width: scaleWidth(64),
 		backgroundColor: COLORS.danger,
-		paddingVertical: scaleHeight(3),
+		paddingVertical: SPACING_H.xs,
 		transform: [{ rotate: '45deg' }],
 		alignItems: 'center',
 	},
@@ -1546,8 +1536,8 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 	},
 	streakChipActive: {
-		backgroundColor: '#FFF7ED',
-		borderColor: '#FDBA74',
+		backgroundColor: COLORS.accentOrangeBg,
+		borderColor: COLORS.accentOrangeBorder,
 	},
 	streakChipIdle: {
 		backgroundColor: COLORS.surfaceAlt,
@@ -1560,7 +1550,7 @@ const styles = StyleSheet.create({
 		marginLeft: SPACING_W.xs,
 	},
 	streakChipTextActive: {
-		color: '#EA580C',
+		color: COLORS.accentOrange,
 	},
 
 	// ===== 하단 퀵 액션 =====
@@ -1579,10 +1569,6 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		shadowColor: '#000',
-		shadowOpacity: 0.06,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	quickActionIconChip: {
 		width: scaleWidth(44),

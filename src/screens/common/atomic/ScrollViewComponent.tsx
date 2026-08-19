@@ -100,10 +100,6 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(48) / 2,
 		justifyContent: 'center',
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.15,
-		shadowRadius: 8,
 	},
 	customInput: {
 		height: scaleHeight(100),

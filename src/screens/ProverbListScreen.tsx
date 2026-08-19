@@ -22,7 +22,7 @@ import FastImage from 'react-native-fast-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
@@ -39,7 +39,7 @@ const COMMON_ALL_OPTION = {
 	value: '전체',
 	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#64748B" />,
 	labelStyle: {
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.xsPlus,
 		fontSize: scaledSize(14),
 	},
 };
@@ -49,10 +49,10 @@ const COMMON_ALL_OPTION2 = {
 	value: '전체',
 	iconType: 'FontAwesome6',
 	iconName: 'clipboard-list',
-	iconColor: '#64748B',
+	iconColor: COLORS.textSecondary,
 	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color="#64748B" />,
 	labelStyle: {
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.xsPlus,
 		fontSize: scaledSize(14),
 	},
 };
@@ -322,6 +322,17 @@ const ProverbListScreen = () => {
 									],
 								},
 							]}>
+							<View style={styles.dictionaryHero}>
+								<View style={styles.dictionaryHeroCopy}>
+									<Text style={styles.dictionaryHeroTitle}>오늘의 지혜를 찾아보세요</Text>
+									<Text style={styles.dictionaryHeroDescription}>속담과 뜻을 한곳에서 빠르게 살펴볼 수 있어요.</Text>
+								</View>
+								<FastImage
+									source={require('@/assets/images/screen-heroes/proverb-dictionary.png')}
+									style={styles.dictionaryHeroImage}
+									resizeMode="contain"
+								/>
+							</View>
 							<View style={styles.filterCard}>
 								<View style={styles.searchRow}>
 									<View style={styles.searchInputWrapper}>
@@ -369,9 +380,9 @@ const ProverbListScreen = () => {
 											onChangeValue={(value) => {
 												scrollToTop();
 											}}
-											listItemLabelStyle={{ marginLeft: scaleWidth(6), fontSize: scaledSize(14) }}
+											listItemLabelStyle={{ marginLeft: SPACING_W.xsPlus, fontSize: scaledSize(14) }}
 											labelStyle={{ fontSize: FONT_SIZES.md, color: COLORS.text }}
-											iconContainerStyle={{ marginRight: scaleWidth(8) }}
+											iconContainerStyle={{ marginRight: SPACING_W.sm }}
 											showArrowIcon={true} // 드롭다운 화살표
 											showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
 										/>
@@ -402,7 +413,7 @@ const ProverbListScreen = () => {
 											zIndexInverse={4000}
 											containerStyle={{ zIndex: 5000 }}
 											labelStyle={{ fontSize: FONT_SIZES.md, color: COLORS.text }}
-											iconContainerStyle={{ marginRight: scaleWidth(8) }}
+											iconContainerStyle={{ marginRight: SPACING_W.sm }}
 											showArrowIcon={true}
 											showTickIcon={false}
 											renderListItem={({ item, onPress }) => (
@@ -412,12 +423,12 @@ const ProverbListScreen = () => {
 													style={{
 														flexDirection: 'row',
 														alignItems: 'center',
-														paddingVertical: scaleHeight(14),
-														paddingHorizontal: scaleWidth(16),
+														paddingVertical: SPACING_H.mdPlus,
+														paddingHorizontal: SPACING_W.lg,
 														borderBottomWidth: 1,
 														borderBottomColor: COLORS.surfaceAlt,
 													}}>
-													<View style={{ width: scaleWidth(28), alignItems: 'center', marginRight: scaleWidth(12) }}>
+													<View style={{ width: scaleWidth(28), alignItems: 'center', marginRight: SPACING_W.md }}>
 														{typeof item.icon === 'function' ? item.icon() : item.icon}
 													</View>
 													<Text style={{ fontSize: FONT_SIZES.mdPlus, color: COLORS.text, flex: 1 }}>{item.label}</Text>
@@ -438,11 +449,7 @@ const ProverbListScreen = () => {
 												borderColor: COLORS.borderDark,
 												borderRadius: RADIUS.xl,
 												paddingHorizontal: 0,
-												paddingVertical: scaleHeight(20),
-												shadowColor: '#000',
-												shadowOpacity: 0.15,
-												shadowOffset: { width: 0, height: 6 },
-												shadowRadius: scaleWidth(8),
+												paddingVertical: SPACING_H.xl,
 												position: 'relative',
 											}}
 											modalTitleStyle={{
@@ -450,12 +457,12 @@ const ProverbListScreen = () => {
 												fontWeight: '700',
 												color: COLORS.text,
 												textAlign: 'center',
-												paddingVertical: scaleHeight(12),
-												paddingHorizontal: scaleWidth(16),
-												paddingRight: scaleWidth(40),
+												paddingVertical: SPACING_H.md,
+												paddingHorizontal: SPACING_W.lg,
+												paddingRight: SPACING_W.xxxxl,
 											}}
 											closeIconStyle={{
-												marginTop: scaleHeight(3),
+												marginTop: SPACING_H.xs,
 												width: scaleWidth(24),
 												height: scaleWidth(24),
 											}}
@@ -463,7 +470,7 @@ const ProverbListScreen = () => {
 												position: 'absolute',
 												right: scaleWidth(12),
 												top: scaleHeight(12),
-												padding: scaleWidth(4),
+												padding: SPACING_W.xs,
 												zIndex: 1,
 											}}
 										/>
@@ -471,7 +478,7 @@ const ProverbListScreen = () => {
 
 									{/* 초기화 버튼 */}
 									{/* <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-                  <Icon name='rotate-right' size={scaledSize(20)} color='#64748B' />
+                  <Icon name='rotate-right' size={scaledSize(20)} color={COLORS.textSecondary} />
                 </TouchableOpacity> */}
 								</View>
 								{/* ✅ 즐겨찾기 버튼 + 리스트 개수 */}
@@ -510,7 +517,7 @@ const ProverbListScreen = () => {
 								keyboardShouldPersistTaps="handled"
 								keyboardDismissMode="on-drag"
 								ListEmptyComponent={() => (
-									<View style={[styles.emptyWrapper, { height: '100%', marginTop: scaleHeight(40) }]}>
+									<View style={[styles.emptyWrapper, { height: '100%', marginTop: SPACING_H.xxxxl }]}>
 										<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
 										<Text style={styles.emptyText}>
 											앗! 조건에 맞는 속담가 없어요.{'\n'}다른 검색어나 필터를 사용해보세요!
@@ -619,20 +626,34 @@ const ProverbListScreen = () => {
 export default ProverbListScreen;
 
 const styles = StyleSheet.create({
+	dictionaryHero: {
+		minHeight: scaleHeight(112),
+		marginBottom: SPACING_H.md,
+		paddingLeft: SPACING_W.lg,
+		backgroundColor: HERO.bg,
+		borderTopWidth: 3,
+		borderTopColor: HERO.accent,
+		borderRadius: RADIUS.lg,
+		flexDirection: 'row',
+		alignItems: 'center',
+		overflow: 'hidden',
+	},
+	dictionaryHeroCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
+	dictionaryHeroTitle: { fontSize: FONT_SIZES.lg, fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
+	dictionaryHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
+	dictionaryHeroImage: { width: scaleWidth(132), height: scaleHeight(108), marginRight: scaleWidth(-4) },
 	main: {
 		flex: 1,
 		backgroundColor: COLORS.background,
 	},
 	filterCard: {
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.lg,
 		marginBottom: SPACING_H.sm,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 		overflow: 'visible',
 	},
 	input: {
@@ -658,10 +679,6 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(44) / 2,
 		justifyContent: 'center',
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.15,
-		shadowRadius: 8,
 	},
 	scrollTopButtonInner: {
 		flex: 1,
@@ -677,10 +694,6 @@ const styles = StyleSheet.create({
 		marginBottom: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: COLORS.surfaceAlt,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	badgeGroup: {
 		flexDirection: 'row',
@@ -821,7 +834,7 @@ const styles = StyleSheet.create({
 	flatListCotent: {
 		paddingTop: SPACING_H.md,
 		paddingHorizontal: SPACING_W.lg,
-		paddingBottom: scaleHeight(40),
+		paddingBottom: SPACING_H.xxxxl,
 	},
 	searchRow: {
 		flexDirection: 'row',
@@ -842,7 +855,7 @@ const styles = StyleSheet.create({
 	searchInput: {
 		flex: 0,
 		width: '100%',
-		paddingLeft: scaleWidth(40),
+		paddingLeft: SPACING_W.xxxxl,
 		marginBottom: 0,
 	},
 	resetButtonInline: {
@@ -878,7 +891,7 @@ const styles = StyleSheet.create({
 		columnGap: SPACING_W.xs,
 	},
 	favoriteFilterButtonActive: {
-		backgroundColor: '#FFFBEB',
+		backgroundColor: HERO.bg,
 		borderColor: '#FBBF24',
 	},
 	favoriteFilterText: {

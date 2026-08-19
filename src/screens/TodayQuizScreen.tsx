@@ -14,7 +14,7 @@ import {
 	Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import notifee, { TimestampTrigger, TriggerType, AndroidImportance, RepeatFrequency } from '@notifee/react-native';
+import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
@@ -35,9 +35,10 @@ import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import FavoriteToast from './common/FavoriteToast';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import FadeInView from '@/components/animation/FadeInView';
-import { getNextTriggerTimestamp } from '@/utils/NotifactionHelper';
+import { playCorrect, playWrong, playFinish } from '@/utils/SoundUtils';
+import { scheduleDailyQuizReminder, cancelDailyQuizReminder, DAILY_QUIZ_NOTIFICATION_ID } from '@/utils/NotifactionHelper';
 
-const NOTIFICATION_ID = 'daily-quiz-reminder';
+const NOTIFICATION_ID = DAILY_QUIZ_NOTIFICATION_ID;
 const DEFAULT_ALARM_HOUR = 15;
 
 /**
@@ -62,7 +63,7 @@ const toAlarmTimeString = (hour: number) => `${String(hour).padStart(2, '0')}:00
 
 /** 화면 표시용 Date (오늘 날짜 + 지정 시각). 스케줄링은 hour 로만 한다. */
 const hourToDate = (hour: number) => {
-	const date = new Date();
+	const date = DateUtils.now();
 	date.setHours(hour, 0, 0, 0);
 	return date;
 };
@@ -111,10 +112,18 @@ const TodayQuizScreen = () => {
 	const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
 	const [showToast, setShowToast] = useState(false);
 	const [toastMessage, setToastMessage] = useState('');
+	const [toastSubMessage, setToastSubMessage] = useState<string | undefined>(undefined);
+
+	/** 주요 변경(알림 설정 등) 피드백용 공통 토스트 */
+	const showToastMessage = (message: string, subMessage?: string) => {
+		setToastMessage(message);
+		setToastSubMessage(subMessage);
+		setShowToast(true);
+	};
 	const [highlightAnswerId, setHighlightAnswerId] = useState<number | null>(null);
 
 	const [showTodayReview, setShowTodayReview] = useState(false);
-	const [todayDate, setTodayDate] = useState(new Date());
+	const [todayDate, setTodayDate] = useState(DateUtils.now());
 
 	// 알림 시각의 단일 소스. 절대시각(Date) 이 아니라 '로컬 시' 만 들고 있어야 타임존/날짜가 섞이지 않는다.
 	const [tempSelectedHour, setTempSelectedHour] = useState(DEFAULT_ALARM_HOUR);
@@ -150,8 +159,7 @@ const TodayQuizScreen = () => {
 	const handleToggleFavorite = async (id: number) => {
 		const added = await toggleFavorite(id);
 		await loadFavorites();
-		setToastMessage(added ? '즐겨찾기 추가' : '즐겨찾기 제거');
-		setShowToast(true);
+		showToastMessage(added ? '즐겨찾기 추가' : '즐겨찾기 제거');
 	};
 
 	useEffect(() => {
@@ -422,43 +430,13 @@ const TodayQuizScreen = () => {
 	 * 매일 지정한 '로컬 시각' 에 반복 알림을 예약한다.
 	 * @param hour 0-23 (로컬 기준). 저장된 값만 넘길 것 — 현재 시각으로 재계산하지 않는다.
 	 */
+	// 예약 로직은 NotifactionHelper 로 일원화했다 — 앱 부팅 시 재예약(드리프트 보정)과 같은 코드를 쓴다.
 	const scheduleDailyQuizNotification = async (hour: number) => {
-		const trigger: TimestampTrigger = {
-			type: TriggerType.TIMESTAMP,
-			timestamp: getNextTriggerTimestamp(hour, 0),
-			repeatFrequency: RepeatFrequency.DAILY,
-		};
-
-		// 재예약 전 항상 기존 예약 취소 (중복 예약 방지)
-		await cancelScheduledNotification();
-
-		await notifee.createTriggerNotification(
-			{
-				id: NOTIFICATION_ID,
-				title: '속담 퀴즈가 도착했습니다. 🍀',
-				body: '출석 체크도 하고 문제도 풀어서 속담 지식을 넓혀보아요!',
-				android: {
-					channelId: await createAndroidChannel(),
-					pressAction: { id: 'default' },
-				},
-				data: {
-					moveToScreen: Paths.TODAY_QUIZ, // ✅ 목적지 명시
-				},
-			},
-			trigger,
-		);
+		await scheduleDailyQuizReminder(hour, Paths.TODAY_QUIZ);
 	};
 
 	const cancelScheduledNotification = async () => {
-		await notifee.cancelNotification(NOTIFICATION_ID);
-	};
-
-	const createAndroidChannel = async () => {
-		return await notifee.createChannel({
-			id: 'quiz-reminder',
-			name: '퀴즈 알림',
-			importance: AndroidImportance.HIGH,
-		});
+		await cancelDailyQuizReminder();
 	};
 
 	const requestPermission = async () => {
@@ -504,7 +482,7 @@ const TodayQuizScreen = () => {
 					// 새로운 퀴즈 생성
 					const newQuiz = getTodayQuiz();
 					const todayQuizData: MainDataType.TodayQuizList = {
-						quizDate: new Date().toISOString(), // ✅ ISO 저장
+						quizDate: DateUtils.now().toISOString(), // ✅ ISO 저장
 						isCheckedIn: false,
 						todayQuizIdArr: newQuiz.map((q) => q.id),
 						correctQuizIdArr: [],
@@ -529,7 +507,7 @@ const TodayQuizScreen = () => {
 
 				// ✅ 알림 설정 완료 팝업 추가
 				const hour = tempSelectedHour.toString().padStart(2, '0');
-				Alert.alert('⏰ 알림 설정 완료!', `매일 ${hour}시에 오늘의 퀴즈가 찾아갈게요!\n놓치지 말고 꼭 참여해보세요 😊`);
+				showToastMessage('⏰ 알림 설정 완료', `매일 ${hour}시에 오늘의 퀴즈가 찾아갈게요!`);
 			} else {
 				Alert.alert('알림 권한 필요', '설정에서 알림 권한을 허용해주세요.');
 				Linking.openSettings();
@@ -568,7 +546,7 @@ const TodayQuizScreen = () => {
 			: {
 					correctProverbId: [],
 					wrongProverbId: [],
-					lastAnsweredAt: new Date(),
+					lastAnsweredAt: DateUtils.now(),
 					quizCounts: {},
 					badges: [],
 					totalScore: 0,
@@ -622,6 +600,13 @@ const TodayQuizScreen = () => {
 		setAnswerResults(newAnswerResults);
 		setSelectedAnswers(newSelectedAnswers);
 
+		// 🔊 정답/오답 효과음
+		if (isCorrect) {
+			playCorrect();
+		} else {
+			playWrong();
+		}
+
 		if (!isCorrect) {
 			setHighlightAnswerId(quizId);
 			addTimer(() => setHighlightAnswerId(null), 2000);
@@ -653,6 +638,7 @@ const TodayQuizScreen = () => {
 			// ✅ 오늘의 퀴즈를 모두 풀었으면 누적 완료 일수 기준 뱃지 부여
 			const isAllAnswered = Object.keys(newAnswerResults).length >= quizList.length && quizList.length > 0;
 			if (isAllAnswered) {
+				playFinish(); // 🎉 오늘의 퀴즈 완료 사운드
 				await checkAndAwardTodayQuizBadges(storedArr);
 			}
 		}
@@ -822,13 +808,13 @@ const TodayQuizScreen = () => {
 				ref={scrollRef}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{
-					paddingBottom: scaleHeight(40),
+					paddingBottom: SPACING_H.xxxxl,
 				}}>
 				{isAlarmEnabled && (
 					<View style={styles.buttonRow}>
 						<View style={styles.leftButtonWrapper}>
 							{/* <TouchableOpacity onPress={handleResetTodayQuiz}>
-								<View style={[styles.buttonContent, { marginLeft: scaleWidth(12) }]}>
+								<View style={[styles.buttonContent, { marginLeft: SPACING_W.md }]}>
 									<IconComponent name="rotate-left" type="FontAwesome" size={scaledSize(13)} color="#95a5a6" style={styles.iconSpacing} />
 									<Text style={styles.buttonText}>오늘 문제 다시 풀기</Text>
 								</View>
@@ -850,6 +836,7 @@ const TodayQuizScreen = () => {
 
 				{!isAlarmEnabled && (
 					<View style={styles.content}>
+						<Image source={require('@/assets/images/screen-heroes/today-quiz.png')} style={styles.todayHeroImage} resizeMode="contain" />
 						<Text style={styles.title}>🍀 매일 '오늘의 퀴즈'가 도착해요! 🍀</Text>
 
 						<View style={{ alignSelf: 'stretch', marginTop: SPACING_H.sm }}>
@@ -1125,7 +1112,7 @@ const TodayQuizScreen = () => {
 										// ✅ 알림 끈 경우엔 별도 메시지 없이 저장만
 									} else {
 										await scheduleDailyQuizNotification(finalHour);
-										Alert.alert('⏰ 알림 저장 완료!', `${finalHour.toString().padStart(2, '0')}시에 오늘의 퀴즈 알람이 지정되었습니다.`);
+										showToastMessage('⏰ 알림 저장 완료', `${finalHour.toString().padStart(2, '0')}시에 오늘의 퀴즈 알람이 지정되었습니다.`);
 									}
 
 									await saveSettingInfo({
@@ -1235,11 +1222,11 @@ const TodayQuizScreen = () => {
 						</TouchableOpacity>
 					</View>
 				</View>
-				<FavoriteToast visible={showToast} message={toastMessage} onHide={() => setShowToast(false)} />
+				<FavoriteToast visible={showToast} message={toastMessage} subMessage={toastSubMessage} onHide={() => setShowToast(false)} />
 			</Modal>
 
 			{/* 상세 모달 */}
-			<ProverbDetailModal visible={detailModalVisible} proverb={detailQuiz} onClose={() => setDetailModalVisible(false)} />
+			<ProverbDetailModal visible={detailModalVisible && !!detailQuiz} proverb={detailQuiz} onClose={() => setDetailModalVisible(false)} />
 
 			{/* ✅ 신규 뱃지 획득 모달 */}
 			<NewBadgeModal
@@ -1291,10 +1278,6 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		backgroundColor: COLORS.surface,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	buttonText: {
 		fontSize: FONT_SIZES.smPlus,
@@ -1318,13 +1301,12 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		borderRadius: RADIUS.lg,
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		justifyContent: 'center',
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
+	todayHeroImage: { width: scaleWidth(190), height: scaleHeight(126), marginBottom: SPACING_H.sm },
 	title: {
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
@@ -1402,12 +1384,10 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		borderRadius: RADIUS.lg,
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		alignItems: 'center',
 		justifyContent: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	scoreRow: {
 		flexDirection: 'row',
@@ -1467,10 +1447,6 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	quizBox: {
 		paddingVertical: SPACING_H.lg,
@@ -1591,7 +1567,7 @@ const styles = StyleSheet.create({
 	emptyQuizBox: {
 		alignItems: 'center',
 		justifyContent: 'center',
-		paddingVertical: scaleHeight(40),
+		paddingVertical: SPACING_H.xxxxl,
 		paddingHorizontal: SPACING_W.lg,
 	},
 	todayQuizArrivalImage: {
@@ -1820,13 +1796,11 @@ const styles = StyleSheet.create({
 		width: '100%',
 		maxWidth: scaleWidth(420),
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		paddingVertical: SPACING_H.xl,
 		paddingHorizontal: SPACING_W.lg,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 		alignItems: 'center',
 	},
 	modalTitle: {
@@ -1906,7 +1880,7 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		top: SPACING_H.lg,
 		right: SPACING_W.lg,
-		padding: scaleWidth(4),
+		padding: SPACING_W.xs,
 		zIndex: 10,
 	},
 	modalFooterButton: {
@@ -1935,7 +1909,7 @@ const styles = StyleSheet.create({
 		paddingBottom: SPACING_H.xl,
 	},
 	emptyView: {
-		paddingVertical: scaleHeight(40),
+		paddingVertical: SPACING_H.xxxxl,
 		alignItems: 'center',
 	},
 	emptyText: {

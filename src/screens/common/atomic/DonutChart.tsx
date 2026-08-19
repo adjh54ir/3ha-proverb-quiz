@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, View } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
 import { scaleWidth } from '@/utils';
+import { COLORS } from '@/const/common/Theme';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -29,8 +30,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
 	size = 110,
 	strokeWidth = 12,
 	percent,
-	color = '#22C55E',
-	trackColor = '#E2E8F0',
+	color = COLORS.primary,
+	trackColor = COLORS.border,
 	children,
 }) => {
 	const dimension = scaleWidth(size);

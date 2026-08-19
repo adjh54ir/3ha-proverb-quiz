@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Animated, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Animated, Image, KeyboardAvoidingView, Keyboard, Platform, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import BookFormModal from './modal/BookFormModal';
@@ -16,8 +16,9 @@ import FavoriteToast from './common/FavoriteToast';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
+import DateUtils from '@/utils/DateUtils';
 
-const DEFAULT_COLOR = '#22C55E';
+const DEFAULT_COLOR = COLORS.primary;
 const DEFAULT_ICON = 'menu-book';
 const STORAGE_KEY = MainStorageKeyType.USER_PROVERB_BOOKS;
 
@@ -125,7 +126,7 @@ const MyProverbBook = () => {
 			setFormTarget(undefined);
 			showToast('속담집 수정', '속담집이 수정되었습니다.');
 		} else {
-			const newBook: MainDataType.ProverbBook = { id: Date.now().toString(), proverbIds: [], createdAt: new Date().toISOString(), ...data };
+			const newBook: MainDataType.ProverbBook = { id: DateUtils.nowTime().toString(), proverbIds: [], createdAt: DateUtils.now().toISOString(), ...data };
 			await saveBooks([...books, newBook]);
 			setFormTarget(undefined);
 			showToast('속담집 생성', '속담집이 생성되었습니다.');
@@ -161,6 +162,10 @@ const MyProverbBook = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.main} edges={['top', 'bottom']}>
+				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboardWrap}>
+				{/* 검색창 밖을 누르면 키보드가 닫힌다 */}
+				<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+				<View style={styles.keyboardWrap}>
 				{/* 헤더 */}
 				<View style={styles.header}>
 					<TouchableOpacity onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME })} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
@@ -178,6 +183,13 @@ const MyProverbBook = () => {
 
 				{books.length > 0 && (
 					<View style={styles.filterContainer}>
+						<View style={styles.libraryHero}>
+							<View style={styles.libraryHeroCopy}>
+								<Text style={styles.libraryHeroTitle}>나만의 지혜 책장을 채워보세요</Text>
+								<Text style={styles.libraryHeroDescription}>마음에 드는 속담을 주제별로 모을 수 있어요.</Text>
+							</View>
+							<Image source={require('@/assets/images/screen-heroes/proverb-library.png')} style={styles.libraryHeroImage} resizeMode="contain" />
+						</View>
 						<View style={styles.searchBox}>
 							<IconComponent type="materialIcons" name="search" size={scaledSize(18)} color={COLORS.textLight} />
 							<TextInput style={styles.searchInput} placeholder="속담집 검색..." placeholderTextColor={COLORS.textLight} value={searchQuery} onChangeText={setSearchQuery} returnKeyType="search" />
@@ -200,7 +212,7 @@ const MyProverbBook = () => {
 				<Animated.ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ opacity: fadeAnim }} contentContainerStyle={styles.booksContainer} showsVerticalScrollIndicator={false}>
 					{books.length === 0 ? (
 						<View style={styles.emptyView}>
-							<Image source={require('@/assets/images/feature-states/empty-proverb-book.png')} style={styles.emptyImage} resizeMode="contain" />
+							<Image source={require('@/assets/images/screen-heroes/library-shelf.png')} style={styles.emptyShelfImage} resizeMode="contain" />
 							<Text style={styles.emptyTitle}>아직 만든 속담집이 없습니다</Text>
 							<Text style={styles.emptyDesc}>지금 만들기 버튼을 눌러서 추가해보세요!</Text>
 							<TouchableOpacity style={styles.emptyBtn} onPress={() => setFormTarget(null)}>
@@ -226,7 +238,7 @@ const MyProverbBook = () => {
 								<AnimatedListItem key={book.id} index={index}>
 								<TouchableOpacity style={styles.bookCard} activeOpacity={0.8} onPress={() => navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: book.id })}>
 									<View style={styles.bookCardPreviewHeader}>
-										<View style={[styles.bookCardIconWrap, { backgroundColor: bookColor, shadowColor: bookColor, shadowOpacity: 0.4, shadowOffset: { width: 0, height: 3 }, shadowRadius: 6 }]}>
+										<View style={[styles.bookCardIconWrap, { backgroundColor: bookColor, }]}>
 											<IconComponent type="materialIcons" name={bookIcon} size={scaledSize(26)} color={COLORS.textWhite} />
 										</View>
 										<View style={{ flex: 1 }}>
@@ -273,6 +285,9 @@ const MyProverbBook = () => {
 					<IconComponent type="materialIcons" name="add" size={scaledSize(28)} color={COLORS.textWhite} />
 				</TouchableOpacity>
 				<BottomHomeButton backgroundColor={COLORS.surfaceAlt} skipConfirm />
+				</View>
+				</TouchableWithoutFeedback>
+				</KeyboardAvoidingView>
 			</SafeAreaView>
 
 			{/* 생성/편집 모달 */}
@@ -368,6 +383,7 @@ const MyProverbBook = () => {
 export default MyProverbBook;
 
 const styles = StyleSheet.create({
+	keyboardWrap: { flex: 1 },
 	main: { flex: 1, backgroundColor: COLORS.background },
 	header: {
 		flexDirection: 'row',
@@ -390,6 +406,22 @@ const styles = StyleSheet.create({
 	},
 	headerCountBadgeText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.secondary },
 	filterContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, backgroundColor: COLORS.background },
+	libraryHero: {
+		minHeight: scaleHeight(112),
+		marginBottom: SPACING_H.md,
+		paddingLeft: SPACING_W.lg,
+		backgroundColor: HERO.bg,
+		borderTopWidth: 3,
+		borderTopColor: HERO.accent,
+		borderRadius: RADIUS.lg,
+		flexDirection: 'row',
+		alignItems: 'center',
+		overflow: 'hidden',
+	},
+	libraryHeroCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
+	libraryHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
+	libraryHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
+	libraryHeroImage: { width: scaleWidth(136), height: scaleHeight(108), marginRight: scaleWidth(-6) },
 	searchBox: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -415,8 +447,9 @@ const styles = StyleSheet.create({
 	sortChipText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary },
 	sortChipTextActive: { color: COLORS.textWhite },
 	booksContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, paddingBottom: scaleHeight(120), flexGrow: 1 },
-	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: scaleHeight(40) },
+	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: SPACING_H.xxxxl },
 	emptyImage: { width: scaleWidth(176), height: scaleWidth(176) },
+	emptyShelfImage: { width: scaleWidth(220), height: scaleHeight(140) },
 	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textLight, textAlign: 'center', lineHeight: scaledSize(20) },
 	emptyBtn: {
@@ -435,10 +468,6 @@ const styles = StyleSheet.create({
 		marginBottom: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: COLORS.surfaceAlt,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	bookCardPreviewHeader: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.md },
 	bookCardIconWrap: {
@@ -451,7 +480,7 @@ const styles = StyleSheet.create({
 	bookCardTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong },
 	bookCardBadgeText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textLight },
 	bookCardDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, marginTop: SPACING_H.xs },
-	moreBtn: { padding: scaleWidth(4) },
+	moreBtn: { padding: SPACING_W.xs },
 	previewRow: { flexDirection: 'row', flexWrap: 'wrap', columnGap: SPACING_W.xs, rowGap: SPACING_H.xs, marginTop: SPACING_H.md },
 	previewTag: {
 		maxWidth: '46%',
@@ -494,17 +523,13 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.secondary,
 		alignItems: 'center',
 		justifyContent: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.2,
-		shadowRadius: 8,
 	},
 	modalOverlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(32),
+		paddingHorizontal: SPACING_W.xxxl,
 	},
 	confirmModal: {
 		width: '100%',

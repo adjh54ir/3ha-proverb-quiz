@@ -305,13 +305,11 @@ const styles = StyleSheet.create({
 		maxHeight: '86%',
 		borderRadius: RADIUS.xl,
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	// ===== 결과 헤더 =====
 	resultHeader: {

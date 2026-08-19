@@ -12,6 +12,8 @@ import {
 	Linking,
 	TextInput,
 	KeyboardAvoidingView,
+	Keyboard,
+	Pressable,
 } from 'react-native';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
@@ -103,6 +105,8 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.overlay}>
+				{/* 카드 밖(딤 영역)을 누르면 키보드를 닫는다 */}
+				<Pressable style={StyleSheet.absoluteFill} onPress={Keyboard.dismiss} />
 				<PopInView visible={visible} style={styles.container}>
 					{/* 헤더 */}
 					<View style={styles.header}>
@@ -211,12 +215,10 @@ const styles = StyleSheet.create({
 		maxHeight: scaleHeight(660),
 		flexShrink: 1, // 키보드로 화면이 줄어들 때 모달이 넘치지 않도록
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		overflow: 'hidden',
-		shadowColor: '#000',
-		shadowOpacity: 0.08,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	header: {
 		paddingTop: SPACING_H.xl,
@@ -311,7 +313,7 @@ const styles = StyleSheet.create({
 	scroll: {
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.xs,
-		paddingBottom: scaleHeight(40),
+		paddingBottom: SPACING_H.xxxxl,
 	},
 	appCard: {
 		flexDirection: 'row',
@@ -377,7 +379,7 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 	},
 	emptyState: {
-		paddingVertical: scaleHeight(40),
+		paddingVertical: SPACING_H.xxxxl,
 		alignItems: 'center',
 	},
 	emptyText: {

@@ -6,6 +6,7 @@
 // import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
 // import IconComponent from '../common/atomic/IconComponent';
 
+import { SPACING_W, SPACING_H } from '@/const/common/Theme';
 // type Props = {
 //     priceText: string;
 //     onPressPurchase: () => void;
@@ -51,7 +52,7 @@
 //                     name="diamond-stone"
 //                     size={scaledSize(32)}
 //                     color="#3498db"
-//                     style={{ marginBottom: scaleHeight(6) }}
+//                     style={{ marginBottom: SPACING_H.xsPlus }}
 //                 />
 //                 <Text style={styles.title}>광고 없이 깔끔하게!</Text>
 //                 <Text style={styles.subtitle}>PREMIUM UPGRADE</Text>
@@ -75,7 +76,7 @@
 //                 onPress={purchaseProduct}
 //                 disabled={loading}
 //             >
-//                 <IconComponent type="MaterialCommunityIcons" name="crown" size={18} color="#ffffff" style={{ marginRight: scaleWidth(8) }} />
+//                 <IconComponent type="MaterialCommunityIcons" name="crown" size={18} color="#ffffff" style={{ marginRight: SPACING_W.sm }} />
 //                 <Text style={styles.buttonText}>
 //                     평생 광고 제거하기
 //                 </Text>
@@ -94,21 +95,21 @@
 // const styles = StyleSheet.create({
 //     container: {
 //         backgroundColor: '#ffffff',
-//         padding: scaleWidth(20),
-//         marginHorizontal: scaleWidth(20),
-//         marginTop: scaleHeight(16),
-//         marginBottom: scaleHeight(12),
+//         padding: SPACING_W.xl,
+//         marginHorizontal: SPACING_W.xl,
+//         marginTop: SPACING_H.lg,
+//         marginBottom: SPACING_H.md,
 //         borderRadius: scaleWidth(12),
 //         borderWidth: 1,
 //         borderColor: '#e2e6ea',
-//         shadowColor: '#000',
-//         shadowOpacity: 0.06,
-//         shadowRadius: 6,
-//         shadowOffset: { width: 0, height: scaleHeight(3) },
+//         
+//         
+//         
+//         
 //     },
 //     header: {
 //         alignItems: 'center',
-//         marginBottom: scaleHeight(10),
+//         marginBottom: SPACING_H.smPlus,
 //     },
 //     title: {
 //         fontSize: scaledSize(18),
@@ -119,17 +120,17 @@
 //         fontSize: scaledSize(11),
 //         color: '#8395a7',
 //         letterSpacing: 1.2,
-//         marginTop: scaleHeight(2),
+//         marginTop: SPACING_H.xxs,
 //     },
 //     badge: {
 //         backgroundColor: '#eaf4ff',
 //         borderColor: '#3498db',
 //         borderWidth: 1,
-//         paddingVertical: scaleHeight(6),
-//         paddingHorizontal: scaleWidth(12),
+//         paddingVertical: SPACING_H.xsPlus,
+//         paddingHorizontal: SPACING_W.md,
 //         borderRadius: scaleWidth(30),
 //         alignSelf: 'center',
-//         marginBottom: scaleHeight(14),
+//         marginBottom: SPACING_H.mdPlus,
 //     },
 //     badgeText: {
 //         fontSize: scaledSize(13),
@@ -137,13 +138,13 @@
 //         fontWeight: '700',
 //     },
 //     benefitList: {
-//         marginBottom: scaleHeight(12),
+//         marginBottom: SPACING_H.md,
 //     },
 //     benefitItem: {
 //         flexDirection: 'row',
 //         alignItems: 'center',
-//         gap: scaleWidth(8),
-//         marginBottom: scaleHeight(6),
+//         gap: SPACING_W.sm,
+//         marginBottom: SPACING_H.xsPlus,
 //     },
 //     benefitText: {
 //         fontSize: scaledSize(13),
@@ -154,7 +155,7 @@
 //         alignItems: 'center',
 //         justifyContent: 'center',
 //         backgroundColor: '#3498db',
-//         paddingVertical: scaleHeight(12),
+//         paddingVertical: SPACING_H.md,
 //         borderRadius: scaleWidth(12),
 //     },
 //     buttonText: {

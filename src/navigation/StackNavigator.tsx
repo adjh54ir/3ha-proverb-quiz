@@ -68,7 +68,7 @@ const StackNavigator = () => {
 					title: '타임 챌린지',
 					headerLeft: () => <></>,
 					// headerLeft: () => (
-					// 	<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
+					// 	<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: SPACING_W.lg }}>
 					// 		<IconComponent type="MaterialIcons" name="arrow-back" size={scaledSize(24)} color="#2c3e50" />
 					// 	</TouchableOpacity>
 					// ),
@@ -102,7 +102,7 @@ const StackNavigator = () => {
 					headerRight: () => <></>,
 					// headerRight: () => (
 					// 	//@ts-ignore
-					// 	<TouchableOpacity onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })} style={{ marginRight: scaleWidth(16) }}>
+					// 	<TouchableOpacity onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })} style={{ marginRight: SPACING_W.lg }}>
 					// 		<IconComponent type='materialIcons' name='info-outline' size={scaledSize(24)} color='#3498db' />
 					// 	</TouchableOpacity>
 					// ),
@@ -127,7 +127,7 @@ const StackNavigator = () => {
 					title: '속담 학습',
 					headerLeft: () => (
 						<></>
-						// <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: scaleWidth(16) }}>
+						// <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: SPACING_W.lg }}>
 						// 	<Icon name='arrow-back' size={24} color='#2c3e50' />
 						// </TouchableOpacity>
 					),

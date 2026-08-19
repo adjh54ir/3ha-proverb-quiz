@@ -9,7 +9,7 @@ import IconComponent from '@/screens/common/atomic/IconComponent';
 import ProverbListScreen from '@/screens/ProverbListScreen';
 import MyScoreScreen from '@/screens/MyScoreScreen';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, SPACING_H } from '@/const/common/Theme';
 import DeviceInfo from 'react-native-device-info';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import TodayQuizScreen from '@/screens/TodayQuizScreen';
@@ -121,7 +121,7 @@ const BottomTabNavigator = () => {
 					name={iconName}
 					size={scaledSize(24)}
 					color={color}
-					style={isTablet ? { marginTop: scaleHeight(25), height: scaleHeight(45), width: scaleWidth(16) } : undefined}
+					style={isTablet ? { marginTop: SPACING_H.xxl, height: scaleHeight(45), width: scaleWidth(16) } : undefined}
 				/>
 			</TabIconPop>
 		);

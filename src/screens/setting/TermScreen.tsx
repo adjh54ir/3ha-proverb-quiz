@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
 	},
 	scrollContainer: {
 		paddingTop: SPACING_H.xl,
-		paddingBottom: scaleHeight(40),
+		paddingBottom: SPACING_H.xxxxl,
 		paddingHorizontal: SPACING_W.lg,
 	},
 	markdownBox: {

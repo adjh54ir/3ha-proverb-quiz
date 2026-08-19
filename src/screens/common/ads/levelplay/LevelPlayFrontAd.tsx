@@ -12,6 +12,7 @@ import {
 } from 'ironsource-mediation';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Platform, StyleSheet, Text, View } from 'react-native';
+import { SPACING_W, SPACING_H } from '@/const/common/Theme';
 
 type Props = {
 	onAdClosed?: () => void;
@@ -105,7 +106,7 @@ export default LevelPlayFrontAd;
 
 const styles = StyleSheet.create({
 	container: {
-		padding: scaleHeight(24),
+		padding: SPACING_H.xxl,
 		backgroundColor: '#ffffff',
 		borderRadius: scaleWidth(20),
 		alignItems: 'center',
@@ -129,14 +130,14 @@ const styles = StyleSheet.create({
 	},
 
 	loadingTxt: {
-		marginTop: scaleHeight(12),
+		marginTop: SPACING_H.md,
 		fontSize: scaledSize(16),
 		color: '#2c3e50',
 		fontWeight: '600',
 	},
 
 	subTxt: {
-		marginTop: scaleHeight(4),
+		marginTop: SPACING_H.xs,
 		fontSize: scaledSize(13),
 		color: '#7f8c8d',
 	},
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
 	mascotImage: {
 		width: scaleWidth(80),
 		height: scaleWidth(80),
-		marginBottom: scaleHeight(16),
+		marginBottom: SPACING_H.lg,
 		opacity: 0.9,
 	},
 });

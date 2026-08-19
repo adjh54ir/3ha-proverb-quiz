@@ -8,14 +8,27 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		205AE27CD1555CAC9B989F63 /* match.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 48FC22B9FCD7C1A549A0BD52 /* match.m4a */; };
+		2AA96B12FBDC9909F5630EF1 /* tick.m4a in Resources */ = {isa = PBXBuildFile; fileRef = F0B1E009C3B49F553B582253 /* tick.m4a */; };
+		2E55C186CD4C60AEC16653A8 /* flip.m4a in Resources */ = {isa = PBXBuildFile; fileRef = E10ACB101DAAD4EA6B28A8A1 /* flip.m4a */; };
+		2F05EE29B3D4FEF90D0562B0 /* wrong.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9DB24E5D38D2BA314B1735AA /* wrong.m4a */; };
+		30078FAC5BFC2CBBF886953C /* bgm_time.m4a in Resources */ = {isa = PBXBuildFile; fileRef = F20F5DD9D49A223192F222E9 /* bgm_time.m4a */; };
 		42B6E327EB9E14C0D7F045A1 /* Pods_ProverbQuiz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 258D903D6EF7D8D264CCB5E1 /* Pods_ProverbQuiz.framework */; };
+		43A95F70C4AAF65BC6FEB7E7 /* combo.m4a in Resources */ = {isa = PBXBuildFile; fileRef = F4A172E53CFC59E29745D4A7 /* combo.m4a */; };
 		4710D17E6B8048DAADCDBA3A /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FBAC0347A09B47018C7047A0 /* BootSplash.storyboard */; };
 		50DD17319E934E4F81CAA745 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 78B0E1A4DF544214A0CEC724 /* Colors.xcassets */; };
+		6AE234BBC8CD4505A5FBC4DC /* timeout.m4a in Resources */ = {isa = PBXBuildFile; fileRef = BB9EC2A71FF0D955DF0C6CBF /* timeout.m4a */; };
+		70BE3034D2206BCDCFEB509F /* bgm_quiz.m4a in Resources */ = {isa = PBXBuildFile; fileRef = D5C23CC99585A4D4FD54D342 /* bgm_quiz.m4a */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		7802120C2EE5714200BD5940 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7802120B2EE5714200BD5940 /* StoreKit.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		94A8BC18F2DBBCE74F1B0CC1 /* pop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = FB3E4CE0CBDC1CDC7A1AAE89 /* pop.m4a */; };
+		A0201AC0DCCC92257DB983D2 /* correct.m4a in Resources */ = {isa = PBXBuildFile; fileRef = E53F7FE885BC70EDBF3CC164 /* correct.m4a */; };
 		A7434ECB2E37670300BC2BA7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7434ECA2E37670300BC2BA7 /* GoogleService-Info.plist */; };
+		B9792E6CC387C3207CEFCAFB /* whoosh.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9A0A116DCF7A1B9B4B77B0AA /* whoosh.m4a */; };
+		BC8A921C3224348034CFD15B /* finish.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 7B90307ABA74E825B9ED101F /* finish.m4a */; };
 		BDDAD110C7AFBFEE3CCD39D7 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		FB9CA12FBAE996CA872C5337 /* complete.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 970B103FA9D3C75652561C4A /* complete.m4a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,14 +37,27 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ProverbQuiz/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = ProverbQuiz/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		258D903D6EF7D8D264CCB5E1 /* Pods_ProverbQuiz.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ProverbQuiz.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		48FC22B9FCD7C1A549A0BD52 /* match.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = match.m4a; sourceTree = "<group>"; };
 		68851B6F45F5056F5698709F /* Pods-ProverbQuiz.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProverbQuiz.debug.xcconfig"; path = "Target Support Files/Pods-ProverbQuiz/Pods-ProverbQuiz.debug.xcconfig"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ProverbQuiz/AppDelegate.swift; sourceTree = "<group>"; };
 		7802120B2EE5714200BD5940 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		78B0E1A4DF544214A0CEC724 /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = ProverbQuiz/Colors.xcassets; sourceTree = "<group>"; };
+		7B90307ABA74E825B9ED101F /* finish.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = finish.m4a; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ProverbQuiz/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		970B103FA9D3C75652561C4A /* complete.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = complete.m4a; sourceTree = "<group>"; };
+		9A0A116DCF7A1B9B4B77B0AA /* whoosh.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = whoosh.m4a; sourceTree = "<group>"; };
+		9DB24E5D38D2BA314B1735AA /* wrong.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = wrong.m4a; sourceTree = "<group>"; };
 		A7434ECA2E37670300BC2BA7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B3B2CE0117B2F0DE5A6C7720 /* Pods-ProverbQuiz.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProverbQuiz.release.xcconfig"; path = "Target Support Files/Pods-ProverbQuiz/Pods-ProverbQuiz.release.xcconfig"; sourceTree = "<group>"; };
+		BB9EC2A71FF0D955DF0C6CBF /* timeout.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = timeout.m4a; sourceTree = "<group>"; };
+		D5C23CC99585A4D4FD54D342 /* bgm_quiz.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = bgm_quiz.m4a; sourceTree = "<group>"; };
+		E10ACB101DAAD4EA6B28A8A1 /* flip.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = flip.m4a; sourceTree = "<group>"; };
+		E53F7FE885BC70EDBF3CC164 /* correct.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = correct.m4a; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F0B1E009C3B49F553B582253 /* tick.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = tick.m4a; sourceTree = "<group>"; };
+		F20F5DD9D49A223192F222E9 /* bgm_time.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = bgm_time.m4a; sourceTree = "<group>"; };
+		F4A172E53CFC59E29745D4A7 /* combo.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = combo.m4a; sourceTree = "<group>"; };
+		FB3E4CE0CBDC1CDC7A1AAE89 /* pop.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = pop.m4a; sourceTree = "<group>"; };
 		FBAC0347A09B47018C7047A0 /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = ProverbQuiz/BootSplash.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -73,6 +99,26 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		3E6C30A1F04A63DF14C44F7A /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				E53F7FE885BC70EDBF3CC164 /* correct.m4a */,
+				9DB24E5D38D2BA314B1735AA /* wrong.m4a */,
+				7B90307ABA74E825B9ED101F /* finish.m4a */,
+				BB9EC2A71FF0D955DF0C6CBF /* timeout.m4a */,
+				970B103FA9D3C75652561C4A /* complete.m4a */,
+				F4A172E53CFC59E29745D4A7 /* combo.m4a */,
+				F0B1E009C3B49F553B582253 /* tick.m4a */,
+				E10ACB101DAAD4EA6B28A8A1 /* flip.m4a */,
+				48FC22B9FCD7C1A549A0BD52 /* match.m4a */,
+				FB3E4CE0CBDC1CDC7A1AAE89 /* pop.m4a */,
+				9A0A116DCF7A1B9B4B77B0AA /* whoosh.m4a */,
+				D5C23CC99585A4D4FD54D342 /* bgm_quiz.m4a */,
+				F20F5DD9D49A223192F222E9 /* bgm_time.m4a */,
+			);
+			name = Sounds;
+			sourceTree = SOURCE_ROOT;
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -88,6 +134,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				3E6C30A1F04A63DF14C44F7A /* Sounds */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -181,6 +228,19 @@
 				BDDAD110C7AFBFEE3CCD39D7 /* PrivacyInfo.xcprivacy in Resources */,
 				4710D17E6B8048DAADCDBA3A /* BootSplash.storyboard in Resources */,
 				50DD17319E934E4F81CAA745 /* Colors.xcassets in Resources */,
+				A0201AC0DCCC92257DB983D2 /* correct.m4a in Resources */,
+				2F05EE29B3D4FEF90D0562B0 /* wrong.m4a in Resources */,
+				BC8A921C3224348034CFD15B /* finish.m4a in Resources */,
+				6AE234BBC8CD4505A5FBC4DC /* timeout.m4a in Resources */,
+				FB9CA12FBAE996CA872C5337 /* complete.m4a in Resources */,
+				43A95F70C4AAF65BC6FEB7E7 /* combo.m4a in Resources */,
+				2AA96B12FBDC9909F5630EF1 /* tick.m4a in Resources */,
+				2E55C186CD4C60AEC16653A8 /* flip.m4a in Resources */,
+				205AE27CD1555CAC9B989F63 /* match.m4a in Resources */,
+				94A8BC18F2DBBCE74F1B0CC1 /* pop.m4a in Resources */,
+				B9792E6CC387C3207CEFCAFB /* whoosh.m4a in Resources */,
+				70BE3034D2206BCDCFEB509F /* bgm_quiz.m4a in Resources */,
+				30078FAC5BFC2CBBF886953C /* bgm_time.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

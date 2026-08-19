@@ -16,8 +16,9 @@ import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
+import { useToast } from '@/hooks/useToast';
 
-const DEFAULT_COLOR = '#22C55E';
+const DEFAULT_COLOR = COLORS.primary;
 const DEFAULT_ICON = 'menu-book';
 const STORAGE_KEY = MainStorageKeyType.USER_PROVERB_BOOKS;
 const PRACTICE_RECORD_KEY = MainStorageKeyType.USER_PROVERB_PRACTICE_RECORDS;
@@ -56,6 +57,8 @@ const MyProverbBookDetail = () => {
 	const [selectedProverb, setSelectedProverb] = useState<MainDataType.Proverb | null>(null);
 	const [showDetailModal, setShowDetailModal] = useState(false);
 	const [practiceRecord, setPracticeRecord] = useState<MainDataType.ProverbBookPracticeRecord | null>(null);
+
+	const { showToast, ToastView } = useToast(scaleHeight(90)); // 하단 빼기 바 위로 띄운다
 
 	// 삭제 모드
 	const [removeMode, setRemoveMode] = useState(false);
@@ -97,9 +100,12 @@ const MyProverbBookDetail = () => {
 	const proverbs = useMemo(() => (book ? ALL_PROVERBS.filter((p) => book.proverbIds.includes(p.id)) : []), [book]);
 
 	const handleAddProverbs = async (target: MainDataType.ProverbBook, ids: number[]) => {
+		const before = target.proverbIds.length;
 		const updated = { ...target, proverbIds: [...new Set([...target.proverbIds, ...ids])] };
 		await saveBook(updated);
 		setAddModalVisible(false);
+		const added = updated.proverbIds.length - before;
+		showToast('속담 추가 완료', added > 0 ? `${added}개를 이 속담집에 담았습니다.` : '이미 담겨 있는 속담이에요.');
 	};
 
 	const toggleRemove = (id: number) => {
@@ -112,11 +118,13 @@ const MyProverbBookDetail = () => {
 
 	const handleRemoveConfirm = async () => {
 		if (!book) return;
+		const removedCount = selectedForRemove.size;
 		const updated = { ...book, proverbIds: book.proverbIds.filter((id) => !selectedForRemove.has(id)) };
 		await saveBook(updated);
 		setRemoveConfirmVisible(false);
 		setRemoveMode(false);
 		setSelectedForRemove(new Set());
+		showToast('속담 빼기 완료', `${removedCount}개를 이 속담집에서 제거했습니다.`);
 	};
 
 	const startQuiz = (target: MainDataType.ProverbBook, mode: 'meaning' | 'proverb' | 'blank' | 'example') => {
@@ -199,6 +207,7 @@ const MyProverbBookDetail = () => {
 							<Text style={styles.summaryRecord}>최근 정답률 {lastAttempt.accuracy}% · {lastAttempt.correctCount}/{lastAttempt.correctCount + lastAttempt.wrongCount}</Text>
 						)}
 					</View>
+					<Image source={require('@/assets/images/screen-heroes/proverb-book-detail.png')} style={styles.summaryHeroImage} resizeMode="contain" />
 				</View>
 
 				{/* 액션 버튼 */}
@@ -246,7 +255,7 @@ const MyProverbBookDetail = () => {
 
 			<AddProverbModal visible={addModalVisible} book={book} onClose={() => setAddModalVisible(false)} onAdd={handleAddProverbs} />
 			<QuizModeModal book={quizModeModal} onClose={() => setQuizModeModal(null)} onSelect={(b, mode) => startQuiz(b, mode)} />
-			<ProverbDetailModal visible={showDetailModal} proverb={selectedProverb} onClose={() => setShowDetailModal(false)} />
+			<ProverbDetailModal visible={showDetailModal && !!selectedProverb} proverb={selectedProverb} onClose={() => setShowDetailModal(false)} />
 
 			<Modal visible={removeConfirmVisible} transparent animationType="fade">
 				<View style={styles.modalOverlay}>
@@ -265,6 +274,8 @@ const MyProverbBookDetail = () => {
 					</View>
 				</View>
 			</Modal>
+
+			<ToastView />
 		</>
 	);
 };
@@ -306,6 +317,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
+	summaryHeroImage: { width: scaleWidth(86), height: scaleHeight(72), marginLeft: SPACING_W.sm },
 	summaryDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, marginBottom: SPACING_H.xs },
 	summaryCount: { fontSize: FONT_SIZES.md, color: COLORS.text, fontWeight: '600' },
 	summaryRecord: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: SPACING_H.xs },
@@ -333,10 +345,6 @@ const styles = StyleSheet.create({
 		marginBottom: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: COLORS.surfaceAlt,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	itemCardSelected: { borderColor: COLORS.danger, backgroundColor: COLORS.dangerBg },
 	itemIndexWrap: { width: scaleWidth(24), alignItems: 'center' },
@@ -357,7 +365,7 @@ const styles = StyleSheet.create({
 	itemBadges: { rowGap: SPACING_H.xs, alignItems: 'flex-end' },
 	miniBadge: { paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs, borderRadius: RADIUS.round },
 	miniBadgeText: { color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' },
-	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: scaleHeight(40) },
+	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: SPACING_H.xxxxl },
 	emptyImage: { width: scaleWidth(164), height: scaleWidth(164) },
 	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textLight, textAlign: 'center', lineHeight: scaledSize(20) },
@@ -367,15 +375,13 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.md,
 		paddingBottom: SPACING_H.xl,
 		borderTopWidth: 1,
 		borderTopColor: COLORS.surfaceAlt,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: -2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	removeBtn: {
 		flexDirection: 'row',
@@ -393,7 +399,7 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(32),
+		paddingHorizontal: SPACING_W.xxxl,
 	},
 	confirmModal: {
 		width: '100%',

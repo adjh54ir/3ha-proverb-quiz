@@ -191,14 +191,12 @@ const styles = StyleSheet.create({
 		width: '100%',
 		maxWidth: scaleWidth(340),
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		// 헤더 밴드가 카드 상단을 가득 채우므로 좌우 패딩은 내부 섹션에서 처리한다.
 		paddingBottom: SPACING_H.xl,
 		overflow: 'hidden',
-		shadowColor: '#000',
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
-		shadowOffset: { width: 0, height: 2 },
 	},
 	header: {
 		backgroundColor: COLORS.primary,

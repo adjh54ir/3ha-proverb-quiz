@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Alert, Clipboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
+import { SPACING_W, SPACING_H } from '@/const/common/Theme';
 
 /**
  * AsyncStorage의 내보내기/ 들여오기 기능
@@ -113,25 +114,25 @@ const styles = StyleSheet.create({
 	section: {
 		backgroundColor: '#f8f9fa',
 		borderRadius: scaleWidth(12),
-		padding: scaleWidth(16),
-		margin: scaleWidth(16),
+		padding: SPACING_W.lg,
+		margin: SPACING_W.lg,
 	},
 	subHeader: {
 		fontSize: scaledSize(16),
 		fontWeight: '500',
-		marginTop: scaleHeight(16),
-		marginBottom: scaleHeight(10),
+		marginTop: SPACING_H.lg,
+		marginBottom: SPACING_H.smPlus,
 	},
 	adminButtons: {
-		marginTop: scaleHeight(12),
-		gap: scaleWidth(8),
+		marginTop: SPACING_H.md,
+		gap: SPACING_W.sm,
 	},
 	adminButton: {
 		backgroundColor: '#e74c3c',
-		padding: scaleWidth(12),
+		padding: SPACING_W.md,
 		borderRadius: scaleWidth(8),
 		alignItems: 'center',
-		marginBottom: scaleHeight(8),
+		marginBottom: SPACING_H.sm,
 		flexDirection: 'row',
 		justifyContent: 'center', // 이 줄 추가
 	},
@@ -148,16 +149,16 @@ const styles = StyleSheet.create({
 	description: {
 		fontSize: scaledSize(14),
 		color: '#7f8c8d',
-		marginTop: scaleHeight(8),
-		marginBottom: scaleHeight(12),
+		marginTop: SPACING_H.sm,
+		marginBottom: SPACING_H.md,
 		lineHeight: scaleHeight(20),
 	},
 	textInput: {
 		borderWidth: 1,
 		borderColor: '#bdc3c7',
 		borderRadius: scaleWidth(8),
-		padding: scaleWidth(12),
-		marginBottom: scaleHeight(12),
+		padding: SPACING_W.md,
+		marginBottom: SPACING_H.md,
 		height: scaleHeight(100),
 		textAlignVertical: 'top',
 	},

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
@@ -73,7 +73,6 @@ const InitQuizModeScreen = () => {
 	};
 
 	const levelInfo = useMemo(() => getLevelByScore(totalScore), [totalScore]);
-	const { mascot } = levelInfo;
 
 	return (
 		<SafeAreaView style={styles.main} edges={['bottom']}>
@@ -81,7 +80,11 @@ const InitQuizModeScreen = () => {
 				<Animated.View style={[styles.animatedWrap, { opacity: enterAnim }]}>
 					<ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 						<View style={styles.mascotSection}>
-							<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.contain} />
+							<FastImage
+								source={require('@/assets/images/screen-heroes/quiz-mode.png')}
+								style={styles.mascotImage}
+								resizeMode={FastImage.resizeMode.contain}
+							/>
 							<View style={styles.levelBadgeRow}>
 								<IconComponent type="FontAwesome5" name={levelInfo.icon} size={scaledSize(16)} color={COLORS.warning} />
 								<Text style={styles.levelBadgeText}>{levelInfo.label}</Text>
@@ -182,33 +185,35 @@ const styles = StyleSheet.create({
 	container: { flex: 1, backgroundColor: COLORS.background, paddingHorizontal: SPACING_W.lg, alignItems: 'center' },
 	animatedWrap: { flex: 1, width: '100%' },
 	scrollArea: { flex: 1 },
-	scrollContent: { flexGrow: 1, justifyContent: 'center', paddingTop: SPACING_H.sm, paddingBottom: scaleHeight(40) },
+	scrollContent: { flexGrow: 1, justifyContent: 'center', paddingTop: SPACING_H.sm, paddingBottom: SPACING_H.xxxxl },
 
 	// ===== 마스코트 / 레벨 =====
-	mascotSection: { width: '100%', alignItems: 'center', marginTop: SPACING_H.sm, marginBottom: SPACING_H.xl },
+	mascotSection: {
+		width: '100%',
+		alignItems: 'center',
+		marginTop: SPACING_H.sm,
+		marginBottom: SPACING_H.xl,
+		backgroundColor: HERO.bg,
+		borderTopWidth: 3,
+		borderTopColor: HERO.accent,
+		borderRadius: RADIUS.lg,
+		paddingVertical: SPACING_H.md,
+	},
 	mascotImage: {
-		width: scaleWidth(120),
-		height: scaleWidth(120),
-		borderRadius: scaleWidth(120) / 2,
-		borderWidth: 1,
-		borderColor: COLORS.gold,
-		backgroundColor: COLORS.surface,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
+		width: scaleWidth(190),
+		height: scaleHeight(128),
 	},
 	levelBadgeRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		columnGap: SPACING_W.xs,
 		marginTop: SPACING_H.sm,
-		backgroundColor: '#FFFBEB',
+		backgroundColor: HERO.bg,
 		paddingVertical: SPACING_H.xs,
 		paddingHorizontal: SPACING_W.md,
 		borderRadius: RADIUS.round,
 		borderWidth: 1,
-		borderColor: '#FDE68A',
+		borderColor: COLORS.warningBorder,
 	},
 	levelBadgeText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#B45309' },
 
@@ -229,10 +234,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	modeIconChipFull: { width: scaleWidth(48), height: scaleWidth(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
 	modeCardDisabled: { opacity: 0.7 },

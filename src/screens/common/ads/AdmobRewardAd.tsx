@@ -3,6 +3,7 @@ import { GOOGLE_ADMOV_ANDROID_REWARD, GOOGLE_ADMOV_IOS_REWARD } from '@env';
 import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { RewardedAd, TestIds, RewardedAdEventType, AdEventType } from 'react-native-google-mobile-ads';
+import { SPACING_W, SPACING_H } from '@/const/common/Theme';
 
 const AD_UNIT_ID = Platform.select({
   ios: __DEV__ ? TestIds.REWARDED : GOOGLE_ADMOV_IOS_REWARD!,
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   container: {
-    padding: scaleHeight(24),
+    padding: SPACING_H.xxl,
     backgroundColor: '#ffffff',
     borderRadius: scaleWidth(20),
     alignItems: 'center',
@@ -92,13 +93,13 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
   },
   loadingTxt: {
-    marginTop: scaleHeight(12),
+    marginTop: SPACING_H.md,
     fontSize: scaledSize(16),
     color: '#2c3e50',
     fontWeight: '600',
   },
   subTxt: {
-    marginTop: scaleHeight(4),
+    marginTop: SPACING_H.xs,
     fontSize: scaledSize(13),
     color: '#7f8c8d',
   },

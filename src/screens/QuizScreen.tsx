@@ -26,7 +26,11 @@ import StartModal from './modal/QuizStartModal';
 import NewBadgeModal from './modal/NewBadgeModal';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import QuizHintModal from './modal/QuizHintModal';
+import FastImage from 'react-native-fast-image';
+import { playCorrect, playWrong, playTimeout, playTick, playWhoosh, playFinish } from '@/utils/SoundUtils';
+import { startBgm, stopBgm } from '@/utils/BgmUtils';
 import { toggleFavorite } from '@/utils/favoriteUtils';
+import DateUtils from '@/utils/DateUtils';
 
 const labelColors = ['#1abc9c', '#3498db', '#16a085', '#e67e22'];
 
@@ -178,7 +182,7 @@ const QuizScreen = () => {
 				const initial: MainDataType.UserQuizHistory = {
 					correctProverbId: [],
 					wrongProverbId: [],
-					lastAnsweredAt: new Date(),
+					lastAnsweredAt: DateUtils.now(),
 					quizCounts: {},
 					badges: [],
 					totalScore: 0,
@@ -277,6 +281,7 @@ const QuizScreen = () => {
 		const total = correct + wrong;
 		const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
 		setCompletionData({ correct, wrong, total, accuracy });
+		playFinish(); // 🎉 퀴즈 완료 사운드
 		setShowCompletionModal(true);
 	};
 
@@ -413,6 +418,15 @@ const QuizScreen = () => {
 		setIsCorrect(correct);
 		setResultType(isTimeout ? 'timeout' : correct ? 'correct' : 'wrong');
 
+		// 🔊 정답/오답/시간초과 효과음
+		if (isTimeout) {
+			playTimeout();
+		} else if (correct) {
+			playCorrect();
+		} else {
+			playWrong();
+		}
+
 		const newCombo = correct ? combo + 1 : 0;
 
 		// 점수 보너스 애니메이션
@@ -454,7 +468,7 @@ const QuizScreen = () => {
 				updated.bestCombo = updated.bestCombo ?? 0;
 
 				updated.quizCounts[id] = (updated.quizCounts[id] || 0) + 1;
-				updated.lastAnsweredAt = new Date();
+				updated.lastAnsweredAt = DateUtils.now();
 
 				// 오답 복습 모드일 경우 오답 → 정답 처리 먼저 실행
 				if (correct && isWrongReview && updated.wrongProverbId.includes(id)) {
@@ -822,6 +836,13 @@ const QuizScreen = () => {
 	}, []);
 
 	// ⏱ 타이머가 노란색(경고) 구간(<=20초)에 진입하면 힌트 전구 깜빡임 시작 / 벗어나면 정지
+	// ⏱️ 마지막 5초 카운트다운 효과음 (setState 업데이터는 순수해야 하므로 여기서 재생)
+	useEffect(() => {
+		if (remainingTime > 0 && remainingTime <= 5 && selected === null && !!question) {
+			playTick();
+		}
+	}, [remainingTime, question, selected]);
+
 	useEffect(() => {
 		const inWarning = remainingTime <= 20 && remainingTime > 0 && !!question && selected === null;
 		if (inWarning) {
@@ -870,6 +891,7 @@ const QuizScreen = () => {
 				hintGlowLoopRef.current = null;
 			}
 			[comboAnim, comboEffectAnim, comboShake, scaleAnim, scoreBonusAnim, hintGlowAnim, questionFadeAnim].forEach((value) => value.stopAnimation());
+			stopBgm(); // 🎵 화면을 벗어나면 BGM 정리
 		};
 	}, [comboAnim, comboEffectAnim, comboShake, scaleAnim, scoreBonusAnim, hintGlowAnim, questionFadeAnim]);
 
@@ -882,8 +904,9 @@ const QuizScreen = () => {
 		<SafeAreaView style={{ flex: 1, backgroundColor: COLORS.surface }}>
 					<View style={styles.container}>
 						<View style={styles.inner}>
-							<View style={styles.progressStatusWrapper}>
-								<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+						<View style={styles.progressStatusWrapper}>
+								<View style={styles.quizHeaderRow}>
+									<View style={styles.quizHeaderCopy}>
 									<Text style={styles.progressText}>{getModeLabel(routeMode)}</Text>
 									{question?.level && (
 										<View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -902,6 +925,8 @@ const QuizScreen = () => {
 											)}
 										</View>
 									)}
+									</View>
+									<FastImage source={require('@/assets/images/screen-heroes/quiz-coach.png')} style={styles.quizCoachImage} resizeMode="contain" />
 								</View>
 
 								<View style={styles.progressBarWrapper}>
@@ -1029,7 +1054,7 @@ const QuizScreen = () => {
 										data={options}
 										scrollEnabled={true} // ✅ 항상 스크롤 가능
 										keyExtractor={(item, index) => `${item}-${index}`}
-										contentContainerStyle={{ paddingBottom: scaleHeight(40) }}
+										contentContainerStyle={{ paddingBottom: SPACING_H.xxxxl }}
 										showsVerticalScrollIndicator
 										renderItem={({ item, index }) => {
 											const scaleAnim = scaleAnims.current[index] ?? new Animated.Value(1);
@@ -1165,6 +1190,8 @@ const QuizScreen = () => {
 				mode={routeMode}
 				onStart={() => {
 					setShowStartModal(false);
+					playWhoosh(); // 🎬 퀴즈 시작 사운드
+					startBgm('quiz'); // 🎵 퀴즈 BGM 시작
 					runLater(() => onStart(), 100); // ✅ onStart 호출 추가
 				}}
 				onBack={() => safelyGoBack()}
@@ -1278,11 +1305,10 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
+	quizHeaderRow: { minHeight: scaleHeight(64), flexDirection: 'row', alignItems: 'center' },
+	quizHeaderCopy: { flex: 1 },
+	quizCoachImage: { width: scaleWidth(72), height: scaleHeight(66), marginTop: scaleHeight(-6) },
 	progressText: {
 		fontSize: FONT_SIZES.lg,
 		color: COLORS.text,
@@ -1416,9 +1442,9 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(34) / 2,
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#FFFBEB',
+		backgroundColor: COLORS.warningSoft,
 		borderWidth: 1,
-		borderColor: '#FDE68A',
+		borderColor: COLORS.warningBorder,
 	},
 	hintBulbButtonWarning: {
 		backgroundColor: COLORS.warningBg,
@@ -1441,10 +1467,6 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		borderColor: COLORS.border,
 		marginBottom: SPACING_H.md,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	optionRow: {
 		flexDirection: 'row',
@@ -1521,14 +1543,12 @@ const styles = StyleSheet.create({
 		width: '100%',
 		maxWidth: scaleWidth(420),
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		paddingHorizontal: SPACING_W.xl,
 		paddingVertical: SPACING_H.xl,
 		borderRadius: RADIUS.xl,
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	exitModalTitle: {
 		fontSize: FONT_SIZES.heading,

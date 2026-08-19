@@ -1,5 +1,5 @@
 import { AppState, NativeEventSubscription, Platform } from 'react-native';
-import { PERMISSIONS, RESULTS, check, checkNotifications, request } from 'react-native-permissions';
+import { PERMISSIONS, RESULTS, check, checkNotifications, request, requestNotifications } from 'react-native-permissions';
 
 /**
  * 앱이 실제로 사용하는 권한
@@ -108,4 +108,25 @@ export const loadAppPermissions = async (): Promise<AppPermissionInfo[]> => {
 	}
 
 	return list;
+};
+
+/**
+ * 설정 화면에서 '미설정' 권한을 눌렀을 때 실제 시스템 팝업을 띄웁니다.
+ * - blocked(거부됨) 는 앱에서 다시 물어볼 수 없으므로 호출부가 설정 앱으로 보내야 합니다.
+ * @returns 요청 후의 상태
+ */
+export const requestAppPermission = async (key: AppPermissionKey): Promise<AppPermissionState> => {
+	try {
+		if (key === 'notifications') {
+			const { status } = await requestNotifications(['alert', 'sound', 'badge']);
+			return toState(status);
+		}
+		if (Platform.OS !== 'ios') {
+			return 'undetermined';
+		}
+		const status = await request(ATT);
+		return toState(status);
+	} catch {
+		return 'undetermined';
+	}
 };

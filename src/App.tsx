@@ -16,6 +16,11 @@ import ProverbServices from './services/ProverbServices';
 import { MainStorageKeyType } from './types/MainStorageKeyType';
 import { requestTrackingPermission } from './utils/PermissionUtils';
 import DateUtils from './utils/DateUtils';
+import { loadSoundSetting, preloadSounds } from './utils/SoundUtils';
+import notifee from '@notifee/react-native';
+import { scheduleDailyQuizReminder } from './utils/NotifactionHelper';
+import { Paths } from './navigation/conf/Paths';
+import { loadBgmSetting } from './utils/BgmUtils';
 // import * as RNIap from 'react-native-iap';
 
 /**
@@ -32,6 +37,10 @@ const App = () => {
 
 		checkTodayQuiz();
 		requestTrackingPermission(); // iOS ATT (내부에서 플랫폼/AppState 가드)
+		// 🔊 사운드 설정 로드 후 효과음 미리 로드(첫 재생 지연 방지)
+		loadSoundSetting().then(preloadSounds);
+		loadBgmSetting();
+		rearmDailyQuizReminder(); // ⏰ 저장된 시각 기준 재예약(알림 시간 드리프트 보정)
 		// initIAP();
 
 		// initPurchaseInfo(); // ✅ 구매정보 초기 세팅
@@ -95,6 +104,45 @@ const App = () => {
 	// };
 
 	/**
+	 * 저장된 알림 시각으로 오늘의 퀴즈 리마인더를 매번 재예약한다.
+	 *
+	 * notifee 의 DAILY 반복은 '실제로 울린 시각' 기준으로 다음 회차를 잡는다.
+	 * Doze 로 알림이 늦게 울리면 그 지연이 매일 누적돼 지정한 시각에서 점점 밀린다.
+	 * 앱이 뜰 때마다 저장값으로 다시 계산해 예약하면 드리프트가 0 으로 돌아온다.
+	 * (고정 ID 라 멱등 — 중복 예약이 쌓이지 않는다)
+	 */
+	const rearmDailyQuizReminder = async () => {
+		try {
+			const json = await AsyncStorage.getItem(MainStorageKeyType.SETTING_INFO);
+			if (!json) {
+				return;
+			}
+			const setting: MainDataType.SettingInfo = JSON.parse(json);
+			if (!setting.isUseAlarm) {
+				return;
+			}
+
+			// 권한이 없으면 예약해도 울리지 않는다 — 조용히 건너뛴다.
+			const settings = await notifee.getNotificationSettings();
+			if (settings.authorizationStatus !== 1) {
+				return;
+			}
+
+			// 'HH:mm' 신규 포맷 우선, 구버전 ISO 문자열도 로컬 시각으로 환산해 읽는다.
+			const stored = setting.alarmTime;
+			const hhmm = /^(\d{1,2}):(\d{2})$/.exec(stored ?? '');
+			const hour = hhmm ? Number(hhmm[1]) : new Date(stored).getHours();
+			if (!Number.isFinite(hour)) {
+				return;
+			}
+
+			await scheduleDailyQuizReminder(hour, Paths.TODAY_QUIZ);
+		} catch (e) {
+			console.error('알림 재예약 실패:', e);
+		}
+	};
+
+	/**
 	 * 최초 앱을 접근하면 오늘의 퀴즈를 발급합니다.
 	 */
 	const checkTodayQuiz = async () => {
@@ -110,7 +158,7 @@ const App = () => {
 			const shuffled = [...all].sort(() => Math.random() - 0.5).slice(0, 5);
 
 			const newQuizData: MainDataType.TodayQuizList = {
-				quizDate: new Date().toISOString(),
+				quizDate: DateUtils.now().toISOString(),
 				isCheckedIn: false,
 				todayQuizIdArr: shuffled.map((q) => q.id),
 				correctQuizIdArr: [],

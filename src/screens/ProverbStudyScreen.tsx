@@ -34,6 +34,8 @@ import { CONST_BADGES } from '@/const/ConstBadges';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import ProverbServices from '@/services/ProverbServices';
 import NewBadgeModal from '@/screens/modal/NewBadgeModal';
+import { playComplete, playFlip } from '@/utils/SoundUtils';
+import DateUtils from '@/utils/DateUtils';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -234,7 +236,7 @@ const QuizStudyScreen = () => {
 	const [studyHistory, setStudyHistory] = useState<MainDataType.UserStudyHistory>({
 		studyProverbes: [],
 		studyCounts: {},
-		lastStudyAt: new Date(),
+		lastStudyAt: DateUtils.now(),
 	});
 	const [filter, setFilter] = useState<'all' | 'learning' | 'learned'>('learning');
 	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
@@ -402,11 +404,11 @@ const QuizStudyScreen = () => {
 					studyProverbes: parsed.studyProverbes ?? [],
 					studyCounts: parsed.studyCounts ?? {},
 					badges: parsed.badges ?? [],
-					lastStudyAt: parsed.lastStudyAt ? new Date(parsed.lastStudyAt) : new Date(),
+					lastStudyAt: parsed.lastStudyAt ? new Date(parsed.lastStudyAt) : DateUtils.now(),
 				};
 				setStudyHistory(fixed);
 			} else {
-				setStudyHistory({ studyProverbes: [], studyCounts: {}, badges: [], lastStudyAt: new Date() });
+				setStudyHistory({ studyProverbes: [], studyCounts: {}, badges: [], lastStudyAt: DateUtils.now() });
 			}
 
 			scrollViewRef.current?.scrollTo({ y: 0, animated: true });
@@ -424,6 +426,10 @@ const QuizStudyScreen = () => {
 
 	const completeStudy = async (id: number) => {
 		const isAlreadyLearned = studyHistory.studyProverbes.includes(id);
+
+		if (!isAlreadyLearned) {
+			playComplete(); // 🎓 학습 완료 사운드 (다시 학습하기는 제외)
+		}
 		const prevFiltered = getFilteredData();
 		const prevIndex = prevFiltered.findIndex((c) => c.id === id);
 
@@ -439,7 +445,7 @@ const QuizStudyScreen = () => {
 			studyProverbes: updatedCountries,
 			studyCounts: updatedCounts,
 			badges: studyHistory.badges || [],
-			lastStudyAt: new Date(), // ✅ 마지막 학습일자 추가
+			lastStudyAt: DateUtils.now(), // ✅ 마지막 학습일자 추가
 		};
 
 		// ✅ 이미지 갱신: 해당 index 위치의 이미지를 새 랜덤 이미지로 교체
@@ -619,6 +625,8 @@ const QuizStudyScreen = () => {
 		}
 		const anim = flipAnimRefs.current[id];
 		const isCurrentlyFlipped = flippedCard === id;
+
+		playFlip(); // 🔊 카드 뒤집기
 
 		Animated.timing(anim, {
 			toValue: isCurrentlyFlipped ? 0 : 180,
@@ -999,6 +1007,17 @@ const QuizStudyScreen = () => {
 						},
 					]}>
 					<View style={styles.progressHeader}>
+						<View style={styles.studyHeroRow}>
+							<View style={styles.studyHeroCopy}>
+								<Text style={styles.studyHeroTitle}>한 장씩 넘기며 지혜를 익혀요</Text>
+								<Text style={styles.studyHeroDescription}>카드를 눌러 뜻과 유래를 살펴보세요.</Text>
+							</View>
+							<FastImage
+								source={require('@/assets/images/screen-heroes/proverb-study.png')}
+								style={styles.studyHeroImage}
+								resizeMode="contain"
+							/>
+						</View>
 						<View style={styles.progressTopRow}>
 							<Text style={styles.progressTitle}>학습 현황</Text>
 							<View style={styles.progressBadge}>
@@ -1151,10 +1170,6 @@ const QuizStudyScreen = () => {
 												borderRadius: RADIUS.xl,
 												paddingHorizontal: 0,
 												paddingVertical: SPACING_H.xl,
-												shadowColor: '#000',
-												shadowOpacity: 0.08,
-												shadowOffset: { width: 0, height: 2 },
-												shadowRadius: 8,
 												position: 'relative',
 											}}
 											modalTitleStyle={{
@@ -1164,10 +1179,10 @@ const QuizStudyScreen = () => {
 												textAlign: 'center',
 												paddingVertical: SPACING_H.md,
 												paddingHorizontal: SPACING_W.lg,
-												paddingRight: scaleWidth(40),
+												paddingRight: SPACING_W.xxxxl,
 											}}
 											closeIconStyle={{
-												marginTop: scaleHeight(3),
+												marginTop: SPACING_H.xs,
 												width: scaleWidth(24),
 												height: scaleWidth(24),
 											}}
@@ -1175,7 +1190,7 @@ const QuizStudyScreen = () => {
 												position: 'absolute',
 												right: SPACING_W.md,
 												top: SPACING_H.md,
-												padding: scaleWidth(4),
+												padding: SPACING_W.xs,
 												zIndex: 1,
 											}}
 										/>
@@ -1361,7 +1376,7 @@ const QuizStudyScreen = () => {
 					);
 				})()}
 
-			<NewBadgeModal visible={badgeModalVisible} badges={newlyEarnedBadges} onConfirm={() => setBadgeModalVisible(false)} />
+			<NewBadgeModal visible={badgeModalVisible && newlyEarnedBadges.length > 0} badges={newlyEarnedBadges} onConfirm={() => setBadgeModalVisible(false)} />
 		</>
 	);
 };
@@ -1407,6 +1422,23 @@ const styles = StyleSheet.create({
 		paddingBottom: 0,
 		marginHorizontal: SPACING_W.lg,
 	},
+	studyHeroRow: {
+		width: '100%',
+		minHeight: scaleHeight(92),
+		paddingLeft: SPACING_W.lg,
+		marginBottom: SPACING_H.md,
+		backgroundColor: '#EFF6FF',
+		borderTopWidth: 3,
+		borderTopColor: COLORS.secondary,
+		borderRadius: RADIUS.md,
+		flexDirection: 'row',
+		alignItems: 'center',
+		overflow: 'hidden',
+	},
+	studyHeroCopy: { flex: 1, paddingVertical: SPACING_H.md, zIndex: 1 },
+	studyHeroTitle: { fontSize: FONT_SIZES.mdPlus, fontWeight: '800', color: '#1E3A8A', marginBottom: SPACING_H.xs },
+	studyHeroDescription: { fontSize: FONT_SIZES.xs, lineHeight: scaledSize(17), color: '#1D4ED8' },
+	studyHeroImage: { width: scaleWidth(124), height: scaleHeight(88), marginRight: scaleWidth(-6) },
 	progressTopRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -1489,7 +1521,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingVertical: scaleHeight(40),
+		paddingVertical: SPACING_H.xxxxl,
 	},
 	loadingText: {
 		marginTop: SPACING_H.md,
@@ -1522,10 +1554,6 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.lg,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 		justifyContent: 'space-between',
 		alignSelf: 'center',
 		borderWidth: 1,
@@ -1536,13 +1564,11 @@ const styles = StyleSheet.create({
 		width: scaleWidth(370),
 		height: CARD_HEIGHT, // ✅ 여기 반영
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.lg,
 		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: SPACING_H.sm,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 		justifyContent: 'space-between',
 		alignSelf: 'center',
 	},
@@ -1594,10 +1620,6 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	toastPill: {
 		flexDirection: 'row',
@@ -1709,7 +1731,7 @@ const styles = StyleSheet.create({
 	},
 	detailToggleButton: {
 		marginLeft: SPACING_W.sm,
-		padding: scaleWidth(4),
+		padding: SPACING_W.xs,
 		marginBottom: SPACING_H.md,
 	},
 	detailFilterWrapper: {
@@ -1724,7 +1746,7 @@ const styles = StyleSheet.create({
 	},
 	resetButton: {
 		marginLeft: SPACING_W.sm,
-		padding: scaleWidth(4),
+		padding: SPACING_W.xs,
 		marginBottom: SPACING_H.md,
 	},
 	dropdown: {
@@ -1739,10 +1761,6 @@ const styles = StyleSheet.create({
 		borderColor: COLORS.border,
 		borderWidth: 1,
 		borderRadius: RADIUS.md,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 		paddingBottom: 0,
 		marginBottom: 0,
 	},
@@ -1770,14 +1788,12 @@ const styles = StyleSheet.create({
 	exitModalBox: {
 		width: '80%',
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		paddingHorizontal: SPACING_W.xl,
 		paddingVertical: SPACING_H.xl,
 		borderRadius: RADIUS.xl,
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	exitHeader: {
 		alignItems: 'center',
@@ -1938,10 +1954,6 @@ const styles = StyleSheet.create({
 		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.md,
 		marginBottom: SPACING_H.md,
-		shadowColor: '#000',
-		shadowOpacity: 0.06,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	sectionText: {
 		fontSize: FONT_SIZES.md,

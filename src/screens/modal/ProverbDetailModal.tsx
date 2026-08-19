@@ -245,12 +245,10 @@ const styles = StyleSheet.create({
 		maxWidth: scaleWidth(340),
 		maxHeight: '85%',
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		overflow: 'hidden',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 
 	modalHeader: {
@@ -315,10 +313,6 @@ const styles = StyleSheet.create({
 		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.lg,
 		marginBottom: SPACING_H.md,
-		shadowColor: '#000',
-		shadowOpacity: 0.06,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	sectionTitle: {
 		fontSize: FONT_SIZES.xl,
@@ -358,10 +352,6 @@ const styles = StyleSheet.create({
 		paddingVertical: SPACING_H.lg,
 		borderRadius: RADIUS.lg,
 		marginBottom: SPACING_H.lg,
-		shadowColor: '#000',
-		shadowOpacity: 0.06,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	meaningQuoteBox: {
 		alignItems: 'center',

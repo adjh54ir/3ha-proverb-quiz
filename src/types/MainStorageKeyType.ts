@@ -10,4 +10,8 @@ export enum MainStorageKeyType {
 	USER_PROVERB_PRACTICE_RECORDS = 'USER_PROVERB_PRACTICE_RECORDS', // 속담집 연습 기록
 	DAILY_MISSION_CLAIMED = 'DAILY_MISSION_CLAIMED', // 일일 미션 보상 수령 날짜 목록
 	LAST_SEEN_GRADE = 'LAST_SEEN_GRADE', // 마지막으로 확인한 점수 등급(레벨업 감지용)
+	SOUND_ENABLED = 'SOUND_ENABLED', // 효과음(SFX) on/off
+	SOUND_VOLUME = 'SOUND_VOLUME', // 효과음 볼륨 (0~1)
+	BGM_ENABLED = 'BGM_ENABLED', // 배경음악(BGM) on/off
+	BGM_VOLUME = 'BGM_VOLUME', // 배경음악 볼륨 (0~1)
 }

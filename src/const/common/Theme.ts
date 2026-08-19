@@ -40,6 +40,14 @@ export const COLORS = {
 	borderLight: '#E2E8F0',
 	borderDark: '#CBD5E1',
 
+	// ===== Accent (Orange/Amber) — 히어로 배너·연속 출석·선택 강조 =====
+	accentOrange: '#EA580C', // 강한 주황 (텍스트/포인트)
+	accentOrangeDark: '#D97706', // 상단 강조 보더
+	accentOrangeDeep: '#7C2D12', // 주황 배경 위 제목
+	accentOrangeText: '#9A3412', // 주황 배경 위 본문
+	accentOrangeBg: '#FFF7ED', // 주황 배경 틴트
+	accentOrangeBorder: '#FDBA74', // 주황 보더
+
 	// ===== Semantic =====
 	success: '#22C55E',
 	successBg: '#F0FDF4',
@@ -50,6 +58,8 @@ export const COLORS = {
 	warning: '#F59E0B',
 	warningDark: '#D97706',
 	warningBg: '#FEF3C7',
+	warningSoft: '#FFFBEB', // 옅은 앰버 틴트 (선택된 카드/힌트 버튼 배경)
+	warningBorder: '#FDE68A', // 옅은 앰버 보더
 	danger: '#EF4444',
 	dangerDark: '#DC2626',
 	dangerBg: '#FEE2E2',
@@ -85,6 +95,17 @@ export const FONT_SIZES = {
 	display: scaledSize(28), // 결과/점수 강조
 } as const;
 
+/**
+ * 화면 상단 히어로 배너 전용 톤 (앰버/오렌지 계열로 통일)
+ * - 화면마다 제각각이던 배경/보더/텍스트 색 리터럴을 이 토큰 하나로 수렴시킨다.
+ */
+export const HERO = {
+	bg: COLORS.accentOrangeBg, // 히어로 배경 틴트
+	accent: COLORS.accentOrangeDark, // 상단 강조 보더
+	title: COLORS.accentOrangeDeep, // 히어로 타이틀
+	description: COLORS.accentOrangeText, // 히어로 설명
+} as const;
+
 /** 공통 radius 토큰 */
 export const RADIUS = {
 	sm: 8,
@@ -101,30 +122,49 @@ export const RADIUS = {
 export const SPACING = {
 	xxs: 2,
 	xs: 4,
+	xsPlus: 6, // 4↔8 중간값 (아이콘-라벨 사이 등 촘촘한 간격)
 	sm: 8,
+	smPlus: 10,
 	md: 12,
+	mdPlus: 14,
 	lg: 16,
+	lgPlus: 18,
 	xl: 20,
 	xxl: 24,
 	xxxl: 32,
+	xxxxl: 40, // 스크롤 하단 여백 등 큰 클리어런스
 } as const;
 
 /** 좌우(수평) 간격 — scaleWidth 적용 완료 값 */
 export const SPACING_W = {
+	xxs: scaleWidth(SPACING.xxs),
 	xs: scaleWidth(SPACING.xs),
+	xsPlus: scaleWidth(SPACING.xsPlus),
 	sm: scaleWidth(SPACING.sm),
+	smPlus: scaleWidth(SPACING.smPlus),
 	md: scaleWidth(SPACING.md),
+	mdPlus: scaleWidth(SPACING.mdPlus),
 	lg: scaleWidth(SPACING.lg),
+	lgPlus: scaleWidth(SPACING.lgPlus),
 	xl: scaleWidth(SPACING.xl),
 	xxl: scaleWidth(SPACING.xxl),
+	xxxl: scaleWidth(SPACING.xxxl),
+	xxxxl: scaleWidth(SPACING.xxxxl),
 } as const;
 
 /** 위아래(수직) 간격 — scaleHeight 적용 완료 값 */
 export const SPACING_H = {
+	xxs: scaleHeight(SPACING.xxs),
 	xs: scaleHeight(SPACING.xs),
+	xsPlus: scaleHeight(SPACING.xsPlus),
 	sm: scaleHeight(SPACING.sm),
+	smPlus: scaleHeight(SPACING.smPlus),
 	md: scaleHeight(SPACING.md),
+	mdPlus: scaleHeight(SPACING.mdPlus),
 	lg: scaleHeight(SPACING.lg),
+	lgPlus: scaleHeight(SPACING.lgPlus),
 	xl: scaleHeight(SPACING.xl),
 	xxl: scaleHeight(SPACING.xxl),
+	xxxl: scaleHeight(SPACING.xxxl),
+	xxxxl: scaleHeight(SPACING.xxxxl),
 } as const;

@@ -345,15 +345,13 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: scaleWidth(340),
         backgroundColor: COLORS.surface,
+        borderWidth: 1,
+        borderColor: COLORS.border,
         borderRadius: RADIUS.xl,
         paddingHorizontal: SPACING_W.lg,
         paddingVertical: SPACING_H.xl,
         alignItems: 'center',
         overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
     },
     // ===== 공통 타이포 =====
     title: {

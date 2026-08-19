@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainDataType } from '@/types/MainDataType';
@@ -18,6 +18,8 @@ import ProverbServices from '@/services/ProverbServices';
 import IconComponent from './common/atomic/IconComponent';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import BottomHomeButton from './common/BottomHomeButton';
+import DateUtils from '@/utils/DateUtils';
+import FastImage from 'react-native-fast-image';
 
 type QuizModeScreenRouteParams = {
 	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' };
@@ -86,7 +88,7 @@ const QuizModeScreen = () => {
 			const safeParsed: MainDataType.UserQuizHistory = {
 				correctProverbId: parsed.correctProverbId || [],
 				wrongProverbId: parsed.wrongProverbId || [],
-				lastAnsweredAt: parsed.lastAnsweredAt ? new Date(parsed.lastAnsweredAt) : new Date(),
+				lastAnsweredAt: parsed.lastAnsweredAt ? new Date(parsed.lastAnsweredAt) : DateUtils.now(),
 				quizCounts: parsed.quizCounts || {},
 				badges: parsed.badges || [],
 				totalScore: parsed.totalScore || 0,
@@ -178,12 +180,12 @@ const QuizModeScreen = () => {
 						}}
 						showsVerticalScrollIndicator={false}
 						contentContainerStyle={styles.scrollContent}>
-						<View style={styles.titleRow}>
-							<View style={styles.titleWithIcon}>
-								<Text style={styles.title}>
-									{tab === 'level' ? '🚀 지금부터 속담 퀴즈 모험 시작! \n난이도를 선택하세요.' : '🚀 지금부터 속담 퀴즈 모험 시작! \n카테고리를 선택하세요.'}
-								</Text>
+						<View style={styles.quizPathHero}>
+							<View style={styles.quizPathCopy}>
+								<Text style={styles.title}>{tab === 'level' ? '도전할 난이도를 골라보세요' : '관심 있는 주제를 골라보세요'}</Text>
+								<Text style={styles.quizPathDescription}>나에게 맞는 길에서 속담 모험을 시작해요.</Text>
 							</View>
+							<FastImage source={require('@/assets/images/screen-heroes/quiz-path.png')} style={styles.quizPathImage} resizeMode="contain" />
 						</View>
 						{selectedMode && (
 							<View style={[styles.selectedModeBoxEnhanced, { backgroundColor: selectedMode.color + '20' }]}>
@@ -195,6 +197,7 @@ const QuizModeScreen = () => {
 								</View>
 							</View>
 						)}
+						<FastImage source={require('@/assets/images/screen-heroes/quiz-path-emblems.png')} style={styles.quizPathEmblems} resizeMode="contain" />
 						<View style={styles.levelListWrap}>
 							{tab === 'level' &&
 								LEVELS.map((item) => {
@@ -392,24 +395,29 @@ const styles = StyleSheet.create({
 	// ===== 스크롤 영역 =====
 	scrollContent: {
 		rowGap: SPACING_H.md,
-		paddingBottom: scaleHeight(40),
+		paddingBottom: SPACING_H.xxxxl,
 	},
-	titleRow: {
-		alignItems: 'center',
-		justifyContent: 'center',
+	quizPathHero: {
+		minHeight: scaleHeight(116),
 		marginTop: SPACING_H.lg,
-	},
-	titleWithIcon: {
+		paddingLeft: SPACING_W.lg,
+		backgroundColor: HERO.bg,
+		borderTopWidth: 3,
+		borderTopColor: HERO.accent,
+		borderRadius: RADIUS.lg,
 		flexDirection: 'row',
 		alignItems: 'center',
-		justifyContent: 'center',
+		overflow: 'hidden',
 	},
+	quizPathCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
+	quizPathImage: { width: scaleWidth(136), height: scaleHeight(112), marginRight: scaleWidth(-6) },
+	quizPathDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description, marginTop: SPACING_H.xs },
+	quizPathEmblems: { alignSelf: 'center', width: scaleWidth(190), height: scaleHeight(54), marginVertical: scaleHeight(-4) },
 	title: {
-		fontSize: FONT_SIZES.xxl,
-		lineHeight: scaledSize(30),
-		color: COLORS.textStrong,
-		fontWeight: '700',
-		textAlign: 'center',
+		fontSize: FONT_SIZES.lg,
+		lineHeight: scaledSize(23),
+		color: HERO.title,
+		fontWeight: '800',
 	},
 	// ===== 선택된 모드 안내 =====
 	selectedModeBoxEnhanced: {
@@ -451,10 +459,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	levelCardDisabled: {
 		opacity: 0.7,
@@ -505,10 +509,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.md,
 		borderRadius: RADIUS.lg,
 		backgroundColor: COLORS.primary,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	categoryCardTitleRow: {
 		flexDirection: 'row',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
 		top: SPACING_H.md,
 		right: SPACING_W.md,
 		zIndex: 2,
-		padding: scaleWidth(4),
+		padding: SPACING_W.xs,
 	},
 	modalTitle: {
 		fontSize: FONT_SIZES.heading,

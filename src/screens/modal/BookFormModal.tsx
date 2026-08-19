@@ -78,7 +78,7 @@ const pickerStyles = StyleSheet.create({
 	scrollArea: { marginBottom: SPACING_H.xs },
 	row: { flexDirection: 'row', marginBottom: SPACING_H.sm },
 	colorDot: { width: scaleWidth(30), height: scaleWidth(30), borderRadius: scaleWidth(30) / 2, marginRight: SPACING_W.sm, justifyContent: 'center', alignItems: 'center' },
-	colorDotSelected: { borderWidth: 2.5, borderColor: COLORS.surface, shadowColor: '#000', shadowOpacity: 0.25, shadowOffset: { width: 0, height: 1 }, shadowRadius: 3 },
+	colorDotSelected: { borderWidth: 2.5, borderColor: COLORS.surface, },
 	iconDot: { width: scaleWidth(38), height: scaleWidth(38), borderRadius: RADIUS.md, marginRight: SPACING_W.sm, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.background },
 	iconDotSelected: { borderWidth: 1.5 },
 	previewDesc: { fontSize: FONT_SIZES.xs, color: COLORS.textLight, marginTop: SPACING_H.xs },

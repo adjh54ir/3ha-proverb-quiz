@@ -31,7 +31,7 @@ import 'moment/locale/ko'; // 한국어 로케일 import
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
 import Colors from '@/const/ConstColors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
@@ -110,7 +110,7 @@ const STYLE_MAP = {
 		type: 'level',
 	},
 	특급: {
-		color: '#EF4444',
+		color: COLORS.danger,
 		icon: { type: 'fontAwesome5', name: 'trophy' },
 		badgeId: 'level_hard',
 		type: 'level',
@@ -135,19 +135,19 @@ const buildDateMark = (isCheckedIn: boolean, isToday: boolean) =>
 		? {
 				// 출석한 날 — 오늘은 앰버, 이전 날은 초록
 				marked: true,
-				dotColor: '#FFFFFF',
+				dotColor: COLORS.textWhite,
 				customStyles: {
-					container: { backgroundColor: isToday ? '#F59E0B' : '#22C55E', borderRadius: scaleWidth(6) },
-					text: { color: '#fff', fontWeight: 'bold' },
+					container: { backgroundColor: isToday ? COLORS.warning : COLORS.primary, borderRadius: scaleWidth(6) },
+					text: { color: COLORS.textWhite, fontWeight: 'bold' },
 				},
 		  }
 		: {
 				// 퀴즈 기록만 있고 출석은 안 한 날
 				marked: true,
-				dotColor: '#22C55E',
+				dotColor: COLORS.primary,
 				customStyles: {
-					container: { backgroundColor: '#EFF6FF' },
-					text: { color: '#22C55E', fontWeight: 'bold' },
+					container: { backgroundColor: COLORS.secondaryBg },
+					text: { color: COLORS.primary, fontWeight: 'bold' },
 				},
 		  };
 moment.locale('ko'); // 로케일 설정
@@ -473,7 +473,7 @@ const MyScoreScreen = () => {
 					...(marked[todayStr] || {}),
 					customStyles: {
 						container: {
-							backgroundColor: '#3B82F6', // 🎨 밝은 파란색
+							backgroundColor: COLORS.secondary,
 						},
 						text: {
 							color: '#fff',
@@ -506,7 +506,7 @@ const MyScoreScreen = () => {
 	const getRelativeDateLabel = (isoString: string): string => {
 		try {
 			const inputDate = new Date(isoString);
-			const now = new Date();
+			const now = DateUtils.now();
 
 			const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 			const startOfInput = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate());
@@ -666,10 +666,10 @@ const MyScoreScreen = () => {
 				...(updated[date] || {}),
 				customStyles: {
 					container: {
-						backgroundColor: '#E2E8F0',
+						backgroundColor: COLORS.border,
 					},
 					text: {
-						color: '#334155',
+						color: COLORS.text,
 						fontWeight: 'bold',
 					},
 				},
@@ -714,12 +714,23 @@ const MyScoreScreen = () => {
 			<ScrollView
 				ref={scrollRef}
 				style={styles.container}
-				contentContainerStyle={{ paddingBottom: scaleHeight(40), flexGrow: 1 }}
+				contentContainerStyle={{ paddingBottom: SPACING_H.xxxxl, flexGrow: 1 }}
 				onScroll={scrollHandler.onScroll}
 				scrollEventThrottle={16}
 				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 				<View style={styles.sectionBox}>
-					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginTop: scaleHeight(14), marginBottom: scaleHeight(-8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
+					<View style={styles.activityHero}>
+						<View style={styles.activityHeroCopy}>
+							<Text style={styles.activityHeroTitle}>배운 만큼 지혜가 쌓였어요</Text>
+							<Text style={styles.activityHeroDescription}>오늘의 기록과 지금까지의 성장을 확인해보세요.</Text>
+						</View>
+						<FastImage
+							source={require('@/assets/images/screen-heroes/activity-achievement.png')}
+							style={styles.activityHeroImage}
+							resizeMode={FastImage.resizeMode.contain}
+						/>
+					</View>
+					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginTop: SPACING_H.mdPlus, marginBottom: scaleHeight(-8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
 						{/* ✅ 홈화면과 동일한 캐릭터/펫 배치 구조 (래퍼 높이 축소로 타이틀과 밀착) */}
 						<View style={{ width: scaleWidth(180), height: scaleWidth(150), alignItems: 'center', justifyContent: 'center' }}>
 							<FastImage
@@ -757,7 +768,7 @@ const MyScoreScreen = () => {
 								activeOpacity={0.7}
 								onPress={() => setShowLevelModal(true)}>
 								<IconComponent type="fontAwesome6" name={icon} size={scaledSize(18)} color={COLORS.primary} />
-								<Text style={{ fontSize: FONT_SIZES.lg, color: COLORS.primary, fontWeight: '700', marginLeft: scaleWidth(6) }}>
+								<Text style={{ fontSize: FONT_SIZES.lg, color: COLORS.primary, fontWeight: '700', marginLeft: SPACING_W.xsPlus }}>
 									{label}
 								</Text>
 								<IconComponent
@@ -1055,14 +1066,14 @@ const MyScoreScreen = () => {
 													type="fontAwesome6"
 													size={scaledSize(24)}
 													color={isEarned ? COLORS.textWhite : COLORS.textLight}
-													style={{ marginBottom: scaleHeight(6) }}
+													style={{ marginBottom: SPACING_H.xsPlus }}
 												/>
 												<Text style={[styles.levelText, isEarned && { color: COLORS.textWhite, fontWeight: '700' }]}> {item.title} </Text>
 												<Text style={[styles.levelSubText, isEarned && { color: COLORS.textWhite }]}> {item.subtitle} </Text>
 
 												{/* ✅ 정복 배지 */}
 												{isEarned && (
-													<View style={[styles.conquerTag, { marginTop: scaleHeight(6) }]}>
+													<View style={[styles.conquerTag, { marginTop: SPACING_H.xsPlus }]}>
 														<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color={COLORS.primaryDark} />
 														<Text style={styles.conquerTagText}>정복</Text>
 													</View>
@@ -1108,10 +1119,6 @@ const MyScoreScreen = () => {
 												isEarned && {
 													backgroundColor: meta.color,
 													borderColor: meta.color,
-													shadowColor: '#000',
-													shadowOpacity: 0.2,
-													shadowRadius: 4,
-													shadowOffset: { width: 0, height: 2 },
 												},
 											]}>
 											<View
@@ -1121,7 +1128,7 @@ const MyScoreScreen = () => {
 													borderRadius: scaleWidth(11),
 													alignItems: 'center',
 													justifyContent: 'center',
-													marginRight: scaleWidth(10),
+													marginRight: SPACING_W.smPlus,
 													backgroundColor: isEarned ? 'rgba(255,255,255,0.22)' : COLORS.surfaceAlt,
 												}}>
 												<IconComponent
@@ -1196,7 +1203,7 @@ const MyScoreScreen = () => {
 						</View>
 
 						{selectedDate === null && (
-							<View style={[styles.subtitleRow, { marginTop: scaleHeight(6), marginBottom: 0 }]}>
+							<View style={[styles.subtitleRow, { marginTop: SPACING_H.xsPlus, marginBottom: 0 }]}>
 								<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(13)} color={COLORS.textLight} />
 								<Text style={styles.emptyText}>날짜를 선택해 주세요.</Text>
 							</View>
@@ -1220,7 +1227,7 @@ const MyScoreScreen = () => {
 						)}
 
 						{selectedDate && selectedQuizData && (
-							<View style={[styles.sectionBox, { marginTop: SPACING_H.md, borderWidth: 0, paddingHorizontal: 0, paddingVertical: scaleHeight(6), backgroundColor: 'transparent' }]}>
+							<View style={[styles.sectionBox, { marginTop: SPACING_H.md, borderWidth: 0, paddingHorizontal: 0, paddingVertical: SPACING_H.xsPlus, backgroundColor: 'transparent' }]}>
 								<Text style={styles.sectionSubtitle}>{selectedDate} 퀴즈 결과</Text>
 								{selectedQuizData?.todayQuizIdArr.map((quizId, idx) => {
 									const userAnswer = selectedQuizData.selectedAnswers?.[quizId];
@@ -1245,10 +1252,6 @@ const MyScoreScreen = () => {
 												paddingHorizontal: SPACING_W.lg,
 												borderWidth: 0,
 												marginBottom: SPACING_H.md,
-												shadowColor: '#000',
-												shadowOffset: { width: 0, height: 2 },
-												shadowOpacity: 0.06,
-												shadowRadius: 8,
 												alignSelf: 'stretch', // ✅ 전체 너비 확보
 											}}>
 											<View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: SPACING_W.sm }}>
@@ -1274,7 +1277,7 @@ const MyScoreScreen = () => {
 																backgroundColor: isCorrect ? COLORS.primarySoft : COLORS.dangerBg,
 																borderRadius: RADIUS.round,
 																paddingHorizontal: SPACING_W.sm,
-																paddingVertical: scaleHeight(3),
+																paddingVertical: SPACING_H.xs,
 																marginBottom: SPACING_H.sm,
 															}}>
 															<IconComponent
@@ -1294,7 +1297,7 @@ const MyScoreScreen = () => {
 														</Text>
 													)}
 												</View>
-												<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.textLight} style={{ marginTop: scaleHeight(2) }} />
+												<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.textLight} style={{ marginTop: SPACING_H.xxs }} />
 											</View>
 										</TouchableOpacity>
 									);
@@ -1367,7 +1370,7 @@ const MyScoreScreen = () => {
 														type="FontAwesome"
 														size={scaledSize(20)}
 														color={COLORS.borderDark}
-														style={{ marginRight: scaleWidth(13) }}
+														style={{ marginRight: SPACING_W.md }}
 													/>
 													<Text style={styles.secondRankLabel}>2등</Text>
 													<Text style={styles.secondRankScore}>
@@ -1513,10 +1516,6 @@ const MyScoreScreen = () => {
 										borderColor: isCleared ? tower.color : COLORS.border,
 										backgroundColor: COLORS.surface,
 										opacity: isCleared ? 1 : 0.55,
-										shadowColor: isCleared ? tower.color : '#64748B',
-										shadowOffset: { width: 0, height: 2 },
-										shadowOpacity: isCleared ? 0.12 : 0.06,
-										shadowRadius: 8,
 									}}>
 									{/* 왼쪽: 보스 이미지 + 레벨 배지 */}
 									<View
@@ -1538,7 +1537,7 @@ const MyScoreScreen = () => {
 												backgroundColor: isCleared ? tower.color : COLORS.textLight,
 												borderRadius: RADIUS.round,
 												paddingHorizontal: SPACING_W.sm,
-												paddingVertical: scaleHeight(2),
+												paddingVertical: SPACING_H.xxs,
 											}}>
 											<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>LV.{tower.level}</Text>
 										</View>
@@ -1546,10 +1545,10 @@ const MyScoreScreen = () => {
 
 									{/* 오른쪽: 보스 정보 + 보상 */}
 									<View style={{ flex: 1, padding: SPACING_W.md, justifyContent: 'center' }}>
-										<Text style={{ fontSize: FONT_SIZES.xxs, color: COLORS.textLight, marginBottom: scaleHeight(2) }}>{tower.bossTitle}</Text>
-										<Text style={{ fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, marginBottom: scaleHeight(6) }}>{tower.bossName}</Text>
+										<Text style={{ fontSize: FONT_SIZES.xxs, color: COLORS.textLight, marginBottom: SPACING_H.xxs }}>{tower.bossTitle}</Text>
+										<Text style={{ fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, marginBottom: SPACING_H.xsPlus }}>{tower.bossName}</Text>
 
-										<View style={{ height: 1, backgroundColor: COLORS.surfaceAlt, marginBottom: scaleHeight(6) }} />
+										<View style={{ height: 1, backgroundColor: COLORS.surfaceAlt, marginBottom: SPACING_H.xsPlus }} />
 
 										<View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm }}>
 											<FastImage
@@ -1564,7 +1563,7 @@ const MyScoreScreen = () => {
 												resizeMode="cover"
 											/>
 											<View>
-												<View style={{ flexDirection: 'row', alignItems: 'center', gap: scaleWidth(3) }}>
+												<View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING_W.xs }}>
 													<IconComponent
 														type="materialIcons"
 														name={tower.reward.type === 'costume' ? 'checkroom' : 'auto-awesome'}
@@ -1583,7 +1582,7 @@ const MyScoreScreen = () => {
 													backgroundColor: isCleared ? tower.color : COLORS.textLight,
 													borderRadius: RADIUS.round,
 													paddingHorizontal: SPACING_W.sm,
-													paddingVertical: scaleHeight(3),
+													paddingVertical: SPACING_H.xs,
 												}}>
 												<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>{isCleared ? '클리어 ✓' : '미클리어 🔒'}</Text>
 											</View>
@@ -1607,7 +1606,7 @@ const MyScoreScreen = () => {
 				isEarned={badgePopupBadge ? earnedBadgeIds.includes(badgePopupBadge.id) : false}
 				onClose={() => setBadgePopupVisible(false)}
 			/>
-			<ProverbDetailModal visible={detailVisible} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
+			<ProverbDetailModal visible={detailVisible && !!detailProverb} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
 
 			{/* 최하단에 위치할것!! */}
 			{showScrollTop && (
@@ -1686,22 +1685,22 @@ const styles = StyleSheet.create({
 	badgeTitleActive: {
 		color: COLORS.primary,
 	},
-	badgeTitleRow: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(6) },
+	badgeTitleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.xsPlus },
 	badgeRarityTag: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(2),
+		gap: SPACING_W.xxs,
 		borderRadius: RADIUS.round,
-		paddingHorizontal: scaleWidth(6),
-		paddingVertical: scaleHeight(2),
+		paddingHorizontal: SPACING_W.xsPlus,
+		paddingVertical: SPACING_H.xxs,
 	},
 	badgeRarityTagText: { fontSize: FONT_SIZES.xxs, fontWeight: '700' },
-	badgeCondRow: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(3), marginTop: SPACING_H.xs },
+	badgeCondRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.xs, marginTop: SPACING_H.xs },
 	badgeCondText: { fontSize: FONT_SIZES.xs, color: COLORS.textLight, flex: 1 },
 	badgeDesc: {
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.textSecondary,
-		marginTop: scaleHeight(2),
+		marginTop: SPACING_H.xxs,
 		lineHeight: scaleHeight(18),
 	},
 	badgeDescActive: {
@@ -1716,6 +1715,22 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
+	activityHero: {
+		minHeight: scaleHeight(118),
+		marginBottom: SPACING_H.md,
+		paddingLeft: SPACING_W.lg,
+		backgroundColor: HERO.bg,
+		borderTopWidth: 3,
+		borderTopColor: HERO.accent,
+		borderRadius: RADIUS.lg,
+		flexDirection: 'row',
+		alignItems: 'center',
+		overflow: 'hidden',
+	},
+	activityHeroCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
+	activityHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
+	activityHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
+	activityHeroImage: { width: scaleWidth(142), height: scaleHeight(112), marginRight: scaleWidth(-8) },
 	scoreDashCard: {
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.lg,
@@ -1723,10 +1738,6 @@ const styles = StyleSheet.create({
 		marginBottom: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		shadowColor: '#0F172A',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	scoreDashHeader: {
 		flexDirection: 'row',
@@ -1751,7 +1762,7 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.warningBg,
 		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.md,
-		paddingVertical: scaleHeight(5),
+		paddingVertical: SPACING_H.xs,
 	},
 	scoreDashScoreText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.warningDark },
 	scoreDashGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: SPACING_H.md },
@@ -1763,7 +1774,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
-	scoreDashTileTop: { flexDirection: 'row', alignItems: 'center', gap: scaleWidth(7), marginBottom: SPACING_H.sm },
+	scoreDashTileTop: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm, marginBottom: SPACING_H.sm },
 	scoreDashTileIcon: {
 		width: scaleWidth(26),
 		height: scaleWidth(26),
@@ -1780,7 +1791,7 @@ const styles = StyleSheet.create({
 		overflow: 'hidden',
 	},
 	scoreDashBarFill: { height: '100%', borderRadius: scaleWidth(3) },
-	scoreDashTilePct: { fontSize: FONT_SIZES.xs, fontWeight: '700', marginTop: scaleHeight(5), textAlign: 'right' },
+	scoreDashTilePct: { fontSize: FONT_SIZES.xs, fontWeight: '700', marginTop: SPACING_H.xs, textAlign: 'right' },
 	subSectionBox1: {
 		backgroundColor: COLORS.surface,
 		padding: SPACING_W.lg,
@@ -1801,13 +1812,13 @@ const styles = StyleSheet.create({
 	statItem: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.text,
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xsPlus,
 	},
 	subTitle: {
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '600',
 		color: COLORS.text,
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xsPlus,
 	},
 	tagItem: {
 		fontSize: FONT_SIZES.md,
@@ -1826,7 +1837,7 @@ const styles = StyleSheet.create({
 	},
 	levelTitle: {
 		fontSize: FONT_SIZES.lg,
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.xsPlus,
 		color: COLORS.primary,
 		fontWeight: '700',
 	},
@@ -1847,10 +1858,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: SPACING_W.sm,
-		shadowColor: '#22C55E',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.25,
-		shadowRadius: 2,
 	},
 	levelModal: {
 		backgroundColor: COLORS.surface,
@@ -1884,7 +1891,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(14),
 		padding: SPACING_W.lg,
 		alignItems: 'center',
-		marginBottom: scaleHeight(14),
+		marginBottom: SPACING_H.mdPlus,
 		width: '100%',
 		borderWidth: 1,
 		borderColor: COLORS.border,
@@ -1896,7 +1903,7 @@ const styles = StyleSheet.create({
 	},
 	levelBadge: {
 		backgroundColor: COLORS.secondary,
-		paddingHorizontal: scaleWidth(10),
+		paddingHorizontal: SPACING_W.smPlus,
 		paddingVertical: SPACING_H.xs,
 		borderRadius: scaleWidth(12),
 		marginBottom: SPACING_H.sm,
@@ -1909,13 +1916,13 @@ const styles = StyleSheet.create({
 	levelMascot: {
 		width: scaleWidth(80),
 		height: scaleWidth(80),
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.smPlus,
 	},
 	levelLabel: {
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		color: COLORS.text,
-		marginBottom: scaleHeight(2),
+		marginBottom: SPACING_H.xxs,
 	},
 	levelScore: {
 		fontSize: FONT_SIZES.smPlus,
@@ -1924,7 +1931,7 @@ const styles = StyleSheet.create({
 	levelEncourage: {
 		fontSize: FONT_SIZES.sm,
 		color: COLORS.primary,
-		marginTop: scaleHeight(6),
+		marginTop: SPACING_H.xsPlus,
 		textAlign: 'center',
 		lineHeight: scaleHeight(20),
 	},
@@ -1935,7 +1942,7 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.secondarySoft,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginRight: scaleWidth(10),
+		marginRight: SPACING_W.smPlus,
 	},
 	levelModalText: {
 		flex: 1,
@@ -1947,7 +1954,7 @@ const styles = StyleSheet.create({
 		color: COLORS.textSecondary,
 	},
 	levelNowText: {
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.xsPlus,
 		fontSize: FONT_SIZES.md,
 		color: COLORS.primary,
 		fontWeight: '700',
@@ -1960,7 +1967,7 @@ const styles = StyleSheet.create({
 	},
 	modalConfirmButton: {
 		marginTop: SPACING_H.lg,
-		paddingVertical: scaleHeight(10),
+		paddingVertical: SPACING_H.smPlus,
 		paddingHorizontal: SPACING_W.xxl,
 		backgroundColor: COLORS.secondary,
 		borderRadius: scaleWidth(8),
@@ -2007,7 +2014,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.smPlus,
 	},
 	activityLabel: {
 		fontSize: FONT_SIZES.md,
@@ -2019,7 +2026,7 @@ const styles = StyleSheet.create({
 		color: COLORS.text,
 	},
 	summaryCard: {
-		backgroundColor: '#FFFBEB',
+		backgroundColor: HERO.bg,
 		padding: SPACING_W.lg,
 		borderRadius: scaleWidth(12),
 		marginBottom: SPACING_H.lg,
@@ -2046,7 +2053,7 @@ const styles = StyleSheet.create({
 		height: scaleHeight(6),
 		backgroundColor: COLORS.surfaceAlt,
 		borderRadius: scaleHeight(3),
-		marginTop: scaleHeight(6),
+		marginTop: SPACING_H.xsPlus,
 		alignSelf: 'center',
 	},
 	progressBarFill: {
@@ -2058,7 +2065,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
-		marginTop: scaleHeight(6),
+		marginTop: SPACING_H.xsPlus,
 	},
 	regionCard: {
 		width: '28%',
@@ -2068,11 +2075,11 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(16),
 		alignItems: 'center',
 		justifyContent: 'center',
-		paddingHorizontal: scaleWidth(6),
+		paddingHorizontal: SPACING_W.xsPlus,
 		paddingVertical: SPACING_H.sm,
 		backgroundColor: COLORS.surface,
 		marginBottom: SPACING_H.md,
-		marginHorizontal: scaleWidth(5),
+		marginHorizontal: SPACING_W.xs,
 	},
 	levelCard: {
 		width: '42%',
@@ -2085,10 +2092,6 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.background,
 		marginHorizontal: SPACING_W.sm,
 		marginBottom: SPACING_H.md,
-		shadowColor: '#64748B',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	regionText: {
 		fontSize: FONT_SIZES.md,
@@ -2118,10 +2121,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 		marginBottom: SPACING_H.md,
 	},
 	statIcon: {
@@ -2132,7 +2131,7 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
 		color: COLORS.text,
-		marginBottom: scaleHeight(3),
+		marginBottom: SPACING_H.xs,
 	},
 	statLabel: {
 		fontSize: FONT_SIZES.sm,
@@ -2144,7 +2143,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(10),
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xsPlus,
 	},
 	chartRow: {
 		flexDirection: 'row',
@@ -2164,7 +2163,7 @@ const styles = StyleSheet.create({
 	donutCenterLabel: {
 		fontSize: FONT_SIZES.xs,
 		color: COLORS.textSecondary,
-		marginTop: scaleHeight(2),
+		marginTop: SPACING_H.xxs,
 	},
 	chartLegend: {
 		flex: 1,
@@ -2174,12 +2173,12 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.md,
 		fontWeight: '700',
 		color: COLORS.textStrong,
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.smPlus,
 	},
 	chartLegendRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xsPlus,
 	},
 	legendDot: {
 		width: scaleWidth(10),
@@ -2208,7 +2207,7 @@ const styles = StyleSheet.create({
 	subtitleRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(6),
+		gap: SPACING_W.xsPlus,
 		marginBottom: SPACING_H.md,
 		marginTop: SPACING_H.sm,
 	},
@@ -2224,7 +2223,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(9),
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: scaleWidth(9),
+		marginRight: SPACING_W.sm,
 	},
 	conquerHeaderTitle: {
 		fontSize: FONT_SIZES.mdPlus,
@@ -2244,10 +2243,10 @@ const styles = StyleSheet.create({
 	conquerTag: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(3),
+		gap: SPACING_W.xs,
 		backgroundColor: COLORS.surface,
 		paddingHorizontal: SPACING_W.sm,
-		paddingVertical: scaleHeight(2),
+		paddingVertical: SPACING_H.xxs,
 		borderRadius: RADIUS.round,
 	},
 	conquerTagText: {
@@ -2293,7 +2292,7 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
 		marginTop: SPACING_H.md,
-		paddingBottom: scaleHeight(6),
+		paddingBottom: SPACING_H.xsPlus,
 	},
 	regionHelperText: {
 		fontSize: FONT_SIZES.sm,
@@ -2303,15 +2302,15 @@ const styles = StyleSheet.create({
 	levelHelperText: {
 		fontSize: FONT_SIZES.sm,
 		color: COLORS.textSecondary,
-		marginTop: scaleHeight(3),
-		marginBottom: scaleHeight(15),
+		marginTop: SPACING_H.xs,
+		marginBottom: SPACING_H.lg,
 	},
 	adContainer: {
 		backgroundColor: COLORS.surface,
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginTop: scaleHeight(10),
-		paddingVertical: scaleHeight(6),
+		marginTop: SPACING_H.smPlus,
+		paddingVertical: SPACING_H.xsPlus,
 	},
 	regionCardActive: {
 		backgroundColor: COLORS.secondaryBg,
@@ -2345,12 +2344,12 @@ const styles = StyleSheet.create({
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.title,
 		fontWeight: '700',
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.xsPlus,
 	},
 	iconCircle1: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),
-		marginRight: scaleWidth(6),
+		marginRight: SPACING_W.xsPlus,
 		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -2362,7 +2361,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: scaleWidth(6),
+		marginRight: SPACING_W.xsPlus,
 		backgroundColor: COLORS.secondary, // 🎨 밝은 파랑 배경 추가
 	},
 
@@ -2372,7 +2371,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: scaleWidth(6),
+		marginRight: SPACING_W.xsPlus,
 		backgroundColor: '#F97316', // 🎨 밝은 파랑 배경 추가
 	},
 
@@ -2382,7 +2381,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: scaleWidth(6),
+		marginRight: SPACING_W.xsPlus,
 		backgroundColor: '#14B8A6', // 오늘의 퀴즈 — 비중복 틸 컬러
 	},
 	iconCircle5: {
@@ -2391,24 +2390,21 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: scaleWidth(6),
+		marginRight: SPACING_W.xsPlus,
 		backgroundColor: COLORS.warning,
 	},
 	sectionHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		marginTop: SPACING_H.lg,
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.smPlus,
 		backgroundColor: COLORS.surface,
 		borderRadius: scaleWidth(14),
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		paddingVertical: SPACING_H.md,
-		paddingHorizontal: scaleWidth(14),
-		shadowColor: '#0F172A',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.04,
-		shadowRadius: 4,	},
+		paddingHorizontal: SPACING_W.mdPlus,
+},
 	sectionHeaderStatic: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -2426,11 +2422,11 @@ const styles = StyleSheet.create({
 		marginTop: SPACING_H.sm,
 	},
 	activityTabBar: {
-		paddingVertical: scaleHeight(6),
+		paddingVertical: SPACING_H.xsPlus,
 		paddingRight: SPACING_W.sm,
 		gap: SPACING_W.sm,
 		alignItems: 'center',
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xsPlus,
 	},
 	activityTabChip: {
 		flexDirection: 'row',
@@ -2439,7 +2435,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		borderRadius: RADIUS.round,
 		backgroundColor: COLORS.surfaceAlt,
-		gap: scaleWidth(6),
+		gap: SPACING_W.xsPlus,
 	},
 	activityTabChipActive: {
 		backgroundColor: COLORS.primary,
@@ -2475,10 +2471,6 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.background,
 		marginBottom: SPACING_H.md,
 		width: '100%',
-		shadowColor: '#64748B',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	categoryRowText: {
 		fontSize: FONT_SIZES.mdPlus,
@@ -2489,7 +2481,7 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.sm,
 		color: COLORS.textSecondary,
 		textAlign: 'center',
-		marginTop: scaleHeight(6),
+		marginTop: SPACING_H.xsPlus,
 		lineHeight: scaleHeight(18),
 	},
 	timeResultCard: {
@@ -2509,7 +2501,7 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		color: COLORS.text,
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xsPlus,
 	},
 	timeResultRow: {
 		flexDirection: 'row',
@@ -2532,21 +2524,17 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(10),
 		borderWidth: 1,
 		borderColor: COLORS.borderDark,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.08,
-		shadowRadius: 2,
 	},
 	timeCardDate: {
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.textSecondary,
-		marginBottom: scaleHeight(2),
+		marginBottom: SPACING_H.xxs,
 	},
 	timeCardScore: {
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		color: COLORS.text,
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xsPlus,
 	},
 	timeCardRow: {
 		flexDirection: 'row',
@@ -2647,11 +2635,7 @@ const styles = StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		gap: scaleWidth(10),
-		shadowColor: '#0F172A',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
+		gap: SPACING_W.smPlus,
 	},
 	levelDescIconChip: {
 		width: scaleWidth(28),

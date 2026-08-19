@@ -150,7 +150,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 									<View style={[styles.rarityTag, { backgroundColor: meta.soft }]}>
 										<Text style={[styles.rarityTagText, { color: meta.color }]}>{meta.label}</Text>
 									</View>
-									<View style={{ flexDirection: 'row', gap: scaleWidth(2) }}>
+									<View style={{ flexDirection: 'row', gap: SPACING_W.xxs }}>
 										{Array.from({ length: 4 }).map((_, i) => (
 											<IconComponent
 												key={i}
@@ -226,11 +226,9 @@ const styles = StyleSheet.create({
 		maxWidth: scaleWidth(340),
 		borderRadius: RADIUS.xl,
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		overflow: 'hidden',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	headerGrad: {
 		width: '100%',
@@ -248,13 +246,13 @@ const styles = StyleSheet.create({
 	rarityPill: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		columnGap: scaleWidth(3),
+		columnGap: SPACING_W.xs,
 		backgroundColor: 'rgba(255,255,255,0.22)',
 		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.xs,
 	},
-	rarityPillText: { color: COLORS.textWhite, fontSize: FONT_SIZES.sm, fontWeight: '700', marginLeft: scaleWidth(3) },
+	rarityPillText: { color: COLORS.textWhite, fontSize: FONT_SIZES.sm, fontWeight: '700', marginLeft: SPACING_W.xs },
 	iconStage: {
 		width: scaleWidth(98),
 		height: scaleWidth(98),
@@ -293,12 +291,10 @@ const styles = StyleSheet.create({
 		height: scaleWidth(68),
 		borderRadius: scaleWidth(68) / 2,
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		alignItems: 'center',
 		justifyContent: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	iconCircleLocked: { backgroundColor: COLORS.surfaceAlt },
 	badgeName: {
@@ -313,7 +309,7 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(255,255,255,0.22)',
 		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.md,
-		paddingVertical: scaleHeight(3),
+		paddingVertical: SPACING_H.xs,
 	},
 	typeChipText: { color: COLORS.textWhite, fontSize: FONT_SIZES.xs, fontWeight: '600' },
 
@@ -347,7 +343,7 @@ const styles = StyleSheet.create({
 	},
 	infoValue: { fontSize: FONT_SIZES.md, color: COLORS.text, lineHeight: scaledSize(20) },
 	rarityValueRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
-	rarityTag: { borderRadius: RADIUS.round, paddingHorizontal: SPACING_W.sm, paddingVertical: scaleHeight(3) },
+	rarityTag: { borderRadius: RADIUS.round, paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs },
 	rarityTagText: { fontSize: FONT_SIZES.sm, fontWeight: '700' },
 	statusBanner: {
 		flexDirection: 'row',

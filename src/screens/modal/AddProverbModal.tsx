@@ -39,7 +39,7 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 
 	const [levelOpen, setLevelOpen] = useState(false);
 	const [levelValue, setLevelValue] = useState('전체');
-	const [levelItems, setLevelItems] = useState(LEVEL_ITEMS.map((v) => ({ ...v, labelStyle: { marginLeft: scaleWidth(6), fontSize: FONT_SIZES.md } })));
+	const [levelItems, setLevelItems] = useState(LEVEL_ITEMS.map((v) => ({ ...v, labelStyle: { marginLeft: SPACING_W.xsPlus, fontSize: FONT_SIZES.md } })));
 
 	const [categoryOpen, setCategoryOpen] = useState(false);
 	const [categoryValue, setCategoryValue] = useState('전체');
@@ -56,8 +56,8 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 	useEffect(() => {
 		const cats = ProverbServices.selectCategoryList();
 		setCategoryItems([
-			{ label: '전체', value: '전체', icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />, labelStyle: { marginLeft: scaleWidth(6), fontSize: FONT_SIZES.md } },
-			...cats.map((c) => ({ label: c, value: c, icon: () => <IconComponent type="materialIcons" name={getFieldIconName(c)} size={scaledSize(16)} color={getCategoryColor(c)} />, labelStyle: { marginLeft: scaleWidth(6), fontSize: FONT_SIZES.md } })),
+			{ label: '전체', value: '전체', icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />, labelStyle: { marginLeft: SPACING_W.xsPlus, fontSize: FONT_SIZES.md } },
+			...cats.map((c) => ({ label: c, value: c, icon: () => <IconComponent type="materialIcons" name={getFieldIconName(c)} size={scaledSize(16)} color={getCategoryColor(c)} />, labelStyle: { marginLeft: SPACING_W.xsPlus, fontSize: FONT_SIZES.md } })),
 		]);
 	}, []);
 
@@ -199,7 +199,7 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 
 								<View style={styles.dropdownRow}>
 									<View style={[styles.dropdownWrapper, { zIndex: levelOpen ? 3000 : 1000 }]}>
-										<DropDownPicker open={levelOpen} value={levelValue} items={levelItems} setOpen={setLevelOpen} setValue={setLevelValue} setItems={setLevelItems} style={styles.dropdown} dropDownContainerStyle={styles.dropdownList} labelStyle={styles.dropdownLabel} listItemLabelStyle={{ marginLeft: scaleWidth(6), fontSize: FONT_SIZES.smPlus }} iconContainerStyle={{ marginRight: scaleWidth(8) }} showTickIcon={false} onOpen={() => setCategoryOpen(false)} />
+										<DropDownPicker open={levelOpen} value={levelValue} items={levelItems} setOpen={setLevelOpen} setValue={setLevelValue} setItems={setLevelItems} style={styles.dropdown} dropDownContainerStyle={styles.dropdownList} labelStyle={styles.dropdownLabel} listItemLabelStyle={{ marginLeft: SPACING_W.xsPlus, fontSize: FONT_SIZES.smPlus }} iconContainerStyle={{ marginRight: SPACING_W.sm }} showTickIcon={false} onOpen={() => setCategoryOpen(false)} />
 									</View>
 									<View style={[styles.dropdownWrapper, { zIndex: categoryOpen ? 3000 : 1000 }]}>
 										<DropDownPicker
@@ -214,7 +214,7 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 											style={styles.dropdown}
 											dropDownContainerStyle={styles.dropdownList}
 											labelStyle={styles.dropdownLabel}
-											iconContainerStyle={{ marginRight: scaleWidth(8) }}
+											iconContainerStyle={{ marginRight: SPACING_W.sm }}
 											showTickIcon={false}
 											renderListItem={({ item, onPress }) => (
 												<TouchableOpacity
@@ -306,8 +306,8 @@ const styles = StyleSheet.create({
 	miniCheckbox: { width: scaleWidth(16), height: scaleWidth(16), borderRadius: scaleWidth(4), borderWidth: 1.5, borderColor: COLORS.textLight, backgroundColor: COLORS.surface, justifyContent: 'center', alignItems: 'center' },
 	miniCheckboxChecked: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
 	listCountText: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary },
-	listContent: { paddingTop: SPACING_H.md, paddingHorizontal: SPACING_W.lg, paddingBottom: scaleHeight(40), flexGrow: 1 },
-	itemCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.md, borderWidth: 1, borderColor: COLORS.surfaceAlt, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8 },
+	listContent: { paddingTop: SPACING_H.md, paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
+	itemCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.md, borderWidth: 1, borderColor: COLORS.surfaceAlt, },
 	itemCardSelected: { borderColor: COLORS.primary, backgroundColor: COLORS.primaryBg },
 	itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.sm },
 	badgeRow: { flexDirection: 'row', gap: SPACING_W.xs },
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
 	checkboxChecked: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
 	hanjaText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.xs },
 	meaningText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, lineHeight: scaledSize(19) },
-	emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: scaleHeight(40) },
+	emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: SPACING_H.xxxxl },
 	emptyImage: { width: scaleWidth(140), height: scaleWidth(140), marginBottom: SPACING_H.md },
 	emptyTitle: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.xs },
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', lineHeight: scaledSize(20) },

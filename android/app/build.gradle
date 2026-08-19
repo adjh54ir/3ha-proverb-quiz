@@ -114,7 +114,17 @@ android {
 
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
+            // R8 이 남긴 리소스까지 정리해 앱 용량을 더 줄인다 (minify 와 세트로만 동작)
+            shrinkResources enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+
+            // 난독화 매핑(mapping.txt)을 Crashlytics 로 자동 업로드해
+            // Play Console/Crashlytics 에서 비정상 종료·ANR 스택을 복원할 수 있게 한다.
+            // 산출물 경로: android/app/build/outputs/mapping/release/mapping.txt
+            firebaseCrashlytics {
+                mappingFileUploadEnabled true
+                nativeSymbolUploadEnabled false
+            }
         }
     }
 }

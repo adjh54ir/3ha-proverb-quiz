@@ -4,10 +4,13 @@
 
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Alert, Animated, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Animated, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import Slider from '@react-native-community/slider';
+import { isSoundEnabled, setSoundEnabled, getSoundVolume, setSoundVolume, playCorrect } from '@/utils/SoundUtils';
+import { isBgmEnabled, setBgmEnabled, getBgmVolume, setBgmVolume } from '@/utils/BgmUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DeviceInfo from 'react-native-device-info';
 import IconComponent from './common/atomic/IconComponent';
@@ -26,8 +29,9 @@ import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import FadeInView from '@/components/animation/FadeInView';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
 import { SCORE_PER_QUESTION } from '@/const/common/CommonCharacterData';
-import { AppPermissionInfo, loadAppPermissions } from '@/utils/PermissionUtils';
+import { AppPermissionInfo, loadAppPermissions, requestAppPermission } from '@/utils/PermissionUtils';
 import DateUtils from '@/utils/DateUtils';
+import { useToast } from '@/hooks/useToast';
 
 // ─────────────────────────────────────────────
 // 상수
@@ -122,6 +126,14 @@ const SETTINGS_MAP: Record<string, { label: string; icon: { type: IconType; name
 // ─────────────────────────────────────────────
 const BASE_SECTIONS = [
 	{
+		titleText: '소리 설정',
+		iconType: 'materialIcons',
+		icon: 'volume-up',
+		iconColor: COLORS.primaryDark,
+		iconBg: COLORS.primarySoft,
+		data: ['__sound__'],
+	},
+	{
 		titleText: '사용자 정보 초기화',
 		iconType: 'materialIcons',
 		icon: 'restart-alt',
@@ -145,6 +157,7 @@ const BASE_SECTIONS = [
 		iconBg: COLORS.primarySoft,
 		data: ['privacyPolicy', 'openSource', 'checkVersion', ...(IS_DEV ? ['completeAllQuiz', 'completeAllStudy', 'completeAllTower'] : [])],
 	},
+	// 권한 상태는 항상 마지막 섹션 — 하단 앱 목록(ListFooterComponent) 바로 위에 노출된다.
 	{
 		titleText: '권한 설정',
 		iconType: 'materialIcons',
@@ -206,6 +219,32 @@ const SettingScreen = () => {
 	const [appVersion, setAppVersion] = useState('');
 	const [latestVersion, setLatestVersion] = useState<string | null>(null);
 	const [permissions, setPermissions] = useState<AppPermissionInfo[]>([]);
+	const { showToast, ToastView } = useToast();
+
+	// ── 소리 설정 ──────────────────────────────────
+	const [soundOn, setSoundOn] = useState(isSoundEnabled());
+	const [bgmOn, setBgmOn] = useState(isBgmEnabled());
+	const [sfxVolume, setSfxVolume] = useState(getSoundVolume());
+	const [bgmVolume, setBgmVolumeState] = useState(getBgmVolume());
+
+	const handleToggleSound = (value: boolean) => {
+		setSoundEnabled(value);
+		setSoundOn(value);
+	};
+
+	const handleToggleBgm = (value: boolean) => {
+		setBgmEnabled(value);
+		setBgmOn(value);
+	};
+
+	/** 슬라이더를 놓는 순간에만 저장한다(드래그 중 매 프레임 AsyncStorage 쓰기 방지) */
+	const handleSfxVolumeCommit = (value: number) => {
+		setSoundVolume(value);
+	};
+
+	const handleBgmVolumeCommit = (value: number) => {
+		setBgmVolume(value);
+	};
 
 	// ── 파생 상태 (RESET_CONFIG 기반) ──────────────
 	const resetConfig = resetType ? RESET_CONFIG[resetType] : null;
@@ -214,6 +253,12 @@ const SettingScreen = () => {
 		useCallback(() => {
 			setAppVersion(VersionCheck.getCurrentVersion());
 			scrollToTop();
+
+			// 퀴즈 시작 팝업 등 다른 화면에서 바꿨을 수 있어 포커스마다 다시 읽는다
+			setSoundOn(isSoundEnabled());
+			setBgmOn(isBgmEnabled());
+			setSfxVolume(getSoundVolume());
+			setBgmVolumeState(getBgmVolume());
 
 			// 설정 앱에서 권한을 바꾸고 돌아오는 경우가 있어 포커스마다 다시 읽는다
 			let isActive = true;
@@ -262,27 +307,27 @@ const SettingScreen = () => {
 	const RESET_ACTIONS: Record<ResetType, () => Promise<void>> = {
 		study: async () => {
 			await AsyncStorage.removeItem(STORAGE_KEYS.study);
-			Alert.alert('완료', '학습 데이터가 초기화되었습니다');
+			showToast('학습 데이터 초기화', '학습 기록과 뱃지를 모두 지웠습니다.');
 		},
 		quiz: async () => {
 			await AsyncStorage.removeItem(STORAGE_KEYS.quiz);
-			Alert.alert('완료', '퀴즈 데이터가 초기화되었습니다');
+			showToast('퀴즈 데이터 초기화', '퀴즈 기록과 점수를 모두 지웠습니다.');
 		},
 		timeChallenge: async () => {
 			await AsyncStorage.removeItem(STORAGE_KEYS.timeChallenge);
-			Alert.alert('완료', '타임 챌린지 데이터가 초기화되었습니다');
+			showToast('타임 챌린지 초기화', '타임 챌린지 기록을 모두 지웠습니다.');
 		},
 		towerChallenge: async () => {
 			await AsyncStorage.removeItem(STORAGE_KEYS.towerChallenge);
-			Alert.alert('완료', '타워 챌린지 데이터가 초기화되었습니다');
+			showToast('타워 챌린지 초기화', '타워 진행도를 모두 지웠습니다.');
 		},
 		todayQuiz: async () => {
 			await resetTodayQuizOnly();
-			Alert.alert('완료', '오늘의 퀴즈 데이터가 초기화되었습니다');
+			showToast('오늘의 퀴즈 초기화', '오늘의 퀴즈 기록을 지웠습니다.');
 		},
 		all: async () => {
 			await AsyncStorage.multiRemove(Object.values(STORAGE_KEYS));
-			Alert.alert('완료', '모든 데이터가 초기화되었습니다');
+			showToast('전체 초기화 완료', '앱의 모든 기록을 지웠습니다.');
 		},
 	};
 
@@ -296,7 +341,7 @@ const SettingScreen = () => {
 			setResetType(null);
 			scrollToTop();
 		} catch {
-			Alert.alert('오류', '초기화 중 오류가 발생했습니다');
+			showToast('초기화 실패', '잠시 후 다시 시도해주세요.');
 		}
 	};
 
@@ -366,11 +411,11 @@ const SettingScreen = () => {
 			wrongProverbId: [],
 			totalScore: fullScore,
 			bestCombo: 20,
-			lastAnsweredAt: new Date(),
+			lastAnsweredAt: DateUtils.now(),
 			quizCounts,
 		};
 		await AsyncStorage.setItem(STORAGE_KEYS.quiz, JSON.stringify(parsed));
-		Alert.alert('처리됨', `모든 퀴즈 완료 + 뱃지 지급! (${allProverbs.length.toLocaleString()}문제 / ${fullScore.toLocaleString()}점)`);
+		showToast('퀴즈 전체 완료 처리', `${allProverbs.length.toLocaleString()}문제 / ${fullScore.toLocaleString()}점 반영했습니다.`);
 	};
 
 	const handleCompleteAllStudy = async () => {
@@ -383,11 +428,11 @@ const SettingScreen = () => {
 		const parsed: MainDataType.UserStudyHistory = {
 			badges: CONST_BADGES.filter((b) => b.type === 'study').map((b) => b.id),
 			studyProverbes: allProverbs.map((p) => p.id),
-			lastStudyAt: new Date(),
+			lastStudyAt: DateUtils.now(),
 			studyCounts,
 		};
 		await AsyncStorage.setItem(STORAGE_KEYS.study, JSON.stringify(parsed));
-		Alert.alert('처리됨', `모든 학습 완료 + 뱃지 지급! (${allProverbs.length.toLocaleString()}개)`);
+		showToast('학습 전체 완료 처리', `${allProverbs.length.toLocaleString()}개 학습 완료로 반영했습니다.`);
 	};
 
 	const handleCompleteAllTower = async () => {
@@ -404,7 +449,7 @@ const SettingScreen = () => {
 			unlockedRewards: allLevels,
 		};
 		await AsyncStorage.setItem(STORAGE_KEYS.towerChallenge, JSON.stringify(towerProgress));
-		Alert.alert('처리됨', '모든 타워 클리어 완료!');
+		showToast('타워 전체 클리어 처리', '모든 층을 클리어 상태로 반영했습니다.');
 	};
 
 	// ── 아이템 이벤트 핸들러 맵 ───────────────────
@@ -477,6 +522,27 @@ const SettingScreen = () => {
 			),
 		[],
 	);
+
+	/**
+	 * 권한 행 탭 처리.
+	 * - 미설정: 앱에서 바로 시스템 팝업을 띄운다(설정 앱까지 나갈 필요 없음)
+	 * - 거부됨: 앱에서 다시 물어볼 수 없으므로 설정 앱으로 보낸다
+	 */
+	const handlePermissionPress = async (perm: AppPermissionInfo) => {
+		if (perm.state === 'undetermined') {
+			const next = await requestAppPermission(perm.key);
+			if (next === 'granted') {
+				setPermissions((prev) => prev.map((item) => (item.key === perm.key ? { ...item, state: next } : item)));
+				return;
+			}
+			// 팝업에서 거부했다면 이후로는 설정 앱에서만 바꿀 수 있다
+			setPermissions(await loadAppPermissions());
+			if (next !== 'blocked') {
+				return;
+			}
+		}
+		Linking.openSettings().catch(() => Alert.alert('오류', '설정 화면을 열 수 없습니다.'));
+	};
 
 	// ── renderItem ────────────────────────────────
 	const renderItem = ({ item }: { item: string }) => {
@@ -551,6 +617,104 @@ const SettingScreen = () => {
 		}
 
 		// 권한 설정 — 현재 상태 표시 + 미허용 항목은 OS 설정으로 이동
+		// 소리 설정 — 효과음/배경음악 on·off + 볼륨
+		if (item === '__sound__') {
+			const soundRows = [
+				{
+					key: 'sfx',
+					on: soundOn,
+					onChange: handleToggleSound,
+					icon: soundOn ? 'volume-high' : 'volume-off',
+					label: '효과음',
+					desc: '정답·오답·완료 등 상황별 소리',
+					volume: sfxVolume,
+					onVolumeChange: setSfxVolume,
+					onVolumeCommit: handleSfxVolumeCommit,
+					onPreview: playCorrect,
+				},
+				{
+					key: 'bgm',
+					on: bgmOn,
+					onChange: handleToggleBgm,
+					icon: bgmOn ? 'music-note' : 'music-note-off',
+					label: '배경음악',
+					desc: '퀴즈·챌린지 진행 중 흐르는 음악',
+					volume: bgmVolume,
+					onVolumeChange: setBgmVolumeState,
+					onVolumeCommit: handleBgmVolumeCommit,
+					onPreview: undefined, // BGM은 볼륨 조절 시 바로 들리므로 미리듣기 불필요
+				},
+			];
+
+			return (
+				<View style={styles.accordionWrapper}>
+					<View style={styles.accordionGroup}>
+						{soundRows.map((row, index) => (
+							<View key={row.key} style={[styles.soundRow, index === soundRows.length - 1 && { borderBottomWidth: 0 }]}>
+								<View style={styles.soundRowHeader}>
+									<View style={[styles.itemIconChip, !row.on && styles.itemIconChipOff]}>
+										<IconComponent
+											type="MaterialCommunityIcons"
+											name={row.icon}
+											size={scaledSize(18)}
+											color={row.on ? COLORS.primaryDark : COLORS.textLight}
+										/>
+									</View>
+									<View style={styles.soundTextWrap}>
+										<Text style={styles.permissionLabel} numberOfLines={1} ellipsizeMode="tail">
+											{row.label}
+										</Text>
+										<Text style={styles.permissionDesc} numberOfLines={2} ellipsizeMode="tail">
+											{row.desc}
+										</Text>
+									</View>
+									<Switch
+										value={row.on}
+										onValueChange={row.onChange}
+										trackColor={{ false: COLORS.borderDark, true: COLORS.primaryLight }}
+										thumbColor={row.on ? COLORS.primaryDark : COLORS.surfaceAlt}
+										accessibilityLabel={row.label}
+									/>
+								</View>
+
+								{/* 볼륨 슬라이더 — 켜져 있을 때만 노출 */}
+								{row.on && (
+									<View style={styles.volumeRow}>
+										<Text style={styles.volumeLabel}>볼륨</Text>
+										<Slider
+											style={styles.volumeSlider}
+											minimumValue={0}
+											maximumValue={1}
+											step={0.05}
+											value={row.volume}
+											onValueChange={row.onVolumeChange}
+											onSlidingComplete={row.onVolumeCommit}
+											minimumTrackTintColor={COLORS.primary}
+											maximumTrackTintColor={COLORS.borderDark}
+											thumbTintColor={COLORS.primaryDark}
+											accessibilityLabel={`${row.label} 볼륨`}
+										/>
+										<Text style={styles.volumeValue}>{Math.round((row.volume ?? 0) * 100)}%</Text>
+										{row.onPreview && (
+											<TouchableOpacity
+												style={styles.volumePreviewButton}
+												onPress={row.onPreview}
+												hitSlop={{ top: scaleHeight(8), bottom: scaleHeight(8), left: scaleWidth(8), right: scaleWidth(8) }}
+												activeOpacity={0.7}
+												accessibilityRole="button"
+												accessibilityLabel="효과음 미리듣기">
+												<IconComponent type="MaterialCommunityIcons" name="play-circle-outline" size={scaledSize(20)} color={COLORS.primaryDark} />
+											</TouchableOpacity>
+										)}
+									</View>
+								)}
+							</View>
+						))}
+					</View>
+				</View>
+			);
+		}
+
 		if (item === '__permissions__') {
 			if (permissions.length === 0) {
 				return null;
@@ -568,7 +732,7 @@ const SettingScreen = () => {
 									style={[styles.permissionRow, index === permissions.length - 1 && { borderBottomWidth: 0 }]}
 									activeOpacity={isGranted ? 1 : 0.7}
 									disabled={isGranted}
-									onPress={() => Linking.openSettings().catch(() => Alert.alert('오류', '설정 화면을 열 수 없습니다.'))}>
+									onPress={() => handlePermissionPress(perm)}>
 									<View style={styles.itemIconChip}>
 										<IconComponent type="MaterialCommunityIcons" name={PERMISSION_ICON[perm.key]} size={scaledSize(18)} color={COLORS.secondary} />
 									</View>
@@ -671,7 +835,7 @@ const SettingScreen = () => {
 									</View>
 									<Text style={styles.recommendSubtitle}>가족이나 친구, 지인에게 유용한 앱을 함께 나눠보세요!</Text>
 									<View style={styles.appIconWrapper}>
-										<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
+										<Image source={require('@/assets/images/screen-heroes/settings-helper.png')} style={styles.appIcon} resizeMode="contain" />
 									</View>
 									<View style={styles.storeButtons}>
 										<TouchableOpacity style={[styles.storeButton, { backgroundColor: COLORS.primary }]} onPress={shareApp} activeOpacity={0.8}>
@@ -761,6 +925,8 @@ const SettingScreen = () => {
 				onClose={() => setShowVersionModal(false)}
 				onUpdatePress={() => latestVersion && Linking.openURL(Platform.OS === 'android' ? GOOGLE_PLAY_STORE_URL : APP_STORE_URL)}
 			/>
+
+			<ToastView />
 		</>
 	);
 };
@@ -769,7 +935,7 @@ export default SettingScreen;
 
 const styles = StyleSheet.create({
 	container: { flex: 1, backgroundColor: COLORS.background },
-	listContent: { paddingBottom: scaleHeight(40) },
+	listContent: { paddingBottom: SPACING_H.xxxxl },
 	headerContainer: { marginBottom: SPACING_H.xs },
 	itemSpacing: { height: SPACING_H.md },
 	// 섹션 사이 총 간격 = 이 값 + sectionHeader marginTop(20) ≈ 24
@@ -800,15 +966,13 @@ const styles = StyleSheet.create({
 
 	cardButton: {
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.md,
 		minHeight: scaleHeight(52),
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.lg,
 		marginHorizontal: SPACING_W.lg,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 		flexDirection: 'row',
 		alignItems: 'center',
 	},
@@ -829,12 +993,10 @@ const styles = StyleSheet.create({
 	accordionWrapper: { marginHorizontal: SPACING_W.lg, gap: SPACING_H.md },
 	accordionGroup: {
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.md,
 		overflow: 'hidden',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	// 파괴적 액션 — 위 그룹들과 한 칸 더 띄운다
 	accordionGroupDanger: {
@@ -891,6 +1053,21 @@ const styles = StyleSheet.create({
 		paddingVertical: SPACING_H.xs,
 	},
 	permissionBadgeText: { fontSize: FONT_SIZES.xs, fontWeight: '700' },
+	// ===== 소리 설정 =====
+	itemIconChipOff: { backgroundColor: COLORS.surfaceAlt },
+	soundRow: {
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		borderBottomWidth: 1,
+		borderBottomColor: COLORS.border,
+	},
+	soundRowHeader: { flexDirection: 'row', alignItems: 'center', minHeight: scaleHeight(44) },
+	soundTextWrap: { flex: 1, marginRight: SPACING_W.md },
+	volumeRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm, marginTop: SPACING_H.sm },
+	volumeLabel: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, fontWeight: '600' },
+	volumeSlider: { flex: 1, height: scaleHeight(32) },
+	volumeValue: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, fontWeight: '700', minWidth: scaleWidth(38), textAlign: 'right' },
+	volumePreviewButton: { paddingLeft: SPACING_W.xs },
 	permissionChevron: { marginLeft: SPACING_W.xs },
 
 	scrollTopWrap: {
@@ -905,10 +1082,6 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(48) / 2,
 		justifyContent: 'center',
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.2,
-		shadowRadius: 8,
 	},
 
 	modalTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: SPACING_H.md },
@@ -923,10 +1096,6 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 		alignItems: 'center',
 		marginTop: SPACING_H.md,
 	},
@@ -975,12 +1144,10 @@ const styles = StyleSheet.create({
 		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		alignItems: 'center',
 		justifyContent: 'flex-start',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	footerAppIconWrapper: {
 		width: scaleWidth(64),

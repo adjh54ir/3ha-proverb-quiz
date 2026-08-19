@@ -6,6 +6,7 @@ import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
+import { playComplete } from '@/utils/SoundUtils';
 
 export interface LevelUpInfo {
 	label: string;
@@ -37,6 +38,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bo
 			mascotAnim.setValue(0);
 			return;
 		}
+		playComplete(); // 🎖️ 레벨업 사운드
 		scaleAnim.setValue(0.95);
 		opacityAnim.setValue(0);
 		mascotAnim.setValue(0);
@@ -116,14 +118,12 @@ const styles = StyleSheet.create({
 		width: '100%',
 		maxWidth: scaleWidth(340),
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
-		shadowOffset: { width: 0, height: 2 },
 	},
 	ribbon: {
 		flexDirection: 'row',

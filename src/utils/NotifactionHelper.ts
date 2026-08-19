@@ -1,4 +1,5 @@
 import notifee, { AndroidImportance, AndroidVisibility, AuthorizationStatus, RepeatFrequency, TriggerType } from "@notifee/react-native";
+import DateUtils from '@/utils/DateUtils';
 
 /** 반복 알림은 고정 ID 를 써야 재예약 시 취소/덮어쓰기가 된다. */
 const DAILY_NOTIFICATION_ID = 'daily-notification';
@@ -16,7 +17,7 @@ const WEEKLY_NOTIFICATION_ID = 'weekly-notification';
  * @param from 기준 시각 (테스트용, 기본값 현재)
  * @returns epoch millis (항상 from 보다 미래)
  */
-const getNextTriggerTimestamp = (hour: number, minute: number, dayOfWeek?: number, from: Date = new Date()): number => {
+const getNextTriggerTimestamp = (hour: number, minute: number, dayOfWeek?: number, from: Date = DateUtils.now()): number => {
     const next = new Date(from);
     next.setHours(hour, minute, 0, 0);
 
@@ -34,6 +35,53 @@ const getNextTriggerTimestamp = (hour: number, minute: number, dayOfWeek?: numbe
     }
     next.setDate(next.getDate() + daysUntilTarget);
     return next.getTime();
+};
+
+/** 오늘의 퀴즈 리마인더 — 고정 ID 라 재예약이 항상 기존 예약을 덮어쓴다. */
+const DAILY_QUIZ_NOTIFICATION_ID = 'daily-quiz-reminder';
+
+/**
+ * 오늘의 퀴즈 리마인더를 '저장된 로컬 시각' 기준으로 다시 예약한다.
+ *
+ * repeatFrequency 반복은 알림이 실제로 울린 시각을 기준으로 다음 회차를 잡기 때문에,
+ * 기기가 Doze 상태라 알림이 늦게 울리면 그 지연이 매일 누적된다(= 지정한 시각이 계속 밀린다).
+ * 그래서 앱이 뜰 때마다 저장된 시/분으로 절대 시각을 다시 계산해 재예약해 드리프트를 0 으로 되돌린다.
+ *
+ * @param hour 0-23 (기기 로컬 기준). 반드시 저장된 값을 넘길 것 — 현재 시각으로 재계산하지 않는다.
+ * @param moveToScreen 알림 탭 시 이동할 라우트명
+ */
+const scheduleDailyQuizReminder = async (hour: number, moveToScreen: string) => {
+    const channelId = await notifee.createChannel({
+        id: 'quiz-reminder',
+        name: '퀴즈 알림',
+        importance: AndroidImportance.HIGH,
+    });
+
+    // 재예약 전 항상 기존 예약 취소 (중복 예약 방지)
+    await notifee.cancelNotification(DAILY_QUIZ_NOTIFICATION_ID);
+
+    await notifee.createTriggerNotification(
+        {
+            id: DAILY_QUIZ_NOTIFICATION_ID,
+            title: '속담 퀴즈가 도착했습니다. 🍀',
+            body: '출석 체크도 하고 문제도 풀어서 속담 지식을 넓혀보아요!',
+            android: {
+                channelId,
+                pressAction: { id: 'default' },
+            },
+            data: { moveToScreen },
+        },
+        {
+            type: TriggerType.TIMESTAMP,
+            timestamp: getNextTriggerTimestamp(hour, 0),
+            repeatFrequency: RepeatFrequency.DAILY,
+        },
+    );
+};
+
+/** 오늘의 퀴즈 리마인더 예약 취소 */
+const cancelDailyQuizReminder = async () => {
+    await notifee.cancelNotification(DAILY_QUIZ_NOTIFICATION_ID);
 };
 
 /**
@@ -194,6 +242,9 @@ const TriggerWeeklyNotification = async (
 }
 
 export {
+    DAILY_QUIZ_NOTIFICATION_ID,
+    scheduleDailyQuizReminder,
+    cancelDailyQuizReminder,
     getNextTriggerTimestamp,
     RequestNotificationPermission,
     DirectNotification,

@@ -347,6 +347,9 @@ const FavoriteScreen = () => {
 							<View style={styles.filterCard}>
 								<View style={styles.headerTopRow}>
 									<View style={styles.headerTitleRow}>
+										{allFavorites.length > 0 && (
+											<FastImage source={require('@/assets/images/screen-heroes/favorites-collection.png')} style={styles.favoriteHeroImage} resizeMode="contain" />
+										)}
 										<Text style={styles.headerTitle}>즐겨찾기</Text>
 									</View>
 
@@ -540,7 +543,7 @@ const FavoriteScreen = () => {
 			</KeyboardAvoidingView>
 
 			<FavoriteAddModal visible={showAddModal} existingIds={favoriteIds} onClose={() => setShowAddModal(false)} onAdd={handleAddFavorites} />
-			<ProverbDetailModal visible={showDetailModal} proverb={selectedProverb} onClose={() => setShowDetailModal(false)} onFavoriteChange={loadFavorites} />
+			<ProverbDetailModal visible={showDetailModal && !!selectedProverb} proverb={selectedProverb} onClose={() => setShowDetailModal(false)} onFavoriteChange={loadFavorites} />
 
 			<Modal visible={showDeleteConfirmModal} transparent animationType="fade" onRequestClose={() => setShowDeleteConfirmModal(false)}>
 				<View style={styles.confirmOverlay}>
@@ -577,6 +580,7 @@ const styles = StyleSheet.create({
 	main: { flex: 1, backgroundColor: COLORS.background },
 	headerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.md },
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
+	favoriteHeroImage: { width: scaleWidth(70), height: scaleHeight(58) },
 	headerTitle: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },
 	headerSubText: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'right' },
 	headerCount: { fontWeight: '700', color: COLORS.warning, fontSize: FONT_SIZES.smPlus },
@@ -589,9 +593,9 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.sm,
 		borderRadius: RADIUS.round,
-		backgroundColor: '#FFFBEB',
+		backgroundColor: COLORS.warningSoft,
 		borderWidth: 1,
-		borderColor: '#FDE68A',
+		borderColor: COLORS.warningBorder,
 	},
 	headerActionText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.warning },
 	headerActionBtnDelete: { backgroundColor: COLORS.dangerBg, borderColor: '#FCA5A5' },
@@ -607,14 +611,12 @@ const styles = StyleSheet.create({
 	resultSummaryRow: { paddingTop: SPACING_H.xs, alignItems: 'flex-end' },
 	filterCard: {
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.lg,
 		marginBottom: SPACING_H.md,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 		overflow: 'visible',
 	},
 	searchRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm, marginBottom: SPACING_H.md },
@@ -672,7 +674,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	miniCheckboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
-	listContent: { paddingTop: SPACING_H.xs, paddingHorizontal: SPACING_W.lg, paddingBottom: scaleHeight(40), flexGrow: 1 },
+	listContent: { paddingTop: SPACING_H.xs, paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
 	itemCard: {
 		backgroundColor: COLORS.surface,
 		paddingHorizontal: SPACING_W.lg,
@@ -681,12 +683,8 @@ const styles = StyleSheet.create({
 		marginBottom: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: COLORS.surfaceAlt,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
-	itemCardSelected: { borderColor: COLORS.warning, backgroundColor: '#FFFBEB' },
+	itemCardSelected: { borderColor: COLORS.warning, backgroundColor: COLORS.warningSoft },
 	badgeGroup: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.xs },
 	badge: {
 		flexDirection: 'row',
@@ -719,7 +717,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	checkboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
-	emptyWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: scaleHeight(40) },
+	emptyWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: SPACING_H.xxxxl },
 	emptyImage: { width: scaleWidth(160), height: scaleWidth(160), marginBottom: SPACING_H.lg },
 	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', lineHeight: scaledSize(20) },
@@ -732,10 +730,6 @@ const styles = StyleSheet.create({
 		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.warning,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	emptyAddBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '700' },
 	bottomActionBar: {
@@ -744,15 +738,13 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.md,
 		paddingBottom: SPACING_H.xl,
 		borderTopWidth: 1,
 		borderTopColor: COLORS.surfaceAlt,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: -2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	deleteActionBtn: {
 		flexDirection: 'row',
@@ -770,7 +762,7 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: scaleWidth(32),
+		paddingHorizontal: SPACING_W.xxxl,
 	},
 	confirmBox: {
 		width: '100%',

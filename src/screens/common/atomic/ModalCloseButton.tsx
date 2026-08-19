@@ -3,6 +3,7 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import IconComponent from './IconComponent';
+import { COLORS, SPACING_W } from '@/const/common/Theme';
 
 /**
  * 모달 공통 닫기(X) 버튼 — 모든 콘텐츠 모달의 닫기 위치/아이콘/색을 통일합니다.
@@ -16,7 +17,7 @@ interface ModalCloseButtonProps {
 	style?: StyleProp<ViewStyle>;
 }
 
-const ModalCloseButton: React.FC<ModalCloseButtonProps> = ({ onPress, color = '#64748B', style }) => {
+const ModalCloseButton: React.FC<ModalCloseButtonProps> = ({ onPress, color = COLORS.textSecondary, style }) => {
 	return (
 		<TouchableOpacity
 			style={[styles.btn, style]}
@@ -36,6 +37,6 @@ const styles = StyleSheet.create({
 		top: scaleHeight(12),
 		right: scaleWidth(12),
 		zIndex: 20,
-		padding: scaleWidth(4),
+		padding: SPACING_W.xs,
 	},
 });

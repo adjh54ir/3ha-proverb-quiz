@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { scaleHeight, scaledSize } from '@/utils/DementionUtils';
+import { COLORS, SPACING_H } from '@/const/common/Theme';
 
 /**
  * 활용예시 
@@ -44,10 +45,10 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: '#FFFFFF',
+		backgroundColor: COLORS.surface,
 	},
 	loadingText: {
-		marginTop: scaleHeight(10),
+		marginTop: SPACING_H.smPlus,
 		fontSize: scaledSize(16),
 		color: '#2c3e50',
 	},

@@ -1,0 +1,10 @@
+Interface Sounds by Kenney (kenney.nl)
+License: Creative Commons CC0 (public domain)
+Source: https://kenney.nl/assets/interface-sounds
+
+Mapping:
+- correct.ogg  <- confirmation_001.ogg (정답)
+- wrong.ogg    <- error_004.ogg (오답)
+- timeout.ogg  <- error_008.ogg (시간 초과)
+- complete.ogg <- confirmation_002.ogg (학습 완료)
+- finish.ogg   <- confirmation_004.ogg (퀴즈 종료)

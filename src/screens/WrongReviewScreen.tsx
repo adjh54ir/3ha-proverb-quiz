@@ -8,7 +8,7 @@ import IconComponent from './common/atomic/IconComponent';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -157,6 +157,17 @@ const WrongReviewScreen = () => {
 				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}>
 				<Animated.View style={{ width: '100%', opacity: contentFade, transform: [{ translateY: contentSlide }] }}>
+					<View style={styles.reviewHero}>
+						<View style={styles.reviewHeroCopy}>
+							<Text style={styles.reviewHeroTitle}>실수는 지혜가 자라는 순간이에요</Text>
+							<Text style={styles.reviewHeroDescription}>천천히 다시 보면 이번에는 분명 맞힐 수 있어요.</Text>
+						</View>
+						<FastImage
+							source={require('@/assets/images/screen-heroes/wrong-review.png')}
+							style={styles.reviewHeroImage}
+							resizeMode="contain"
+						/>
+					</View>
 					{/* ✅ 컴팩트 통계 카드 */}
 					<View style={styles.statsCard}>
 						<View style={styles.statsItem}>
@@ -251,7 +262,7 @@ const WrongReviewScreen = () => {
 				</TouchableOpacity>
 			)}
 
-			<ProverbDetailModal visible={detailVisible} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
+			<ProverbDetailModal visible={detailVisible && !!detailProverb} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
 		</SafeAreaView>
 	);
 };
@@ -272,10 +283,27 @@ const styles = StyleSheet.create({
 	scrollContainer: {
 		paddingTop: SPACING_H.xl,
 		paddingHorizontal: SPACING_W.lg,
-		paddingBottom: scaleHeight(40),
+		paddingBottom: SPACING_H.xxxxl,
 		alignItems: 'center',
 		backgroundColor: COLORS.background,
 	},
+	reviewHero: {
+		width: '100%',
+		minHeight: scaleHeight(124),
+		marginBottom: SPACING_H.md,
+		paddingLeft: SPACING_W.lg,
+		backgroundColor: HERO.bg,
+		borderTopWidth: 3,
+		borderTopColor: HERO.accent,
+		borderRadius: RADIUS.lg,
+		flexDirection: 'row',
+		alignItems: 'center',
+		overflow: 'hidden',
+	},
+	reviewHeroCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
+	reviewHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
+	reviewHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
+	reviewHeroImage: { width: scaleWidth(138), height: scaleHeight(118), marginRight: scaleWidth(-8) },
 	// ===== 통계 카드 =====
 	statsCard: {
 		flexDirection: 'row',
@@ -289,10 +317,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		width: '100%',
 		marginBottom: SPACING_H.md,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	statsItem: {
 		flex: 1,
@@ -423,10 +447,6 @@ const styles = StyleSheet.create({
 		marginBottom: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	reviewCardBody: {
 		flex: 1,
@@ -508,9 +528,5 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(48) / 2,
 		justifyContent: 'center',
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.15,
-		shadowRadius: 8,
 	},
 });

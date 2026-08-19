@@ -27,6 +27,10 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
+import FastImage from 'react-native-fast-image';
+import { playCorrect, playWrong, playCombo, playTick, playWhoosh, playFinish } from '@/utils/SoundUtils';
+import { startBgm, stopBgm } from '@/utils/BgmUtils';
+import DateUtils from '@/utils/DateUtils';
 
 const MAX_LIVES = 5;
 const CHOICE_COUNT = 4;
@@ -186,6 +190,7 @@ const InfinityQuizScreen = () => {
 			comboAnim.stopAnimation();
 			comboShake.stopAnimation();
 			comboEffectAnim.stopAnimation();
+			stopBgm(); // 🎵 화면 이탈 시 BGM 정리(메모리 누수 방지)
 			toastOpacity.stopAnimation();
 		};
 	}, [scaleAnim, scoreAnim, comboAnim, comboShake, comboEffectAnim, toastOpacity]);
@@ -229,6 +234,25 @@ const InfinityQuizScreen = () => {
 
 		return () => clearInterval(interval);
 	}, [isGameOver, isPaused]); // isPaused 추가!
+
+	// ⏱️ 마지막 5초 카운트다운 효과음 (1초 단위로 한 번씩만)
+	useEffect(() => {
+		if (isGameOver || isPaused) {
+			return;
+		}
+		const secondsLeft = Math.ceil(timeLeftMs / 1000);
+		if (secondsLeft > 0 && secondsLeft <= 5) {
+			playTick();
+		}
+	}, [Math.ceil(timeLeftMs / 1000), isGameOver, isPaused]); // eslint-disable-line react-hooks/exhaustive-deps
+
+	// 🎉 게임 종료 사운드 + BGM 정리
+	useEffect(() => {
+		if (isGameOver) {
+			stopBgm();
+			playFinish();
+		}
+	}, [isGameOver]);
 
 	// lives 감소 시 애니메이션
 	useEffect(() => {
@@ -324,6 +348,8 @@ const InfinityQuizScreen = () => {
 
 				countdownTimeoutRef.current = setTimeout(() => {
 					setIsCountingDown(false);
+					playWhoosh(); // 🎬 챌린지 시작 사운드
+					startBgm('time'); // 🎵 타임챌린지 BGM
 					resetGame(); // 기존 resetGame 호출
 				}, 800);
 				return;
@@ -331,12 +357,13 @@ const InfinityQuizScreen = () => {
 
 			setCount(countdown);
 			animateScale();
+			playTick(); // ⏱️ 3·2·1 카운트다운
 		}, 1000);
 		countdownTimerRef.current = timer;
 	};
 
 	const handleGameOver = () => {
-		const quizDate = new Date().toISOString(); // 예: '2025-06-26T14:20:00.000Z'
+		const quizDate = DateUtils.now().toISOString(); // 예: '2025-06-26T14:20:00.000Z'
 
 		const totalQuestions = currentIndex + 1;
 		const correctQuizIdList = questionList
@@ -381,6 +408,7 @@ const InfinityQuizScreen = () => {
 			// 선택 즉시 UI 반응 방지 → 약간 딜레이 후 처리
 			setTimeout(() => {
 				if (isCorrect) {
+					playCorrect(); // 🔊 정답
 					setResultMap((prev) => ({ ...prev, [questionList[currentIndex].id]: 'correct' }));
 					setFeedback('correct');
 					// ✅ 점수 증가 → 애니메이션 → 상태 업데이트 순서 변경
@@ -424,6 +452,7 @@ const InfinityQuizScreen = () => {
 					triggerScoreAnim(); // 점수 애니메이션
 					if (combo + 1 >= 2) {
 						triggerComboAnim(); // 콤보 애니메이션 (2콤보 이상일 때만)
+						playCombo(combo + 1); // 🔊 콤보가 쌓일수록 음이 높아진다
 					}
 
 					// ✅ 콤보 증가도 마찬가지로 처리
@@ -442,6 +471,7 @@ const InfinityQuizScreen = () => {
 						return newCombo;
 					});
 				} else {
+					playWrong(); // 🔊 오답
 					setResultMap((prev) => ({ ...prev, [questionList[currentIndex].id]: 'wrong' }));
 					setFeedback('wrong');
 					setLives((prev) => prev - 1);
@@ -685,7 +715,7 @@ const InfinityQuizScreen = () => {
 									key={i}
 									style={{
 										transform: [{ scale: heartAnimations[i] }],
-										marginHorizontal: scaleWidth(2),
+										marginHorizontal: SPACING_W.xxs,
 									}}>
 									<IconComponent
 										name="heart"
@@ -736,6 +766,7 @@ const InfinityQuizScreen = () => {
 						<View style={styles.resultWrapper}>
 							<View style={styles.gameOverBox}>
 								<View style={styles.resultHeader}>
+									<FastImage source={require('@/assets/images/screen-heroes/time-result.png')} style={styles.timeResultImage} resizeMode="contain" />
 									<Text style={styles.resultHeaderTitle}>타임 챌린지 결과</Text>
 									<Text style={styles.resultHeaderSub}>수고했어요! 결과를 확인해 보세요</Text>
 								</View>
@@ -823,7 +854,7 @@ const InfinityQuizScreen = () => {
 											type="FontAwesome"
 											size={scaledSize(16)}
 											color={COLORS.secondary}
-											style={{ marginRight: scaleWidth(6) }}
+											style={{ marginRight: SPACING_W.xsPlus }}
 										/>
 										<Text style={styles.resultBtnSecondaryText}>랭킹</Text>
 									</TouchableOpacity>
@@ -838,7 +869,7 @@ const InfinityQuizScreen = () => {
 											type="FontAwesome"
 											color={COLORS.textWhite}
 											size={scaledSize(16)}
-											style={{ marginRight: scaleWidth(6) }}
+											style={{ marginRight: SPACING_W.xsPlus }}
 										/>
 										<Text style={styles.resultBtnPrimaryText}>다시 도전</Text>
 									</TouchableOpacity>
@@ -852,7 +883,7 @@ const InfinityQuizScreen = () => {
 							style={{
 								backgroundColor: COLORS.surfaceAlt,
 								borderRadius: RADIUS.sm,
-								paddingVertical: scaleHeight(10),
+								paddingVertical: SPACING_H.smPlus,
 								paddingHorizontal: SPACING_W.lg,
 								marginTop: SPACING_H.md,
 								flexDirection: 'row',
@@ -864,7 +895,7 @@ const InfinityQuizScreen = () => {
 									fontSize: FONT_SIZES.mdPlus,
 									fontWeight: '600',
 									color: COLORS.text,
-									marginRight: scaleWidth(5),
+									marginRight: SPACING_W.xs,
 								}}>
 								정답과 해설 보기
 							</Text>
@@ -1211,10 +1242,6 @@ const InfinityQuizScreen = () => {
 							alignItems: 'center',
 							flexDirection: isToastClosable ? 'column' : 'row',
 							gap: SPACING_W.sm,
-							shadowColor: '#000',
-							shadowOffset: { width: 0, height: 4 },
-							shadowOpacity: 0.25,
-							shadowRadius: 8,
 						}}>
 						<Text
 							style={{
@@ -1238,7 +1265,7 @@ const InfinityQuizScreen = () => {
 								style={{
 									marginTop: SPACING_H.xs,
 									backgroundColor: COLORS.text,
-									paddingVertical: scaleHeight(6),
+									paddingVertical: SPACING_H.xsPlus,
 									paddingHorizontal: SPACING_W.lg,
 									borderRadius: RADIUS.md,
 								}}>
@@ -1291,11 +1318,11 @@ const styles = StyleSheet.create({
 	},
 	finalScore: {
 		fontSize: FONT_SIZES.heading,
-		marginBottom: scaleHeight(30),
+		marginBottom: SPACING_H.xxxl,
 	},
 	restartBtn: {
-		paddingVertical: scaleHeight(14),
-		paddingHorizontal: scaleWidth(30),
+		paddingVertical: SPACING_H.mdPlus,
+		paddingHorizontal: SPACING_W.xxxl,
 		backgroundColor: COLORS.secondary,
 		borderRadius: RADIUS.sm,
 		marginBottom: SPACING_H.xxl,
@@ -1312,13 +1339,13 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.surface,
 		borderTopWidth: 1,
 		borderTopColor: COLORS.surfaceAlt,
-		paddingTop: scaleHeight(6),
+		paddingTop: SPACING_H.xsPlus,
 		paddingBottom: Platform.OS === 'android' ? scaleHeight(10) : scaleHeight(14),
 	},
 	exitButton: {
 		backgroundColor: COLORS.textSecondary,
-		paddingVertical: scaleHeight(10),
-		paddingHorizontal: scaleWidth(32),
+		paddingVertical: SPACING_H.smPlus,
+		paddingHorizontal: SPACING_W.xxxl,
 		borderRadius: RADIUS.round,
 		height: scaleHeight(40), // ✅ 버튼 높이 보장
 		justifyContent: 'center', // 수직 정렬 보장
@@ -1335,7 +1362,7 @@ const styles = StyleSheet.create({
 		// backgroundColor: 'red',
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingTop: scaleHeight(40),
+		paddingTop: SPACING_H.xxxxl,
 	},
 	exitModal: {
 		width: '85%',
@@ -1362,9 +1389,9 @@ const styles = StyleSheet.create({
 	exitModalConfirmButton: {
 		flex: 1,
 		backgroundColor: COLORS.danger,
-		padding: scaleHeight(12),
+		padding: SPACING_H.md,
 		borderRadius: RADIUS.sm,
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.xsPlus,
 		alignItems: 'center',
 	},
 	modalButtonRow: {
@@ -1375,17 +1402,17 @@ const styles = StyleSheet.create({
 	modalBackButton: {
 		flex: 1,
 		backgroundColor: COLORS.borderDark,
-		padding: scaleHeight(12),
+		padding: SPACING_H.md,
 		borderRadius: RADIUS.sm,
-		marginRight: scaleWidth(6),
+		marginRight: SPACING_W.xsPlus,
 		alignItems: 'center',
 	},
 	modalStartButton: {
 		flex: 1,
 		backgroundColor: COLORS.secondary,
-		padding: scaleHeight(12),
+		padding: SPACING_H.md,
 		borderRadius: RADIUS.sm,
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.xsPlus,
 		alignItems: 'center',
 	},
 	modalButtonText: {
@@ -1411,13 +1438,9 @@ const styles = StyleSheet.create({
 		marginHorizontal: SPACING_W.xs,
 		backgroundColor: COLORS.background,
 		borderRadius: RADIUS.md,
-		paddingVertical: scaleHeight(10),
+		paddingVertical: SPACING_H.smPlus,
 		paddingHorizontal: SPACING_W.sm,
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 3,
 	},
 
 	statusRow: {
@@ -1439,24 +1462,24 @@ const styles = StyleSheet.create({
 	heartRow: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		gap: scaleWidth(2),
+		gap: SPACING_W.xxs,
 	},
 	iconWithLabel: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
 		gap: SPACING_W.xs,
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xsPlus,
 	},
 	statusWrapper: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		paddingHorizontal: SPACING_W.sm,
-		paddingVertical: scaleHeight(10),
+		paddingVertical: SPACING_H.smPlus,
 		backgroundColor: COLORS.surface,
 		borderBottomWidth: 1,
 		borderBottomColor: COLORS.surfaceAlt,
-		gap: scaleWidth(6),
+		gap: SPACING_W.xsPlus,
 	},
 	statusBoxRow: {
 		marginTop: SPACING_H.sm,
@@ -1472,10 +1495,6 @@ const styles = StyleSheet.create({
 		borderColor: COLORS.border,
 		borderRadius: RADIUS.md,
 		marginBottom: SPACING_H.md,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: 2,
 	},
 
 	questionBox: {
@@ -1486,10 +1505,6 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.background,
 		borderWidth: 1,
 		borderColor: COLORS.secondarySoft,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	questionText: {
 		fontSize: FONT_SIZES.mdPlus,
@@ -1513,16 +1528,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		alignSelf: 'center',
 		gap: SPACING_W.xs,
-		marginTop: scaleHeight(10),
+		marginTop: SPACING_H.smPlus,
 		paddingHorizontal: SPACING_W.md,
-		paddingVertical: scaleHeight(5),
+		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,
 	},
 	feedbackTagCorrect: { backgroundColor: COLORS.primarySoft },
 	feedbackTagWrong: { backgroundColor: COLORS.dangerBg },
 	feedbackTagText: { fontSize: FONT_SIZES.smPlus, fontWeight: '800' },
 	choicesWrapper: {
-		gap: scaleHeight(10),
+		gap: SPACING_H.smPlus,
 	},
 	choiceBtn: {
 		flexDirection: 'row',
@@ -1534,10 +1549,6 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.md,
 		borderWidth: 2,
 		borderColor: COLORS.borderDark,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	choiceBtnText: {
 		flex: 1,
@@ -1606,10 +1617,6 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.round,
 		borderWidth: 1,
 		borderColor: '#BFDBFE',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
 	},
 
 	timeText: {
@@ -1621,9 +1628,9 @@ const styles = StyleSheet.create({
 	skipInlineButton: {
 		backgroundColor: COLORS.surfaceAlt,
 		paddingVertical: SPACING_H.xs,
-		paddingHorizontal: scaleWidth(10),
+		paddingHorizontal: SPACING_W.smPlus,
 		borderRadius: RADIUS.sm,
-		marginLeft: scaleWidth(6),
+		marginLeft: SPACING_W.xsPlus,
 	},
 	skipInlineText: {
 		fontSize: FONT_SIZES.sm,
@@ -1646,22 +1653,18 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.background,
 		borderWidth: 1,
 		borderColor: COLORS.border,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.05,
-		shadowRadius: 4,
 	},
 	resultRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		paddingVertical: scaleHeight(6),
+		paddingVertical: SPACING_H.xsPlus,
 		paddingHorizontal: SPACING_W.xs,
 		borderBottomWidth: 1,
 		borderBottomColor: COLORS.surfaceAlt,
 	},
 	resultText: {
 		fontSize: FONT_SIZES.mdPlus,
-		marginLeft: scaleWidth(10),
+		marginLeft: SPACING_W.smPlus,
 		color: COLORS.text,
 		fontWeight: '500',
 	},
@@ -1681,23 +1684,23 @@ const styles = StyleSheet.create({
 	feedbackItem: {
 		padding: SPACING_W.md,
 		borderRadius: RADIUS.sm,
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.smPlus,
 		borderWidth: 1,
 		borderColor: COLORS.borderDark,
 	},
 	feedbackTitleRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(7),
-		marginBottom: scaleHeight(10),
+		gap: SPACING_W.sm,
+		marginBottom: SPACING_H.smPlus,
 	},
 	feedbackResultBadge: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(3),
+		gap: SPACING_W.xs,
 		borderRadius: RADIUS.sm,
-		paddingHorizontal: scaleWidth(7),
-		paddingVertical: scaleHeight(2),
+		paddingHorizontal: SPACING_W.sm,
+		paddingVertical: SPACING_H.xxs,
 	},
 	feedbackResultBadgeText: { fontSize: FONT_SIZES.xs, fontWeight: '800' },
 	feedbackTitle: {
@@ -1707,7 +1710,7 @@ const styles = StyleSheet.create({
 	},
 	feedbackMeaning: {
 		fontSize: FONT_SIZES.md,
-		marginBottom: scaleHeight(2),
+		marginBottom: SPACING_H.xxs,
 		color: COLORS.text,
 	},
 	feedbackResult: {
@@ -1749,9 +1752,9 @@ const styles = StyleSheet.create({
 		letterSpacing: 0.3,
 	},
 	countdownMessageWrapper: {
-		marginTop: scaleHeight(32),
+		marginTop: SPACING_H.xxxl,
 		paddingHorizontal: SPACING_W.xxl,
-		paddingVertical: scaleHeight(10),
+		paddingVertical: SPACING_H.smPlus,
 		backgroundColor: 'rgba(255,255,255,0.12)',
 		borderRadius: RADIUS.xl,
 		minWidth: scaleWidth(180),
@@ -1767,12 +1770,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: COLORS.secondaryBg,
 		borderRadius: RADIUS.round,
-		paddingVertical: scaleHeight(6),
+		paddingVertical: SPACING_H.xsPlus,
 		paddingHorizontal: SPACING_W.md,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
 	},
 
 	skipContent: {
@@ -1791,7 +1790,7 @@ const styles = StyleSheet.create({
 		position: 'relative',
 		height: scaleHeight(32),
 		justifyContent: 'center',
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xsPlus,
 		paddingVertical: SPACING_H.xs,
 		paddingHorizontal: SPACING_W.sm,
 		borderWidth: 1,
@@ -1817,12 +1816,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: COLORS.secondaryBg,
 		borderRadius: RADIUS.round,
-		paddingVertical: scaleHeight(6),
+		paddingVertical: SPACING_H.xsPlus,
 		paddingHorizontal: SPACING_W.md,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
 		zIndex: 2,
 	},
 	scrollTopButton: {
@@ -1854,10 +1849,6 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.md,
 		paddingVertical: SPACING_H.xs,
 		paddingHorizontal: SPACING_W.sm,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
 	},
 
 	chanceText: {
@@ -1873,25 +1864,19 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.md,
 		paddingVertical: SPACING_H.xs,
 		paddingHorizontal: SPACING_W.sm,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
 		gap: SPACING_W.xs, // 아이콘과 텍스트 간격
 	},
 	chanceModalCard: {
 		width: '85%',
 		maxWidth: scaleWidth(360),
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
-		paddingTop: scaleHeight(22),
-		paddingBottom: scaleHeight(18),
+		paddingTop: SPACING_H.xxl,
+		paddingBottom: SPACING_H.lgPlus,
 		paddingHorizontal: SPACING_W.xl,
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 8 },
-		shadowOpacity: 0.18,
-		shadowRadius: 16,
 	},
 	chanceModalHeaderIcon: {
 		width: scaleWidth(52),
@@ -1900,13 +1885,13 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.primaryDark,
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginBottom: scaleHeight(10),
+		marginBottom: SPACING_H.smPlus,
 	},
 	chanceModalTitle: {
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '800',
 		color: COLORS.textStrong,
-		marginBottom: scaleHeight(2),
+		marginBottom: SPACING_H.xxs,
 	},
 	chanceModalSubtitle: {
 		fontSize: FONT_SIZES.sm,
@@ -1918,7 +1903,7 @@ const styles = StyleSheet.create({
 		width: '100%',
 		flexDirection: 'row',
 		gap: SPACING_W.sm,
-		marginBottom: scaleHeight(14),
+		marginBottom: SPACING_H.mdPlus,
 	},
 	chanceCharRow: {
 		flex: 1,
@@ -1926,20 +1911,20 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.surfaceAlt,
 		borderRadius: RADIUS.sm,
 		paddingVertical: SPACING_H.sm,
-		paddingHorizontal: scaleWidth(6),
+		paddingHorizontal: SPACING_W.xsPlus,
 	},
 	chanceCharChar: {
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '800',
 		color: '#0F172A',
-		marginBottom: scaleHeight(3),
+		marginBottom: SPACING_H.xs,
 	},
 	chanceCharReading: {
 		fontSize: FONT_SIZES.xs,
 		color: COLORS.secondary,
 		fontWeight: '800',
 		textAlign: 'center',
-		marginTop: scaleHeight(2),
+		marginTop: SPACING_H.xxs,
 	},
 	chanceCharMeaning: {
 		fontSize: FONT_SIZES.xs,
@@ -1952,23 +1937,23 @@ const styles = StyleSheet.create({
 		color: COLORS.textLight,
 		fontWeight: '600',
 		textAlign: 'center',
-		marginTop: scaleHeight(2),
+		marginTop: SPACING_H.xxs,
 	},
-	chanceMetaRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: scaleWidth(6), marginBottom: scaleHeight(10) },
-	chanceMetaChip: { backgroundColor: COLORS.secondaryBg, borderRadius: RADIUS.round, paddingHorizontal: scaleWidth(10), paddingVertical: SPACING_H.xs },
+	chanceMetaRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: SPACING_W.xsPlus, marginBottom: SPACING_H.smPlus },
+	chanceMetaChip: { backgroundColor: COLORS.secondaryBg, borderRadius: RADIUS.round, paddingHorizontal: SPACING_W.smPlus, paddingVertical: SPACING_H.xs },
 	chanceMetaChipText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.secondary },
-	chanceKeywordBox: { width: '100%', marginBottom: scaleHeight(10) },
-	chanceKeywordWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: scaleWidth(6), marginTop: scaleHeight(6) },
-	chanceKeywordChip: { backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.sm, paddingHorizontal: SPACING_W.sm, paddingVertical: scaleHeight(3) },
+	chanceKeywordBox: { width: '100%', marginBottom: SPACING_H.smPlus },
+	chanceKeywordWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING_W.xsPlus, marginTop: SPACING_H.xsPlus },
+	chanceKeywordChip: { backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.sm, paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs },
 	chanceKeywordText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#475569' },
 
 	chanceExampleBox: {
 		width: '100%',
 		backgroundColor: COLORS.primaryBg,
 		borderRadius: RADIUS.md,
-		paddingVertical: scaleHeight(10),
+		paddingVertical: SPACING_H.smPlus,
 		paddingHorizontal: SPACING_W.md,
-		marginBottom: scaleHeight(18),
+		marginBottom: SPACING_H.lgPlus,
 	},
 	chanceExampleLabel: {
 		fontSize: FONT_SIZES.sm,
@@ -1985,7 +1970,7 @@ const styles = StyleSheet.create({
 	chanceModalButton: {
 		width: '100%',
 		backgroundColor: COLORS.primaryDark,
-		paddingVertical: scaleHeight(13),
+		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.md,
 		alignItems: 'center',
 	},
@@ -1997,15 +1982,11 @@ const styles = StyleSheet.create({
 	resultTitleCard: {
 		alignItems: 'center',
 		paddingHorizontal: SPACING_W.md,
-		paddingVertical: scaleHeight(10),
-		backgroundColor: '#FFFBEB',
+		paddingVertical: SPACING_H.smPlus,
+		backgroundColor: COLORS.warningSoft,
 		borderRadius: RADIUS.md,
 		borderWidth: 1,
 		borderColor: '#FCD34D',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 4,
 	},
 	animatedScore: {
 		fontSize: FONT_SIZES.xl,
@@ -2013,7 +1994,7 @@ const styles = StyleSheet.create({
 		color: '#F97316',
 	},
 	quizScrollContent: {
-		paddingBottom: scaleHeight(40),
+		paddingBottom: SPACING_H.xxxxl,
 	},
 	resultScrollContent: {
 		flexGrow: 1,
@@ -2028,16 +2009,12 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		backgroundColor: COLORS.surface,
 		padding: SPACING_W.lg,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: 2,
 	},
 	resultButtons: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		width: '100%',
-		gap: scaleWidth(10),
+		gap: SPACING_W.smPlus,
 		marginTop: SPACING_H.xs,
 		marginBottom: SPACING_H.sm,
 	},
@@ -2046,6 +2023,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginBottom: SPACING_H.xs,
 	},
+	timeResultImage: { width: scaleWidth(148), height: scaleHeight(104), marginBottom: SPACING_H.xs },
 	resultHeaderTitle: {
 		fontSize: FONT_SIZES.xxl,
 		fontWeight: '800',
@@ -2055,31 +2033,31 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.sm,
 		color: COLORS.textLight,
 		fontWeight: '600',
-		marginTop: scaleHeight(3),
+		marginTop: SPACING_H.xs,
 	},
 	scoreHero: {
 		width: '100%',
 		alignItems: 'center',
 		paddingVertical: SPACING_H.md,
-		marginTop: scaleHeight(6),
+		marginTop: SPACING_H.xsPlus,
 	},
 	scoreHeroLabel: {
 		fontSize: FONT_SIZES.smPlus,
 		fontWeight: '700',
 		color: COLORS.textLight,
-		marginBottom: scaleHeight(2),
+		marginBottom: SPACING_H.xxs,
 	},
 	resultScoreCardRow: {
 		flexDirection: 'row',
 		width: '100%',
-		gap: scaleWidth(10),
-		marginTop: scaleHeight(6),
-		marginBottom: scaleHeight(10),
+		gap: SPACING_W.smPlus,
+		marginTop: SPACING_H.xsPlus,
+		marginBottom: SPACING_H.smPlus,
 	},
 	resultScoreCard: {
 		flex: 1,
 		alignItems: 'center',
-		paddingVertical: scaleHeight(14),
+		paddingVertical: SPACING_H.mdPlus,
 		borderRadius: RADIUS.lg,
 		borderWidth: 1,
 	},
@@ -2089,7 +2067,7 @@ const styles = StyleSheet.create({
 		borderRadius: scaleWidth(14),
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginBottom: scaleHeight(6),
+		marginBottom: SPACING_H.xsPlus,
 	},
 	resultScoreValue: {
 		fontSize: FONT_SIZES.title,
@@ -2099,7 +2077,7 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.sm,
 		color: COLORS.textSecondary,
 		fontWeight: '700',
-		marginTop: scaleHeight(2),
+		marginTop: SPACING_H.xxs,
 	},
 	statList: {
 		width: '100%',
@@ -2109,14 +2087,14 @@ const styles = StyleSheet.create({
 		borderColor: COLORS.border,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xs,
-		marginTop: scaleHeight(6),
+		marginTop: SPACING_H.xsPlus,
 		marginBottom: SPACING_H.md,
 	},
 	statLine: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingVertical: scaleHeight(11),
+		paddingVertical: SPACING_H.md,
 	},
 	statLineLabel: {
 		fontSize: FONT_SIZES.smPlus,
@@ -2150,7 +2128,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		fontWeight: '600',
 		lineHeight: scaleHeight(20),
-		marginTop: scaleHeight(6),
+		marginTop: SPACING_H.xsPlus,
 	},
 	statGrid: {
 		flexDirection: 'row',
@@ -2158,7 +2136,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		width: '100%',
 		gap: SPACING_W.sm,
-		marginTop: scaleHeight(14),
+		marginTop: SPACING_H.mdPlus,
 		marginBottom: SPACING_H.md,
 	},
 	statChip: {
@@ -2175,7 +2153,7 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '800',
 		color: COLORS.text,
-		marginBottom: scaleHeight(2),
+		marginBottom: SPACING_H.xxs,
 	},
 	statChipLabel: {
 		fontSize: FONT_SIZES.xs,
@@ -2186,12 +2164,12 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		gap: SPACING_W.sm,
-		marginBottom: scaleHeight(14),
+		marginBottom: SPACING_H.mdPlus,
 	},
 	usedTag: {
 		backgroundColor: COLORS.primaryBg,
 		borderRadius: RADIUS.round,
-		paddingVertical: scaleHeight(5),
+		paddingVertical: SPACING_H.xs,
 		paddingHorizontal: SPACING_W.md,
 	},
 	usedTagText: {
@@ -2205,7 +2183,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderRadius: RADIUS.md,
-		paddingVertical: scaleHeight(13),
+		paddingVertical: SPACING_H.md,
 	},
 	resultBtnPrimary: {
 		backgroundColor: COLORS.secondary,
@@ -2240,6 +2218,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 	},
 	feedbackArrow: {
-		marginLeft: scaleWidth(10),
+		marginLeft: SPACING_W.smPlus,
 	},
 });

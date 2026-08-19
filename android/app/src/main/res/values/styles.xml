@@ -1,7 +1,15 @@
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <!--
+      앱은 시스템 설정과 무관하게 항상 화이트(Light) 모드로 동작한다.
+      - DayNight 를 쓰면 시스템 다크모드에서 TextInput/네이티브 다이얼로그 배경이 어두워져
+        화이트 기준으로 잡은 텍스트 색과 대비가 깨진다.
+      - forceDarkAllowed=false 로 Android 자동 다크 변환도 차단한다.
+    -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="BootTheme" parent="Theme.BootSplash">

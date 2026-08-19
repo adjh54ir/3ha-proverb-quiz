@@ -278,6 +278,7 @@ const TowerChallengeScreen = () => {
 					)}
 					<Text style={styles.mainTitle}>타워 챌린지</Text>
 					<Text style={styles.subTitle}>정상을 향한 여정</Text>
+					<FastImage source={require('@/assets/images/screen-heroes/tower-adventure.png')} style={styles.towerGuideImage} resizeMode="contain" />
 				</Animated.View>
 
 				{/* 도전 횟수 표시 */}
@@ -394,6 +395,7 @@ const styles = StyleSheet.create({
 		paddingTop: SPACING_H.sm,
 		paddingBottom: SPACING_H.xs,
 	},
+	towerGuideImage: { position: 'absolute', right: SPACING_W.lg, top: 0, width: scaleWidth(78), height: scaleHeight(82) },
 	mainTitle: {
 		fontSize: FONT_SIZES.title,
 		fontWeight: '700',
@@ -440,7 +442,7 @@ const styles = StyleSheet.create({
 	},
 	adCardDisabled: {
 		borderColor: 'rgba(100, 116, 139, 0.4)',
-		backgroundColor: '#64748B',
+		backgroundColor: COLORS.textSecondary,
 	},
 	adTextContainer: {
 		flexShrink: 1,
@@ -493,10 +495,6 @@ const styles = StyleSheet.create({
 		paddingVertical: SPACING_H.lg,
 		borderWidth: 1,
 		borderColor: 'rgba(255, 255, 255, 0.15)',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.2,
-		shadowRadius: 8,
 		overflow: 'hidden', // ← 추가
 	},
 	towerCardCompleted: {
@@ -515,10 +513,6 @@ const styles = StyleSheet.create({
 		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,
 		marginBottom: SPACING_H.sm,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.2,
-		shadowRadius: 3,
 	},
 	levelText: {
 		fontSize: FONT_SIZES.sm,
@@ -639,16 +633,12 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderRadius: RADIUS.md,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.2,
-		shadowRadius: 8,
 	},
 	challengeButtonCompleted: {
 		backgroundColor: COLORS.secondary,
 	},
 	challengeButtonLocked: {
-		backgroundColor: '#64748B',
+		backgroundColor: COLORS.textSecondary,
 	},
 	challengeButtonText: {
 		color: COLORS.textWhite,

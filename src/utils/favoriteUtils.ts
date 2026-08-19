@@ -1,6 +1,8 @@
 // @/utils/favoriteUtils.ts
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { playPop } from '@/utils/SoundUtils';
+import DateUtils from '@/utils/DateUtils';
 
 const FAVORITES_STORAGE_KEY = MainStorageKeyType.FAVORITES_STORAGE_KEY;
 
@@ -39,8 +41,9 @@ export const addFavorite = async (id: number): Promise<boolean> => {
 			return false;
 		}
 
-		favorites.push({ id, addedAt: Date.now() });
+		favorites.push({ id, addedAt: DateUtils.nowTime() });
 		await AsyncStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+		playPop(); // 🔊 즐겨찾기 저장
 		return true;
 	} catch (error) {
 		console.error('즐겨찾기 추가 실패:', error);
@@ -66,6 +69,7 @@ export const removeFavorite = async (id: number): Promise<boolean> => {
 		}
 
 		await AsyncStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(filtered));
+		playPop(); // 🔊 즐겨찾기 해제
 		return true;
 	} catch (error) {
 		console.error('즐겨찾기 제거 실패:', error);

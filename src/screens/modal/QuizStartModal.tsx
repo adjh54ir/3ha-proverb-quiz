@@ -1,8 +1,10 @@
-import React, { useEffect, useRef } from 'react';
-import { Modal, View, Text, TouchableOpacity, Animated, StyleSheet, Image } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Modal, View, Text, TouchableOpacity, Animated, StyleSheet, Image, Switch } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
+import { isSoundEnabled, setSoundEnabled } from '@/utils/SoundUtils';
+import { isBgmEnabled, setBgmEnabled, startBgm, stopBgm, BgmTrack } from '@/utils/BgmUtils';
 
 export type QuizStartMode = 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' | 'arrange';
 
@@ -13,6 +15,8 @@ interface Props {
 	timeLimit?: number; // 문제당 제한시간(초)
 	scorePerCorrect?: number; // 정답 점수
 	showHint?: boolean; // 힌트 안내 표시 여부
+	/** 이 화면에서 재생할 BGM 트랙 — 스위치를 켰을 때 즉시 다시 틀어주기 위해 필요 */
+	bgmTrack?: BgmTrack;
 	onStart: () => void;
 	onBack: () => void;
 }
@@ -37,6 +41,7 @@ const QuizStartModal = ({
 	timeLimit = 30,
 	scorePerCorrect = 10,
 	showHint = true,
+	bgmTrack = 'quiz',
 	onStart,
 	onBack,
 }: Props) => {
@@ -44,6 +49,33 @@ const QuizStartModal = ({
 	const scaleAnim = useRef(new Animated.Value(0.95)).current;
 	const opacityAnim = useRef(new Animated.Value(0)).current;
 	const meta = MODE_META[mode] ?? MODE_META.meaning;
+	// 시작 전에 소리 설정을 바로 바꿀 수 있게 — 설정 화면까지 나갔다 오지 않아도 된다
+	const [sfxOn, setSfxOn] = useState(isSoundEnabled());
+	const [bgmOn, setBgmOn] = useState(isBgmEnabled());
+
+	// 팝업이 열릴 때마다 저장된 현재 값을 다시 읽어 스위치와 실제 설정을 맞춘다
+	useEffect(() => {
+		if (!visible) {
+			return;
+		}
+		setSfxOn(isSoundEnabled());
+		setBgmOn(isBgmEnabled());
+	}, [visible]);
+
+	const toggleSfx = (v: boolean) => {
+		setSfxOn(v);
+		setSoundEnabled(v);
+	};
+
+	const toggleBgm = (v: boolean) => {
+		setBgmOn(v);
+		setBgmEnabled(v); // false면 내부에서 stopBgm() 처리
+		if (v) {
+			startBgm(bgmTrack);
+		} else {
+			stopBgm();
+		}
+	};
 
 	useEffect(() => {
 		if (!visible) {
@@ -106,6 +138,35 @@ const QuizStartModal = ({
 						))}
 					</View>
 
+					{/* 🔊 시작 전 소리 설정 — 설정 화면까지 나가지 않고 바로 끄고 켠다 */}
+					<View style={styles.soundBox}>
+						{[
+							{ key: 'sfx', on: sfxOn, onChange: toggleSfx, icon: sfxOn ? 'volume-up' : 'volume-off', label: '효과음' },
+							{ key: 'bgm', on: bgmOn, onChange: toggleBgm, icon: bgmOn ? 'music-note' : 'music-off', label: '배경음악' },
+						].map((row, i) => (
+							<View key={row.key} style={[styles.soundRow, i === 0 && styles.soundRowDivider]}>
+								<View style={styles.soundLabelWrap}>
+									<IconComponent
+										type="materialIcons"
+										name={row.icon}
+										size={scaledSize(16)}
+										color={row.on ? COLORS.primary : COLORS.textLight}
+									/>
+									<Text style={styles.soundLabel} numberOfLines={1} ellipsizeMode="tail">
+										{row.label}
+									</Text>
+								</View>
+								<Switch
+									value={row.on}
+									onValueChange={row.onChange}
+									trackColor={{ false: COLORS.borderDark, true: COLORS.primaryLight }}
+									thumbColor={row.on ? COLORS.primaryDark : COLORS.surfaceAlt}
+									accessibilityLabel={row.label}
+								/>
+							</View>
+						))}
+					</View>
+
 					<View style={styles.buttonRow}>
 						<TouchableOpacity style={styles.secondaryButton} onPress={onBack} activeOpacity={0.8}>
 							<Text style={styles.secondaryButtonText}>돌아가기</Text>
@@ -136,14 +197,12 @@ const styles = StyleSheet.create({
 		width: '100%',
 		maxWidth: scaleWidth(340),
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	// ===== 헤더 =====
 	iconCircle: {
@@ -204,6 +263,23 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	infoText: { flex: 1, fontSize: FONT_SIZES.md, color: COLORS.text, lineHeight: scaledSize(18) },
+	// ===== 소리 설정 =====
+	soundBox: {
+		width: '100%',
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.md,
+		paddingHorizontal: SPACING_W.md,
+		marginBottom: SPACING_H.xl,
+	},
+	soundRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		paddingVertical: SPACING_H.sm,
+	},
+	soundRowDivider: { borderBottomWidth: 1, borderBottomColor: COLORS.border },
+	soundLabelWrap: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm, flexShrink: 1 },
+	soundLabel: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text, flexShrink: 1 },
 	// ===== 하단 버튼 =====
 	buttonRow: { flexDirection: 'row', columnGap: SPACING_W.md, width: '100%' },
 	secondaryButton: {

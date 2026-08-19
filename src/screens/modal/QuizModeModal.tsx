@@ -17,7 +17,7 @@ type Props = {
 const MODES: { key: QuizMode; label: string; desc: string; icon: string; color: string; bg: string }[] = [
 	{ key: 'meaning', label: '뜻 맞추기', desc: '속담을 보고 의미를 골라요', icon: 'lightbulb', color: COLORS.secondary, bg: COLORS.secondaryBg },
 	{ key: 'proverb', label: '속담 맞추기', desc: '의미를 보고 속담을 골라요', icon: 'menu-book', color: COLORS.primary, bg: COLORS.primaryBg },
-	{ key: 'blank', label: '빈칸 채우기', desc: '속담의 빈칸을 채워요', icon: 'edit', color: COLORS.warning, bg: '#FFFBEB' },
+	{ key: 'blank', label: '빈칸 채우기', desc: '속담의 빈칸을 채워요', icon: 'edit', color: COLORS.warning, bg: COLORS.warningSoft },
 	{ key: 'example', label: '예문 속담', desc: '예문에 어울리는 속담을 골라요', icon: 'forum', color: '#9333EA', bg: '#FAF5FF' },
 ];
 
@@ -94,13 +94,11 @@ const styles = StyleSheet.create({
 		width: '100%',
 		maxWidth: scaleWidth(340),
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	// ===== 헤더 =====
 	headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },

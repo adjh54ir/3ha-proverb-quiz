@@ -3,6 +3,7 @@ import { useLayoutEffect, useState } from "react";
 import { Keyboard, KeyboardAvoidingView, Modal, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import IconComponent from "../atomic/IconComponent";
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
+import { SPACING_W, SPACING_H } from '@/const/common/Theme';
 
 const InfoModal = () => {
 
@@ -12,7 +13,7 @@ const InfoModal = () => {
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
-                <TouchableOpacity onPress={() => setShowGuideModal(true)} style={{ marginRight: scaleWidth(16) }}>
+                <TouchableOpacity onPress={() => setShowGuideModal(true)} style={{ marginRight: SPACING_W.lg }}>
                     <IconComponent type="materialIcons" name="info-outline" size={scaledSize(24)} color="#3498db" />
                 </TouchableOpacity>
             ),
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: scaleWidth(20),
+        padding: SPACING_W.xl,
     },
     modalOverlay: {
         flex: 1,
@@ -79,14 +80,14 @@ const styles = StyleSheet.create({
     modalContent: {
         width: '85%',
         backgroundColor: '#ffffff',
-        padding: scaleWidth(20),
+        padding: SPACING_W.xl,
         borderRadius: scaleWidth(12),
         alignItems: 'center',
     },
     modalCloseButton: {
         backgroundColor: '#3498db',
-        paddingVertical: scaleHeight(10),
-        paddingHorizontal: scaleWidth(20),
+        paddingVertical: SPACING_H.smPlus,
+        paddingHorizontal: SPACING_W.xl,
         borderRadius: scaleWidth(8),
     },
     modalCloseText: {
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
         fontSize: scaledSize(18),
         fontWeight: 'bold',
         color: '#2c3e50',
-        marginBottom: scaleHeight(14),
+        marginBottom: SPACING_H.mdPlus,
         textAlign: 'center',
     },
     modalText: {
@@ -105,8 +106,8 @@ const styles = StyleSheet.create({
         color: '#2c3e50',
         lineHeight: scaleHeight(22),
         textAlign: 'left',
-        marginTop: scaleHeight(10),
-        marginBottom: scaleHeight(20)
+        marginTop: SPACING_H.smPlus,
+        marginBottom: SPACING_H.xl
     },
     boldText: {
         fontWeight: 'bold',
@@ -116,6 +117,6 @@ const styles = StyleSheet.create({
         top: scaleHeight(10),
         right: scaleWidth(10),
         zIndex: 2,
-        padding: scaleWidth(5),
+        padding: SPACING_W.xs,
     },
 });

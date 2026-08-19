@@ -1,8 +1,25 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools">
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+  <!--
+    아래 권한들은 라이브러리(notifee 등) 매니페스트가 자동으로 넣지만 이 앱은 쓰지 않는다.
+    - SCHEDULE_EXACT_ALARM / USE_EXACT_ALARM : 리마인더는 '정확한 알람'이 필요 없다.
+      (앱 실행마다 저장된 시각으로 재예약해 드리프트를 보정하므로 부정확 알람으로 충분하다)
+      Android 14+ 에서는 사용자가 직접 허용해야 동작하고, USE_EXACT_ALARM 은
+      알람/캘린더 앱이 아니면 Play 정책상 거절 사유가 된다.
+    - ACCESS_NOTIFICATION_POLICY / BROADCAST_CLOSE_SYSTEM_DIALOGS : 방해금지 모드 제어·시스템
+      다이얼로그 닫기를 하지 않는다.
+    - FOREGROUND_SERVICE : 포그라운드 서비스 알림을 쓰지 않는다.
+  -->
+  <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" tools:node="remove" />
+  <uses-permission android:name="android.permission.USE_EXACT_ALARM" tools:node="remove" />
+  <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" tools:node="remove" />
+  <uses-permission android:name="android.permission.BROADCAST_CLOSE_SYSTEM_DIALOGS" tools:node="remove" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
 
   <application
     android:name=".MainApplication"

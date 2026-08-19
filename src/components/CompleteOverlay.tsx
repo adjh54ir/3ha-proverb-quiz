@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 
+import { SPACING_H } from '@/const/common/Theme';
 const CompleteOverlay = () => {
     const opacity = useSharedValue(0);
     const scale = useSharedValue(0.5);
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
         borderRadius: scaleWidth(20),
         justifyContent: 'center',
         alignItems: 'center',
-        gap: scaleHeight(12),
+        gap: SPACING_H.md,
         zIndex: 10,
     },
     circle: {

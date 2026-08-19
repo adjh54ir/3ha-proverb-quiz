@@ -53,7 +53,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 
 					<ScrollView style={{ width: '100%' }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 						<View style={styles.rowCentered}>
-							<FastImage source={mascot} style={styles.mascotImage} resizeMode={FastImage.resizeMode.cover} />
+							<FastImage source={require('@/assets/images/screen-heroes/check-in-stamp.png')} style={styles.checkInHeroImage} resizeMode={FastImage.resizeMode.contain} />
 							<Text style={[styles.modalText, { flex: 1 }]}>매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어줘요!{'\n'}</Text>
 						</View>
 
@@ -179,13 +179,11 @@ const styles = StyleSheet.create({
 		maxWidth: scaleWidth(340),
 		maxHeight: scaleHeight(700),
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
-		shadowColor: '#000',
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
-		shadowOffset: { width: 0, height: 2 },
 	},
 	modalTitle: {
 		fontSize: FONT_SIZES.heading,
@@ -210,6 +208,7 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		borderColor: COLORS.primary,
 	},
+	checkInHeroImage: { width: scaleWidth(96), height: scaleHeight(92) },
 	modalText: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.text,
@@ -317,10 +316,6 @@ const styles = StyleSheet.create({
 		borderColor: COLORS.surface,
 		backgroundColor: COLORS.surface,
 		overflow: 'hidden',
-		shadowColor: '#000',
-		shadowOpacity: 0.08,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
 	},
 	stampPetImage: {
 		width: '100%',
@@ -375,10 +370,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.xs,
 		overflow: 'hidden',
 		backgroundColor: COLORS.surface,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
 	},
 	swipeHintRow: {
 		flexDirection: 'row',

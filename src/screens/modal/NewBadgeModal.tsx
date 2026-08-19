@@ -8,6 +8,7 @@ import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils/Dement
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
+import { playComplete } from '@/utils/SoundUtils';
 
 interface Props {
 	visible: boolean;
@@ -36,6 +37,7 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 			return;
 		}
 		confettiKey.current += 1;
+		playComplete(); // 🏅 뱃지 획득 사운드
 		fadeAnim.setValue(0);
 		scaleAnim.setValue(0.95);
 		iconPopAnim.setValue(0);
@@ -191,14 +193,12 @@ const styles = StyleSheet.create({
 		maxWidth: scaleWidth(340),
 		maxHeight: '80%',
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	headerIconStage: {
 		width: scaleWidth(56),
@@ -265,16 +265,12 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	rarityRibbonText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.xs,
 		fontWeight: '700',
-		marginRight: scaleWidth(2),
+		marginRight: SPACING_W.xxs,
 	},
 	ribbonStarRow: { flexDirection: 'row', columnGap: scaleWidth(1) },
 	emblemStage: {
@@ -289,10 +285,6 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.surface,
 		justifyContent: 'center',
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	emblemImage: { width: scaleWidth(60), height: scaleWidth(60) },
 	emblemIconBg: { justifyContent: 'center', alignItems: 'center' },

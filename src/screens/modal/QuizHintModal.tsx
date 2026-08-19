@@ -163,13 +163,11 @@ const styles = StyleSheet.create({
 		maxWidth: scaleWidth(340),
 		maxHeight: '80%',
 		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
 	},
 	// ===== 헤더 =====
 	header: {
@@ -232,7 +230,7 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.warningBg,
 		borderRadius: RADIUS.round,
 		borderWidth: 1,
-		borderColor: '#FDE68A',
+		borderColor: COLORS.warningBorder,
 	},
 	tagText: {
 		fontSize: FONT_SIZES.smPlus,
@@ -254,7 +252,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: '#FDE68A',
+		borderColor: COLORS.warningBorder,
 	},
 	questionText: {
 		fontSize: FONT_SIZES.mdPlus,

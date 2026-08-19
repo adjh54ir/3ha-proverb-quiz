@@ -1,4 +1,5 @@
 import axios from "axios";
+import DateUtils from '@/utils/DateUtils';
 class LottoService {
   private axios = axios.create({
     baseURL: "https://www.dhlottery.co.kr",
@@ -45,7 +46,7 @@ class LottoService {
    */
   fetchLottoHistoryPer5 = async (page: number) => {
     const startDate = new Date("2002-12-07");
-    const today = new Date();
+    const today = DateUtils.now();
     const weekInMs = 7 * 24 * 60 * 60 * 1000;
     const currentDraw =
       Math.floor((today.getTime() - startDate.getTime()) / weekInMs) + 1;

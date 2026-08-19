@@ -85,10 +85,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: SPACING_W.md,
-		shadowColor: '#000',
-		shadowOpacity: 0.08,
-		shadowRadius: 8,
-		shadowOffset: { width: 0, height: 2 },
 		zIndex: 999999,
 	},
 	icon: {

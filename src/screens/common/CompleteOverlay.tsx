@@ -84,10 +84,6 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.surface,
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
     },
     checkIcon: {
         fontSize: scaledSize(36),

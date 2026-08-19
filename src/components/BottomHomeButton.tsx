@@ -6,6 +6,7 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { Paths } from '@/navigation/conf/Paths';
 import IconComponent from '@/screens/common/atomic/IconComponent';
 
+import { SPACING_W, SPACING_H } from '@/const/common/Theme';
 const BottomHomeButton = ({ marginBottom = 0 }: { marginBottom?: number }) => {
 	const navigation = useNavigation<any>();
 
@@ -31,19 +32,19 @@ const styles = StyleSheet.create({
 	wrapper: {
 		alignItems: 'center',
 
-		paddingVertical: scaleHeight(10),
+		paddingVertical: SPACING_H.smPlus,
 	},
 	button: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: scaleWidth(6),
+		gap: SPACING_W.xsPlus,
 
 		borderWidth: 1,
 		borderColor: '#d1d5db',
 		borderRadius: scaleWidth(20),
 
-		paddingVertical: scaleHeight(9),
-		paddingHorizontal: scaleWidth(22),
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.xxl,
 
 		backgroundColor: '#ffffff',
 	},

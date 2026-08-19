@@ -18,6 +18,8 @@ import { MainDataType } from '@/types/MainDataType';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import TowerResultModal from './modal/TowerResultModal';
 import DateUtils from '@/utils/DateUtils';
+import { playCorrect, playWrong, playWhoosh, playFinish } from '@/utils/SoundUtils';
+import { startBgm, stopBgm } from '@/utils/BgmUtils';
 
 const TOWER_STORAGE_KEY = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
 
@@ -77,6 +79,13 @@ const TowerQuizScreen = () => {
 		setQuizData(generatedQuiz);
 		loadProgress();
 	}, [level]);
+
+	// 🎬 도전 시작 사운드 + 🎵 퀴즈 BGM (화면 이탈 시 반드시 정리)
+	useEffect(() => {
+		playWhoosh();
+		startBgm('quiz');
+		return () => stopBgm();
+	}, []);
 
 	// 문제가 바뀔 때마다 카드/보기 영역 진입 애니메이션
 	useEffect(() => {
@@ -243,9 +252,11 @@ const TowerQuizScreen = () => {
 
 		const isCorrect = answerIndex === currentQuestion.correctAnswer;
 		if (isCorrect) {
+			playCorrect(); // 🔊 정답
 			setCorrectCount((prev) => prev + 1);
 			playBossHitAnimation();
 		} else {
+			playWrong(); // 🔊 오답
 			playBossAttackAnimation();
 		}
 		playEffectText(isCorrect);
@@ -296,6 +307,7 @@ const TowerQuizScreen = () => {
 			saveProgress(newProgress);
 		}
 
+		playFinish(); // 🎉 층 종료 사운드
 		setShowResultModal(true);
 	};
 
@@ -340,6 +352,7 @@ const TowerQuizScreen = () => {
 			<View style={styles.container}>
 				<LinearGradient colors={['#2B2D3A', '#21222C', '#191A21']} style={StyleSheet.absoluteFillObject} />
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
+					<FastImage source={require('@/assets/images/screen-heroes/tower-quiz-coach.png')} style={styles.loadingCoachImage} resizeMode="contain" />
 					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>퀴즈 생성 중...</Text>
 				</SafeAreaView>
 			</View>
@@ -387,7 +400,10 @@ const TowerQuizScreen = () => {
 					</TouchableOpacity>
 
 					<View style={styles.headerCenter}>
-						<Text style={styles.levelTitle} numberOfLines={1}>{towerLevel.name}</Text>
+						<View style={styles.headerTitleRow}>
+							<FastImage source={require('@/assets/images/screen-heroes/tower-crest.png')} style={styles.headerCrest} resizeMode="contain" />
+							<Text style={styles.levelTitle} numberOfLines={1}>{towerLevel.name}</Text>
+						</View>
 						<Text style={styles.questionCount}>
 							{currentQuestionIndex + 1} / {totalQuestions} 문제
 						</Text>
@@ -587,6 +603,9 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	headerCenter: { flex: 1, alignItems: 'center' },
+	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.xs },
+	headerCrest: { width: scaleWidth(28), height: scaleWidth(28) },
+	loadingCoachImage: { width: scaleWidth(150), height: scaleHeight(150), marginBottom: SPACING_H.lg },
 	levelTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
 	questionCount: { fontSize: FONT_SIZES.md, color: '#CBD5E1', marginTop: SPACING_H.xs },
 	progressBarContainer: { paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.lg },
@@ -606,7 +625,7 @@ const styles = StyleSheet.create({
 	progressBarFill: { height: '100%', borderRadius: RADIUS.round },
 	content: { flex: 1, paddingHorizontal: SPACING_W.lg },
 	// 하단 고정 '다음 문제' 버튼에 컨텐츠가 가리지 않도록 여백 확보
-	contentContainer: { paddingBottom: scaleHeight(40) },
+	contentContainer: { paddingBottom: SPACING_H.xxxxl },
 	bossSection: { alignItems: 'center', marginVertical: SPACING_H.xl },
 	bossGlow: {
 		position: 'absolute',

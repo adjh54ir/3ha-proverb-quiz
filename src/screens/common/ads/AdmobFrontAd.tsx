@@ -1,4 +1,5 @@
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import DateUtils from '@/utils/DateUtils';
 import { GOOGLE_ADMOV_ANDROID_FRONT, GOOGLE_ADMOV_IOS_FRONT } from '@env';
 import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View, ActivityIndicator, Text, StyleSheet } from 'react-native';
@@ -73,7 +74,7 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 					device_brand: DeviceInfo.getBrand(),       // 🏷️ 제조사 (예: "Apple", "Samsung")
 					system_version: DeviceInfo.getSystemVersion(), // 🧪 OS 버전 (예: "17.5")
 					app_instance_id: instanceId,               // 🆔 Firebase 고유 사용자 식별자 (익명 추적 ID)
-					timestamp: new Date().toISOString(),       // 🕒 이벤트 발생 시각 (ISO 형식, 예: "2025-08-04T06:21:00Z")
+					timestamp: DateUtils.now().toISOString(),       // 🕒 이벤트 발생 시각 (ISO 형식, 예: "2025-08-04T06:21:00Z")
 					...additionalParams,                       // 🧩 기타 추가 파라미터 (사용자 정의 값)
 				});
 			} catch (error) {

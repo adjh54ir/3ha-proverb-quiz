@@ -32,7 +32,7 @@ import NewBadgeModal from './modal/NewBadgeModal';
 import { CONST_BADGES } from '@/const/ConstBadges';
 import { TodayQuizBadgeInterceptor } from '@/services/interceptor/TodayQuizBadgeInterceptor';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
-import FavoriteToast from './common/FavoriteToast';
+import { useToast } from '@/hooks/useToast';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import FadeInView from '@/components/animation/FadeInView';
 import { playCorrect, playWrong, playFinish } from '@/utils/SoundUtils';
@@ -110,16 +110,8 @@ const TodayQuizScreen = () => {
 
 	const [groupedPrevQuizzes, setGroupedPrevQuizzes] = useState<GroupedPrevQuiz[]>([]);
 	const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
-	const [showToast, setShowToast] = useState(false);
-	const [toastMessage, setToastMessage] = useState('');
-	const [toastSubMessage, setToastSubMessage] = useState<string | undefined>(undefined);
-
 	/** 주요 변경(알림 설정 등) 피드백용 공통 토스트 */
-	const showToastMessage = (message: string, subMessage?: string) => {
-		setToastMessage(message);
-		setToastSubMessage(subMessage);
-		setShowToast(true);
-	};
+	const { showToast: showToastMessage, ToastView } = useToast();
 	const [highlightAnswerId, setHighlightAnswerId] = useState<number | null>(null);
 
 	const [showTodayReview, setShowTodayReview] = useState(false);
@@ -1222,7 +1214,7 @@ const TodayQuizScreen = () => {
 						</TouchableOpacity>
 					</View>
 				</View>
-				<FavoriteToast visible={showToast} message={toastMessage} subMessage={toastSubMessage} onHide={() => setShowToast(false)} />
+				<ToastView />
 			</Modal>
 
 			{/* 상세 모달 */}

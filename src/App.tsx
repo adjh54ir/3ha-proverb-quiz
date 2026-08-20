@@ -37,12 +37,20 @@ const App = () => {
 		console.log('Now env mode : [', REACT_NATIVE_APP_MODE, ']');
 
 		checkTodayQuiz();
-		requestTrackingPermission(); // iOS ATT (내부에서 플랫폼/AppState 가드)
-		// AdMob SDK 초기화. 전면/리워드 광고는 초기화 완료 후에만 load() 동작함
-		mobileAds()
-			.initialize()
-			.then(() => console.log('✅ AdMob SDK 초기화 완료'))
-			.catch((e) => console.warn('❌ AdMob SDK 초기화 실패:', e));
+		// iOS 는 ATT 응답 전에 광고 SDK 를 초기화하면 그 세션 동안 광고 식별자를 못 쓴다.
+		// requestTrackingPermission 은 요청을 예약만 하고 즉시 반환하므로 await 해도 멈추지 않는다.
+		// (Android / iOS 14 미만은 내부에서 바로 통과)
+		const initAds = async () => {
+			await requestTrackingPermission();
+			try {
+				// AdMob SDK 초기화. 전면/리워드 광고는 초기화 완료 후에만 load() 동작함
+				await mobileAds().initialize();
+				console.log('✅ AdMob SDK 초기화 완료');
+			} catch (e) {
+				console.warn('❌ AdMob SDK 초기화 실패:', e);
+			}
+		};
+		initAds();
 		// 🔊 사운드 설정 로드 후 효과음 미리 로드(첫 재생 지연 방지)
 		loadSoundSetting().then(preloadSounds);
 		loadBgmSetting();

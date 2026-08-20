@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import DateUtils from '@/utils/DateUtils';
 import { Platform, StyleSheet, View } from 'react-native';
 import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 import { GOOGLE_ADMOV_ANDROID_BANNER, GOOGLE_ADMOV_IOS_BANNER } from '@env';
@@ -49,7 +50,7 @@ const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({
 				device_brand: DeviceInfo.getBrand(),
 				system_version: DeviceInfo.getSystemVersion(),
 				app_instance_id: instanceId,
-				timestamp: new Date().toISOString(),
+				timestamp: DateUtils.now().toISOString(),
 			});
 		} catch (error) {
 			console.error('🔥 Failed to log ad click:', error);

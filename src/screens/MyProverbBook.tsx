@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
+import { useModalHandoff } from '@/hooks/useModalHandoff';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Animated, Image, KeyboardAvoidingView, Keyboard, Platform, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -13,7 +14,7 @@ import BottomHomeButton from './common/BottomHomeButton';
 import BookFormModal from './modal/BookFormModal';
 import AddProverbModal from './modal/AddProverbModal';
 import QuizModeModal from './modal/QuizModeModal';
-import FavoriteToast from './common/FavoriteToast';
+import { useToast } from '@/hooks/useToast';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
@@ -53,6 +54,8 @@ const AnimatedListItem = React.memo(({ children, index }: { children: React.Reac
 });
 
 const MyProverbBook = () => {
+	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
+	const handoff = useModalHandoff();
 	const navigation = useNavigation<any>();
 	const insets = useSafeAreaInsets();
 	const ALL_PROVERBS = ProverbServices.selectProverbList();
@@ -66,14 +69,15 @@ const MyProverbBook = () => {
 	const [deleteConfirm, setDeleteConfirm] = useState<MainDataType.ProverbBook | null>(null);
 	const [quizModeModal, setQuizModeModal] = useState<MainDataType.ProverbBook | null>(null);
 	const [addProverbModal, setAddProverbModal] = useState<MainDataType.ProverbBook | null>(null);
-	const [toast, setToast] = useState<{ visible: boolean; message: string; subMessage?: string }>({ visible: false, message: '' });
+	// 주요 CRUD 피드백은 공통 토스트 훅으로 통일한다(하단 고정 버튼을 피해 조금 띄운다).
+	const { showToast, hideToast, ToastView } = useToast(scaleHeight(60));
 
 	const fadeAnim = useRef(new Animated.Value(1)).current;
 
 	useFocusEffect(
 		useCallback(() => {
 			loadBooks();
-			setToast({ visible: false, message: '' });
+			hideToast();
 			fadeAnim.setValue(0);
 			const fade = Animated.timing(fadeAnim, { toValue: 1, duration: 280, useNativeDriver: true });
 			fade.start();
@@ -95,7 +99,6 @@ const MyProverbBook = () => {
 		}
 	};
 
-	const showToast = (message: string, subMessage?: string) => setToast({ visible: true, message, subMessage });
 
 	const saveBooks = async (updated: MainDataType.ProverbBook[]) => {
 		await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
@@ -302,7 +305,7 @@ const MyProverbBook = () => {
 			{/* 퀴즈 모드 선택 */}
 			<QuizModeModal book={quizModeModal} onClose={() => setQuizModeModal(null)} onSelect={(b, mode) => startQuiz(b, mode)} />
 
-			<FavoriteToast visible={toast.visible} message={toast.message} subMessage={toast.subMessage} bottom={scaleHeight(60)} onHide={() => setToast((prev) => ({ ...prev, visible: false }))} />
+			<ToastView />
 
 			{/* 삭제 확인 */}
 			<Modal visible={!!deleteConfirm} transparent animationType="fade">
@@ -330,7 +333,7 @@ const MyProverbBook = () => {
 				<TouchableOpacity style={styles.actionSheetOverlay} activeOpacity={1} onPress={() => setActionSheet(null)}>
 					<TouchableOpacity activeOpacity={1} style={[styles.actionSheet, { paddingBottom: Math.max(insets.bottom, SPACING_H.xxl) }]}>
 						<View style={styles.actionSheetHandle} />
-						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; setActionSheet(null); b && navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: b.id }); }}>
+						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; handoff(() => setActionSheet(null), () => b && navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: b.id })); }}>
 							<View style={[styles.actionItemIcon, { backgroundColor: (actionSheet?.color || getDefaultColor()) + '20' }]}>
 								<IconComponent type="materialIcons" name={actionSheet?.icon || DEFAULT_ICON} size={scaledSize(18)} color={actionSheet?.color || getDefaultColor()} />
 							</View>
@@ -341,7 +344,7 @@ const MyProverbBook = () => {
 							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.border} />
 						</TouchableOpacity>
 						<View style={styles.actionDivider} />
-						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; setActionSheet(null); setAddProverbModal(b); }}>
+						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; handoff(() => setActionSheet(null), () => setAddProverbModal(b)); }}>
 							<View style={[styles.actionItemIcon, { backgroundColor: COLORS.primaryBg }]}>
 								<IconComponent type="materialIcons" name="add-circle-outline" size={scaledSize(18)} color={COLORS.primary} />
 							</View>
@@ -352,7 +355,7 @@ const MyProverbBook = () => {
 							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.border} />
 						</TouchableOpacity>
 						<View style={styles.actionDivider} />
-						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; setActionSheet(null); setFormTarget(b); }}>
+						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; handoff(() => setActionSheet(null), () => setFormTarget(b)); }}>
 							<View style={[styles.actionItemIcon, { backgroundColor: COLORS.primaryBg }]}>
 								<IconComponent type="materialIcons" name="edit" size={scaledSize(18)} color={COLORS.primary} />
 							</View>
@@ -363,7 +366,7 @@ const MyProverbBook = () => {
 							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.border} />
 						</TouchableOpacity>
 						<View style={styles.actionDivider} />
-						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; setActionSheet(null); setDeleteConfirm(b); }}>
+						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; handoff(() => setActionSheet(null), () => setDeleteConfirm(b)); }}>
 							<View style={[styles.actionItemIcon, { backgroundColor: COLORS.dangerBg }]}>
 								<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(18)} color={COLORS.danger} />
 							</View>

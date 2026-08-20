@@ -30,7 +30,7 @@ import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import ProverbDetailModal from './modal/ProverbDetailModal';
-import FavoriteToast from './common/FavoriteToast';
+import { useToast } from '@/hooks/useToast';
 import BottomHomeButton from './common/BottomHomeButton';
 import FavoriteAddModal from './modal/FavoriteAddModal';
 
@@ -86,8 +86,8 @@ const FavoriteScreen = () => {
 	const [selectedProverb, setSelectedProverb] = useState<MainDataType.Proverb | null>(null);
 	const [showDetailModal, setShowDetailModal] = useState(false);
 
-	const [showToast, setShowToast] = useState(false);
-	const [toastMessage, setToastMessage] = useState('');
+	// 주요 CRUD 피드백은 공통 토스트 훅으로 통일한다.
+	const { showToast, ToastView } = useToast();
 	const [showAddModal, setShowAddModal] = useState(false);
 
 	// ─── 다중 선택 모드 상태 ─────────────────────────────────
@@ -136,8 +136,7 @@ const FavoriteScreen = () => {
 		for (const id of ids) {
 			await toggleFavorite(id);
 		}
-		setToastMessage(`${ids.length}개를 즐겨찾기에 추가했어요`);
-		setShowToast(true);
+		showToast(`${ids.length}개를 즐겨찾기에 추가했어요`);
 		loadFavorites();
 	};
 
@@ -187,8 +186,7 @@ const FavoriteScreen = () => {
 
 	const handleToggleFavorite = async (id: number) => {
 		await toggleFavorite(id);
-		setToastMessage('즐겨찾기에서 제거됐어요');
-		setShowToast(true);
+		showToast('즐겨찾기에서 제거됐어요');
 		loadFavorites();
 	};
 
@@ -233,8 +231,7 @@ const FavoriteScreen = () => {
 		const deletedCount = selectedIds.length;
 		setShowDeleteConfirmModal(false);
 		exitSelectionMode();
-		setToastMessage(`${deletedCount}개를 즐겨찾기에서 제거했어요`);
-		setShowToast(true);
+		showToast(`${deletedCount}개를 즐겨찾기에서 제거했어요`);
 		loadFavorites();
 	};
 
@@ -498,7 +495,7 @@ const FavoriteScreen = () => {
 							renderItem={renderItem}
 							contentContainerStyle={[styles.listContent, isSelectionMode && { paddingBottom: scaleHeight(120) }]}
 							keyboardShouldPersistTaps="handled"
-								keyboardDismissMode="on-drag"
+							keyboardDismissMode="on-drag"
 							refreshControl={<RefreshControl
 									refreshing={refreshing}
 									onRefresh={onRefresh}
@@ -573,7 +570,7 @@ const FavoriteScreen = () => {
 				</View>
 			</Modal>
 
-			<FavoriteToast visible={showToast} message={toastMessage} onHide={() => setShowToast(false)} />
+			<ToastView />
 			{!isSelectionMode && <BottomHomeButton skipConfirm />}
 		</SafeAreaView>
 	);

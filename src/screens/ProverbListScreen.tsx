@@ -30,7 +30,7 @@ import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName, getLevelIconName } from './common/CommonProverbModule';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
-import FavoriteToast from './common/FavoriteToast';
+import { useToast } from '@/hooks/useToast';
 
 
 const PAGE_SIZE = 30;
@@ -125,8 +125,8 @@ const ProverbListScreen = () => {
 	const [showDetailModal, setShowDetailModal] = useState(false);
 
 	const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-	const [showToast, setShowToast] = useState(false);
-	const [toastMessage, setToastMessage] = useState('');
+	// 주요 CRUD 피드백은 공통 토스트 훅으로 통일한다.
+	const { showToast, ToastView } = useToast();
 
 	const [levelItems, setLevelItems] = useState([{ label: '', value: '' }]);
 	const [categoryItems, setCategoryItems] = useState([{ label: '', value: '' }]);
@@ -225,10 +225,7 @@ const ProverbListScreen = () => {
 		const isNowFavorite = await toggleFavorite(id);
 		await loadFavorites();
 
-		if (isNowFavorite) {
-			setToastMessage('즐겨찾기 추가');
-			setShowToast(true);
-		}
+		showToast(isNowFavorite ? '즐겨찾기 추가' : '즐겨찾기 해제', isNowFavorite ? '즐겨찾기 목록에서 다시 볼 수 있어요' : '즐겨찾기 목록에서 제거했어요');
 	};
 
 	const onRefresh = () => {
@@ -613,7 +610,7 @@ const ProverbListScreen = () => {
 					</View>
 				</TouchableWithoutFeedback>
 			</KeyboardAvoidingView>
-			<FavoriteToast visible={showToast} message={toastMessage} onHide={() => setShowToast(false)} />
+			<ToastView />
 		</SafeAreaView>
 	);
 };

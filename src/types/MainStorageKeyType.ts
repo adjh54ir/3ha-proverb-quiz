@@ -16,4 +16,5 @@ export enum MainStorageKeyType {
 	BGM_VOLUME = 'BGM_VOLUME', // 배경음악 볼륨 (0~1)
 	THEME_MODE = 'THEME_MODE', // 화이트/다크 모드 ('light' | 'dark', 시스템 설정 미반영)
 	TEXT_SIZE_MODE = 'TEXT_SIZE_MODE', // 글자 크기 모드 ('default' | 'large')
+	PENDING_NOTIFICATION_ROUTE = 'PENDING_NOTIFICATION_ROUTE', // 백그라운드에서 누른 알림의 이동 대상 화면
 }

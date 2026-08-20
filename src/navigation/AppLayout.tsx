@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState, Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, Theme } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,6 +10,8 @@ import DeviceInfo from 'react-native-device-info';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 import BootSplash from 'react-native-bootsplash'; // 추가
+import notifee, { EventType } from '@notifee/react-native';
+import { takePendingRoute } from '@/utils/PendingNotification';
 import { useThemeMode } from '@/hooks/useThemeMode';
 
 const AD_ALLOWED_ROUTES = [
@@ -107,6 +109,60 @@ const AppLayout = () => {
 	};
 
 	const handleBannerHeight = useCallback((height: number) => setBannerHeight(height), []);
+
+	/**
+	 * 알림 탭 → 지정 화면 이동.
+	 *
+	 * 화면(Home)에 두면 그 화면이 마운트돼 있을 때만 동작해서, 퀴즈 중에 알림을 누르면
+	 * 아무 일도 일어나지 않는다. 네비게이션 컨테이너를 들고 있는 여기(앱 루트)에서 처리한다.
+	 */
+	useEffect(() => {
+		const goTo = (screen?: unknown) => {
+			if (typeof screen === 'string' && screen.length > 0) {
+				navigationRef.current?.navigate(screen as never);
+			}
+		};
+
+		// 앱이 떠 있는 동안 누른 경우
+		const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
+			if (type === EventType.PRESS) {
+				goTo(detail.notification?.data?.moveToScreen);
+			}
+		});
+
+		// 앱이 완전히 종료된 상태에서 누른 경우 (네비게이터 준비 후 이동)
+		notifee.getInitialNotification().then((initial) => {
+			if (!initial) {
+				return;
+			}
+			const screen = initial.notification?.data?.moveToScreen;
+			if (navigationRef.current?.isReady()) {
+				goTo(screen);
+			} else {
+				// onReady 전이면 한 틱 뒤에 다시 시도한다
+				setTimeout(() => goTo(screen), 0);
+			}
+		});
+
+		/**
+		 * 백그라운드에서 누른 알림은 index.js 의 백그라운드 핸들러가 이동 대상만 적어둔다.
+		 * 앱이 활성화되는 시점에 꺼내서 이동시킨다(첫 진입 + 이후 복귀 모두).
+		 */
+		const consumePending = () => {
+			takePendingRoute().then((screen) => screen && goTo(screen));
+		};
+		consumePending();
+		const appStateSub = AppState.addEventListener('change', (state) => {
+			if (state === 'active') {
+				consumePending();
+			}
+		});
+
+		return () => {
+			unsubscribe();
+			appStateSub.remove();
+		};
+	}, []);
 
 	/**
 	 * 네비게이션 자체 테마.

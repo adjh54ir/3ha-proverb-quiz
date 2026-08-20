@@ -36,6 +36,9 @@ const readLicense = (meta) => {
 	return 'UNKNOWN';
 };
 
+/** node_modules 에 없어 메타를 읽지 못한 의존성 */
+const missing = [];
+
 const rows = Object.keys(pkg.dependencies || {})
 	.filter((name) => !EXCLUDE.has(name) && !EXCLUDE_PREFIX.some((p) => name.startsWith(p)))
 	.sort((a, b) => a.localeCompare(b))
@@ -44,7 +47,9 @@ const rows = Object.keys(pkg.dependencies || {})
 		try {
 			meta = require(path.join(ROOT, 'node_modules', name, 'package.json'));
 		} catch {
-			return null; // 설치되지 않은 패키지는 고지하지 않는다
+			// 설치되지 않은 패키지. 조용히 빠지면 고지 목록에서 누락되므로 기록해 두고 아래에서 중단한다.
+			missing.push(name);
+			return null;
 		}
 		const repo = meta.repository;
 		return {
@@ -55,6 +60,13 @@ const rows = Object.keys(pkg.dependencies || {})
 		};
 	})
 	.filter(Boolean);
+
+if (missing.length > 0) {
+	console.error('❌ 설치되지 않은 의존성이 있어 고지 목록이 누락될 수 있습니다:');
+	missing.forEach((name) => console.error(`   - ${name}`));
+	console.error('   yarn install 후 다시 실행하세요. (기존 파일은 그대로 둡니다)');
+	process.exit(1);
+}
 
 const body = rows
 	.map((r) => `\t{ name: '${r.name}', license: '${r.license}', version: '${r.version}', url: '${r.url}' },`)

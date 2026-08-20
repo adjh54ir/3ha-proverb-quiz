@@ -17,7 +17,7 @@ const SLIDE_DISTANCE = scaleHeight(30);
 /**
  * 즐겨찾기 추가/제거 알림 토스트 (공용)
  */
-const FavoriteToast = ({ visible, message = '즐겨찾기 추가', subMessage = '즐겨찾기 목록에 추가 되었습니다!', bottom = scaleHeight(30), onHide }: Props) => {
+const FavoriteToast = ({ visible, message = '즐겨찾기 추가', subMessage, bottom = scaleHeight(30), onHide }: Props) => {
 	const opacity = useRef(new Animated.Value(0)).current;
 	const translateY = useRef(new Animated.Value(SLIDE_DISTANCE)).current;
 	const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -66,7 +66,8 @@ const FavoriteToast = ({ visible, message = '즐겨찾기 추가', subMessage = 
 			<Image source={require('@/assets/images/home-actions/action-favorite.png')} style={styles.icon} resizeMode="contain" />
 			<View style={styles.textWrapper}>
 				<Text style={styles.text}>{message}</Text>
-				<Text style={styles.subText}>{subMessage}</Text>
+				{/* 보조 문구가 없으면 줄 자체를 그리지 않는다(기본 문구가 잘못 붙는 것을 막는다) */}
+				{!!subMessage && <Text style={styles.subText}>{subMessage}</Text>}
 			</View>
 		</Animated.View>
 	);

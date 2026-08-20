@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useModalHandoff } from '@/hooks/useModalHandoff';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,7 +20,6 @@ import { MainDataType } from '@/types/MainDataType';
 import { LocaleConfig } from 'react-native-calendars';
 import { CONST_MAIN_DATA } from '@/const/ConstMainData';
 import DateUtils from '@/utils/DateUtils';
-import notifee, { EventType } from '@notifee/react-native';
 import ProverbServices from '@/services/ProverbServices';
 import moment from 'moment';
 import CheckInModal from './modal/CheckInModal';
@@ -148,6 +148,8 @@ const MascotMoment = ({
 );
 
 const Home = () => {
+	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
+	const handoff = useModalHandoff();
 	const navigation = useNavigation();
 	const scrollRef = useRef<NodeJS.Timeout | null>(null);
 	const levelScrollRef = useRef<ScrollView>(null);
@@ -395,37 +397,6 @@ const Home = () => {
 
 		// 정리
 		return () => clearTimeout(timeout);
-	}, []);
-
-	/**
-	 * navigation 관리
-	 */
-	useEffect(() => {
-		// 푸시 클릭했을 때
-		const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
-			if (type === EventType.PRESS) {
-				const screen = detail.notification?.data?.moveToScreen;
-				if (screen) {
-					// @ts-ignore
-					navigation.navigate(screen);
-				}
-			}
-		});
-
-		// 앱 종료 상태에서 푸시 누른 경우
-		notifee.getInitialNotification().then((initialNotification) => {
-			console.log('앱 종료 상태에서 푸시 누른 경우');
-			if (initialNotification) {
-				const screen = initialNotification.notification?.data?.moveToScreen;
-				if (screen) {
-					// @ts-ignore
-					navigation.navigate(screen);
-				}
-			}
-		});
-		return () => {
-			unsubscribe();
-		};
 	}, []);
 
 	const getPetLevel = (checkedIn: { [date: string]: any }) => {
@@ -1112,8 +1083,11 @@ const Home = () => {
 				earnedIds={earnedBadgeIds}
 				onClose={() => setShowBadgeModal(false)}
 				onSelectBadge={(badge) => {
-					setShowBadgeModal(false);
-					setSelectedBadge(badge);
+					// 목록 모달이 닫힌 뒤 상세를 연다(동시에 뜨면 이전 모달이 깜빡인다)
+					handoff(
+						() => setShowBadgeModal(false),
+						() => setSelectedBadge(badge),
+					);
 				}}
 			/>
 

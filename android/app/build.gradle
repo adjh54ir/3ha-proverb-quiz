@@ -125,6 +125,12 @@ android {
                 mappingFileUploadEnabled true
                 nativeSymbolUploadEnabled false
             }
+
+            // 네이티브(C++/Hermes) 프레임까지 심볼화해야 Play Console 의 ANR/비정상 종료가 읽힌다.
+            // AAB 안에 디버그 심볼이 함께 담겨 별도 업로드가 필요 없다.
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
     }
 }

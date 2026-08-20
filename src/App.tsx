@@ -21,6 +21,7 @@ import notifee from '@notifee/react-native';
 import { scheduleDailyQuizReminder } from './utils/NotifactionHelper';
 import { Paths } from './navigation/conf/Paths';
 import { loadBgmSetting } from './utils/BgmUtils';
+import mobileAds from 'react-native-google-mobile-ads';
 // import * as RNIap from 'react-native-iap';
 
 /**
@@ -37,6 +38,11 @@ const App = () => {
 
 		checkTodayQuiz();
 		requestTrackingPermission(); // iOS ATT (내부에서 플랫폼/AppState 가드)
+		// AdMob SDK 초기화. 전면/리워드 광고는 초기화 완료 후에만 load() 동작함
+		mobileAds()
+			.initialize()
+			.then(() => console.log('✅ AdMob SDK 초기화 완료'))
+			.catch((e) => console.warn('❌ AdMob SDK 초기화 실패:', e));
 		// 🔊 사운드 설정 로드 후 효과음 미리 로드(첫 재생 지연 방지)
 		loadSoundSetting().then(preloadSounds);
 		loadBgmSetting();

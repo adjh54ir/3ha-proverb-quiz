@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, Platform, Dimensions } from 'react-native';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
@@ -27,6 +27,7 @@ const DESIGN_HEIGHT = 812;
 const AppLayout = () => {
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);
 	const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
+	const [bannerHeight, setBannerHeight] = useState(0);
 	const { height: screenHeight } = Dimensions.get('window');
 
 	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute as Paths), [currentRoute]);
@@ -57,9 +58,10 @@ const AppLayout = () => {
 			return 0;
 		}
 
-		// 테블릿인 경우
+		// ponytail: 태블릿만 배너 실측 높이 사용. adaptive 배너 높이가 기기별 50~90dp로 갈려 고정값이 안 맞음.
+		//           폰은 adaptive가 사실상 50dp 고정이라 기존 튜닝값 유지.
 		if (DeviceInfo.isTablet()) {
-			return scaleHeight(60); // 태블릿
+			return bannerHeight || scaleHeight(60); // 태블릿 (로드 전엔 기존값)
 		}
 		if (Platform.OS === 'android') {
 			return scaleHeight(50); // 안드로이드
@@ -101,6 +103,8 @@ const AppLayout = () => {
 		return 0;
 	};
 
+	const handleBannerHeight = useCallback((height: number) => setBannerHeight(height), []);
+
 	return (
 		<NavigationContainer
 			ref={navigationRef}
@@ -117,7 +121,7 @@ const AppLayout = () => {
 			<SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={shouldShowAd ? ['top'] : []}>
 				<View style={styles.container}>
 					<View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]}>
-						<AdmobBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} />
+						<AdmobBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} onHeightChange={handleBannerHeight} />
 					</View>
 					{shouldShowAd && <View style={{ paddingTop: getAdPaddingTop() }} />}
 					<View style={[styles.navigatorWrapper, { paddingTop: getNavigatorPaddingTop(shouldShowAd), backgroundColor }]}>

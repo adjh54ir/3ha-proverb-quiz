@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Dimensions, Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 import { GOOGLE_ADMOV_ANDROID_BANNER, GOOGLE_ADMOV_IOS_BANNER } from '@env';
 import analytics from '@react-native-firebase/analytics';
@@ -8,39 +8,31 @@ import DeviceInfo from 'react-native-device-info';
 type AdUnitIdType = string;
 
 const AD_UNIT_ID: AdUnitIdType = Platform.select({
-	ios: __DEV__ ? TestIds.BANNER : GOOGLE_ADMOV_IOS_BANNER!,
-	android: __DEV__ ? TestIds.BANNER : GOOGLE_ADMOV_ANDROID_BANNER!,
+	ios: __DEV__ ? TestIds.ADAPTIVE_BANNER : GOOGLE_ADMOV_IOS_BANNER!,
+	android: __DEV__ ? TestIds.ADAPTIVE_BANNER : GOOGLE_ADMOV_ANDROID_BANNER!,
 }) as AdUnitIdType;
 
 interface AdmobBannerAdProps {
 	paramMarginTop?: number;
 	paramMarginBottom?: number;
 	visible?: boolean;
+	/** 배너 실측 높이(dp) 콜백. 레이아웃 여백 계산용 */
+	onHeightChange?: (height: number) => void;
 }
 
 const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({
 	paramMarginTop = 6,
 	paramMarginBottom = 6,
 	visible = true, // 표시 여부
+	onHeightChange,
 }) => {
 	const bannerRef = useRef<BannerAd | null>(null);
-	const screenWidth = Dimensions.get('window').width;
 
 	useForeground(() => {
 		if (Platform.OS === 'ios') {
 			bannerRef.current?.load();
 		}
 	});
-
-	const getBannerSize = () => {
-		if (screenWidth >= 600) {
-			return BannerAdSize.FULL_BANNER;
-		}
-		if (screenWidth >= 480) {
-			return BannerAdSize.LARGE_BANNER;
-		}
-		return BannerAdSize.BANNER;
-	};
 
 	const handleAdOpened = async () => {
 		try {
@@ -75,7 +67,13 @@ const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({
 					height: visible ? undefined : 0,
 				},
 			]}>
-			<BannerAd ref={bannerRef} unitId={AD_UNIT_ID} size={getBannerSize()} onAdOpened={handleAdOpened} />
+			<BannerAd
+				ref={bannerRef}
+				unitId={AD_UNIT_ID}
+				size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+				onAdOpened={handleAdOpened}
+				onSizeChange={({ height }) => onHeightChange?.(height)}
+			/>
 		</View>
 	);
 };

@@ -3,7 +3,7 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import IconComponent from './IconComponent';
-import { COLORS, SPACING_W } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, SPACING_W } from '@/const/common/Theme';
 
 /**
  * 모달 공통 닫기(X) 버튼 — 모든 콘텐츠 모달의 닫기 위치/아이콘/색을 통일합니다.
@@ -23,7 +23,7 @@ const ModalCloseButton: React.FC<ModalCloseButtonProps> = ({ onPress, color = CO
 			style={[styles.btn, style]}
 			onPress={onPress}
 			activeOpacity={0.7}
-			hitSlop={{ top: scaleHeight(8), bottom: scaleHeight(8), left: scaleWidth(8), right: scaleWidth(8) }}>
+			hitSlop={HIT_SLOP}>
 			<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={color} />
 		</TouchableOpacity>
 	);

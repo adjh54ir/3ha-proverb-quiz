@@ -5,9 +5,25 @@
  * - 다크 팔레트는 라이트와 같은 키를 하나도 빠짐없이 가져야 한다(누락 시 undefined 색상 발생).
  */
 import { StyleSheet } from 'react-native';
-import { COLORS, HERO, PALETTES, getPickerTheme, getThemeMode, setThemeMode, themedStyles, themedValue } from '../src/const/common/Theme';
+import {
+	COLORS,
+	FONT_SIZES,
+	HERO,
+	PALETTES,
+	TEXT_SIZE_MAX_MULTIPLIER,
+	getPickerTheme,
+	getTextSizeMode,
+	getThemeMode,
+	setTextSizeMode,
+	setThemeMode,
+	themedStyles,
+	themedValue,
+} from '../src/const/common/Theme';
 
-afterEach(() => setThemeMode('light'));
+afterEach(() => {
+	setThemeMode('light');
+	setTextSizeMode('default');
+});
 
 test('기본 모드는 라이트다 (시스템 설정을 따르지 않는다)', () => {
 	expect(getThemeMode()).toBe('light');
@@ -81,4 +97,26 @@ test('드롭다운 라이브러리 테마도 모드를 따라간다', () => {
 	expect(getPickerTheme()).toBe('LIGHT');
 	setThemeMode('dark');
 	expect(getPickerTheme()).toBe('DARK');
+});
+
+test("글자 크게 모드는 FONT_SIZES 를 키우고 OS 확대 상한도 함께 푼다", () => {
+	const base = FONT_SIZES.md;
+
+	setTextSizeMode('large');
+	expect(getTextSizeMode()).toBe('large');
+	expect(FONT_SIZES.md).toBeGreaterThan(base);
+	expect(TEXT_SIZE_MAX_MULTIPLIER.large).toBeGreaterThan(TEXT_SIZE_MAX_MULTIPLIER.default);
+
+	setTextSizeMode('default');
+	expect(FONT_SIZES.md).toBe(base);
+});
+
+test('themedStyles 는 글자 크기 모드가 바뀌어도 다시 만들어진다', () => {
+	const styles = themedStyles(() => StyleSheet.create({ label: { fontSize: FONT_SIZES.md } }));
+	const base = styles.label.fontSize;
+
+	setTextSizeMode('large');
+	expect(styles.label.fontSize).toBeGreaterThan(base);
+	setTextSizeMode('default');
+	expect(styles.label.fontSize).toBe(base);
 });

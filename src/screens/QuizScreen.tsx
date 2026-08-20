@@ -4,7 +4,7 @@
 /* eslint-disable curly */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Dimensions, Animated, FlatList } from 'react-native';
+import { Animated, FlatList, Modal, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import ProverbServices from '@/services/ProverbServices';
@@ -19,7 +19,7 @@ import { CONST_BADGES } from '@/const/ConstBadges';
 import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
@@ -53,7 +53,7 @@ type QuizRoute = RouteProp<{ QUIZ: QuizRouteParams }, 'QUIZ'>;
 
 const QuizScreen = () => {
 	const route = useRoute<QuizRoute>();
-	const { width: screenWidth } = Dimensions.get('window');
+	const { width: screenWidth } = useWindowDimensions();
 	const flatListRef = useRef<FlatList<string>>(null);
 	const [showAdForHint, setShowAdForHint] = useState(false);
 
@@ -662,6 +662,28 @@ const QuizScreen = () => {
 		top: scaleHeight(-30),
 	};
 
+	/**
+	 * 완료 팝업의 '틀린 문제 다시 풀기' — 누적 오답만 모아 오답 복습 모드로 즉시 재진입한다.
+	 * replace 로 이동해야 뒤로가기 시 방금 끝낸 퀴즈로 돌아가지 않는다.
+	 */
+	const wrongPool = useMemo(() => {
+		const wrongIds = new Set(quizHistory?.wrongProverbId ?? []);
+		return proverbs.filter((p) => wrongIds.has(p.id));
+	}, [proverbs, quizHistory]);
+
+	const handleReviewWrong = () => {
+		setShowCompletionModal(false);
+		// @ts-ignore
+		navigation.replace(Paths.QUIZ, {
+			mode: routeMode,
+			questionPool: wrongPool,
+			isWrongReview: true,
+			title: '오답 복습',
+			selectedLevel: 'all',
+			levelKey: 'all',
+		});
+	};
+
 	const safelyGoBack = () => {
 		// @ts-ignore
 		navigation.replace(Paths.MAIN_TAB, { screen: Paths.HOME });
@@ -1010,7 +1032,7 @@ const QuizScreen = () => {
 													}
 													setShowAdForHint(true);
 												}}
-												hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+												hitSlop={HIT_SLOP}>
 												<Animated.View
 													style={[
 														styles.hintBulbButton,
@@ -1241,6 +1263,7 @@ const QuizScreen = () => {
 				wrong={completionData.wrong}
 				total={completionData.total}
 				accuracy={completionData.accuracy}
+				onReviewWrong={wrongPool.length > 0 ? handleReviewWrong : undefined}
 				onConfirm={() => {
 					setShowCompletionModal(false);
 					safelyGoBack();

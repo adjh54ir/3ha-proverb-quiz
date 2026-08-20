@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, Platform, Dimensions } from 'react-native';
+import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, Theme } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -30,7 +30,7 @@ const AppLayout = () => {
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);
 	const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
 	const [bannerHeight, setBannerHeight] = useState(0);
-	const { height: screenHeight } = Dimensions.get('window');
+	const { height: screenHeight } = useWindowDimensions();
 
 	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute as Paths), [currentRoute]);
 	// const shouldShowAd = false

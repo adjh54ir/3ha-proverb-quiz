@@ -4,7 +4,7 @@ import { StatusBar, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AppLayout from './AppLayout';
 import { COLORS, STATUS_BAR_STYLE } from '@/const/common/Theme';
-import { loadThemeMode, useThemeMode } from '@/hooks/useThemeMode';
+import { loadTextSizeMode, loadThemeMode, useThemeMode } from '@/hooks/useThemeMode';
 
 /**
  * 모든 네비게이션에 대해 일괄 메인으로 관리합니다.
@@ -12,7 +12,7 @@ import { loadThemeMode, useThemeMode } from '@/hooks/useThemeMode';
  * GestureHandlerRootView 로 루트를 감싸야 Android 에서 RN Modal(별도 윈도우)의
  * 내부 터치가 죽거나 레이아웃이 깨지는 문제가 발생하지 않는다.
  *
- * 저장된 화이트/다크 모드를 먼저 적용한 뒤에 화면을 그린다.
+ * 저장된 화이트/다크 모드와 글자 크기 모드를 먼저 적용한 뒤에 화면을 그린다.
  * (부트스플래시가 떠 있는 동안 처리되므로 라이트 → 다크로 번쩍이는 현상이 없다)
  * @returns
  */
@@ -22,7 +22,8 @@ const ApplicationNavigator = () => {
 
 	useEffect(() => {
 		let mounted = true;
-		loadThemeMode().finally(() => {
+		// 테마와 글자 크기를 함께 복원한 뒤 첫 화면을 그린다.
+		Promise.all([loadThemeMode(), loadTextSizeMode()]).finally(() => {
 			if (mounted) {
 				setThemeReady(true);
 			}

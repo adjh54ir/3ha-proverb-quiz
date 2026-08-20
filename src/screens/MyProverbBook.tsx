@@ -1,12 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { matchesKeyword } from '@/utils/SearchUtils';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Animated, Image, KeyboardAvoidingView, Keyboard, Platform, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import BookFormModal from './modal/BookFormModal';
@@ -105,7 +106,8 @@ const MyProverbBook = () => {
 		let result = [...books];
 		const q = searchQuery.trim().toLowerCase();
 		if (q) {
-			result = result.filter((b) => b.title.toLowerCase().includes(q) || b.description.toLowerCase().includes(q));
+			// 초성 검색 지원
+			result = result.filter((b) => matchesKeyword(q, b.title, b.description));
 		}
 		switch (sortType) {
 			case 'latest':
@@ -169,7 +171,7 @@ const MyProverbBook = () => {
 				<View style={styles.keyboardWrap}>
 				{/* 헤더 */}
 				<View style={styles.header}>
-					<TouchableOpacity onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME })} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+					<TouchableOpacity onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME })} hitSlop={HIT_SLOP}>
 						<IconComponent type="materialIcons" name="arrow-back" size={scaledSize(22)} color={COLORS.text} />
 					</TouchableOpacity>
 					<Text style={styles.headerTitle}>나만의 속담집</Text>
@@ -193,7 +195,7 @@ const MyProverbBook = () => {
 						</View>
 						<View style={styles.searchBox}>
 							<IconComponent type="materialIcons" name="search" size={scaledSize(18)} color={COLORS.textLight} />
-							<TextInput style={styles.searchInput} placeholder="속담집 검색..." placeholderTextColor={COLORS.textLight} value={searchQuery} onChangeText={setSearchQuery} returnKeyType="search" />
+							<TextInput style={styles.searchInput} placeholder="속담집 이름 또는 초성 검색" placeholderTextColor={COLORS.textLight} value={searchQuery} onChangeText={setSearchQuery} returnKeyType="search" />
 							{!!searchQuery && (
 								<TouchableOpacity onPress={() => setSearchQuery('')}>
 									<IconComponent type="materialIcons" name="cancel" size={scaledSize(16)} color={COLORS.textLight} />
@@ -249,7 +251,7 @@ const MyProverbBook = () => {
 											</View>
 											{!!book.description && <Text style={styles.bookCardDesc} numberOfLines={1}>{book.description}</Text>}
 										</View>
-										<TouchableOpacity style={styles.moreBtn} onPress={(e) => { e.stopPropagation(); setActionSheet(book); }} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+										<TouchableOpacity style={styles.moreBtn} onPress={(e) => { e.stopPropagation(); setActionSheet(book); }} hitSlop={HIT_SLOP}>
 											<IconComponent type="materialIcons" name="more-vert" size={scaledSize(22)} color={COLORS.textLight} />
 										</TouchableOpacity>
 									</View>

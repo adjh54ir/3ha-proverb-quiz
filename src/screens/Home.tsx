@@ -9,7 +9,7 @@ import IconComponent from './common/atomic/IconComponent';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import BadgeListModal from './modal/BadgeListModal';
-import { COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
@@ -64,7 +64,6 @@ moment.locale('ko'); // 로케일 설정
 const ActionCard = ({
 	iconName,
 	iconType,
-	image,
 	label,
 	description,
 	color,
@@ -74,7 +73,6 @@ const ActionCard = ({
 }: {
 	iconName: string;
 	iconType: string;
-	image?: number;
 	label: string;
 	description: string;
 	color: string;
@@ -104,17 +102,9 @@ const ActionCard = ({
 				transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
 			}}>
 			<TouchableOpacity style={[styles.actionCard, { borderColor: color }]} activeOpacity={0.85} onPress={onPress}>
-				{image ? (
-					<View
-						style={[styles.actionImageShell, { backgroundColor: color }]}>
-						<FastImage source={image} style={styles.actionImage} resizeMode="contain" />
-					</View>
-				) : (
-					<View
-						style={[styles.iconCircle, { backgroundColor: color }]}>
-						<IconComponent name={iconName} type={iconType} size={scaledSize(24)} color={COLORS.textWhite} />
-					</View>
-				)}
+				<View style={[styles.iconCircle, { backgroundColor: color }]}>
+					<IconComponent name={iconName} type={iconType} size={scaledSize(24)} color={COLORS.textWhite} />
+				</View>
 				<View style={styles.cardTextBox}>
 					<Text style={styles.cardTitle}>{label}</Text>
 					<Text style={styles.cardDescription}>{description}</Text>
@@ -896,7 +886,7 @@ const Home = () => {
 									<TouchableOpacity
 										style={styles.levelTitleTouch}
 										activeOpacity={0.7}
-										hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+										hitSlop={HIT_SLOP}
 										onPress={() => setShowLevelModal(true)}>
 										<IconComponent
 											type="fontAwesome6"
@@ -989,7 +979,6 @@ const Home = () => {
 						index={0}
 						iconName="play-arrow"
 						iconType="materialIcons"
-						image={require('@/assets/images/home-actions/action-quiz.png')}
 						label="시작하기"
 						description="속담 뜻, 속담 찾기, 빈칸 채우기 퀴즈를 선택해서 퀴즈를 풀어봐요"
 						color={COLORS.secondary}
@@ -999,7 +988,6 @@ const Home = () => {
 						index={1}
 						iconName="school"
 						iconType="materialIcons"
-						image={require('@/assets/images/home-actions/action-study.png')}
 						label="학습 모드"
 						description="카드 형식으로 속담과 속담의 의미를 재미있게 익혀봐요"
 						color={COLORS.primary}
@@ -1016,7 +1004,6 @@ const Home = () => {
 						index={2}
 						iconName="replay"
 						iconType="materialIcons"
-						image={require('@/assets/images/home-actions/action-wrong-review.png')}
 						label="오답 복습"
 						description="틀린 퀴즈를 다시 풀면서 기억을 더 확실히 다져봐요"
 						color={COLORS.warning}
@@ -1026,7 +1013,6 @@ const Home = () => {
 						index={3}
 						iconName="schedule"
 						iconType="materialIcons"
-						image={require('@/assets/images/home-actions/action-time.png')}
 						label="타임 챌린지"
 						description="180초 제한 시간 안에 5개의 하트로 문제를 최대한 많이 풀어보세요!"
 						color={COLORS.accentFlame}
@@ -1036,7 +1022,6 @@ const Home = () => {
 						index={4}
 						iconName="castle"
 						iconType="materialCommunityIcons"
-						image={require('@/assets/images/home-actions/action-tower.png')}
 						label="타워 챌린지"
 						description="레벨별 보스를 차례로 도전하고 특별한 보상을 획득하세요!"
 						color={COLORS.accentTeal}
@@ -1054,7 +1039,6 @@ const Home = () => {
 						index={5}
 						iconName="star"
 						iconType="materialIcons"
-						image={require('@/assets/images/home-actions/action-favorite.png')}
 						label="즐겨찾기"
 						description="자주 보고 싶은 속담을 모아두고 한눈에 다시 확인해요"
 						color={COLORS.gold}
@@ -1065,10 +1049,9 @@ const Home = () => {
 						index={6}
 						iconName="menu-book"
 						iconType="materialIcons"
-						image={require('@/assets/images/home-actions/action-my-book.png')}
 						label="나만의 속담집"
 						description="원하는 속담을 모아 나만의 속담집을 만들고 퀴즈로 풀어봐요"
-						color={COLORS.secondary}
+						color={COLORS.accentPink}
 						onPress={moveToHandler.myBook}
 						isNew
 					/>
@@ -1423,19 +1406,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginRight: SPACING_W.lg,
-	},
-	actionImageShell: {
-		width: scaleWidth(58),
-		height: scaleWidth(58),
-		borderRadius: RADIUS.md,
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: SPACING_W.lg,
-		overflow: 'hidden',
-	},
-	actionImage: {
-		width: scaleWidth(54),
-		height: scaleWidth(54),
 	},
 	cardTextBox: {
 		flex: 1,

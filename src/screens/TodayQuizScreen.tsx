@@ -16,7 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -822,7 +822,7 @@ const TodayQuizScreen = () => {
 						</View>
 
 						<View style={styles.rightButtonWrapper}>
-							<TouchableOpacity onPress={loadLastTodayQuizList} activeOpacity={0.8} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+							<TouchableOpacity onPress={loadLastTodayQuizList} activeOpacity={0.8} hitSlop={HIT_SLOP}>
 								<View style={styles.buttonContent}>
 									<IconComponent name="book" type="FontAwesome" size={scaledSize(13)} color={COLORS.textSecondary} style={styles.iconSpacing} />
 									<Text style={styles.buttonText}>지난 오늘의 퀴즈</Text>
@@ -900,7 +900,7 @@ const TodayQuizScreen = () => {
 							<View style={styles.scoreRightGroup}>
 								<TouchableOpacity
 									activeOpacity={0.8}
-									hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+									hitSlop={HIT_SLOP}
 									onPress={() => {
 										setTempIsAlarmEnabled(isAlarmEnabled);
 										setTempSelectedHour(alarmTime.getHours());
@@ -1024,7 +1024,7 @@ const TodayQuizScreen = () => {
 							<TouchableOpacity
 								activeOpacity={0.8}
 								onPress={initQuiz}
-								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+								hitSlop={HIT_SLOP}
 								style={{ marginTop: SPACING_H.md }}>
 								<Text style={{ color: COLORS.secondary, fontSize: FONT_SIZES.md, fontWeight: '600' }}>🔄 다시 불러오기</Text>
 							</TouchableOpacity>
@@ -1139,7 +1139,7 @@ const TodayQuizScreen = () => {
 						<TouchableOpacity
 							style={styles.modalCloseIcon}
 							activeOpacity={0.8}
-							hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+							hitSlop={HIT_SLOP}
 							onPress={() => setShowPrevQuizModal(false)}>
 							<IconComponent name="close" type="AntDesign" size={scaledSize(20)} color={COLORS.text} />
 						</TouchableOpacity>
@@ -1204,7 +1204,7 @@ const TodayQuizScreen = () => {
 																	e.stopPropagation();
 																	handleToggleFavorite(item.id);
 																}}
-																hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+																hitSlop={HIT_SLOP}>
 																<Icon name="star" solid={isFavorite} size={scaledSize(18)} color={isFavorite ? COLORS.warning : COLORS.borderDark} />
 															</TouchableOpacity>
 														</View>

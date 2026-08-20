@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { matchesKeyword } from '@/utils/SearchUtils';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, FlatList, Keyboard, TouchableWithoutFeedback, Platform, KeyboardAvoidingView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import FastImage from 'react-native-fast-image';
@@ -8,7 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconComponent from '../common/atomic/IconComponent';
 import FadeInView from '@/components/animation/FadeInView';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from '../common/CommonProverbModule';
@@ -89,13 +90,8 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 	const filteredList = useMemo(() => {
 		let list = [...baseList];
 		if (keyword.trim()) {
-			const lower = keyword.toLowerCase();
-			list = list.filter(
-				(item) =>
-					item.proverb?.toLowerCase().includes(lower) ||
-					item.longMeaning?.toLowerCase().includes(lower) ||
-					item.meaning?.toLowerCase().includes(lower),
-			);
+			// 초성 검색 지원
+			list = list.filter((item) => matchesKeyword(keyword, item.proverb, item.longMeaning, item.meaning));
 		}
 		if (levelValue !== '전체') {
 			list = list.filter((item) => item.levelName?.trim() === levelValue);
@@ -186,7 +182,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 								<Icon name="star" solid size={scaledSize(16)} color={COLORS.warning} />
 								<Text style={styles.headerTitle}>즐겨찾기 추가</Text>
 							</View>
-							<TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} activeOpacity={0.7}>
+							<TouchableOpacity onPress={onClose} hitSlop={HIT_SLOP} activeOpacity={0.7}>
 								<Icon name="xmark" size={scaledSize(20)} color={COLORS.textSecondary} />
 							</TouchableOpacity>
 						</View>
@@ -203,7 +199,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 										<Icon name="magnifying-glass" size={scaledSize(14)} color={COLORS.textLight} style={styles.searchIcon} />
 										<TextInput
 											style={styles.searchInput}
-											placeholder="속담이나 의미를 검색해보세요"
+											placeholder="속담·의미 또는 초성(ㄱㄴㄷ) 검색"
 											placeholderTextColor={COLORS.textLight}
 											value={keyword}
 											onFocus={() => setSearchFocused(true)}
@@ -215,7 +211,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 											}}
 										/>
 										{keyword.length > 0 && (
-											<TouchableOpacity onPress={() => setKeyword('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+											<TouchableOpacity onPress={() => setKeyword('')} hitSlop={HIT_SLOP}>
 												<Icon name="circle-xmark" size={scaledSize(15)} color={COLORS.textLight} />
 											</TouchableOpacity>
 										)}

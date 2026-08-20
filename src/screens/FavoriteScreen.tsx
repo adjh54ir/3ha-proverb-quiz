@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { matchesKeyword } from '@/utils/SearchUtils';
 import {
 	View,
 	Text,
@@ -23,7 +24,7 @@ import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
@@ -146,13 +147,8 @@ const FavoriteScreen = () => {
 		let filtered = [...source];
 
 		if (kw.trim()) {
-			const lower = kw.toLowerCase();
-			filtered = filtered.filter(
-				(item) =>
-					item.proverb?.toLowerCase().includes(lower) ||
-					item.longMeaning?.toLowerCase().includes(lower) ||
-					item.meaning?.toLowerCase().includes(lower),
-			);
+			// 초성 검색 지원
+			filtered = filtered.filter((item) => matchesKeyword(kw, item.proverb, item.longMeaning, item.meaning));
 		}
 		if (category !== '전체') {
 			filtered = filtered.filter((item) => item.category?.trim() === category);
@@ -307,7 +303,7 @@ const FavoriteScreen = () => {
 										e.stopPropagation();
 										handleToggleFavorite(item.id);
 									}}
-									hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+									hitSlop={HIT_SLOP}>
 									<Icon name="star" solid size={scaledSize(18)} color={COLORS.warning} />
 								</TouchableOpacity>
 							)}
@@ -359,7 +355,7 @@ const FavoriteScreen = () => {
 											<TouchableOpacity
 												style={styles.headerActionBtn}
 												onPress={() => setShowAddModal(true)}
-												hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+												hitSlop={HIT_SLOP}>
 												<Icon name="plus" size={scaledSize(14)} color={COLORS.warning} />
 												<Text style={styles.headerActionText}>추가</Text>
 											</TouchableOpacity>
@@ -367,7 +363,7 @@ const FavoriteScreen = () => {
 												<TouchableOpacity
 													style={[styles.headerActionBtn, styles.headerActionBtnDelete]}
 													onPress={enterSelectionMode}
-													hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+													hitSlop={HIT_SLOP}>
 													<Icon name="trash-can" size={scaledSize(13)} color={COLORS.danger} />
 													<Text style={styles.headerActionTextDelete}>선택 삭제</Text>
 												</TouchableOpacity>
@@ -377,7 +373,7 @@ const FavoriteScreen = () => {
 										<TouchableOpacity
 											style={styles.cancelBtn}
 											onPress={exitSelectionMode}
-											hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+											hitSlop={HIT_SLOP}>
 											<Text style={styles.cancelBtnText}>취소</Text>
 										</TouchableOpacity>
 									)}
@@ -388,7 +384,7 @@ const FavoriteScreen = () => {
 										<Icon name="magnifying-glass" size={scaledSize(15)} color={COLORS.textLight} style={styles.searchIcon} />
 										<TextInput
 											style={styles.searchInput}
-											placeholder="속담이나 의미를 입력해주세요"
+											placeholder="속담·의미 또는 초성(ㄱㄴㄷ) 검색"
 											placeholderTextColor={COLORS.textLight}
 											value={keyword}
 											onChangeText={(text) => {

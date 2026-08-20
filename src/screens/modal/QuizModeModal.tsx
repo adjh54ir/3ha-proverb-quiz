@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { scaledSize, scaleWidth, scaleHeight } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 
@@ -51,7 +51,7 @@ const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
 					<TouchableOpacity activeOpacity={1} style={styles.card}>
 						<View style={styles.headerRow}>
 							<Text style={styles.title} numberOfLines={1}>{book?.title ? `${book.title} 퀴즈` : '퀴즈 모드 선택'}</Text>
-							<TouchableOpacity onPress={onClose} hitSlop={{ top: scaleHeight(10), bottom: scaleHeight(10), left: scaleWidth(10), right: scaleWidth(10) }}>
+							<TouchableOpacity onPress={onClose} hitSlop={HIT_SLOP}>
 								<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
 							</TouchableOpacity>
 						</View>

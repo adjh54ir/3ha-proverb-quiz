@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View, Linking, TouchableOpacity } from 'react-native';
 import { scaleHeight, scaledSize } from '@/utils/DementionUtils';
 import Icon from 'react-native-vector-icons/Feather';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import FadeInView from '@/components/animation/FadeInView';
 import { OPEN_SOURCE_LIBS } from '@/const/common/OpenSourceData';
 
@@ -32,7 +32,7 @@ const OpenSourceScreen = () => {
 								onPress={() => Linking.openURL(lib.url)}
 								style={styles.linkWrapper}
 								activeOpacity={0.8}
-								hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+								hitSlop={HIT_SLOP}>
 								<Icon name="external-link" size={scaledSize(14)} color={COLORS.secondaryDark} />
 								<Text style={styles.linkText}>GitHub 보기</Text>
 							</TouchableOpacity>

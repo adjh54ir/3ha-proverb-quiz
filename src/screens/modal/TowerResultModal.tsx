@@ -1,11 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, Dimensions, ScrollView } from 'react-native';
+import { Animated, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
-
-const { width, height } = Dimensions.get('window');
 
 interface TowerReward {
 	name: string;
@@ -42,6 +40,8 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 	onHome,
 	onNext,
 }) => {
+	// 회전/폴더블 대응: 화면 크기가 바뀌면 모달 크기도 따라간다.
+	const { width, height } = useWindowDimensions();
 	const scaleAnim = useRef(new Animated.Value(0)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
 	const starAnims = useRef([new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)]).current;
@@ -131,6 +131,9 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 					style={[
 						styles.modalContainer,
 						{
+							width: width * 0.9,
+							// 화면 높이의 80%로 고정 → 버튼이 항상 화면 안에 들어옴
+							height: height * 0.8,
 							transform: [{ scale: scaleAnim }],
 							backgroundColor: bgColor,
 							borderColor,
@@ -284,9 +287,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	modalContainer: {
-		width: width * 0.9,
-		// 화면 높이의 80%로 고정 → 버튼이 항상 화면 안에 들어옴
-		height: height * 0.8,
+		// 크기(width/height)는 useWindowDimensions 값으로 호출부에서 지정한다.
 		borderRadius: RADIUS.xl,
 		overflow: 'hidden',
 		borderWidth: 1.5,

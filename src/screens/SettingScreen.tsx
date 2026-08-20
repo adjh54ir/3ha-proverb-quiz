@@ -27,12 +27,12 @@ import CurrentVersionModal from './modal/CurrentVersionModal';
 import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL, APP_NAME as ENV_APP_NAME, APP_DESCRIPTION as ENV_APP_DESCRIPTION } from '@env';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import FadeInView from '@/components/animation/FadeInView';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue } from '@/const/common/Theme';
 import { SCORE_PER_QUESTION } from '@/const/common/CommonCharacterData';
 import { AppPermissionInfo, loadAppPermissions, requestAppPermission } from '@/utils/PermissionUtils';
 import DateUtils from '@/utils/DateUtils';
 import { useToast } from '@/hooks/useToast';
-import { changeThemeMode, useThemeMode } from '@/hooks/useThemeMode';
+import { changeTextSizeMode, changeThemeMode, useTextSizeMode, useThemeMode } from '@/hooks/useThemeMode';
 
 // ─────────────────────────────────────────────
 // 상수
@@ -212,11 +212,18 @@ const AnimatedPressCard = ({ children, onPress }: { children: React.ReactNode; o
 	);
 };
 
+/** 글자 크기 선택지 — 미리보기 '가' 글자 크기까지 함께 보여준다. */
+const TEXT_SIZE_OPTIONS = themedValue(() => [
+	{ key: 'default' as const, label: '기본', desc: '표준 크기', sampleSize: FONT_SIZES.md },
+	{ key: 'large' as const, label: '크게', desc: '한 단계 크게', sampleSize: FONT_SIZES.xl },
+]);
+
 // ─────────────────────────────────────────────
 // 컴포넌트
 // ─────────────────────────────────────────────
 const SettingScreen = () => {
 	const themeMode = useThemeMode(); // 화이트/다크 선택 상태
+	const textSizeMode = useTextSizeMode(); // 기본/글자 크게 선택 상태
 	const sectionRef = useRef<SectionList>(null);
 
 	const [showDevModal, setShowDevModal] = useState(false);
@@ -672,6 +679,38 @@ const SettingScreen = () => {
 						})}
 					</View>
 					<Text style={styles.themeHint}>시스템(휴대폰) 설정과 무관하게 앱에서 고른 테마로 표시됩니다.</Text>
+
+					{/* 글자 크기 — 시각 약자를 위해 앱 전체 폰트를 한 단계 키운다 */}
+					<Text style={styles.themeGroupLabel}>글자 크기</Text>
+					<View style={styles.themeRow}>
+						{TEXT_SIZE_OPTIONS.map((option) => {
+							const isActive = textSizeMode === option.key;
+							return (
+								<TouchableOpacity
+									key={option.key}
+									style={[styles.themeCard, isActive && styles.themeCardActive]}
+									activeOpacity={0.85}
+									onPress={() => changeTextSizeMode(option.key)}
+									accessibilityRole="button"
+									accessibilityState={{ selected: isActive }}
+									accessibilityLabel={`글자 크기 ${option.label}`}>
+									<View style={[styles.themeIconChip, isActive && styles.themeIconChipActive]}>
+										<Text style={[styles.textSizeSample, isActive && styles.textSizeSampleActive, { fontSize: option.sampleSize }]}>가</Text>
+									</View>
+									<View style={styles.themeTextWrap}>
+										<Text style={[styles.themeLabel, isActive && styles.themeLabelActive]} numberOfLines={1} ellipsizeMode="tail">
+											{option.label}
+										</Text>
+										<Text style={styles.themeDesc} numberOfLines={1} ellipsizeMode="tail">
+											{option.desc}
+										</Text>
+									</View>
+									{isActive && <IconComponent type="materialIcons" name="check-circle" size={scaledSize(20)} color={COLORS.primary} />}
+								</TouchableOpacity>
+							);
+						})}
+					</View>
+					<Text style={styles.themeHint}>글자를 크게 하면 앱 전체 글자가 커지고, 휴대폰의 큰 글씨 설정도 더 넓게 반영됩니다.</Text>
 				</View>
 			);
 		}
@@ -759,7 +798,7 @@ const SettingScreen = () => {
 											<TouchableOpacity
 												style={styles.volumePreviewButton}
 												onPress={row.onPreview}
-												hitSlop={{ top: scaleHeight(8), bottom: scaleHeight(8), left: scaleWidth(8), right: scaleWidth(8) }}
+												hitSlop={HIT_SLOP}
 												activeOpacity={0.7}
 												accessibilityRole="button"
 												accessibilityLabel="효과음 미리듣기">
@@ -934,13 +973,12 @@ const SettingScreen = () => {
 												<View style={{ position: 'relative' }}>
 													<View style={styles.footerAppIconWrapper}>
 														<Image source={item.icon} style={styles.footerAppIcon} resizeMode="contain" />
-														{newAppIds.has(item.id) && (
-															<>
-																<View style={styles.footerNewBadge} />
-																<Text style={styles.footerNewBadgeText}>NEW</Text>
-															</>
-														)}
 													</View>
+													{newAppIds.has(item.id) && (
+														<View style={styles.footerNewBadge}>
+															<Text style={styles.footerNewBadgeText}>NEW</Text>
+														</View>
+													)}
 												</View>
 												<Text style={styles.footerAppTitle}>{item.title}</Text>
 												<Text style={styles.footerAppDesc} numberOfLines={2}>
@@ -963,7 +1001,7 @@ const SettingScreen = () => {
 
 			{showScrollTop && (
 				<FadeInView style={styles.scrollTopWrap} duration={220} offsetY={8}>
-					<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop} activeOpacity={0.8} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+					<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop} activeOpacity={0.8} hitSlop={HIT_SLOP}>
 						<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color={COLORS.textWhite} />
 					</TouchableOpacity>
 				</FadeInView>
@@ -1160,6 +1198,9 @@ const styles = themedStyles(() => StyleSheet.create({
 	themeLabelActive: { color: COLORS.primaryDeep },
 	themeDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: SPACING_H.xxs },
 	themeHint: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, lineHeight: scaledSize(18) },
+	themeGroupLabel: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.xs },
+	textSizeSample: { fontWeight: '700', color: COLORS.textSecondary },
+	textSizeSampleActive: { color: COLORS.textWhite },
 
 	scrollTopWrap: {
 		position: 'absolute',
@@ -1248,25 +1289,24 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 	},
 	footerAppIcon: { width: '100%', height: '100%' },
+	// 아이콘 우상단 NEW 배지 — 이전에는 삼각형 리본 + 5px 회전 텍스트라 글자가 읽히지 않았다.
 	footerNewBadge: {
 		position: 'absolute',
-		top: 0,
-		right: 0,
-		width: 0,
-		height: 0,
-		borderTopWidth: scaleWidth(26),
-		borderTopColor: COLORS.danger,
-		borderLeftWidth: scaleWidth(26),
-		borderLeftColor: 'transparent',
+		top: -scaleHeight(4),
+		right: -scaleWidth(6),
+		paddingHorizontal: SPACING_W.xs,
+		paddingVertical: scaleHeight(1),
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.danger,
+		borderWidth: 1,
+		borderColor: COLORS.surface,
 	},
 	footerNewBadgeText: {
-		position: 'absolute',
-		top: scaleWidth(4),
-		right: scaleWidth(2),
-		fontSize: scaledSize(5),
+		fontSize: FONT_SIZES.xxs,
+		lineHeight: scaledSize(13),
 		fontWeight: '700',
 		color: COLORS.textWhite,
-		transform: [{ rotate: '45deg' }],
+		letterSpacing: 0.2,
 	},
 	footerAppTitle: { fontSize: FONT_SIZES.smPlus, fontWeight: '600', color: COLORS.text, textAlign: 'center', marginBottom: SPACING_H.xs },
 	footerAppDesc: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, textAlign: 'center' },

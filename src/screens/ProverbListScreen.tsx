@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { matchesKeyword } from '@/utils/SearchUtils';
 import {
 	View,
 	Text,
@@ -22,7 +23,7 @@ import FastImage from 'react-native-fast-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
@@ -142,13 +143,8 @@ const ProverbListScreen = () => {
 		let filtered = [...allData];
 
 		if (keyword.trim()) {
-			const lowerKeyword = keyword.trim().toLowerCase();
-			filtered = filtered.filter(
-				(item) =>
-					item.proverb?.toLowerCase().includes(lowerKeyword) ||
-					item.meaning?.toLowerCase().includes(lowerKeyword) ||
-					item.longMeaning?.toLowerCase().includes(lowerKeyword),
-			);
+			// 초성 검색 지원: 'ㄱㅇㅁ' 로도 '가는 말이…' 가 걸린다.
+			filtered = filtered.filter((item) => matchesKeyword(keyword, item.proverb, item.meaning, item.longMeaning));
 		}
 		if (categoryValue !== '전체') {
 			filtered = filtered.filter((item) => item.category?.trim() === categoryValue);
@@ -331,7 +327,7 @@ const ProverbListScreen = () => {
 										<TextInput
 											ref={searchInputRef}
 											style={[styles.input, styles.searchInput]}
-											placeholder="속담이나 의미를 입력해주세요"
+											placeholder="속담·의미 또는 초성(ㄱㄴㄷ) 검색"
 											placeholderTextColor={COLORS.textLight}
 											onChangeText={(text) => {
 												setKeyword(text);
@@ -553,7 +549,7 @@ const ProverbListScreen = () => {
 															e.stopPropagation();
 															handleToggleFavorite(item.id);
 														}}
-														hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+														hitSlop={HIT_SLOP}>
 														<Icon
 															name="star"
 															solid={favoriteIds.includes(item.id)}

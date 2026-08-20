@@ -308,7 +308,7 @@ const styles = themedStyles(() => StyleSheet.create({
         paddingVertical: scaleHeight(1),
     },
     towerRewardBadgeText: {
-        fontSize: scaledSize(8),
+        fontSize: FONT_SIZES.xxs,
         color: COLORS.textWhite,
         fontWeight: '700',
     },

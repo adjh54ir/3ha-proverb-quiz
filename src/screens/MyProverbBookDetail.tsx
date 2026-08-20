@@ -6,7 +6,7 @@ import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/nativ
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import AddProverbModal from './modal/AddProverbModal';
@@ -183,12 +183,12 @@ const MyProverbBookDetail = () => {
 			<SafeAreaView style={styles.main} edges={['top', 'bottom']}>
 				{/* 헤더 */}
 				<View style={styles.header}>
-					<TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+					<TouchableOpacity onPress={() => navigation.goBack()} hitSlop={HIT_SLOP}>
 						<IconComponent type="materialIcons" name="arrow-back" size={scaledSize(22)} color={COLORS.text} />
 					</TouchableOpacity>
 					<Text style={styles.headerTitle} numberOfLines={1}>{book?.title ?? '속담집'}</Text>
 					{proverbs.length > 0 ? (
-						<TouchableOpacity onPress={() => { setRemoveMode((v) => !v); setSelectedForRemove(new Set()); }} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+						<TouchableOpacity onPress={() => { setRemoveMode((v) => !v); setSelectedForRemove(new Set()); }} hitSlop={HIT_SLOP}>
 							<Text style={[styles.headerAction, removeMode && { color: COLORS.textSecondary }]}>{removeMode ? '취소' : '편집'}</Text>
 						</TouchableOpacity>
 					) : (

@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainDataType } from '@/types/MainDataType';
@@ -324,7 +324,7 @@ const QuizModeScreen = () => {
 			<Modal visible={showInfoModal} transparent animationType="fade" onRequestClose={() => setShowInfoModal(false)}>
 				<View style={styles.modalOverlay}>
 					<View style={styles.modalContent}>
-						<TouchableOpacity style={styles.modalCloseIcon} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} onPress={() => setShowInfoModal(false)}>
+						<TouchableOpacity style={styles.modalCloseIcon} hitSlop={HIT_SLOP} onPress={() => setShowInfoModal(false)}>
 							<IconComponent type="materialIcons" name="close" size={scaledSize(24)} color={COLORS.textSecondary} />
 						</TouchableOpacity>
 						<Text style={styles.modalTitle}>난이도별 퀴즈 안내</Text>

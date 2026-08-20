@@ -1,17 +1,8 @@
 import React, { useState, useRef } from 'react';
-import {
-	View,
-	Text,
-	TouchableOpacity,
-	TouchableWithoutFeedback,
-	StyleSheet,
-	UIManager,
-	findNodeHandle,
-	Dimensions,
-} from 'react-native';
+import { findNodeHandle, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, UIManager, useWindowDimensions, View } from 'react-native';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 
 interface TooltipProps {
 	text: string;
@@ -20,6 +11,7 @@ interface TooltipProps {
 }
 
 export const ToolTipComponent: React.FC<TooltipProps> = ({ text, marginLeft = 0, marginTop = 0 }) => {
+	const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 	const [showTooltip, setShowTooltip] = useState(false);
 	const [tooltipPosition, setTooltipPosition] = useState<'left' | 'right'>('left');
 	const iconRef = useRef(null);
@@ -29,7 +21,6 @@ export const ToolTipComponent: React.FC<TooltipProps> = ({ text, marginLeft = 0,
 			const nodeHandle = findNodeHandle(iconRef.current);
 			if (nodeHandle) {
 				UIManager.measure(nodeHandle, (x, y, width, height, pageX, pageY) => {
-					const screenWidth = Dimensions.get('window').width;
 					const tooltipWidth = 200;
 					const margin = 10;
 
@@ -82,8 +73,8 @@ export const ToolTipComponent: React.FC<TooltipProps> = ({ text, marginLeft = 0,
 			position: 'absolute',
 			top: 0,
 			left: 0,
-			width: Dimensions.get('window').width,
-			height: Dimensions.get('window').height,
+			width: screenWidth,
+			height: screenHeight,
 			zIndex: 10000, // 툴팁 아래에 깔림
 		},
 	}));
@@ -94,7 +85,7 @@ export const ToolTipComponent: React.FC<TooltipProps> = ({ text, marginLeft = 0,
 				ref={iconRef}
 				onPress={toggleTooltip}
 				activeOpacity={0.8}
-				hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}>
+				hitSlop={HIT_SLOP}>
 				<FontAwesome6Icon name='circle-question' size={scaledSize(16)} color={COLORS.textSecondary} />
 			</TouchableOpacity>
 

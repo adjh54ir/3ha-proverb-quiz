@@ -254,6 +254,44 @@ export const setThemeMode = (mode: ThemeMode): void => {
 	listeners.forEach((listener) => listener());
 };
 
+// ─────────────────────────────────────────────────────────────
+// 글자 크기 모드 (접근성)
+// ─────────────────────────────────────────────────────────────
+/** 'default' = 기본, 'large' = 글자 크게 */
+export type TextSizeMode = 'default' | 'large';
+
+/** FONT_SIZES 토큰에 곱해지는 배율. OS 글꼴 설정과 무관하게 앱 안에서 적용된다. */
+const TEXT_SIZE_FACTOR: Record<TextSizeMode, number> = {
+	default: 1,
+	large: 1.15,
+};
+
+/**
+ * OS 글꼴 확대 상한.
+ * 기본 모드는 레이아웃이 깨질 만큼의 과확대만 막고(1.25),
+ * '글자 크게' 모드에서는 시각 약자를 위해 상한을 더 풀어준다.
+ */
+export const TEXT_SIZE_MAX_MULTIPLIER: Record<TextSizeMode, number> = {
+	default: 1.25,
+	large: 1.5,
+};
+
+let activeTextSize: TextSizeMode = 'default';
+
+export const getTextSizeMode = (): TextSizeMode => activeTextSize;
+
+/** 글자 크기 모드 변경 구독 — 테마와 같은 리스너를 쓰므로 화면이 함께 리렌더된다. */
+export const subscribeTextSizeMode = subscribeThemeMode;
+
+/** 글자 크기 전환. FONT_SIZES 와 themedStyles 캐시가 새 배율로 다시 만들어진다. */
+export const setTextSizeMode = (mode: TextSizeMode): void => {
+	if (mode === activeTextSize) {
+		return;
+	}
+	activeTextSize = mode;
+	listeners.forEach((listener) => listener());
+};
+
 /**
  * react-native-dropdown-picker 용 테마 값.
  * 라이브러리 내부 기본 색(리스트 라벨/배경)이 라이트 고정이라 다크에서 글자가 묻힌다.
@@ -303,15 +341,17 @@ export const HERO = createLivePalette((palette) => ({
  * ```
  */
 export const themedValue = <T extends object>(factory: () => T): T => {
-	const cache = new Map<ThemeMode, T>();
+	// 캐시 키 = 팔레트 모드 + 글자 크기 모드. 둘 중 하나만 바뀌어도 다시 만들어야 한다.
+	const cacheKey = (): string => `${activeMode}|${activeTextSize}`;
+	const cache = new Map<string, T>();
 	const seed = factory();
-	cache.set(activeMode, seed);
+	cache.set(cacheKey(), seed);
 
 	const resolve = (): any => {
-		let value = cache.get(activeMode);
+		let value = cache.get(cacheKey());
 		if (!value) {
 			value = factory();
-			cache.set(activeMode, value);
+			cache.set(cacheKey(), value);
 		}
 		return value;
 	};
@@ -342,21 +382,43 @@ export const themedStyles = themedValue;
 /**
  * 폰트 사이즈 체계 (scaledSize 적용 완료 값)
  * 화면에서는 FONT_SIZES.md 처럼 바로 사용한다.
+ *
+ * ── 타이틀 사용 규칙 (통일 기준) ──────────────────────────────
+ * - `xl`      : 바텀시트 헤더. 시트는 화면을 거의 채우므로 다이얼로그보다 한 단계 낮춘다.
+ *               (예: AddProverbModal / FavoriteAddModal 의 headerTitle)
+ * - `heading` : 가운데 뜨는 다이얼로그형 모달의 타이틀 기본값.
+ *               (예: QuizStartModal, CheckInModal, DailyMissionModal …)
+ * - `xxl`     : 화면(Screen) 타이틀. 모달에는 쓰지 않는다.
+ * 새 모달을 만들 때 이 규칙을 벗어나면 화면 간 위계가 흔들리므로 반드시 둘 중 하나를 고른다.
  */
-export const FONT_SIZES = {
-	xxs: scaledSize(10), // 캡션/뱃지
-	xs: scaledSize(11), // 탭 라벨
-	sm: scaledSize(12), // 보조 텍스트
-	smPlus: scaledSize(13), // 보조 본문
-	md: scaledSize(14), // 본문
-	mdPlus: scaledSize(15), // 본문 강조
-	lg: scaledSize(16), // 강조 본문/버튼
-	xl: scaledSize(18), // 섹션 타이틀/헤더
-	xxl: scaledSize(20), // 화면 타이틀
-	heading: scaledSize(22), // 모달 타이틀
-	title: scaledSize(24), // 큰 타이틀
-	display: scaledSize(28), // 결과/점수 강조
+const BASE_FONT_SIZES = {
+	xxs: 10, // 캡션/뱃지
+	xs: 11, // 탭 라벨
+	sm: 12, // 보조 텍스트
+	smPlus: 13, // 보조 본문
+	md: 14, // 본문
+	mdPlus: 15, // 본문 강조
+	lg: 16, // 강조 본문/버튼
+	xl: 18, // 섹션 타이틀/헤더
+	xxl: 20, // 화면 타이틀
+	heading: 22, // 모달 타이틀
+	title: 24, // 큰 타이틀
+	display: 28, // 결과/점수 강조
 } as const;
+
+/**
+ * 글자 크기 모드가 반영된 폰트 토큰.
+ * COLORS 와 같은 방식의 Proxy 라 렌더 시점 배율로 읽힌다(모듈 상수에 담아두면 굳는다).
+ */
+export const FONT_SIZES: Record<keyof typeof BASE_FONT_SIZES, number> = new Proxy({} as any, {
+	get: (_t, key: string) => scaledSize((BASE_FONT_SIZES as any)[key] * TEXT_SIZE_FACTOR[activeTextSize]),
+	has: (_t, key) => key in BASE_FONT_SIZES,
+	ownKeys: () => Reflect.ownKeys(BASE_FONT_SIZES),
+	getOwnPropertyDescriptor: (_t, key: string) =>
+		key in BASE_FONT_SIZES
+			? { value: scaledSize((BASE_FONT_SIZES as any)[key] * TEXT_SIZE_FACTOR[activeTextSize]), enumerable: true, configurable: true, writable: false }
+			: undefined,
+});
 
 /** 공통 radius 토큰 */
 export const RADIUS = {
@@ -420,3 +482,9 @@ export const SPACING_H = {
 	xxxl: scaleHeight(SPACING.xxxl),
 	xxxxl: scaleHeight(SPACING.xxxxl),
 } as const;
+
+/**
+ * 공통 터치 확장 영역(hitSlop) — 아이콘 버튼처럼 시각 크기가 작은 요소의 터치 반경을 넓힌다.
+ * 화면 배율이 아니라 손가락 크기에 맞추는 값이라 scale 을 적용하지 않는다.
+ */
+export const HIT_SLOP = { top: 10, bottom: 10, left: 10, right: 10 } as const;

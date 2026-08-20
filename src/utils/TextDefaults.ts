@@ -13,14 +13,17 @@
  */
 import React from 'react';
 import { Text, TextInput } from 'react-native';
-import { COLORS, FONT_SIZES, getThemeMode, themedValue } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, getTextSizeMode, getThemeMode, TEXT_SIZE_MAX_MULTIPLIER, themedValue } from '@/const/common/Theme';
 
 /** <Text> 안에 중첩된 <Text> 인지 여부를 알려주는 RN 내부 컨텍스트 (public export 없음) */
 // @ts-ignore - RN 내부 모듈이라 타입 선언(.d.ts)이 없다.
 const TextAncestorContext = require('react-native/Libraries/Text/TextAncestor') as React.Context<boolean>;
 
-/** OS 글꼴 확대 상한. 접근성은 유지하되 레이아웃이 깨질 만큼의 과확대만 막는다. */
-const MAX_FONT_SIZE_MULTIPLIER = 1.25;
+/**
+ * OS 글꼴 확대 상한. 접근성은 유지하되 레이아웃이 깨질 만큼의 과확대만 막는다.
+ * 설정의 '글자 크게'를 켜면 상한이 더 풀린다(TEXT_SIZE_MAX_MULTIPLIER).
+ */
+const maxFontSizeMultiplier = () => TEXT_SIZE_MAX_MULTIPLIER[getTextSizeMode()];
 
 /**
  * 기본 텍스트 스타일.
@@ -42,7 +45,7 @@ TextAny.render = function patchedTextRender(props: any, ref: any) {
 	return baseTextRender.call(
 		this,
 		{
-			maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER,
+			maxFontSizeMultiplier: maxFontSizeMultiplier(),
 			...props,
 			// 기본 스타일을 배열 앞쪽에 두어 호출부 style 이 항상 덮어쓰게 한다.
 			style: isNested ? props.style : [defaultTextStyle, props.style],
@@ -56,7 +59,7 @@ TextInputAny.render = function patchedTextInputRender(props: any, ref: any) {
 	return baseTextInputRender.call(
 		this,
 		{
-			maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER,
+			maxFontSizeMultiplier: maxFontSizeMultiplier(),
 			// iOS 키보드 외형도 앱 테마를 따라간다(다크에서 흰 키보드가 튀는 문제).
 			keyboardAppearance: getThemeMode() === 'dark' ? 'dark' : 'light',
 			...props,

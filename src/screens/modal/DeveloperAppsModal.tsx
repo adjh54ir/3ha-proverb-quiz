@@ -16,7 +16,7 @@ import {
 	Pressable,
 } from 'react-native';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { COMMON_APPS_DATA } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
@@ -113,7 +113,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 					<View style={styles.header}>
 						<View style={styles.headerTop}>
 							<Text style={styles.titleText}>📱 제작자의 다른 앱</Text>
-							<TouchableOpacity style={styles.closeButton} onPress={handleClose} activeOpacity={0.7} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+							<TouchableOpacity style={styles.closeButton} onPress={handleClose} activeOpacity={0.7} hitSlop={HIT_SLOP}>
 								<Text style={styles.closeText}>✕</Text>
 							</TouchableOpacity>
 						</View>

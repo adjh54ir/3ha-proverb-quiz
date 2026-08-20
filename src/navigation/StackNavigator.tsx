@@ -13,7 +13,7 @@ import { TouchableOpacity } from 'react-native';
 import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
 import WrongReviewScreen from '@/screens/WrongReviewScreen';
 import { scaledSize } from '@/utils';
-import { COLORS, FONT_SIZES, SPACING_W } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, SPACING_W } from '@/const/common/Theme';
 import InitTimeChallengeScreen from '@/screens/InitTimeChallengeScreen';
 import TimeChanllengeScreen from '@/screens/TimeChanllengeScreen';
 import QuizModeScreen from '@/screens/QuizModeScreen';
@@ -117,7 +117,7 @@ const StackNavigator = () => {
 						<TouchableOpacity
 							onPress={() => navigation.goBack()}
 							style={{ marginLeft: SPACING_W.lg }}
-							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+							hitSlop={HIT_SLOP}>
 							<Icon name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
 						</TouchableOpacity>
 					),
@@ -165,7 +165,7 @@ const StackNavigator = () => {
 						<TouchableOpacity
 							onPress={() => navigation.goBack()}
 							style={{ marginLeft: SPACING_W.lg }}
-							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+							hitSlop={HIT_SLOP}>
 							<Icon name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
 						</TouchableOpacity>
 					),
@@ -182,7 +182,7 @@ const StackNavigator = () => {
 						<TouchableOpacity
 							onPress={() => navigation.goBack()}
 							style={{ marginLeft: SPACING_W.lg }}
-							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+							hitSlop={HIT_SLOP}>
 							<IconComponent type="MaterialIcons" name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
 						</TouchableOpacity>
 					),
@@ -199,7 +199,7 @@ const StackNavigator = () => {
 						<TouchableOpacity
 							onPress={() => navigation.goBack()}
 							style={{ marginLeft: SPACING_W.lg }}
-							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+							hitSlop={HIT_SLOP}>
 							<IconComponent type="MaterialIcons" name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
 						</TouchableOpacity>
 					),

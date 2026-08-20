@@ -2,22 +2,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
-import {
-	View,
-	Text,
-	StyleSheet,
-	Dimensions,
-	TouchableOpacity,
-	Image,
-	ActivityIndicator,
-	Animated,
-	Easing,
-	ScrollView,
-	InteractionManager,
-	Pressable,
-	Modal,
-	Platform,
-} from 'react-native';
+import { ActivityIndicator, Animated, Dimensions, Easing, Image, InteractionManager, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
@@ -26,7 +11,7 @@ import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -38,7 +23,8 @@ import NewBadgeModal from '@/screens/modal/NewBadgeModal';
 import { playComplete, playFlip } from '@/utils/SoundUtils';
 import DateUtils from '@/utils/DateUtils';
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+// 기기 분류(태블릿 여부)용 1회 측정값. 실시간 레이아웃은 useWindowDimensions 를 쓴다.
+const { width: screenWidth } = Dimensions.get('window');
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const COMMON_ALL_OPTION = themedValue(() => ({
@@ -200,6 +186,8 @@ const reviewPraiseMessages = [
 const DETAIL_FILTER_HEIGHT = scaleHeight(60);
 const IMAGE_HEIGHT = isAndroid ? scaleHeight(220) : scaleHeight(200);
 const QuizStudyScreen = () => {
+	// 회전/폴더블 대응: 캐러셀 높이는 실시간 화면 높이를 따른다.
+	const { height: windowHeight } = useWindowDimensions();
 	const STORAGE_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
 	const completionImages = require('@/assets/images/cheer-up.png');
 
@@ -279,7 +267,7 @@ const QuizStudyScreen = () => {
 						setLevelOpen(false); // ✅ 드롭다운 닫기
 						setRegionOpen(false); // ✅ 드롭다운 닫기
 					}}
-					hitSlop={{ top: scaleHeight(10), bottom: scaleHeight(10), left: SPACING_W.sm, right: SPACING_W.sm }}
+					hitSlop={HIT_SLOP}
 					style={{ marginRight: SPACING_W.lg }}>
 					<IconComponent type="materialIcons" name="info-outline" size={scaledSize(24)} color={COLORS.secondary} />
 				</TouchableOpacity>
@@ -831,7 +819,7 @@ const QuizStudyScreen = () => {
 								});
 							}}
 							disabled={isButtonDisabled}
-							hitSlop={{ top: scaleHeight(10), bottom: scaleHeight(10), left: scaleWidth(10), right: scaleWidth(10) }} // 여유 클릭 범위
+							hitSlop={HIT_SLOP} // 여유 클릭 범위
 						>
 							<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
 						</TouchableOpacity>
@@ -955,7 +943,7 @@ const QuizStudyScreen = () => {
 									});
 								}}
 								disabled={isButtonDisabled}
-								hitSlop={{ top: scaleHeight(10), bottom: scaleHeight(10), left: scaleWidth(10), right: scaleWidth(10) }} // 여유 클릭 범위
+								hitSlop={HIT_SLOP} // 여유 클릭 범위
 							>
 								<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
 							</TouchableOpacity>
@@ -1047,14 +1035,14 @@ const QuizStudyScreen = () => {
 										return newState;
 									});
 								}}
-								hitSlop={{ top: scaleHeight(8), bottom: scaleHeight(8), left: SPACING_W.sm, right: SPACING_W.sm }}
+								hitSlop={HIT_SLOP}
 								style={styles.detailToggleButton}>
 								<IconComponent type="materialIcons" name={isDetailFilterOpen ? 'expand-less' : 'expand-more'} size={scaledSize(24)} />
 							</TouchableOpacity>
 							{/* 🔻 초기화 버튼 추가 */}
 							<TouchableOpacity
 								onPress={resetCard}
-								hitSlop={{ top: scaleHeight(8), bottom: scaleHeight(8), left: SPACING_W.sm, right: SPACING_W.sm }}
+								hitSlop={HIT_SLOP}
 								style={styles.resetButton}>
 								<IconComponent type="materialIcons" name="restart-alt" size={scaledSize(24)} color={COLORS.danger} />
 							</TouchableOpacity>
@@ -1209,7 +1197,7 @@ const QuizStudyScreen = () => {
 									<Carousel
 										ref={carouselRef}
 										width={scaleWidth(370)}
-										height={screenHeight * 0.65}
+										height={windowHeight * 0.65}
 										// @ts-ignore
 										data={getFilteredData()}
 										renderItem={renderItem}

@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal, StyleSheet, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
 
 /** 레벨 번호 → 난이도 이름 (공통 난이도 램프 조회용) */
@@ -159,7 +159,7 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 							style={styles.favoriteIconButton}
 							onPress={handleToggleFavorite}
 							activeOpacity={0.7}
-							hitSlop={{ top: scaleHeight(8), bottom: scaleHeight(8), left: scaleWidth(8), right: scaleWidth(8) }}>
+							hitSlop={HIT_SLOP}>
 							<Icon name="star" solid={isFavorite} size={scaledSize(20)} color={isFavorite ? COLORS.gold : COLORS.borderDark} />
 						</TouchableOpacity>
 

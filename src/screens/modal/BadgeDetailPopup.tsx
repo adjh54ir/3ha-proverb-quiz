@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, Easing, Dimensions } from 'react-native';
+import { Animated, Easing, Modal, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
@@ -9,7 +9,6 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 
-const { width: SCREEN_W } = Dimensions.get('window');
 
 interface Props {
 	visible: boolean;
@@ -21,6 +20,8 @@ interface Props {
 const TYPE_LABEL: Record<string, string> = { study: '학습 뱃지', quiz: '퀴즈 뱃지', attendance: '출석 뱃지' };
 
 const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
+	// 회전/폴더블 대응: 화면 크기가 바뀌면 컴포넌트가 다시 렌더된다.
+	const { width: screenWidth } = useWindowDimensions();
 	const backdrop = useRef(new Animated.Value(0)).current;
 	const scale = useRef(new Animated.Value(0.95)).current;
 	const spin = useRef(new Animated.Value(0)).current;
@@ -189,7 +190,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 					<ConfettiCannon
 						ref={confettiRef}
 						count={80}
-						origin={{ x: SCREEN_W / 2, y: 0 }}
+						origin={{ x: screenWidth / 2, y: 0 }}
 						autoStart={false}
 						fadeOut
 						fallSpeed={2600}

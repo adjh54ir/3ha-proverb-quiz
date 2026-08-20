@@ -31,7 +31,7 @@ import 'moment/locale/ko'; // 한국어 로케일 import
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
@@ -1582,7 +1582,7 @@ const MyScoreScreen = () => {
 				<TouchableOpacity
 					style={styles.scrollTopButton}
 					activeOpacity={0.85}
-					hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+					hitSlop={HIT_SLOP}
 					onPress={scrollHandler.toTop}>
 					<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color={COLORS.textWhite} />
 				</TouchableOpacity>

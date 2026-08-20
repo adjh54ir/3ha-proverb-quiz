@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import IconComponent from './atomic/IconComponent';
 
@@ -78,7 +78,7 @@ const BottomHomeButton = ({
 				style={styles.button}
 				onPress={() => (skipConfirm ? goHome() : setShowConfirm(true))}
 				activeOpacity={0.8}
-				hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+				hitSlop={HIT_SLOP}>
 				<IconComponent type="MaterialIcons" name="home" size={scaledSize(16)} color={iconColor} />
 				<Text style={styles.text}>HOME</Text>
 			</TouchableOpacity>

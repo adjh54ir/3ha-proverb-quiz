@@ -5,7 +5,7 @@ import { Platform, View, ActivityIndicator, Text, StyleSheet } from 'react-nativ
 import { InterstitialAd, TestIds, AdEventType } from 'react-native-google-mobile-ads';
 import analytics from '@react-native-firebase/analytics'; // Firebase Analytics
 import DeviceInfo from 'react-native-device-info';
-import { SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 const AD_UNIT_ID = Platform.select({
 	ios: __DEV__ ? TestIds.INTERSTITIAL : GOOGLE_ADMOV_IOS_FRONT!,
@@ -116,21 +116,21 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 	return (
 		<View style={styles.adOverlay}>
 			<View style={styles.container}>
-				<ActivityIndicator size='large' color='#3498db' />
+				<ActivityIndicator size='large' color={COLORS.primary} />
 				<Text style={styles.loadingTxt}>광고를 준비 중이에요…</Text>
 			</View>
 		</View>
 	);
 };
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	container: {
 		padding: SPACING_H.xxl,
-		backgroundColor: '#ffffff',
-		borderRadius: scaleWidth(20),
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.xl,
 		alignItems: 'center',
 		justifyContent: 'center',
-		shadowColor: '#000',
+		shadowColor: COLORS.textDeep,
 		shadowOpacity: 0.1,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 6,
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		bottom: 0,
-		backgroundColor: 'rgba(0,0,0,0.4)', // 더 어둡게
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
 		zIndex: 999,
@@ -150,15 +150,15 @@ const styles = StyleSheet.create({
 
 	loadingTxt: {
 		marginTop: SPACING_H.md,
-		fontSize: scaledSize(16),
-		color: '#2c3e50',
+		fontSize: FONT_SIZES.lg,
+		color: COLORS.textStrong,
 		fontWeight: '600',
 	},
 
 	subTxt: {
 		marginTop: SPACING_H.xs,
-		fontSize: scaledSize(13),
-		color: '#7f8c8d',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textSecondary,
 	},
 
 	mascotImage: {
@@ -167,6 +167,6 @@ const styles = StyleSheet.create({
 		marginBottom: SPACING_H.lg,
 		opacity: 0.9,
 	},
-});
+}));
 
 export default AdmobFrontAd;

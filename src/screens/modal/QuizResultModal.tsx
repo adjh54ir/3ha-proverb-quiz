@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, ScrollView, StyleSheet, Animated, Easing } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import SuccessToast from '../SuccessToast';
@@ -167,7 +167,7 @@ const QuizResultModal = ({
 							<TouchableOpacity
 								style={[styles.favoriteButton, isFavorited && styles.favoriteButtonActive]}
 								activeOpacity={0.8}
-								hitSlop={{ top: scaleHeight(6), bottom: scaleHeight(6), left: scaleWidth(6), right: scaleWidth(6) }}
+								hitSlop={HIT_SLOP}
 								onPress={handleToggleFavoriteWithToast}>
 								<IconComponent
 									type="MaterialIcons"

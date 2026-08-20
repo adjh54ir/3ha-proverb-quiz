@@ -25,6 +25,8 @@ interface QuizCompletionModalProps {
     accuracy: number;
     onConfirm: () => void;
     onRetry?: () => void; // ✅ 추가
+    /** 틀린 문제만 모아 바로 다시 풀기 — 오답이 있을 때만 노출된다. */
+    onReviewWrong?: () => void;
 }
 
 const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
@@ -36,6 +38,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
     accuracy,
     onConfirm,
     onRetry, // ✅ 추가
+    onReviewWrong,
 }) => {
     // ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
     const scaleAnim = useRef(new Animated.Value(0.95)).current;
@@ -176,6 +179,16 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                             </View>
                         </View>
 
+                        {wrong > 0 && onReviewWrong && (
+                            <TouchableOpacity
+                                style={styles.reviewWrongButton}
+                                onPress={onReviewWrong}
+                                activeOpacity={0.85}
+                                accessibilityRole="button">
+                                <IconComponent type="MaterialIcons" name="replay" size={scaledSize(18)} color={COLORS.textWhite} />
+                                <Text style={styles.reviewWrongButtonText}>틀린 문제 {wrong}개 다시 풀기</Text>
+                            </TouchableOpacity>
+                        )}
                         <TouchableOpacity
                             style={styles.primaryButton}
                             onPress={onConfirm}
@@ -314,6 +327,16 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                         </Text>
                     </View>
 
+                    {wrong > 0 && onReviewWrong && (
+                        <TouchableOpacity
+                            style={styles.reviewWrongButton}
+                            onPress={onReviewWrong}
+                            activeOpacity={0.85}
+                            accessibilityRole="button">
+                            <IconComponent type="MaterialIcons" name="replay" size={scaledSize(18)} color={COLORS.textWhite} />
+                            <Text style={styles.reviewWrongButtonText}>틀린 문제 {wrong}개 다시 풀기</Text>
+                        </TouchableOpacity>
+                    )}
                     <View style={styles.buttonRow}>
                         {onRetry && (
                             <TouchableOpacity
@@ -529,6 +552,24 @@ const styles = themedStyles(() => StyleSheet.create({
         columnGap: SPACING_W.md,
         width: '100%',
         zIndex: 1,
+    },
+    // 오답 재도전 CTA — 확인 버튼 위에 한 줄로 놓아 다음 행동을 먼저 제안한다.
+    reviewWrongButton: {
+        width: '100%',
+        height: scaleHeight(48),
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        columnGap: SPACING_W.sm,
+        backgroundColor: COLORS.warningDark,
+        borderRadius: RADIUS.md,
+        marginBottom: SPACING_H.sm,
+        zIndex: 1,
+    },
+    reviewWrongButtonText: {
+        fontSize: FONT_SIZES.lg,
+        fontWeight: '700',
+        color: COLORS.textWhite,
     },
     primaryButton: {
         width: '100%',

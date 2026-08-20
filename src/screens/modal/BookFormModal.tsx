@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Animated, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { BOOK_COLORS, BOOK_ICONS } from '../common/CommonProverbModule';
@@ -133,7 +133,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.overlay}>
 				<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
 					<Animated.View style={[styles.modal, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
-						<TouchableOpacity style={styles.closeIcon} onPress={onClose} activeOpacity={0.7} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+						<TouchableOpacity style={styles.closeIcon} onPress={onClose} activeOpacity={0.7} hitSlop={HIT_SLOP}>
 							<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
 						</TouchableOpacity>
 

@@ -13,7 +13,7 @@ import {
 import { scaledSize, scaleHeight } from '@/utils/DementionUtils';
 import Markdown from 'react-native-markdown-display';
 import IconComponent from '../atomic/IconComponent';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue, getThemeMode } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue, getThemeMode } from '@/const/common/Theme';
 
 /** 모달 진입 애니메이션 (fade + slide-up) — 두 모달에서 공용 */
 const useModalEnterAnim = (visible: boolean) => {
@@ -251,7 +251,7 @@ export const TermsOfServiceModal = ({ visible, onClose }) => {
               style={modalStyles.closeIcon}
               onPress={onClose}
               activeOpacity={0.8}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+              hitSlop={HIT_SLOP}>
               <IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
             </TouchableOpacity>
           </View>
@@ -335,7 +335,7 @@ export const OpenSourceModal = ({ visible, onClose }) => {
               style={modalStyles.closeIcon}
               onPress={onClose}
               activeOpacity={0.8}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+              hitSlop={HIT_SLOP}>
               <IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
             </TouchableOpacity>
           </View>
@@ -361,7 +361,7 @@ export const OpenSourceModal = ({ visible, onClose }) => {
                     onPress={() => Linking.openURL(lib.url)}
                     style={styles.linkWrapper}
                     activeOpacity={0.8}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    hitSlop={HIT_SLOP}
                   >
                     <IconComponent
                       type="Feather"

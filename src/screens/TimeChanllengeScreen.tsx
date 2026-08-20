@@ -17,7 +17,7 @@ import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -701,7 +701,7 @@ const InfinityQuizScreen = () => {
 									}}
 									style={styles.chanceContent}
 									activeOpacity={0.8}
-									hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+									hitSlop={HIT_SLOP}>
 									<IconComponent name="magic" type="FontAwesome" color={COLORS.primaryDark} size={scaledSize(12)} />
 									<Text style={styles.chanceText}>찬스</Text>
 								</TouchableOpacity>
@@ -739,7 +739,7 @@ const InfinityQuizScreen = () => {
 								}}
 								style={styles.rightFixed}
 								activeOpacity={0.8}
-								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+								hitSlop={HIT_SLOP}>
 								<View style={styles.skipContent}>
 									<IconComponent name="forward" type="FontAwesome" color={COLORS.primaryDark} size={scaledSize(12)} />
 									<Text style={styles.skipText}>스킵</Text>

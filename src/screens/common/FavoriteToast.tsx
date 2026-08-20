@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Image, StyleSheet, Text, View } from 'react-native';
 import { scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 interface Props {
 	visible: boolean;
@@ -74,7 +74,7 @@ const FavoriteToast = ({ visible, message = '즐겨찾기 추가', subMessage = 
 
 export default FavoriteToast;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	toast: {
 		position: 'absolute',
 		alignSelf: 'center',
@@ -107,4 +107,4 @@ const styles = StyleSheet.create({
 		fontWeight: '500',
 		color: COLORS.text,
 	},
-});
+}));

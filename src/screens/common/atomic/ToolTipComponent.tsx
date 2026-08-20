@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 
 interface TooltipProps {
 	text: string;
@@ -49,7 +49,7 @@ export const ToolTipComponent: React.FC<TooltipProps> = ({ text, marginLeft = 0,
 	const closeTooltip = () => {
 		setShowTooltip(false);
 	};
-	const styles = StyleSheet.create({
+	const styles = themedStyles(() => StyleSheet.create({
 		tooltipContainer: {
 			position: 'relative',
 			marginTop: marginTop,
@@ -86,7 +86,7 @@ export const ToolTipComponent: React.FC<TooltipProps> = ({ text, marginLeft = 0,
 			height: Dimensions.get('window').height,
 			zIndex: 10000, // 툴팁 아래에 깔림
 		},
-	});
+	}));
 
 	return (
 		<View style={styles.tooltipContainer}>

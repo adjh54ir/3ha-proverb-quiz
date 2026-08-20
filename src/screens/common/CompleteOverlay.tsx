@@ -10,7 +10,7 @@ import Animated, {
     cancelAnimation,
 } from 'react-native-reanimated';
 import { scaledSize, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 const CompleteOverlay = () => {
     const opacity = useSharedValue(0);
@@ -66,7 +66,7 @@ const CompleteOverlay = () => {
 
 export default CompleteOverlay;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
     overlay: {
         ...StyleSheet.absoluteFillObject,
         // 부모 towerCard 와 동일한 라운드(RADIUS.lg) 유지
@@ -100,4 +100,4 @@ const styles = StyleSheet.create({
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
     },
-});
+}));

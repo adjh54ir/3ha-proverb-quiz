@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Keyboard, RefreshControl, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 
 const ScrollViewComponent = () => {
 	const scrollViewRef = useRef<ScrollView>(null);
@@ -89,7 +89,7 @@ const ScrollViewComponent = () => {
 };
 export default ScrollViewComponent;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	scrollTopButton: {
 		position: 'absolute',
 		right: SPACING_W.lg,
@@ -111,4 +111,4 @@ const styles = StyleSheet.create({
 		marginBottom: SPACING_H.xs,
 		textAlignVertical: 'top',
 	},
-});
+}));

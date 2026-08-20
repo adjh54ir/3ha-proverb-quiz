@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconComponent from '../common/atomic/IconComponent';
 import FadeInView from '@/components/animation/FadeInView';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName } from '../common/CommonProverbModule';
@@ -20,13 +20,14 @@ interface Props {
 	onAdd: (book: MainDataType.ProverbBook, ids: number[]) => void;
 }
 
-const LEVEL_ITEMS = [
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const LEVEL_ITEMS = themedValue(() => ([
 	{ label: '전체', value: '전체', icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} /> },
 	{ label: '초급', value: '초급', icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color={getLevelColor('초급')} /> },
 	{ label: '중급', value: '중급', icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color={COLORS.warning} /> },
 	{ label: '고급', value: '고급', icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color={getLevelColor('고급')} /> },
 	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelColor('특급')} /> },
-];
+]));
 
 const LEVEL_ICON_MAP: Record<string, string> = { '초급': 'seedling', 중급: 'leaf', 고급: 'tree', 특급: 'trophy' };
 
@@ -202,10 +203,11 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 
 								<View style={styles.dropdownRow}>
 									<View style={[styles.dropdownWrapper, { zIndex: levelOpen ? 3000 : 1000 }]}>
-										<DropDownPicker open={levelOpen} value={levelValue} items={levelItems} setOpen={setLevelOpen} setValue={setLevelValue} setItems={setLevelItems} style={styles.dropdown} dropDownContainerStyle={styles.dropdownList} labelStyle={styles.dropdownLabel} listItemLabelStyle={{ marginLeft: SPACING_W.xsPlus, fontSize: FONT_SIZES.smPlus }} iconContainerStyle={{ marginRight: SPACING_W.sm }} showTickIcon={false} onOpen={() => setCategoryOpen(false)} />
+										<DropDownPicker theme={getPickerTheme()} open={levelOpen} value={levelValue} items={levelItems} setOpen={setLevelOpen} setValue={setLevelValue} setItems={setLevelItems} style={styles.dropdown} dropDownContainerStyle={styles.dropdownList} labelStyle={styles.dropdownLabel} listItemLabelStyle={{ marginLeft: SPACING_W.xsPlus, fontSize: FONT_SIZES.smPlus }} iconContainerStyle={{ marginRight: SPACING_W.sm }} showTickIcon={false} onOpen={() => setCategoryOpen(false)} />
 									</View>
 									<View style={[styles.dropdownWrapper, { zIndex: categoryOpen ? 3000 : 1000 }]}>
 										<DropDownPicker
+											theme={getPickerTheme()}
 											listMode="MODAL"
 											open={categoryOpen}
 											modalTitle="카테고리 선택"
@@ -280,7 +282,7 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 
 export default AddProverbModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	overlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'flex-end' },
 	sheet: { height: '92%', backgroundColor: COLORS.background, borderTopLeftRadius: RADIUS.xl, borderTopRightRadius: RADIUS.xl, overflow: 'hidden' },
 	modalHeader: { backgroundColor: COLORS.surface, paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.sm, paddingBottom: SPACING_H.md, borderBottomWidth: 1, borderBottomColor: COLORS.surfaceAlt },
@@ -330,4 +332,4 @@ const styles = StyleSheet.create({
 	confirmBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING_W.sm, height: scaleHeight(48), borderRadius: RADIUS.md, backgroundColor: COLORS.primary },
 	confirmBtnDisabled: { backgroundColor: COLORS.borderDark },
 	confirmBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
-});
+}));

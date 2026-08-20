@@ -17,7 +17,7 @@ import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -1160,7 +1160,9 @@ const InfinityQuizScreen = () => {
 				</Modal>
 			)}
 
-			{isCountingDown && (
+			{/* 카운트다운: 절대배치 View 는 SafeAreaView(bottom) 안쪽까지만 덮여
+			    하단 네비게이션바 영역이 비어 보인다 → Modal 로 띄워 화면 끝까지 채운다 */}
+			<Modal visible={isCountingDown} transparent animationType="fade">
 				<View style={StyleSheet.absoluteFillObject}>
 					<View style={styles.countdownOverlay}>
 						<Animated.View style={[styles.countdownCircle, { transform: [{ scale: scaleAnim }] }]}>
@@ -1173,7 +1175,7 @@ const InfinityQuizScreen = () => {
 						</View>
 					</View>
 				</View>
-			)}
+			</Modal>
 
 			{/* 최하단에 위치할것!! */}
 			{showScrollTop && (
@@ -1288,7 +1290,7 @@ const InfinityQuizScreen = () => {
 
 export default InfinityQuizScreen;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	container: { flex: 1, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.md, backgroundColor: COLORS.surface },
 	header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
 	score: { fontSize: FONT_SIZES.xxl, fontWeight: '700' },
@@ -2220,4 +2222,4 @@ const styles = StyleSheet.create({
 	feedbackArrow: {
 		marginLeft: SPACING_W.smPlus,
 	},
-});
+}));

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
@@ -180,7 +180,7 @@ const InitQuizModeScreen = () => {
 	);
 };
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	main: { flex: 1, backgroundColor: COLORS.background },
 	container: { flex: 1, backgroundColor: COLORS.background, paddingHorizontal: SPACING_W.lg, alignItems: 'center' },
 	animatedWrap: { flex: 1, width: '100%' },
@@ -286,6 +286,6 @@ const styles = StyleSheet.create({
 		borderRadius: RADIUS.md,
 	},
 	accordionButtonText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '600' },
-});
+}));
 
 export default InitQuizModeScreen;

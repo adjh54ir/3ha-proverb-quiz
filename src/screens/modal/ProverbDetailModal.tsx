@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal, StyleSheet, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
 
 /** 레벨 번호 → 난이도 이름 (공통 난이도 램프 조회용) */
@@ -215,7 +215,7 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 
 export default ProverbDetailModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	modalOverlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -376,4 +376,4 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
-});
+}));

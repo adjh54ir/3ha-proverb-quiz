@@ -3,7 +3,7 @@ import React from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { scaledSize, scaleHeight } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue, getThemeMode } from '@/const/common/Theme';
 import FadeInView from '@/components/animation/FadeInView';
 
 const markdown = `
@@ -209,7 +209,7 @@ const TermsScreen = () => {
 			<FadeInView style={styles.flex}>
 				<ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
 					<View style={styles.markdownBox}>
-						<Markdown style={markdownStyles}>{markdown}</Markdown>
+						<Markdown key={getThemeMode()} style={markdownStyles}>{markdown}</Markdown>
 					</View>
 				</ScrollView>
 			</FadeInView>
@@ -219,7 +219,7 @@ const TermsScreen = () => {
 
 export default TermsScreen;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	flex: {
 		flex: 1,
 	},
@@ -240,9 +240,10 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.lg,
 	},
-});
+}));
 
-const markdownStyles = {
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const markdownStyles = themedValue(() => ({
 	body: {
 		color: COLORS.text,
 		fontSize: FONT_SIZES.md,
@@ -281,4 +282,4 @@ const markdownStyles = {
 	link: {
 		color: COLORS.secondary,
 	},
-};
+}));

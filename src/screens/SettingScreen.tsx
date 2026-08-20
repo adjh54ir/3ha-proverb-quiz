@@ -27,11 +27,12 @@ import CurrentVersionModal from './modal/CurrentVersionModal';
 import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL, APP_NAME as ENV_APP_NAME, APP_DESCRIPTION as ENV_APP_DESCRIPTION } from '@env';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import FadeInView from '@/components/animation/FadeInView';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue } from '@/const/common/Theme';
 import { SCORE_PER_QUESTION } from '@/const/common/CommonCharacterData';
 import { AppPermissionInfo, loadAppPermissions, requestAppPermission } from '@/utils/PermissionUtils';
 import DateUtils from '@/utils/DateUtils';
 import { useToast } from '@/hooks/useToast';
+import { changeThemeMode, useThemeMode } from '@/hooks/useThemeMode';
 
 // ─────────────────────────────────────────────
 // 상수
@@ -77,7 +78,8 @@ const RESET_CONFIG: Record<ResetType, { title: string; summary: string; iconName
 // ─────────────────────────────────────────────
 // 아코디언 그룹 정의 (사용자 정보 초기화)
 // ─────────────────────────────────────────────
-const ACCORDION_CONFIG = {
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const ACCORDION_CONFIG = themedValue(() => ({
 	study: {
 		label: '학습 데이터 초기화',
 		icon: 'book-open-variant',
@@ -99,7 +101,7 @@ const ACCORDION_CONFIG = {
 			{ key: 'resetTowerChallenge', label: '타워챌린지 기록 초기화' },
 		],
 	},
-} as const;
+}));
 
 // ─────────────────────────────────────────────
 // 설정 아이템 정의 (컴포넌트 외부)
@@ -124,7 +126,16 @@ const SETTINGS_MAP: Record<string, { label: string; icon: { type: IconType; name
 // ─────────────────────────────────────────────
 // 섹션 정의
 // ─────────────────────────────────────────────
-const BASE_SECTIONS = [
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const BASE_SECTIONS = themedValue(() => ([
+	{
+		titleText: '화면 테마',
+		iconType: 'materialIcons',
+		icon: 'brightness-6',
+		iconColor: COLORS.secondaryDark,
+		iconBg: COLORS.secondarySoft,
+		data: ['__theme__'],
+	},
 	{
 		titleText: '소리 설정',
 		iconType: 'materialIcons',
@@ -166,14 +177,15 @@ const BASE_SECTIONS = [
 		iconBg: COLORS.secondarySoft,
 		data: ['__permissions__'],
 	},
-];
+]));
 
 // 권한 상태별 뱃지 표기
-const PERMISSION_BADGE: Record<AppPermissionInfo['state'], { text: string; color: string }> = {
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const PERMISSION_BADGE: Record<AppPermissionInfo['state'], { text: string; color: string }> = themedValue(() => ({
 	granted: { text: '허용', color: COLORS.success },
 	blocked: { text: '거부', color: COLORS.danger },
 	undetermined: { text: '미설정', color: COLORS.textSecondary },
-};
+}));
 
 const PERMISSION_ICON: Record<AppPermissionInfo['key'], string> = {
 	notifications: 'bell-outline',
@@ -204,6 +216,7 @@ const AnimatedPressCard = ({ children, onPress }: { children: React.ReactNode; o
 // 컴포넌트
 // ─────────────────────────────────────────────
 const SettingScreen = () => {
+	const themeMode = useThemeMode(); // 화이트/다크 선택 상태
 	const sectionRef = useRef<SectionList>(null);
 
 	const [showDevModal, setShowDevModal] = useState(false);
@@ -616,6 +629,53 @@ const SettingScreen = () => {
 			);
 		}
 
+		// 화면 테마 — 시스템 설정과 무관하게 화이트/다크를 직접 고른다
+		if (item === '__theme__') {
+			const themeOptions = [
+				{ key: 'light' as const, label: '화이트', desc: '밝은 배경', icon: 'white-balance-sunny' },
+				{ key: 'dark' as const, label: '다크', desc: '어두운 배경', icon: 'weather-night' },
+			];
+
+			return (
+				<View style={styles.accordionWrapper}>
+					<View style={styles.themeRow}>
+						{themeOptions.map((option) => {
+							const isActive = themeMode === option.key;
+							return (
+								<TouchableOpacity
+									key={option.key}
+									style={[styles.themeCard, isActive && styles.themeCardActive]}
+									activeOpacity={0.85}
+									onPress={() => changeThemeMode(option.key)}
+									accessibilityRole="button"
+									accessibilityState={{ selected: isActive }}
+									accessibilityLabel={`${option.label} 모드`}>
+									<View style={[styles.themeIconChip, isActive && styles.themeIconChipActive]}>
+										<IconComponent
+											type="MaterialCommunityIcons"
+											name={option.icon}
+											size={scaledSize(20)}
+											color={isActive ? COLORS.textWhite : COLORS.textSecondary}
+										/>
+									</View>
+									<View style={styles.themeTextWrap}>
+										<Text style={[styles.themeLabel, isActive && styles.themeLabelActive]} numberOfLines={1} ellipsizeMode="tail">
+											{option.label}
+										</Text>
+										<Text style={styles.themeDesc} numberOfLines={1} ellipsizeMode="tail">
+											{option.desc}
+										</Text>
+									</View>
+									{isActive && <IconComponent type="materialIcons" name="check-circle" size={scaledSize(20)} color={COLORS.primary} />}
+								</TouchableOpacity>
+							);
+						})}
+					</View>
+					<Text style={styles.themeHint}>시스템(휴대폰) 설정과 무관하게 앱에서 고른 테마로 표시됩니다.</Text>
+				</View>
+			);
+		}
+
 		// 권한 설정 — 현재 상태 표시 + 미허용 항목은 OS 설정으로 이동
 		// 소리 설정 — 효과음/배경음악 on·off + 볼륨
 		if (item === '__sound__') {
@@ -933,7 +993,7 @@ const SettingScreen = () => {
 
 export default SettingScreen;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	container: { flex: 1, backgroundColor: COLORS.background },
 	listContent: { paddingBottom: SPACING_H.xxxxl },
 	headerContainer: { marginBottom: SPACING_H.xs },
@@ -1070,6 +1130,37 @@ const styles = StyleSheet.create({
 	volumePreviewButton: { paddingLeft: SPACING_W.xs },
 	permissionChevron: { marginLeft: SPACING_W.xs },
 
+	// ===== 화면 테마 (화이트/다크) =====
+	themeRow: { flexDirection: 'row', columnGap: SPACING_W.md },
+	themeCard: {
+		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.sm,
+		minHeight: scaleHeight(60),
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.md,
+		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.md,
+	},
+	themeCardActive: { borderColor: COLORS.primary, backgroundColor: COLORS.primaryBg },
+	themeIconChip: {
+		width: scaleWidth(34),
+		height: scaleWidth(34),
+		borderRadius: scaleWidth(17),
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: COLORS.surfaceAlt,
+	},
+	themeIconChipActive: { backgroundColor: COLORS.primary },
+	themeTextWrap: { flex: 1 },
+	themeLabel: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text },
+	themeLabelActive: { color: COLORS.primaryDeep },
+	themeDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: SPACING_H.xxs },
+	themeHint: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, lineHeight: scaledSize(18) },
+
 	scrollTopWrap: {
 		position: 'absolute',
 		right: SPACING_W.lg,
@@ -1179,4 +1270,4 @@ const styles = StyleSheet.create({
 	},
 	footerAppTitle: { fontSize: FONT_SIZES.smPlus, fontWeight: '600', color: COLORS.text, textAlign: 'center', marginBottom: SPACING_H.xs },
 	footerAppDesc: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, textAlign: 'center' },
-});
+}));

@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from "react";
 import { Keyboard, KeyboardAvoidingView, Modal, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import IconComponent from "../atomic/IconComponent";
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 const InfoModal = () => {
 
@@ -60,7 +60,7 @@ const InfoModal = () => {
 export default InfoModal;
 
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
     wrapper: {
         flex: 1,
         backgroundColor: COLORS.surface,
@@ -119,4 +119,4 @@ const styles = StyleSheet.create({
         zIndex: 2,
         padding: SPACING_W.xs,
     },
-});
+}));

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Animated }
 import IconComponent from '../common/atomic/IconComponent';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 
 const BadgeListModal = ({
@@ -174,7 +174,7 @@ const BadgeListModal = ({
 
 export default BadgeListModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	modalOverlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -371,4 +371,4 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		fontSize: FONT_SIZES.lg,
 	},
-});
+}));

@@ -6,7 +6,7 @@ import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/nativ
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import AddProverbModal from './modal/AddProverbModal';
@@ -18,7 +18,8 @@ import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { useToast } from '@/hooks/useToast';
 
-const DEFAULT_COLOR = COLORS.primary;
+// 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const getDefaultColor = () => COLORS.primary;
 const DEFAULT_ICON = 'menu-book';
 const STORAGE_KEY = MainStorageKeyType.USER_PROVERB_BOOKS;
 const PRACTICE_RECORD_KEY = MainStorageKeyType.USER_PROVERB_PRACTICE_RECORDS;
@@ -133,7 +134,7 @@ const MyProverbBookDetail = () => {
 		navigation.navigate(Paths.QUIZ, { questionPool: pool, title: target.title, mode, selectedLevel: '전체', levelKey: 'all', isWrongReview: true });
 	};
 
-	const bookColor = book?.color || DEFAULT_COLOR;
+	const bookColor = book?.color || getDefaultColor();
 	const lastAttempt = practiceRecord?.attempts?.[0];
 
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
@@ -282,7 +283,7 @@ const MyProverbBookDetail = () => {
 
 export default MyProverbBookDetail;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	main: { flex: 1, backgroundColor: COLORS.background },
 	header: {
 		flexDirection: 'row',
@@ -422,4 +423,4 @@ const styles = StyleSheet.create({
 	confirmBtnCancel: { backgroundColor: COLORS.surfaceAlt },
 	confirmBtnDelete: { backgroundColor: COLORS.danger },
 	confirmBtnText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
-});
+}));

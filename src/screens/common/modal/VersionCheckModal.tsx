@@ -1,10 +1,11 @@
 // components/VersionCheckModal.tsx
 import { setCurrentAppVerion } from '@/store/slice/UserDeviceInfoSlice';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, AppState, Modal, View, Text, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Linking, Platform, Image } from 'react-native';
 import VersionCheck from 'react-native-version-check';
+import { useThemeMode } from '@/hooks/useThemeMode';
 import { useDispatch } from 'react-redux';
 
 /** 업데이트 종류: 팝업 없음 / 닫기 가능한 안내 / 강제 업데이트 */
@@ -61,6 +62,7 @@ export const getUpdateKind = (current?: string | null, latest?: string | null): 
  * - 패치 상승: 닫기 가능한 안내
  */
 const VersionCheckModal = () => {
+	useThemeMode(); // 네비게이터 밖(App 루트)에 있어 직접 구독해야 테마가 반영된다
 	const dispatch = useDispatch();
 	const [updateKind, setUpdateKind] = useState<UpdateKind>('none');
 	const [currentVersion, setCurrentVersion] = useState('');
@@ -215,7 +217,7 @@ const VersionCheckModal = () => {
 	);
 };
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	overlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -346,6 +348,6 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: COLORS.textLight,
 	},
-});
+}));
 
 export default VersionCheckModal;

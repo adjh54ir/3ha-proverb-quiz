@@ -3,7 +3,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { scaledSize, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColor } from './CommonProverbModule';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './atomic/IconComponent';
@@ -152,7 +152,7 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 
 export default ProverbDetailContent;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	titleWrap: {
 		alignItems: 'center',
 		marginBottom: SPACING_H.md,
@@ -256,4 +256,4 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.sm,
 		fontWeight: '700',
 	},
-});
+}));

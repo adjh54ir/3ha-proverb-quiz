@@ -9,7 +9,7 @@ import IconComponent from './common/atomic/IconComponent';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import BadgeListModal from './modal/BadgeListModal';
-import { COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
@@ -1170,7 +1170,7 @@ const Home = () => {
 	);
 };
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	main: { flex: 1, backgroundColor: COLORS.surface },
 	wrapper: { flex: 1, backgroundColor: COLORS.surface, marginTop: scaleHeight(-16) },
 	container: {
@@ -1612,6 +1612,6 @@ const styles = StyleSheet.create({
 		zIndex: 999,
 		pointerEvents: 'none',
 	},
-});
+}));
 
 export default Home;

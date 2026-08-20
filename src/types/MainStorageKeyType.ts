@@ -14,4 +14,5 @@ export enum MainStorageKeyType {
 	SOUND_VOLUME = 'SOUND_VOLUME', // 효과음 볼륨 (0~1)
 	BGM_ENABLED = 'BGM_ENABLED', // 배경음악(BGM) on/off
 	BGM_VOLUME = 'BGM_VOLUME', // 배경음악 볼륨 (0~1)
+	THEME_MODE = 'THEME_MODE', // 화이트/다크 모드 ('light' | 'dark', 시스템 설정 미반영)
 }

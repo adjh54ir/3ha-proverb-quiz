@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, Dimensions, ScrollView } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 
 const { width, height } = Dimensions.get('window');
@@ -276,7 +276,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 
 export default TowerResultModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	overlay: {
 		flex: 1,
 		backgroundColor: 'rgba(0,0,0,0.9)',
@@ -553,4 +553,4 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		letterSpacing: 1,
 	},
-});
+}));

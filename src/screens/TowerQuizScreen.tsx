@@ -10,7 +10,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import { Paths } from '@/navigation/conf/Paths';
 import { generateTowerQuiz, TowerQuizQuestion } from '@/const/ConstTowerQuizData';
@@ -588,7 +588,7 @@ const TowerQuizScreen = () => {
 
 export default TowerQuizScreen;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	container: { flex: 1 },
 	safeArea: { flex: 1 },
 	header: {
@@ -710,4 +710,4 @@ const styles = StyleSheet.create({
 		textShadowRadius: 4,
 		zIndex: 10,
 	},
-});
+}));

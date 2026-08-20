@@ -1,6 +1,6 @@
 // CommonConfirmModal.tsx
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import React, { FC, useEffect, useRef } from 'react';
 import {
     Animated,
@@ -90,7 +90,7 @@ const CmmDelConfirmModal: FC<Props> = ({
     );
 };
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
     modalBackdrop: {
         flex: 1,
         backgroundColor: COLORS.dim,
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     modalCancelText: {
         color: COLORS.textSecondary,
     },
-});
+}));
 
 export default CmmDelConfirmModal;
 

@@ -1,7 +1,7 @@
 // QuizCompletionModal.tsx 수정
 
 import { scaleWidth, scaleHeight, scaledSize, screenWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import React, { useRef, useEffect } from 'react';
 import {
     View,
@@ -338,7 +338,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
 
 export default QuizCompletionModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
     // ===== 모달 공통 껍데기 =====
     overlay: {
         flex: 1,
@@ -561,4 +561,4 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: COLORS.textSecondary,
     },
-});
+}));

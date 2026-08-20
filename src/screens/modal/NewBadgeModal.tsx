@@ -5,7 +5,7 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import { MainDataType } from '@/types/MainDataType';
 import { BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { playComplete } from '@/utils/SoundUtils';
@@ -184,7 +184,7 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 
 export default NewBadgeModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	modalOverlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -330,4 +330,4 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 	},
-});
+}));

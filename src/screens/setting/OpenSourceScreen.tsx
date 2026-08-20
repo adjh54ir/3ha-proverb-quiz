@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View, Linking, TouchableOpacity } from 'react-native';
 import { scaleHeight, scaledSize } from '@/utils/DementionUtils';
 import Icon from 'react-native-vector-icons/Feather';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import FadeInView from '@/components/animation/FadeInView';
 import { OPEN_SOURCE_LIBS } from '@/const/common/OpenSourceData';
 
@@ -49,7 +49,7 @@ const OpenSourceScreen = () => {
 
 export default OpenSourceScreen;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	content: {
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.lg,
@@ -114,4 +114,4 @@ const styles = StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.lg,
 	},
-});
+}));

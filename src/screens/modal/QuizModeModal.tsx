@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { scaledSize, scaleWidth, scaleHeight } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 
@@ -14,12 +14,13 @@ type Props = {
 	onSelect: (book: MainDataType.ProverbBook, mode: QuizMode) => void;
 };
 
-const MODES: { key: QuizMode; label: string; desc: string; icon: string; color: string; bg: string }[] = [
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const MODES: { key: QuizMode; label: string; desc: string; icon: string; color: string; bg: string }[] = themedValue(() => ([
 	{ key: 'meaning', label: '뜻 맞추기', desc: '속담을 보고 의미를 골라요', icon: 'lightbulb', color: COLORS.secondary, bg: COLORS.secondaryBg },
 	{ key: 'proverb', label: '속담 맞추기', desc: '의미를 보고 속담을 골라요', icon: 'menu-book', color: COLORS.primary, bg: COLORS.primaryBg },
 	{ key: 'blank', label: '빈칸 채우기', desc: '속담의 빈칸을 채워요', icon: 'edit', color: COLORS.warning, bg: COLORS.warningSoft },
 	{ key: 'example', label: '예문 속담', desc: '예문에 어울리는 속담을 골라요', icon: 'forum', color: COLORS.accentTeal, bg: COLORS.accentTealBg },
-];
+]));
 
 const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
 	// ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
@@ -81,7 +82,7 @@ const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
 
 export default QuizModeModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	// ===== 모달 공통 껍데기 =====
 	overlay: {
 		flex: 1,
@@ -137,4 +138,4 @@ const styles = StyleSheet.create({
 	},
 	modeLabel: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.text },
 	modeDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: SPACING_H.xs },
-});
+}));

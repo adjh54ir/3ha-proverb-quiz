@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Modal, View, Text, Image, StyleSheet, TouchableOpacity, Linking, ScrollView } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import IconComponent from '../atomic/IconComponent';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 
 interface Props {
 	visible: boolean;
@@ -139,7 +139,7 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 	);
 };
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	overlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -241,6 +241,6 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		textAlign: 'center',
 	},
-});
+}));
 
 export default Contributor9Modal;

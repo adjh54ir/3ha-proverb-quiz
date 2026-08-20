@@ -8,7 +8,7 @@ import IconComponent from './common/atomic/IconComponent';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -269,7 +269,7 @@ const WrongReviewScreen = () => {
 
 export default WrongReviewScreen;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	safeArea: {
 		flex: 1,
 		backgroundColor: COLORS.background,
@@ -529,4 +529,4 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-});
+}));

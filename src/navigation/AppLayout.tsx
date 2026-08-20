@@ -1,15 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, Platform, Dimensions } from 'react-native';
-import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, Theme } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaleHeight } from '@/utils';
-import { COLORS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import DeviceInfo from 'react-native-device-info';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 import BootSplash from 'react-native-bootsplash'; // 추가
+import { useThemeMode } from '@/hooks/useThemeMode';
 
 const AD_ALLOWED_ROUTES = [
 	Paths.TODAY_QUIZ,
@@ -25,6 +26,7 @@ const AD_ALLOWED_ROUTES = [
 
 const DESIGN_HEIGHT = 812;
 const AppLayout = () => {
+	const themeMode = useThemeMode(); // 모드 변경 시 배경색 재계산
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);
 	const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
 	const [bannerHeight, setBannerHeight] = useState(0);
@@ -47,7 +49,8 @@ const AppLayout = () => {
 			default:
 				return COLORS.surface; // 기본값
 		}
-	}, [currentRoute]);
+		// themeMode 가 바뀌면 COLORS 가 다른 팔레트를 가리키므로 다시 계산해야 한다.
+	}, [currentRoute, themeMode]);
 
 	/**
 	 * 배너 높이에 따른 패딩 계산 함수
@@ -105,8 +108,30 @@ const AppLayout = () => {
 
 	const handleBannerHeight = useCallback((height: number) => setBannerHeight(height), []);
 
+	/**
+	 * 네비게이션 자체 테마.
+	 * 지정하지 않으면 화면 전환 카드/헤더 뒤 기본 배경이 라이트(회백색)로 남아
+	 * 다크모드에서 전환 중 흰 배경이 번쩍인다.
+	 */
+	const navigationTheme = useMemo<Theme>(() => {
+		const base = themeMode === 'dark' ? DarkTheme : DefaultTheme;
+		return {
+			...base,
+			colors: {
+				...base.colors,
+				primary: COLORS.primary,
+				background: COLORS.background,
+				card: COLORS.surface,
+				text: COLORS.text,
+				border: COLORS.border,
+				notification: COLORS.danger,
+			},
+		};
+	}, [themeMode]);
+
 	return (
 		<NavigationContainer
+			theme={navigationTheme}
 			ref={navigationRef}
 			onReady={() => {
 				setCurrentRoute(navigationRef.current?.getCurrentRoute()?.name || '');
@@ -133,7 +158,7 @@ const AppLayout = () => {
 	);
 };
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	safeArea: {
 		flex: 1,
 		backgroundColor: COLORS.surface,
@@ -158,6 +183,6 @@ const styles = StyleSheet.create({
 	navigatorWrapper: {
 		flex: 1,
 	},
-});
+}));
 
 export default AppLayout;

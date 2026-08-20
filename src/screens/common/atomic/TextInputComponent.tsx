@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { scaleHeight } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 
 /**
  * TextInput 줄넘김 증상에 대한 해결
@@ -41,7 +41,7 @@ const TextInputComponent = () => {
 };
 export default TextInputComponent;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	formGroup: {
 		marginBottom: SPACING_H.lg,
 		position: 'relative',
@@ -71,4 +71,4 @@ const styles = StyleSheet.create({
 		color: COLORS.text,
 		textAlignVertical: 'top',
 	},
-});
+}));

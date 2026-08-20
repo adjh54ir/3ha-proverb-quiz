@@ -1,5 +1,6 @@
 // IconComponent.tsx
 import { scaledSize } from '@/utils';
+import { COLORS } from '@/const/common/Theme';
 import React from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -61,7 +62,8 @@ interface IconProps {
  * @param param0
  * @returns
  */
-const IconComponent: React.FC<IconProps> = ({ type, name, size = scaledSize(24), color = 'black', style }) => {
+// color 기본값을 'black' 으로 두면 다크모드에서 아이콘이 배경에 묻힌다 → 테마 본문색을 기본으로.
+const IconComponent: React.FC<IconProps> = ({ type, name, size = scaledSize(24), color = COLORS.text, style }) => {
 	const normalizedType = type.toLowerCase(); // 소문자 변환
 
 	const iconMap: Record<IconType, any> = {

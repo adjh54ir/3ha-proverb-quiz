@@ -26,7 +26,7 @@ import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -40,7 +40,8 @@ import DateUtils from '@/utils/DateUtils';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-const COMMON_ALL_OPTION = {
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const COMMON_ALL_OPTION = themedValue(() => ({
 	label: '전체',
 	value: '전체',
 	iconType: 'FontAwesome6',
@@ -52,7 +53,7 @@ const COMMON_ALL_OPTION = {
 		marginLeft: SPACING_W.xs,
 		fontSize: FONT_SIZES.md,
 	},
-};
+}));
 const LEVEL_DROPDOWN_ITEMS = [
 	COMMON_ALL_OPTION,
 	{
@@ -1067,6 +1068,7 @@ const QuizStudyScreen = () => {
 										{' '}
 										{/* zIndex 역전 방지 */}
 										<DropDownPicker
+											theme={getPickerTheme()}
 											open={isDetailFilterOpen && levelOpen}
 											setOpen={setLevelOpen}
 											value={levelFilter}
@@ -1090,6 +1092,7 @@ const QuizStudyScreen = () => {
 									<View style={{ width: SPACING_W.sm }} />
 									<View style={{ flex: 1, zIndex: levelOpen ? 1000 : 2000 }}>
 										<DropDownPicker
+											theme={getPickerTheme()}
 											listMode="MODAL"
 											open={isDetailFilterOpen && regionOpen}
 											value={regionFilter}
@@ -1363,7 +1366,7 @@ const QuizStudyScreen = () => {
 		</>
 	);
 };
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	main: {
 		flex: 1,
 		backgroundColor: COLORS.surface,
@@ -2014,6 +2017,6 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: COLORS.text,
 	},
-});
+}));
 
 export default QuizStudyScreen;

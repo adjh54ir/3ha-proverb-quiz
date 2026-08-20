@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Animated, ScrollView } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
@@ -152,7 +152,7 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 
 export default QuizHintModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	// ===== 모달 공통 껍데기 =====
 	overlay: {
 		flex: 1,
@@ -290,4 +290,4 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		color: COLORS.textWhite,
 	},
-});
+}));

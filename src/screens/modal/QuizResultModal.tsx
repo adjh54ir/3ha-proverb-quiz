@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, ScrollView, StyleSheet, Animated, Easing } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import SuccessToast from '../SuccessToast';
@@ -290,7 +290,7 @@ const QuizResultModal = ({
 
 export default QuizResultModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	// ===== 모달 공통 껍데기 =====
 	overlay: {
 		flex: 1,
@@ -506,4 +506,4 @@ const styles = StyleSheet.create({
 		borderColor: COLORS.warning,
 		backgroundColor: COLORS.warningBg,
 	},
-});
+}));

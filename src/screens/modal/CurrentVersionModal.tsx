@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import PopInView from '@/components/animation/PopInView';
 
@@ -74,7 +74,7 @@ const CurrentVersionModal = ({ visible, currentVersion, latestVersion, onClose, 
 
 export default CurrentVersionModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
     backdrop: {
         flex: 1,
         backgroundColor: COLORS.dim,
@@ -168,4 +168,4 @@ const styles = StyleSheet.create({
     needUpdate: {
         color: COLORS.danger,
     },
-});
+}));

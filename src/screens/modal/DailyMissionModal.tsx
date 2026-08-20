@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Modal, StyleSheet, Animated, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import DateUtils from '@/utils/DateUtils';
@@ -187,7 +187,7 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 
 export default DailyMissionModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	overlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -347,4 +347,4 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		marginTop: SPACING_H.sm,
 	},
-});
+}));

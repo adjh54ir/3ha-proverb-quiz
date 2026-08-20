@@ -31,7 +31,7 @@ import 'moment/locale/ko'; // 한국어 로케일 import
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
@@ -680,7 +680,13 @@ const MyScoreScreen = () => {
 				contentContainerStyle={{ paddingBottom: SPACING_H.xxxxl, flexGrow: 1 }}
 				onScroll={scrollHandler.onScroll}
 				scrollEventThrottle={16}
-				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+				refreshControl={<RefreshControl
+						refreshing={refreshing}
+						onRefresh={onRefresh}
+						tintColor={COLORS.textSecondary}
+						colors={[COLORS.primary]}
+						progressBackgroundColor={COLORS.surface}
+					/>}>
 				<View style={styles.sectionBox}>
 					<View style={styles.activityHero}>
 						<View style={styles.activityHeroCopy}>
@@ -1587,7 +1593,7 @@ const MyScoreScreen = () => {
 
 export default MyScoreScreen;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	safeArea: { flex: 1, backgroundColor: COLORS.background },
 	container: {
 		paddingHorizontal: SPACING_W.lg,
@@ -2618,4 +2624,4 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		color: COLORS.primary,
 	},
-});
+}));

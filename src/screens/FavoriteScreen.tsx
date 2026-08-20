@@ -23,7 +23,7 @@ import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
@@ -33,12 +33,13 @@ import FavoriteToast from './common/FavoriteToast';
 import BottomHomeButton from './common/BottomHomeButton';
 import FavoriteAddModal from './modal/FavoriteAddModal';
 
-const COMMON_ALL_OPTION = {
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const COMMON_ALL_OPTION = themedValue(() => ({
 	label: '전체',
 	value: '전체',
 	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />,
 	labelStyle: { marginLeft: SPACING_W.xs, fontSize: FONT_SIZES.md },
-};
+}));
 
 const LEVEL_DROPDOWN_ITEMS = [
 	COMMON_ALL_OPTION,
@@ -405,6 +406,7 @@ const FavoriteScreen = () => {
 								<View style={styles.filterDropdownRow}>
 									<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
 										<DropDownPicker
+											theme={getPickerTheme()}
 											open={levelOpen}
 											value={levelValue}
 											items={levelItems}
@@ -423,6 +425,7 @@ const FavoriteScreen = () => {
 									</View>
 									<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000, overflow: 'visible' }]}>
 										<DropDownPicker
+											theme={getPickerTheme()}
 											listMode="MODAL"
 											open={fieldOpen}
 											modalTitle="카테고리 선택"
@@ -500,7 +503,13 @@ const FavoriteScreen = () => {
 							contentContainerStyle={[styles.listContent, isSelectionMode && { paddingBottom: scaleHeight(120) }]}
 							keyboardShouldPersistTaps="handled"
 								keyboardDismissMode="on-drag"
-							refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+							refreshControl={<RefreshControl
+									refreshing={refreshing}
+									onRefresh={onRefresh}
+									tintColor={COLORS.textSecondary}
+									colors={[COLORS.primary]}
+									progressBackgroundColor={COLORS.surface}
+								/>}
 							ListEmptyComponent={() => (
 								<View style={styles.emptyWrapper}>
 									{allFavorites.length === 0 ? (
@@ -576,7 +585,7 @@ const FavoriteScreen = () => {
 
 export default FavoriteScreen;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	main: { flex: 1, backgroundColor: COLORS.background },
 	headerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.md },
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
@@ -797,4 +806,4 @@ const styles = StyleSheet.create({
 	confirmBtnCancelText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textSecondary },
 	confirmBtnDelete: { backgroundColor: COLORS.danger },
 	confirmBtnDeleteText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textWhite },
-});
+}));

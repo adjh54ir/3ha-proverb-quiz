@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated, Easing } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated, Easing, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainDataType } from '@/types/MainDataType';
@@ -319,7 +319,9 @@ const QuizModeScreen = () => {
 			</View>
 			<BottomHomeButton backgroundColor={COLORS.surface} />
 
-			{showInfoModal && (
+			{/* 안내 팝업: 화면 안 절대배치 View 로 두면 SafeAreaView 안쪽까지만 딤이 깔려
+			    상태바/네비게이션바 영역이 비어 보인다 → RN Modal 로 띄워 화면 끝까지 채운다 */}
+			<Modal visible={showInfoModal} transparent animationType="fade" onRequestClose={() => setShowInfoModal(false)}>
 				<View style={styles.modalOverlay}>
 					<View style={styles.modalContent}>
 						<TouchableOpacity style={styles.modalCloseIcon} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} onPress={() => setShowInfoModal(false)}>
@@ -332,7 +334,7 @@ const QuizModeScreen = () => {
 						</TouchableOpacity>
 					</View>
 				</View>
-			)}
+			</Modal>
 
 			{showAd && (
 				<AdmobFrontAd
@@ -352,7 +354,7 @@ const QuizModeScreen = () => {
 	);
 };
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: COLORS.surface,
@@ -603,5 +605,5 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		fontSize: FONT_SIZES.lg,
 	},
-});
+}));
 export default QuizModeScreen;

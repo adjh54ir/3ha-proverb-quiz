@@ -3,7 +3,7 @@ import { View, Text, Modal, StyleSheet, TouchableOpacity, Animated } from 'react
 import FastImage from 'react-native-fast-image';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { playComplete } from '@/utils/SoundUtils';
@@ -105,7 +105,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bo
 
 export default LevelUpModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	overlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -198,4 +198,4 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 	},
-});
+}));

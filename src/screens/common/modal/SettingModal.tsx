@@ -13,7 +13,7 @@ import {
 import { scaledSize, scaleHeight } from '@/utils/DementionUtils';
 import Markdown from 'react-native-markdown-display';
 import IconComponent from '../atomic/IconComponent';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue, getThemeMode } from '@/const/common/Theme';
 
 /** 모달 진입 애니메이션 (fade + slide-up) — 두 모달에서 공용 */
 const useModalEnterAnim = (visible: boolean) => {
@@ -258,7 +258,8 @@ export const TermsOfServiceModal = ({ visible, onClose }) => {
 
           <ScrollView contentContainerStyle={modalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
             <View style={modalStyles.markdownBox}>
-              <Markdown style={markdownStyles}>
+              {/* React.memo 컴포넌트라 style 프롭 동등성으로 렌더를 건너뛴다 → 모드를 key 로 걸어 갱신 */}
+              <Markdown key={getThemeMode()} style={markdownStyles}>
                 {markdown}
               </Markdown>
             </View>
@@ -382,7 +383,7 @@ export const OpenSourceModal = ({ visible, onClose }) => {
     </Modal>
   );
 };
-const modalStyles = StyleSheet.create({
+const modalStyles = themedStyles(() => StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: COLORS.dim,
@@ -432,8 +433,8 @@ const modalStyles = StyleSheet.create({
   closeIcon: {
     padding: SPACING_W.xs,
   },
-});
-const styles = StyleSheet.create({
+}));
+const styles = themedStyles(() => StyleSheet.create({
   wrapperBox: {
     backgroundColor: COLORS.background,
     borderWidth: 1,
@@ -486,9 +487,10 @@ const styles = StyleSheet.create({
     color: COLORS.textLight,
     textAlign: 'center',
   },
-});
+}));
 
-const markdownStyles = {
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const markdownStyles = themedValue(() => ({
   body: {
     color: COLORS.text,
     fontSize: FONT_SIZES.md,
@@ -527,4 +529,4 @@ const markdownStyles = {
   link: {
     color: COLORS.secondary,
   },
-};
+}));

@@ -88,7 +88,10 @@ const COMMON_ALL_OPTION = {
 	iconType: 'FontAwesome6',
 	badgeId: '',
 	iconName: 'clipboard-list',
-	iconColor: COLORS.textSecondary,
+	// getter 로 둬야 모듈 로드 시점의 팔레트로 굳지 않고 다크모드 전환을 따라간다.
+	get iconColor() {
+		return COLORS.textSecondary;
+	},
 	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />,
 	labelStyle: {
 		marginLeft: SPACING_W.xsPlus,

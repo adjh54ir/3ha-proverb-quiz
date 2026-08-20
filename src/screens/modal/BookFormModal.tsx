@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Animated, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { BOOK_COLORS, BOOK_ICONS } from '../common/CommonProverbModule';
@@ -13,7 +13,8 @@ type PickerProps = {
 	onIconChange: (i: string) => void;
 };
 
-const DEFAULT_COLOR: string = COLORS.primary;
+// 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const getDefaultColor = (): string => COLORS.primary;
 const DEFAULT_ICON = 'menu-book';
 
 type Props = {
@@ -69,7 +70,7 @@ const ColorIconPicker = ({ selectedColor, selectedIcon, onColorChange, onIconCha
 	);
 };
 
-const pickerStyles = StyleSheet.create({
+const pickerStyles = themedStyles(() => StyleSheet.create({
 	container: { width: '100%', marginTop: SPACING_H.md },
 	preview: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.md, borderWidth: 1, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md, marginBottom: SPACING_H.md },
 	previewIcon: { width: scaleWidth(44), height: scaleWidth(44), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
@@ -82,14 +83,14 @@ const pickerStyles = StyleSheet.create({
 	iconDot: { width: scaleWidth(38), height: scaleWidth(38), borderRadius: RADIUS.md, marginRight: SPACING_W.sm, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.background },
 	iconDotSelected: { borderWidth: 1.5 },
 	previewDesc: { fontSize: FONT_SIZES.xs, color: COLORS.textLight, marginTop: SPACING_H.xs },
-});
+}));
 
 const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 	const isEdit = !!editTarget;
 
 	const [title, setTitle] = useState('');
 	const [desc, setDesc] = useState('');
-	const [color, setColor] = useState(DEFAULT_COLOR);
+	const [color, setColor] = useState(getDefaultColor());
 	const [icon, setIcon] = useState(DEFAULT_ICON);
 	const [focusedField, setFocusedField] = useState<'title' | 'desc' | null>(null);
 
@@ -100,7 +101,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 		if (visible) {
 			setTitle(editTarget?.title ?? '');
 			setDesc(editTarget?.description ?? '');
-			setColor(editTarget?.color ?? DEFAULT_COLOR);
+			setColor(editTarget?.color ?? getDefaultColor());
 			setIcon(editTarget?.icon ?? DEFAULT_ICON);
 			setFocusedField(null);
 		}
@@ -197,7 +198,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 
 export default BookFormModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	headerImage: { width: scaleWidth(72), height: scaleWidth(72), alignSelf: 'center', marginTop: SPACING_H.sm },
 	overlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'center', alignItems: 'center' },
 	scrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: SPACING_H.xl, width: '100%' },
@@ -212,4 +213,4 @@ const styles = StyleSheet.create({
 	submitBtnDisabled: { backgroundColor: COLORS.borderDark },
 	submitBtnText: { color: COLORS.textWhite, fontWeight: '700', fontSize: FONT_SIZES.lg },
 	fieldLabel: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, marginTop: SPACING_H.xs },
-});
+}));

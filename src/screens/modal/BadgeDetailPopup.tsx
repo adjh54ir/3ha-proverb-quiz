@@ -6,7 +6,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -215,7 +215,7 @@ const InfoRow = ({ icon, label, value, tint }: { icon: string; label: string; va
 
 export default BadgeDetailPopup;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	backdrop: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -366,4 +366,4 @@ const styles = StyleSheet.create({
 		marginTop: SPACING_H.xs,
 	},
 	closeBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '700' },
-});
+}));

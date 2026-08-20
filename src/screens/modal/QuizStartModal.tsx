@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, Animated, StyleSheet, Image, Switch } from 'react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { isSoundEnabled, setSoundEnabled } from '@/utils/SoundUtils';
 import { isBgmEnabled, setBgmEnabled, startBgm, stopBgm, BgmTrack } from '@/utils/BgmUtils';
@@ -184,7 +184,7 @@ const QuizStartModal = ({
 
 export default QuizStartModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	// ===== 모달 공통 껍데기 =====
 	overlay: {
 		flex: 1,
@@ -302,4 +302,4 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	primaryButtonText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textWhite },
-});
+}));

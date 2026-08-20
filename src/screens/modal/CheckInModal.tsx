@@ -4,7 +4,7 @@ import { View, Modal, Text, ScrollView, StyleSheet, Animated } from 'react-nativ
 import FastImage from 'react-native-fast-image';
 import { Calendar } from 'react-native-calendars';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { PET_REWARDS } from '@/const/ConstInfoData';
@@ -166,7 +166,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 
 export default CheckInModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	modalOverlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -397,4 +397,4 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		textAlign: 'center',
 	},
-});
+}));

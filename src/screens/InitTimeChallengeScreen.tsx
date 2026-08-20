@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Image, Modal } from 'react-native';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
@@ -350,7 +350,7 @@ const InitTimeChallengeScreen = () => {
 	);
 };
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: COLORS.background,
@@ -704,6 +704,6 @@ const styles = StyleSheet.create({
 	},
 
 	// 카운트다운
-});
+}));
 
 export default InitTimeChallengeScreen;

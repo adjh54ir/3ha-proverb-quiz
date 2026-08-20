@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal, Pressable,
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { TOWER_LEVELS } from '@/const/ConstTowerData';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 interface Props {
     unlockedRewards: number[];
@@ -274,7 +274,7 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
 
 export default TowerRewardSection;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
     towerRewardView: {
         width: '100%',
         marginTop: SPACING_H.sm,
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
         height: scaleWidth(48),
         borderRadius: scaleWidth(48) / 2,
         borderWidth: 2,
-        borderColor: '#16a085',
+        borderColor: COLORS.accentTeal,
     },
     towerRewardBadge: {
         position: 'absolute',
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
     },
     highlight: {
         fontWeight: '700',
-        color: '#e67e22',
+        color: COLORS.accentOrangeDark,
     },
     divider: {
         height: 1,
@@ -493,4 +493,4 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize: FONT_SIZES.lg,
     },
-});
+}));

@@ -6,7 +6,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import BookFormModal from './modal/BookFormModal';
@@ -18,7 +18,8 @@ import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import DateUtils from '@/utils/DateUtils';
 
-const DEFAULT_COLOR = COLORS.primary;
+// 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const getDefaultColor = () => COLORS.primary;
 const DEFAULT_ICON = 'menu-book';
 const STORAGE_KEY = MainStorageKeyType.USER_PROVERB_BOOKS;
 
@@ -84,7 +85,7 @@ const MyProverbBook = () => {
 		if (json) {
 			const parsed: MainDataType.ProverbBook[] = JSON.parse(json).map((b: MainDataType.ProverbBook) => ({
 				...b,
-				color: b.color || DEFAULT_COLOR,
+				color: b.color || getDefaultColor(),
 				icon: b.icon || DEFAULT_ICON,
 			}));
 			setBooks(parsed);
@@ -230,7 +231,7 @@ const MyProverbBook = () => {
 						</View>
 					) : (
 						filteredBooks.map((book, index) => {
-							const bookColor = book.color || DEFAULT_COLOR;
+							const bookColor = book.color || getDefaultColor();
 							const bookIcon = book.icon || DEFAULT_ICON;
 							const proverbs = ALL_PROVERBS.filter((p) => book.proverbIds.includes(p.id));
 							const preview = proverbs.slice(0, 4);
@@ -328,8 +329,8 @@ const MyProverbBook = () => {
 					<TouchableOpacity activeOpacity={1} style={[styles.actionSheet, { paddingBottom: Math.max(insets.bottom, SPACING_H.xxl) }]}>
 						<View style={styles.actionSheetHandle} />
 						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; setActionSheet(null); b && navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: b.id }); }}>
-							<View style={[styles.actionItemIcon, { backgroundColor: (actionSheet?.color || DEFAULT_COLOR) + '20' }]}>
-								<IconComponent type="materialIcons" name={actionSheet?.icon || DEFAULT_ICON} size={scaledSize(18)} color={actionSheet?.color || DEFAULT_COLOR} />
+							<View style={[styles.actionItemIcon, { backgroundColor: (actionSheet?.color || getDefaultColor()) + '20' }]}>
+								<IconComponent type="materialIcons" name={actionSheet?.icon || DEFAULT_ICON} size={scaledSize(18)} color={actionSheet?.color || getDefaultColor()} />
 							</View>
 							<View style={{ flex: 1 }}>
 								<Text style={styles.actionItemLabel} numberOfLines={1}>{actionSheet?.title}</Text>
@@ -382,7 +383,7 @@ const MyProverbBook = () => {
 
 export default MyProverbBook;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	keyboardWrap: { flex: 1 },
 	main: { flex: 1, backgroundColor: COLORS.background },
 	header: {
@@ -588,4 +589,4 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	actionCancelText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textSecondary },
-});
+}));

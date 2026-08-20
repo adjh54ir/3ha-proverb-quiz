@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import IconComponent from './atomic/IconComponent';
 
@@ -108,7 +108,7 @@ const BottomHomeButton = ({
 
 export default BottomHomeButton;
 
-const modalStyles = StyleSheet.create({
+const modalStyles = themedStyles(() => StyleSheet.create({
 	overlay: {
 		flex: 1,
 		backgroundColor: 'rgba(15,23,42,0.5)',
@@ -172,4 +172,4 @@ const modalStyles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	confirmText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.textWhite },
-});
+}));

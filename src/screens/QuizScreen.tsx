@@ -19,7 +19,7 @@ import { CONST_BADGES } from '@/const/ConstBadges';
 import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
@@ -33,7 +33,8 @@ import { startBgm, stopBgm } from '@/utils/BgmUtils';
 import { toggleFavorite } from '@/utils/favoriteUtils';
 import DateUtils from '@/utils/DateUtils';
 
-const labelColors = [COLORS.secondary, COLORS.primary, COLORS.accentTeal, COLORS.accentFlame]; // A, B, C, D 보기 라벨
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const labelColors = themedValue(() => [COLORS.secondary, COLORS.primary, COLORS.accentTeal, COLORS.accentFlame]); // A, B, C, D 보기 라벨
 const LEVEL_NAME_BY_NUMBER: Record<number, string> = { 1: '초급', 2: '중급', 3: '고급', 4: '특급' };
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
@@ -1263,7 +1264,7 @@ const QuizScreen = () => {
 export default QuizScreen;
 
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: COLORS.surface,
@@ -1581,4 +1582,4 @@ const styles = StyleSheet.create({
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '600',
 	},
-});
+}));

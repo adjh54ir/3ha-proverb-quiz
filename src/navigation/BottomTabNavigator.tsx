@@ -13,6 +13,8 @@ import { COLORS, FONT_SIZES, SPACING_H } from '@/const/common/Theme';
 import DeviceInfo from 'react-native-device-info';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import TodayQuizScreen from '@/screens/TodayQuizScreen';
+import { withThemedScreen } from './withThemedScreen';
+import { useThemeMode } from '@/hooks/useThemeMode';
 
 /**
  * 탭 선택 시 아이콘에 가벼운 scale pop 을 주는 래퍼
@@ -76,15 +78,17 @@ const withFreshMount = (Screen: React.ComponentType<any>) => {
 	return FreshMountScreen;
 };
 
-const FreshProverbListScreen = withFreshMount(ProverbListScreen);
-const FreshTodayQuizScreen = withFreshMount(TodayQuizScreen);
-const FreshHome = withFreshMount(Home);
-const FreshMyScoreScreen = withFreshMount(MyScoreScreen);
-const FreshSettingScreen = withFreshMount(SettingScreen);
+// 탭 재진입 초기화(withFreshMount) + 테마 전환 시 재적용(withThemedScreen)을 함께 감싼다.
+const FreshProverbListScreen = withThemedScreen(withFreshMount(ProverbListScreen));
+const FreshTodayQuizScreen = withThemedScreen(withFreshMount(TodayQuizScreen));
+const FreshHome = withThemedScreen(withFreshMount(Home));
+const FreshMyScoreScreen = withThemedScreen(withFreshMount(MyScoreScreen));
+const FreshSettingScreen = withThemedScreen(withFreshMount(SettingScreen));
 
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
+	useThemeMode(); // 모드 변경 시 탭바 색상 재적용
 	const isTablet = DeviceInfo.isTablet();
 	const insets = useSafeAreaInsets();
 

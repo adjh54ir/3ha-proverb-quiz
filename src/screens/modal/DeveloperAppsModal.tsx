@@ -16,7 +16,7 @@ import {
 	Pressable,
 } from 'react-native';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { COMMON_APPS_DATA } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
@@ -37,11 +37,12 @@ const CATEGORY_LABEL: Record<CommonType.AppCategory, string> = {
 	utility: '유틸리티',
 };
 
-const CATEGORY_COLORS: Record<CommonType.AppCategory, { bg: string; text: string }> = {
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const CATEGORY_COLORS: Record<CommonType.AppCategory, { bg: string; text: string }> = themedValue(() => ({
 	quiz: { bg: COLORS.secondaryBg, text: COLORS.secondaryDark },
 	calculator: { bg: COLORS.primaryBg, text: COLORS.primaryDeep },
 	utility: { bg: COLORS.accentOrangeBg, text: COLORS.warningDeep },
-};
+}));
 
 interface Props {
 	visible: boolean;
@@ -202,7 +203,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 
 export default DeveloperAppsModal;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	overlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -402,4 +403,4 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		letterSpacing: 0.5,
 	},
-});
+}));

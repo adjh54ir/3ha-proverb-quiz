@@ -22,12 +22,34 @@ import QuizScreen from '@/screens/QuizScreen';
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import TowerChallengeScreen from '@/screens/TowerChallengeScreen';
 import TowerQuizScreen from '@/screens/TowerQuizScreen';
+import { withThemedScreen } from './withThemedScreen';
+import { useThemeMode } from '@/hooks/useThemeMode';
+
+/**
+ * 화이트/다크 전환 시 각 화면만 새 팔레트로 다시 그린다.
+ * 모듈 스코프에서 1회만 감싸야 한다(렌더마다 새 컴포넌트가 되면 무한 리마운트).
+ */
+const ThemedTimeChallenge = withThemedScreen(TimeChanllengeScreen);
+const ThemedInitTimeChallenge = withThemedScreen(InitTimeChallengeScreen);
+const ThemedQuiz = withThemedScreen(QuizScreen);
+const ThemedInitQuizMode = withThemedScreen(InitQuizModeScreen);
+const ThemedQuizMode = withThemedScreen(QuizModeScreen);
+const ThemedProverbStudy = withThemedScreen(ProverbStudyScreen);
+const ThemedWrongReview = withThemedScreen(WrongReviewScreen);
+const ThemedTowerChallenge = withThemedScreen(TowerChallengeScreen);
+const ThemedTowerQuiz = withThemedScreen(TowerQuizScreen);
+const ThemedHome = withThemedScreen(Home);
+const ThemedSetting = withThemedScreen(SettingScreen);
+const ThemedFavorite = withThemedScreen(FavoriteScreen);
+const ThemedMyProverbBook = withThemedScreen(MyProverbBook);
+const ThemedMyProverbBookDetail = withThemedScreen(MyProverbBookDetail);
 
 /**
  * Stack Navigator : 일반적인 화면만 출력을 하는 경우
  * @returns
  */
 const StackNavigator = () => {
+	useThemeMode(); // 모드 변경 시 헤더 색상 재적용
 	const Stack = createStackNavigator(); // Stack Navigator 이름을 정의합니다.
 
 	return (
@@ -53,7 +75,7 @@ const StackNavigator = () => {
 			/>
 			<Stack.Screen
 				name={Paths.TIME_CHANLLENGE}
-				component={TimeChanllengeScreen}
+				component={ThemedTimeChallenge}
 				options={({ navigation }) => ({
 					headerShown: false,
 					title: '타임 챌린지',
@@ -62,7 +84,7 @@ const StackNavigator = () => {
 			/>
 			<Stack.Screen
 				name={Paths.INIT_TIME_CHANLLENGE}
-				component={InitTimeChallengeScreen}
+				component={ThemedInitTimeChallenge}
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '타임 챌린지',
@@ -77,7 +99,7 @@ const StackNavigator = () => {
 
 			<Stack.Screen
 				name={Paths.QUIZ}
-				component={QuizScreen}
+				component={ThemedQuiz}
 				options={({ navigation }) => ({
 					headerShown: false,
 					title: '속담 찾기',
@@ -87,7 +109,7 @@ const StackNavigator = () => {
 
 			<Stack.Screen
 				name={Paths.PROVERB_QUIZ_MODE_SELECT}
-				component={InitQuizModeScreen}
+				component={ThemedInitQuizMode}
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '퀴즈 모드 선택',
@@ -111,7 +133,7 @@ const StackNavigator = () => {
 
 			<Stack.Screen
 				name={Paths.QUIZ_MODE}
-				component={QuizModeScreen}
+				component={ThemedQuizMode}
 				options={({ navigation }) => ({
 					headerShown: false,
 					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
@@ -121,7 +143,7 @@ const StackNavigator = () => {
 			/>
 			<Stack.Screen
 				name={Paths.PROVERB_STUDY}
-				component={ProverbStudyScreen}
+				component={ThemedProverbStudy}
 				options={({ navigation }) => ({
 					headerShown: false,
 					title: '속담 학습',
@@ -135,7 +157,7 @@ const StackNavigator = () => {
 			/>
 			<Stack.Screen
 				name={Paths.QUIZ_WRONG_REVIEW}
-				component={WrongReviewScreen}
+				component={ThemedWrongReview}
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '오답 복습',
@@ -151,7 +173,7 @@ const StackNavigator = () => {
 			/>
 			<Stack.Screen
 				name={Paths.TOWER_CHANLLENGE}
-				component={TowerChallengeScreen}
+				component={ThemedTowerChallenge}
 				options={({ navigation }) => ({
 					headerShown: false,
 					title: '타워 챌린지',
@@ -168,7 +190,7 @@ const StackNavigator = () => {
 			/>
 			<Stack.Screen
 				name={Paths.TOWER_QUIZ}
-				component={TowerQuizScreen}
+				component={ThemedTowerQuiz}
 				options={({ navigation }) => ({
 					headerShown: false,
 					title: '타워퀴즈',
@@ -183,11 +205,11 @@ const StackNavigator = () => {
 					),
 				})}
 			/>
-			<Stack.Screen name={Paths.HOME} component={Home} />
-			<Stack.Screen name={Paths.SETTING} component={SettingScreen} />
-			<Stack.Screen name={Paths.FAVORITE} component={FavoriteScreen} options={{ headerShown: false }} />
-			<Stack.Screen name={Paths.MY_PROVERB_BOOK} component={MyProverbBook} options={{ headerShown: false }} />
-			<Stack.Screen name={Paths.MY_PROVERB_BOOK_DETAIL} component={MyProverbBookDetail} options={{ headerShown: false }} />
+			<Stack.Screen name={Paths.HOME} component={ThemedHome} />
+			<Stack.Screen name={Paths.SETTING} component={ThemedSetting} />
+			<Stack.Screen name={Paths.FAVORITE} component={ThemedFavorite} options={{ headerShown: false }} />
+			<Stack.Screen name={Paths.MY_PROVERB_BOOK} component={ThemedMyProverbBook} options={{ headerShown: false }} />
+			<Stack.Screen name={Paths.MY_PROVERB_BOOK_DETAIL} component={ThemedMyProverbBookDetail} options={{ headerShown: false }} />
 		</Stack.Navigator>
 	);
 };

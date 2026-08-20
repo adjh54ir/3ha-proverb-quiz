@@ -22,7 +22,7 @@ import FastImage from 'react-native-fast-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
@@ -34,7 +34,8 @@ import FavoriteToast from './common/FavoriteToast';
 
 const PAGE_SIZE = 30;
 
-const COMMON_ALL_OPTION = {
+// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
+const COMMON_ALL_OPTION = themedValue(() => ({
 	label: '전체',
 	value: '전체',
 	iconType: 'FontAwesome6',
@@ -45,7 +46,7 @@ const COMMON_ALL_OPTION = {
 		marginLeft: SPACING_W.xsPlus,
 		fontSize: FONT_SIZES.md,
 	},
-};
+}));
 
 // 공통 아이콘(CommonProverbModule)을 실제 데이터 값 기준으로 불러와 드롭다운 좌측 아이콘 구성
 const buildLevelItems = (levels: string[]) => [
@@ -349,6 +350,7 @@ const ProverbListScreen = () => {
 								<View style={styles.filterDropdownRow}>
 									<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
 										<DropDownPicker
+											theme={getPickerTheme()}
 											open={levelOpen}
 											value={levelValue}
 											items={levelItems}
@@ -379,6 +381,7 @@ const ProverbListScreen = () => {
 									</View>
 									<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000, overflow: 'visible' }]}>
 										<DropDownPicker
+											theme={getPickerTheme()}
 											listMode="MODAL"
 											open={fieldOpen}
 											modalTitle="카테고리 선택"
@@ -496,7 +499,13 @@ const ProverbListScreen = () => {
 								data={visibleList}
 								scrollEnabled={!fieldOpen && !levelOpen} // ⛔ 드롭다운 열려 있으면 스크롤 막기
 								keyExtractor={(item) => item.id.toString()}
-								refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+								refreshControl={<RefreshControl
+										refreshing={refreshing}
+										onRefresh={onRefresh}
+										tintColor={COLORS.textSecondary}
+										colors={[COLORS.primary]}
+										progressBackgroundColor={COLORS.surface}
+									/>}
 								onEndReached={loadMoreData}
 								onEndReachedThreshold={0.5}
 								onScroll={(event) => {
@@ -615,7 +624,7 @@ const ProverbListScreen = () => {
 
 export default ProverbListScreen;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => StyleSheet.create({
 	dictionaryHero: {
 		minHeight: scaleHeight(112),
 		marginBottom: SPACING_H.md,
@@ -892,4 +901,4 @@ const styles = StyleSheet.create({
 	favoriteFilterTextActive: {
 		color: COLORS.accentFlame,
 	},
-});
+}));

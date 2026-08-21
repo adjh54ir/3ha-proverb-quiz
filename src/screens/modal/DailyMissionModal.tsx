@@ -25,6 +25,8 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 	const [claimedToday, setClaimedToday] = useState(false);
 	const scaleAnim = useRef(new Animated.Value(0.95)).current;
 	const opacityAnim = useRef(new Animated.Value(0)).current;
+	// claimedToday 는 await 이후에야 true 가 되므로, 빠르게 두 번 누르면 보너스가 두 번 지급된다.
+	const claimingRef = useRef(false);
 
 	useEffect(() => {
 		if (!visible) {
@@ -70,9 +72,10 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 
 	// 미션 전체 완료 시 보너스 점수 수령 (하루 1회)
 	const handleClaim = async () => {
-		if (!allDone || claimedToday) {
+		if (!allDone || claimedToday || claimingRef.current) {
 			return;
 		}
+		claimingRef.current = true;
 		try {
 			const todayStr = DateUtils.getLocalDateString();
 			// 보너스 점수 지급 (다른 필드는 보존)
@@ -95,6 +98,8 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 			onClaimed?.(MISSION_BONUS);
 		} catch {
 			// 무시
+		} finally {
+			claimingRef.current = false;
 		}
 	};
 
@@ -111,7 +116,7 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 						</View>
 						<Text style={styles.title}>오늘의 미션</Text>
 						<Text style={styles.subtitle}>
-							{allDone ? '오늘 미션을 모두 완료했어요! 🎉' : `${doneCount} / ${missions.length} 완료`}
+							{allDone ? '오늘 미션을 모두 완료했습니다! 🎉' : `${doneCount} / ${missions.length} 완료`}
 						</Text>
 						<View style={styles.progressTrack}>
 							<View
@@ -178,7 +183,7 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 						)}
 					</View>
 
-					<Text style={styles.hint}>미션은 매일 자정에 새로 시작돼요.</Text>
+					<Text style={styles.hint}>미션은 매일 자정에 새로 시작됩니다.</Text>
 				</Animated.View>
 			</View>
 		</Modal>

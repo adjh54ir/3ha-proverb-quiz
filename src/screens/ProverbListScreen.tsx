@@ -164,7 +164,15 @@ const ProverbListScreen = () => {
 
 	useEffect(() => {
 		fetchData();
-	}, [keyword, categoryValue, levelValue, showFavoritesOnly, favoriteIds]);
+	}, [keyword, categoryValue, levelValue, showFavoritesOnly]);
+
+	// 즐겨찾기 변경은 '즐겨찾기만 보기'일 때만 목록을 다시 만든다.
+	// (평소에도 다시 만들면 ★ 한 번 누를 때마다 페이지가 1로 돌아가 스크롤이 맨 위로 튄다)
+	useEffect(() => {
+		if (showFavoritesOnly) {
+			fetchData();
+		}
+	}, [favoriteIds]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	// 화면 진입 fade + slide-up
 	useEffect(() => {
@@ -196,6 +204,13 @@ const ProverbListScreen = () => {
 			setLevelValue('전체');
 			setShowFavoritesOnly(false); // ✅ 즐겨찾기 필터 초기화
 
+			// ✅ 열려 있던 드롭다운/키보드 닫고 스크롤을 맨 위로
+			setFieldOpen(false);
+			setLevelOpen(false);
+			setShowScrollTop(false);
+			Keyboard.dismiss();
+			scrollRef.current?.scrollToOffset({ offset: 0, animated: false });
+
 			// ✅ 리스트 상태 초기화
 			setPage(1);
 			setVisibleList([]);
@@ -225,7 +240,7 @@ const ProverbListScreen = () => {
 		const isNowFavorite = await toggleFavorite(id);
 		await loadFavorites();
 
-		showToast(isNowFavorite ? '즐겨찾기 추가' : '즐겨찾기 해제', isNowFavorite ? '즐겨찾기 목록에서 다시 볼 수 있어요' : '즐겨찾기 목록에서 제거했어요');
+		showToast(isNowFavorite ? '즐겨찾기 추가' : '즐겨찾기 해제', isNowFavorite ? '즐겨찾기 목록에서 다시 볼 수 있습니다' : '즐겨찾기 목록에서 제거했습니다');
 	};
 
 	const onRefresh = () => {
@@ -309,7 +324,7 @@ const ProverbListScreen = () => {
 							<View style={styles.dictionaryHero}>
 								<View style={styles.dictionaryHeroCopy}>
 									<Text style={styles.dictionaryHeroTitle}>오늘의 지혜를 찾아보세요</Text>
-									<Text style={styles.dictionaryHeroDescription}>속담과 뜻을 한곳에서 빠르게 살펴볼 수 있어요.</Text>
+									<Text style={styles.dictionaryHeroDescription}>속담과 뜻을 한곳에서 빠르게 살펴볼 수 있습니다.</Text>
 								</View>
 								<FastImage
 									source={require('@/assets/images/screen-heroes/proverb-dictionary.png')}
@@ -341,7 +356,7 @@ const ProverbListScreen = () => {
 									)}
 								</View>
 								<View style={styles.filterDropdownRow}>
-									<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
+									<View style={[styles.dropdownWrapper, { zIndex: levelOpen ? 3000 : 1000 }]}>
 										<DropDownPicker
 											theme={getPickerTheme()}
 											open={levelOpen}
@@ -372,7 +387,7 @@ const ProverbListScreen = () => {
 											showTickIcon={false} // 선택 시 오른쪽 체크 표시 제거
 										/>
 									</View>
-									<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000, overflow: 'visible' }]}>
+									<View style={[styles.dropdownWrapperLast, { zIndex: fieldOpen ? 3000 : 1000, overflow: 'visible' }]}>
 										<DropDownPicker
 											theme={getPickerTheme()}
 											listMode="MODAL"
@@ -480,7 +495,7 @@ const ProverbListScreen = () => {
 											즐겨찾기
 										</Text>
 									</TouchableOpacity>
-									<Text style={styles.listCountText}>총 {mainList.length}개가 검색되었어요!</Text>
+									<Text style={styles.listCountText}>총 {mainList.length}개가 검색되었습니다!</Text>
 								</View>
 							</View>
 						</Animated.View>
@@ -512,7 +527,7 @@ const ProverbListScreen = () => {
 									<View style={[styles.emptyWrapper, { height: '100%', marginTop: SPACING_H.xxxxl }]}>
 										<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
 										<Text style={styles.emptyText}>
-											앗! 조건에 맞는 속담가 없어요.{'\n'}다른 검색어나 필터를 사용해보세요!
+											앗! 조건에 맞는 속담이 없습니다.{'\n'}다른 검색어나 필터를 사용해보세요!
 										</Text>
 									</View>
 								)}

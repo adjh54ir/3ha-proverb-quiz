@@ -171,8 +171,8 @@ const HamberBottonComponent = () => {
 				<EmptyStateComponent navigation={naivgation} />
 			) : (
 				<>
-					{mainState.filteredList.map((item) => (
-						<TouchableOpacity style={styles.iconButton} onPress={(e) => handleMenuPress(e, item)}>
+					{mainState.filteredList.map((item, index) => (
+						<TouchableOpacity key={item?.id ?? index} style={styles.iconButton} onPress={(e) => handleMenuPress(e, item)}>
 							<FontAwesome6Icon name='ellipsis' size={20} color='#6B7280' />
 						</TouchableOpacity>
 					))}

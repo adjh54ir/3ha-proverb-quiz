@@ -19,52 +19,52 @@ export const BADGE_RARITY_META: Record<
 📚 학습 관련 뱃지
 =========================================
 - 첫 학습: 🎈 첫 속담을 학습했어요! 시작이 반이에요!
-- 10개 학습: 📝 속담 10개 돌파! 슬슬 감이 오죠?
-- 50개 학습: 📖 속담 50개 달성! 지식이 쌓이고 있어요!
+- 10개 학습: 📝 속담 10개 돌파! 슬슬 감이 옵니다!
+- 50개 학습: 📖 속담 50개 달성! 지식이 쌓이고 있습니다!
 - 100개 학습: 🎓 속담 100개 학습! 당신은 진정한 학자!
-- 200개 학습: 🧠 무려 200개! 속담 마스터의 길에 들어섰어요!
-- 300개 학습: 📚 벌써 300개! 끝을 향해 달려가고 있어요!
-- 400개 학습: ✨ 와! 400개나 학습했어요! 정복의 끝이 보이네요!
-- 500개 학습: 🚀 500개 돌파! 절반을 훌쩍 넘었어요!
-- 600개 학습: 🌟 600개 달성! 이제 진짜 고수예요!
+- 200개 학습: 🧠 무려 200개! 속담 마스터의 길에 들어섰습니다!
+- 300개 학습: 📚 벌써 300개! 끝을 향해 달려가고 있습니다!
+- 400개 학습: ✨ 와! 400개나 학습했습니다! 정복의 끝이 보입니다!
+- 500개 학습: 🚀 500개 돌파! 절반을 훌쩍 넘었습니다!
+- 600개 학습: 🌟 600개 달성! 이제 진짜 고수입니다!
 - 학습 완료: 🌟 모든 속담을 학습 완료! 완벽한 정복이에요!
 
 =========================================
 🧠 퀴즈 관련 뱃지
 =========================================
-- 첫 퀴즈 완료: 🚀 첫 문제 풀기 성공! 이제 진짜 시작이에요!
-- 10개 퀴즈 완료: ✍️ 10문제 돌파! 꾸준함이 빛나요!
+- 첫 퀴즈 완료: 🚀 첫 문제 풀기 성공! 이제 진짜 시작입니다!
+- 10개 퀴즈 완료: ✍️ 10문제 돌파! 꾸준함이 빛납니다!
 - 50개 퀴즈 완료: 🏅 50문제 클리어! 퀴즈 고수의 기운이!
-- 100개 퀴즈 완료: 🧭 100문제 완주! 대단한 집중력이에요!
-- 150개 퀴즈 완료: 🎖️ 벌써 150개? 이건 거의 속담 탐험가죠!
+- 100개 퀴즈 완료: 🧭 100문제 완주! 대단한 집중력입니다!
+- 150개 퀴즈 완료: 🎖️ 벌써 150개! 이건 거의 속담 탐험가입니다!
 - 200개 퀴즈 완료: 🌍 200문제! 당신은 퀴즈의 전설!
-- 300개 퀴즈 완료: 🏅 300문제 돌파! 이제 전설의 반열에 올랐어요!
-- 400개 퀴즈 완료: 🎖️ 무려 400문제 돌파! 당신은 퀴즈의 전설이에요!
-- 500개 퀴즈 완료: 🚀 500문제 돌파! 절반을 훌쩍 넘었어요!
-- 600개 퀴즈 완료: 🌟 600문제 달성! 이제 진짜 고수예요!
+- 300개 퀴즈 완료: 🏅 300문제 돌파! 이제 전설의 반열에 올랐습니다!
+- 400개 퀴즈 완료: 🎖️ 무려 400문제 돌파! 당신은 퀴즈의 전설입니다!
+- 500개 퀴즈 완료: 🚀 500문제 돌파! 절반을 훌쩍 넘었습니다!
+- 600개 퀴즈 완료: 🌟 600문제 달성! 이제 진짜 고수입니다!
 - 퀴즈 완료: 🌈 모든 문제 완료! 세계 정복 완료예요!
 
 =========================================
 🎯 레벨별 마스터 뱃지
 (난이도별 완벽 정복)
 =========================================
-- 초급 마스터: 🌱 기초 속담은 다 외웠어요! 깔끔한 출발!
+- 초급 마스터: 🌱 기초 속담은 다 외웠습니다! 깔끔한 출발!
 - 중급 마스터: 🍃 쉬운 속담도 완벽하게 마스터!
-- 고급 마스터: 🌳 고급 난이도? 문제없죠!
-- 특급 마스터: 🧠 어려운 속담까지 모두 정복했어요!
+- 고급 마스터: 🌳 고급 난이도도 문제없습니다!
+- 특급 마스터: 🧠 어려운 속담까지 모두 정복했습니다!
 
 =========================================
 💬 카테고리별 마스터 뱃지
 (속담 주제 정복자)
 =========================================
-- 운/우연 마스터: 🍀 운과 우연에 관한 속담을 전부 익혔어요!
+- 운/우연 마스터: 🍀 운과 우연에 관한 속담을 전부 익혔습니다!
 - 인간관계 마스터: 👫 관계의 지혜, 당신은 인간관계 달인!
-- 세상 이치 마스터: 🌐 세상 돌아가는 이치, 속담으로 다 알았죠!
-- 근면/검소 마스터: 🧺 성실과 절약, 삶의 기본이죠!
+- 세상 이치 마스터: 🌐 세상 돌아가는 이치, 속담으로 다 알았습니다!
+- 근면/검소 마스터: 🧺 성실과 절약, 삶의 기본입니다!
 - 노력/성공 마스터: 🏃‍♂️ 노력 끝에 성공한 자에게!
-- 경계/조심 마스터: ⚠️ 조심 또 조심! 지혜롭게 살아가요!
-- 욕심/탐욕 마스터: 🤑 욕심에 관한 교훈, 뼛속까지 새겼어요!
-- 배신/불신 마스터: 🤝 신뢰의 중요성, 확실히 배웠네요!
+- 경계/조심 마스터: ⚠️ 조심 또 조심! 지혜롭게 살아갑니다!
+- 욕심/탐욕 마스터: 🤑 욕심에 관한 교훈, 뼛속까지 새겼습니다!
+- 배신/불신 마스터: 🤝 신뢰의 중요성, 확실히 배웠습니다!
 
 =========================================
 🔥 콤보 달성 뱃지
@@ -73,8 +73,8 @@ export const BADGE_RARITY_META: Record<
 - 콤보 3: 🔥 연속 3문제! 워밍업 완료!
 - 콤보 5: 🔥🔥 집중력 5단계 돌입!
 - 콤보 10: 🔥🔥🔥 집중력 끝판왕 등장!
-- 콤보 15: 🔥🔥🔥🔥 불꽃처럼 타오르고 있어요!
-- 콤보 20: ⚡ 전설의 20콤보! 퀴즈 신이시군요!
+- 콤보 15: 🔥🔥🔥🔥 불꽃처럼 타오르고 있습니다!
+- 콤보 20: ⚡ 전설의 20콤보! 퀴즈의 신입니다!
 
 =========================================
 🏆 점수 달성 뱃지
@@ -91,7 +91,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_1',
 		name: '시작이 반이다',
-		description: '첫 번째 속담을 학습했어요! 시작이 반이에요!',
+		description: '첫 번째 속담을 학습했습니다! 시작이 반입니다!',
 		iconType: 'materialIcons',
 		icon: 'school',
 		type: 'study',
@@ -101,7 +101,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_10',
 		name: '10개 학습 완료',
-		description: '속담 10개 돌파! 슬슬 감이 오죠?',
+		description: '속담 10개 돌파! 슬슬 감이 옵니다!',
 		iconType: 'materialIcons',
 		icon: 'travel-explore',
 		type: 'study',
@@ -111,7 +111,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_50',
 		name: '50개 학습 완료',
-		description: '속담 50개 달성! 지식이 쌓이고 있어요!',
+		description: '속담 50개 달성! 지식이 쌓이고 있습니다!',
 		iconType: 'materialIcons',
 		icon: 'menu-book',
 		type: 'study',
@@ -131,7 +131,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_200',
 		name: '200개 학습 완료',
-		description: '무려 200개! 속담 마스터의 길에 들어섰어요!',
+		description: '무려 200개! 속담 마스터의 길에 들어섰습니다!',
 		iconType: 'materialIcons',
 		icon: 'school',
 		type: 'study',
@@ -141,7 +141,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_300',
 		name: '300개 학습 완료',
-		description: '벌써 300개! 끝을 향해 달려가고 있어요!',
+		description: '벌써 300개! 끝을 향해 달려가고 있습니다!',
 		iconType: 'materialIcons',
 		icon: 'menu-book',
 		type: 'study',
@@ -151,7 +151,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_400',
 		name: '400개 학습 완료',
-		description: '와! 400개나 학습했어요! 정복의 끝이 보이네요!',
+		description: '와! 400개나 학습했습니다! 정복의 끝이 보입니다!',
 		iconType: 'materialIcons',
 		icon: 'auto-awesome',
 		type: 'study',
@@ -161,7 +161,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_500',
 		name: '500개 학습 완료',
-		description: '500개 돌파! 절반을 훌쩍 넘었어요!',
+		description: '500개 돌파! 절반을 훌쩍 넘었습니다!',
 		iconType: 'materialIcons',
 		icon: 'rocket-launch',
 		type: 'study',
@@ -171,7 +171,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_600',
 		name: '600개 학습 완료',
-		description: '600개 달성! 이제 진짜 고수예요!',
+		description: '600개 달성! 이제 진짜 고수입니다!',
 		iconType: 'materialIcons',
 		icon: 'stars',
 		type: 'study',
@@ -181,7 +181,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_700',
 		name: '700개 학습 완료',
-		description: '700개 돌파! 배움의 깊이가 남다르네요!',
+		description: '700개 돌파! 배움의 깊이가 남다릅니다!',
 		iconType: 'materialIcons',
 		icon: 'auto-stories',
 		type: 'study',
@@ -191,7 +191,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_800',
 		name: '800개 학습 완료',
-		description: '800개 학습! 지식의 탑이 높이 쌓였어요!',
+		description: '800개 학습! 지식의 탑이 높이 쌓였습니다!',
 		iconType: 'materialIcons',
 		icon: 'menu-book',
 		type: 'study',
@@ -201,7 +201,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_1000',
 		name: '1,000개 학습 완료',
-		description: '천 개 돌파! 이제 속담 도서관이 따로 없네요!',
+		description: '천 개 돌파! 이제 속담 도서관이 따로 없습니다!',
 		iconType: 'materialIcons',
 		icon: 'local-library',
 		type: 'study',
@@ -211,7 +211,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_1500',
 		name: '1,500개 학습 완료',
-		description: '1,500개 학습! 방대한 지혜를 품었어요!',
+		description: '1,500개 학습! 방대한 지혜를 품었습니다!',
 		iconType: 'materialIcons',
 		icon: 'psychology',
 		type: 'study',
@@ -221,7 +221,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_2000',
 		name: '2,000개 학습 완료',
-		description: '2,000개 정복! 속담 백과사전의 경지예요!',
+		description: '2,000개 정복! 속담 백과사전의 경지입니다!',
 		iconType: 'materialIcons',
 		icon: 'workspace-premium',
 		type: 'study',
@@ -231,7 +231,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_2500',
 		name: '2,500개 학습 완료',
-		description: '2,500개 학습! 끝이 눈앞에 보여요!',
+		description: '2,500개 학습! 끝이 눈앞에 보입니다!',
 		iconType: 'materialIcons',
 		icon: 'diamond',
 		type: 'study',
@@ -241,7 +241,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_3000',
 		name: '3,000개 학습 완료',
-		description: '무려 3,000개! 진정한 속담 대가의 반열이에요!',
+		description: '무려 3,000개! 진정한 속담 대가의 반열입니다!',
 		iconType: 'materialIcons',
 		icon: 'military-tech',
 		type: 'study',
@@ -251,7 +251,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'study_all',
 		name: '학습 완전 정복',
-		description: '모든 속담 학습 완료! 완벽한 정복이에요!',
+		description: '모든 속담 학습 완료! 완벽한 정복입니다!',
 		iconType: 'materialIcons',
 		icon: 'verified',
 		type: 'study',
@@ -263,7 +263,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_1',
 		name: '첫 퀴즈 완료',
-		description: '첫 문제 풀기 성공! 이제 진짜 시작이에요!',
+		description: '첫 문제 풀기 성공! 이제 진짜 시작입니다!',
 		iconType: 'materialIcons',
 		icon: 'looks-one',
 		type: 'quiz',
@@ -273,7 +273,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_10',
 		name: '10문제 퀴즈 완료',
-		description: '10문제 돌파! 꾸준함이 빛나요!',
+		description: '10문제 돌파! 꾸준함이 빛납니다!',
 		iconType: 'materialIcons',
 		icon: 'military-tech',
 		type: 'quiz',
@@ -293,7 +293,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_100',
 		name: '100문제 퀴즈 완료',
-		description: '100문제 완주! 대단한 집중력이에요!',
+		description: '100문제 완주! 대단한 집중력입니다!',
 		iconType: 'materialIcons',
 		icon: 'emoji-events',
 		type: 'quiz',
@@ -303,7 +303,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_150',
 		name: '150문제 퀴즈 완료',
-		description: '벌써 150개? 이건 거의 속담 탐험가죠!',
+		description: '벌써 150개! 이건 거의 속담 탐험가입니다!',
 		iconType: 'materialIcons',
 		icon: 'military-tech',
 		type: 'quiz',
@@ -323,7 +323,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_300',
 		name: '300문제 퀴즈 완료',
-		description: '300문제 돌파! 이제 전설의 반열에 올랐어요!',
+		description: '300문제 돌파! 이제 전설의 반열에 올랐습니다!',
 		iconType: 'materialIcons',
 		icon: 'workspace-premium',
 		type: 'quiz',
@@ -333,7 +333,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_400',
 		name: '400문제 퀴즈 완료',
-		description: '무려 400문제 돌파! 당신은 퀴즈의 전설이에요!',
+		description: '무려 400문제 돌파! 당신은 퀴즈의 전설입니다!',
 		iconType: 'materialIcons',
 		icon: 'emoji-events',
 		type: 'quiz',
@@ -343,7 +343,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_500',
 		name: '500문제 퀴즈 완료',
-		description: '500문제 돌파! 절반을 훌쩍 넘었어요!',
+		description: '500문제 돌파! 절반을 훌쩍 넘었습니다!',
 		iconType: 'materialIcons',
 		icon: 'rocket-launch',
 		type: 'quiz',
@@ -353,7 +353,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_600',
 		name: '600문제 퀴즈 완료',
-		description: '600문제 달성! 이제 진짜 고수예요!',
+		description: '600문제 달성! 이제 진짜 고수입니다!',
 		iconType: 'materialIcons',
 		icon: 'stars',
 		type: 'quiz',
@@ -363,7 +363,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_700',
 		name: '700문제 퀴즈 완료',
-		description: '700문제 돌파! 멈추지 않는 도전 정신이에요!',
+		description: '700문제 돌파! 멈추지 않는 도전 정신입니다!',
 		iconType: 'materialIcons',
 		icon: 'bolt',
 		type: 'quiz',
@@ -373,7 +373,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_800',
 		name: '800문제 퀴즈 완료',
-		description: '800문제 클리어! 불붙은 실력이 대단해요!',
+		description: '800문제 클리어! 불붙은 실력이 대단합니다!',
 		iconType: 'materialIcons',
 		icon: 'whatshot',
 		type: 'quiz',
@@ -383,7 +383,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_1000',
 		name: '1,000문제 퀴즈 완료',
-		description: '천 문제 돌파! 퀴즈 마스터의 위엄이에요!',
+		description: '천 문제 돌파! 퀴즈 마스터의 위엄입니다!',
 		iconType: 'materialIcons',
 		icon: 'local-fire-department',
 		type: 'quiz',
@@ -393,7 +393,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_1500',
 		name: '1,500문제 퀴즈 완료',
-		description: '1,500문제 정복! 흔들림 없는 실력이에요!',
+		description: '1,500문제 정복! 흔들림 없는 실력입니다!',
 		iconType: 'materialIcons',
 		icon: 'shield',
 		type: 'quiz',
@@ -403,7 +403,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_2000',
 		name: '2,000문제 퀴즈 완료',
-		description: '2,000문제 돌파! 전설을 넘어선 경지예요!',
+		description: '2,000문제 돌파! 전설을 넘어선 경지입니다!',
 		iconType: 'materialIcons',
 		icon: 'diamond',
 		type: 'quiz',
@@ -413,7 +413,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_2500',
 		name: '2,500문제 퀴즈 완료',
-		description: '2,500문제 클리어! 완주가 눈앞이에요!',
+		description: '2,500문제 클리어! 완주가 눈앞입니다!',
 		iconType: 'materialIcons',
 		icon: 'workspace-premium',
 		type: 'quiz',
@@ -423,7 +423,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_3000',
 		name: '3,000문제 퀴즈 완료',
-		description: '무려 3,000문제! 퀴즈의 신이라 불러도 손색없어요!',
+		description: '무려 3,000문제! 퀴즈의 신이라 불러도 손색없습니다!',
 		iconType: 'materialIcons',
 		icon: 'military-tech',
 		type: 'quiz',
@@ -433,7 +433,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'quiz_all',
 		name: '퀴즈 정복자',
-		description: '모든 속담 퀴즈 완료! 세계 정복 완료예요!',
+		description: '모든 속담 퀴즈 완료! 세계 정복 완료입니다!',
 		iconType: 'materialIcons',
 		icon: 'verified',
 		type: 'quiz',
@@ -445,7 +445,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'level_easy_1',
 		name: '초급 마스터',
-		description: '기초 속담은 다 외웠어요! 깔끔한 출발!',
+		description: '기초 속담은 다 외웠습니다! 깔끔한 출발!',
 		iconType: 'fontAwesome6',
 		icon: 'seedling',
 		type: 'quiz',
@@ -465,7 +465,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'level_medium',
 		name: '고급 마스터',
-		description: '고급 난이도? 문제없죠!',
+		description: '고급 난이도도 문제없습니다!',
 		iconType: 'fontAwesome6',
 		icon: 'tree',
 		type: 'quiz',
@@ -475,7 +475,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'level_hard',
 		name: '특급 마스터',
-		description: '어려운 속담까지 모두 정복했어요!',
+		description: '어려운 속담까지 모두 정복했습니다!',
 		iconType: 'fontAwesome6',
 		icon: 'trophy',
 		type: 'quiz',
@@ -487,7 +487,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'category_luck',
 		name: '운/우연 마스터',
-		description: '운과 우연에 관한 속담을 전부 익혔어요!',
+		description: '운과 우연에 관한 속담을 전부 익혔습니다!',
 		iconType: 'materialIcons',
 		icon: 'casino',
 		type: 'quiz',
@@ -507,7 +507,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'category_life',
 		name: '세상 이치 마스터',
-		description: '세상 돌아가는 이치, 속담으로 다 알았죠!',
+		description: '세상 돌아가는 이치, 속담으로 다 알았습니다!',
 		iconType: 'materialIcons',
 		icon: 'language',
 		type: 'quiz',
@@ -517,7 +517,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'category_diligence',
 		name: '근면/검소 마스터',
-		description: '성실과 절약, 삶의 기본이죠!',
+		description: '성실과 절약, 삶의 기본입니다!',
 		iconType: 'materialIcons',
 		icon: 'cleaning-services',
 		type: 'quiz',
@@ -537,7 +537,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'category_caution',
 		name: '경계/조심 마스터',
-		description: '조심 또 조심! 지혜롭게 살아가요!',
+		description: '조심 또 조심! 지혜롭게 살아갑니다!',
 		iconType: 'materialIcons',
 		icon: 'report-problem',
 		type: 'quiz',
@@ -547,7 +547,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'category_greed',
 		name: '욕심/탐욕 마스터',
-		description: '욕심에 관한 교훈, 뼛속까지 새겼어요!',
+		description: '욕심에 관한 교훈, 뼛속까지 새겼습니다!',
 		iconType: 'materialIcons',
 		icon: 'paid',
 		type: 'quiz',
@@ -557,7 +557,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'category_betrayal',
 		name: '배신/불신 마스터',
-		description: '신뢰의 중요성, 확실히 배웠네요!',
+		description: '신뢰의 중요성, 확실히 배웠습니다!',
 		iconType: 'materialIcons',
 		icon: 'handshake',
 		type: 'quiz',
@@ -599,7 +599,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'combo_15',
 		name: '콤보 15 연속',
-		description: '불꽃처럼 타오르고 있어요!',
+		description: '불꽃처럼 타오르고 있습니다!',
 		iconType: 'materialCommunityIcons',
 		icon: 'fire',
 		type: 'quiz',
@@ -609,7 +609,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'combo_20',
 		name: '콤보 20 연속',
-		description: '전설의 20콤보! 퀴즈 신이시군요!',
+		description: '전설의 20콤보! 퀴즈의 신입니다!',
 		iconType: 'materialCommunityIcons',
 		icon: 'fire-alert',
 		type: 'quiz',
@@ -621,7 +621,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'score_1000',
 		name: '입문자 등극',
-		description: '1,000점 돌파! 속담 입문자 캐릭터를 손에 넣었어요!',
+		description: '1,000점 돌파! 속담 입문자 캐릭터를 손에 넣었습니다!',
 		iconType: 'fontAwesome6',
 		icon: 'leaf',
 		type: 'quiz',
@@ -631,7 +631,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'score_2000',
 		name: '숙련자의 길',
-		description: '2,000점 달성! 속담 숙련자 캐릭터로 성장했어요!',
+		description: '2,000점 달성! 속담 숙련자 캐릭터로 성장했습니다!',
 		iconType: 'fontAwesome6',
 		icon: 'tree',
 		type: 'quiz',
@@ -641,7 +641,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'score_5000',
 		name: '고수의 관록',
-		description: '5,000점 돌파! 속담 고수 캐릭터에 도달했어요!',
+		description: '5,000점 돌파! 속담 고수 캐릭터에 도달했습니다!',
 		iconType: 'fontAwesome6',
 		icon: 'chess-knight',
 		type: 'quiz',
@@ -651,7 +651,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'score_10000',
 		name: '마스터 등극',
-		description: '10,000점 정복! 속담 마스터 캐릭터의 주인공이 됐어요!',
+		description: '10,000점 정복! 속담 마스터 캐릭터의 주인공이 됐습니다!',
 		iconType: 'fontAwesome6',
 		icon: 'trophy',
 		type: 'quiz',
@@ -661,7 +661,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'score_20000',
 		name: '살아있는 전설',
-		description: '20,000점 정복! 속담 전설 캐릭터로 역사에 이름을 새겼어요!',
+		description: '20,000점 정복! 속담 전설 캐릭터로 역사에 이름을 새겼습니다!',
 		iconType: 'fontAwesome6',
 		icon: 'crown',
 		type: 'quiz',
@@ -675,7 +675,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'attend_1',
 		name: '첫 출석',
-		description: '🌅 첫 출석을 완료했어요! 좋은 습관의 시작이에요!',
+		description: '🌅 첫 출석을 완료했습니다! 좋은 습관의 시작입니다!',
 		iconType: 'materialIcons',
 		icon: 'event-available',
 		type: 'attendance',
@@ -685,7 +685,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'attend_5',
 		name: '출석 5일',
-		description: '📅 벌써 5일째 출석! 꾸준함이 보여요!',
+		description: '📅 벌써 5일째 출석! 꾸준함이 보입니다!',
 		iconType: 'materialIcons',
 		icon: 'event-available',
 		type: 'attendance',
@@ -695,7 +695,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'attend_10',
 		name: '출석 10일',
-		description: '🗓️ 출석 10일 달성! 루틴이 자리 잡고 있어요!',
+		description: '🗓️ 출석 10일 달성! 루틴이 자리 잡고 있습니다!',
 		iconType: 'materialIcons',
 		icon: 'date-range',
 		type: 'attendance',
@@ -705,7 +705,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'attend_20',
 		name: '출석 20일',
-		description: '📆 출석 20일! 어느새 습관이 됐네요!',
+		description: '📆 출석 20일! 어느새 습관이 됐습니다!',
 		iconType: 'materialIcons',
 		icon: 'date-range',
 		type: 'attendance',
@@ -715,7 +715,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'attend_30',
 		name: '한 달 개근',
-		description: '🏅 출석 30일 달성! 한 달 개근, 정말 대단해요!',
+		description: '🏅 출석 30일 달성! 한 달 개근, 정말 대단합니다!',
 		iconType: 'materialIcons',
 		icon: 'calendar-month',
 		type: 'attendance',
@@ -725,7 +725,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'attend_50',
 		name: '출석 50일',
-		description: '🎖️ 출석 50일! 꾸준함의 아이콘이에요!',
+		description: '🎖️ 출석 50일! 꾸준함의 아이콘입니다!',
 		iconType: 'materialIcons',
 		icon: 'calendar-month',
 		type: 'attendance',
@@ -735,7 +735,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'attend_100',
 		name: '출석 100일',
-		description: '🏆 출석 100일 돌파! 백일의 정성을 모았어요!',
+		description: '🏆 출석 100일 돌파! 백일의 정성을 모았습니다!',
 		iconType: 'materialIcons',
 		icon: 'workspace-premium',
 		type: 'attendance',
@@ -745,7 +745,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'attend_150',
 		name: '출석 150일',
-		description: '🌟 출석 150일! 이쯤 되면 진정한 고수예요!',
+		description: '🌟 출석 150일! 이쯤 되면 진정한 고수입니다!',
 		iconType: 'materialIcons',
 		icon: 'workspace-premium',
 		type: 'attendance',
@@ -779,7 +779,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'today_1',
 		name: '오늘의 퀴즈 첫 도전',
-		description: '🌱 오늘의 퀴즈를 처음으로 완료했어요! 좋은 시작이에요!',
+		description: '🌱 오늘의 퀴즈를 처음으로 완료했습니다! 좋은 시작입니다!',
 		iconType: 'materialIcons',
 		icon: 'today',
 		type: 'quiz',
@@ -789,7 +789,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'today_5',
 		name: '오늘의 퀴즈 5일',
-		description: '📅 오늘의 퀴즈 5일 완료! 꾸준함이 보여요!',
+		description: '📅 오늘의 퀴즈 5일 완료! 꾸준함이 보입니다!',
 		iconType: 'materialIcons',
 		icon: 'event-available',
 		type: 'quiz',
@@ -799,7 +799,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'today_10',
 		name: '오늘의 퀴즈 10일',
-		description: '🗓️ 오늘의 퀴즈 10일 완료! 루틴이 자리 잡고 있어요!',
+		description: '🗓️ 오늘의 퀴즈 10일 완료! 루틴이 자리 잡고 있습니다!',
 		iconType: 'materialIcons',
 		icon: 'date-range',
 		type: 'quiz',
@@ -809,7 +809,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'today_20',
 		name: '오늘의 퀴즈 20일',
-		description: '📆 오늘의 퀴즈 20일 완료! 어느새 습관이 됐네요!',
+		description: '📆 오늘의 퀴즈 20일 완료! 어느새 습관이 됐습니다!',
 		iconType: 'materialIcons',
 		icon: 'date-range',
 		type: 'quiz',
@@ -819,7 +819,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'today_30',
 		name: '오늘의 퀴즈 한 달',
-		description: '🏅 오늘의 퀴즈 30일 완료! 한 달 개근, 정말 대단해요!',
+		description: '🏅 오늘의 퀴즈 30일 완료! 한 달 개근, 정말 대단합니다!',
 		iconType: 'materialIcons',
 		icon: 'calendar-month',
 		type: 'quiz',
@@ -829,7 +829,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'today_50',
 		name: '오늘의 퀴즈 50일',
-		description: '🎖️ 오늘의 퀴즈 50일 완료! 꾸준함의 아이콘이에요!',
+		description: '🎖️ 오늘의 퀴즈 50일 완료! 꾸준함의 아이콘입니다!',
 		iconType: 'materialIcons',
 		icon: 'auto-awesome',
 		type: 'quiz',
@@ -839,7 +839,7 @@ export const CONST_BADGES: MainDataType.UserBadge[] = [
 	{
 		id: 'today_100',
 		name: '오늘의 퀴즈 100일',
-		description: '🏆 오늘의 퀴즈 100일 완료! 백일의 정성을 모았어요!',
+		description: '🏆 오늘의 퀴즈 100일 완료! 백일의 정성을 모았습니다!',
 		iconType: 'materialIcons',
 		icon: 'emoji-events',
 		type: 'quiz',

@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Animated, Image, KeyboardAvoidingView, Keyboard, Platform, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Animated, Image, KeyboardAvoidingView, Keyboard, Platform, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -73,11 +73,22 @@ const MyProverbBook = () => {
 	const { showToast, hideToast, ToastView } = useToast(scaleHeight(60));
 
 	const fadeAnim = useRef(new Animated.Value(1)).current;
+	const scrollRef = useRef<ScrollView>(null);
 
 	useFocusEffect(
 		useCallback(() => {
 			loadBooks();
 			hideToast();
+			// 다시 들어올 때는 검색어/정렬/열려 있던 팝업을 초기화하고 맨 위에서 시작한다
+			setSearchQuery('');
+			setSortType('latest');
+			setActionSheet(null);
+			setFormTarget(undefined);
+			setDeleteConfirm(null);
+			setQuizModeModal(null);
+			setAddProverbModal(null);
+			Keyboard.dismiss();
+			scrollRef.current?.scrollTo({ y: 0, animated: false });
 			fadeAnim.setValue(0);
 			const fade = Animated.timing(fadeAnim, { toValue: 1, duration: 280, useNativeDriver: true });
 			fade.start();
@@ -192,7 +203,7 @@ const MyProverbBook = () => {
 						<View style={styles.libraryHero}>
 							<View style={styles.libraryHeroCopy}>
 								<Text style={styles.libraryHeroTitle}>나만의 지혜 책장을 채워보세요</Text>
-								<Text style={styles.libraryHeroDescription}>마음에 드는 속담을 주제별로 모을 수 있어요.</Text>
+								<Text style={styles.libraryHeroDescription}>마음에 드는 속담을 주제별로 모을 수 있습니다.</Text>
 							</View>
 							<Image source={require('@/assets/images/screen-heroes/proverb-library.png')} style={styles.libraryHeroImage} resizeMode="contain" />
 						</View>
@@ -215,7 +226,7 @@ const MyProverbBook = () => {
 					</View>
 				)}
 
-				<Animated.ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ opacity: fadeAnim }} contentContainerStyle={styles.booksContainer} showsVerticalScrollIndicator={false}>
+				<Animated.ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ opacity: fadeAnim }} contentContainerStyle={styles.booksContainer} showsVerticalScrollIndicator={false}>
 					{books.length === 0 ? (
 						<View style={styles.emptyView}>
 							<Image source={require('@/assets/images/screen-heroes/library-shelf.png')} style={styles.emptyShelfImage} resizeMode="contain" />
@@ -228,7 +239,7 @@ const MyProverbBook = () => {
 					) : filteredBooks.length === 0 ? (
 						<View style={styles.emptyView}>
 							<Image source={require('@/assets/images/feature-states/empty-search.png')} style={styles.emptyImage} resizeMode="contain" />
-							<Text style={styles.emptyTitle}>검색 결과가 없어요</Text>
+							<Text style={styles.emptyTitle}>검색 결과가 없습니다</Text>
 							<Text style={styles.emptyDesc}>{`'${searchQuery}'와 일치하는\n속담집이 없습니다.`}</Text>
 							<TouchableOpacity style={styles.emptyBtn} onPress={() => setSearchQuery('')}>
 								<Text style={styles.emptyBtnText}>검색 초기화</Text>
@@ -312,9 +323,9 @@ const MyProverbBook = () => {
 				<View style={styles.modalOverlay}>
 					<View style={styles.confirmModal}>
 						<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(40)} color={COLORS.danger} />
-						<Text style={styles.confirmTitle}>속담집을 삭제할까요?</Text>
+						<Text style={styles.confirmTitle}>속담집을 삭제하시겠습니까?</Text>
 						<Text style={styles.confirmDesc}>
-							<Text style={{ fontWeight: '700' }}>{deleteConfirm?.title}</Text>을 삭제하면{'\n'}복구할 수 없어요.
+							<Text style={{ fontWeight: '700' }}>{deleteConfirm?.title}</Text>을 삭제하면{'\n'}복구할 수 없습니다.
 						</Text>
 						<View style={styles.confirmBtnRow}>
 							<TouchableOpacity style={[styles.confirmBtn, styles.confirmBtnCancel]} onPress={() => setDeleteConfirm(null)}>

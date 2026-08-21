@@ -16,6 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { sampleSize, shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
@@ -125,7 +126,6 @@ const TodayQuizScreen = () => {
 	const correct = Object.values(answerResults).filter((v) => v === true).length;
 
 	const isQuizCompleted = Object.keys(answerResults).length === quizList.length;
-	const [isResultReady, setIsResultReady] = useState(false);
 
 	const { getLocalDateString, getLocalParamDateToString } = DateUtils;
 
@@ -160,22 +160,16 @@ const TodayQuizScreen = () => {
 
 	useFocusEffect(
 		useCallback(() => {
-			const resetIfUnsolved = async () => {
-				const todayStr = getLocalParamDateToString(todayDate);
-				const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
-				const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
-				const todayData = storedArr.find((q) => getLocalParamDateToString(q.quizDate) === todayStr);
-
-				// 아직 퀴즈를 다 안 푼 경우만 초기화 실행
-				if (todayData && Object.keys(todayData.answerResults ?? {}).length < 5) {
-					await handleResetTodayQuiz();
-				}
-			};
-
-			resetIfUnsolved();
-
+			// ⚠️ 예전에는 여기서 "아직 다 안 푼 오늘의 퀴즈"를 초기화했는데,
+			//    1~4문제만 푼 상태로 탭을 벗어났다 돌아오면 진행도가 통째로 날아갔다.
+			//    복원/생성은 initQuiz 가 이미 정확히 처리하므로 초기화하지 않는다.
 			loadSetting();
 			getScheduledAlarmTime();
+			// 다시 들어올 때는 접힌 상태 + 맨 위에서 시작한다 (진행 중인 답안은 유지)
+			setShowTodayReview(false);
+			setShowPrevQuizModal(false);
+			setShowAlarmModal(false);
+			setDetailModalVisible(false);
 			scrollRef.current?.scrollTo({ y: 0, animated: false });
 		}, [todayDate]),
 	);
@@ -234,9 +228,9 @@ const TodayQuizScreen = () => {
 	const getTodayQuiz = (excludeIds: number[] = []) => {
 		const allProverbs = ProverbServices.selectProverbList();
 
-		const filtered = allProverbs.filter((p) => !excludeIds.includes(p.id)); // ✅ 이전 문제 제외
-		const shuffled = [...filtered].sort(() => Math.random() - 0.5);
-		return shuffled.slice(0, 5);
+		const excludeSet = new Set(excludeIds);
+		const filtered = allProverbs.filter((p) => !excludeSet.has(p.id)); // ✅ 이전 문제 제외
+		return sampleSize(filtered, 5);
 	};
 	const saveSettingInfo = async (setting: MainDataType.SettingInfo) => {
 		try {
@@ -351,16 +345,20 @@ const TodayQuizScreen = () => {
 				prevQuizIdArr: storedArr.length > 0 ? storedArr[storedArr.length - 1].todayQuizIdArr : [],
 			};
 			await saveTodayQuizToStorage(newQuizData);
+			// 새 퀴즈를 만들었으면 이전 날짜의 답안이 남아 있으면 안 된다(완료 화면으로 잘못 넘어간다).
+			setAnswerResults({});
+			setSelectedAnswers({});
+			setCurrentIndex(0);
 			setQuizList(finalQuizList);
 			generateQuizOptions(finalQuizList);
 		} else {
 			// 기존 퀴즈 복원
-			const finalQuizList = ProverbServices.selectProverbByIds(todayData.todayQuizIdArr);
+			const restored = ProverbServices.selectProverbByIds(todayData.todayQuizIdArr);
+
 			// ⚠️ 매칭된 문제 개수가 5개가 아니면 새로 생성
-			if (!finalQuizList || finalQuizList.length < 5) {
+			if (!restored || restored.length < 5) {
 				console.warn('⚠️ 오늘의 퀴즈 데이터 누락 → 새 퀴즈 생성');
 				const newQuiz = getTodayQuiz();
-				setQuizList(newQuiz);
 
 				const newQuizData: MainDataType.TodayQuizList = {
 					quizDate: getLocalDateString(),
@@ -372,32 +370,49 @@ const TodayQuizScreen = () => {
 					selectedAnswers: {},
 				};
 				await saveTodayQuizToStorage(newQuizData);
+				// ⚠️ 예전에는 아래에서 다시 restored(누락된 목록)로 덮어써서 복구가 무효가 됐다.
+				setAnswerResults({});
+				setSelectedAnswers({});
+				setCurrentIndex(0);
+				setQuizList(newQuiz);
 				generateQuizOptions(newQuiz);
-			} else {
-				setQuizList(finalQuizList);
-				generateQuizOptions(finalQuizList);
+				return;
 			}
-			setAnswerResults(todayData.answerResults ?? {});
+
+			const restoredResults = todayData.answerResults ?? {};
+			setQuizList(restored);
+			generateQuizOptions(restored);
+			setAnswerResults(restoredResults);
 			setSelectedAnswers(todayData.selectedAnswers ?? {});
-			setQuizList(finalQuizList);
-			generateQuizOptions(finalQuizList);
+
+			// 풀다 만 상태로 돌아왔다면 이미 푼 문제를 다시 넘기지 않도록 첫 미답 문항부터 이어서 푼다.
+			const answeredCount = Object.keys(restoredResults).length;
+			if (answeredCount > 0 && answeredCount < restored.length) {
+				const nextIndex = restored.findIndex((q) => restoredResults[q.id] === undefined);
+				setCurrentIndex(nextIndex === -1 ? 0 : nextIndex);
+				setHasStarted(true);
+			} else {
+				setCurrentIndex(0);
+			}
 		}
 	};
 
 	const generateQuizOptions = (quizListParam: MainDataType.Proverb[]) => {
+		// 전체 속담 목록은 문항마다 다시 조회할 필요가 없다(문항 수 x 전체 건수 만큼 낭비된다).
+		const allMeanings = ProverbServices.selectProverbList().filter((p) => !!p.longMeaning);
 		const optionsMap: { [id: number]: string[] } = {};
-		quizListParam.forEach((item) => {
-			const wrongMeanings = ProverbServices.selectProverbList()
-				.filter((p) => p.id !== item.id && !!p.longMeaning)
-				.map((p) => p.longMeaning);
-			const shuffledWrong = wrongMeanings.sort(() => Math.random() - 0.5).slice(0, 3);
 
-			while (shuffledWrong.length < 3) {
-				shuffledWrong.push('모름');
+		quizListParam.forEach((item) => {
+			const answer = item.longMeaning;
+			// id 뿐 아니라 '뜻이 같은' 항목도 빼야 보기 안에 정답이 두 번 뜨지 않는다.
+			const wrongPool = allMeanings.filter((p) => p.id !== item.id && p.longMeaning !== answer).map((p) => p.longMeaning);
+			const wrongs = sampleSize(wrongPool, 3);
+
+			while (wrongs.length < 3) {
+				wrongs.push('모름');
 			}
 
-			const options = [...shuffledWrong, item.longMeaning].sort(() => Math.random() - 0.5);
-			optionsMap[item.id] = options;
+			optionsMap[item.id] = shuffle([...wrongs, answer]);
 		});
 		setQuizOptionsMap(optionsMap);
 	};
@@ -499,7 +514,7 @@ const TodayQuizScreen = () => {
 
 				// ✅ 알림 설정 완료 팝업 추가
 				const hour = tempSelectedHour.toString().padStart(2, '0');
-				showToastMessage('⏰ 알림 설정 완료', `매일 ${hour}시에 오늘의 퀴즈가 찾아갈게요!`);
+				showToastMessage('⏰ 알림 설정 완료', `매일 ${hour}시에 오늘의 퀴즈가 찾아갑니다!`);
 			} else {
 				Alert.alert('알림 권한 필요', '설정에서 알림 권한을 허용해주세요.');
 				Linking.openSettings();
@@ -640,50 +655,6 @@ const TodayQuizScreen = () => {
 		}, 200); // 약간의 딜레이 주면 UI 반응이 자연스러워짐
 	};
 
-	const handleResetTodayQuiz = async () => {
-		const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
-		const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
-		const todayStr = getLocalParamDateToString(todayDate);
-
-		const todayData = storedArr.find((q) => getLocalParamDateToString(q.quizDate) === todayStr);
-		const filteredArr = storedArr.filter((q) => getLocalParamDateToString(q.quizDate) !== todayStr);
-
-		// 출석 정보 유지
-		const preservedIsCheckedIn = todayData?.isCheckedIn ?? false;
-
-		// 새로운 퀴즈 생성
-		const newQuizList = getTodayQuiz();
-		const newTodayData: MainDataType.TodayQuizList = {
-			quizDate: getLocalDateString(),
-			isCheckedIn: preservedIsCheckedIn, // ✅ 출석 정보 유지
-			todayQuizIdArr: newQuizList.map((q) => q.id),
-			correctQuizIdArr: [],
-			worngQuizIdArr: [],
-			answerResults: {},
-			selectedAnswers: {},
-			prevQuizIdArr: todayData?.todayQuizIdArr ?? [],
-		};
-
-		const updatedArr = [...filteredArr, newTodayData];
-		await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedArr));
-
-		// 상태 초기화
-		setAnswerResults({});
-		setSelectedAnswers({});
-		setProgressPercent(0);
-		setQuizList(newQuizList);
-		setQuizOptionsMap({});
-		setCurrentIndex(0);
-		generateQuizOptions(newQuizList);
-
-		// ✅ 여기서 핵심!
-		setHasStarted(false); // 👉 다시 시작 전 상태로 전환
-		setShowTodayReview(false); // 👉 리뷰 모드 닫기
-
-		// 새로운 오늘 퀴즈 다시 생성
-		initQuiz();
-	};
-
 	const getFormattedDate = () => {
 		const date = todayDate;
 		const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
@@ -739,7 +710,7 @@ const TodayQuizScreen = () => {
 										<IconComponent type="materialIcons" name={result ? 'check' : 'close'} size={scaledSize(16)} color={COLORS.textWhite} />
 									</View>
 									<Text style={[styles.resultBannerText, { color: result ? COLORS.primaryDeep : COLORS.dangerDark }]}>
-										{result ? '정답이에요!' : '아쉬워요, 오답이에요'}
+										{result ? '정답입니다!' : '아쉽습니다, 오답입니다'}
 									</Text>
 								</View>
 							</View>
@@ -768,23 +739,16 @@ const TodayQuizScreen = () => {
 								</TouchableOpacity>
 							);
 						})}
-						{result !== undefined && (
+						{/* 마지막 문제를 풀면 상위에서 곧바로 완료 화면으로 전환되므로 '다음 문제'만 노출한다 */}
+						{result !== undefined && currentIndex < quizList.length - 1 && (
 							<TouchableOpacity
 								style={styles.nextButton}
 								activeOpacity={0.8}
 								onPress={() => {
-									if (currentIndex < quizList.length - 1) {
-										// 👉 다음 문제로 이동
-										setCurrentIndex((prev) => prev + 1);
-										scrollRef.current?.scrollTo({ y: 0, animated: true });
-									} else {
-										// 👉 마지막 문제일 때는 바로 결과 전환 ❌
-										// "결과 보기" 버튼만 표시 → 눌렀을 때 실행
-										// 별도 state 추가
-										setIsResultReady(true);
-									}
+									setCurrentIndex((prev) => prev + 1);
+									scrollRef.current?.scrollTo({ y: 0, animated: true });
 								}}>
-								<Text style={styles.nextButtonText}>{currentIndex < quizList.length - 1 ? '다음 문제' : '결과 보기'}</Text>
+								<Text style={styles.nextButtonText}>다음 문제</Text>
 							</TouchableOpacity>
 						)}
 					</>
@@ -804,15 +768,6 @@ const TodayQuizScreen = () => {
 				}}>
 				{isAlarmEnabled && (
 					<View style={styles.buttonRow}>
-						<View style={styles.leftButtonWrapper}>
-							{/* <TouchableOpacity onPress={handleResetTodayQuiz}>
-								<View style={[styles.buttonContent, { marginLeft: SPACING_W.md }]}>
-									<IconComponent name="rotate-left" type="FontAwesome" size={scaledSize(13)} color={COLORS.textLight} style={styles.iconSpacing} />
-									<Text style={styles.buttonText}>오늘 문제 다시 풀기</Text>
-								</View>
-							</TouchableOpacity> */}
-						</View>
-
 						<View style={styles.rightButtonWrapper}>
 							<TouchableOpacity onPress={loadLastTodayQuizList} activeOpacity={0.8} hitSlop={HIT_SLOP}>
 								<View style={styles.buttonContent}>
@@ -829,20 +784,20 @@ const TodayQuizScreen = () => {
 				{!isAlarmEnabled && (
 					<View style={styles.content}>
 						<Image source={require('@/assets/images/screen-heroes/today-quiz.png')} style={styles.todayHeroImage} resizeMode="contain" />
-						<Text style={styles.title}>🍀 매일 '오늘의 퀴즈'가 도착해요! 🍀</Text>
+						<Text style={styles.title}>🍀 매일 '오늘의 퀴즈'가 도착합니다! 🍀</Text>
 
 						<View style={{ alignSelf: 'stretch', marginTop: SPACING_H.sm }}>
 							<View style={styles.bulletRow}>
 								<Text style={styles.bullet}>•</Text>
-								<Text style={styles.bulletText}>매일 5개의 속담 퀴즈가 도착해요.</Text>
+								<Text style={styles.bulletText}>매일 5개의 속담 퀴즈가 도착합니다.</Text>
 							</View>
 							<View style={styles.bulletRow}>
 								<Text style={styles.bullet}>•</Text>
-								<Text style={styles.bulletText}>원하는 시간에 푸시 알림을 받을 수 있어요.</Text>
+								<Text style={styles.bulletText}>원하는 시간에 푸시 알림을 받을 수 있습니다.</Text>
 							</View>
 							<View style={styles.bulletRow}>
 								<Text style={styles.bullet}>•</Text>
-								<Text style={styles.bulletText}>문제를 모두 풀면 자세한 해설을 볼 수 있어요.</Text>
+								<Text style={styles.bulletText}>문제를 모두 풀면 자세한 해설을 볼 수 있습니다.</Text>
 							</View>
 						</View>
 
@@ -862,7 +817,6 @@ const TodayQuizScreen = () => {
 
 								<ScrollView
 									ref={hourScrollRef}
-									key={currentIndex}
 									horizontal
 									showsHorizontalScrollIndicator={false}
 									contentContainerStyle={styles.hourScrollContainer}>
@@ -943,7 +897,8 @@ const TodayQuizScreen = () => {
 								// 👉 시작했고 아직 안 끝났을 때는 문제 화면
 								// key 로 문항마다 재마운트 → 문제 전환 시 페이드+슬라이드업
 								<FadeInView key={currentIndex} duration={260} style={{ paddingBottom: SPACING_H.lg }}>
-									{renderItem({ item: quizList[currentIndex] })}
+									{/* 목록이 새로 만들어지는 순간 index 가 범위를 벗어날 수 있어 방어한다 */}
+									{quizList[currentIndex] ? renderItem({ item: quizList[currentIndex] }) : null}
 								</FadeInView>
 							) : (
 								// 👉 다 끝난 후 완료 화면
@@ -954,7 +909,7 @@ const TodayQuizScreen = () => {
 												<Text style={styles.completedEmoji}>🎉</Text>
 											</View>
 											<Text style={styles.completedTitle}>오늘의 문제 끝!</Text>
-											<Text style={styles.completedSubtitle}>내일 또 만나요 👋</Text>
+											<Text style={styles.completedSubtitle}>내일 또 뵙겠습니다 👋</Text>
 											<View style={styles.completedScorePill}>
 												<IconComponent type="materialIcons" name="check-circle" size={scaledSize(16)} color={COLORS.primary} />
 												<Text style={styles.completedScoreText}>
@@ -991,8 +946,12 @@ const TodayQuizScreen = () => {
 																setDetailModalVisible(true);
 															}}>
 															<View style={styles.reviewItemTextWrap}>
-																<Text style={styles.reviewItemTitle}>{item.proverb}</Text>
-																<Text style={styles.reviewItemMeaning}>{item.longMeaning || item.meaning}</Text>
+																<Text style={styles.reviewItemTitle} numberOfLines={1} ellipsizeMode="tail">
+																	{item.proverb}
+																</Text>
+																<Text style={styles.reviewItemMeaning} numberOfLines={2} ellipsizeMode="tail">
+																	{item.longMeaning || item.meaning}
+																</Text>
 															</View>
 															<View style={[styles.reviewItemPill, itemResult ? styles.pillCorrect : styles.pillWrong]}>
 																<Text style={styles.resultPillText}>{itemResult ? '정답' : '오답'}</Text>
@@ -1146,7 +1105,7 @@ const TodayQuizScreen = () => {
 						<ScrollView ref={modalScrollRef} style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
 							{groupedPrevQuizzes.length === 0 ? (
 								<View style={styles.emptyView}>
-									<Text style={styles.emptyText}>오늘의 퀴즈를 아직 풀지 않았어요.</Text>
+									<Text style={styles.emptyText}>오늘의 퀴즈를 아직 풀지 않았습니다.</Text>
 								</View>
 							) : (
 								groupedPrevQuizzes.map((group) => {
@@ -1220,6 +1179,10 @@ const TodayQuizScreen = () => {
 			{/* 상세 모달 */}
 			<ProverbDetailModal visible={detailModalVisible && !!detailQuiz} proverb={detailQuiz} onClose={() => setDetailModalVisible(false)} />
 
+			{/* 토스트는 화면 최상위에 한 번만 렌더한다.
+			    (모달이 열려 있을 때는 모달 안쪽 ToastView 가 대신 보여준다 → 중복 렌더 방지) */}
+			{!showPrevQuizModal && <ToastView />}
+
 			{/* ✅ 신규 뱃지 획득 모달 */}
 			<NewBadgeModal
 				visible={badgeModalVisible}
@@ -1248,14 +1211,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	/* ===== 상단 버튼 행 ===== */
 	buttonRow: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
+		justifyContent: 'flex-end',
 		alignItems: 'center',
 		marginHorizontal: SPACING_W.lg,
 		marginTop: SPACING_H.sm,
-	},
-	leftButtonWrapper: {
-		flexDirection: 'row',
-		alignItems: 'center',
 	},
 	rightButtonWrapper: {
 		flexDirection: 'row',

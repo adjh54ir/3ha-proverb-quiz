@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated, Easing, Modal } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated, Easing, Modal, ScrollView } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
@@ -27,10 +27,10 @@ type QuizModeScreenRouteParams = {
 
 /** 난이도별 설명 (카드 서브텍스트) */
 const LEVEL_DESC: Record<string, string> = {
-	beginner: '아주 쉬운 속담으로 가볍게 시작해요',
-	intermediate: '한 단계 높은 속담에 도전해요',
-	advanced: '익숙하지 않은 속담까지 풀어봐요',
-	expert: '어려운 속담으로 실력을 확인해요',
+	beginner: '아주 쉬운 속담으로 가볍게 시작합니다',
+	intermediate: '한 단계 높은 속담에 도전합니다',
+	advanced: '익숙하지 않은 속담까지 풀어 봅니다',
+	expert: '어려운 속담으로 실력을 확인합니다',
 	all: '모든 난이도의 속담을 풀어보기',
 	comingsoon: '새로운 문제가 준비 중입니다',
 };
@@ -64,10 +64,20 @@ const QuizModeScreen = () => {
 
 	// 🎞 화면 진입 / 탭 전환 시 페이드 + 슬라이드 업
 	const enterAnim = useRef(new Animated.Value(0)).current;
+	const scrollRef = useRef<ScrollView>(null);
 
-	useEffect(() => {
-		initData();
-	}, []);
+	// 퀴즈를 풀고 돌아오면 진행도가 달라져 있으므로 포커스마다 다시 읽고,
+	// 탭은 '난이도'로 되돌리고 맨 위에서 시작한다.
+	useFocusEffect(
+		useCallback(() => {
+			initData();
+			setTab('level');
+			setShowInfoModal(false);
+			setSelectedLevelKey(null);
+			setSelectedCategory(null);
+			scrollRef.current?.scrollTo({ y: 0, animated: false });
+		}, []),
+	);
 
 	useEffect(() => {
 		enterAnim.setValue(0);
@@ -174,6 +184,7 @@ const QuizModeScreen = () => {
 						</TouchableOpacity>
 					</View>
 					<Animated.ScrollView
+						ref={scrollRef}
 						style={{
 							opacity: enterAnim,
 							transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
@@ -183,7 +194,7 @@ const QuizModeScreen = () => {
 						<View style={styles.quizPathHero}>
 							<View style={styles.quizPathCopy}>
 								<Text style={styles.title}>{tab === 'level' ? '도전할 난이도를 골라보세요' : '관심 있는 주제를 골라보세요'}</Text>
-								<Text style={styles.quizPathDescription}>나에게 맞는 길에서 속담 모험을 시작해요.</Text>
+								<Text style={styles.quizPathDescription}>나에게 맞는 길에서 속담 모험을 시작합니다.</Text>
 							</View>
 							<FastImage source={require('@/assets/images/screen-heroes/quiz-path.png')} style={styles.quizPathImage} resizeMode="contain" />
 						</View>

@@ -112,7 +112,7 @@ const BadgeListModal = ({
 							<View style={styles.badgeEmptyBox}>
 								<IconComponent type="materialIcons" name="inbox" size={scaledSize(34)} color={COLORS.borderDark} />
 								<Text style={styles.badgeEmptyText}>
-									{filter === 'earned' ? '아직 획득한 뱃지가 없어요.' : '해당하는 뱃지가 없어요.'}
+									{filter === 'earned' ? '아직 획득한 뱃지가 없습니다.' : '해당하는 뱃지가 없습니다.'}
 								</Text>
 							</View>
 						)}

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ActivityIndicator, Animated, Dimensions, Easing, Image, InteractionManager, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,7 +14,6 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
@@ -164,24 +163,24 @@ const CARD_HEIGHT = isTablet
 		: scaleHeight(540);
 
 const praiseMessages = [
-	'속담 하나 더 마스터했어요! 🎉',
-	'어휘력이 쑥쑥 자라고 있어요! 🌱',
-	'오늘도 속담 하나 추가! 내공이 쌓이고 있어요 💪',
-	'이 속담, 이제 완전히 내 것이에요! 📖',
-	'꾸준한 학습이 속담 고수를 만들어요! 🏆',
-	'속담 하나를 알면 열을 이해할 수 있어요! 🔑',
+	'속담 하나를 더 마스터했습니다! 🎉',
+	'어휘력이 쑥쑥 자라고 있습니다! 🌱',
+	'오늘도 속담 하나 추가! 내공이 쌓이고 있습니다 💪',
+	'이 속담, 이제 완전히 내 것입니다! 📖',
+	'꾸준한 학습이 속담 고수를 만듭니다! 🏆',
+	'속담 하나를 알면 열을 이해할 수 있습니다! 🔑',
 	'오늘 배운 속담, 일상에서 써보세요! 😊',
 	'하나씩 차근차근, 속담 달인이 되는 중! ✨',
-	'이 속담의 깊은 뜻까지 알아가고 있네요! 🧠',
-	'좋아요! 또 하나의 속담이 머릿속에 새겨졌어요! 📚',
+	'이 속담의 깊은 뜻까지 알아가고 있습니다! 🧠',
+	'좋습니다! 또 하나의 속담이 머릿속에 새겨졌습니다! 📚',
 ];
 
 const reviewPraiseMessages = [
-	'복습도 실력이에요! 👍',
-	'다시 봐도 새로운 속담이죠? 🔁',
-	'반복이 속담 실력의 비결이에요! 💡',
-	'한 번 더 보면 더 오래 기억돼요! 🧱',
-	'꾸준한 복습, 최고예요! 🌟',
+	'복습도 실력입니다! 👍',
+	'다시 봐도 새롭게 다가옵니다 🔁',
+	'반복이 속담 실력의 비결입니다! 💡',
+	'한 번 더 보면 더 오래 기억됩니다! 🧱',
+	'꾸준한 복습, 최고입니다! 🌟',
 ];
 const DETAIL_FILTER_HEIGHT = scaleHeight(60);
 const IMAGE_HEIGHT = isAndroid ? scaleHeight(220) : scaleHeight(200);
@@ -193,7 +192,6 @@ const QuizStudyScreen = () => {
 
 	const navigation = useNavigation();
 	const isFocused = useIsFocused();
-	const scrollViewRef = useRef<ScrollView>(null);
 	const carouselRef = useRef<any>(null);
 	const isBackCardScrollingRef = useRef(false);
 	const toastAnim = useRef(new Animated.Value(0)).current;
@@ -230,7 +228,6 @@ const QuizStudyScreen = () => {
 	});
 	const [filter, setFilter] = useState<'all' | 'learning' | 'learned'>('learning');
 	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
-	const [showGuideModal, setShowGuideModal] = useState(false);
 	const [showToast, setShowToast] = useState(false);
 	const [praiseText, setPraiseText] = useState('');
 	const [levelFilter, setLevelFilter] = useState<'전체' | '초급' | '중급' | '고급' | '특급'>('전체');
@@ -254,26 +251,6 @@ const QuizStudyScreen = () => {
 		anim.start();
 		return () => anim.stop();
 	}, [screenFadeAnim]);
-
-	/**
-	 * Info 팝업 업데이트
-	 */
-	useLayoutEffect(() => {
-		navigation.setOptions({
-			headerRight: () => (
-				<TouchableOpacity
-					onPress={() => {
-						setShowGuideModal(true);
-						setLevelOpen(false); // ✅ 드롭다운 닫기
-						setRegionOpen(false); // ✅ 드롭다운 닫기
-					}}
-					hitSlop={HIT_SLOP}
-					style={{ marginRight: SPACING_W.lg }}>
-					<IconComponent type="materialIcons" name="info-outline" size={scaledSize(24)} color={COLORS.secondary} />
-				</TouchableOpacity>
-			),
-		});
-	}, [navigation]);
 
 	useEffect(() => {
 		if (carouselRef.current && getFilteredData().length > 0) {
@@ -318,10 +295,22 @@ const QuizStudyScreen = () => {
 	}, [levelFilter, regionFilter]);
 
 	// ✅ 화면 재진입 시마다 재조회 (설정 화면에서 학습 기록 초기화/주입이 가능하므로 최신 상태가 필요)
+	//    + 필터/아코디언/카드 위치를 처음 상태로 되돌린다.
 	useEffect(() => {
-		if (isFocused) {
-			fetchData();
+		if (!isFocused) {
+			return;
 		}
+		fetchData();
+		setFilter('learning');
+		setLevelFilter('전체');
+		setRegionFilter('전체');
+		setIsDetailFilterOpen(false);
+		setLevelOpen(false);
+		setRegionOpen(false);
+		setFlippedCard(null);
+		setCompletedCardId(null);
+		setShowExitModal(false);
+		carouselRef.current?.scrollTo({ index: 0, animated: false });
 	}, [isFocused]);
 
 	// 레벨 이름/숫자 매핑(재사용용)
@@ -378,7 +367,6 @@ const QuizStudyScreen = () => {
 				setStudyHistory({ studyProverbes: [], studyCounts: {}, badges: [], lastStudyAt: DateUtils.now() });
 			}
 
-			scrollViewRef.current?.scrollTo({ y: 0, animated: true });
 		} catch (error) {
 			console.error(error);
 		} finally {
@@ -418,8 +406,7 @@ const QuizStudyScreen = () => {
 		// ✅ 이미지 갱신: 해당 index 위치의 이미지를 새 랜덤 이미지로 교체
 		setMascotImagesQueue((prevQueue) => {
 			const newQueue = [...prevQueue];
-			const filteredData = getFilteredData();
-			const currentIndex = filteredData.findIndex((p) => p.id === id);
+			const currentIndex = getFilteredData().findIndex((p) => p.id === id);
 			if (currentIndex !== -1 && newQueue.length > 0) {
 				newQueue[currentIndex % newQueue.length] = mascotImages[Math.floor(Math.random() * mascotImages.length)];
 			}
@@ -447,10 +434,7 @@ const QuizStudyScreen = () => {
 
 		// 3. AsyncStorage, 뱃지, 토스트 등은 InteractionManager 이후 처리
 		InteractionManager.runAfterInteractions(() => {
-			// 상태 저장
-			AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
-
-			// 뱃지 검사 및 모달
+			// 저장은 checkAndHandleNewStudyBadges 안에서 뱃지까지 포함해 한 번에 처리한다(중복 쓰기 제거).
 			checkAndHandleNewStudyBadges(updatedHistory, setStudyHistory, setBadgeModalVisible, setNewlyEarnedBadges);
 		});
 
@@ -615,13 +599,19 @@ const QuizStudyScreen = () => {
 		return koCollator ? koCollator.compare(A, B) : A.localeCompare(B, 'ko-KR');
 	};
 
-	const getFilteredData = (): MainDataType.Proverb[] => {
+	/**
+	 * 현재 필터가 적용된 목록.
+	 * ⚠️ 한 렌더에서 로딩 판정 / 빈 목록 판정 / Carousel data 로 여러 번 호출된다.
+	 *    메모이즈하지 않으면 전체 속담을 그때마다 필터 + 한글 정렬하게 되어 스크롤이 눈에 띄게 버벅인다.
+	 */
+	const filteredData = useMemo((): MainDataType.Proverb[] => {
+		const studied = new Set(studyHistory.studyProverbes ?? []);
 		let filtered = proverbList;
 
 		if (filter === 'learned') {
-			filtered = filtered.filter((c) => studyHistory.studyProverbes.includes(c.id));
+			filtered = filtered.filter((c) => studied.has(c.id));
 		} else if (filter === 'learning') {
-			filtered = filtered.filter((c) => !studyHistory.studyProverbes.includes(c.id));
+			filtered = filtered.filter((c) => !studied.has(c.id));
 		}
 
 		const LEVEL_MAP: Record<string, number> = { '초급': 1, 중급: 2, 고급: 3, 특급: 4 };
@@ -634,7 +624,10 @@ const QuizStudyScreen = () => {
 
 		// ✅ 여기서 'idiomKr' 기준으로 가나다 정렬
 		return [...filtered].sort((a, b) => compareKr(a.proverb, b.proverb));
-	};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [proverbList, studyHistory.studyProverbes, filter, levelFilter, regionFilter]);
+
+	const getFilteredData = (): MainDataType.Proverb[] => filteredData;
 
 	const resetCard = () => {
 		setIsDetailFilterOpen(false); // 상세 필터 닫기
@@ -795,7 +788,7 @@ const QuizStudyScreen = () => {
 								</View>
 
 								{/* <Text style={styles.hangulText}>{item.hangul}</Text> */}
-								<Text style={styles.cardHint}>카드를 탭하면 속담 정보가 나와요 👆</Text>
+								<Text style={styles.cardHint}>카드를 탭하면 속담 정보가 나옵니다 👆</Text>
 							</View>
 						)}
 
@@ -839,7 +832,6 @@ const QuizStudyScreen = () => {
 						]}>
 						<View style={styles.cardBackSurface}>
 							<ScrollView
-								ref={scrollViewRef}
 								style={styles.cardBackScroll}
 								onScrollBeginDrag={() => {
 									isBackCardScrollingRef.current = true;
@@ -976,7 +968,7 @@ const QuizStudyScreen = () => {
 					<View style={styles.progressHeader}>
 						<View style={styles.studyHeroRow}>
 							<View style={styles.studyHeroCopy}>
-								<Text style={styles.studyHeroTitle}>한 장씩 넘기며 지혜를 익혀요</Text>
+								<Text style={styles.studyHeroTitle}>한 장씩 넘기며 지혜를 익힙니다</Text>
 								<Text style={styles.studyHeroDescription}>카드를 눌러 뜻과 유래를 살펴보세요.</Text>
 							</View>
 							<FastImage
@@ -1184,16 +1176,16 @@ const QuizStudyScreen = () => {
 							<Image source={require('@/assets/images/feature-states/empty-search.png')} style={styles.emptyImage} resizeMode="contain" />
 							<Text style={styles.emptyText}>
 								{filter === 'learned'
-									? '완료한 속담이 아직 없어요.\n학습 후 완료 버튼을 눌러보세요!'
+									? '완료한 속담이 아직 없습니다.\n학습 후 완료 버튼을 눌러 보세요!'
 									: filter === 'learning'
-										? '진행 중인 속담이 없어요.\n다시 학습하기 버튼으로 시작해보세요!'
+										? '진행 중인 속담이 없습니다.\n다시 학습하기 버튼으로 시작해 보세요!'
 										: '등록된 속담이 없습니다.'}
 							</Text>
 						</View>
 					) : (
 						<>
 							<Animated.View style={[styles.carouselContainer, { zIndex: 1, alignSelf: 'center' }]}>
-								{!(Platform.OS === 'android' && (showGuideModal || badgeModalVisible || showExitModal)) && (
+								{!(Platform.OS === 'android' && (badgeModalVisible || showExitModal)) && (
 									<Carousel
 										ref={carouselRef}
 										width={scaleWidth(370)}
@@ -1256,7 +1248,7 @@ const QuizStudyScreen = () => {
 								style={{ marginBottom: SPACING_H.sm }}
 							/>
 							<Text style={[styles.exitTitle, isTablet && { fontSize: FONT_SIZES.heading, lineHeight: scaledSize(32) }]}>
-								진행 중인 학습을 종료하시겠어요?
+								진행 중인 학습을 종료하시겠습니까?
 							</Text>
 						</View>
 

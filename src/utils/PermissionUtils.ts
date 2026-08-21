@@ -84,7 +84,7 @@ export const loadAppPermissions = async (): Promise<AppPermissionInfo[]> => {
 		list.push({
 			key: 'notifications',
 			label: '알림',
-			description: '오늘의 퀴즈와 학습 리마인더를 받아요',
+			description: '오늘의 퀴즈와 학습 리마인더를 받습니다',
 			state: toState(status),
 		});
 	} catch {
@@ -98,7 +98,7 @@ export const loadAppPermissions = async (): Promise<AppPermissionInfo[]> => {
 				list.push({
 					key: 'tracking',
 					label: '추적 허용',
-					description: '더 관련성 높은 광고를 제공하는 데 사용돼요',
+					description: '더 관련성 높은 광고를 제공하는 데 사용됩니다',
 					state: toState(status),
 				});
 			}

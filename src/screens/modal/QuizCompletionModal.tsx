@@ -100,11 +100,11 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
     }, [visible, scaleAnim, fadeAnim, mascotBounce]);
 
     const getPerformanceMessage = () => {
-        if (accuracy >= 90) return '완벽해요!';
-        if (accuracy >= 80) return '정말 잘했어요!';
-        if (accuracy >= 70) return '훌륭해요!';
-        if (accuracy >= 60) return '좋아요!';
-        return '수고했어요!';
+        if (accuracy >= 90) return '완벽합니다!';
+        if (accuracy >= 80) return '정말 잘했습니다!';
+        if (accuracy >= 70) return '훌륭합니다!';
+        if (accuracy >= 60) return '좋습니다!';
+        return '수고하셨습니다!';
     };
 
     const getPerformanceEmoji = () => {
@@ -128,7 +128,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
 
     if (!isPracticeMode) {
         return (
-            <Modal visible={visible} transparent animationType="fade">
+            <Modal visible={visible} transparent animationType="fade" onRequestClose={onConfirm}>
                 <View style={styles.overlay}>
                     <ConfettiCannon
                         key={confettiKey}
@@ -169,12 +169,12 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                                 {getPerformanceMessage()} {getPerformanceEmoji()}
                             </Text>
                             <Text style={styles.subtitle}>
-                                모든 퀴즈를 정복했어요
+                                모든 퀴즈를 정복했습니다
                             </Text>
 
                             <View style={styles.celebrateRow}>
                                 <Text style={styles.celebrateEmoji}>🎊</Text>
-                                <Text style={styles.celebrateText}>정말 잘했어요! 축하해요</Text>
+                                <Text style={styles.celebrateText}>정말 잘했습니다! 축하합니다</Text>
                                 <Text style={styles.celebrateEmoji}>🎊</Text>
                             </View>
                         </View>
@@ -203,7 +203,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
 
     // ✅ 연습 모드 - AnimatedCircularProgress 적용
     return (
-        <Modal visible={visible} transparent animationType="fade">
+        <Modal visible={visible} transparent animationType="fade" onRequestClose={onConfirm}>
             <View style={styles.overlay}>
                 {accuracy >= 80 && (
                     <ConfettiCannon

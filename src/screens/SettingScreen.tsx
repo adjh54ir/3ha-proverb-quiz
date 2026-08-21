@@ -53,24 +53,38 @@ const STORAGE_KEYS = {
 	favorites: MainStorageKeyType.FAVORITES_STORAGE_KEY,
 };
 
+/**
+ * '전체 데이터 초기화' 대상.
+ * ⚠️ STORAGE_KEYS 만 지우면 속담집/연습 기록/미션 수령일/마지막 등급이 남아
+ *    "모든 기록을 지웠습니다" 라는 안내와 실제 상태가 어긋난다.
+ *    소리·테마·글자 크기 같은 '설정'은 사용자 취향이라 초기화 대상에서 제외한다.
+ */
+const RESET_ALL_KEYS: string[] = [
+	...Object.values(STORAGE_KEYS),
+	MainStorageKeyType.USER_PROVERB_BOOKS,
+	MainStorageKeyType.USER_PROVERB_PRACTICE_RECORDS,
+	MainStorageKeyType.DAILY_MISSION_CLAIMED,
+	MainStorageKeyType.LAST_SEEN_GRADE,
+];
+
 type ResetType = 'study' | 'quiz' | 'timeChallenge' | 'todayQuiz' | 'towerChallenge' | 'all';
 
 // ─────────────────────────────────────────────
 // 리셋 설정 테이블 (switch문 → 데이터 기반)
 // ─────────────────────────────────────────────
 const RESET_CONFIG: Record<ResetType, { title: string; summary: string; iconName: string }> = {
-	study: { title: '학습을 다시 해볼까요?', summary: '지금까지 학습했던 내용들이 모두 사라져요.\n 정말 다시 시작할까요?', iconName: 'refresh' },
-	quiz: { title: '퀴즈를 다시 풀어볼까요?', summary: '지금까지 풀었던 퀴즈 기록이 초기화돼요. \n 다시 도전해볼까요?', iconName: 'refresh' },
-	todayQuiz: { title: '오늘의 퀴즈를 초기화할까요?', summary: '오늘의 퀴즈 기록이 사라져요. \n다시 새로 시작할까요?', iconName: 'refresh' },
-	timeChallenge: { title: '타임 챌린지를 초기화할까요?', summary: '타임 챌린지 기록이 모두 초기화돼요.\n 괜찮으신가요?', iconName: 'refresh' },
+	study: { title: '학습을 다시 시작하시겠습니까?', summary: '지금까지 학습했던 내용이 모두 사라집니다.\n 정말 다시 시작하시겠습니까?', iconName: 'refresh' },
+	quiz: { title: '퀴즈를 다시 푸시겠습니까?', summary: '지금까지 풀었던 퀴즈 기록이 초기화됩니다. \n 다시 도전하시겠습니까?', iconName: 'refresh' },
+	todayQuiz: { title: '오늘의 퀴즈를 초기화하시겠습니까?', summary: '오늘의 퀴즈 기록이 사라집니다. \n다시 시작하시겠습니까?', iconName: 'refresh' },
+	timeChallenge: { title: '타임 챌린지를 초기화하시겠습니까?', summary: '타임 챌린지 기록이 모두 초기화됩니다.\n 계속하시겠습니까?', iconName: 'refresh' },
 	towerChallenge: {
-		title: '타워 챌린지를 초기화할까요?',
-		summary: '타워 챌린지의 모든 진행 상황이 초기화돼요.\n 처음부터 다시 도전하시겠어요?',
+		title: '타워 챌린지를 초기화하시겠습니까?',
+		summary: '타워 챌린지의 모든 진행 상황이 초기화됩니다.\n 처음부터 다시 도전하시겠습니까?',
 		iconName: 'refresh',
 	},
 	all: {
-		title: '모두 다시 해볼까요?',
-		summary: '지금까지 학습하고 풀었던 모든 기록이 사라져요. 정말 전부 다시 시작할까요?',
+		title: '모두 초기화하시겠습니까?',
+		summary: '지금까지 학습하고 풀었던 모든 기록이 사라집니다. 정말 전부 다시 시작하시겠습니까?',
 		iconName: 'delete-alert-outline',
 	},
 };
@@ -272,6 +286,15 @@ const SettingScreen = () => {
 	useFocusEffect(
 		useCallback(() => {
 			setAppVersion(VersionCheck.getCurrentVersion());
+			// 다시 들어올 때는 아코디언을 접고 열려 있던 팝업을 닫은 뒤 맨 위에서 시작한다
+			setOpenAccordion(null);
+			setModalVisible(false);
+			setShowDevModal(false);
+			setShowAppsModal(false);
+			setShowTermsModal(false);
+			setShowOpenSourceModal(false);
+			setShowVersionModal(false);
+			setShowScrollTop(false);
 			scrollToTop();
 
 			// 퀴즈 시작 팝업 등 다른 화면에서 바꿨을 수 있어 포커스마다 다시 읽는다
@@ -330,7 +353,8 @@ const SettingScreen = () => {
 			showToast('학습 데이터 초기화', '학습 기록과 뱃지를 모두 지웠습니다.');
 		},
 		quiz: async () => {
-			await AsyncStorage.removeItem(STORAGE_KEYS.quiz);
+			// 점수를 0으로 되돌리므로 '마지막으로 본 등급' 도 함께 지워야 레벨업 감지가 다시 동작한다.
+			await AsyncStorage.multiRemove([STORAGE_KEYS.quiz, MainStorageKeyType.LAST_SEEN_GRADE]);
 			showToast('퀴즈 데이터 초기화', '퀴즈 기록과 점수를 모두 지웠습니다.');
 		},
 		timeChallenge: async () => {
@@ -346,7 +370,7 @@ const SettingScreen = () => {
 			showToast('오늘의 퀴즈 초기화', '오늘의 퀴즈 기록을 지웠습니다.');
 		},
 		all: async () => {
-			await AsyncStorage.multiRemove(Object.values(STORAGE_KEYS));
+			await AsyncStorage.multiRemove(RESET_ALL_KEYS);
 			showToast('전체 초기화 완료', '앱의 모든 기록을 지웠습니다.');
 		},
 	};
@@ -398,7 +422,7 @@ const SettingScreen = () => {
 			}
 
 			const message = [
-				'요즘 제가 재미있게 쓰고 있는 앱이 있어서 추천드려요! 😊',
+				'요즘 재미있게 쓰고 있는 앱이 있어 추천드립니다! 😊',
 				'',
 				`📱 ${APP_NAME}`,
 				DESCRIPTION,
@@ -517,20 +541,6 @@ const SettingScreen = () => {
 			Linking.openURL(`mailto:adjh54ir@gmail.com?subject=${encodeURIComponent(`${APP_NAME} 앱 문의`)}&body=${encodeURIComponent(body)}`);
 		},
 	};
-
-	// ── sections ─────────────────────────────────
-	const sections = useMemo(
-		() =>
-			BASE_SECTIONS.map((s) => ({
-				titleText: s.titleText,
-				iconType: s.iconType,
-				icon: s.icon,
-				iconColor: s.iconColor,
-				iconBg: s.iconBg,
-				data: s.data,
-			})),
-		[],
-	);
 
 	const newAppIds = useMemo(
 		() =>
@@ -905,9 +915,10 @@ const SettingScreen = () => {
 						ref={sectionRef}
 						keyExtractor={(item, index) => `${item}-${index}`}
 						renderItem={renderItem}
-						sections={sections.map((section, i) => ({ ...section, key: `section-${i}` }))}
+						sections={BASE_SECTIONS.map((section, i) => ({ ...section, key: `section-${i}` }))}
 						stickySectionHeadersEnabled={false}
 						onScroll={(e) => setShowScrollTop(e.nativeEvent.contentOffset.y > 100)}
+						scrollEventThrottle={16}
 						contentContainerStyle={styles.listContent}
 						ItemSeparatorComponent={() => <View style={styles.itemSpacing} />}
 						renderSectionFooter={() => <View style={styles.sectionSpacing} />}
@@ -930,7 +941,7 @@ const SettingScreen = () => {
 										<View style={styles.recommendTitleIconChip}>
 											<IconComponent type="MaterialCommunityIcons" name="cellphone-check" size={scaledSize(16)} color={COLORS.secondary} />
 										</View>
-										<Text style={styles.recommendTitle}>앱이 마음에 드셨나요?</Text>
+										<Text style={styles.recommendTitle}>앱이 마음에 드셨습니까?</Text>
 									</View>
 									<Text style={styles.recommendSubtitle}>가족이나 친구, 지인에게 유용한 앱을 함께 나눠보세요!</Text>
 									<View style={styles.appIconWrapper}>

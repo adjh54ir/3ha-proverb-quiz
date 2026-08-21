@@ -16,6 +16,7 @@ import ProverbServices from './services/ProverbServices';
 import { MainStorageKeyType } from './types/MainStorageKeyType';
 import { requestTrackingPermission } from './utils/PermissionUtils';
 import DateUtils from './utils/DateUtils';
+import { sampleSize } from './utils/ArrayUtils';
 import { loadSoundSetting, preloadSounds } from './utils/SoundUtils';
 import notifee from '@notifee/react-native';
 import { scheduleDailyQuizReminder } from './utils/NotifactionHelper';
@@ -169,7 +170,7 @@ const App = () => {
 		console.log('alreadyExists :: ', alreadyExists);
 		if (!alreadyExists) {
 			const all = ProverbServices.selectProverbList();
-			const shuffled = [...all].sort(() => Math.random() - 0.5).slice(0, 5);
+			const shuffled = sampleSize(all, 5);
 
 			const newQuizData: MainDataType.TodayQuizList = {
 				quizDate: DateUtils.now().toISOString(),

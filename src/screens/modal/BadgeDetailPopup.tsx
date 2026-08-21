@@ -176,7 +176,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 								color={isEarned ? meta.color : COLORS.textLight}
 							/>
 							<Text style={[styles.statusText, { color: isEarned ? meta.color : COLORS.textLight }]}>
-								{isEarned ? '획득 완료한 뱃지예요!' : '아직 획득하지 못했어요'}
+								{isEarned ? '획득 완료한 뱃지입니다!' : '아직 획득하지 못했습니다'}
 							</Text>
 						</View>
 

@@ -15,8 +15,8 @@ const BottomHomeButton = ({
 	borderColor = COLORS.border,
 	textColor = COLORS.text,
 	iconColor = COLORS.textMuted,
-	confirmTitle = '퀴즈를 종료할까요?',
-	confirmMessage = '진행 중인 내용은 저장되지 않아요.',
+	confirmTitle = '퀴즈를 종료하시겠습니까?',
+	confirmMessage = '진행 중인 내용은 저장되지 않습니다.',
 	skipConfirm = false,
 }: {
 	paddingBottom?: number;

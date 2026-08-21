@@ -43,6 +43,11 @@ const WrongReviewScreen = () => {
 			return;
 		}
 		fetchWrongData();
+		// 다시 들어올 때는 목록을 접고 맨 위에서 시작한다
+		setShowWrongList(false);
+		setDetailVisible(false);
+		setShowScrollTop(false);
+		scrollViewRef.current?.scrollTo({ y: 0, animated: false });
 	}, [isFocused]);
 
 	useEffect(() => {
@@ -135,11 +140,11 @@ const WrongReviewScreen = () => {
 						style={styles.emptyMascot}
 						resizeMode="contain"
 					/>
-					<Text style={styles.emptyTitle}>틀린 문제가 없어요! 🎉</Text>
+					<Text style={styles.emptyTitle}>틀린 문제가 없습니다! 🎉</Text>
 					<Text style={styles.emptyDesc}>
-						아직 오답으로 기록된 속담이 없어요.{'\n'}
+						아직 오답으로 기록된 속담이 없습니다.{'\n'}
 						퀴즈를 풀다가 틀린 문제가 생기면{'\n'}
-						이곳에서 모아 다시 복습할 수 있어요.
+						이곳에서 모아 다시 복습할 수 있습니다.
 					</Text>
 				</Animated.View>
 			</View>
@@ -159,8 +164,8 @@ const WrongReviewScreen = () => {
 				<Animated.View style={{ width: '100%', opacity: contentFade, transform: [{ translateY: contentSlide }] }}>
 					<View style={styles.reviewHero}>
 						<View style={styles.reviewHeroCopy}>
-							<Text style={styles.reviewHeroTitle}>실수는 지혜가 자라는 순간이에요</Text>
-							<Text style={styles.reviewHeroDescription}>천천히 다시 보면 이번에는 분명 맞힐 수 있어요.</Text>
+							<Text style={styles.reviewHeroTitle}>실수는 지혜가 자라는 순간입니다</Text>
+							<Text style={styles.reviewHeroDescription}>천천히 다시 보면 이번에는 분명 맞힐 수 있습니다.</Text>
 						</View>
 						<FastImage
 							source={require('@/assets/images/screen-heroes/wrong-review.png')}
@@ -189,16 +194,16 @@ const WrongReviewScreen = () => {
 					{/* ✅ 격려 메시지 */}
 					<Text style={styles.encourageText}>
 						지금까지 <Text style={styles.encourageHighlight}>{totalSolvedCount}</Text>문제를 풀었고,{' '}
-						<Text style={styles.encourageHighlight}>{wrongProverbIds.length}</Text>문제가 남았어요.{'\n'}한 번 더 도전해볼까요? 💪
+						<Text style={styles.encourageHighlight}>{wrongProverbIds.length}</Text>문제가 남았습니다.{'\n'}한 번 더 도전해 보시겠습니까? 💪
 					</Text>
 
 					{/* ✅ 안내 */}
 					<View style={styles.guideCard}>
 						<Text style={styles.guideCardTitle}>📘 오답 복습이란?</Text>
 						<Text style={styles.guideCardContent}>
-							• 틀린 문제를 다시 풀고, <Text style={styles.guideHighlight}>정답</Text>을 맞히면 목록에서 자동으로 사라져요.{'\n'}•
+							• 틀린 문제를 다시 풀고, <Text style={styles.guideHighlight}>정답</Text>을 맞히면 목록에서 자동으로 사라집니다.{'\n'}•
 							항상 <Text style={styles.guideHighlight}>뜻 맞추기</Text>로 출제되며, 정답 시 <Text style={styles.guideHighlight}>10점</Text>을
-							받아요 🎯{'\n'}• 다시 틀려도 걱정 마세요. 반복하며 실력을 쌓을 수 있어요! 🔄
+							받습니다 🎯{'\n'}• 다시 틀려도 걱정 마세요. 반복하며 실력을 쌓을 수 있습니다! 🔄
 						</Text>
 					</View>
 

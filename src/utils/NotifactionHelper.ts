@@ -64,7 +64,7 @@ const scheduleDailyQuizReminder = async (hour: number, moveToScreen: string) => 
         {
             id: DAILY_QUIZ_NOTIFICATION_ID,
             title: '속담 퀴즈가 도착했습니다. 🍀',
-            body: '출석 체크도 하고 문제도 풀어서 속담 지식을 넓혀보아요!',
+            body: '출석 체크도 하고 문제도 풀면서 속담 지식을 넓혀 보세요!',
             android: {
                 channelId,
                 pressAction: { id: 'default' },

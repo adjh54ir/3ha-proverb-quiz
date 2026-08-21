@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
@@ -31,13 +31,20 @@ const InitQuizModeScreen = () => {
 	const [accordionOpen, setAccordionOpen] = useState(false);
 	const [totalScore, setTotalScore] = useState<number>(0);
 
+	const scrollRef = useRef<ScrollView>(null);
 	const enterAnim = useRef(new Animated.Value(0)).current;
 	// 모드 카드 stagger 진입 (최대 6개까지만 지연)
 	const cardAnims = useRef(QUIZ_MODES.map(() => new Animated.Value(0))).current;
 
-	useEffect(() => {
-		loadData();
-	}, []);
+	// 퀴즈를 풀고 돌아오면 점수가 달라져 있으므로 포커스마다 다시 읽고,
+	// 아코디언은 접은 채 맨 위에서 시작한다.
+	useFocusEffect(
+		useCallback(() => {
+			loadData();
+			setAccordionOpen(false);
+			scrollRef.current?.scrollTo({ y: 0, animated: false });
+		}, []),
+	);
 
 	useEffect(() => {
 		const animation = Animated.timing(enterAnim, { toValue: 1, duration: 420, easing: Easing.out(Easing.cubic), useNativeDriver: true });
@@ -78,7 +85,7 @@ const InitQuizModeScreen = () => {
 		<SafeAreaView style={styles.main} edges={['bottom']}>
 			<View style={styles.container}>
 				<Animated.View style={[styles.animatedWrap, { opacity: enterAnim }]}>
-					<ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+					<ScrollView ref={scrollRef} style={styles.scrollArea} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 						<View style={styles.mascotSection}>
 							<FastImage
 								source={require('@/assets/images/screen-heroes/quiz-mode.png')}
@@ -92,7 +99,7 @@ const InitQuizModeScreen = () => {
 						</View>
 
 						<View style={styles.titleWrap}>
-							<Text style={styles.titleLine}>🧩 퀴즈 준비됐나요?</Text>
+							<Text style={styles.titleLine}>🧩 퀴즈 준비되셨습니까?</Text>
 							<Text style={styles.titleLine}>도전하려는 퀴즈 모드를 선택하세요!</Text>
 						</View>
 
@@ -136,7 +143,7 @@ const InitQuizModeScreen = () => {
 						</View>
 
 						<TouchableOpacity style={styles.accordionHeader} activeOpacity={0.8} onPress={() => setAccordionOpen((prev) => !prev)}>
-							<Text style={styles.accordionHeaderText}>❓ 틀린 문제는 어떻게 다시 풀 수 있나요?</Text>
+							<Text style={styles.accordionHeaderText}>❓ 틀린 문제는 어떻게 다시 풀 수 있습니까?</Text>
 							<IconComponent type="MaterialIcons" name={accordionOpen ? 'expand-less' : 'expand-more'} size={scaledSize(20)} color={COLORS.text} />
 						</TouchableOpacity>
 
@@ -145,7 +152,7 @@ const InitQuizModeScreen = () => {
 								<View style={styles.accordionDescBox}>
 									<View style={styles.accordionRow}>
 										<IconComponent type="FontAwesome5" name="book" size={scaledSize(16)} color={COLORS.accentFlame} />
-										<Text style={styles.accordionText}>틀린 문제는 오답 복습에서 다시 확인할 수 있어요.</Text>
+										<Text style={styles.accordionText}>틀린 문제는 오답 복습에서 다시 확인할 수 있습니다.</Text>
 									</View>
 									<View style={styles.accordionRow}>
 										<IconComponent type="MaterialCommunityIcons" name="reload" size={scaledSize(18)} color={COLORS.primary} />

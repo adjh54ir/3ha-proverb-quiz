@@ -14,13 +14,13 @@ import { HIT_SLOP, COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, theme
 
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { sampleSize } from '@/utils/ArrayUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import { LocaleConfig } from 'react-native-calendars';
 import { CONST_MAIN_DATA } from '@/const/ConstMainData';
 import DateUtils from '@/utils/DateUtils';
-import ProverbServices from '@/services/ProverbServices';
 import moment from 'moment';
 import CheckInModal from './modal/CheckInModal';
 import DailyMissionModal from './modal/DailyMissionModal';
@@ -29,22 +29,22 @@ import LevelModal from './modal/LevelModal';
 import { calcStreak, StreakInfo } from '@/utils/StreakUtils';
 import { AttendanceBadgeInterceptor } from '@/services/interceptor/AttendanceBadgeInterceptor';
 import { computeDailyMissions, countDoneMissions, allMissionsDone } from '@/utils/DailyMissionUtils';
-import { LEVEL_DATA, PET_REWARDS, SCORE_PER_QUESTION, getLevelByScore, getNextLevel, getProgressPercent, getQuestionsToNext } from '@/const/ConstInfoData';
+import { PET_REWARDS, getLevelByScore, getProgressPercent, getQuestionsToNext } from '@/const/ConstInfoData';
 import TowerRewardSection from '@/components/TowerRewardSection';
 import { TowerProgress } from '@/const/ConstTowerData';
 import { playFinish } from '@/utils/SoundUtils';
 
 const greetingMessages = [
-	'🎯 반가워! 오늘도 똑똑해질 준비됐나요?',
-	'🧠 오늘의 속담으로 지혜를 키워봐요!',
-	'📚 기억력 자신 있죠? 속담 퀴즈에 도전!',
-	'📝 속담 하나, 교훈 하나! 함께 배워봐요!',
-	'✨ 속담으로 생각을 키워보는 시간이에요!',
-	'💡 옛말 속 지혜, 오늘도 한마디 배워볼까요?',
+	'🎯 반갑습니다! 오늘도 똑똑해질 준비되셨습니까?',
+	'🧠 오늘의 속담으로 지혜를 키워 보세요!',
+	'📚 기억력 자신 있으십니까? 속담 퀴즈에 도전!',
+	'📝 속담 하나, 교훈 하나! 함께 배워 보세요!',
+	'✨ 속담으로 생각을 키워 보는 시간입니다!',
+	'💡 옛말 속 지혜, 오늘도 한마디 배워 보시겠습니까?',
 	'👀 퀴즈로 속담을 익히면 재미가 두 배!',
 	'🔍 뜻을 알면 더 재밌는 속담! 지금 풀어보세요!',
 	'🧩 맞히는 재미, 배우는 즐거움! 속담 퀴즈 GO!',
-	'🐣 하루 한 속담! 작지만 큰 지혜가 자라나요!',
+	'🐣 하루 한 속담! 작지만 큰 지혜가 자랍니다!',
 ];
 
 LocaleConfig.locales.kr = {
@@ -151,11 +151,10 @@ const Home = () => {
 	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
 	const handoff = useModalHandoff();
 	const navigation = useNavigation();
-	const scrollRef = useRef<NodeJS.Timeout | null>(null);
-	const levelScrollRef = useRef<ScrollView>(null);
+	const confettiTimer = useRef<NodeJS.Timeout | null>(null); // 축포 자동 종료 타이머
 	const scrollViewRef = useRef<ScrollView>(null);
 
-	const [greeting, setGreeting] = useState('🖐️ 안녕! 오늘도 속담 퀴즈 풀 준비 됐니?');
+	const [greeting, setGreeting] = useState('🖐️ 안녕하세요! 오늘도 속담 퀴즈 풀 준비 되셨습니까?');
 	const [totalScore, setTotalScore] = useState(0);
 	const [showConfetti, setShowConfetti] = useState(false);
 	const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
@@ -180,7 +179,6 @@ const Home = () => {
 	const hasAutoCheckedIn = useRef(false); // ✅ 중복 방지용
 	const stampAnim = useRef(new Animated.Value(0)).current;
 	const stampTimer = useRef<NodeJS.Timeout | null>(null);
-	const levelScrollTimer = useRef<NodeJS.Timeout | null>(null);
 	// 화면 진입 fade + slide-up
 	const screenAnim = useRef(new Animated.Value(0)).current;
 	const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -209,14 +207,14 @@ const Home = () => {
 
 	const PET_MESSAGES = [
 		'뀨! 안녕하세요!',
-		'오늘도 같이 공부해요!',
-		'속담 한 개 배워볼까요?',
-		'나랑 놀아줘서 고마워요!',
-		'잘하고 있어요, 최고예요!',
-		'조금만 더 힘내봐요!',
-		'쓰담쓰담 좋아요~',
-		'퀴즈 풀러 가볼까요?',
-		'배고파요... 점수 주세요!',
+		'오늘도 함께 공부하겠습니다!',
+		'속담 한 개 배워 보시겠습니까?',
+		'함께 놀아 주셔서 고맙습니다!',
+		'잘하고 계십니다, 최고입니다!',
+		'조금만 더 힘내 보세요!',
+		'쓰담쓰담 좋습니다~',
+		'퀴즈 풀러 가 보시겠습니까?',
+		'배고픕니다... 점수 주세요!',
 		'오늘도 출석 잊지 마세요!',
 	];
 
@@ -259,9 +257,6 @@ const Home = () => {
 			if (stampTimer.current) {
 				clearTimeout(stampTimer.current);
 			}
-			if (levelScrollTimer.current) {
-				clearTimeout(levelScrollTimer.current);
-			}
 		},
 		[],
 	);
@@ -294,15 +289,15 @@ const Home = () => {
 			hasShownInitialPetSpeech.current = true;
 			// 요일별로 좀 더 귀여운 인사말
 			const dayGreetings = [
-				'일요일이에요~ 푹 쉬면서 한 문제 어때요? 😴',
-				'월요일 파이팅! 오늘도 같이 시작해요 💪',
-				'화요일이에요! 가볍게 한 판 풀어볼까요? 🔥',
-				'수요일, 벌써 한 주의 절반! 잘하고 있어요 🌱',
-				'목요일이에요~ 조금만 더 힘내요! ✨',
-				'불금이에요! 오늘도 똑똑해지고 가요 🎉',
-				'토요일이에요~ 여유롭게 한 문제 풀어요 ☕',
+				'일요일입니다~ 푹 쉬면서 한 문제 어떠십니까? 😴',
+				'월요일 파이팅! 오늘도 같이 시작합니다 💪',
+				'화요일입니다! 가볍게 한 판 풀어 보시겠습니까? 🔥',
+				'수요일, 벌써 한 주의 절반! 잘하고 계십니다 🌱',
+				'목요일입니다~ 조금만 더 힘내세요! ✨',
+				'불금입니다! 오늘도 똑똑해지고 가세요 🎉',
+				'토요일입니다~ 여유롭게 한 문제 풀어 보세요 ☕',
 			];
-			const firstGreeting = dayGreetings[DateUtils.now().getDay()] ?? '안녕하세요! 오늘도 함께 공부해요 😊';
+			const firstGreeting = dayGreetings[DateUtils.now().getDay()] ?? '안녕하세요! 오늘도 함께 공부하겠습니다 😊';
 			const t = setTimeout(() => showPetSpeech(firstGreeting), 900);
 			return () => clearTimeout(t);
 		}
@@ -325,9 +320,15 @@ const Home = () => {
 			setEarnedBadgeIds([]);
 			setTotalScore(0);
 			setUnlockedRewards([]);
+			// 열려 있던 팝업은 닫고 시작한다 (출석 팝업은 checkTodayCheckIn 이 다시 판단)
+			setShowBadgeModal(false);
+			setSelectedBadge(null);
+			setShowLevelModal(false);
+			setShowDailyMission(false);
+			setShowLevelUp(false);
 
 			setShowConfetti(true);
-			scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
+			confettiTimer.current = setTimeout(() => setShowConfetti(false), 3000);
 			hasAutoCheckedIn.current = false;
 
 			(async () => {
@@ -342,16 +343,12 @@ const Home = () => {
 			scrollViewRef.current?.scrollTo({ y: 0, animated: true });
 
 			return () => {
-				if (scrollRef.current) {
-					clearTimeout(scrollRef.current);
+				if (confettiTimer.current) {
+					clearTimeout(confettiTimer.current);
 				}
 			};
 		}, []),
 	);
-	useEffect(() => {
-		const result = ProverbServices.getDuplicateProverbs();
-		console.log('중복데이터를 확인합니다 :: ', result);
-	}, []);
 
 	useEffect(() => {
 		if (showCheckInModal && !isCheckedIn && !hasAutoCheckedIn.current) {
@@ -360,44 +357,9 @@ const Home = () => {
 		}
 	}, [showCheckInModal, isCheckedIn]);
 
-	const levelDataForScroll = useMemo(() => [...LEVEL_DATA], []);
-
-	const currentLevel = getLevelByScore(totalScore);
-
-	const nextLevel = getNextLevel(totalScore);
-
-	const currentLevelIndex = levelDataForScroll.findIndex((item) => totalScore >= item.score && totalScore < (item.next ?? Infinity));
-	useEffect(() => {
-		if (showLevelModal && levelScrollRef.current) {
-			levelScrollTimer.current = setTimeout(() => {
-				levelScrollRef.current?.scrollTo({
-					y: currentLevelIndex * scaleHeight(150), // 카드 높이 예상값
-					animated: true,
-				});
-			}, 100); // 모달이 나타난 후 살짝 delay
-			return () => {
-				if (levelScrollTimer.current) {
-					clearTimeout(levelScrollTimer.current);
-				}
-			};
-		}
-	}, [showLevelModal]);
-
 	const levelData = useMemo(() => getLevelByScore(totalScore), [totalScore]);
 
 	const { label, icon, mascot, description } = levelData;
-
-	useEffect(() => {
-		setShowConfetti(true);
-
-		// 일정 시간 후 자동 종료
-		const timeout = setTimeout(() => {
-			setShowConfetti(false);
-		}, 3000);
-
-		// 정리
-		return () => clearTimeout(timeout);
-	}, []);
 
 	const getPetLevel = (checkedIn: { [date: string]: any }) => {
 		const count = Object.keys(checkedIn).length;
@@ -489,10 +451,6 @@ const Home = () => {
 			},
 		}));
 
-		if (scrollRef.current) {
-			clearTimeout(scrollRef.current);
-		}
-		scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
 	};
 
 	// 진행도(다음 등급까지 %) — 중앙 헬퍼 사용
@@ -570,9 +528,8 @@ const Home = () => {
 	};
 	// 필요 시 랜덤 퀴즈 생성기 로직
 	const generateTodayQuizIds = (count: number): number[] => {
-		const allIds = CONST_MAIN_DATA.PROVERB.map((item) => item.id);
-		const shuffled = allIds.sort(() => Math.random() - 0.5);
-		return shuffled.slice(0, count);
+		// sort(() => Math.random() - 0.5) 는 균등 셔플이 아니라 편향된다 → 부분 Fisher-Yates 사용
+		return sampleSize(CONST_MAIN_DATA.PROVERB, count).map((item) => item.id);
 	};
 	const ensureTodayQuizExists = async () => {
 		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
@@ -736,10 +693,10 @@ const Home = () => {
 		}
 
 		requestAnimationFrame(() => setShowConfetti(true));
-		if (scrollRef.current) {
-			clearTimeout(scrollRef.current);
+		if (confettiTimer.current) {
+			clearTimeout(confettiTimer.current);
 		}
-		scrollRef.current = setTimeout(() => setShowConfetti(false), 3000);
+		confettiTimer.current = setTimeout(() => setShowConfetti(false), 3000);
 	};
 
 	const moveToHandler = {
@@ -951,7 +908,7 @@ const Home = () => {
 						iconName="play-arrow"
 						iconType="materialIcons"
 						label="시작하기"
-						description="속담 뜻, 속담 찾기, 빈칸 채우기 퀴즈를 선택해서 퀴즈를 풀어봐요"
+						description="속담 뜻, 속담 찾기, 빈칸 채우기 퀴즈를 선택해서 퀴즈를 풀어 봅니다"
 						color={COLORS.secondary}
 						onPress={moveToHandler.quiz}
 					/>
@@ -960,14 +917,14 @@ const Home = () => {
 						iconName="school"
 						iconType="materialIcons"
 						label="학습 모드"
-						description="카드 형식으로 속담과 속담의 의미를 재미있게 익혀봐요"
+						description="카드 형식으로 속담과 속담의 의미를 재미있게 익힙니다"
 						color={COLORS.primary}
 						onPress={moveToHandler.study}
 					/>
 					<MascotMoment
 						image={require('@/assets/images/home-mascot-moments/mascot-study.png')}
-						title="속담은 뜻을 알면 더 오래 남아요"
-						description="천천히 읽고, 오늘의 지혜를 하나씩 익혀봐요."
+						title="속담은 뜻을 알면 더 오래 남습니다"
+						description="천천히 읽고, 오늘의 지혜를 하나씩 익혀 보세요."
 						backgroundColor={HERO.bg}
 						accentColor={HERO.accent}
 					/>
@@ -976,7 +933,7 @@ const Home = () => {
 						iconName="replay"
 						iconType="materialIcons"
 						label="오답 복습"
-						description="틀린 퀴즈를 다시 풀면서 기억을 더 확실히 다져봐요"
+						description="틀린 퀴즈를 다시 풀면서 기억을 더 확실히 다집니다"
 						color={COLORS.warning}
 						onPress={moveToHandler.wrongReview}
 					/>
@@ -1001,7 +958,7 @@ const Home = () => {
 					<MascotMoment
 						image={require('@/assets/images/home-mascot-moments/mascot-challenge-final.png')}
 						title="준비됐다면 기록에 도전!"
-						description="빠르게 풀어도, 한 문제씩 정확하게 풀어도 좋아요."
+						description="빠르게 풀어도, 한 문제씩 정확하게 풀어도 좋습니다."
 						backgroundColor={HERO.bg}
 						accentColor={HERO.accent}
 						imageOnRight
@@ -1011,7 +968,7 @@ const Home = () => {
 						iconName="star"
 						iconType="materialIcons"
 						label="즐겨찾기"
-						description="자주 보고 싶은 속담을 모아두고 한눈에 다시 확인해요"
+						description="자주 보고 싶은 속담을 모아두고 한눈에 다시 확인합니다"
 						color={COLORS.gold}
 						onPress={moveToHandler.favorite}
 						isNew
@@ -1021,15 +978,15 @@ const Home = () => {
 						iconName="menu-book"
 						iconType="materialIcons"
 						label="나만의 속담집"
-						description="원하는 속담을 모아 나만의 속담집을 만들고 퀴즈로 풀어봐요"
+						description="원하는 속담을 모아 나만의 속담집을 만들고 퀴즈로 풀어 봅니다"
 						color={COLORS.accentPink}
 						onPress={moveToHandler.myBook}
 						isNew
 					/>
 					<MascotMoment
 						image={require('@/assets/images/home-mascot-moments/mascot-collection.png')}
-						title="나만의 지혜 창고를 채워봐요"
-						description="좋아하는 속담과 뱃지를 차곡차곡 모을 수 있어요."
+						title="나만의 지혜 창고를 채워 보세요"
+						description="좋아하는 속담과 뱃지를 차곡차곡 모을 수 있습니다."
 						backgroundColor={HERO.bg}
 						accentColor={HERO.accent}
 					/>

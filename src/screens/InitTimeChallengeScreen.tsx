@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Image, Modal } from 'react-native';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
@@ -43,9 +43,12 @@ const InitTimeChallengeScreen = () => {
 	const [adWatched, setAdWatched] = useState(false);
 	const shouldShowAdRef = useRef(Math.random() < 0.5);
 
-	useEffect(() => {
-		fetchTopHistory();
-	}, []);
+	// 챌린지를 마치고 돌아오면 방금 기록이 랭킹에 바로 보여야 한다 → 포커스마다 다시 읽는다.
+	useFocusEffect(
+		useCallback(() => {
+			fetchTopHistory();
+		}, []),
+	);
 
 	// 화면 진입 애니메이션 (fade + slide-up)
 	useEffect(() => {
@@ -75,8 +78,8 @@ const InitTimeChallengeScreen = () => {
 			const raw = await AsyncStorage.getItem(STORAGE_KEY);
 			const history: MainDataType.TimeChallengeResult[] = raw ? JSON.parse(raw) : [];
 
-			const sorted = history.sort((a, b) => b.finalScore - a.finalScore);
-			setTop5History(sorted.slice(0, 5));
+			const sorted = [...history].sort((a, b) => b.finalScore - a.finalScore);
+			setTop5History(sorted.slice(0, 3));
 		} catch (e) {
 			console.error('기록 불러오기 실패', e);
 		}
@@ -277,14 +280,8 @@ const InitTimeChallengeScreen = () => {
 								<Text style={styles.emptySubtext}>첫 챌린지를 시작해보세요!</Text>
 							</View>
 						) : (
-							top5History.slice(0, 3).map((item, index) => {
+							top5History.map((item, index) => {
 								const medals = ['🥇', '🥈', '🥉'];
-								const gradients = [
-									{ from: COLORS.gold, to: COLORS.warning },
-									{ from: COLORS.borderDark, to: COLORS.textLight },
-									{ from: COLORS.accentOrangeLight, to: COLORS.accentOrangeText },
-								];
-
 								return (
 									<View
 										key={index}

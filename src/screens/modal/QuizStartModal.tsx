@@ -99,20 +99,20 @@ const QuizStartModal = ({
 	}
 
 	const infoRows: { icon: string; text: string }[] = [
-		{ icon: 'check-box', text: '보기 4개 중 하나를 고르는 방식이에요.' },
-		{ icon: 'timer', text: `각 문제는 ${timeLimit}초 안에 풀어야 해요.` },
-		{ icon: 'star', text: `정답을 맞히면 ${scorePerCorrect}점을 얻어요.` },
-		{ icon: 'sentiment-satisfied-alt', text: '틀려도 점수가 깎이지 않아요.' },
+		{ icon: 'check-box', text: '보기 4개 중 하나를 고르는 방식입니다.' },
+		{ icon: 'timer', text: `각 문제는 ${timeLimit}초 안에 풀어야 합니다.` },
+		{ icon: 'star', text: `정답을 맞히면 ${scorePerCorrect}점을 얻습니다.` },
+		{ icon: 'sentiment-satisfied-alt', text: '틀려도 점수가 깎이지 않습니다.' },
 	];
 	if (mode === 'arrange') {
-		infoRows[0] = { icon: 'touch-app', text: '단어 조각을 순서대로 탭해서 완성해요.' };
+		infoRows[0] = { icon: 'touch-app', text: '단어 조각을 순서대로 탭해서 완성합니다.' };
 	}
 	if (showHint) {
-		infoRows.push({ icon: 'lightbulb', text: '힌트 버튼으로 단서를 확인할 수 있어요.' });
+		infoRows.push({ icon: 'lightbulb', text: '힌트 버튼으로 단서를 확인할 수 있습니다.' });
 	}
 
 	return (
-		<Modal visible transparent animationType="fade">
+		<Modal visible transparent animationType="fade" onRequestClose={onBack}>
 			<View style={styles.overlay}>
 				<Animated.View style={[styles.card, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
 					<Image source={require('@/assets/images/home-mascot-moments/mascot-challenge-final.png')} style={styles.headerMascot} resizeMode="contain" />
@@ -123,7 +123,7 @@ const QuizStartModal = ({
 					{isPracticeMode && (
 						<View style={styles.practiceBanner}>
 							<IconComponent type="materialIcons" name="info" size={scaledSize(14)} color={COLORS.warningDark} />
-							<Text style={styles.practiceText}>연습 모드 · 점수와 뱃지가 기록되지 않아요.</Text>
+							<Text style={styles.practiceText}>연습 모드 · 점수와 뱃지가 기록되지 않습니다.</Text>
 						</View>
 					)}
 

@@ -44,7 +44,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 	}, [visible, fadeAnim, scaleAnim]);
 
 	return (
-		<Modal visible={visible} transparent animationType="fade">
+		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<View style={styles.modalOverlay}>
 				<Animated.View style={[styles.modalContent, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
 					<ModalCloseButton onPress={onClose} />
@@ -54,13 +54,13 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 					<ScrollView style={{ width: '100%' }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 						<View style={styles.rowCentered}>
 							<FastImage source={require('@/assets/images/screen-heroes/check-in-stamp.png')} style={styles.checkInHeroImage} resizeMode={FastImage.resizeMode.contain} />
-							<Text style={[styles.modalText, { flex: 1 }]}>매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어줘요!{'\n'}</Text>
+							<Text style={[styles.modalText, { flex: 1 }]}>매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어 줍니다!{'\n'}</Text>
 						</View>
 
 						<View style={styles.highlightBox}>
 							<Text style={styles.highlightText}>
 								연속 출석을 통해 5단계로 진화하는 귀여운 펫도 함께 얻을 수 있답니다 🐾{'\n'}
-								획득한 펫은 캐릭터 옆에 항상 따라다녀요!
+								획득한 펫은 캐릭터 옆에 항상 따라다닙니다!
 							</Text>
 						</View>
 

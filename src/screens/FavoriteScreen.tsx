@@ -136,7 +136,7 @@ const FavoriteScreen = () => {
 		for (const id of ids) {
 			await toggleFavorite(id);
 		}
-		showToast(`${ids.length}개를 즐겨찾기에 추가했어요`);
+		showToast(`${ids.length}개를 즐겨찾기에 추가했습니다`);
 		loadFavorites();
 	};
 
@@ -169,6 +169,12 @@ const FavoriteScreen = () => {
 			setLevelValue('전체');
 			setIsSelectionMode(false);
 			setSelectedIds([]);
+			// 열려 있던 드롭다운/키보드를 닫고 목록을 맨 위로 돌린다
+			setFieldOpen(false);
+			setLevelOpen(false);
+			setShowDeleteConfirmModal(false);
+			Keyboard.dismiss();
+			flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
 			loadFavorites();
 		}, []),
 	);
@@ -186,7 +192,7 @@ const FavoriteScreen = () => {
 
 	const handleToggleFavorite = async (id: number) => {
 		await toggleFavorite(id);
-		showToast('즐겨찾기에서 제거됐어요');
+		showToast('즐겨찾기에서 제거했습니다');
 		loadFavorites();
 	};
 
@@ -231,7 +237,7 @@ const FavoriteScreen = () => {
 		const deletedCount = selectedIds.length;
 		setShowDeleteConfirmModal(false);
 		exitSelectionMode();
-		showToast(`${deletedCount}개를 즐겨찾기에서 제거했어요`);
+		showToast(`${deletedCount}개를 즐겨찾기에서 제거했습니다`);
 		loadFavorites();
 	};
 
@@ -397,7 +403,7 @@ const FavoriteScreen = () => {
 								</View>
 
 								<View style={styles.filterDropdownRow}>
-									<View style={[styles.dropdownWrapper, { zIndex: fieldOpen ? 2000 : 1000 }]}>
+									<View style={[styles.dropdownWrapper, { zIndex: levelOpen ? 3000 : 1000 }]}>
 										<DropDownPicker
 											theme={getPickerTheme()}
 											open={levelOpen}
@@ -416,7 +422,7 @@ const FavoriteScreen = () => {
 											showTickIcon={false}
 										/>
 									</View>
-									<View style={[styles.dropdownWrapperLast, { zIndex: levelOpen ? 2000 : 1000, overflow: 'visible' }]}>
+									<View style={[styles.dropdownWrapperLast, { zIndex: fieldOpen ? 3000 : 1000, overflow: 'visible' }]}>
 										<DropDownPicker
 											theme={getPickerTheme()}
 											listMode="MODAL"
@@ -476,7 +482,7 @@ const FavoriteScreen = () => {
 								<View style={styles.resultSummaryRow}>
 									{!isSelectionMode ? (
 										<Text style={styles.headerSubText}>
-											총 <Text style={styles.headerCount}>{allFavorites.length}</Text>개가 저장되었어요!
+											총 <Text style={styles.headerCount}>{allFavorites.length}</Text>개가 저장되었습니다!
 										</Text>
 									) : (
 										<Text style={styles.headerSubText}>
@@ -508,7 +514,7 @@ const FavoriteScreen = () => {
 									{allFavorites.length === 0 ? (
 										<>
 											<FastImage source={emptyFavoritesImage} style={styles.emptyImage} resizeMode="contain" />
-											<Text style={styles.emptyTitle}>아직 즐겨찾기가 없어요</Text>
+											<Text style={styles.emptyTitle}>아직 즐겨찾기가 없습니다</Text>
 											<Text style={styles.emptyDesc}>속담 목록에서 ★를 눌러{'\n'}원하는 속담을 저장해보세요!</Text>
 											<TouchableOpacity style={styles.emptyAddBtn} onPress={() => setShowAddModal(true)} activeOpacity={0.85}>
 												<Icon name="plus" size={scaledSize(14)} color={COLORS.textWhite} />
@@ -518,7 +524,7 @@ const FavoriteScreen = () => {
 									) : (
 										<>
 											<FastImage source={emptySearchImage} style={styles.emptyImage} resizeMode="contain" />
-											<Text style={styles.emptyTitle}>검색 결과가 없어요</Text>
+											<Text style={styles.emptyTitle}>검색 결과가 없습니다</Text>
 											<Text style={styles.emptyDesc}>다른 검색어나 필터를 사용해보세요</Text>
 										</>
 									)}
@@ -553,7 +559,7 @@ const FavoriteScreen = () => {
 						<View style={styles.confirmIconWrapper}>
 							<Icon name="triangle-exclamation" size={scaledSize(28)} color={COLORS.danger} />
 						</View>
-						<Text style={styles.confirmTitle}>정말 삭제하시겠어요?</Text>
+						<Text style={styles.confirmTitle}>정말 삭제하시겠습니까?</Text>
 						<Text style={styles.confirmDesc}>
 							선택한 <Text style={styles.confirmCount}>{selectedIds.length}</Text>개의 속담을{'\n'}
 							즐겨찾기에서 제거합니다.

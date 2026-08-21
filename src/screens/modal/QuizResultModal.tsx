@@ -151,7 +151,7 @@ const QuizResultModal = ({
 	}
 
 	return (
-		<Modal visible={visible} transparent animationType="fade">
+		<Modal visible={visible} transparent animationType="fade" onRequestClose={onNext}>
 			<View style={styles.overlay}>
 				<Animated.View style={[styles.card, { opacity: cardFade, transform: [{ scale: cardScale }] }]}>
 					{/* 상단 결과 영역 */}

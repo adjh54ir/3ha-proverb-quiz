@@ -180,7 +180,7 @@ const VersionCheckModal = () => {
 							</View>
 
 							<Text style={[styles.badge, isForce && styles.badgeForce]}>{isForce ? '필수 업데이트' : '새로운 버전 출시'}</Text>
-							<Text style={styles.title}>{isForce ? '업데이트가 필요해요' : '새 버전이 나왔어요'}</Text>
+							<Text style={styles.title}>{isForce ? '업데이트가 필요합니다' : '새 버전이 나왔습니다'}</Text>
 
 							<View style={styles.versionRow}>
 								<View style={styles.versionChip}>
@@ -196,8 +196,8 @@ const VersionCheckModal = () => {
 
 							<Text style={styles.message}>
 								{isForce
-									? '중요한 변경 사항이 포함되어 있어요.\n계속하려면 업데이트가 필요합니다.'
-									: '더 편리해진 기능과 개선 사항이 준비됐어요.\n최신 버전으로 업데이트해 주세요.'}
+									? '중요한 변경 사항이 포함되어 있습니다.\n계속하려면 업데이트가 필요합니다.'
+									: '더 편리해진 기능과 개선 사항이 준비됐습니다.\n최신 버전으로 업데이트해 주세요.'}
 							</Text>
 
 							<TouchableOpacity style={styles.updateButton} onPress={handleUpdate} activeOpacity={0.85}>

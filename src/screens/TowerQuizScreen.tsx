@@ -278,7 +278,13 @@ const TowerQuizScreen = () => {
 	};
 
 	const handleQuizComplete = () => {
-		if (!progress || !towerLevel) {
+		if (!towerLevel) {
+			return;
+		}
+		// 진행도를 못 읽었더라도 결과 화면은 반드시 보여준다(예전에는 여기서 조용히 빠져나가 화면이 멈춘 것처럼 보였다).
+		if (!progress) {
+			playFinish();
+			setShowResultModal(true);
 			return;
 		}
 		// 마지막 문제에서는 isAnswered useEffect(500ms)와 handleNext(300ms)가 모두 이 함수를 부른다.
@@ -486,7 +492,7 @@ const TowerQuizScreen = () => {
 							<View style={styles.questionCardGradient}>
 							<Text style={styles.questionText}>
 								<Text style={styles.questionProverb}>'{currentQuestion.proverb}'</Text>
-								<Text style={styles.questionAsk}>의 뜻은 무엇일까요?</Text>
+								<Text style={styles.questionAsk}>의 뜻은 무엇입니까?</Text>
 							</Text>
 						</View>
 						</View>

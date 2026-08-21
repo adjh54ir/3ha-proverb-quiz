@@ -9,7 +9,6 @@ import {
 	RefreshControl,
 	Alert,
 	Modal,
-	LayoutAnimation,
 	FlatList,
 	NativeSyntheticEvent,
 	NativeScrollEvent,
@@ -38,7 +37,7 @@ import { MainDataType } from '@/types/MainDataType';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
-import { PET_REWARDS, LEVEL_DATA as CHARACTER_LEVELS } from '@/const/ConstInfoData';
+import { PET_REWARDS, getLevelByScore } from '@/const/ConstInfoData';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import LevelModal from './modal/LevelModal';
@@ -199,7 +198,6 @@ const MyScoreScreen = () => {
 	const [lastAnsweredAt, setLastAnsweredAt] = useState<string>('');
 	const [bestCombo, setBestCombo] = useState<number>(0);
 	const [showLevelModal, setShowLevelModal] = useState(false);
-	const [showBadgeList, setShowBadgeList] = useState(false);
 	const [badgeFilter, setBadgeFilter] = useState<'all' | 'earned' | 'locked'>('all');
 	const [studyCountries, setStudyCountries] = useState<string[]>([]);
 	const [lastStudyAt, setLastStudyAt] = useState<string>('');
@@ -209,18 +207,9 @@ const MyScoreScreen = () => {
 	const [categoryMaster, setCategoryMaster] = useState<string[]>([]);
 	const [totalCountryCount, setTotalCountryCount] = useState<number>(0);
 
-	const [showStudySection, setShowStudySection] = useState(false);
-	const [showQuizSection, setShowQuizSection] = useState(false);
-	const [showTimeSection, setShowTimeSection] = useState(false);
-	const [showBadgeSection, setShowBadgeSection] = useState(false);
-	const [showTowerSection, setShowTowerSection] = useState(false);
 	const [unlockedRewards, setUnlockedRewards] = useState<number[]>([]);
-
-	const [showTodayQuizSection, setShowTodayQuizSection] = useState(false);
 	const [markedQuizDates, setMarkedQuizDates] = useState<{ [date: string]: any }>({});
-
 	const [timeChallengeResults, setTimeChallengeResults] = useState<MainDataType.TimeChallengeResult[]>([]);
-	const [isAllExpanded, setIsAllExpanded] = useState(false);
 
 	// ✅ 아코디언 대신 빠른 탐색용 탭 (한 번에 하나의 활동만 표시)
 	const ACTIVITY_TABS = [
@@ -274,6 +263,13 @@ const MyScoreScreen = () => {
 	useFocusEffect(
 		useCallback(() => {
 			loadData(); // 캘린더 마킹 + 펫 레벨까지 여기서 한 번에 계산한다
+			// 다시 들어올 때는 첫 화면 상태로 (활동 탭 / 뱃지 필터 / 열려 있던 팝업 초기화)
+			setActiveTab('all');
+			setBadgeFilter('all');
+			setShowLevelModal(false);
+			setBadgePopupVisible(false);
+			setDetailVisible(false);
+			setShowScrollTop(false);
 			// 마스코트 진입 애니메이션 실행
 			mascotFade.setValue(0);
 			mascotScale.setValue(0.8);
@@ -330,19 +326,6 @@ const MyScoreScreen = () => {
 		}, [todayQuizDataList]),
 	);
 
-	useFocusEffect(
-		useCallback(() => {
-			// 탭 이동 시 진입할 때마다 접힌 상태로 초기화
-			setIsAllExpanded(false);
-			setShowStudySection(false);
-			setShowQuizSection(false);
-			setShowTimeSection(false);
-			setShowBadgeSection(false);
-			setShowTodayQuizSection(false);
-			setShowTowerSection(false);
-		}, []),
-	);
-
 	const loadData = async () => {
 		try {
 			const studyData = await AsyncStorage.getItem(STORAGE_KEY_STUDY);
@@ -376,7 +359,9 @@ const MyScoreScreen = () => {
 
 			const timeData = await AsyncStorage.getItem(STORAGE_KEY_TIME);
 			const timeResults: MainDataType.TimeChallengeResult[] = timeData ? JSON.parse(timeData) : [];
-			setTimeChallengeResults(timeResults.slice(0, 3)); // 최근 3개만 보기
+			// ⚠️ 예전에는 최근 3건만 남겨 두고 그 안에서 정렬해 'TOP 3' 로 표시했다(=최근 3판 중 1등).
+			//    전체 기록에서 점수 상위 3건을 뽑아야 실제 랭킹이 된다.
+			setTimeChallengeResults([...timeResults].sort((a, b) => b.finalScore - a.finalScore).slice(0, 3));
 
 			const allBadges = [...new Set([...studyBadges, ...quizBadges])];
 			setEarnedBadgeIds(allBadges);
@@ -475,7 +460,8 @@ const MyScoreScreen = () => {
 			const startOfInput = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate());
 
 			const diffMs = startOfToday.getTime() - startOfInput.getTime();
-			const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+			// 서머타임이 있는 지역에서는 자정~자정 간격이 23h/25h 가 되므로 floor 대신 round
+			const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
 			const hour = inputDate.getHours();
 			const minute = inputDate.getMinutes();
@@ -506,18 +492,6 @@ const MyScoreScreen = () => {
 		}
 	};
 
-	const toggleAllSections = () => {
-		const nextState = !isAllExpanded;
-		setIsAllExpanded(nextState);
-		setShowStudySection(nextState);
-		setShowQuizSection(nextState);
-		setShowTimeSection(nextState);
-		setShowBadgeSection(nextState);
-		setShowTodayQuizSection(nextState); // ✅ 추가됨
-		setShowTowerSection(nextState); // ✅ 추가
-		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-	};
-
 	const onRefresh = () => {
 		setRefreshing(true);
 		loadData().finally(() => setRefreshing(false)); // ✅ 이 방식 권장
@@ -527,41 +501,8 @@ const MyScoreScreen = () => {
 		scrollRef.current?.scrollTo({ y: 0, animated: true });
 	};
 
-	const toggleBadgeList = () => {
-		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-		setShowBadgeList((prev) => !prev);
-	};
-
-	const handleClearSelectedDate = () => {
-		if (!selectedDate) {
-			return;
-		}
-
-		setMarkedQuizDates((prev) => {
-			const updated = { ...prev };
-
-			// 선택된 날짜 마킹이 있으면 기본 마킹으로 복원, 없으면 삭제
-			const originalMark = todayQuizDataList.find((item) => DateUtils.toLocalDateKey(item.quizDate) === selectedDate);
-
-			if (originalMark) {
-				updated[selectedDate] = buildDateMark(!!originalMark.isCheckedIn, selectedDate === DateUtils.getLocalDateString());
-			} else {
-				delete updated[selectedDate]; // 마킹도 없으면 삭제
-			}
-
-			return updated;
-		});
-
-		setSelectedDate(null);
-		setSelectedQuizData(null);
-	};
-
 	const totalSolved = correctCount + wrongCount;
 	const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
-
-	// 점수별 캐릭터(등급) — 단일 소스에서 가져와 오름차순(초심자→전설)으로 사용
-	// 등급 안내 팝업은 공통 컴포넌트 LevelModal 을 사용한다.
-	const LEVEL_DATA = [...CHARACTER_LEVELS].sort((a, b) => a.score - b.score);
 
 	/**
 	 * 스크롤을 관리하는 Handler
@@ -569,20 +510,12 @@ const MyScoreScreen = () => {
 	const scrollHandler = (() => {
 		return {
 			/**
-			 * 스크롤 최상단으로 당기면 Refresh 기능
-			 */
-			onRefresh: () => {
-				// TODO: 로직을 불러오는 부분을 추가해야함.
-				setRefreshing(true);
-			},
-
-			/**
 			 * 스크롤을 일정 높이 만큼 움직였을때 아이콘 등장 처리
 			 * @param event
 			 */
 			onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
 				const offsetY = event.nativeEvent.contentOffset.y;
-				setShowScrollTop(offsetY > 100);
+				setShowScrollTop(offsetY > scaleHeight(100));
 			},
 			/**
 			 * 스크롤 최상단으로 이동
@@ -590,16 +523,6 @@ const MyScoreScreen = () => {
 			 */
 			toTop: (): void => {
 				scrollRef.current?.scrollTo({ y: 0, animated: true });
-			},
-
-			/**
-			 * 스크롤 뷰 최하단으로 이동
-			 * @return {void}
-			 */
-			toBottom: (): void => {
-				setTimeout(() => {
-					scrollRef.current?.scrollToEnd({ animated: true });
-				}, 100);
 			},
 		};
 	})();
@@ -642,35 +565,8 @@ const MyScoreScreen = () => {
 		});
 	};
 
-	const levelGuide = [
-		{ score: 0, next: 600, label: '속담 초보자', icon: 'seedling' },
-		{ score: 600, next: 1200, label: '속담 입문자', icon: 'leaf' },
-		{ score: 1200, next: 1800, label: '여행 능력자', icon: 'tree' },
-		{ score: 1800, next: 2461, label: '속담 마스터', icon: 'trophy' },
-	];
-
-	const getEncourageMessage = (score: number) => {
-		if (score >= 1800) {
-			return '🌎 당신은 속담 마스터! 모두가 당신을 주목해요!';
-		}
-		if (score >= 1200) {
-			return '🌍 이제 마스터까지 한 걸음! 계속 도전해요!';
-		}
-		if (score >= 600) {
-			return '✈️ 더 넓은 세계가 당신을 기다리고 있어요!';
-		}
-		return '🚀 지금부터 시작이에요! 차근차근 도전해봐요!';
-	};
-	const getTitleByScore = (score: number) => {
-		const level = LEVEL_DATA.find((level) => score >= level.score && score < level.next) || LEVEL_DATA[0];
-		return {
-			label: level.label,
-			icon: level.icon,
-			mascot: level.mascot,
-			description: level.description, // ✅ 이 라인에서 가져옴
-		};
-	};
-	const { label, icon, mascot, description } = getTitleByScore(totalScore);
+	// 등급 판정은 중앙 헬퍼 하나만 사용한다(화면마다 다른 규칙이 생기지 않도록).
+	const { label, icon, mascot, description } = getLevelByScore(totalScore);
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -690,7 +586,7 @@ const MyScoreScreen = () => {
 				<View style={styles.sectionBox}>
 					<View style={styles.activityHero}>
 						<View style={styles.activityHeroCopy}>
-							<Text style={styles.activityHeroTitle}>배운 만큼 지혜가 쌓였어요</Text>
+							<Text style={styles.activityHeroTitle}>배운 만큼 지혜가 쌓였습니다</Text>
 							<Text style={styles.activityHeroDescription}>오늘의 기록과 지금까지의 성장을 확인해보세요.</Text>
 						</View>
 						<FastImage
@@ -762,7 +658,7 @@ const MyScoreScreen = () => {
 						</View>
 						{/* 카드 높이가 padding 기반이라 유연하다. 중첩 Text + 1줄 축소는 안드로이드에서 과축소되므로 2줄 허용으로 대체 */}
 						<Text style={styles.levelDescriptionText} numberOfLines={2} ellipsizeMode="tail">
-							전체 퀴즈 완료 시 <Text style={[styles.levelHighlight, { color: COLORS.warningDark }]}>'속담 전설'</Text> 등급을 획득해요
+							전체 퀴즈 완료 시 <Text style={[styles.levelHighlight, { color: COLORS.warningDark }]}>'속담 전설'</Text> 등급을 획득합니다
 						</Text>
 					</View>
 
@@ -772,7 +668,7 @@ const MyScoreScreen = () => {
 						</View>
 						{/* 위 카드와 동일: 1줄 강제 축소 대신 2줄 허용 */}
 						<Text style={styles.levelDescriptionText} numberOfLines={2} ellipsizeMode="tail">
-							틀린 문제는 <Text style={styles.levelHighlight}>오답 복습</Text>에서 다시 도전할 수 있어요
+							틀린 문제는 <Text style={styles.levelHighlight}>오답 복습</Text>에서 다시 도전할 수 있습니다
 						</Text>
 					</View>
 				</View>
@@ -1010,7 +906,7 @@ const MyScoreScreen = () => {
 								current={levelMaster.length}
 								total={DIFFICULTIES.length}
 							/>
-							<Text style={styles.levelHelperText}>각 레벨의 속담 퀴즈를 모두 풀면 획득할 수 있어요</Text>
+							<Text style={styles.levelHelperText}>각 레벨의 속담 퀴즈를 모두 풀면 획득할 수 있습니다</Text>
 							<View style={{ alignItems: 'center' }}>
 								<FlatList
 									data={DIFFICULTIES}
@@ -1065,7 +961,7 @@ const MyScoreScreen = () => {
 								current={categoryMaster.length}
 								total={allCategories.length}
 							/>
-							<Text style={styles.regionHelperText}>특정 분야의 속담을 모두 풀면 획득할 수 있어요</Text>
+							<Text style={styles.regionHelperText}>특정 분야의 속담을 모두 풀면 획득할 수 있습니다</Text>
 							<FlatList
 								data={allCategories}
 								keyExtractor={(item) => item}
@@ -1190,7 +1086,7 @@ const MyScoreScreen = () => {
 									alignSelf: 'stretch',
 								}}>
 								<Text style={{ fontSize: FONT_SIZES.smPlus, color: COLORS.textLight, textAlign: 'left' }}>
-									선택한 날짜에는 오늘의 퀴즈를 풀지 않았어요
+									선택한 날짜에는 오늘의 퀴즈를 풀지 않았습니다
 								</Text>
 							</View>
 						)}
@@ -1274,20 +1170,6 @@ const MyScoreScreen = () => {
 							</View>
 						)}
 
-						{/* {selectedDate && (
-							<TouchableOpacity
-								onPress={handleClearSelectedDate}
-								style={{
-									alignSelf: 'center',
-									marginTop: SPACING_H.sm,
-									paddingHorizontal: SPACING_W.md,
-									paddingVertical: SPACING_H.xs,
-									backgroundColor: COLORS.border,
-									borderRadius: scaleWidth(8),
-								}}>
-								<Text style={{ fontSize: FONT_SIZES.sm, color: COLORS.text }}>선택 해제</Text>
-							</TouchableOpacity>
-						)} */}
 					</View>
 				)}
 
@@ -1311,10 +1193,7 @@ const MyScoreScreen = () => {
 						{timeChallengeResults.length === 0 ? (
 							<Text style={styles.noRecordText}>아직 기록이 없습니다. 챌린지를 시작해보세요!</Text>
 						) : (
-							[...timeChallengeResults]
-								.sort((a, b) => b.finalScore - a.finalScore)
-								.slice(0, 3)
-								.map((item, index) => (
+							timeChallengeResults.map((item, index) => (
 									<View key={index} style={styles.recordCard}>
 										<View style={styles.rankRow}>
 											{index === 0 && (
@@ -1470,7 +1349,7 @@ const MyScoreScreen = () => {
 							current={unlockedRewards.length}
 							total={TOWER_LEVELS.length}
 						/>
-						<Text style={styles.regionHelperText}>레벨별 보스를 클리어하면 보상을 받을 수 있어요</Text>
+						<Text style={styles.regionHelperText}>레벨별 보스를 클리어하면 보상을 받을 수 있습니다</Text>
 						{TOWER_LEVELS.map((tower) => {
 							const isCleared = unlockedRewards.includes(tower.level);
 							return (

@@ -74,7 +74,7 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 	}, [visible, totalScore, reversedLevelData]);
 
 	return (
-		<Modal visible={visible} transparent animationType="fade">
+		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<View style={styles.modalOverlay}>
 				<Animated.View
 					style={[styles.levelModal, { maxHeight: scaleHeight(600), opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>

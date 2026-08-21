@@ -89,7 +89,7 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 	}
 
 	return (
-		<Modal visible={visible} transparent animationType="fade">
+		<Modal visible={visible} transparent animationType="fade" onRequestClose={handleConfirm}>
 			<View style={styles.modalOverlay}>
 				<ConfettiCannon
 					key={confettiKey.current}
@@ -113,7 +113,7 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 						</Animated.View>
 					</View>
 					<Text style={styles.badgeModalTitle}>🎉 새로운 뱃지 획득!</Text>
-					<Text style={styles.badgeModalSubtitle}>{badges.length}개의 새로운 뱃지를 손에 넣었어요!</Text>
+					<Text style={styles.badgeModalSubtitle}>{badges.length}개의 새로운 뱃지를 손에 넣었습니다!</Text>
 					<ScrollView
 						style={styles.badgeScroll}
 						contentContainerStyle={styles.badgeScrollContent}

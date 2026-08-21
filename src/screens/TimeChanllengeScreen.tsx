@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
 	Alert,
 	Text,
@@ -17,6 +17,7 @@ import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { sampleSize, shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
@@ -39,32 +40,36 @@ const SCORE_ENCOURAGEMENTS: { min: number; messages: string[] }[] = [
 	{
 		min: 1000,
 		messages: [
-			'🏆 정말 대단해요! 이건 거의 신급이에요!',
+			'🏆 정말 대단합니다! 이건 거의 신급입니다!',
 			'🎉 환상적인 성과! 축하드립니다!',
 			'🌟 당신은 진정한 속담 마스터!',
 		],
 	},
 	{
 		min: 500,
-		messages: ['💪 훌륭했어요! 많이 맞췄네요!', '🔥 집중력이 남달라요!', '👏 눈부신 실력이에요!'],
+		messages: ['💪 훌륭했습니다! 많이 맞히셨습니다!', '🔥 집중력이 남다릅니다!', '👏 눈부신 실력입니다!'],
 	},
 	{
 		min: 200,
-		messages: ['👍 잘했어요! 점점 실력이 늘고 있어요!', '😊 안정적인 실력이네요!', '📈 다음엔 더 높은 점수를 노려봐요!'],
+		messages: ['👍 잘했습니다! 점점 실력이 늘고 있습니다!', '😊 안정적인 실력입니다!', '📈 다음에는 더 높은 점수를 노려 보세요!'],
 	},
 	{
 		min: 0,
 		messages: [
-			'🌱 시작이 반이에요! 포기하지 마세요!',
-			'🙌 계속 도전하면 분명 좋아질 거예요!',
+			'🌱 시작이 반입니다! 포기하지 마세요!',
+			'🙌 계속 도전하면 분명 좋아집니다!',
 			'🐾 한 걸음 한 걸음 앞으로!',
 		],
 	},
 ];
+/**
+ * 보기 4개 구성.
+ * - 정답과 문자열이 같은 뜻은 오답 후보에서 빼야 보기 안에 정답이 두 번 뜨지 않는다.
+ * - sort(() => 0.5 - Math.random()) 은 균등 셔플이 아니라 정답 위치가 한쪽으로 쏠린다 → Fisher-Yates 사용.
+ */
 const getShuffledChoices = (correct: string, allMeanings: string[]) => {
-	const wrongs = allMeanings.filter((m) => m !== correct);
-	const shuffled = [...wrongs.sort(() => 0.5 - Math.random()).slice(0, CHOICE_COUNT - 1), correct];
-	return shuffled.sort(() => 0.5 - Math.random());
+	const wrongs = sampleSize(allMeanings.filter((m) => m !== correct), CHOICE_COUNT - 1);
+	return shuffle([...wrongs, correct]);
 };
 
 const InfinityQuizScreen = () => {
@@ -140,11 +145,16 @@ const InfinityQuizScreen = () => {
 	const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const countdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const scoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	// 화면 안에서 예약되는 일회성 setTimeout 을 모아 두었다가 언마운트 시 일괄 정리
+	const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+	const runLater = (fn: () => void, ms: number) => {
+		timersRef.current.push(setTimeout(fn, ms));
+	};
 
 	useEffect(() => {
-		const allProverbs = ProverbServices.selectProverbList();
-		const shuffled = allProverbs.sort(() => 0.5 - Math.random());
-		setQuestionList(shuffled);
+		// ⚠️ selectProverbList() 는 전역 상수 배열을 그대로 돌려준다.
+		//    복사 없이 sort 하면 앱 전체(속담 사전 등)의 목록 순서가 영구히 뒤섞인다.
+		setQuestionList(shuffle(ProverbServices.selectProverbList()));
 	}, []);
 
 	useEffect(() => {
@@ -185,6 +195,8 @@ const InfinityQuizScreen = () => {
 			if (countdownTimeoutRef.current) {
 				clearTimeout(countdownTimeoutRef.current);
 			}
+			timersRef.current.forEach(clearTimeout);
+			timersRef.current = [];
 			scaleAnim.stopAnimation();
 			scoreAnim.stopAnimation();
 			comboAnim.stopAnimation();
@@ -195,14 +207,15 @@ const InfinityQuizScreen = () => {
 		};
 	}, [scaleAnim, scoreAnim, comboAnim, comboShake, comboEffectAnim, toastOpacity]);
 
+	// 전체 뜻 목록은 문제마다 다시 만들 필요가 없다(문항 전환마다 전체 순회 + 정렬은 낭비).
+	const allMeanings = useMemo(() => questionList.map((q) => q.longMeaning || q.meaning), [questionList]);
+
 	useEffect(() => {
 		if (questionList.length > 0 && currentIndex < questionList.length) {
 			const current = questionList[currentIndex];
-			const allMeanings = questionList.map((q) => q.longMeaning || q.meaning);
-			const newChoices = getShuffledChoices(current.longMeaning || current.meaning, allMeanings);
-			setChoices(newChoices);
+			setChoices(getShuffledChoices(current.longMeaning || current.meaning, allMeanings));
 		}
-	}, [questionList, currentIndex]);
+	}, [questionList, currentIndex, allMeanings]);
 
 	useEffect(() => {
 		if (isGameOver && gameResult) {
@@ -211,7 +224,7 @@ const InfinityQuizScreen = () => {
 
 			// 점수에 맞는 메시지 세트 찾기
 			const match = SCORE_ENCOURAGEMENTS.find(({ min }) => score >= min);
-			const shuffled = match?.messages.sort(() => 0.5 - Math.random()) ?? [];
+			const shuffled = match ? shuffle(match.messages) : [];
 			setEncouragements(shuffled.slice(0, 3)); // 최대 3개만 표시
 		}
 	}, [isGameOver, gameResult]);
@@ -253,6 +266,18 @@ const InfinityQuizScreen = () => {
 			playFinish();
 		}
 	}, [isGameOver]);
+
+	/**
+	 * 게임 종료 시 결과 집계 — 한 곳에서만 처리한다.
+	 * ⚠️ 예전에는 시간이 다 됐을 때 setIsGameOver(true) 만 하고 handleGameOver() 를 부르지 않아
+	 *    결과 화면에 점수/통계가 비고 랭킹 기록도 저장되지 않았다.
+	 *    하트 소진 경로도 setTimeout 안에서 호출해 점수·정오답이 한 문제 전 값(스테일)로 잡혔다.
+	 */
+	useEffect(() => {
+		if (isGameOver && !gameResult) {
+			handleGameOver();
+		}
+	}, [isGameOver, gameResult]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	// lives 감소 시 애니메이션
 	useEffect(() => {
@@ -302,7 +327,7 @@ const InfinityQuizScreen = () => {
 			 * @return {void}
 			 */
 			toBottom: (): void => {
-				setTimeout(() => {
+				runLater(() => {
 					scrollViewRef.current?.scrollToEnd({ animated: true });
 				}, 100);
 			},
@@ -385,7 +410,7 @@ const InfinityQuizScreen = () => {
 			correctCount: correctQuizIdList.length,
 			wrongCount: wrongQuizIdList.length,
 			maxCombo,
-			timeUsedMs: 180000 - timeLeftMs,
+			timeUsedMs: Math.max(0, 180000 - timeLeftMs), // 보너스 시간으로 남은 시간이 180초를 넘을 수 있어 음수 방지
 			hasUsedChance,
 			hasUsedSkip,
 			quizIdList: questionList.slice(0, currentIndex + 1).map((q) => q.id),
@@ -406,7 +431,7 @@ const InfinityQuizScreen = () => {
 			setSelectedChoice(choice); // 사용자가 고른 보기 기록
 
 			// 선택 즉시 UI 반응 방지 → 약간 딜레이 후 처리
-			setTimeout(() => {
+			runLater(() => {
 				if (isCorrect) {
 					playCorrect(); // 🔊 정답
 					setResultMap((prev) => ({ ...prev, [questionList[currentIndex].id]: 'correct' }));
@@ -459,7 +484,7 @@ const InfinityQuizScreen = () => {
 					setCombo((prev) => {
 						const newCombo = prev + 1;
 						if (newCombo >= 2) {
-							setTimeout(() => {
+							runLater(() => {
 								triggerComboAnim();
 								triggerComboShake();
 								triggerComboEffect(newCombo); // 👈 여기 추가
@@ -478,14 +503,14 @@ const InfinityQuizScreen = () => {
 					setCombo(0);
 				}
 
-				setTimeout(() => {
+				runLater(() => {
 					setFeedback(null);
 					setSelectedChoice(null);
 					// 수정 코드
 					const newLives = isCorrect ? lives : lives - 1;
 
 					if (newLives <= 0) {
-						handleGameOver();
+						// 결과 집계는 아래 useEffect 가 최신 state(점수/정오답)로 처리한다.
 						setIsGameOver(true);
 					} else {
 						setCurrentIndex((prev) => prev + 1);
@@ -513,19 +538,6 @@ const InfinityQuizScreen = () => {
 			useNativeDriver: true,
 		}).start();
 	};
-	const showLongToast = (message: string) => {
-		setIsToastClosable(true); // 닫기 버튼 보이기
-		setToastMessage(message);
-		toastOpacity.setValue(0);
-		Animated.sequence([
-			Animated.timing(toastOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-			Animated.delay(5000), // 5초 이상 유지
-			Animated.timing(toastOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
-		]).start(() => {
-			setToastMessage('');
-		});
-	};
-
 	const triggerComboShake = () => {
 		comboShake.setValue(0);
 		Animated.sequence([
@@ -583,8 +595,8 @@ const InfinityQuizScreen = () => {
 	};
 
 	const resetGame = () => {
-		const shuffled = ProverbServices.selectProverbList().sort(() => 0.5 - Math.random());
-		setQuestionList(shuffled);
+		// 전역 상수 배열을 복사한 뒤 섞는다(원본 순서 보존)
+		setQuestionList(shuffle(ProverbServices.selectProverbList()));
 		setScore(0);
 		setLives(MAX_LIVES);
 		setCurrentIndex(0);
@@ -596,6 +608,14 @@ const InfinityQuizScreen = () => {
 		setIsGameOver(false);
 		setIsFeedbackOpen(false);
 		setHasUsedChance(false);
+		// ⚠️ 이전 판의 정오답/보너스/결과가 남아 있으면 새 판의 해설 목록과 점수가 섞인다.
+		setResultMap({});
+		setBonusHistory([]);
+		setGameResult(null);
+		setAnimatedScore(0);
+		setSelectedChoice(null);
+		setShowConfetti(false);
+		setEncouragements([]);
 		// ✅ 하트 애니메이션 초기화
 		heartAnimations.forEach((anim) => anim.setValue(1));
 	};
@@ -611,12 +631,13 @@ const InfinityQuizScreen = () => {
 	const current = questionList[currentIndex];
 
 	return (
-		<SafeAreaView style={styles.container} edges={['bottom']}>
+		<SafeAreaView style={styles.container} edges={['top', 'bottom']}>
 			<ScrollView
 				ref={scrollViewRef}
 				style={{ flex: 1 }}
 				contentContainerStyle={isGameOver ? styles.resultScrollContent : styles.quizScrollContent}
 				onScroll={scrollHandler.onScroll}
+				scrollEventThrottle={16}
 				keyboardShouldPersistTaps="handled">
 				{!isGameOver && (
 					<View style={styles.statusBoxRow}>
@@ -735,7 +756,7 @@ const InfinityQuizScreen = () => {
 									setCurrentIndex((prev) => prev + 1);
 									setFeedback(null);
 									setCombo(0);
-									showToast('⏭️ 이번 문제는 건너뛸게요! 스킵은 게임당 한 번만 사용할 수 있어요');
+									showToast('⏭️ 이번 문제는 건너뜁니다! 스킵은 게임당 한 번만 사용할 수 있습니다');
 								}}
 								style={styles.rightFixed}
 								activeOpacity={0.8}
@@ -768,7 +789,7 @@ const InfinityQuizScreen = () => {
 								<View style={styles.resultHeader}>
 									<FastImage source={require('@/assets/images/screen-heroes/time-result.png')} style={styles.timeResultImage} resizeMode="contain" />
 									<Text style={styles.resultHeaderTitle}>타임 챌린지 결과</Text>
-									<Text style={styles.resultHeaderSub}>수고했어요! 결과를 확인해 보세요</Text>
+									<Text style={styles.resultHeaderSub}>수고하셨습니다! 결과를 확인해 보세요</Text>
 								</View>
 								{gameResult && (
 									<View style={styles.scoreHero}>
@@ -1128,10 +1149,17 @@ const InfinityQuizScreen = () => {
 			</Modal>
 
 			{showExitModal && (
-				<Modal visible transparent animationType="fade">
+				<Modal
+					visible
+					transparent
+					animationType="fade"
+					onRequestClose={() => {
+						setShowExitModal(false);
+						setIsPaused(false);
+					}}>
 					<View style={styles.modalOverlay}>
 						<View style={styles.exitModal}>
-							<Text style={styles.exitModalTitle}>타임 챌린지를 종료하시겠어요?</Text>
+							<Text style={styles.exitModalTitle}>타임 챌린지를 종료하시겠습니까?</Text>
 							<Text style={styles.exitModalMessage}>진행 중인 퀴즈는 저장되지 않습니다.</Text>
 							<View style={styles.modalButtonRow}>
 								<TouchableOpacity

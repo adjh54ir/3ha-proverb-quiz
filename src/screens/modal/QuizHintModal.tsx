@@ -53,7 +53,7 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 	const hasAnyHint = similar.length > 0 || examples.length > 0 || !!question?.usageTip;
 
 	return (
-		<Modal visible={visible} transparent animationType="fade">
+		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<View style={styles.overlay}>
 				<Animated.View style={[styles.card, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
 					<ModalCloseButton onPress={onClose} />
@@ -134,7 +134,7 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 						{!hasAnyHint && (
 							<View style={styles.emptyHint}>
 								<IconComponent type="materialIcons" name="search" size={scaledSize(22)} color={COLORS.borderDark} />
-								<Text style={styles.emptyHintText}>이 문제는 제공되는 힌트가 없어요.</Text>
+								<Text style={styles.emptyHintText}>이 문제는 제공되는 힌트가 없습니다.</Text>
 							</View>
 						)}
 					</ScrollView>
@@ -142,7 +142,7 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 					{/* 하단 버튼 */}
 					<TouchableOpacity style={styles.primaryButton} onPress={onClose} activeOpacity={0.8}>
 						<IconComponent type="materialIcons" name="check" size={scaledSize(18)} color={COLORS.textWhite} />
-						<Text style={styles.primaryButtonText}>확인했어요</Text>
+						<Text style={styles.primaryButtonText}>확인했습니다</Text>
 					</TouchableOpacity>
 				</Animated.View>
 			</View>

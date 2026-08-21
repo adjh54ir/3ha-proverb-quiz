@@ -129,7 +129,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 	};
 
 	return (
-		<Modal visible={visible} transparent animationType="fade">
+		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.overlay}>
 				{/* 카드 밖(딤 영역)을 누르면 키보드를 닫는다 */}
 				<Pressable style={StyleSheet.absoluteFill} onPress={Keyboard.dismiss} />
@@ -141,7 +141,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 
 						<Text style={styles.modalTitle}>{isEdit ? '속담집 편집' : '새 속담집 만들기'}</Text>
 						{!isEdit && <Image source={require('@/assets/images/home-actions/action-my-book.png')} style={styles.headerImage} resizeMode="contain" />}
-						{!isEdit && <Text style={styles.modalSubtitle}>이름을 정하고, 속담집에서 속담을 추가해봐요</Text>}
+						{!isEdit && <Text style={styles.modalSubtitle}>이름을 정하고, 속담집에 속담을 추가해 보세요</Text>}
 
 						<View style={[pickerStyles.preview, { backgroundColor: color + '20', borderColor: color + '40', width: '100%', marginTop: SPACING_H.md }]}>
 							<View style={[pickerStyles.previewIcon, { backgroundColor: color }]}>

@@ -70,6 +70,13 @@ const MyProverbBookDetail = () => {
 		useCallback(() => {
 			loadBook();
 			loadPracticeRecord();
+			// 다시 들어올 때는 편집(빼기) 모드와 열려 있던 팝업을 초기화한다
+			setRemoveMode(false);
+			setSelectedForRemove(new Set());
+			setRemoveConfirmVisible(false);
+			setAddModalVisible(false);
+			setQuizModeModal(null);
+			setShowDetailModal(false);
 		}, [bookId]),
 	);
 
@@ -106,7 +113,7 @@ const MyProverbBookDetail = () => {
 		await saveBook(updated);
 		setAddModalVisible(false);
 		const added = updated.proverbIds.length - before;
-		showToast('속담 추가 완료', added > 0 ? `${added}개를 이 속담집에 담았습니다.` : '이미 담겨 있는 속담이에요.');
+		showToast('속담 추가 완료', added > 0 ? `${added}개를 이 속담집에 담았습니다.` : '이미 담겨 있는 속담입니다.');
 	};
 
 	const toggleRemove = (id: number) => {
@@ -234,7 +241,7 @@ const MyProverbBookDetail = () => {
 					ListEmptyComponent={() => (
 						<View style={styles.emptyView}>
 							<Image source={require('@/assets/images/feature-states/empty-proverb-book.png')} style={styles.emptyImage} resizeMode="contain" />
-							<Text style={styles.emptyTitle}>아직 담은 속담이 없어요</Text>
+							<Text style={styles.emptyTitle}>아직 담은 속담이 없습니다</Text>
 							<Text style={styles.emptyDesc}>속담 추가 버튼을 눌러 채워보세요!</Text>
 						</View>
 					)}
@@ -262,7 +269,7 @@ const MyProverbBookDetail = () => {
 				<View style={styles.modalOverlay}>
 					<View style={styles.confirmModal}>
 						<IconComponent type="materialIcons" name="remove-circle-outline" size={scaledSize(40)} color={COLORS.danger} />
-						<Text style={styles.confirmTitle}>선택한 속담을 뺄까요?</Text>
+						<Text style={styles.confirmTitle}>선택한 속담을 빼시겠습니까?</Text>
 						<Text style={styles.confirmDesc}>선택한 {selectedForRemove.size}개의 속담을{'\n'}이 속담집에서 제거합니다.</Text>
 						<View style={styles.confirmBtnRow}>
 							<TouchableOpacity style={[styles.confirmBtn, styles.confirmBtnCancel]} onPress={() => setRemoveConfirmVisible(false)}>

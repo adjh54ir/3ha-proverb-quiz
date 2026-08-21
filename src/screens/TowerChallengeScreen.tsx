@@ -1,12 +1,12 @@
 // @/screens/TowerChallenge.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import FastImage from 'react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
@@ -16,8 +16,9 @@ import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import CompleteOverlay from './common/CompleteOverlay';
 import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
+import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 
-const TOWER_STORAGE_KEY = 'TOWER_CHALLENGE_PROGRESS';
+const TOWER_STORAGE_KEY = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
 const SCREEN_WIDTH = screenWidth;
 
 const TowerChallengeScreen = () => {
@@ -40,9 +41,13 @@ const TowerChallengeScreen = () => {
 	const headerAnim = useRef(new Animated.Value(0)).current;
 	const infoAnim = useRef(new Animated.Value(0)).current;
 
-	useEffect(() => {
-		loadProgress();
-	}, []);
+	// 타워 퀴즈를 끝내고 goBack 으로 돌아오면 이 화면은 언마운트되지 않는다.
+	// 진행도를 포커스마다 다시 읽어야 클리어/도전 횟수가 즉시 반영된다.
+	useFocusEffect(
+		useCallback(() => {
+			loadProgress();
+		}, []),
+	);
 
 	useEffect(() => {
 		const anim = Animated.stagger(120, [
@@ -60,7 +65,7 @@ const TowerChallengeScreen = () => {
 				const parsed = JSON.parse(saved);
 				const today = DateUtils.getLocalDateString();
 
-				if (parsed.lastAttemptDate !== today) {
+				if (DateUtils.toLocalDateKey(parsed.lastAttemptDate) !== today) {
 					parsed.attempts = 1;
 					parsed.adRewardUsed = 0;
 					parsed.lastAttemptDate = today;
@@ -93,7 +98,7 @@ const TowerChallengeScreen = () => {
 	};
 
 	// handleStartChallenge 함수 수정
-	const handleStartChallenge = (level: number) => {
+	const handleStartChallenge = async (level: number) => {
 		const towerLevel = TOWER_LEVELS.find((t) => t.level === level);
 
 		if (!towerLevel) {
@@ -124,7 +129,8 @@ const TowerChallengeScreen = () => {
 			...progress,
 			attempts: newAttempts,
 		};
-		saveProgress(newProgress);
+		// ⚠️ 저장 완료 전에 이동하면 퀴즈 화면이 진행도를 못 읽어 결과가 저장되지 않는다.
+		await saveProgress(newProgress);
 
 		// 타입 안전하게 네비게이션
 		// @ts-ignore
@@ -339,7 +345,7 @@ const TowerChallengeScreen = () => {
 					{/* 안내 박스 */}
 					<View style={styles.descriptionBox}>
 						<Text style={styles.descriptionBullet}>• 각 레벨마다 5문제를 모두 맞춰야 클리어!</Text>
-						<Text style={styles.descriptionBullet}>• 클리어 시 특별한 보상을 획득할 수 있어요</Text>
+						<Text style={styles.descriptionBullet}>• 클리어 시 특별한 보상을 획득할 수 있습니다</Text>
 						<Text style={styles.descriptionBullet}>• 하루 1회만 도전 가능 (매일 자정 초기화)</Text>
 						<Text style={styles.descriptionBullet}>• 광고 시청으로 최대 3회 추가 도전 가능</Text>
 					</View>

@@ -123,7 +123,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 		));
 
 	return (
-		<Modal visible={visible} transparent animationType="none" statusBarTranslucent>
+		<Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onHome}>
 			{/* 오버레이 */}
 			<Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
 				{/* 모달 전체 컨테이너: 화면 높이의 일정 비율로 고정 */}

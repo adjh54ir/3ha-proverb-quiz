@@ -2,6 +2,7 @@
 
 import { MainDataType } from '@/types/MainDataType';
 import { CONST_MAIN_DATA } from './ConstMainData';
+import { sampleSize, shuffle } from '@/utils/ArrayUtils';
 
 export interface TowerQuizQuestion {
 	question: string;
@@ -13,36 +14,25 @@ export interface TowerQuizQuestion {
 	category: MainDataType.Proverb['category'];
 }
 
-// 배열 셔플 함수
-function shuffle<T>(array: T[]): T[] {
-	const shuffled = [...array];
-	for (let i = shuffled.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-	}
-	return shuffled;
-}
-
 // 레벨별 퀴즈 생성
 export function generateTowerQuiz(level: MainDataType.Proverb['level'], questionCount: number = 10): TowerQuizQuestion[] {
 	const levelWords = CONST_MAIN_DATA.PROVERB.filter((item) => item.level === level);
 
 	if (levelWords.length === 0) return [];
 
-	const selectedWords = shuffle(levelWords).slice(0, Math.min(questionCount, levelWords.length));
+	const selectedWords = sampleSize(levelWords, questionCount);
 
 	return selectedWords.map((item) => {
 		const correctMeaning = item.longMeaning || item.meaning;
-		const otherWords = CONST_MAIN_DATA.PROVERB.filter((w) => w.id !== item.id);
-		const wrongAnswers = shuffle(otherWords)
-			.slice(0, 3)
-			.map((w) => w.longMeaning || w.meaning);
+		// 뜻이 같은 다른 속담이 오답으로 뽑히면 보기 안에 정답이 두 번 뜬다 → 문자열 기준으로도 제외한다.
+		const otherWords = CONST_MAIN_DATA.PROVERB.filter((w) => w.id !== item.id && (w.longMeaning || w.meaning) !== correctMeaning);
+		const wrongAnswers = sampleSize(otherWords, 3).map((w) => w.longMeaning || w.meaning);
 
 		const allOptions = shuffle([correctMeaning, ...wrongAnswers]);
 		const correctAnswer = allOptions.indexOf(correctMeaning);
 
 		return {
-			question: `'${item.proverb}'의 뜻은 무엇일까요?`,
+			question: `'${item.proverb}'의 뜻은 무엇입니까?`,
 			options: allOptions,
 			correctAnswer,
 			explanation: `${item.longMeaning || item.meaning}\n\n예시: ${item.example[0] ?? ''}`,
@@ -65,19 +55,17 @@ export function generateCategoryQuiz(category: MainDataType.Proverb['category'],
 
 	if (categoryWords.length === 0) return [];
 
-	const selectedWords = shuffle(categoryWords).slice(0, Math.min(questionCount, categoryWords.length));
+	const selectedWords = sampleSize(categoryWords, questionCount);
 
 	return selectedWords.map((item) => {
-		const otherWords = CONST_MAIN_DATA.PROVERB.filter((w) => w.id !== item.id);
-		const wrongAnswers = shuffle(otherWords)
-			.slice(0, 3)
-			.map((w) => w.meaning);
+		const otherWords = CONST_MAIN_DATA.PROVERB.filter((w) => w.id !== item.id && w.meaning !== item.meaning);
+		const wrongAnswers = sampleSize(otherWords, 3).map((w) => w.meaning);
 
 		const allOptions = shuffle([item.meaning, ...wrongAnswers]);
 		const correctAnswer = allOptions.indexOf(item.meaning);
 
 		return {
-			question: `'${item.proverb}'의 뜻은 무엇일까요?`,
+			question: `'${item.proverb}'의 뜻은 무엇입니까?`,
 			options: allOptions,
 			correctAnswer,
 			explanation: `${item.meaning}\n\n예시: ${item.example[0] ?? ''}`,

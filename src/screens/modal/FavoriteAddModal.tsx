@@ -307,8 +307,8 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 								ListEmptyComponent={() => (
 									<View style={styles.emptyWrap}>
 										<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
-										<Text style={styles.emptyTitle}>{baseList.length === 0 ? '모든 속담이 이미 저장되어 있어요' : '검색 결과가 없어요'}</Text>
-										<Text style={styles.emptyDesc}>{baseList.length === 0 ? '축하합니다! 전체 속담을 수집하셨어요' : '다른 검색어나 필터를 사용해보세요'}</Text>
+										<Text style={styles.emptyTitle}>{baseList.length === 0 ? '모든 속담이 이미 저장되어 있습니다' : '검색 결과가 없습니다'}</Text>
+										<Text style={styles.emptyDesc}>{baseList.length === 0 ? '축하합니다! 전체 속담을 수집하셨습니다' : '다른 검색어나 필터를 사용해보세요'}</Text>
 									</View>
 								)}
 							/>

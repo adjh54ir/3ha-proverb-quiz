@@ -19,6 +19,7 @@ import { CONST_BADGES } from '@/const/ConstBadges';
 import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -38,6 +39,9 @@ const labelColors = themedValue(() => [COLORS.secondary, COLORS.primary, COLORS.
 const LEVEL_NAME_BY_NUMBER: Record<number, string> = { 1: '초급', 2: '중급', 3: '고급', 4: '특급' };
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
+
+/** 문제당 제한시간(초) — 타이머 / 시작 안내 팝업이 같은 값을 쓰도록 한 곳에서 관리한다. */
+const QUESTION_TIME_LIMIT = 40;
 
 type QuizRouteParams = {
 	mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank';
@@ -91,7 +95,7 @@ const QuizScreen = () => {
 	const [options, setOptions] = useState<string[]>([]);
 	const [selected, setSelected] = useState<string | null>(null);
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-	const [remainingTime, setRemainingTime] = useState(40);
+	const [remainingTime, setRemainingTime] = useState(QUESTION_TIME_LIMIT);
 	const [showResultModal, setShowResultModal] = useState(false);
 	const [showCompletionModal, setShowCompletionModal] = useState(false);
 	const [completionData, setCompletionData] = useState({ correct: 0, wrong: 0, total: 0, accuracy: 0 });
@@ -138,13 +142,13 @@ const QuizScreen = () => {
 	};
 
 	const praiseMessages = [
-		'정답이에요! 정말 똑똑하네요! 🎉\n이번 퀴즈를 정확히 짚어냈어요!',
-		'대단해요! 완벽한 정답이에요! 🏆\n계속 이렇게만 간다면 금방 속담 마스터가 되겠어요!',
-		'굿잡! 멋져요! 💯\n지금까지의 학습이 빛을 발하고 있네요!',
-		'똑소리 나는 정답이에요! 🤓✨\n집중력이 정말 뛰어나네요!',
-		'정답을 쏙쏙 맞히네요! 🌟\n공부한 보람이 느껴지죠?\n계속 도전해봐요!',
-		'👏 대단해요!\n이 속도라면 모든 속담을 금방 외울 수 있을 것 같아요!',
-		'정말 똑똑하군요! 📚\n퀴즈를 척척 풀어가는 모습이 인상적이에요!',
+		'정답입니다! 정말 똑똑합니다! 🎉\n이번 퀴즈를 정확히 짚어냈습니다!',
+		'대단합니다! 완벽한 정답입니다! 🏆\n계속 이렇게만 간다면 금방 속담 마스터가 되겠습니다!',
+		'굿잡! 멋집니다! 💯\n지금까지의 학습이 빛을 발하고 있습니다!',
+		'똑소리 나는 정답입니다! 🤓✨\n집중력이 정말 뛰어납니다!',
+		'정답을 쏙쏙 맞히십니다! 🌟\n공부한 보람이 느껴집니다.\n계속 도전해 보세요!',
+		'👏 대단합니다!\n이 속도라면 모든 속담을 금방 외울 수 있을 것 같습니다!',
+		'정말 똑똑합니다! 📚\n퀴즈를 척척 풀어가는 모습이 인상적입니다!',
 	];
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
@@ -330,8 +334,8 @@ const QuizScreen = () => {
 	 * 문제 2: 문제 세팅 로직을 별도로 분리하여 재사용 가능하게
 	 */
 	const setupQuestion = (newQuestion: MainDataType.Proverb, pool: MainDataType.Proverb[] = filteredProverbs) => {
-		const distractors = pool.filter((p) => p.id !== newQuestion.id);
-		const shuffledDistractors = [...distractors].sort(() => Math.random() - 0.5).slice(0, 3);
+		const shuffledPool = shuffle(pool.filter((p) => p.id !== newQuestion.id));
+		const shuffledDistractors = shuffledPool.slice(0, 3);
 
 		let allOptions: string[] = [];
 		let displayText = '';
@@ -344,7 +348,18 @@ const QuizScreen = () => {
 			displayText = newQuestion.longMeaning!;
 		} else if (routeMode === 'blank') {
 			const blank = pickBlankWord(newQuestion.proverb);
-			allOptions = [...shuffledDistractors.map((p) => pickBlankWord(p.proverb)), blank];
+			// 오답 보기가 정답과 같은 단어를 뽑는 경우가 있어 중복을 제거한 뒤 부족분을 다른 속담에서 채운다.
+			const wrongWords: string[] = [];
+			for (const p of shuffledPool) {
+				if (wrongWords.length >= 3) {
+					break;
+				}
+				const word = pickBlankWord(p.proverb);
+				if (word && word !== blank && !wrongWords.includes(word)) {
+					wrongWords.push(word);
+				}
+			}
+			allOptions = [...wrongWords, blank];
 			displayText = newQuestion.proverb.replace(blank, '(____)');
 			setBlankWord(blank);
 		} else if (routeMode === 'example' || routeMode === 'exampleBlank') {
@@ -352,18 +367,18 @@ const QuizScreen = () => {
 			const ex = (newQuestion.example && newQuestion.example[0]) || '';
 			displayText = ex
 				? routeMode === 'exampleBlank' && ex.includes(newQuestion.proverb)
-					? ex.replace(new RegExp(newQuestion.proverb, 'g'), '◯◯◯')
+					? ex.split(newQuestion.proverb).join('◯◯◯')
 					: ex
 				: newQuestion.longMeaning || newQuestion.meaning;
 		}
 
 		// 상태 갱신
 		setQuestion(newQuestion);
-		setOptions(allOptions.sort(() => Math.random() - 0.5));
+		setOptions(shuffle(allOptions));
 		setQuestionText(displayText);
 		setSelected(null);
 		setIsCorrect(null);
-		setRemainingTime(40);
+		setRemainingTime(QUESTION_TIME_LIMIT);
 
 		// 타이머 새로 시작
 		if (timerRef.current) clearInterval(timerRef.current);
@@ -440,7 +455,8 @@ const QuizScreen = () => {
 			setCombo(newCombo); // 콤보 업데이트
 			triggerComboAnimation(); // 콤보 애니메이션 즉시 실행
 			if (newComboValue >= 2) {
-				triggerComboAnim();
+				// triggerComboAnim() 은 같은 comboAnim 을 1.4→1 로 몰아서
+				// triggerComboAnimation()(0→1→0)과 충돌해 콤보 숫자가 확대된 채 굳는다 → 사용하지 않는다.
 				triggerComboShake();
 				triggerComboEffect(newComboValue); // ✅ 항상 실행
 			}
@@ -522,10 +538,10 @@ const QuizScreen = () => {
 		// ✅ 뱃지가 없을 경우에만 결과 모달 출력
 		const title = isTimeout ? '⏰ 시간 초과!' : correct ? '🎉 정답입니다!' : '😢 오답입니다';
 		const message = isTimeout
-			? '시간 초과로 오답 처리됐어요!'
+			? '시간 초과로 오답 처리됐습니다!'
 			: correct
 				? praiseMessages[Math.floor(Math.random() * praiseMessages.length)]
-				: '앗, 다음엔 맞힐 수 있어요!';
+				: '앗, 다음에는 맞힐 수 있습니다!';
 
 		runLater(() => {
 			setResultTitle(title);
@@ -538,17 +554,6 @@ const QuizScreen = () => {
 	const getLevelColor = (level: number) => getLevelNameColor(LEVEL_NAME_BY_NUMBER[level] ?? '');
 
 	const triggerComboEffect = (comboValue: number) => {
-		let bonus = 0;
-		if (comboValue === 3) {
-			bonus = 5;
-		} else if (comboValue === 4) {
-			bonus = 10;
-		} else if (comboValue === 5) {
-			bonus = 20;
-		} else if (comboValue >= 6) {
-			bonus = 30;
-		}
-
 		if (comboValue >= 2) {
 			setComboEffectText(`🔥 ${comboValue} Combo!`);
 			comboEffectAnim.setValue(0);
@@ -562,10 +567,18 @@ const QuizScreen = () => {
 		}
 	};
 
-	const pickBlankWord = (text: string) => {
+	/**
+	 * 빈칸으로 가릴 단어를 고른다.
+	 * 2글자 이상 단어가 하나도 없는 속담(짧은 단어로만 구성)에서 undefined 가 나오면
+	 * replace(undefined) 가 되어 빈칸이 표시되지 않고 정답 비교도 깨진다 → 항상 문자열을 돌려준다.
+	 */
+	const pickBlankWord = (text: string): string => {
 		const words = text.split(' ').filter((w) => w.length > 1);
-		const randomWord = words[Math.floor(Math.random() * words.length)];
-		return randomWord;
+		if (words.length > 0) {
+			return words[Math.floor(Math.random() * words.length)];
+		}
+		const fallback = text.split(' ').filter(Boolean);
+		return fallback.length > 0 ? fallback.reduce((a, b) => (b.length > a.length ? b : a)) : text;
 	};
 	const getSolvedCount = () => {
 		if (isWrongReview && questionPool) {
@@ -609,15 +622,6 @@ const QuizScreen = () => {
 			}),
 		]).start();
 	};
-	const triggerComboAnim = () => {
-		comboAnim.setValue(1.4);
-		Animated.spring(comboAnim, {
-			toValue: 1,
-			friction: 4,
-			useNativeDriver: true,
-		}).start();
-	};
-
 	const triggerComboShake = () => {
 		comboShake.setValue(0);
 		Animated.sequence([
@@ -990,7 +994,7 @@ const QuizScreen = () => {
 								<AnimatedCircularProgress
 									size={scaleWidth(70)}
 									width={scaleWidth(6)} // ✅ 기존 8 → 6
-									fill={((40 - remainingTime) / 40) * 100} // ✅ 수정된 부분
+									fill={((QUESTION_TIME_LIMIT - remainingTime) / QUESTION_TIME_LIMIT) * 100}
 									duration={500}
 									tintColor={remainingTime > 20 ? COLORS.secondary : remainingTime > 10 ? COLORS.warning : COLORS.danger}
 									backgroundColor={COLORS.surfaceAlt}>
@@ -1015,11 +1019,11 @@ const QuizScreen = () => {
 										<View style={styles.promptRow}>
 											<Text style={styles.promptText}>
 												{routeMode === 'meaning'
-													? '무슨 의미일까요?'
+													? '무슨 의미입니까?'
 													: routeMode === 'proverb'
-														? '무슨 속담일까요?'
+														? '무슨 속담입니까?'
 													: routeMode === 'blank'
-														? '빈칸은 무엇일까요?'
+														? '빈칸은 무엇입니까?'
 														: routeMode === 'exampleBlank'
 															? '빈칸에 들어갈 속담은?'
 															: '어울리는 속담은?'}
@@ -1176,10 +1180,10 @@ const QuizScreen = () => {
 					const correct = isCorrect === true;
 					const titleText = isTimeout ? '⏰ 시간 초과!' : correct ? '🎉 정답입니다!' : '😢 오답입니다';
 					const message = isTimeout
-						? '시간 초과로 오답 처리됐어요!'
+						? '시간 초과로 오답 처리됐습니다!'
 						: correct
 							? praiseMessages[Math.floor(Math.random() * praiseMessages.length)]
-							: '앗, 다음엔 맞힐 수 있어요!';
+							: '앗, 다음에는 맞힐 수 있습니다!';
 
 					runLater(() => {
 						setResultTitle(titleText);
@@ -1192,6 +1196,7 @@ const QuizScreen = () => {
 			<StartModal
 				visible={showStartModal}
 				mode={routeMode}
+				timeLimit={QUESTION_TIME_LIMIT}
 				onStart={() => {
 					setShowStartModal(false);
 					playWhoosh(); // 🎬 퀴즈 시작 사운드
@@ -1202,10 +1207,10 @@ const QuizScreen = () => {
 			/>
 			<QuizHintModal visible={showHintModal} question={question} mode={routeMode} questionText={questionText} onClose={() => setShowHintModal(false)} />
 			{/* ======================= 퀴즈 종료 ============================ */}
-			<Modal visible={showExitModal} transparent animationType='fade'>
+			<Modal visible={showExitModal} transparent animationType='fade' onRequestClose={() => setShowExitModal(false)}>
 				<View style={styles.modalOverlay}>
 					<View style={styles.exitModal}>
-						<Text style={styles.exitModalTitle}>퀴즈를 종료하시겠어요?</Text>
+						<Text style={styles.exitModalTitle}>퀴즈를 종료하시겠습니까?</Text>
 						<Text style={styles.exitModalMessage}>진행 중인 퀴즈가 저장되지 않습니다.</Text>
 						<View style={styles.modalButtonRow}>
 							<TouchableOpacity
@@ -1248,10 +1253,8 @@ const QuizScreen = () => {
 					setShowResultModal(false);
 					if (badgeModalVisible) return;
 					if (resultType === 'done') {
-						runLater(() => {
-							//@ts-ignore
-							navigation.navigate(Paths.MAIN_TAB, { screen: Paths.SETTING });
-						}, 300);
+						// 퀴즈를 다 풀면 홈으로 돌아간다(설정 탭으로 보내던 오이동 수정)
+						runLater(() => safelyGoBack(), 300);
 					} else {
 						handleNextQuestion();
 					}

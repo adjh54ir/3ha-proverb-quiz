@@ -8,16 +8,19 @@ import IconComponent from './common/atomic/IconComponent';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
 const WrongReviewScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('wrongReview', false);
 	const navigation = useNavigation();
 	const isFocused = useIsFocused();
 	const [loading, setLoading] = useState(true);
@@ -155,6 +158,7 @@ const WrongReviewScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['bottom']}>
+		<FloatingGuideButton onPress={guide.open} />
 			<ScrollView
 				contentContainerStyle={styles.scrollContainer}
 				ref={scrollViewRef}
@@ -162,17 +166,6 @@ const WrongReviewScreen = () => {
 				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}>
 				<Animated.View style={{ width: '100%', opacity: contentFade, transform: [{ translateY: contentSlide }] }}>
-					<View style={styles.reviewHero}>
-						<View style={styles.reviewHeroCopy}>
-							<Text style={styles.reviewHeroTitle}>실수는 지혜가 자라는 순간입니다</Text>
-							<Text style={styles.reviewHeroDescription}>천천히 다시 보면 이번에는 분명 맞힐 수 있습니다.</Text>
-						</View>
-						<FastImage
-							source={require('@/assets/images/screen-heroes/wrong-review.png')}
-							style={styles.reviewHeroImage}
-							resizeMode="contain"
-						/>
-					</View>
 					{/* ✅ 컴팩트 통계 카드 */}
 					<View style={styles.statsCard}>
 						<View style={styles.statsItem}>
@@ -268,6 +261,16 @@ const WrongReviewScreen = () => {
 			)}
 
 			<ProverbDetailModal visible={detailVisible && !!detailProverb} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'틀린 문제만 모아 다시 도전하는 화면입니다.',
+					'위 카드에서 푼 문제 수와 정답률을 확인할 수 있습니다.',
+					'다시 맞히면 오답 목록에서 사라집니다!',
+				]}
+				title="오답 복습, 이렇게 씁니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -292,23 +295,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: COLORS.background,
 	},
-	reviewHero: {
-		width: '100%',
-		minHeight: scaleHeight(124),
-		marginBottom: SPACING_H.md,
-		paddingLeft: SPACING_W.lg,
-		backgroundColor: HERO.bg,
-		borderTopWidth: 3,
-		borderTopColor: HERO.accent,
-		borderRadius: RADIUS.lg,
-		flexDirection: 'row',
-		alignItems: 'center',
-		overflow: 'hidden',
-	},
-	reviewHeroCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
-	reviewHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
-	reviewHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
-	reviewHeroImage: { width: scaleWidth(138), height: scaleHeight(118), marginRight: scaleWidth(-8) },
 	// ===== 통계 카드 =====
 	statsCard: {
 		flexDirection: 'row',

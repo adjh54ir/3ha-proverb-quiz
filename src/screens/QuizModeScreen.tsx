@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated, Easing, Modal, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated, Easing, ScrollView } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainDataType } from '@/types/MainDataType';
@@ -20,6 +21,7 @@ import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
 import FastImage from 'react-native-fast-image';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
 
 type QuizModeScreenRouteParams = {
 	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' };
@@ -36,6 +38,8 @@ const LEVEL_DESC: Record<string, string> = {
 };
 
 const QuizModeScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('quizMode', false);
 	const navigation = useNavigation();
 
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
@@ -173,6 +177,7 @@ const QuizModeScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: COLORS.surface }} edges={['top', 'bottom']}>
+		<FloatingGuideButton onPress={guide.open} />
 			<View style={styles.container}>
 				<View style={styles.centerWrapper}>
 					<View style={styles.tabRow}>
@@ -191,13 +196,6 @@ const QuizModeScreen = () => {
 						}}
 						showsVerticalScrollIndicator={false}
 						contentContainerStyle={styles.scrollContent}>
-						<View style={styles.quizPathHero}>
-							<View style={styles.quizPathCopy}>
-								<Text style={styles.title}>{tab === 'level' ? '도전할 난이도를 골라보세요' : '관심 있는 주제를 골라보세요'}</Text>
-								<Text style={styles.quizPathDescription}>나에게 맞는 길에서 속담 모험을 시작합니다.</Text>
-							</View>
-							<FastImage source={require('@/assets/images/screen-heroes/quiz-path.png')} style={styles.quizPathImage} resizeMode="contain" />
-						</View>
 						{selectedMode && (
 							<View style={[styles.selectedModeBoxEnhanced, { backgroundColor: selectedMode.color + '20' }]}>
 								<View style={styles.selectedModeRow}>
@@ -361,6 +359,16 @@ const QuizModeScreen = () => {
 					}}
 				/>
 			)}
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'도전할 난이도나 관심 있는 주제를 고르는 화면입니다.',
+					'위쪽 탭으로 난이도와 카테고리를 오갈 수 있습니다.',
+					'카드 오른쪽 숫자는 지금까지 푼 문제 수를 뜻합니다!',
+				]}
+				title="난이도·카테고리 고르기"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -410,28 +418,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		rowGap: SPACING_H.md,
 		paddingBottom: SPACING_H.xxxxl,
 	},
-	quizPathHero: {
-		minHeight: scaleHeight(116),
-		marginTop: SPACING_H.lg,
-		paddingLeft: SPACING_W.lg,
-		backgroundColor: HERO.bg,
-		borderTopWidth: 3,
-		borderTopColor: HERO.accent,
-		borderRadius: RADIUS.lg,
-		flexDirection: 'row',
-		alignItems: 'center',
-		overflow: 'hidden',
-	},
-	quizPathCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
-	quizPathImage: { width: scaleWidth(136), height: scaleHeight(112), marginRight: scaleWidth(-6) },
-	quizPathDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description, marginTop: SPACING_H.xs },
 	quizPathEmblems: { alignSelf: 'center', width: scaleWidth(190), height: scaleHeight(54), marginVertical: scaleHeight(-4) },
-	title: {
-		fontSize: FONT_SIZES.lg,
-		lineHeight: scaledSize(23),
-		color: HERO.title,
-		fontWeight: '800',
-	},
 	// ===== 선택된 모드 안내 =====
 	selectedModeBoxEnhanced: {
 		flexDirection: 'row',
@@ -460,6 +447,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	levelListWrap: {
 		width: '100%',
 		rowGap: SPACING_H.md,
+		// 난이도 카드가 화면 끝에 붙어 보이던 문제 — 카테고리 그리드 거터보다 살짝 작게 좌우를 띄운다
+		paddingHorizontal: SPACING_W.xsPlus,
 	},
 	levelCardFull: {
 		width: '100%',
@@ -469,7 +458,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.lg,
 		paddingVertical: SPACING_H.lg,
-		paddingHorizontal: SPACING_W.lg,
+		paddingHorizontal: SPACING_W.xl,
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},

@@ -1,15 +1,7 @@
 // 추가 모달 컴포넌트 두 개 생성
 import React, { useEffect, useRef } from 'react';
-import {
-  Animated,
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Linking,
-} from 'react-native';
+import { Animated, View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleHeight } from '@/utils/DementionUtils';
 import Markdown from 'react-native-markdown-display';
 import IconComponent from '../atomic/IconComponent';

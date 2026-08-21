@@ -9,7 +9,7 @@ import VersionCheck from 'react-native-version-check';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
-import { isSoundEnabled, setSoundEnabled, getSoundVolume, setSoundVolume, playCorrect } from '@/utils/SoundUtils';
+import { isSoundEnabled, setSoundEnabled, getSoundVolume, setSoundVolume, playCorrect, playPop } from '@/utils/SoundUtils';
 import { isBgmEnabled, setBgmEnabled, getBgmVolume, setBgmVolume } from '@/utils/BgmUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DeviceInfo from 'react-native-device-info';
@@ -33,6 +33,7 @@ import { AppPermissionInfo, loadAppPermissions, requestAppPermission } from '@/u
 import DateUtils from '@/utils/DateUtils';
 import { useToast } from '@/hooks/useToast';
 import { changeTextSizeMode, changeThemeMode, useTextSizeMode, useThemeMode } from '@/hooks/useThemeMode';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton, resetCharacterGuideSeen } from '@/screens/common/CharacterGuide';
 
 // ─────────────────────────────────────────────
 // 상수
@@ -236,6 +237,8 @@ const TEXT_SIZE_OPTIONS = themedValue(() => [
 // 컴포넌트
 // ─────────────────────────────────────────────
 const SettingScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('setting', false);
 	const themeMode = useThemeMode(); // 화이트/다크 선택 상태
 	const textSizeMode = useTextSizeMode(); // 기본/글자 크게 선택 상태
 	const sectionRef = useRef<SectionList>(null);
@@ -264,6 +267,9 @@ const SettingScreen = () => {
 	const handleToggleSound = (value: boolean) => {
 		setSoundEnabled(value);
 		setSoundOn(value);
+		if (value) {
+			playPop(); // 켠 자리에서 바로 소리를 확인시켜 준다
+		}
 	};
 
 	const handleToggleBgm = (value: boolean) => {
@@ -271,9 +277,11 @@ const SettingScreen = () => {
 		setBgmOn(value);
 	};
 
+
 	/** 슬라이더를 놓는 순간에만 저장한다(드래그 중 매 프레임 AsyncStorage 쓰기 방지) */
 	const handleSfxVolumeCommit = (value: number) => {
 		setSoundVolume(value);
+		playPop(); // 조절한 크기를 바로 들려준다
 	};
 
 	const handleBgmVolumeCommit = (value: number) => {
@@ -371,6 +379,8 @@ const SettingScreen = () => {
 		},
 		all: async () => {
 			await AsyncStorage.multiRemove(RESET_ALL_KEYS);
+			// 화면 안내를 '본 적 있음' 기록도 함께 지워 처음 상태로 되돌린다
+			await resetCharacterGuideSeen();
 			showToast('전체 초기화 완료', '앱의 모든 기록을 지웠습니다.');
 		},
 	};
@@ -910,6 +920,7 @@ const SettingScreen = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.container} edges={['top']}>
+			<FloatingGuideButton onPress={guide.open} />
 				<FadeInView style={{ flex: 1 }}>
 					<SectionList
 						ref={sectionRef}
@@ -945,7 +956,7 @@ const SettingScreen = () => {
 									</View>
 									<Text style={styles.recommendSubtitle}>가족이나 친구, 지인에게 유용한 앱을 함께 나눠보세요!</Text>
 									<View style={styles.appIconWrapper}>
-										<Image source={require('@/assets/images/screen-heroes/settings-helper.png')} style={styles.appIcon} resizeMode="contain" />
+										<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
 									</View>
 									<View style={styles.storeButtons}>
 										<TouchableOpacity style={[styles.storeButton, { backgroundColor: COLORS.primary }]} onPress={shareApp} activeOpacity={0.8}>
@@ -1036,6 +1047,17 @@ const SettingScreen = () => {
 			/>
 
 			<ToastView />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'앱의 알림·소리·화면 설정을 바꾸는 곳입니다.',
+					'효과음과 배경음은 각각 켜고 끄거나 크기를 조절할 수 있습니다.',
+					'소리가 나는 동안에는 다른 앱의 음악·영상이 잠시 멈춥니다.',
+					'아래쪽에서 앱 버전과 다른 앱들도 확인할 수 있습니다!',
+				]}
+				title="설정, 이렇게 씁니다"
+			/>
 		</>
 	);
 };

@@ -2,21 +2,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
-import {
-	View,
-	Text,
-	StyleSheet,
-	TextInput,
-	TouchableOpacity,
-	Keyboard,
-	TouchableWithoutFeedback,
-	FlatList,
-	KeyboardAvoidingView,
-	Platform,
-	RefreshControl,
-	Modal,
-	Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, TouchableWithoutFeedback, FlatList, KeyboardAvoidingView, Platform, RefreshControl, Animated } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -33,6 +20,7 @@ import ProverbDetailModal from './modal/ProverbDetailModal';
 import { useToast } from '@/hooks/useToast';
 import BottomHomeButton from './common/BottomHomeButton';
 import FavoriteAddModal from './modal/FavoriteAddModal';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const COMMON_ALL_OPTION = themedValue(() => ({
@@ -72,6 +60,8 @@ const AnimatedListItem = React.memo(({ children, index }: { children: React.Reac
 });
 
 const FavoriteScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('favorite', false);
 	const emptyFavoritesImage = require('@/assets/images/feature-states/empty-favorites.png');
 	const emptySearchImage = require('@/assets/images/feature-states/empty-search.png');
 	const flatListRef = useRef<FlatList>(null);
@@ -380,6 +370,7 @@ const FavoriteScreen = () => {
 											<Text style={styles.cancelBtnText}>취소</Text>
 										</TouchableOpacity>
 									)}
+									<CharacterGuideButton onPress={guide.open} />
 								</View>
 
 								<View style={styles.searchRow}>
@@ -578,6 +569,16 @@ const FavoriteScreen = () => {
 
 			<ToastView />
 			{!isSelectionMode && <BottomHomeButton skipConfirm />}
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'즐겨찾기는 마음에 든 속담을 모아두는 곳입니다.',
+					'목록에서 별을 누르면 이곳에 바로 담깁니다.',
+					'담아둔 속담만 골라 다시 보고 복습할 수 있습니다!',
+				]}
+				title="즐겨찾기, 이렇게 씁니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -586,7 +587,7 @@ export default FavoriteScreen;
 
 const styles = themedStyles(() => StyleSheet.create({
 	main: { flex: 1, backgroundColor: COLORS.background },
-	headerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.md },
+	headerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', columnGap: SPACING_W.sm, marginBottom: SPACING_H.md },
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
 	favoriteHeroImage: { width: scaleWidth(70), height: scaleHeight(58) },
 	headerTitle: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },

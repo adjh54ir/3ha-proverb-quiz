@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleWidth, scaleHeight } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';

@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, FlatList, Keyboard, TouchableWithoutFeedback, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Keyboard, TouchableWithoutFeedback, Platform, KeyboardAvoidingView } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';

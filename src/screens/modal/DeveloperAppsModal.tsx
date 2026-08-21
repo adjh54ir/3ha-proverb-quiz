@@ -1,24 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import {
-	View,
-	Text,
-	Modal,
-	TouchableOpacity,
-	Image,
-	StyleSheet,
-	ScrollView,
-	Platform,
-	Alert,
-	Linking,
-	TextInput,
-	KeyboardAvoidingView,
-	Keyboard,
-	Pressable,
-} from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Platform, Alert, Linking, TextInput, KeyboardAvoidingView, Keyboard, Pressable } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
-import { COMMON_APPS_DATA } from '@/const/common/CommonAppsData';
+import { COMMON_APPS_DATA, appStoreUrl } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
 import PopInView from '@/components/animation/PopInView';
 
@@ -63,12 +49,6 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 		});
 	}, [selectedCategory, searchQuery]);
 
-	const getDownloadUrl = (app: CommonType.AppItem) => {
-		const primary = Platform.OS === 'android' ? app.android : app.ios;
-		const fallback = Platform.OS === 'android' ? app.ios : app.android;
-		return primary || fallback || null;
-	};
-
 	const newAppIds = useMemo(
 		() =>
 			new Set(
@@ -80,7 +60,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 		[],
 	);
 	const onDownloadApp = async (app: CommonType.AppItem) => {
-		const url = getDownloadUrl(app);
+		const url = appStoreUrl(app);
 		if (!url) {
 			Alert.alert('Coming Soon!', '아직 스토어 링크가 준비되지 않았습니다.');
 			return;

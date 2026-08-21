@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { ActivityIndicator, Animated, Dimensions, Easing, Image, InteractionManager, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Animated, Dimensions, Easing, Image, InteractionManager, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import Carousel from 'react-native-reanimated-carousel';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
@@ -11,7 +12,7 @@ import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
@@ -21,6 +22,7 @@ import ProverbServices from '@/services/ProverbServices';
 import NewBadgeModal from '@/screens/modal/NewBadgeModal';
 import { playComplete, playFlip } from '@/utils/SoundUtils';
 import DateUtils from '@/utils/DateUtils';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
 
 // 기기 분류(태블릿 여부)용 1회 측정값. 실시간 레이아웃은 useWindowDimensions 를 쓴다.
 const { width: screenWidth } = Dimensions.get('window');
@@ -185,6 +187,8 @@ const reviewPraiseMessages = [
 const DETAIL_FILTER_HEIGHT = scaleHeight(60);
 const IMAGE_HEIGHT = isAndroid ? scaleHeight(220) : scaleHeight(200);
 const QuizStudyScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('study', false);
 	// 회전/폴더블 대응: 캐러셀 높이는 실시간 화면 높이를 따른다.
 	const { height: windowHeight } = useWindowDimensions();
 	const STORAGE_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
@@ -950,6 +954,7 @@ const QuizStudyScreen = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.main} edges={['top']}>
+			<FloatingGuideButton onPress={guide.open} />
 				<Animated.View
 					style={[
 						styles.container,
@@ -966,17 +971,6 @@ const QuizStudyScreen = () => {
 						},
 					]}>
 					<View style={styles.progressHeader}>
-						<View style={styles.studyHeroRow}>
-							<View style={styles.studyHeroCopy}>
-								<Text style={styles.studyHeroTitle}>한 장씩 넘기며 지혜를 익힙니다</Text>
-								<Text style={styles.studyHeroDescription}>카드를 눌러 뜻과 유래를 살펴보세요.</Text>
-							</View>
-							<FastImage
-								source={require('@/assets/images/screen-heroes/proverb-study.png')}
-								style={styles.studyHeroImage}
-								resizeMode="contain"
-							/>
-						</View>
 						<View style={styles.progressTopRow}>
 							<Text style={styles.progressTitle}>학습 현황</Text>
 							<View style={styles.progressBadge}>
@@ -1343,6 +1337,16 @@ const QuizStudyScreen = () => {
 				})()}
 
 			<NewBadgeModal visible={badgeModalVisible && newlyEarnedBadges.length > 0} badges={newlyEarnedBadges} onConfirm={() => setBadgeModalVisible(false)} />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'학습은 속담 카드를 한 장씩 넘기며 익히는 곳입니다.',
+					'카드를 누르면 뜻과 유래, 예문까지 펼쳐집니다.',
+					'읽은 카드는 학습 완료로 기록되어 진도가 쌓입니다!',
+				]}
+				title="학습, 이렇게 씁니다"
+			/>
 		</>
 	);
 };
@@ -1387,29 +1391,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		paddingBottom: 0,
 		marginHorizontal: SPACING_W.lg,
-	},
-	studyHeroRow: {
-		width: '100%',
-		minHeight: scaleHeight(92),
-		paddingLeft: SPACING_W.lg,
-		marginBottom: SPACING_H.md,
-		backgroundColor: HERO.bg,
-		borderTopWidth: 3,
-		borderTopColor: HERO.accent,
-		borderRadius: RADIUS.md,
-		flexDirection: 'row',
-		alignItems: 'center',
-		overflow: 'hidden',
-	},
-	studyHeroCopy: { flex: 1, paddingVertical: SPACING_H.md, zIndex: 1 },
-	studyHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
-	studyHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
-	studyHeroImage: { width: scaleWidth(124), height: scaleHeight(88), marginRight: scaleWidth(-6) },
-	progressTopRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginBottom: SPACING_H.xs,
 	},
 	progressTitle: {
 		fontSize: FONT_SIZES.lg,
@@ -1499,6 +1480,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.md,
 		color: COLORS.textSecondary,
 		lineHeight: scaledSize(21),
+	},
+	progressTopRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginBottom: SPACING_H.xs,
 	},
 	progressBarWrapper: {
 		width: '80%',

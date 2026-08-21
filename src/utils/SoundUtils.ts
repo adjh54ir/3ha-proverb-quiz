@@ -13,34 +13,28 @@
  */
 import Sound from 'react-native-sound';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import DateUtils from '@/utils/DateUtils';
 
 /**
- * 오디오 세션 설정 — 다른 앱(음악/영상)의 소리를 끊지 않는 것이 목적이다.
+ * 오디오 세션 설정 — 소리가 실제로 귀에 들리는 것을 최우선으로 한다.
  *
- * iOS 주의:
- *  - Ambient 는 다른 앱 소리와 섞인다. 대신 무음 스위치를 따른다.
- *  - Playback 은 무음 스위치를 무시하지만 기본이 '비믹스'라, play() 안에서 부르는
- *    setActive:YES 가 다른 앱의 재생을 끊어버린다(= 보던 영상이 꺼진다).
- *  - Playback + 믹스를 쓰려면 mixWithOthers=true 를 넘겨야 하는데, react-native-sound 가
- *    이때 AVAudioSessionCategoryOptionAllowBluetooth 를 같이 지정한다. 이 옵션은
- *    Record/PlayAndRecord 에서만 유효해 setCategory 자체가 실패하고(에러를 삼킨다)
- *    세션이 기본값 SoloAmbient 로 남아 오히려 더 확실하게 남의 소리를 끊는다.
- *  그래서 iOS 는 예외 없이 Ambient 로 고정한다 — "남의 음악/영상을 끊지 않는다"가
- *  "무음 스위치를 무시한다"보다 우선한다.
+ * 믹스(다른 앱 음악 유지)를 택하면 앱이 오디오 포커스를 잡지 않는데, 그러면
+ * 볼륨 버튼이 미디어 볼륨이 아니라 벨소리 볼륨을 조절한다. 미디어 볼륨이 0으로
+ * 내려가 있는 기기에서는 효과음이 0.1~1.7초라 볼륨을 올릴 틈도 없이 그냥 무음이 된다
+ * (iOS·Android 모두에서 "앱 전체가 무음"으로 보이던 원인).
  *
- * ponytail: 무음 스위치 무시 + 믹스를 둘 다 원하면 AVAudioSession 을 직접 다루는
+ * iOS: Playback — 무음 스위치를 무시하고 미디어 볼륨을 쓴다.
+ * Android: mixWithOthers=false — 재생할 때 오디오 포커스를 요청한다(STREAM_MUSIC).
+ *
+ * 대가: 다른 앱의 음악/영상 재생이 끊긴다. 라이브러리가 Playback+믹스 조합에서
+ * AllowBluetooth 옵션을 같이 넣어 setCategory 자체가 실패하므로 둘 다 갖는 방법은 없다.
+ *
+ * ponytail: 믹스까지 원하면 AVAudioSession(iOS)/AudioFocusRequest(Android)를 직접 다루는
  *           네이티브 모듈이 필요하다. 그때 Playback + MixWithOthers 로 올린다.
  */
 export const applyAudioCategory = () => {
-	if (Platform.OS === 'ios') {
-		Sound.setCategory('Ambient', false);
-		return;
-	}
-	// Android: mixWithOthers=true면 오디오 포커스를 요청하지 않아 다른 앱 소리를 뺏지 않는다
-	Sound.setCategory('Playback', true);
+	Sound.setCategory('Playback', false);
 };
 
 const SOURCES = {
@@ -69,7 +63,7 @@ let soundEnabled = true;
 let volumeRatio = 1; // 사용자 설정 볼륨 0~1
 
 // 설정 로드를 기다리지 않고 모듈이 올라오는 즉시 한 번 적용한다.
-// (먼저 만들어진 플레이어가 mixWithOthers 없이 잡히면 다른 앱 음악이 끊긴다)
+// (플레이어가 만들어질 때 세션 설정이 이미 잡혀 있어야 한다)
 applyAudioCategory();
 
 // 로드된 플레이어 캐시 (첫 재생 때 만들어 두고 재사용)

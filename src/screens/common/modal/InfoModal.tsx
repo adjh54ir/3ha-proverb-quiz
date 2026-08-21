@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import { useLayoutEffect, useState } from "react";
-import { Keyboard, KeyboardAvoidingView, Modal, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import Modal from '@/screens/common/atomic/AppModal';
 import IconComponent from "../atomic/IconComponent";
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';

@@ -63,13 +63,19 @@ const AppLayout = () => {
 			return 0;
 		}
 
-		// ponytail: 태블릿만 배너 실측 높이 사용. adaptive 배너 높이가 기기별 50~90dp로 갈려 고정값이 안 맞음.
-		//           폰은 adaptive가 사실상 50dp 고정이라 기존 튜닝값 유지.
+		// adaptive 배너 높이는 기기별로 50~90dp까지 갈린다. 고정값을 쓰면 어떤 기기에선 남고
+		// 어떤 기기에선 모자라 배너가 화면을 덮는다 — 실측 높이가 오면 그 값을 그대로 쓴다.
 		if (DeviceInfo.isTablet()) {
 			return bannerHeight || scaleHeight(60); // 태블릿 (로드 전엔 기존값)
 		}
 		if (Platform.OS === 'android') {
-			return scaleHeight(50); // 안드로이드
+			return bannerHeight || scaleHeight(50); // 안드로이드 폰 (로드 전엔 기존값)
+		}
+		// iOS 는 배너를 상단 세이프에어리어(노치) 영역에 얹는 구조라 실측 높이를 그대로 더하면
+		// 여백이 두 번 들어간다. 폴백보다 실제 배너가 더 클 때만 그 차이를 반영한다.
+		if (bannerHeight) {
+			const iosFallback = screenHeight < DESIGN_HEIGHT ? scaleHeight(40) : 0;
+			return Math.max(iosFallback, bannerHeight - scaleHeight(50));
 		}
 		if (screenHeight < DESIGN_HEIGHT) {
 			return scaleHeight(40); // 작은 화면
@@ -81,11 +87,12 @@ const AppLayout = () => {
 	const getNavigatorPaddingTop = (shouldShowAd: boolean): number => {
 		// [CASE1] 광고가 있는 경우
 		if (shouldShowAd) {
+			// 배너 바로 아래에 화면이 붙지 않도록 여백을 둔다
 			switch (Platform.OS) {
 				case 'android':
-					return scaleHeight(20);
+					return scaleHeight(32);
 				case 'ios':
-					return scaleHeight(12);
+					return scaleHeight(24);
 				default:
 					return 0;
 			}
@@ -221,7 +228,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	adWrapperAbsolute: {
 		position: 'absolute',
-		top: Platform.OS === 'android' ? scaleHeight(20) : scaleHeight(6),
+		// 배너가 화면 상단에 바짝 붙어 보이던 문제 — 화면 기준으로 더 띄운다
+		top: Platform.OS === 'android' ? scaleHeight(28) : scaleHeight(14),
 		left: 0,
 		right: 0,
 		zIndex: 10,

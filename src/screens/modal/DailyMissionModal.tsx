@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Modal, StyleSheet, Animated, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Image } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';

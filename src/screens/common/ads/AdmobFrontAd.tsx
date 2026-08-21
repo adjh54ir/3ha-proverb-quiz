@@ -55,6 +55,11 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 	const adRef = useRef<InterstitialAd | null>(null);
 
 	useEffect(() => {
+		// 개발 빌드에서는 전면 광고를 띄우지 않는다 — 바로 닫힌 것으로 처리해 다음 흐름을 이어간다
+		if (__DEV__) {
+			onAdClosed?.();
+			return;
+		}
 		const ad = InterstitialAd.createForAdRequest(AD_UNIT_ID);
 		adRef.current = ad;
 
@@ -113,6 +118,8 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 			unsubscribeFailed();
 		};
 	}, []);
+
+	if (__DEV__) return null;
 
 	return (
 		<View style={styles.adOverlay}>

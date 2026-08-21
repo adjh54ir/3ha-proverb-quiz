@@ -1,6 +1,7 @@
 // ProverbDetailModal.tsx
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Modal, StyleSheet, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Animated } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';

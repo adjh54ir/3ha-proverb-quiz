@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';

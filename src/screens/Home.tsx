@@ -33,6 +33,7 @@ import { PET_REWARDS, getLevelByScore, getProgressPercent, getQuestionsToNext } 
 import TowerRewardSection from '@/components/TowerRewardSection';
 import { TowerProgress } from '@/const/ConstTowerData';
 import { playFinish } from '@/utils/SoundUtils';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
 
 const greetingMessages = [
 	'🎯 반갑습니다! 오늘도 똑똑해질 준비되셨습니까?',
@@ -148,6 +149,7 @@ const MascotMoment = ({
 );
 
 const Home = () => {
+	const guide = useCharacterGuideOnce('home');
 	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
 	const handoff = useModalHandoff();
 	const navigation = useNavigation();
@@ -717,6 +719,7 @@ const Home = () => {
 	};
 	return (
 		<SafeAreaView style={styles.main} edges={['top']}>
+		<FloatingGuideButton onPress={guide.open} />
 			{showConfetti && (
 				<View style={styles.globalConfettiWrapper}>
 					<ConfettiCannon count={60} origin={{ x: scaleWidth(180), y: 0 }} fadeOut explosionSpeed={500} fallSpeed={2500} />
@@ -1080,6 +1083,16 @@ const Home = () => {
 					loadData();
 				}}
 			/>
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'여기는 홈입니다. 오늘 할 학습과 도전을 한눈에 볼 수 있습니다.',
+					'캐릭터를 누르면 지금 등급과 성장 상태를 확인할 수 있습니다.',
+					'아래 메뉴에서 학습·퀴즈·도전 중 하나를 골라 시작해보세요!',
+				]}
+				title="홈, 이렇게 씁니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -1089,7 +1102,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	wrapper: { flex: 1, backgroundColor: COLORS.surface, marginTop: scaleHeight(-16) },
 	container: {
 		flexGrow: 1,
-		paddingHorizontal: SPACING_W.lg,
+		paddingHorizontal: SPACING_W.md,
 		paddingTop: SPACING_H.md,
 		paddingBottom: SPACING_H.xxxxl, // 하단 잘림 방지 여백
 	},

@@ -68,9 +68,35 @@ export const loadBgmSetting = async () => {
 	}
 };
 
+/**
+ * 화면 사정으로 잠깐 멈춤 (일시정지 팝업·안내 등). stopBgm 과 달리 트랙을 버리지 않는다.
+ * 앱이 백그라운드로 내려간 경우와 구분하기 위해 별도 플래그를 둔다.
+ */
+let pausedByScreen = false;
+
+export const pauseBgm = () => {
+	if (!currentPlayer || pausedByScreen) {
+		return;
+	}
+	pausedByScreen = true;
+	currentPlayer.pause();
+};
+
+/** pauseBgm 으로 멈춘 BGM 재개. 멈춘 적이 없으면 아무것도 하지 않는다. */
+export const resumeBgm = () => {
+	if (!pausedByScreen) {
+		return;
+	}
+	pausedByScreen = false;
+	if (currentPlayer && bgmEnabled) {
+		currentPlayer.play();
+	}
+};
+
 /** 현재 재생 중인 BGM 정지 + 리소스 해제 */
 export const stopBgm = () => {
 	generation += 1; // 로딩 중인 트랙이 있으면 재생되지 않도록 무효화
+	pausedByScreen = false;
 	const player = currentPlayer;
 	currentPlayer = null;
 	currentTrack = null;
@@ -128,7 +154,7 @@ export const startBgm = (track: BgmTrack) => {
 let pausedByBackground = false;
 AppState.addEventListener('change', (state) => {
 	if (state === 'active') {
-		if (pausedByBackground && currentPlayer && bgmEnabled) {
+		if (pausedByBackground && currentPlayer && bgmEnabled && !pausedByScreen) {
 			currentPlayer.play();
 		}
 		pausedByBackground = false;
@@ -140,4 +166,4 @@ AppState.addEventListener('change', (state) => {
 	}
 });
 
-export default { startBgm, stopBgm, setBgmEnabled, isBgmEnabled, setBgmVolume, getBgmVolume, loadBgmSetting };
+export default { startBgm, stopBgm, pauseBgm, resumeBgm, setBgmEnabled, isBgmEnabled, setBgmVolume, getBgmVolume, loadBgmSetting };

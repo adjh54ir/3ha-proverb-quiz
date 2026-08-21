@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal, Pressable, Animated, Easing } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Pressable, Animated, Easing } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { TOWER_LEVELS } from '@/const/ConstTowerData';

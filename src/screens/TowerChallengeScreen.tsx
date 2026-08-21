@@ -17,11 +17,14 @@ import CompleteOverlay from './common/CompleteOverlay';
 import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
 
 const TOWER_STORAGE_KEY = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
 const SCREEN_WIDTH = screenWidth;
 
 const TowerChallengeScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('towerChallenge', false);
 	const navigation = useNavigation();
 	const [progress, setProgress] = useState<TowerProgress>({
 		level: 1,
@@ -267,6 +270,7 @@ const TowerChallengeScreen = () => {
 			<LinearGradient colors={COLORS.darkGradient} style={StyleSheet.absoluteFillObject} />
 
 			<SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+			<FloatingGuideButton onPress={guide.open} tone="onDark" />
 				{/* 타워 메인 헤더 */}
 				<Animated.View
 					style={[
@@ -382,6 +386,16 @@ const TowerChallengeScreen = () => {
 					/>
 				)}
 			</SafeAreaView>
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'타워 챌린지는 층마다 보스를 만나 문제를 푸는 도전입니다.',
+					'한 층을 깨야 다음 층이 열리고, 층마다 보상이 있습니다.',
+					'정상까지 올라가 마지막 보스를 이겨보세요!',
+				]}
+				title="타워 챌린지, 이렇게 씁니다"
+			/>
 		</View>
 	);
 };

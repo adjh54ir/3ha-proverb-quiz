@@ -2,14 +2,8 @@
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import React, { FC, useEffect, useRef } from 'react';
-import {
-    Animated,
-    Modal,
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-} from 'react-native';
+import { Animated, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 
 type IconType = 'MaterialCommunityIcons' | 'materialIcons';
 

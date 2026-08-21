@@ -31,6 +31,7 @@ import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName, getLev
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 
 
 const PAGE_SIZE = 30;
@@ -103,6 +104,8 @@ const AnimatedListItem = React.memo(({ children, index }: { children: React.Reac
 });
 
 const ProverbListScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('proverbList', false);
 	const scrollRef = useRef<FlatList>(null);
 	const searchInputRef = useRef<TextInput>(null);
 	const headerAnim = useRef(new Animated.Value(0)).current;
@@ -321,17 +324,6 @@ const ProverbListScreen = () => {
 									],
 								},
 							]}>
-							<View style={styles.dictionaryHero}>
-								<View style={styles.dictionaryHeroCopy}>
-									<Text style={styles.dictionaryHeroTitle}>오늘의 지혜를 찾아보세요</Text>
-									<Text style={styles.dictionaryHeroDescription}>속담과 뜻을 한곳에서 빠르게 살펴볼 수 있습니다.</Text>
-								</View>
-								<FastImage
-									source={require('@/assets/images/screen-heroes/proverb-dictionary.png')}
-									style={styles.dictionaryHeroImage}
-									resizeMode="contain"
-								/>
-							</View>
 							<View style={styles.filterCard}>
 								<View style={styles.searchRow}>
 									<View style={styles.searchInputWrapper}>
@@ -354,6 +346,9 @@ const ProverbListScreen = () => {
 											<Icon name="rotate-right" size={scaledSize(18)} color={COLORS.textSecondary} />
 										</TouchableOpacity>
 									)}
+									<View style={styles.searchGuideButton}>
+										<CharacterGuideButton onPress={guide.open} />
+									</View>
 								</View>
 								<View style={styles.filterDropdownRow}>
 									<View style={[styles.dropdownWrapper, { zIndex: levelOpen ? 3000 : 1000 }]}>
@@ -626,6 +621,16 @@ const ProverbListScreen = () => {
 				</TouchableWithoutFeedback>
 			</KeyboardAvoidingView>
 			<ToastView />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'속담 사전에서는 모든 속담을 한곳에서 찾아볼 수 있습니다.',
+					'검색창에 속담·뜻은 물론 초성(ㄱㄴㄷ)으로도 찾을 수 있습니다.',
+					'난이도와 카테고리로 걸러 보면 원하는 속담을 더 빨리 만납니다!',
+				]}
+				title="속담 사전, 이렇게 씁니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -633,22 +638,6 @@ const ProverbListScreen = () => {
 export default ProverbListScreen;
 
 const styles = themedStyles(() => StyleSheet.create({
-	dictionaryHero: {
-		minHeight: scaleHeight(112),
-		marginBottom: SPACING_H.md,
-		paddingLeft: SPACING_W.lg,
-		backgroundColor: HERO.bg,
-		borderTopWidth: 3,
-		borderTopColor: HERO.accent,
-		borderRadius: RADIUS.lg,
-		flexDirection: 'row',
-		alignItems: 'center',
-		overflow: 'hidden',
-	},
-	dictionaryHeroCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
-	dictionaryHeroTitle: { fontSize: FONT_SIZES.lg, fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
-	dictionaryHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
-	dictionaryHeroImage: { width: scaleWidth(132), height: scaleHeight(108), marginRight: scaleWidth(-4) },
 	main: {
 		flex: 1,
 		backgroundColor: COLORS.background,
@@ -848,6 +837,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		columnGap: SPACING_W.sm,
 	},
+	// 검색 입력창과 같은 줄에 두되, 입력창의 아래 여백만큼 함께 올린다
+	searchGuideButton: { marginBottom: SPACING_H.md },
 	searchInputWrapper: {
 		flex: 1,
 		position: 'relative',

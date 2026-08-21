@@ -1,18 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-	Alert,
-	Linking,
-	StyleSheet,
-	Switch,
-	Text,
-	View,
-	TouchableOpacity,
-	ScrollView,
-	Modal,
-	ActivityIndicator,
-	Image,
-} from 'react-native';
+import { Alert, Linking, StyleSheet, Switch, Text, View, TouchableOpacity, ScrollView, ActivityIndicator, Image } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
@@ -38,6 +27,7 @@ import Icon from 'react-native-vector-icons/FontAwesome6';
 import FadeInView from '@/components/animation/FadeInView';
 import { playCorrect, playWrong, playFinish } from '@/utils/SoundUtils';
 import { scheduleDailyQuizReminder, cancelDailyQuizReminder, DAILY_QUIZ_NOTIFICATION_ID } from '@/utils/NotifactionHelper';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 
 const NOTIFICATION_ID = DAILY_QUIZ_NOTIFICATION_ID;
 const DEFAULT_ALARM_HOUR = 15;
@@ -77,6 +67,8 @@ type GroupedPrevQuiz = {
 };
 
 const TodayQuizScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('todayQuiz', false);
 	const STORAGE_KEY = MainStorageKeyType.TODAY_QUIZ_LIST;
 	const SETTING_KEY = MainStorageKeyType.SETTING_INFO;
 
@@ -766,8 +758,8 @@ const TodayQuizScreen = () => {
 				contentContainerStyle={{
 					paddingBottom: SPACING_H.xxxxl,
 				}}>
-				{isAlarmEnabled && (
-					<View style={styles.buttonRow}>
+				<View style={styles.buttonRow}>
+					{isAlarmEnabled && (
 						<View style={styles.rightButtonWrapper}>
 							<TouchableOpacity onPress={loadLastTodayQuizList} activeOpacity={0.8} hitSlop={HIT_SLOP}>
 								<View style={styles.buttonContent}>
@@ -776,8 +768,9 @@ const TodayQuizScreen = () => {
 								</View>
 							</TouchableOpacity>
 						</View>
-					</View>
-				)}
+					)}
+					<CharacterGuideButton onPress={guide.open} />
+				</View>
 
 				<View style={styles.rightAlignedRow} />
 
@@ -1192,6 +1185,16 @@ const TodayQuizScreen = () => {
 					setNewlyEarnedBadges([]);
 				}}
 			/>
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'오늘의 퀴즈는 하루에 한 번 새로 도착하는 문제 모음입니다.',
+					'매일 풀면 연속 출석이 쌓이고 뱃지도 받을 수 있습니다.',
+					'알림을 켜두면 도착 시간에 맞춰 알려드립니다!',
+				]}
+				title="오늘의 퀴즈, 이렇게 씁니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -1213,6 +1216,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'flex-end',
 		alignItems: 'center',
+		columnGap: SPACING_W.md,
 		marginHorizontal: SPACING_W.lg,
 		marginTop: SPACING_H.sm,
 	},

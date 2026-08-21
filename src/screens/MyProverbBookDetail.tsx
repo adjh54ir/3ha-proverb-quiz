@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, Animated, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Animated, Image } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,6 +18,7 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { useToast } from '@/hooks/useToast';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 
 // 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const getDefaultColor = () => COLORS.primary;
@@ -46,6 +48,8 @@ const AnimatedListItem = React.memo(({ children, index }: { children: React.Reac
 });
 
 const MyProverbBookDetail = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('myProverbBookDetail', false);
 	const navigation = useNavigation<any>();
 	const route = useRoute<any>();
 	const { bookId } = route.params as { bookId: string };
@@ -201,6 +205,7 @@ const MyProverbBookDetail = () => {
 					) : (
 						<View style={{ width: scaleWidth(28) }} />
 					)}
+					<CharacterGuideButton onPress={guide.open} />
 				</View>
 
 				{/* 요약 카드 */}
@@ -284,6 +289,16 @@ const MyProverbBookDetail = () => {
 			</Modal>
 
 			<ToastView />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'이 속담집에 담아둔 속담을 모아 보는 화면입니다.',
+					'속담을 누르면 뜻과 예문을 자세히 볼 수 있습니다.',
+					'편집을 누르면 담아둔 속담을 골라 뺄 수 있습니다!',
+				]}
+				title="속담집 상세, 이렇게 씁니다"
+			/>
 		</>
 	);
 };

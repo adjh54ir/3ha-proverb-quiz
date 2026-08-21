@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, ScrollView, StyleSheet, Animated, Easing } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Animated, Easing } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';

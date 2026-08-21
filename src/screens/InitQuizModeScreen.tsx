@@ -11,6 +11,7 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import FastImage from 'react-native-fast-image';
 import { QUIZ_MODES, getLevelByScore } from '@/const/ConstInfoData';
 import BottomHomeButton from './common/BottomHomeButton';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
 
 /** 모드별 설명 (카드 서브텍스트) */
 const MODE_DESC: Record<string, string> = {
@@ -25,6 +26,8 @@ const MODE_DESC: Record<string, string> = {
  * 퀴즈 모드 선택
  */
 const InitQuizModeScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('initQuizMode', false);
 	const navigation = useNavigation();
 	const USER_QUIZ_HISTORY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
@@ -83,6 +86,7 @@ const InitQuizModeScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.main} edges={['bottom']}>
+		<FloatingGuideButton onPress={guide.open} />
 			<View style={styles.container}>
 				<Animated.View style={[styles.animatedWrap, { opacity: enterAnim }]}>
 					<ScrollView ref={scrollRef} style={styles.scrollArea} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
@@ -183,6 +187,16 @@ const InitQuizModeScreen = () => {
 				</Animated.View>
 			</View>
 			<BottomHomeButton backgroundColor={COLORS.background} />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'풀어볼 퀴즈 모드를 고르는 화면입니다.',
+					'모드마다 문제가 나오는 방식이 다릅니다.',
+					'고른 뒤에는 난이도나 카테고리를 정하면 바로 시작합니다!',
+				]}
+				title="퀴즈 모드 고르기"
+			/>
 		</SafeAreaView>
 	);
 };

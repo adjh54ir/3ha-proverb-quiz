@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, Modal, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
@@ -8,6 +9,7 @@ import { BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
+import { getBadgeProgress, BadgeProgress } from '@/utils/BadgeProgressUtils';
 
 
 interface Props {
@@ -23,30 +25,52 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 	// 회전/폴더블 대응: 화면 크기가 바뀌면 컴포넌트가 다시 렌더된다.
 	const { width: screenWidth } = useWindowDimensions();
 	const backdrop = useRef(new Animated.Value(0)).current;
-	const scale = useRef(new Animated.Value(0.95)).current;
+	const scale = useRef(new Animated.Value(0.6)).current;
+	const translateY = useRef(new Animated.Value(40)).current;
 	const spin = useRef(new Animated.Value(0)).current;
 	const glow = useRef(new Animated.Value(0)).current;
 	const confettiRef = useRef<any>(null);
 	const confettiTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const [progress, setProgress] = useState<BadgeProgress | null>(null);
+
+	// 아직 못 얻은 뱃지만 진행도를 읽는다 — 이미 얻은 뱃지는 막대가 항상 100%라 알려 주는 게 없다
+	useEffect(() => {
+		if (!visible || !badge || isEarned) {
+			setProgress(null);
+			return;
+		}
+		let alive = true;
+		getBadgeProgress(badge.id).then((p) => {
+			if (alive) {
+				setProgress(p);
+			}
+		});
+		return () => {
+			alive = false;
+		};
+	}, [visible, badge, isEarned]);
 
 	useEffect(() => {
 		if (!visible) {
 			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
 			backdrop.setValue(0);
-			scale.setValue(0.95);
+			scale.setValue(0.6);
+			translateY.setValue(40);
 			spin.setValue(0);
 			glow.setValue(0);
 			return;
 		}
 		backdrop.setValue(0);
-		scale.setValue(0.95);
+		scale.setValue(0.6);
+		translateY.setValue(40);
 		spin.setValue(0);
 		glow.setValue(0);
 
-		// 진입: fade + scale
+		// 진입: 딤은 페이드, 카드는 아래에서 튀어 오르듯 스프링
 		const enter = Animated.parallel([
-			Animated.timing(backdrop, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(scale, { toValue: 1, duration: 250, useNativeDriver: true }),
+			Animated.timing(backdrop, { toValue: 1, duration: 220, useNativeDriver: true }),
+			Animated.spring(scale, { toValue: 1, friction: 6, tension: 90, useNativeDriver: true }),
+			Animated.spring(translateY, { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
 		]);
 		const spinLoop = Animated.loop(
 			Animated.timing(spin, { toValue: 1, duration: 6000, easing: Easing.linear, useNativeDriver: true }),
@@ -73,7 +97,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 				confettiTimer.current = null;
 			}
 		};
-	}, [visible, isEarned, backdrop, scale, spin, glow]);
+	}, [visible, isEarned, backdrop, scale, translateY, spin, glow]);
 
 	if (!badge) {return null;}
 
@@ -87,7 +111,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 			<Animated.View style={[styles.backdrop, { opacity: backdrop }]}>
 				<TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
 
-				<Animated.View style={[styles.card, { transform: [{ scale }] }]}>
+				<Animated.View style={[styles.card, { transform: [{ scale }, { translateY }] }]}>
 					{/* 헤더 - 단색 + 우하단 어두운 오버레이로 그라데이션 대체 */}
 					<View style={[styles.headerGrad, { backgroundColor: meta.color }]}>
 						<View style={[StyleSheet.absoluteFill, styles.headerOverlay]} />
@@ -114,7 +138,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 										{Array.from({ length: 8 }).map((_, i) => (
 											<View
 												key={i}
-												style={[styles.ray, { transform: [{ rotate: `${i * 45}deg` }, { translateY: -scaleWidth(36) }] }]}
+												style={[styles.ray, { transform: [{ rotate: `${i * 45}deg` }, { translateY: -scaleWidth(46) }] }]}
 											/>
 										))}
 									</Animated.View>
@@ -123,7 +147,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 									<IconComponent
 										type={badge.iconType}
 										name={isEarned ? badge.icon : 'lock'}
-										size={scaledSize(34)}
+										size={scaledSize(40)}
 										color={isEarned ? meta.color : COLORS.textLight}
 									/>
 								</View>
@@ -167,6 +191,33 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 								</View>
 							</View>
 						</View>
+
+						{!!progress && progress.goal > 0 && (
+							<View style={[styles.progressBlock, styles.sectionCard]}>
+								<View style={styles.progressHead}>
+									<Text style={styles.infoLabel}>획득 진행도</Text>
+									<Text style={[styles.progressValue, { color: meta.color }]}>
+										{Math.min(progress.current, progress.goal).toLocaleString()} / {progress.goal.toLocaleString()}
+									</Text>
+								</View>
+								<View style={styles.progressTrack}>
+									<View
+										style={[
+											styles.progressFill,
+											{
+												backgroundColor: meta.color,
+												width: `${Math.min(100, Math.round((progress.current / progress.goal) * 100))}%`,
+											},
+										]}
+									/>
+								</View>
+								<Text style={styles.progressLeft}>
+									{progress.current >= progress.goal
+										? '조건을 채웠습니다! 곧 지급됩니다.'
+										: `${(progress.goal - progress.current).toLocaleString()}${progress.unit} 더 하면 획득!`}
+								</Text>
+							</View>
+						)}
 
 						<View style={[styles.statusBanner, isEarned ? { backgroundColor: meta.soft } : styles.statusBannerLocked]}>
 							<IconComponent
@@ -257,42 +308,42 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	rarityPillText: { color: COLORS.textWhite, fontSize: FONT_SIZES.sm, fontWeight: '700', marginLeft: SPACING_W.xs },
 	iconStage: {
-		width: scaleWidth(98),
-		height: scaleWidth(98),
+		width: scaleWidth(120),
+		height: scaleWidth(120),
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginVertical: SPACING_H.xs,
 	},
 	glowCircle: {
 		position: 'absolute',
-		top: scaleWidth(4),
-		left: scaleWidth(4),
-		width: scaleWidth(90),
-		height: scaleWidth(90),
-		borderRadius: scaleWidth(90) / 2,
+		top: scaleWidth(5),
+		left: scaleWidth(5),
+		width: scaleWidth(110),
+		height: scaleWidth(110),
+		borderRadius: scaleWidth(110) / 2,
 	},
 	spinRing: {
 		position: 'absolute',
-		top: scaleWidth(4),
-		left: scaleWidth(4),
-		width: scaleWidth(90),
-		height: scaleWidth(90),
+		top: scaleWidth(5),
+		left: scaleWidth(5),
+		width: scaleWidth(110),
+		height: scaleWidth(110),
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 	ray: {
 		position: 'absolute',
-		top: scaleWidth(45) - scaleWidth(7),
-		left: scaleWidth(45) - scaleWidth(2),
+		top: scaleWidth(55) - scaleWidth(7),
+		left: scaleWidth(55) - scaleWidth(2),
 		width: scaleWidth(4),
-		height: scaleWidth(13),
+		height: scaleWidth(14),
 		borderRadius: scaleWidth(2),
 		backgroundColor: 'rgba(255,255,255,0.85)',
 	},
 	iconCircle: {
-		width: scaleWidth(68),
-		height: scaleWidth(68),
-		borderRadius: scaleWidth(68) / 2,
+		width: scaleWidth(82),
+		height: scaleWidth(82),
+		borderRadius: scaleWidth(82) / 2,
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,
@@ -356,6 +407,17 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 		paddingVertical: SPACING_H.md,
 	},
+	progressBlock: { rowGap: SPACING_H.sm },
+	progressHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+	progressValue: { fontSize: FONT_SIZES.smPlus, fontWeight: '700' },
+	progressTrack: {
+		height: scaleHeight(8),
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.surfaceAlt,
+		overflow: 'hidden',
+	},
+	progressFill: { height: '100%', borderRadius: RADIUS.round },
+	progressLeft: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
 	statusBannerLocked: { backgroundColor: COLORS.surfaceAlt },
 	statusText: { fontSize: FONT_SIZES.md, fontWeight: '600' },
 	closeBtn: {

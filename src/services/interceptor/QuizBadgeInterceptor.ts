@@ -10,19 +10,36 @@ export interface UserQuizHistory {
 	bestCombo?: number;
 }
 
+/**
+ * 레벨별 마스터 뱃지 매핑.
+ * 뱃지 상세의 진행도 표시도 이 값을 그대로 읽는다 — 지급 기준과 표시 기준이 갈라지지 않게 한 곳에 둔다.
+ */
+export const BADGE_LEVEL_META = [
+	{ level: '초급', badgeId: 'level_easy_1' },
+	{ level: '중급', badgeId: 'level_easy_2' },
+	{ level: '고급', badgeId: 'level_medium' },
+	{ level: '특급', badgeId: 'level_hard' },
+];
+
+/** 카테고리별 마스터 뱃지 매핑 (BADGE_LEVEL_META 와 같은 이유로 밖으로 뺀다) */
+export const BADGE_CATEGORY_META = [
+	{ category: '운/우연', badgeId: 'category_luck' },
+	{ category: '인간관계', badgeId: 'category_relation' },
+	{ category: '세상 이치', badgeId: 'category_life' },
+	{ category: '근면/검소', badgeId: 'category_diligence' },
+	{ category: '노력/성공', badgeId: 'category_effort' },
+	{ category: '경계/조심', badgeId: 'category_caution' },
+	{ category: '욕심/탐욕', badgeId: 'category_greed' },
+	{ category: '배신/불신', badgeId: 'category_betrayal' },
+];
+
 export const QuizBadgeInterceptor = (history: MainDataType.UserQuizHistory, allProverbs: MainDataType.Proverb[]): string[] => {
 	const newBadges: string[] = [];
 	const correctSet = new Set(history.correctProverbId);
 	const solvedSet = new Set([...(history.correctProverbId ?? []), ...(history.wrongProverbId ?? [])]);
 
 	// 레벨별 마스터 조건 (난이도별 속담 정복 여부)
-	const LEVEL_META = [
-		{ level: '초급', badgeId: 'level_easy_1' },
-		{ level: '중급', badgeId: 'level_easy_2' },
-		{ level: '고급', badgeId: 'level_medium' },
-		{ level: '특급', badgeId: 'level_hard' },
-	];
-	LEVEL_META.forEach(({ level, badgeId }) => {
+	BADGE_LEVEL_META.forEach(({ level, badgeId }) => {
 		const levelList = allProverbs.filter((p) => p.levelName === level);
 		const allSolved = levelList.length > 0 && levelList.every((p) => solvedSet.has(p.id));
 		if (!history.badges.includes(badgeId) && allSolved) {
@@ -31,17 +48,7 @@ export const QuizBadgeInterceptor = (history: MainDataType.UserQuizHistory, allP
 	});
 
 	// 카테고리별 마스터 뱃지 (정복한 주제)
-	const CATEGORY_META = [
-		{ category: '운/우연', badgeId: 'category_luck' },
-		{ category: '인간관계', badgeId: 'category_relation' },
-		{ category: '세상 이치', badgeId: 'category_life' },
-		{ category: '근면/검소', badgeId: 'category_diligence' },
-		{ category: '노력/성공', badgeId: 'category_effort' },
-		{ category: '경계/조심', badgeId: 'category_caution' },
-		{ category: '욕심/탐욕', badgeId: 'category_greed' },
-		{ category: '배신/불신', badgeId: 'category_betrayal' },
-	];
-	CATEGORY_META.forEach(({ category, badgeId }) => {
+	BADGE_CATEGORY_META.forEach(({ category, badgeId }) => {
 		const categoryList = allProverbs.filter((p) => p.category === category);
 		const allSolved = categoryList.length > 0 && categoryList.every((p) => solvedSet.has(p.id));
 		if (!history.badges.includes(badgeId) && allSolved) {

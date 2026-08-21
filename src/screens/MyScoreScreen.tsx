@@ -44,6 +44,7 @@ import LevelModal from './modal/LevelModal';
 import { FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { getLevelColor } from '@/screens/common/CommonProverbModule';
 import DateUtils from '@/utils/DateUtils';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
 
 interface TodayQuizList {
 	quizDate: string;
@@ -175,6 +176,8 @@ const ConquerHeader = ({
 );
 
 const MyScoreScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('myScore', false);
 	const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 	const isFocused = useIsFocused();
 	const scrollRef = useRef<ScrollView>(null);
@@ -570,6 +573,7 @@ const MyScoreScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['top']}>
+		<FloatingGuideButton onPress={guide.open} />
 			<ScrollView
 				ref={scrollRef}
 				style={styles.container}
@@ -584,17 +588,6 @@ const MyScoreScreen = () => {
 						progressBackgroundColor={COLORS.surface}
 					/>}>
 				<View style={styles.sectionBox}>
-					<View style={styles.activityHero}>
-						<View style={styles.activityHeroCopy}>
-							<Text style={styles.activityHeroTitle}>배운 만큼 지혜가 쌓였습니다</Text>
-							<Text style={styles.activityHeroDescription}>오늘의 기록과 지금까지의 성장을 확인해보세요.</Text>
-						</View>
-						<FastImage
-							source={require('@/assets/images/screen-heroes/activity-achievement.png')}
-							style={styles.activityHeroImage}
-							resizeMode={FastImage.resizeMode.contain}
-						/>
-					</View>
 					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginTop: SPACING_H.mdPlus, marginBottom: scaleHeight(-8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
 						{/* ✅ 홈화면과 동일한 캐릭터/펫 배치 구조 (래퍼 높이 축소로 타이틀과 밀착) */}
 						<View style={{ width: scaleWidth(180), height: scaleWidth(150), alignItems: 'center', justifyContent: 'center' }}>
@@ -647,7 +640,7 @@ const MyScoreScreen = () => {
 						</View>
 
 						<View style={styles.scoreBadge}>
-							<IconComponent name="leaderboard" type="materialIcons" size={scaledSize(14)} color={COLORS.textWhite} />
+							<IconComponent name="leaderboard" type="materialIcons" size={scaledSize(13)} color={COLORS.textWhite} />
 							<Text style={styles.scoreBadgeText}>{totalScore.toLocaleString()}점</Text>
 						</View>
 					</View>
@@ -689,7 +682,7 @@ const MyScoreScreen = () => {
 							<View style={styles.scoreDashHeader}>
 								<View style={styles.scoreDashTitleRow}>
 									<View style={styles.scoreDashIconChip}>
-										<IconComponent type="materialIcons" name="insights" size={scaledSize(16)} color={COLORS.textWhite} />
+										<IconComponent type="materialIcons" name="insights" size={scaledSize(14)} color={COLORS.textWhite} />
 									</View>
 									<Text style={styles.scoreDashTitle}>전체 스코어</Text>
 								</View>
@@ -718,7 +711,7 @@ const MyScoreScreen = () => {
 										]}>
 										<View style={styles.scoreDashTileTop}>
 											<View style={[styles.scoreDashTileIcon, { backgroundColor: m.soft }]}>
-												<IconComponent type="materialIcons" name={m.icon} size={scaledSize(15)} color={m.color} />
+												<IconComponent type="materialIcons" name={m.icon} size={scaledSize(13)} color={m.color} />
 											</View>
 											<Text style={styles.scoreDashTileLabel}>{m.label}</Text>
 										</View>
@@ -1466,6 +1459,16 @@ const MyScoreScreen = () => {
 					<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color={COLORS.textWhite} />
 				</TouchableOpacity>
 			)}
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'나의 활동에서는 지금까지의 기록을 모아서 볼 수 있습니다.',
+					'전체 스코어로 학습 진척도와 정답률을 한눈에 확인하세요.',
+					'뱃지를 누르면 획득 조건과 상세 설명이 나옵니다!',
+				]}
+				title="나의 활동, 이렇게 봅니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -1563,22 +1566,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
-	activityHero: {
-		minHeight: scaleHeight(118),
-		marginBottom: SPACING_H.md,
-		paddingLeft: SPACING_W.lg,
-		backgroundColor: HERO.bg,
-		borderTopWidth: 3,
-		borderTopColor: HERO.accent,
-		borderRadius: RADIUS.lg,
-		flexDirection: 'row',
-		alignItems: 'center',
-		overflow: 'hidden',
-	},
-	activityHeroCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
-	activityHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
-	activityHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
-	activityHeroImage: { width: scaleWidth(142), height: scaleHeight(112), marginRight: scaleWidth(-8) },
 	scoreDashCard: {
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.lg,
@@ -1595,14 +1582,14 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	scoreDashTitleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm },
 	scoreDashIconChip: {
-		width: scaleWidth(28),
-		height: scaleWidth(28),
-		borderRadius: scaleWidth(9),
+		width: scaleWidth(24),
+		height: scaleWidth(24),
+		borderRadius: scaleWidth(8),
 		backgroundColor: COLORS.primary,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	scoreDashTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong },
+	scoreDashTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.textStrong },
 	scoreDashScorePill: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -1612,26 +1599,27 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.xs,
 	},
-	scoreDashScoreText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.warningDark },
-	scoreDashGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: SPACING_H.md },
+	scoreDashScoreText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.warningDark },
+	scoreDashGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: SPACING_H.sm },
 	scoreDashTile: {
 		width: '48%',
 		backgroundColor: COLORS.background,
 		borderRadius: RADIUS.md,
-		padding: SPACING_W.md,
+		paddingHorizontal: SPACING_W.smPlus,
+		paddingVertical: SPACING_H.smPlus,
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
-	scoreDashTileTop: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm, marginBottom: SPACING_H.sm },
+	scoreDashTileTop: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.xsPlus, marginBottom: SPACING_H.xs },
 	scoreDashTileIcon: {
-		width: scaleWidth(26),
-		height: scaleWidth(26),
-		borderRadius: scaleWidth(8),
+		width: scaleWidth(22),
+		height: scaleWidth(22),
+		borderRadius: scaleWidth(7),
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 	scoreDashTileLabel: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, flexShrink: 1 },
-	scoreDashTileValue: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
+	scoreDashTileValue: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.xs },
 	scoreDashBarTrack: {
 		height: scaleHeight(6),
 		borderRadius: scaleWidth(3),
@@ -2184,13 +2172,13 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: COLORS.primary,
 		borderRadius: RADIUS.round,
-		paddingHorizontal: SPACING_W.lg,
-		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
 		marginBottom: SPACING_H.md,
 	},
 	scoreBadgeText: {
 		color: COLORS.textWhite,
-		fontSize: FONT_SIZES.title,
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		marginLeft: SPACING_W.xsPlus,
 	},

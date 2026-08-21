@@ -2,13 +2,14 @@
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Animated, Image, KeyboardAvoidingView, Keyboard, Platform, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Animated, Image, KeyboardAvoidingView, Keyboard, Platform, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import BookFormModal from './modal/BookFormModal';
@@ -19,6 +20,7 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import DateUtils from '@/utils/DateUtils';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 
 // 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const getDefaultColor = () => COLORS.primary;
@@ -54,6 +56,8 @@ const AnimatedListItem = React.memo(({ children, index }: { children: React.Reac
 });
 
 const MyProverbBook = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('myProverbBook', false);
 	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
 	const handoff = useModalHandoff();
 	const navigation = useNavigation<any>();
@@ -196,17 +200,11 @@ const MyProverbBook = () => {
 					) : (
 						<View style={{ width: scaleWidth(22) }} />
 					)}
+					<CharacterGuideButton onPress={guide.open} />
 				</View>
 
 				{books.length > 0 && (
 					<View style={styles.filterContainer}>
-						<View style={styles.libraryHero}>
-							<View style={styles.libraryHeroCopy}>
-								<Text style={styles.libraryHeroTitle}>나만의 지혜 책장을 채워보세요</Text>
-								<Text style={styles.libraryHeroDescription}>마음에 드는 속담을 주제별로 모을 수 있습니다.</Text>
-							</View>
-							<Image source={require('@/assets/images/screen-heroes/proverb-library.png')} style={styles.libraryHeroImage} resizeMode="contain" />
-						</View>
 						<View style={styles.searchBox}>
 							<IconComponent type="materialIcons" name="search" size={scaledSize(18)} color={COLORS.textLight} />
 							<TextInput style={styles.searchInput} placeholder="속담집 이름 또는 초성 검색" placeholderTextColor={COLORS.textLight} value={searchQuery} onChangeText={setSearchQuery} returnKeyType="search" />
@@ -393,6 +391,16 @@ const MyProverbBook = () => {
 					</TouchableOpacity>
 				</TouchableOpacity>
 			</Modal>
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'마음에 드는 속담을 주제별로 묶어 보관하는 곳입니다.',
+					'속담집을 만들고, 원하는 속담을 담아둘 수 있습니다.',
+					'속담집을 누르면 담아둔 속담을 모아서 볼 수 있습니다!',
+				]}
+				title="나만의 속담집, 이렇게 씁니다"
+			/>
 		</>
 	);
 };
@@ -423,22 +431,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	headerCountBadgeText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.secondary },
 	filterContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, backgroundColor: COLORS.background },
-	libraryHero: {
-		minHeight: scaleHeight(112),
-		marginBottom: SPACING_H.md,
-		paddingLeft: SPACING_W.lg,
-		backgroundColor: HERO.bg,
-		borderTopWidth: 3,
-		borderTopColor: HERO.accent,
-		borderRadius: RADIUS.lg,
-		flexDirection: 'row',
-		alignItems: 'center',
-		overflow: 'hidden',
-	},
-	libraryHeroCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
-	libraryHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
-	libraryHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
-	libraryHeroImage: { width: scaleWidth(136), height: scaleHeight(108), marginRight: scaleWidth(-6) },
 	searchBox: {
 		flexDirection: 'row',
 		alignItems: 'center',

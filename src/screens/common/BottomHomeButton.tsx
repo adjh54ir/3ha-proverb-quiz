@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { useNavigation } from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';

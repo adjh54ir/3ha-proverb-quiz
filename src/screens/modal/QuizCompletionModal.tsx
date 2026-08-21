@@ -3,14 +3,8 @@
 import { scaleWidth, scaleHeight, scaledSize, screenWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import React, { useRef, useEffect } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    Modal,
-    TouchableOpacity,
-    Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import IconComponent from '../common/atomic/IconComponent';

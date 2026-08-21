@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Image, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Image } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,6 +13,7 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
 
 // 규칙 한 줄 행 (아이콘 + 한 줄 텍스트)
 const RuleRow = ({ iconType, iconName, iconColor, chipColor, text }: { iconType: string; iconName: string; iconColor: string; chipColor: string; text: string }) => (
@@ -26,6 +28,8 @@ const RuleRow = ({ iconType, iconName, iconColor, chipColor, text }: { iconType:
 );
 
 const InitTimeChallengeScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('initTimeChallenge', false);
 	const STORAGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 	const navigation = useNavigation();
 	const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -172,6 +176,7 @@ const InitTimeChallengeScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.container} edges={['bottom']}>
+		<FloatingGuideButton onPress={guide.open} />
 			<Animated.View style={[styles.contentWrapper, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
 				<ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
 					{/* 🎯 대표 이미지 영역 */}
@@ -343,6 +348,16 @@ const InitTimeChallengeScreen = () => {
 					}}
 				/>
 			)}
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'타임 챌린지는 제한 시간 안에 최대한 많이 맞히는 도전입니다.',
+					'오답이 쌓이면 하트가 줄고, 하트가 없으면 종료됩니다.',
+					'규칙을 확인했다면 아래 버튼으로 도전을 시작하세요!',
+				]}
+				title="타임 챌린지 준비하기"
+			/>
 		</SafeAreaView>
 	);
 };

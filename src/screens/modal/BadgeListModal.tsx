@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import IconComponent from '../common/atomic/IconComponent';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';

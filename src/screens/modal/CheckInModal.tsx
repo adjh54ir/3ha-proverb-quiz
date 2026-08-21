@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef } from 'react';
-import { View, Modal, Text, ScrollView, StyleSheet, Animated } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Animated } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { Calendar } from 'react-native-calendars';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';

@@ -4,7 +4,8 @@
 /* eslint-disable curly */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Animated, FlatList, Modal, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Animated, FlatList, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import ProverbServices from '@/services/ProverbServices';
@@ -33,6 +34,7 @@ import { playCorrect, playWrong, playTimeout, playTick, playWhoosh, playFinish }
 import { startBgm, stopBgm } from '@/utils/BgmUtils';
 import { toggleFavorite } from '@/utils/favoriteUtils';
 import DateUtils from '@/utils/DateUtils';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const labelColors = themedValue(() => [COLORS.secondary, COLORS.primary, COLORS.accentTeal, COLORS.accentFlame]); // A, B, C, D 보기 라벨
@@ -111,6 +113,8 @@ const QuizScreen = () => {
 	const [showExitModal, setShowExitModal] = useState<boolean>(false);
 	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
 	const [showHintModal, setShowHintModal] = useState(false);
+	// 진행 중인 퀴즈를 가로막지 않도록 자동 노출은 끄고, 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('quiz', false);
 	const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
 	const [hintAdWatchedQuestionId, setHintAdWatchedQuestionId] = useState<number | null>(null);
 
@@ -215,6 +219,17 @@ const QuizScreen = () => {
 			}
 		}
 	}, [showHintModal]);
+	// 안내가 열려 있는 동안에도 타이머를 멈춘다(힌트 모달과 같은 규칙)
+	useEffect(() => {
+		if (guide.visible) {
+			if (timerRef.current) {
+				clearInterval(timerRef.current);
+				timerRef.current = null;
+			}
+		} else if (question && !selected) {
+			startTimer();
+		}
+	}, [guide.visible]); // eslint-disable-line react-hooks/exhaustive-deps
 	useEffect(() => {
 		if (quizHistory) setTotalScore(quizHistory.totalScore ?? 0);
 	}, [quizHistory]);
@@ -935,6 +950,7 @@ const QuizScreen = () => {
 									)}
 									</View>
 									<FastImage source={require('@/assets/images/screen-heroes/quiz-coach.png')} style={styles.quizCoachImage} resizeMode="contain" />
+									<CharacterGuideButton onPress={guide.open} />
 								</View>
 
 								<View style={styles.progressBarWrapper}>
@@ -1283,6 +1299,16 @@ const QuizScreen = () => {
 					}}
 				/>
 			)}
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'문제를 읽고 아래 보기 중 알맞은 것을 고르면 됩니다.',
+					'시간이 다 되기 전에 답을 고르세요. 안내를 보는 동안에는 시간이 멈춥니다.',
+					'막히면 힌트 버튼을 눌러 실마리를 얻을 수 있습니다!',
+				]}
+				title="퀴즈, 이렇게 풉니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -1314,7 +1340,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
-	quizHeaderRow: { minHeight: scaleHeight(64), flexDirection: 'row', alignItems: 'center' },
+	quizHeaderRow: { minHeight: scaleHeight(64), flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
 	quizHeaderCopy: { flex: 1 },
 	quizCoachImage: { width: scaleWidth(72), height: scaleHeight(66), marginTop: scaleHeight(-6) },
 	progressText: {

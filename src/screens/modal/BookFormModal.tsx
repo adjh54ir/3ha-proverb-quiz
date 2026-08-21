@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Image, Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Animated, Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { Modal, View, Text, ScrollView, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { MainDataType } from '@/types/MainDataType';

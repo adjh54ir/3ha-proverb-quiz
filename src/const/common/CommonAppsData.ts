@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 import { CommonType } from '@/types/CommonType';
 
 export const COMMON_APPS_DATA: {
@@ -5,11 +7,39 @@ export const COMMON_APPS_DATA: {
 } = {
 	Apps: [
 		{
+			id: 23,
+			icon: require('@/assets/appicons/main_hanpick.png'),
+			title: '한자 급수 퀴즈',
+			desc: '한자 급수 퀴즈는 한국어문회·한자교육진흥회 급수별 배정한자 6,182자를 훈음·부수·총획 퀴즈로 익히는 한자 급수 학습 앱입니다.',
+			category: 'quiz',
+			android: '',
+			ios: 'https://apps.apple.com/us/app/id6801430351',
+		},
+		{
+			id: 22,
+			icon: require('@/assets/appicons/main_vaulty.png'),
+			title: 'PhotoLock',
+			desc: '숨기고 싶은 사진과 영상을 갤러리에서 숨기고 PIN·지문으로 잠그는 프라이빗 보관함 앱입니다.',
+			category: 'utility',
+			android: 'https://play.google.com/store/apps/details?id=com.tha.picturevault',
+			ios: 'https://apps.apple.com/kr/app/id6789028942',
+		},
+		{
+			id: 21,
+			icon: require('@/assets/appicons/main_mindCare.png'),
+			title: '마음:숲',
+			desc:
+				'감정 기록, 마음 나무 키우기, 스트레스 해소 도구, 힐링 사운드와 호흡 명상으로 지친 하루의 마음을 돌보는 앱입니다',
+			category: 'utility',
+			android: 'https://play.google.com/store/apps/details?id=com.tha.metalcare',
+			ios: 'https://apps.apple.com/us/app/id6787877075',
+		},
+		{
 			id: 20,
 			icon: require('@/assets/appicons/main_financeCalc.png'),
 			title: '나만의 생활 금융 계산기',
 			desc: '예금·적금·대출·연봉 등 생활 속 금융 계산을 한곳에서 빠르고 간편하게 해결할 수 있는 생활금융 계산기 앱.',
-			category: 'quiz',
+			category: 'calculator',
 			android: 'https://play.google.com/store/apps/details?id=com.tha.lifefinancecalc',
 			ios: 'https://apps.apple.com/us/app/id6759258758',
 		},
@@ -44,7 +74,7 @@ export const COMMON_APPS_DATA: {
 			id: 16,
 			icon: require('@/assets/appicons/main_emotionalEmoticon.png'),
 			title: '갬티콘: 감성 이모티콘',
-			desc: '2,000개 이상의 텍스트 이모티콘이 기다리고 있습니다. 탭 한 번으로 바로 복사, 어디서든 바로 붙여넣기를 해보세요!',
+			desc: '2,000개 이상의 텍스트 이모티콘이 기다리고 있어요. 탭 한 번으로 바로 복사, 어디서든 바로 붙여넣기를 해보세요!',
 			category: 'utility',
 			android: 'https://play.google.com/store/apps/details?id=com.tha.emotionalemoticon',
 			ios: 'https://apps.apple.com/us/app/id6760441156',
@@ -194,3 +224,11 @@ export const COMMON_APPS_DATA: {
 		},
 	],
 };
+
+/**
+ * 지금 기기에서 열 수 있는 스토어 주소. 없으면 null.
+ * 반대 플랫폼 링크로 대체하지 않는다 — 한쪽에만 출시된 앱(HanPick)에서 안드로이드 사용자를
+ * 앱스토어 페이지로 보내면 설치가 아예 불가능한 화면만 보게 된다.
+ */
+export const appStoreUrl = (app: CommonType.AppItem): string | null =>
+	(Platform.OS === 'android' ? app.android : app.ios) || null;

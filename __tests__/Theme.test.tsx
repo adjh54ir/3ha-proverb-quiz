@@ -1,6 +1,6 @@
 /**
  * 다크모드 토큰 회귀 테스트
- * - COLORS 는 현재 모드를 따라가는 Proxy 여야 한다.
+ * - COLORS 는 현재 모드를 따라가는 라이브 객체여야 한다.
  * - themedStyles 로 감싼 스타일시트는 모드별로 다시 만들어져야 한다.
  * - 다크 팔레트는 라이트와 같은 키를 하나도 빠짐없이 가져야 한다(누락 시 undefined 색상 발생).
  */
@@ -119,4 +119,21 @@ test('themedStyles 는 글자 크기 모드가 바뀌어도 다시 만들어진�
 	expect(styles.label.fontSize).toBeGreaterThan(base);
 	setTextSizeMode('default');
 	expect(styles.label.fontSize).toBe(base);
+});
+
+test('스타일 객체를 Object.freeze 해도 값이 계속 모드를 따라간다 (RN 개발 모드 회귀)', () => {
+	// RN 은 __DEV__ 에서 StyleSheet 의 스타일 객체를 Object.freeze 한다.
+	// 예전엔 이 값들이 Proxy 라서 얼리는 순간 불변식이 깨지며
+	// "trap result is configurable but target property is non-configurable" 로 <Text> 렌더가 죽었다.
+	const defaultTextStyle = themedValue(() => ({ fontSize: FONT_SIZES.md, color: COLORS.text }));
+
+	expect(() => Object.freeze(defaultTextStyle)).not.toThrow();
+	expect(() => Object.keys(defaultTextStyle)).not.toThrow();
+	expect(StyleSheet.flatten([defaultTextStyle]).color).toBe(PALETTES.light.text);
+
+	setThemeMode('dark');
+	expect(StyleSheet.flatten([defaultTextStyle]).color).toBe(PALETTES.dark.text);
+
+	expect(() => Object.freeze(COLORS)).not.toThrow();
+	expect(COLORS.text).toBe(PALETTES.dark.text);
 });

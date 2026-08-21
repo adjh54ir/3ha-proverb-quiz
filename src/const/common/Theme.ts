@@ -298,20 +298,32 @@ export const setTextSizeMode = (mode: TextSizeMode): void => {
  */
 export const getPickerTheme = (): 'LIGHT' | 'DARK' => (activeMode === 'dark' ? 'DARK' : 'LIGHT');
 
-/** 현재 모드의 팔레트를 매 접근마다 읽어오는 Proxy 를 만든다. */
+/**
+ * '읽을 때마다 현재 모드 값을 돌려주는' 객체를 만든다.
+ *
+ * ⚠️ Proxy 를 쓰면 안 된다.
+ *    RN/React 는 스타일 객체를 개발 모드에서 `Object.freeze` 하는데(StyleSheet.create 등),
+ *    프록시가 얼려지면 빈 타깃에 non-configurable 속성이 박히고 그 뒤로
+ *    getOwnPropertyDescriptor 트랩 결과와 어긋나 프록시 불변식이 깨진다.
+ *    → "trap result is configurable but target property is non-configurable" 로
+ *      <Text> 렌더가 통째로 죽는다(전역 기본 텍스트 스타일이 이 경로를 탄다).
+ *    getter 를 가진 '진짜 객체' 는 얼려도 값이 계속 살아 있어 안전하다.
+ */
+const defineLive = <T extends object>(keys: Array<string | symbol>, read: (key: string | symbol) => any, base: any = {}): T => {
+	for (const key of keys) {
+		Object.defineProperty(base, key, {
+			get: () => read(key),
+			enumerable: true,
+			configurable: true,
+		});
+	}
+	return base as T;
+};
+
+/** 현재 모드의 팔레트를 매 접근마다 읽어오는 객체를 만든다. */
 const createLivePalette = <T extends object>(read: (palette: AppColors) => T): T =>
-	new Proxy({} as T, {
-		get: (_target, key) => (read(PALETTES[activeMode]) as any)[key],
-		has: (_target, key) => key in read(PALETTES[activeMode]),
-		ownKeys: () => Reflect.ownKeys(read(PALETTES[activeMode])),
-		getOwnPropertyDescriptor: (_target, key) => {
-			const source = read(PALETTES[activeMode]) as any;
-			if (!(key in source)) {
-				return undefined;
-			}
-			return { value: source[key], enumerable: true, configurable: true, writable: false };
-		},
-	});
+	// 라이트/다크 팔레트는 키가 동일하므로(AppColors 타입이 강제) 라이트 기준으로 키를 뽑는다.
+	defineLive<T>(Reflect.ownKeys(read(PALETTES.light)), (key) => (read(PALETTES[activeMode]) as any)[key]);
 
 /**
  * 색상 토큰. 현재 모드의 값을 읽어오는 Proxy 이므로 렌더 중 접근하면 항상 최신값이다.
@@ -357,15 +369,12 @@ export const themedValue = <T extends object>(factory: () => T): T => {
 	};
 
 	// 배열이면 배열 타깃이어야 Array.prototype 메서드/스프레드가 정상 동작한다.
-	const target: any = Array.isArray(seed) ? [] : {};
+	// (인덱스를 defineProperty 로 넣으면 length 는 자동으로 따라 늘어난다)
+	const isArray = Array.isArray(seed);
+	const keys = Reflect.ownKeys(seed).filter((key) => !(isArray && key === 'length'));
 
-	return new Proxy(target, {
-		get: (_target, key) => resolve()[key],
-		has: (_target, key) => key in resolve(),
-		ownKeys: () => Reflect.ownKeys(resolve()),
-		// 실제 값의 디스크립터를 그대로 넘겨야 배열 length 같은 non-configurable 속성에서 안전하다.
-		getOwnPropertyDescriptor: (_target, key) => Reflect.getOwnPropertyDescriptor(resolve(), key),
-	});
+	// Proxy 가 아니라 getter 객체로 만든다 — 이유는 defineLive 주석 참고.
+	return defineLive<T>(keys, (key) => resolve()[key], isArray ? [] : {});
 };
 
 /**
@@ -410,15 +419,10 @@ const BASE_FONT_SIZES = {
  * 글자 크기 모드가 반영된 폰트 토큰.
  * COLORS 와 같은 방식의 Proxy 라 렌더 시점 배율로 읽힌다(모듈 상수에 담아두면 굳는다).
  */
-export const FONT_SIZES: Record<keyof typeof BASE_FONT_SIZES, number> = new Proxy({} as any, {
-	get: (_t, key: string) => scaledSize((BASE_FONT_SIZES as any)[key] * TEXT_SIZE_FACTOR[activeTextSize]),
-	has: (_t, key) => key in BASE_FONT_SIZES,
-	ownKeys: () => Reflect.ownKeys(BASE_FONT_SIZES),
-	getOwnPropertyDescriptor: (_t, key: string) =>
-		key in BASE_FONT_SIZES
-			? { value: scaledSize((BASE_FONT_SIZES as any)[key] * TEXT_SIZE_FACTOR[activeTextSize]), enumerable: true, configurable: true, writable: false }
-			: undefined,
-});
+export const FONT_SIZES: Record<keyof typeof BASE_FONT_SIZES, number> = defineLive(
+	Reflect.ownKeys(BASE_FONT_SIZES),
+	(key) => scaledSize((BASE_FONT_SIZES as any)[key] * TEXT_SIZE_FACTOR[activeTextSize]),
+);
 
 /** 공통 radius 토큰 */
 export const RADIUS = {

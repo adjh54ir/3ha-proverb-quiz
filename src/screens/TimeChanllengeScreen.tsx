@@ -8,9 +8,8 @@ import IconComponent from './common/atomic/IconComponent';
 import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TimeChallengeInterceptor } from '@/services/interceptor/TimeChanllengeInterceptor';
 import AnimatedNumbers from 'react-native-animated-numbers';
 import ConfettiCannon from 'react-native-confetti-cannon';
@@ -22,6 +21,9 @@ import { playCorrect, playWrong, playCombo, playTick, playWhoosh, playFinish } f
 import { startBgm, stopBgm, pauseBgm, resumeBgm } from '@/utils/BgmUtils';
 import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
+import { useAppNavigation } from '@/navigation/conf/Types';
+import { update } from '@/services/StorageService';
 
 const MAX_LIVES = 5;
 const CHOICE_COUNT = 4;
@@ -65,7 +67,7 @@ const getShuffledChoices = (correct: string, allMeanings: string[]) => {
 const InfinityQuizScreen = () => {
 	const TIME_CHALLENGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 
-	const navigation = useNavigation();
+	const navigation = useAppNavigation();
 	const isFocused = useIsFocused();
 
 	const scrollViewRef = useRef<ScrollView>(null);
@@ -349,14 +351,8 @@ const InfinityQuizScreen = () => {
 	})();
 
 	const saveChallengeResultToStorage = async (result: MainDataType.TimeChallengeResult) => {
-		try {
-			const existingData = await AsyncStorage.getItem(TIME_CHALLENGE_KEY);
-			const history: MainDataType.TimeChallengeHistory = existingData ? JSON.parse(existingData) : [];
-			const updated = [result, ...history]; // 최근 기록을 맨 앞에
-			await AsyncStorage.setItem(TIME_CHALLENGE_KEY, JSON.stringify(updated));
-		} catch (e) {
-			console.error('⚠️ Failed to save TimeChallenge result', e);
-		}
+		// 최근 기록을 맨 앞에 — update 라 다른 저장과 겹쳐도 기록이 사라지지 않는다
+		await update<MainDataType.TimeChallengeHistory>(TIME_CHALLENGE_KEY, [], (history) => [result, ...history]);
 	};
 
 	const animateScale = () => {
@@ -890,8 +886,7 @@ const InfinityQuizScreen = () => {
 										style={[styles.resultBtn, styles.resultBtnSecondary]}
 										activeOpacity={0.85}
 										onPress={() => {
-											//@ts-ignore
-											navigation.navigate(Paths.INIT_TIME_CHANLLENGE); // 실제 경로로 변경
+											navigation.navigate(Paths.INIT_TIME_CHANLLENGE);
 										}}>
 										<IconComponent
 											name="bar-chart"
@@ -1057,7 +1052,7 @@ const InfinityQuizScreen = () => {
 									<View
 										style={[
 											styles.choiceLabelBadge,
-											{ backgroundColor: labelColors[index] + '1A', borderColor: labelColors[index] + '55' },
+											{ backgroundColor: withAlpha(labelColors[index], ALPHA.faint), borderColor: withAlpha(labelColors[index], ALPHA.border) },
 										]}>
 										<Text style={[styles.choiceLabelText, { color: labelColors[index] }]}>{String.fromCharCode(65 + index)}</Text>
 									</View>
@@ -1200,7 +1195,6 @@ const InfinityQuizScreen = () => {
 									onPress={() => {
 										setShowExitModal(false);
 										setIsPaused(false); // 상태 초기화
-										//@ts-ignore
 										navigation.replace(Paths.MAIN_TAB, { screen: Paths.HOME });
 									}}>
 									<Text style={styles.modalButtonText}>종료하기</Text>
@@ -1230,7 +1224,7 @@ const InfinityQuizScreen = () => {
 
 			{/* 최하단에 위치할것!! */}
 			{showScrollTop && (
-				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop} activeOpacity={0.85}>
+				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop} activeOpacity={0.85} hitSlop={HIT_SLOP}>
 					<IconComponent type="MaterialIcons" name="arrow-upward" size={scaledSize(24)} color={COLORS.textWhite} />
 				</TouchableOpacity>
 			)}

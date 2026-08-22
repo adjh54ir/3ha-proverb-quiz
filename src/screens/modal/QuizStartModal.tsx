@@ -6,6 +6,7 @@ import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '
 import IconComponent from '../common/atomic/IconComponent';
 import { isSoundEnabled, setSoundEnabled } from '@/utils/SoundUtils';
 import { isBgmEnabled, setBgmEnabled, startBgm, stopBgm, BgmTrack } from '@/utils/BgmUtils';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
 export type QuizStartMode = 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' | 'arrange';
 
@@ -46,9 +47,8 @@ const QuizStartModal = ({
 	onStart,
 	onBack,
 }: Props) => {
-	// ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
-	const scaleAnim = useRef(new Animated.Value(0.95)).current;
-	const opacityAnim = useRef(new Animated.Value(0)).current;
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(visible);
 	const meta = MODE_META[mode] ?? MODE_META.meaning;
 	// 시작 전에 소리 설정을 바로 바꿀 수 있게 — 설정 화면까지 나갔다 오지 않아도 된다
 	const [sfxOn, setSfxOn] = useState(isSoundEnabled());
@@ -78,23 +78,6 @@ const QuizStartModal = ({
 		}
 	};
 
-	useEffect(() => {
-		if (!visible) {
-			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-			scaleAnim.setValue(0.95);
-			opacityAnim.setValue(0);
-			return;
-		}
-		scaleAnim.setValue(0.95);
-		opacityAnim.setValue(0);
-		const anim = Animated.parallel([
-			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(opacityAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-		]);
-		anim.start();
-		return () => anim.stop();
-	}, [visible, scaleAnim, opacityAnim]);
-
 	if (!visible) {
 		return null;
 	}
@@ -115,7 +98,7 @@ const QuizStartModal = ({
 	return (
 		<Modal visible transparent animationType="fade" onRequestClose={onBack}>
 			<View style={styles.overlay}>
-				<Animated.View style={[styles.card, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
+				<Animated.View style={[styles.card, enterStyle]}>
 					<Image source={require('@/assets/images/home-mascot-moments/mascot-challenge-final.png')} style={styles.headerMascot} resizeMode="contain" />
 
 					<Text style={styles.title}>{meta.title}</Text>

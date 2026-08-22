@@ -81,7 +81,7 @@ const styles = themedStyles(() => StyleSheet.create({
         backgroundColor: COLORS.dim,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: SPACING_W.xxl,
+        paddingHorizontal: SPACING_W.lg,
         paddingVertical: SPACING_H.xxl,
     },
     container: {

@@ -4,13 +4,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import {useRoute, RouteProp} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import { Paths } from '@/navigation/conf/Paths';
 import { generateTowerQuiz, TowerQuizQuestion } from '@/const/ConstTowerQuizData';
@@ -21,6 +20,9 @@ import DateUtils from '@/utils/DateUtils';
 import { playCorrect, playWrong, playWhoosh, playFinish } from '@/utils/SoundUtils';
 import { startBgm, stopBgm } from '@/utils/BgmUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
+import { useAppNavigation } from '@/navigation/conf/Types';
+import { read, write } from '@/services/StorageService';
 
 const TOWER_STORAGE_KEY = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
 
@@ -41,7 +43,7 @@ type RouteParams = {
 const TowerQuizScreen = () => {
 	// 진행 중인 도전을 가로막지 않도록 자동 노출은 끄고, 물음표 버튼으로만 연다
 	const guide = useCharacterGuideOnce('towerQuiz', false);
-	const navigation = useNavigation();
+	const navigation = useAppNavigation();
 	const route = useRoute<RouteProp<RouteParams, 'TowerQuiz'>>();
 	const level = route.params?.level || 1; // number (TOWER_LEVELS 기준)
 	const proverbLevel = TOWER_LEVEL_MAP[level] ?? 1; // generateTowerQuiz용 난이도(number)
@@ -187,9 +189,8 @@ const TowerQuizScreen = () => {
 
 	const loadProgress = async () => {
 		try {
-			const saved = await AsyncStorage.getItem(TOWER_STORAGE_KEY);
-			if (saved) {
-				const parsed = JSON.parse(saved);
+			const parsed = await read<TowerProgress | null>(TOWER_STORAGE_KEY, null);
+			if (parsed) {
 				const today = DateUtils.getLocalDateString();
 				// SettingScreen 초기화가 ISO 타임스탬프로 저장하는 경우가 있어 로컬 날짜 키로 정규화 후 비교
 				if (DateUtils.toLocalDateKey(parsed.lastAttemptDate) !== today) {
@@ -208,7 +209,7 @@ const TowerQuizScreen = () => {
 
 	const saveProgress = async (newProgress: TowerProgress) => {
 		try {
-			await AsyncStorage.setItem(TOWER_STORAGE_KEY, JSON.stringify(newProgress));
+			await write(TOWER_STORAGE_KEY, newProgress);
 			setProgress(newProgress);
 		} catch (error) {
 			console.error('진행 상황 저장 실패:', error);
@@ -332,8 +333,8 @@ const TowerQuizScreen = () => {
 
 	const handleNextLevel = () => {
 		setShowResultModal(false);
-		//@ts-ignore
-		navigation.replace(Paths.TOWER_CHANLLENGE, { level: level + 1 });
+		// 다음 단계는 저장된 진행도로 판단하므로 파라미터를 넘기지 않는다.
+		navigation.replace(Paths.TOWER_CHANLLENGE);
 	};
 
 	const handleExit = () => {
@@ -406,7 +407,7 @@ const TowerQuizScreen = () => {
 
 			<SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
 				<View style={styles.header}>
-					<TouchableOpacity onPress={handleExit} style={styles.exitButton}>
+					<TouchableOpacity onPress={handleExit} style={styles.exitButton} hitSlop={HIT_SLOP}>
 						<IconComponent type="materialIcons" name="close" size={scaledSize(28)} color={COLORS.textWhite} />
 					</TouchableOpacity>
 
@@ -422,7 +423,7 @@ const TowerQuizScreen = () => {
 
 					<View style={styles.headerRight}>
 						{__DEV__ && (
-							<TouchableOpacity onPress={handleAutoPass} style={styles.devButton}>
+							<TouchableOpacity onPress={handleAutoPass} style={styles.devButton} hitSlop={HIT_SLOP}>
 								<IconComponent type="materialIcons" name="flash-on" size={scaledSize(20)} color={COLORS.warning} />
 							</TouchableOpacity>
 						)}
@@ -466,7 +467,7 @@ const TowerQuizScreen = () => {
 					contentContainerStyle={styles.contentContainer}
 					showsVerticalScrollIndicator={false}>
 					<View style={styles.bossSection}>
-						<View style={[styles.bossGlow, { backgroundColor: towerLevel.color + '40' }]} />
+						<View style={[styles.bossGlow, { backgroundColor: withAlpha(towerLevel.color, ALPHA.border) }]} />
 						<Animated.View
 							style={{
 								transform: [{ translateX: bossShakeAnim }, { scale: bossScaleAnim }],

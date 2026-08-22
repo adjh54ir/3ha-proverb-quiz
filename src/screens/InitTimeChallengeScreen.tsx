@@ -3,17 +3,18 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Image }
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { useAppNavigation } from '@/navigation/conf/Types';
+import { read } from '@/services/StorageService';
 
 // 규칙 한 줄 행 (아이콘 + 한 줄 텍스트)
 const RuleRow = ({ iconType, iconName, iconColor, chipColor, text }: { iconType: string; iconName: string; iconColor: string; chipColor: string; text: string }) => (
@@ -31,7 +32,7 @@ const InitTimeChallengeScreen = () => {
 	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
 	const guide = useCharacterGuideOnce('initTimeChallenge', false);
 	const STORAGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
-	const navigation = useNavigation();
+	const navigation = useAppNavigation();
 	const scaleAnim = useRef(new Animated.Value(1)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
 	const slideAnim = useRef(new Animated.Value(scaleHeight(12))).current;
@@ -78,15 +79,9 @@ const InitTimeChallengeScreen = () => {
 	}, [scaleAnim]);
 
 	const fetchTopHistory = async () => {
-		try {
-			const raw = await AsyncStorage.getItem(STORAGE_KEY);
-			const history: MainDataType.TimeChallengeResult[] = raw ? JSON.parse(raw) : [];
-
-			const sorted = [...history].sort((a, b) => b.finalScore - a.finalScore);
-			setTop5History(sorted.slice(0, 3));
-		} catch (e) {
-			console.error('기록 불러오기 실패', e);
-		}
+		const history = await read<MainDataType.TimeChallengeResult[]>(STORAGE_KEY, []);
+		const sorted = [...history].sort((a, b) => b.finalScore - a.finalScore);
+		setTop5History(sorted.slice(0, 3));
 	};
 
 	const getRelativeDateLabel = (isoString: string): string => {
@@ -148,7 +143,6 @@ const InitTimeChallengeScreen = () => {
 				clearInterval(timer);
 				countdownTimeoutRef.current = setTimeout(() => {
 					setIsCountingDown(false);
-					// @ts-ignore
 					navigation.navigate(Paths.TIME_CHANLLENGE);
 				}, 800);
 				return;

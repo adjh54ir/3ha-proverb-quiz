@@ -1,31 +1,12 @@
 // 추가 모달 컴포넌트 두 개 생성
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Animated, View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
+import { useModalEnter } from '@/hooks/useModalEnter';
 import { scaledSize, scaleHeight } from '@/utils/DementionUtils';
 import Markdown from 'react-native-markdown-display';
 import IconComponent from '../atomic/IconComponent';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue, getThemeMode } from '@/const/common/Theme';
-
-/** 모달 진입 애니메이션 (fade + slide-up) — 두 모달에서 공용 */
-const useModalEnterAnim = (visible: boolean) => {
-  const anim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (!visible) {
-      anim.setValue(0);
-      return;
-    }
-    const enter = Animated.timing(anim, { toValue: 1, duration: 260, useNativeDriver: true });
-    enter.start();
-    return () => enter.stop();
-  }, [visible, anim]);
-
-  return {
-    opacity: anim,
-    transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
-  };
-};
 
 const markdown = `
 # 1) 개인정보처리방침
@@ -230,7 +211,7 @@ Wi-Fi 외 환경에서 사용 시 발생하는 데이터 요금 및 로밍 요�
 
 
 export const TermsOfServiceModal = ({ visible, onClose }) => {
-  const enterStyle = useModalEnterAnim(visible);
+  const enterStyle = useModalEnter(visible);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -314,7 +295,7 @@ const openSourceData = [
 ];
 
 export const OpenSourceModal = ({ visible, onClose }) => {
-  const enterStyle = useModalEnterAnim(visible);
+  const enterStyle = useModalEnter(visible);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>

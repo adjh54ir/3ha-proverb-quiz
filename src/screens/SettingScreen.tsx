@@ -34,6 +34,7 @@ import DateUtils from '@/utils/DateUtils';
 import { useToast } from '@/hooks/useToast';
 import { changeTextSizeMode, changeThemeMode, useTextSizeMode, useThemeMode } from '@/hooks/useThemeMode';
 import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton, resetCharacterGuideSeen } from '@/screens/common/CharacterGuide';
+import { update, write } from '@/services/StorageService';
 
 // ─────────────────────────────────────────────
 // 상수
@@ -333,26 +334,22 @@ const SettingScreen = () => {
 	};
 
 	const resetTodayQuizOnly = async () => {
-		const json = await AsyncStorage.getItem(STORAGE_KEYS.todayQuiz);
-		if (!json) {
-			return;
-		}
-
 		const todayStr = DateUtils.getLocalDateString();
-		const updated = (JSON.parse(json) as MainDataType.TodayQuizList[]).map((item) =>
-			DateUtils.toLocalDateKey(item.quizDate) === todayStr
-				? {
-						...item,
-						todayQuizIdArr: [],
-						correctQuizIdArr: [],
-						worngQuizIdArr: [],
-						answerResults: {},
-						selectedAnswers: {},
-						isCheckedIn: item.isCheckedIn ?? false,
-					}
-				: item,
+		await update<MainDataType.TodayQuizList[]>(STORAGE_KEYS.todayQuiz, [], (list) =>
+			list.map((item) =>
+				DateUtils.toLocalDateKey(item.quizDate) === todayStr
+					? {
+							...item,
+							todayQuizIdArr: [],
+							correctQuizIdArr: [],
+							worngQuizIdArr: [],
+							answerResults: {},
+							selectedAnswers: {},
+							isCheckedIn: item.isCheckedIn ?? false,
+						}
+					: item,
+			),
 		);
-		await AsyncStorage.setItem(STORAGE_KEYS.todayQuiz, JSON.stringify(updated));
 	};
 
 	const RESET_ACTIONS: Record<ResetType, () => Promise<void>> = {
@@ -468,7 +465,7 @@ const SettingScreen = () => {
 			lastAnsweredAt: DateUtils.now(),
 			quizCounts,
 		};
-		await AsyncStorage.setItem(STORAGE_KEYS.quiz, JSON.stringify(parsed));
+		await write(STORAGE_KEYS.quiz, parsed);
 		showToast('퀴즈 전체 완료 처리', `${allProverbs.length.toLocaleString()}문제 / ${fullScore.toLocaleString()}점 반영했습니다.`);
 	};
 
@@ -485,7 +482,7 @@ const SettingScreen = () => {
 			lastStudyAt: DateUtils.now(),
 			studyCounts,
 		};
-		await AsyncStorage.setItem(STORAGE_KEYS.study, JSON.stringify(parsed));
+		await write(STORAGE_KEYS.study, parsed);
 		showToast('학습 전체 완료 처리', `${allProverbs.length.toLocaleString()}개 학습 완료로 반영했습니다.`);
 	};
 
@@ -502,7 +499,7 @@ const SettingScreen = () => {
 			lastAttemptDate: DateUtils.getLocalDateString(),
 			unlockedRewards: allLevels,
 		};
-		await AsyncStorage.setItem(STORAGE_KEYS.towerChallenge, JSON.stringify(towerProgress));
+		await write(STORAGE_KEYS.towerChallenge, towerProgress);
 		showToast('타워 전체 클리어 처리', '모든 층을 클리어 상태로 반영했습니다.');
 	};
 

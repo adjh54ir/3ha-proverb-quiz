@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Animated, Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
@@ -6,6 +6,8 @@ import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyle
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { BOOK_COLORS, BOOK_ICONS } from '../common/CommonProverbModule';
+import { useModalEnter } from '@/hooks/useModalEnter';
+import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 
 type PickerProps = {
 	selectedColor: string;
@@ -39,7 +41,7 @@ const ColorIconPicker = ({ selectedColor, selectedIcon, onColorChange, onIconCha
 							{row.map((icon) => (
 								<TouchableOpacity
 									key={icon}
-									style={[pickerStyles.iconDot, selectedIcon === icon && [pickerStyles.iconDotSelected, { borderColor: selectedColor, backgroundColor: selectedColor + '15' }]]}
+									style={[pickerStyles.iconDot, selectedIcon === icon && [pickerStyles.iconDotSelected, { borderColor: selectedColor, backgroundColor: withAlpha(selectedColor, ALPHA.faint) }]]}
 									activeOpacity={0.8}
 									onPress={() => onIconChange(icon)}>
 									<IconComponent type="materialIcons" name={icon} size={scaledSize(20)} color={selectedIcon === icon ? selectedColor : COLORS.textLight} />
@@ -60,7 +62,7 @@ const ColorIconPicker = ({ selectedColor, selectedIcon, onColorChange, onIconCha
 									style={[pickerStyles.colorDot, { backgroundColor: color }, selectedColor === color && pickerStyles.colorDotSelected]}
 									activeOpacity={0.8}
 									onPress={() => onColorChange(color)}>
-									{selectedColor === color && <IconComponent type="materialIcons" name="check" size={scaledSize(14)} color={COLORS.textWhite} />}
+									{selectedColor === color && <IconComponent type="materialIcons" name="check" size={scaledSize(14)} color={readableTextOn(color)} />}
 								</TouchableOpacity>
 							))}
 						</View>
@@ -95,9 +97,10 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 	const [icon, setIcon] = useState(DEFAULT_ICON);
 	const [focusedField, setFocusedField] = useState<'title' | 'desc' | null>(null);
 
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const scaleAnim = useRef(new Animated.Value(0.95)).current;
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(visible);
 
+	// 열릴 때마다 편집 대상 값으로 폼을 초기화한다(이전에 입력하던 값이 남지 않도록)
 	useEffect(() => {
 		if (visible) {
 			setTitle(editTarget?.title ?? '');
@@ -107,20 +110,6 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 			setFocusedField(null);
 		}
 	}, [visible, editTarget]);
-
-	useEffect(() => {
-		if (!visible) {
-			fadeAnim.setValue(0);
-			scaleAnim.setValue(0.95);
-			return;
-		}
-		const anim = Animated.parallel([
-			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-		]);
-		anim.start();
-		return () => anim.stop();
-	}, [visible, fadeAnim, scaleAnim]);
 
 	const handleSubmit = () => {
 		if (!title.trim()) {
@@ -135,7 +124,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 				{/* 카드 밖(딤 영역)을 누르면 키보드를 닫는다 */}
 				<Pressable style={StyleSheet.absoluteFill} onPress={Keyboard.dismiss} />
 				<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
-					<Animated.View style={[styles.modal, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+					<Animated.View style={[styles.modal, enterStyle]}>
 						<TouchableOpacity style={styles.closeIcon} onPress={onClose} activeOpacity={0.7} hitSlop={HIT_SLOP}>
 							<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
 						</TouchableOpacity>
@@ -144,9 +133,9 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 						{!isEdit && <Image source={require('@/assets/images/home-actions/action-my-book.png')} style={styles.headerImage} resizeMode="contain" />}
 						{!isEdit && <Text style={styles.modalSubtitle}>이름을 정하고, 속담집에 속담을 추가해 보세요</Text>}
 
-						<View style={[pickerStyles.preview, { backgroundColor: color + '20', borderColor: color + '40', width: '100%', marginTop: SPACING_H.md }]}>
+						<View style={[pickerStyles.preview, { backgroundColor: withAlpha(color, ALPHA.soft), borderColor: withAlpha(color, ALPHA.border), width: '100%', marginTop: SPACING_H.md }]}>
 							<View style={[pickerStyles.previewIcon, { backgroundColor: color }]}>
-								<IconComponent type="materialIcons" name={icon} size={scaledSize(26)} color={COLORS.textWhite} />
+								<IconComponent type="materialIcons" name={icon} size={scaledSize(26)} color={readableTextOn(color)} />
 							</View>
 							<View style={{ flex: 1 }}>
 								<Text style={[pickerStyles.previewLabel, { color }]} numberOfLines={1}>{title.trim() || '속담집 이름'}</Text>

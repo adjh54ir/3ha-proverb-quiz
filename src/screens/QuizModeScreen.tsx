@@ -2,9 +2,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated, Easing, ScrollView } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
@@ -22,6 +21,9 @@ import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
 import FastImage from 'react-native-fast-image';
 import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
+import { useAppNavigation } from '@/navigation/conf/Types';
+import QuizHistoryService from '@/services/QuizHistoryService';
 
 type QuizModeScreenRouteParams = {
 	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' };
@@ -40,7 +42,7 @@ const LEVEL_DESC: Record<string, string> = {
 const QuizModeScreen = () => {
 	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
 	const guide = useCharacterGuideOnce('quizMode', false);
-	const navigation = useNavigation();
+	const navigation = useAppNavigation();
 
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
@@ -96,9 +98,8 @@ const QuizModeScreen = () => {
 	const initData = async () => {
 		const allProverbs = ProverbServices.selectProverbList();
 		setProverbList(allProverbs);
-		const stored = await AsyncStorage.getItem(STORAGE_KEY);
-		if (stored) {
-			const parsed: MainDataType.UserQuizHistory = JSON.parse(stored);
+		const parsed = await QuizHistoryService.getQuizHistory();
+		if (parsed) {
 			const safeParsed: MainDataType.UserQuizHistory = {
 				correctProverbId: parsed.correctProverbId || [],
 				wrongProverbId: parsed.wrongProverbId || [],
@@ -149,7 +150,6 @@ const QuizModeScreen = () => {
 			// 난이도별 문제 필터링
 			filteredQuestions = proverbList.filter((item) => item.level === selectedLevel);
 		}
-		//@ts-ignore
 		navigation.push(Paths.QUIZ, {
 			questionPool: filteredQuestions,
 			isWrongReview: false,
@@ -163,7 +163,6 @@ const QuizModeScreen = () => {
 	const moveToCategoryQuiz = (categoryLabel: string) => {
 		const filteredQuestions = categoryLabel === '전체' ? proverbList : proverbList.filter((p) => p.category === categoryLabel);
 
-		//@ts-ignore
 		navigation.push(Paths.QUIZ, {
 			questionPool: filteredQuestions,
 			isWrongReview: false,
@@ -197,7 +196,7 @@ const QuizModeScreen = () => {
 						showsVerticalScrollIndicator={false}
 						contentContainerStyle={styles.scrollContent}>
 						{selectedMode && (
-							<View style={[styles.selectedModeBoxEnhanced, { backgroundColor: selectedMode.color + '20' }]}>
+							<View style={[styles.selectedModeBoxEnhanced, { backgroundColor: withAlpha(selectedMode.color, ALPHA.soft) }]}>
 								<View style={styles.selectedModeRow}>
 									<IconComponent type={selectedMode.type} name={selectedMode.icon} size={scaledSize(20)} color={selectedMode.color} style={{ marginRight: SPACING_W.sm }} />
 									<Text style={styles.selectedModeTextEnhanced}>
@@ -210,7 +209,6 @@ const QuizModeScreen = () => {
 						<View style={styles.levelListWrap}>
 							{tab === 'level' &&
 								LEVELS.map((item) => {
-									// @ts-ignore
 									const isComingSoon = item.key === 'comingsoon';
 									if (isComingSoon) {
 										return (

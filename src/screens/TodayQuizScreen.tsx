@@ -9,7 +9,7 @@ import { sampleSize, shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { read, write } from '@/services/StorageService';
 import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
@@ -24,10 +24,12 @@ import { TodayQuizBadgeInterceptor } from '@/services/interceptor/TodayQuizBadge
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
 import Icon from 'react-native-vector-icons/FontAwesome6';
-import FadeInView from '@/components/animation/FadeInView';
+import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import { playCorrect, playWrong, playFinish } from '@/utils/SoundUtils';
 import { scheduleDailyQuizReminder, cancelDailyQuizReminder, DAILY_QUIZ_NOTIFICATION_ID } from '@/utils/NotifactionHelper';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import QuizHistoryService from '@/services/QuizHistoryService';
+import * as TodayQuizService from '@/services/TodayQuizService';
 
 const NOTIFICATION_ID = DAILY_QUIZ_NOTIFICATION_ID;
 const DEFAULT_ALARM_HOUR = 15;
@@ -85,7 +87,10 @@ const TodayQuizScreen = () => {
 	const [isAlarmEnabled, setIsAlarmEnabled] = useState(false);
 	const [alarmTime, setAlarmTime] = useState(hourToDate(DEFAULT_ALARM_HOUR));
 	const [quizList, setQuizList] = useState<MainDataType.Proverb[]>([]);
-	const [answerResults, setAnswerResults] = useState<{ [id: number]: boolean | null }>({});
+	// 저장 타입(TodayQuizList.answerResults)과 같은 모양이어야 한다.
+	// 예전에는 boolean | null 로 넓게 잡아 두고 저장할 때 @ts-ignore 로 넘겼는데,
+	// 실제로 null 이 들어가는 경로는 없다(안 푼 문제는 키 자체가 없다).
+	const [answerResults, setAnswerResults] = useState<{ [id: number]: boolean }>({});
 	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
 	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
 	const [selectedAnswers, setSelectedAnswers] = useState<{
@@ -194,10 +199,9 @@ const TodayQuizScreen = () => {
 
 	const loadSetting = async () => {
 		try {
-			const json = await AsyncStorage.getItem(SETTING_KEY);
+			const parseJson = await read<MainDataType.SettingInfo | null>(SETTING_KEY, null);
 
-			if (json !== null) {
-				const parseJson: MainDataType.SettingInfo = JSON.parse(json);
+			if (parseJson !== null) {
 				const hour = parseAlarmHour(parseJson.alarmTime);
 
 				setIsAlarmEnabled(parseJson.isUseAlarm); // ✅ 수정
@@ -225,33 +229,15 @@ const TodayQuizScreen = () => {
 		return sampleSize(filtered, 5);
 	};
 	const saveSettingInfo = async (setting: MainDataType.SettingInfo) => {
-		try {
-			console.log('setting : ', setting);
-
-			await AsyncStorage.setItem(SETTING_KEY, JSON.stringify(setting));
-			console.log('알림 설정 저장 완료');
-		} catch (e) {
-			console.error('알림 설정 저장 실패:', e);
-		}
+		await write(SETTING_KEY, setting);
 	};
 
 	const saveTodayQuizToStorage = async (newData: MainDataType.TodayQuizList) => {
-		try {
-			const existingJson = await AsyncStorage.getItem(STORAGE_KEY);
-			const existing: MainDataType.TodayQuizList[] = existingJson ? JSON.parse(existingJson) : [];
-
-			// 같은 날짜가 있는 경우 제외하고 새로 저장
-			const todayStr = getLocalDateString(); // ✅ 이렇게 바꿔야 함
-			const updated = [...existing.filter((q) => getLocalParamDateToString(q.quizDate) !== getLocalParamDateToString(todayDate)), newData];
-
-			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-			console.log('퀴즈 저장 완료');
-			// 👇 상태 즉시 반영
-			setQuizList(newData.todayQuizIdArr.map((id) => ProverbServices.selectProverbByIds([id])[0]));
-			generateQuizOptions(newData.todayQuizIdArr.map((id) => ProverbServices.selectProverbByIds([id])[0]));
-		} catch (error) {
-			console.error('퀴즈 저장 실패:', error);
-		}
+		await TodayQuizService.patchToday(() => newData);
+		// 👇 상태 즉시 반영
+		const proverbs = newData.todayQuizIdArr.map((id) => ProverbServices.selectProverbByIds([id])[0]);
+		setQuizList(proverbs);
+		generateQuizOptions(proverbs);
 	};
 
 	const formatQuizDate = (isoDate: string) => {
@@ -270,10 +256,7 @@ const TodayQuizScreen = () => {
 	 * 지난 문제 리스트
 	 */
 	const loadLastTodayQuizList = async () => {
-		const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
-		const stored: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
-
-		console.log('stored :: ', stored);
+		const stored = await TodayQuizService.getAll();
 
 		const sorted = [...stored].sort((a, b) => new Date(b.quizDate).getTime() - new Date(a.quizDate).getTime());
 
@@ -309,11 +292,8 @@ const TodayQuizScreen = () => {
 			setShowTodayReview(false);
 		} // 👈 이 줄 추가
 
-		const todayStr = getLocalDateString();
-		const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
-		const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
-		// 여기서 KST 기준 비교로 todayData 찾기
-		const todayData = storedArr.find((q) => getLocalParamDateToString(q.quizDate) === todayStr); // ✅ 중요
+		const storedArr = await TodayQuizService.getAll();
+		const todayData = await TodayQuizService.getToday();
 
 		// ✅ 오늘 문제를 아직 안 푼 상태 판별
 		const unsolved = !!todayData && (!todayData.answerResults || Object.keys(todayData.answerResults).length === 0);
@@ -457,10 +437,7 @@ const TodayQuizScreen = () => {
 			const granted = await requestPermission();
 			if (granted) {
 				const todayStr = getLocalDateString();
-				const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
-				const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
-
-				const todayData = storedArr.find((q) => DateUtils.toLocalDateKey(q.quizDate) === todayStr);
+				const todayData = await TodayQuizService.getToday();
 
 				// 사용자가 고른 '로컬 시' 를 그대로 저장한다. (타임존 오프셋 보정 금지 — 읽고 쓸 때마다 시각이 밀린다)
 				await saveSettingInfo({
@@ -539,33 +516,21 @@ const TodayQuizScreen = () => {
 				Object.keys(d.answerResults ?? {}).length >= (d.todayQuizIdArr?.length ?? 0),
 		).length;
 
-		const historyJson = await AsyncStorage.getItem(MainStorageKeyType.USER_QUIZ_HISTORY);
-		const history: MainDataType.UserQuizHistory = historyJson
-			? JSON.parse(historyJson)
-			: {
-					correctProverbId: [],
-					wrongProverbId: [],
-					lastAnsweredAt: DateUtils.now(),
-					quizCounts: {},
-					badges: [],
-					totalScore: 0,
-			  };
-		history.badges = history.badges ?? [];
-
-		const newBadgeIds = TodayQuizBadgeInterceptor(completedDayCount, history.badges);
+		const existing = await QuizHistoryService.getBadgeList();
+		const newBadgeIds = TodayQuizBadgeInterceptor(completedDayCount, existing);
 		if (newBadgeIds.length === 0) {
 			return;
 		}
 
-		const earnedBadgeObjects = newBadgeIds
+		// addBadges 는 실제로 새로 추가된 것만 돌려준다(중복 지급/덮어쓰기 방지)
+		const added = await QuizHistoryService.addBadges(newBadgeIds);
+		if (added.length === 0) {
+			return;
+		}
+
+		const earnedBadgeObjects = added
 			.map((id) => CONST_BADGES.find((b) => b.id === id))
 			.filter(Boolean) as MainDataType.UserBadge[];
-
-		const updatedHistory: MainDataType.UserQuizHistory = {
-			...history,
-			badges: [...new Set([...history.badges, ...newBadgeIds])],
-		};
-		await AsyncStorage.setItem(MainStorageKeyType.USER_QUIZ_HISTORY, JSON.stringify(updatedHistory));
 
 		setNewlyEarnedBadges(earnedBadgeObjects);
 		setBadgeModalVisible(true);
@@ -611,35 +576,23 @@ const TodayQuizScreen = () => {
 			addTimer(() => setHighlightAnswerId(null), 2000);
 		}
 
-		// 저장
-		const storedJson = await AsyncStorage.getItem(STORAGE_KEY);
-		const storedArr: MainDataType.TodayQuizList[] = storedJson ? JSON.parse(storedJson) : [];
+		// 저장 — patchToday 는 키 단위로 직렬화되므로 출석 저장 등과 겹쳐도 서로 덮어쓰지 않는다
+		await TodayQuizService.patchToday(() => ({
+			answerResults: newAnswerResults,
+			selectedAnswers: newSelectedAnswers,
+			correctQuizIdArr: Object.entries(newAnswerResults)
+				.filter(([_, v]) => v)
+				.map(([k]) => Number(k)),
+			worngQuizIdArr: Object.entries(newAnswerResults)
+				.filter(([_, v]) => !v)
+				.map(([k]) => Number(k)),
+		}));
 
-		const todayStr = getLocalParamDateToString(todayDate);
-		const todayIndex = storedArr.findIndex((q) => getLocalParamDateToString(q.quizDate) === todayStr);
-
-		if (todayIndex !== -1) {
-			const updatedToday = {
-				...storedArr[todayIndex],
-				answerResults: newAnswerResults,
-				selectedAnswers: newSelectedAnswers,
-				correctQuizIdArr: Object.entries(newAnswerResults)
-					.filter(([_, v]) => v)
-					.map(([k]) => Number(k)),
-				worngQuizIdArr: Object.entries(newAnswerResults)
-					.filter(([_, v]) => !v)
-					.map(([k]) => Number(k)),
-			};
-			// @ts-ignore
-			storedArr[todayIndex] = updatedToday;
-			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(storedArr));
-
-			// ✅ 오늘의 퀴즈를 모두 풀었으면 누적 완료 일수 기준 뱃지 부여
-			const isAllAnswered = Object.keys(newAnswerResults).length >= quizList.length && quizList.length > 0;
-			if (isAllAnswered) {
-				playFinish(); // 🎉 오늘의 퀴즈 완료 사운드
-				await checkAndAwardTodayQuizBadges(storedArr);
-			}
+		// ✅ 오늘의 퀴즈를 모두 풀었으면 누적 완료 일수 기준 뱃지 부여
+		const isAllAnswered = Object.keys(newAnswerResults).length >= quizList.length && quizList.length > 0;
+		if (isAllAnswered) {
+			playFinish(); // 🎉 오늘의 퀴즈 완료 사운드
+			await checkAndAwardTodayQuizBadges(await TodayQuizService.getAll());
 		}
 		// handleAnswer 내부 마지막 부분에 추가
 		addTimer(() => {
@@ -930,7 +883,7 @@ const TodayQuizScreen = () => {
 												const itemResult = answerResults[item.id];
 												return (
 													// 리스트 stagger — 최대 6개까지만 지연
-													<FadeInView key={item.id} delay={Math.min(idx, 5) * 40} duration={260} offsetY={8}>
+													<FadeInView key={item.id} delay={staggerDelay(idx)} duration={260} offsetY={8}>
 														<TouchableOpacity
 															activeOpacity={0.85}
 															style={styles.reviewItemCard}
@@ -1861,7 +1814,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: '100%',
 	},
 	scrollContent: {
-		paddingBottom: SPACING_H.xl,
+		// 다른 스크롤 화면과 같은 하단 클리어런스 (탭바에 마지막 카드가 붙어 보이지 않게)
+		paddingBottom: SPACING_H.xxxxl,
 	},
 	emptyView: {
 		paddingVertical: SPACING_H.xxxxl,

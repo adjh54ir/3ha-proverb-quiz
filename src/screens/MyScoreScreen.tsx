@@ -21,12 +21,10 @@ import { RootStackParamList } from '@/navigation/conf/Types';
 import IconComponent from './common/atomic/IconComponent';
 import DonutChart from './common/atomic/DonutChart';
 import AnimatedCounter from './common/atomic/AnimatedCounter';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import FastImage from 'react-native-fast-image';
-import 'moment/locale/ko'; // 한국어 로케일 import
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
@@ -34,7 +32,8 @@ import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, theme
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
+import { Calendar } from 'react-native-calendars';
+import '@/utils/KoreanLocale'; // 달력/moment 한국어 설정 (단일 소스)
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { PET_REWARDS, getLevelByScore } from '@/const/ConstInfoData';
@@ -45,6 +44,10 @@ import { FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { getLevelColor } from '@/screens/common/CommonProverbModule';
 import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { buildDateMark, buildTodayPendingMark, buildSelectedMark } from '@/utils/CalendarMarkUtils';
+import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
+import { read } from '@/services/StorageService';
+import QuizHistoryService from '@/services/QuizHistoryService';
 
 interface TodayQuizList {
 	quizDate: string;
@@ -96,40 +99,7 @@ const STYLE_MAP = {
 	},
 };
 
-LocaleConfig.locales.kr = {
-	monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-	monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-	dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-	dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
-};
 
-LocaleConfig.defaultLocale = 'kr';
-
-/**
- * 캘린더 셀의 기본(비선택) 마킹.
- * 날짜 선택을 해제할 때도 이 규칙으로 복원해야 출석 표시가 연파랑으로 덮어써지지 않는다.
- */
-const buildDateMark = (isCheckedIn: boolean, isToday: boolean) =>
-	isCheckedIn
-		? {
-				// 출석한 날 — 오늘은 앰버, 이전 날은 초록
-				marked: true,
-				dotColor: COLORS.textWhite,
-				customStyles: {
-					container: { backgroundColor: isToday ? COLORS.warning : COLORS.primary, borderRadius: scaleWidth(6) },
-					text: { color: COLORS.textWhite, fontWeight: 'bold' },
-				},
-		  }
-		: {
-				// 퀴즈 기록만 있고 출석은 안 한 날
-				marked: true,
-				dotColor: COLORS.primary,
-				customStyles: {
-					container: { backgroundColor: COLORS.secondaryBg },
-					text: { color: COLORS.primary, fontWeight: 'bold' },
-				},
-		  };
-moment.locale('ko'); // 로케일 설정
 
 const STORAGE_KEY_QUIZ = MainStorageKeyType.USER_QUIZ_HISTORY;
 const STORAGE_KEY_STUDY = MainStorageKeyType.USER_STUDY_HISTORY;
@@ -198,12 +168,13 @@ const MyScoreScreen = () => {
 	const [levelMaster, setLevelMaster] = useState<string[]>([]);
 	const [correctCount, setCorrectCount] = useState<number>(0);
 	const [wrongCount, setWrongCount] = useState<number>(0);
-	const [lastAnsweredAt, setLastAnsweredAt] = useState<string>('');
+	// 저장값은 ISO 문자열이지만 방금 쓴 값은 Date 일 수 있다 (moment 는 둘 다 받는다)
+	const [lastAnsweredAt, setLastAnsweredAt] = useState<string | Date>('');
 	const [bestCombo, setBestCombo] = useState<number>(0);
 	const [showLevelModal, setShowLevelModal] = useState(false);
 	const [badgeFilter, setBadgeFilter] = useState<'all' | 'earned' | 'locked'>('all');
 	const [studyCountries, setStudyCountries] = useState<string[]>([]);
-	const [lastStudyAt, setLastStudyAt] = useState<string>('');
+	const [lastStudyAt, setLastStudyAt] = useState<string | Date>('');
 	const [totalStudyCount, setTotalStudyCount] = useState<number>(0);
 	const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -331,13 +302,11 @@ const MyScoreScreen = () => {
 
 	const loadData = async () => {
 		try {
-			const studyData = await AsyncStorage.getItem(STORAGE_KEY_STUDY);
-			const quizData = await AsyncStorage.getItem(STORAGE_KEY_QUIZ);
+			const studyJson = await read<MainDataType.UserStudyHistory | null>(STORAGE_KEY_STUDY, null);
+			const quizJson = await QuizHistoryService.getQuizHistory();
 
-			const studyBadges = studyData ? (JSON.parse(studyData)?.badges ?? []) : [];
-			const quizJson = quizData ? JSON.parse(quizData) : null;
+			const studyBadges = studyJson?.badges ?? [];
 			const quizBadges = quizJson?.badges ?? [];
-			const studyJson = studyData ? JSON.parse(studyData) : null;
 			const studiedIds: number[] = studyJson?.studyProverbes ?? [];
 			const studyCounts = studyJson?.studyCounts ?? {};
 			const lastDate = studyJson?.lastStudyAt ?? '';
@@ -350,9 +319,8 @@ const MyScoreScreen = () => {
 			const totalCount = (Object.values(studyCounts) as number[]).reduce((a, b) => a + b, 0);
 			setTotalStudyCount(totalCount);
 			// ✅ 수정 - 올바른 키 사용
-			const towerRaw = await AsyncStorage.getItem(MainStorageKeyType.TOWER_CHALLENGE_PROGRESS);
-			const towerParsed: TowerProgress = towerRaw ? JSON.parse(towerRaw) : {};
-			setUnlockedRewards(towerParsed.unlockedRewards ?? []);
+			const towerParsed = await read<TowerProgress | null>(MainStorageKeyType.TOWER_CHALLENGE_PROGRESS, null);
+			setUnlockedRewards(towerParsed?.unlockedRewards ?? []);
 
 			setTotalScore(quizJson?.totalScore ?? 0);
 			setCorrectCount(quizJson?.correctProverbId?.length ?? 0);
@@ -360,8 +328,7 @@ const MyScoreScreen = () => {
 			setLastAnsweredAt(quizJson?.lastAnsweredAt ?? '');
 			setBestCombo(quizJson?.bestCombo ?? 0);
 
-			const timeData = await AsyncStorage.getItem(STORAGE_KEY_TIME);
-			const timeResults: MainDataType.TimeChallengeResult[] = timeData ? JSON.parse(timeData) : [];
+			const timeResults = await read<MainDataType.TimeChallengeResult[]>(STORAGE_KEY_TIME, []);
 			// ⚠️ 예전에는 최근 3건만 남겨 두고 그 안에서 정렬해 'TOP 3' 로 표시했다(=최근 3판 중 1등).
 			//    전체 기록에서 점수 상위 3건을 뽑아야 실제 랭킹이 된다.
 			setTimeChallengeResults([...timeResults].sort((a, b) => b.finalScore - a.finalScore).slice(0, 3));
@@ -397,8 +364,7 @@ const MyScoreScreen = () => {
 			setLevelMaster(conqueredLevels);
 
 			// 타임 챌린지 정보
-			const todayJson = await AsyncStorage.getItem(STORAGE_KEY_TODAY);
-			const todayData: MainDataType.TodayQuizList[] = todayJson ? JSON.parse(todayJson) : [];
+			const todayData = await read<MainDataType.TodayQuizList[]>(STORAGE_KEY_TODAY, []);
 
 			// 캘린더 마킹은 여기 한 곳에서만 만든다.
 			// (예전에는 loadCheckedInDates() 가 별도 marked 를 만들고도 setMarkedQuizDates 를 호출하지 않아
@@ -420,18 +386,7 @@ const MyScoreScreen = () => {
 			// 오늘 출석 전이면 오늘 날짜를 파란색으로 강조 (출석 앰버 표시는 덮어쓰지 않는다)
 			const isTodayCheckedIn = todayData.some((item) => DateUtils.toLocalDateKey(item.quizDate) === todayStr && item.isCheckedIn);
 			if (!isTodayCheckedIn) {
-				marked[todayStr] = {
-					...(marked[todayStr] || {}),
-					customStyles: {
-						container: {
-							backgroundColor: COLORS.secondary,
-						},
-						text: {
-							color: COLORS.textWhite,
-							fontWeight: 'bold',
-						},
-					},
-				};
+				marked[todayStr] = { ...(marked[todayStr] || {}), ...buildTodayPendingMark() };
 			}
 
 			setTodayQuizDataList(todayData); // todayData를 상태로 저장
@@ -551,18 +506,7 @@ const MyScoreScreen = () => {
 			}
 
 			// ✅ 새 선택 날짜 강조
-			updated[date] = {
-				...(updated[date] || {}),
-				customStyles: {
-					container: {
-						backgroundColor: COLORS.border,
-					},
-					text: {
-						color: COLORS.text,
-						fontWeight: 'bold',
-					},
-				},
-			};
+			updated[date] = { ...(updated[date] || {}), ...buildSelectedMark() };
 
 			return updated;
 		});
@@ -1362,7 +1306,8 @@ const MyScoreScreen = () => {
 									<View
 										style={{
 											width: scaleWidth(80),
-											backgroundColor: isCleared ? tower.backgroundColor : COLORS.surfaceAlt,
+											// 고정 파스텔 대신 보스 색에서 틴트를 만든다 — 다크모드에서도 배경에 어울린다
+											backgroundColor: isCleared ? withAlpha(tower.color, ALPHA.soft) : COLORS.surfaceAlt,
 											alignItems: 'center',
 											justifyContent: 'center',
 											padding: SPACING_W.sm,
@@ -1380,7 +1325,9 @@ const MyScoreScreen = () => {
 												paddingHorizontal: SPACING_W.sm,
 												paddingVertical: SPACING_H.xxs,
 											}}>
-											<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>LV.{tower.level}</Text>
+											<Text style={{ color: isCleared ? readableTextOn(tower.color) : COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>
+												LV.{tower.level}
+											</Text>
 										</View>
 									</View>
 

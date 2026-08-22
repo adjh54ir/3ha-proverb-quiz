@@ -9,7 +9,8 @@ export declare namespace MainDataType {
 		studyProverbes: number[]; // 학습 속담 목록
 		studyCounts?: { [id: string]: number }; // 각 속담별 학습 횟수 (선택)
 		badges?: string[]; // ✅ 학습 뱃지 ID 목록 추가
-		lastStudyAt: Date;
+		// 저장할 때는 Date 를 넣지만 JSON 을 거치면 ISO 문자열로 돌아온다 — 두 경우를 모두 표기한다.
+		lastStudyAt: Date | string;
 	}
 
 	/**
@@ -55,7 +56,8 @@ export declare namespace MainDataType {
 	export interface UserQuizHistory {
 		correctProverbId: number[]; // 사용자가 정답을 맞춘 속담의 아이디 목록 (예: [1, 2])
 		wrongProverbId: number[]; // 사용자가 오답을 선택한 속담의 아이디 목록
-		lastAnsweredAt: Date; // 마지막으로 퀴즈를 푼 시간 (Date 객체 또는 ISO 문자열)
+		// 저장할 때는 Date 를 넣지만 JSON 을 거치면 ISO 문자열로 돌아온다.
+		lastAnsweredAt: Date | string;
 		quizCounts: { [id: number]: number }; // 각 속담별 퀴즈 시도 횟수 (key는 사용자 아이디)
 		badges: string[]; // 사용자가 획득한 뱃지의 ID 목록 (ex: ['asia_master', 'level1_perfect'])
 		totalScore: number; // 사용자의 퀴즈 총 누적 점수

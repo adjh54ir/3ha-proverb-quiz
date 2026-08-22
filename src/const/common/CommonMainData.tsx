@@ -1,7 +1,7 @@
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import { scaledSize, scaleWidth } from '@/utils/DementionUtils';
 import React, { JSX } from 'react';
-import { COLORS, FONT_SIZES, SPACING_W } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, SPACING_W, themedValue } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColor } from '@/screens/common/CommonProverbModule';
 // 공통 타입 정의
 export interface CategoryItem {
@@ -26,59 +26,23 @@ interface QuizLevel {
 	desc: string;
 }
 
-export type QuizLevelKey = 'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert';
+/** 'comingsoon' 은 실제로 카드가 렌더링되므로(비활성 안내) 타입에 포함한다. */
+export type QuizLevelKey = 'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert' | 'comingsoon';
 
-export const LEVELS: QuizLevel[] = [
-	{
-		key: 'beginner',
-		label: '초급 문제',
-		icon: 'seedling',
-		type: 'FontAwesome6',
-		color: '#34D399', // 초급 - 밝은 민트
-		desc: '',
-	},
-	{
-		key: 'intermediate',
-		label: '중급 문제',
-		icon: 'leaf',
-		type: 'FontAwesome6',
-		color: '#F59E0B', // 중급 - 앰버
-		desc: '',
-	},
-	{
-		key: 'advanced',
-		label: '고급 문제',
-		icon: 'tree',
-		type: 'FontAwesome6',
-		color: '#EA580C', // 고급 - 진한 주황
-		desc: '',
-	},
-	{
-		key: 'expert',
-		label: '특급 문제',
-		icon: 'trophy',
-		type: 'FontAwesome6',
-		color: '#B91C1C', // 특급 - 가장 어두운 빨강(난이도 강조)
-		desc: '',
-	},
-	{
-		key: 'all',
-		label: '전체 문제',
-		icon: 'clipboard-list',
-		type: 'fontAwesome5',
-		color: '#5DADE2',
-		desc: '',
-	},
-	{
-		//@ts-ignore
-		key: 'comingsoon',
-		label: '새로운 문제',
-		icon: 'hourglass-half',
-		type: 'fontAwesome6',
-		color: '#dfe6e9',
-		desc: '',
-	},
-];
+/**
+ * 난이도별 문제 선택 카드.
+ * 색은 공통 난이도 램프(getLevelColor)와 팔레트 토큰만 쓴다 —
+ * 예전에는 여기에만 램프 색이 복사돼 있고 '전체/새로운 문제' 는 앱 컨셉 밖의
+ * 플랫 UI 색(#5DADE2 / #dfe6e9)이라 다크모드에서 그대로 떠 있었다.
+ */
+export const LEVELS: QuizLevel[] = themedValue(() => [
+	{ key: 'beginner', label: '초급 문제', icon: 'seedling', type: 'FontAwesome6', color: getLevelColor('초급'), desc: '' },
+	{ key: 'intermediate', label: '중급 문제', icon: 'leaf', type: 'FontAwesome6', color: getLevelColor('중급'), desc: '' },
+	{ key: 'advanced', label: '고급 문제', icon: 'tree', type: 'FontAwesome6', color: getLevelColor('고급'), desc: '' },
+	{ key: 'expert', label: '특급 문제', icon: 'trophy', type: 'FontAwesome6', color: getLevelColor('특급'), desc: '' },
+	{ key: 'all', label: '전체 문제', icon: 'clipboard-list', type: 'fontAwesome5', color: COLORS.secondary, desc: '' },
+	{ key: 'comingsoon', label: '새로운 문제', icon: 'hourglass-half', type: 'fontAwesome6', color: COLORS.borderDark, desc: '' },
+]);
 // LEVEL_DATA(점수별 캐릭터)는 단일 소스 @/const/common/CommonCharacterData 로 이관됨.
 // (중복 정의 제거 — 필요 시 ConstInfoData 또는 CommonCharacterData 에서 import)
 
@@ -148,26 +112,15 @@ export const FIELD_DROPDOWN_ITEMS = [
 	})),
 ];
 
-export const QUIZ_MODES = [
-	{
-		key: 'meaning',
-		label: '속담 뜻 퀴즈',
-		icon: 'lightbulb',
-		type: 'fontAwesome6',
-		color: '#5DADE2',
-	},
-	{
-		key: 'proverb',
-		label: '속담 찾기 퀴즈',
-		icon: 'quote-left',
-		type: 'fontAwesome6',
-		color: '#58D68D',
-	},
-	{
-		key: 'blank',
-		label: '빈칸 채우기 퀴즈',
-		icon: 'pen',
-		type: 'fontAwesome6',
-		color: '#F5B041',
-	},
-];
+/**
+ * 퀴즈 모드 카드 (앱 전체 단일 소스)
+ * - 색은 팔레트 토큰만 쓴다. 예전에는 화면마다 사본이 있었고 색도 앱 컨셉 밖의
+ *   플랫 UI 팔레트(#5DADE2/#58D68D/#F5B041)라 다크모드에서도 그대로 떠 있었다.
+ * - themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않는다.
+ */
+export const QUIZ_MODES = themedValue(() => [
+	{ key: 'meaning', label: '속담 뜻 퀴즈', icon: 'lightbulb', type: 'fontAwesome6', color: COLORS.secondary },
+	{ key: 'proverb', label: '속담 찾기 퀴즈', icon: 'quote-left', type: 'fontAwesome6', color: COLORS.primary },
+	{ key: 'blank', label: '빈칸 채우기 퀴즈', icon: 'pen', type: 'fontAwesome6', color: COLORS.warning },
+	{ key: 'comingsoon', label: '새로운 퀴즈\nComing Soon...', icon: 'hourglass-half', type: 'fontAwesome6', color: COLORS.borderDark },
+]);

@@ -189,7 +189,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: SPACING_W.xl,
+		paddingHorizontal: SPACING_W.lg,
 	},
 	container: {
 		width: '100%',

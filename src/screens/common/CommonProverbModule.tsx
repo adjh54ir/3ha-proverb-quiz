@@ -22,6 +22,9 @@ export const getCategoryColor = (category: string): string => {
 	return map[category] || '#94A3B8';
 };
 
+/** 난이도 숫자 → 난이도 이름. 화면 4곳에 같은 표가 복사돼 있어 한 곳으로 모았다. */
+export const LEVEL_NAME_BY_NUMBER: Record<number, string> = { 1: '초급', 2: '중급', 3: '고급', 4: '특급' };
+
 /** 난이도(levelName)별 색상 — 초급에서 특급으로 갈수록 진해지는 램프 */
 export const getLevelColor = (level: string): string => {
 	// 난이도가 올라갈수록 어두워지는 램프(난이도 강조)
@@ -33,6 +36,9 @@ export const getLevelColor = (level: string): string => {
 	};
 	return map[level] || '#94A3B8';
 };
+
+/** 난이도 숫자로 바로 색을 얻는다 (`getLevelColor(LEVEL_NAME_BY_NUMBER[n])` 반복 제거) */
+export const getLevelColorByNumber = (level: number): string => getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? '');
 
 /** 카테고리별 아이콘 이름 (materialIcons) */
 export const getFieldIconName = (category: string): string => {
@@ -55,15 +61,9 @@ export const getFieldIcon = (category: string): React.ReactNode => {
 };
 
 /** 난이도(levelName)별 아이콘 이름 (FontAwesome6) — 속담 목록 레벨 배지와 동일 */
-export const getLevelIconName = (level: string): string => {
-	const iconMap: Record<string, string> = {
-		초급: 'seedling',
-		중급: 'leaf',
-		고급: 'tree',
-		특급: 'trophy',
-	};
-	return iconMap[level] || 'seedling';
-};
+const LEVEL_ICON_BY_NAME: Record<string, string> = { 초급: 'seedling', 중급: 'leaf', 고급: 'tree', 특급: 'trophy' };
+
+export const getLevelIconName = (level: string): string => LEVEL_ICON_BY_NAME[level] || 'seedling';
 
 // ── 속담집 색상/아이콘 팔레트
 export const BOOK_COLORS = [

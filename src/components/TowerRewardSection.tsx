@@ -5,6 +5,7 @@ import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { TOWER_LEVELS } from '@/const/ConstTowerData';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 
 interface Props {
     unlockedRewards: number[];
@@ -218,7 +219,7 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
                         <Pressable style={styles.popup} onPress={() => { }}>
                             {selectedTower && (
                             <>
-                                <View style={[styles.popupHeader, { backgroundColor: selectedTower.backgroundColor }]}>
+                                <View style={[styles.popupHeader, { backgroundColor: withAlpha(selectedTower.color, ALPHA.soft) }]}>
                                     <FastImage
                                         source={selectedTower.bossImage}
                                         style={styles.bossImage}

@@ -2,10 +2,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 import { Paths } from '@/navigation/conf/Paths';
+import { useAppNavigation } from '@/navigation/conf/Types';
 import IconComponent from './common/atomic/IconComponent';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
@@ -14,24 +14,20 @@ import { HIT_SLOP, COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, theme
 
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { sampleSize } from '@/utils/ArrayUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MainStorageKeyType } from '@/types/MainStorageKeyType';
-import { MainDataType } from '@/types/MainDataType';
-import { LocaleConfig } from 'react-native-calendars';
-import { CONST_MAIN_DATA } from '@/const/ConstMainData';
 import DateUtils from '@/utils/DateUtils';
-import moment from 'moment';
+import '@/utils/KoreanLocale'; // 달력/moment 한국어 설정 (단일 소스)
 import CheckInModal from './modal/CheckInModal';
 import DailyMissionModal from './modal/DailyMissionModal';
 import LevelUpModal, { LevelUpInfo } from './modal/LevelUpModal';
 import LevelModal from './modal/LevelModal';
-import { calcStreak, StreakInfo } from '@/utils/StreakUtils';
-import { AttendanceBadgeInterceptor } from '@/services/interceptor/AttendanceBadgeInterceptor';
-import { computeDailyMissions, countDoneMissions, allMissionsDone } from '@/utils/DailyMissionUtils';
+import * as TodayQuizService from '@/services/TodayQuizService';
+import { useHomeProgress } from '@/hooks/home/useHomeProgress';
+import { useAttendance } from '@/hooks/home/useAttendance';
+import { useDailyMissionSummary } from '@/hooks/home/useDailyMissionSummary';
 import { PET_REWARDS, getLevelByScore, getProgressPercent, getQuestionsToNext } from '@/const/ConstInfoData';
+import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import TowerRewardSection from '@/components/TowerRewardSection';
-import { TowerProgress } from '@/const/ConstTowerData';
 import { playFinish } from '@/utils/SoundUtils';
 import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
 
@@ -48,15 +44,6 @@ const greetingMessages = [
 	'🐣 하루 한 속담! 작지만 큰 지혜가 자랍니다!',
 ];
 
-LocaleConfig.locales.kr = {
-	monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-	monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-	dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-	dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
-};
-
-LocaleConfig.defaultLocale = 'kr';
-moment.locale('ko'); // 로케일 설정
 
 /**
  * 홈 화면 메인 액션 카드
@@ -71,6 +58,7 @@ const ActionCard = ({
 	onPress,
 	isNew,
 	index = 0,
+	primary = false,
 }: {
 	iconName: string;
 	iconType: string;
@@ -80,29 +68,16 @@ const ActionCard = ({
 	onPress: () => void;
 	isNew?: boolean;
 	index?: number;
+	/** 그 화면에서 가장 먼저 눌러야 할 동작인지 — 보더를 색으로 칠해 위계를 만든다 */
+	primary?: boolean;
 }) => {
-	const enterAnim = useRef(new Animated.Value(0)).current;
-
-	useEffect(() => {
-		// 리스트 stagger: 최대 6개까지만 지연을 늘린다
-		const anim = Animated.timing(enterAnim, {
-			toValue: 1,
-			duration: 280,
-			delay: Math.min(index, 5) * 40,
-			easing: Easing.out(Easing.quad),
-			useNativeDriver: true,
-		});
-		anim.start();
-		return () => anim.stop();
-	}, [enterAnim, index]);
-
 	return (
-		<Animated.View
-			style={{
-				opacity: enterAnim,
-				transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
-			}}>
-			<TouchableOpacity style={[styles.actionCard, { borderColor: color }]} activeOpacity={0.85} onPress={onPress}>
+		// 카드 8장이 위에서부터 차례로 떠오른다 (공통 리스트 진입 애니메이션)
+		<FadeInView delay={staggerDelay(index, 8)} duration={280}>
+			<TouchableOpacity
+				style={[styles.actionCard, primary && { borderColor: color, borderWidth: 1.5 }]}
+				activeOpacity={0.85}
+				onPress={onPress}>
 				<View style={[styles.iconCircle, { backgroundColor: color }]}>
 					<IconComponent name={iconName} type={iconType} size={scaledSize(24)} color={COLORS.textWhite} />
 				</View>
@@ -120,7 +95,7 @@ const ActionCard = ({
 					</View>
 				)}
 			</TouchableOpacity>
-		</Animated.View>
+		</FadeInView>
 	);
 };
 
@@ -152,17 +127,26 @@ const Home = () => {
 	const guide = useCharacterGuideOnce('home');
 	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
 	const handoff = useModalHandoff();
-	const navigation = useNavigation();
+	const navigation = useAppNavigation();
 	const confettiTimer = useRef<NodeJS.Timeout | null>(null); // 축포 자동 종료 타이머
 	const scrollViewRef = useRef<ScrollView>(null);
 
 	const [greeting, setGreeting] = useState('🖐️ 안녕하세요! 오늘도 속담 퀴즈 풀 준비 되셨습니까?');
-	const [totalScore, setTotalScore] = useState(0);
 	const [showConfetti, setShowConfetti] = useState(false);
-	const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
 	const [showBadgeModal, setShowBadgeModal] = useState(false);
 	const [selectedBadge, setSelectedBadge] = useState<(typeof CONST_BADGES)[number] | null>(null);
-	const [unlockedRewards, setUnlockedRewards] = useState<number[]>([]);
+
+	// 저장소를 만지는 로직은 전부 훅/서비스로 분리했다 (화면은 그리기만 담당)
+	const { progress, status: progressStatus, levelUp, clearLevelUp, refresh: refreshProgress, addScoreLocally } = useHomeProgress();
+	const attendance = useAttendance();
+	const { summary: missionSummary, refresh: refreshMissionSummary } = useDailyMissionSummary();
+
+	const { totalScore, badgeIds: progressBadgeIds, unlockedRewards } = progress;
+	// 출석 훅이 새로 준 뱃지도 함께 보여준다
+	const earnedBadgeIds = useMemo(
+		() => [...new Set([...progressBadgeIds, ...attendance.earnedBadgeIds])],
+		[progressBadgeIds, attendance.earnedBadgeIds],
+	);
 
 	// 획득 뱃지 (CONST_BADGES 기준으로 유효한 것만 — 중복/유령 id 방지)
 	const earnedBadges = CONST_BADGES.filter((b) => earnedBadgeIds.includes(b.id));
@@ -172,28 +156,16 @@ const Home = () => {
 	const extraBadgeCount = Math.max(earnedBadges.length - previewBadges.length, 0);
 	const [showLevelModal, setShowLevelModal] = useState(false);
 
-	// 오늘의 퀴즈
-	const USER_QUIZ_HISTORY_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
-	const USER_STUDY_HISTORY_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
-	const TODAY_QUIZ_LIST_KEY = MainStorageKeyType.TODAY_QUIZ_LIST;
-	const TOWER_CHALLENGE_PROGRESS = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
-
 	const hasAutoCheckedIn = useRef(false); // ✅ 중복 방지용
 	const stampAnim = useRef(new Animated.Value(0)).current;
 	const stampTimer = useRef<NodeJS.Timeout | null>(null);
 	// 화면 진입 fade + slide-up
 	const screenAnim = useRef(new Animated.Value(0)).current;
-	const [isCheckedIn, setIsCheckedIn] = useState(false);
-	const [petLevel, setPetLevel] = useState(-1);
+	const { isCheckedIn, checkedInDates, petLevel, streakInfo } = attendance;
 	const [showStamp, setShowStamp] = useState(false);
-	const [checkedInDates, setCheckedInDates] = useState<{ [date: string]: any }>({});
 	const [showCheckInModal, setShowCheckInModal] = useState(false); // 초기값 false
-	const [streakInfo, setStreakInfo] = useState<StreakInfo>({ current: 0, best: 0, total: 0, checkedToday: false });
 	const [showDailyMission, setShowDailyMission] = useState(false); // 오늘의 미션 모달
-	const [missionSummary, setMissionSummary] = useState({ done: 0, total: 3, allDone: false, claimed: false });
 	const [showLevelUp, setShowLevelUp] = useState(false); // 레벨업 축하 모달
-	const [levelUpData, setLevelUpData] = useState<LevelUpInfo | null>(null);
-	const levelUpPendingRef = useRef(false); // 출석/미션 모달과 겹침 방지용 보류 플래그
 
 	const [showMascotHint, setShowMascotHint] = useState(true);
 
@@ -307,22 +279,15 @@ const Home = () => {
 
 	// ✅ 출석/미션 모달이 떠 있지 않을 때, 보류된 레벨업 모달을 살짝 지연 후 노출
 	useEffect(() => {
-		if (levelUpPendingRef.current && levelUpData && !showCheckInModal && !showDailyMission) {
-			const t = setTimeout(() => {
-				setShowLevelUp(true);
-				levelUpPendingRef.current = false;
-			}, 600);
+		if (levelUp && !showCheckInModal && !showDailyMission) {
+			const t = setTimeout(() => setShowLevelUp(true), 600);
 			return () => clearTimeout(t);
 		}
-	}, [showCheckInModal, showDailyMission, levelUpData]);
+	}, [showCheckInModal, showDailyMission, levelUp]);
 
 	useFocusEffect(
 		useCallback(() => {
-			// ✅ 진입 시 먼저 초기화
-			setEarnedBadgeIds([]);
-			setTotalScore(0);
-			setUnlockedRewards([]);
-			// 열려 있던 팝업은 닫고 시작한다 (출석 팝업은 checkTodayCheckIn 이 다시 판단)
+			// 열려 있던 팝업은 닫고 시작한다 (출석 팝업은 아래에서 다시 판단)
 			setShowBadgeModal(false);
 			setSelectedBadge(null);
 			setShowLevelModal(false);
@@ -333,14 +298,7 @@ const Home = () => {
 			confettiTimer.current = setTimeout(() => setShowConfetti(false), 3000);
 			hasAutoCheckedIn.current = false;
 
-			(async () => {
-				await refreshMissionSummary(); // ✅ 미션 요약 먼저 즉시 갱신
-				await ensureTodayQuizExists();
-				await loadData();
-				await checkTodayCheckIn();
-				await loadCheckedInDates();
-				await refreshMissionSummary(); // ✅ 데이터 로드 후 한 번 더 갱신
-			})();
+			loadHomeData();
 
 			scrollViewRef.current?.scrollTo({ y: 0, animated: true });
 
@@ -363,25 +321,6 @@ const Home = () => {
 
 	const { label, icon, mascot, description } = levelData;
 
-	const getPetLevel = (checkedIn: { [date: string]: any }) => {
-		const count = Object.keys(checkedIn).length;
-		if (count >= 28) {
-			return 4;
-		}
-		if (count >= 21) {
-			return 3;
-		}
-		if (count >= 14) {
-			return 2;
-		}
-		if (count >= 7) {
-			return 1;
-		}
-		if (count >= 1) {
-			return 0;
-		} // ✅ 1일 이상이면 첫 번째 펫 표시
-		return -1;
-	};
 	const stampStyle = {
 		position: 'absolute',
 		top: '50%',
@@ -409,19 +348,10 @@ const Home = () => {
 	} as const;
 
 	const handleCheckIn = async () => {
-		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
-		if (!json) {
-			return;
-		}
-
-		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-		const updated = arr.map((item) => (DateUtils.toLocalDateKey(item.quizDate) === todayStr ? { ...item, isCheckedIn: true } : item));
-		await AsyncStorage.setItem(TODAY_QUIZ_LIST_KEY, JSON.stringify(updated));
-		setIsCheckedIn(true);
+		await attendance.checkIn(); // 저장 + 달력 반영은 훅이 담당
 		playFinish(); // 🎉 출석 완료 축하 사운드
 
 		setShowStamp(true); // 애니메이션용 플래그
-
 		stampAnim.setValue(0); // 초기화
 		Animated.timing(stampAnim, {
 			toValue: 1,
@@ -435,24 +365,6 @@ const Home = () => {
 			}
 			stampTimer.current = setTimeout(() => setShowStamp(false), 3000);
 		});
-
-		// ✅ 바로 달력에 반영
-		setCheckedInDates((prev) => ({
-			...prev,
-			[todayStr]: {
-				customStyles: {
-					container: {
-						backgroundColor: COLORS.secondary, // ✅ 오늘은 블루 강조 (달력 표기 규칙 통일)
-						borderRadius: RADIUS.sm,
-					},
-					text: {
-						color: COLORS.textWhite,
-						fontWeight: '700',
-					},
-				},
-			},
-		}));
-
 	};
 
 	// 진행도(다음 등급까지 %) — 중앙 헬퍼 사용
@@ -470,213 +382,17 @@ const Home = () => {
 	// 다음 등급까지 남은 문제 수 — 중앙 헬퍼 사용
 	const questionsToNext = getQuestionsToNext(totalScore);
 
-	/** 마지막으로 확인한 등급보다 상승했으면 레벨업 모달 표시 (등급 임계 점수 기준) */
-	const detectLevelUp = async (score: number) => {
-		try {
-			const current = getLevelByScore(score);
-			const storedRaw = await AsyncStorage.getItem(MainStorageKeyType.LAST_SEEN_GRADE);
-			const stored = storedRaw != null ? parseInt(storedRaw, 10) : null;
-			if (stored != null && current.score > stored) {
-				setLevelUpData({
-					label: current.label,
-					mascot: current.mascot,
-					encouragement: current.encouragement,
-					description: current.description,
-					score: current.score,
-				});
-				levelUpPendingRef.current = true; // 안전한 시점(출석/미션 모달 닫힘)에 노출
-			}
-			if (stored == null || current.score !== stored) {
-				await AsyncStorage.setItem(MainStorageKeyType.LAST_SEEN_GRADE, String(current.score));
-			}
-		} catch (e) {
-			console.log('레벨업 감지 실패:', e);
+	/** 홈 진입 시 필요한 데이터를 한 번에 읽어 온다. */
+	const loadHomeData = useCallback(async () => {
+		await TodayQuizService.ensureToday(); // 오늘 항목이 없으면 만들어 둔다
+		await Promise.all([refreshProgress(), attendance.refresh(), refreshMissionSummary()]);
+
+		// 아직 출석 전이면 출석 팝업을 띄운다
+		const today = await TodayQuizService.getToday();
+		if (today && !today.isCheckedIn) {
+			setShowCheckInModal(true);
 		}
-	};
-
-	const loadData = async () => {
-		const quizData = await AsyncStorage.getItem(USER_QUIZ_HISTORY_KEY);
-		const studyData = await AsyncStorage.getItem(USER_STUDY_HISTORY_KEY);
-		const todayQuiz = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
-		const towerData = await AsyncStorage.getItem(TOWER_CHALLENGE_PROGRESS);
-
-		let realScore = 0;
-		if (quizData) {
-			realScore = JSON.parse(quizData).totalScore || 0;
-			if (todayQuiz) {
-				const parsed = JSON.parse(todayQuiz);
-				const todayItem = parsed.find((q: any) => DateUtils.toLocalDateKey(q.quizDate) === todayStr);
-				if (todayItem) {
-					setIsCheckedIn(todayItem.isCheckedIn || false);
-				}
-			}
-		}
-
-		setTotalScore(realScore);
-		await detectLevelUp(realScore); // ✅ 레벨업 감지
-
-		const quizBadges = quizData ? JSON.parse(quizData).badges || [] : [];
-		const studyBadges = studyData ? JSON.parse(studyData).badges || [] : [];
-
-		// ✅ 타워 뱃지도 포함
-		let towerBadges: string[] = [];
-		if (towerData) {
-			const parsed: TowerProgress = JSON.parse(towerData);
-			setUnlockedRewards(parsed.unlockedRewards ?? []);
-			towerBadges = parsed.badges || []; // TowerProgress에 badges 필드가 없으면 [] 유지
-		}
-
-		setEarnedBadgeIds([...new Set([...quizBadges, ...studyBadges, ...towerBadges])]);
-	};
-	// 필요 시 랜덤 퀴즈 생성기 로직
-	const generateTodayQuizIds = (count: number): number[] => {
-		// sort(() => Math.random() - 0.5) 는 균등 셔플이 아니라 편향된다 → 부분 Fisher-Yates 사용
-		return sampleSize(CONST_MAIN_DATA.PROVERB, count).map((item) => item.id);
-	};
-	const ensureTodayQuizExists = async () => {
-		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
-
-		if (json) {
-			const list: MainDataType.TodayQuizList[] = JSON.parse(json);
-			const exists = list.some((item) => {
-				return DateUtils.toLocalDateKey(item.quizDate) === todayStr;
-			});
-			if (exists) {
-				console.log('✅ 이미 오늘의 퀴즈 항목이 존재합니다');
-				return;
-			}
-
-			// 오늘 항목이 없으면 추가
-			const newQuizItem: MainDataType.TodayQuizList = {
-				quizDate: todayStr,
-				isCheckedIn: false,
-				todayQuizIdArr: generateTodayQuizIds(5),
-				correctQuizIdArr: [],
-				worngQuizIdArr: [],
-				answerResults: {},
-				selectedAnswers: {},
-			};
-
-			await AsyncStorage.setItem(TODAY_QUIZ_LIST_KEY, JSON.stringify([...list, newQuizItem]));
-			console.log('📌 오늘 퀴즈 추가됨');
-		} else {
-			// 키 자체가 없음: 새로 생성
-			const newQuizItem: MainDataType.TodayQuizList = {
-				quizDate: todayStr,
-				isCheckedIn: false,
-				todayQuizIdArr: generateTodayQuizIds(5),
-				correctQuizIdArr: [],
-				worngQuizIdArr: [],
-				answerResults: {},
-				selectedAnswers: {},
-			};
-
-			await AsyncStorage.setItem(TODAY_QUIZ_LIST_KEY, JSON.stringify([newQuizItem]));
-			console.log('📌 오늘 퀴즈 리스트 새로 생성됨');
-		}
-	};
-
-	const checkTodayCheckIn = async () => {
-		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
-		if (!json) {
-			return;
-		}
-
-		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-		const todayItem = arr.find((q) => DateUtils.toLocalDateKey(q.quizDate) === todayStr);
-
-		if (todayItem) {
-			const checked = todayItem.isCheckedIn || false;
-			setIsCheckedIn(checked);
-
-			if (!checked) {
-				setShowCheckInModal(true); // ✅ 출석 안했을 때만 모달 표시
-			}
-		}
-	};
-
-	const loadCheckedInDates = async () => {
-		const json = await AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY);
-		if (!json) {
-			return;
-		}
-
-		const arr: MainDataType.TodayQuizList[] = JSON.parse(json);
-
-		const marked: { [date: string]: any } = {};
-		arr.forEach((item) => {
-			if (item.isCheckedIn) {
-				const date = DateUtils.toLocalDateKey(item.quizDate);
-				const isToday = date === todayStr;
-
-				marked[date] = {
-					customStyles: {
-						container: {
-							backgroundColor: isToday ? COLORS.secondary : COLORS.primary, // ✅ 블루: 오늘(강조), 그린: 이전 출석
-							borderRadius: RADIUS.sm,
-						},
-						text: {
-							color: COLORS.textWhite,
-							fontWeight: '700',
-						},
-					},
-				};
-			}
-		});
-		setCheckedInDates(marked);
-		setPetLevel(getPetLevel(marked)); // ✅ 추가
-
-		// ✅ 연속 출석 스트릭 계산
-		const streak = calcStreak(Object.keys(marked), todayStr);
-		setStreakInfo(streak);
-
-		// ✅ 누적 출석일 기준 출석 뱃지 부여 (USER_QUIZ_HISTORY.badges 에 병합 저장)
-		await awardAttendanceBadges(Object.keys(marked).length);
-	};
-
-	/**
-	 * 누적 출석일로 출석 뱃지를 부여하고 저장/표시에 반영
-	 */
-	const awardAttendanceBadges = async (checkInCount: number) => {
-		try {
-			const quizJson = await AsyncStorage.getItem(USER_QUIZ_HISTORY_KEY);
-			const quiz = quizJson ? JSON.parse(quizJson) : {};
-			const existing: string[] = quiz.badges ?? [];
-			const earned = AttendanceBadgeInterceptor(checkInCount, existing);
-			if (earned.length === 0) {
-				return;
-			}
-			const merged = [...new Set([...existing, ...earned])];
-			quiz.badges = merged;
-			await AsyncStorage.setItem(USER_QUIZ_HISTORY_KEY, JSON.stringify(quiz));
-			setEarnedBadgeIds((prev) => [...new Set([...prev, ...earned])]);
-		} catch (e) {
-			console.log('출석 뱃지 부여 실패:', e);
-		}
-	};
-
-	// ✅ 오늘의 미션 요약을 스토리지에서 즉시 재계산
-	const refreshMissionSummary = async () => {
-		try {
-			const today = DateUtils.getLocalDateString();
-			const [json, claimedJson] = await Promise.all([
-				AsyncStorage.getItem(TODAY_QUIZ_LIST_KEY),
-				AsyncStorage.getItem(MainStorageKeyType.DAILY_MISSION_CLAIMED),
-			]);
-			const list: MainDataType.TodayQuizList[] = json ? JSON.parse(json) : [];
-			const todayItem = list.find((q) => DateUtils.toLocalDateKey(q.quizDate) === today) ?? null;
-			const missions = computeDailyMissions(todayItem);
-			const claimedList: string[] = claimedJson ? JSON.parse(claimedJson) : [];
-			setMissionSummary({
-				done: countDoneMissions(missions),
-				total: missions.length,
-				allDone: allMissionsDone(missions),
-				claimed: claimedList.includes(today),
-			});
-		} catch (e) {
-			// no-op
-		}
-	};
+	}, [refreshProgress, attendance.refresh, refreshMissionSummary]);
 
 	const handleMascotPress = () => {
 		const random = greetingMessages[Math.floor(Math.random() * greetingMessages.length)];
@@ -702,19 +418,12 @@ const Home = () => {
 	};
 
 	const moveToHandler = {
-		//@ts-ignore
 		quiz: () => navigation.navigate(Paths.PROVERB_QUIZ_MODE_SELECT),
-		//@ts-ignore
 		study: () => navigation.navigate(Paths.PROVERB_STUDY),
-		//@ts-ignore
 		wrongReview: () => navigation.navigate(Paths.QUIZ_WRONG_REVIEW),
-		//@ts-ignore
 		timechalleng: () => navigation.navigate(Paths.INIT_TIME_CHANLLENGE),
-		//@ts-ignore
-		towerchalleng: () => navigation.navigate(Paths.TOWER_CHANLLENGE), // ✅ 추가
-		//@ts-ignore
+		towerchalleng: () => navigation.navigate(Paths.TOWER_CHANLLENGE),
 		favorite: () => navigation.navigate(Paths.FAVORITE),
-		//@ts-ignore
 		myBook: () => navigation.navigate(Paths.MY_PROVERB_BOOK),
 	};
 	return (
@@ -733,6 +442,12 @@ const Home = () => {
 						transform: [{ translateY: screenAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
 					},
 				]}>
+				{/*
+				  아이콘 칩 색은 '기능 계열' 을 나타낸다 — 무지개처럼 흩어지지 않도록 3계열로 묶는다.
+				  · 학습  : 블루 / 그린  (주 동작 2개, 보더까지 칠해 위계를 준다)
+				  · 도전  : 앰버 → 플레임 → 오렌지 (난이도가 올라가는 램프)
+				  · 수집  : 틸 / 스카이
+				*/}
 				<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false} ref={scrollViewRef}>
 					<View style={styles.heroSection}>
 						<View style={styles.imageContainer}>
@@ -844,10 +559,24 @@ const Home = () => {
 								</View>
 
 								{/* 점수 뱃지 */}
-								<View style={styles.scoreBadgeItem}>
-									<IconComponent name="leaderboard" type="materialIcons" size={scaledSize(14)} color={COLORS.textWhite} />
-									<Text style={styles.scoreBadgeTextItem}>{totalScore.toLocaleString()}점</Text>
-								</View>
+								{progressStatus === 'error' ? (
+									// 읽기에 실패했는데 0점으로 보여주면 기록이 날아간 줄 안다 → 실패임을 밝히고 다시 시도할 길을 준다
+									<TouchableOpacity
+										style={[styles.scoreBadgeItem, styles.scoreBadgeItemError]}
+										onPress={refreshProgress}
+										activeOpacity={0.8}
+										hitSlop={HIT_SLOP}>
+										<IconComponent name="refresh" type="materialIcons" size={scaledSize(14)} color={COLORS.textWhite} />
+										<Text style={styles.scoreBadgeTextItem}>기록을 불러오지 못했습니다 · 다시 시도</Text>
+									</TouchableOpacity>
+								) : (
+									<View style={styles.scoreBadgeItem}>
+										<IconComponent name="leaderboard" type="materialIcons" size={scaledSize(14)} color={COLORS.textWhite} />
+										<Text style={styles.scoreBadgeTextItem}>
+											{progressStatus === 'ready' ? `${totalScore.toLocaleString()}점` : '불러오는 중…'}
+										</Text>
+									</View>
+								)}
 								{/* 설명 */}
 								<Text style={[styles.levelDescription]}>{description}</Text>
 								<TowerRewardSection unlockedRewards={unlockedRewards} />
@@ -913,6 +642,7 @@ const Home = () => {
 						label="시작하기"
 						description="속담 뜻, 속담 찾기, 빈칸 채우기 퀴즈를 선택해서 퀴즈를 풀어 봅니다"
 						color={COLORS.secondary}
+						primary
 						onPress={moveToHandler.quiz}
 					/>
 					<ActionCard
@@ -922,6 +652,7 @@ const Home = () => {
 						label="학습 모드"
 						description="카드 형식으로 속담과 속담의 의미를 재미있게 익힙니다"
 						color={COLORS.primary}
+						primary
 						onPress={moveToHandler.study}
 					/>
 					<MascotMoment
@@ -955,7 +686,7 @@ const Home = () => {
 						iconType="materialCommunityIcons"
 						label="타워 챌린지"
 						description="레벨별 보스를 차례로 도전하고 특별한 보상을 획득하세요!"
-						color={COLORS.accentTeal}
+						color={COLORS.accentOrange}
 						onPress={moveToHandler.towerchalleng}
 					/>
 					<MascotMoment
@@ -972,7 +703,7 @@ const Home = () => {
 						iconType="materialIcons"
 						label="즐겨찾기"
 						description="자주 보고 싶은 속담을 모아두고 한눈에 다시 확인합니다"
-						color={COLORS.gold}
+						color={COLORS.accentTeal}
 						onPress={moveToHandler.favorite}
 						isNew
 					/>
@@ -982,7 +713,7 @@ const Home = () => {
 						iconType="materialIcons"
 						label="나만의 속담집"
 						description="원하는 속담을 모아 나만의 속담집을 만들고 퀴즈로 풀어 봅니다"
-						color={COLORS.accentPink}
+						color={COLORS.accentSky}
 						onPress={moveToHandler.myBook}
 						isNew
 					/>
@@ -1059,14 +790,21 @@ const Home = () => {
 				}}
 				onClaimed={(bonus) => {
 					// ✅ 보너스 즉시 반영 (캐릭터/점수/게이지 바로 갱신)
-					setTotalScore((prev) => prev + (bonus ?? 0));
+					addScoreLocally(bonus ?? 0);
 					// 스토리지 기준으로 한 번 더 정합성 맞춤
-					loadData();
+					refreshProgress();
 					refreshMissionSummary();
 				}}
 			/>
 
-			<LevelUpModal visible={showLevelUp && !!levelUpData} level={levelUpData} onClose={() => setShowLevelUp(false)} />
+			<LevelUpModal
+				visible={showLevelUp && !!levelUp}
+				level={levelUp}
+				onClose={() => {
+					setShowLevelUp(false);
+					clearLevelUp();
+				}}
+			/>
 
 			<LevelModal visible={showLevelModal} totalScore={totalScore} onClose={() => setShowLevelModal(false)} />
 			<CheckInModal
@@ -1079,8 +817,8 @@ const Home = () => {
 				petLevel={petLevel}
 				onClose={() => {
 					setShowCheckInModal(false);
-					loadCheckedInDates();
-					loadData();
+					attendance.refresh();
+					refreshProgress();
 				}}
 			/>
 			<CharacterGuide
@@ -1099,11 +837,11 @@ const Home = () => {
 
 const styles = themedStyles(() => StyleSheet.create({
 	main: { flex: 1, backgroundColor: COLORS.surface },
-	wrapper: { flex: 1, backgroundColor: COLORS.surface, marginTop: scaleHeight(-16) },
+	wrapper: { flex: 1, backgroundColor: COLORS.surface },
 	container: {
 		flexGrow: 1,
-		paddingHorizontal: SPACING_W.md,
-		paddingTop: SPACING_H.md,
+		// 좌우 여백은 다른 화면(속담 사전/나의 활동/즐겨찾기 …)과 같은 lg 로 맞춘다.
+		paddingHorizontal: SPACING_W.lg,
 		paddingBottom: SPACING_H.xxxxl, // 하단 잘림 방지 여백
 	},
 
@@ -1271,6 +1009,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.xs,
 		marginBottom: SPACING_H.sm,
+	},
+	scoreBadgeItemError: {
+		backgroundColor: COLORS.danger,
 	},
 	scoreBadgeTextItem: {
 		color: COLORS.textWhite,

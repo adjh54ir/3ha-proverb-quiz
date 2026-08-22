@@ -8,6 +8,7 @@ import Modal from '@/screens/common/atomic/AppModal';
 import VersionCheck from 'react-native-version-check';
 import { useThemeMode } from '@/hooks/useThemeMode';
 import { useDispatch } from 'react-redux';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
 /** 업데이트 종류: 팝업 없음 / 닫기 가능한 안내 / 강제 업데이트 */
 export type UpdateKind = 'none' | 'optional' | 'force';
@@ -71,12 +72,11 @@ const VersionCheckModal = () => {
 	/** 선택 업데이트를 닫은 뒤에는 포그라운드 복귀 시 다시 띄우지 않는다(강제는 제외). */
 	const optionalDismissed = useRef(false);
 
-	// 진입 애니메이션 (fade + scale 0.95 → 1)
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const scaleAnim = useRef(new Animated.Value(0.95)).current;
-
 	const visible = updateKind !== 'none';
 	const isForce = updateKind === 'force';
+
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(visible);
 
 	useEffect(() => {
 		let mounted = true;
@@ -122,23 +122,6 @@ const VersionCheckModal = () => {
 		};
 	}, [dispatch]);
 
-	useEffect(() => {
-		if (!visible) {
-			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-			fadeAnim.setValue(0);
-			scaleAnim.setValue(0.95);
-			return;
-		}
-		fadeAnim.setValue(0);
-		scaleAnim.setValue(0.95);
-		const enter = Animated.parallel([
-			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-		]);
-		enter.start();
-		return () => enter.stop();
-	}, [visible, fadeAnim, scaleAnim]);
-
 	/** 스토어로 이동 */
 	const handleUpdate = async (): Promise<void> => {
 		try {
@@ -175,7 +158,7 @@ const VersionCheckModal = () => {
 			<TouchableWithoutFeedback onPress={handleClose}>
 				<View style={styles.overlay}>
 					<TouchableWithoutFeedback onPress={() => {}}>
-						<Animated.View style={[styles.card, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+						<Animated.View style={[styles.card, enterStyle]}>
 							<View style={[styles.iconWrap, isForce && styles.iconWrapForce]}>
 								<Image source={require('@/assets/images/update.png')} style={styles.icon} />
 							</View>
@@ -224,7 +207,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: SPACING_W.xxl,
+		paddingHorizontal: SPACING_W.lg,
 	},
 	card: {
 		backgroundColor: COLORS.surface,

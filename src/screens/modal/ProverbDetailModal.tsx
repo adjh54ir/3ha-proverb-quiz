@@ -1,19 +1,19 @@
 // ProverbDetailModal.tsx
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Animated } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
-import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
+import { getCategoryColor, getLevelColorByNumber } from '@/screens/common/CommonProverbModule';
 
 /** 레벨 번호 → 난이도 이름 (공통 난이도 램프 조회용) */
-const LEVEL_NAME_BY_NUMBER: Record<number, string> = { 1: '초급', 2: '중급', 3: '고급', 4: '특급' };
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import SuccessToast from '../SuccessToast';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
 type Props = {
 	visible: boolean;
@@ -27,8 +27,8 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 	const [isFavorite, setIsFavorite] = useState(false);
 	const [toastMessage, setToastMessage] = useState('');
 	const [toastSubMessage, setToastSubMessage] = useState('');
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const scaleAnim = useRef(new Animated.Value(0.95)).current;
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(visible);
 
 	// ✅ 즐겨찾기 상태 로드 (early return 위에서 선언해야 아래 useEffect 가 안전하게 참조한다)
 	const loadFavoriteStatus = useCallback(async () => {
@@ -46,24 +46,6 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 		}
 	}, [visible, proverb, loadFavoriteStatus]);
 
-	// 진입: fade + scale
-	useEffect(() => {
-		if (!visible) {
-			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-			fadeAnim.setValue(0);
-			scaleAnim.setValue(0.95);
-			return;
-		}
-		fadeAnim.setValue(0);
-		scaleAnim.setValue(0.95);
-		const enter = Animated.parallel([
-			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-		]);
-		enter.start();
-		return () => enter.stop();
-	}, [visible, fadeAnim, scaleAnim]);
-
 	// ✅ early return은 모든 Hook 선언 이후에
 	if (!proverb) {
 		return null;
@@ -71,7 +53,7 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 
 	// 카테고리/난이도 색 — 공통 팔레트(CommonProverbModule) 단일 소스 사용
 	const getFieldColor = (field: string) => getCategoryColor(field);
-	const getLevelColor = (level: number) => getLevelNameColor(LEVEL_NAME_BY_NUMBER[level] ?? '');
+	const getLevelColor = getLevelColorByNumber;
 
 	const getLevelIcon = (level: number) => {
 		switch (level) {
@@ -131,7 +113,7 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 	return (
 		<Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
 			<View style={styles.modalOverlay}>
-				<Animated.View style={[styles.modalContainer, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+				<Animated.View style={[styles.modalContainer, enterStyle]}>
 					{/* ───────────── 헤더 ───────────── */}
 					<View style={styles.modalHeader}>
 						<Text style={styles.modalHeaderTitle}>속담 상세</Text>

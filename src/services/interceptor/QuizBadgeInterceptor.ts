@@ -3,7 +3,7 @@ import { MainDataType } from '@/types/MainDataType';
 export interface UserQuizHistory {
 	correctProverbId: number[];
 	wrongProverbId: number[];
-	lastAnsweredAt: Date;
+	lastAnsweredAt: Date | string;
 	quizCounts: { [id: number]: number };
 	badges: string[];
 	totalScore: number;

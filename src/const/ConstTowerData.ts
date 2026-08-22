@@ -16,7 +16,6 @@ export const TOWER_LEVELS = [
 			image: require('@/assets/images/costumes/beginner_hat_v2.png'),
 		},
 		color: '#82c91e', // 연두색 (멧돼지)
-		backgroundColor: '#f1f8e9',
 		clearCondition: '초급 문제 전체 클리어',
 	},
 	{
@@ -35,7 +34,6 @@ export const TOWER_LEVELS = [
 			image: require('@/assets/images/costumes/intermediate_cape_v2.png'),
 		},
 		color: '#8d6e63', // 갈색 (바위)
-		backgroundColor: '#efebe9',
 		clearCondition: '중급 문제 전체 클리어',
 	},
 	{
@@ -55,7 +53,6 @@ export const TOWER_LEVELS = [
 			image: require('@/assets/images/costumes/legendary_guardian_v2.png'),
 		},
 		color: '#16a085', // 보라색 (신비)
-		backgroundColor: '#f3e5f5',
 	},
 	{
 		id: 4, // ← 추가
@@ -73,7 +70,6 @@ export const TOWER_LEVELS = [
 			image: require('@/assets/images/costumes/golden_club_v2.png'),
 		},
 		color: '#d32f2f', // 붉은색 (도깨비)
-		backgroundColor: '#ffebee',
 		clearCondition: '특급 문제 전체 클리어',
 	},
 ];

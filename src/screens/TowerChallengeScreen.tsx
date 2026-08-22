@@ -6,11 +6,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
+import { useAppNavigation } from '@/navigation/conf/Types';
 import FastImage from 'react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
-import Carousel from 'react-native-reanimated-carousel';
+import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
 import AdmobRewardAd from './common/ads/AdmobRewardAd';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import CompleteOverlay from './common/CompleteOverlay';
@@ -18,6 +19,8 @@ import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
+import { read, write } from '@/services/StorageService';
 
 const TOWER_STORAGE_KEY = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
 const SCREEN_WIDTH = screenWidth;
@@ -25,7 +28,7 @@ const SCREEN_WIDTH = screenWidth;
 const TowerChallengeScreen = () => {
 	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
 	const guide = useCharacterGuideOnce('towerChallenge', false);
-	const navigation = useNavigation();
+	const navigation = useAppNavigation();
 	const [progress, setProgress] = useState<TowerProgress>({
 		level: 1,
 		attempts: 1,
@@ -44,12 +47,25 @@ const TowerChallengeScreen = () => {
 	const headerAnim = useRef(new Animated.Value(0)).current;
 	const infoAnim = useRef(new Animated.Value(0)).current;
 
+	// 캐러셀은 항상 1단계부터 보여주고 있었다. 클리어하고 돌아와도 다시 1단계라
+	// 매번 손으로 넘겨야 했으므로, 도전할 차례인 단계로 맞춰 준다.
+	const carouselRef = useRef<ICarouselInstance>(null);
+	/** 도전할 차례인 단계의 캐러셀 인덱스 (마지막 단계까지 깼으면 마지막 카드) */
+	const currentIndex = Math.min(Math.max(progress.level, 1), TOWER_LEVELS.length) - 1;
+
 	// 타워 퀴즈를 끝내고 goBack 으로 돌아오면 이 화면은 언마운트되지 않는다.
 	// 진행도를 포커스마다 다시 읽어야 클리어/도전 횟수가 즉시 반영된다.
 	useFocusEffect(
 		useCallback(() => {
 			loadProgress();
 		}, []),
+	);
+
+	// 진행도를 읽은 뒤(=level 이 정해진 뒤) 도전할 단계로 캐러셀을 옮긴다.
+	useFocusEffect(
+		useCallback(() => {
+			carouselRef.current?.scrollTo({ index: currentIndex, animated: true });
+		}, [currentIndex]),
 	);
 
 	useEffect(() => {
@@ -63,9 +79,8 @@ const TowerChallengeScreen = () => {
 
 	const loadProgress = async () => {
 		try {
-			const saved = await AsyncStorage.getItem(TOWER_STORAGE_KEY);
-			if (saved) {
-				const parsed = JSON.parse(saved);
+			const parsed = await read<TowerProgress | null>(TOWER_STORAGE_KEY, null);
+			if (parsed) {
 				const today = DateUtils.getLocalDateString();
 
 				if (DateUtils.toLocalDateKey(parsed.lastAttemptDate) !== today) {
@@ -85,7 +100,7 @@ const TowerChallengeScreen = () => {
 
 	const saveProgress = async (newProgress: TowerProgress) => {
 		try {
-			await AsyncStorage.setItem(TOWER_STORAGE_KEY, JSON.stringify(newProgress));
+			await write(TOWER_STORAGE_KEY, newProgress);
 			setProgress(newProgress);
 		} catch (error) {
 			console.error('탑 도전 데이터 저장 실패:', error);
@@ -135,8 +150,6 @@ const TowerChallengeScreen = () => {
 		// ⚠️ 저장 완료 전에 이동하면 퀴즈 화면이 진행도를 못 읽어 결과가 저장되지 않는다.
 		await saveProgress(newProgress);
 
-		// 타입 안전하게 네비게이션
-		// @ts-ignore
 		navigation.navigate(Paths.TOWER_QUIZ, { level });
 	};
 	const handleDevReset = () => {
@@ -188,7 +201,7 @@ const TowerChallengeScreen = () => {
 					{isCompleted && <CompleteOverlay />}
 					{/* 레벨 배지 */}
 					<View style={[styles.levelBadge, { backgroundColor: tower.color }]}>
-						<Text style={styles.levelText}>LV.{tower.level}</Text>
+						<Text style={[styles.levelText, { color: readableTextOn(tower.color) }]}>LV.{tower.level}</Text>
 						{isCompleted && (
 							<IconComponent type="materialIcons" name="check-circle" size={scaledSize(18)} color={COLORS.textWhite} style={styles.badgeIcon} />
 						)}
@@ -199,7 +212,7 @@ const TowerChallengeScreen = () => {
 					<View style={styles.bossContainer}>
 						{!isLocked ? (
 							<View style={styles.bossWrapper}>
-								<View style={[styles.bossGlow, { backgroundColor: tower.color + '30' }]} />
+								<View style={[styles.bossGlow, { backgroundColor: withAlpha(tower.color, ALPHA.border) }]} />
 								<View style={[styles.bossImageContainer, { borderColor: tower.color }]}>
 									<FastImage source={tower.bossImage} style={styles.bossImage} resizeMode="contain" />
 								</View>
@@ -296,6 +309,8 @@ const TowerChallengeScreen = () => {
 				{/* 캐러셀 */}
 				<View style={styles.carouselContainer}>
 					<Carousel
+						ref={carouselRef}
+						defaultIndex={currentIndex}
 						loop={false}
 						width={SCREEN_WIDTH * 0.9}
 						height={scaleHeight(480)} // 620 → 480

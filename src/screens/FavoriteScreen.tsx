@@ -21,6 +21,8 @@ import { useToast } from '@/hooks/useToast';
 import BottomHomeButton from './common/BottomHomeButton';
 import FavoriteAddModal from './modal/FavoriteAddModal';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import { LEVEL_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
+import { AnimatedListItem } from '@/components/animation/FadeInView';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const COMMON_ALL_OPTION = themedValue(() => ({
@@ -30,34 +32,10 @@ const COMMON_ALL_OPTION = themedValue(() => ({
 	labelStyle: { marginLeft: SPACING_W.xs, fontSize: FONT_SIZES.md },
 }));
 
-const LEVEL_DROPDOWN_ITEMS = [
-	COMMON_ALL_OPTION,
-	{ label: '초급', value: '초급', icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color={getLevelColor('초급')} /> },
-	{ label: '중급', value: '중급', icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color={getLevelColor('중급')} /> },
-	{ label: '고급', value: '고급', icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color={getLevelColor('고급')} /> },
-	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelColor('특급')} /> },
-];
 
 /**
  * FlatList 아이템 fade + slide-up 진입 애니메이션 래퍼
  */
-const AnimatedListItem = React.memo(({ children, index }: { children: React.ReactNode; index: number }) => {
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const translateY = useRef(new Animated.Value(scaleHeight(12))).current;
-
-	useEffect(() => {
-		// 처음 6개만 stagger, 이후는 즉시 표시 (스크롤 성능 보호)
-		const delay = index < 6 ? index * 40 : 0;
-		const anim = Animated.parallel([
-			Animated.timing(fadeAnim, { toValue: 1, duration: 250, delay, useNativeDriver: true }),
-			Animated.timing(translateY, { toValue: 0, duration: 250, delay, useNativeDriver: true }),
-		]);
-		anim.start();
-		return () => anim.stop();
-	}, []);
-
-	return <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY }] }}>{children}</Animated.View>;
-});
 
 const FavoriteScreen = () => {
 	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
@@ -388,7 +366,7 @@ const FavoriteScreen = () => {
 											}}
 										/>
 									</View>
-									<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset}>
+									<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset} hitSlop={HIT_SLOP}>
 										<Icon name="rotate-right" size={scaledSize(16)} color={COLORS.textSecondary} />
 									</TouchableOpacity>
 								</View>
@@ -490,7 +468,7 @@ const FavoriteScreen = () => {
 							scrollEnabled={!fieldOpen && !levelOpen}
 							keyExtractor={(item) => item.id.toString()}
 							renderItem={renderItem}
-							contentContainerStyle={[styles.listContent, isSelectionMode && { paddingBottom: scaleHeight(120) }]}
+							contentContainerStyle={[styles.listContent, isSelectionMode && styles.listContentWithBar]}
 							keyboardShouldPersistTaps="handled"
 							keyboardDismissMode="on-drag"
 							refreshControl={<RefreshControl
@@ -590,7 +568,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	headerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', columnGap: SPACING_W.sm, marginBottom: SPACING_H.md },
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
 	favoriteHeroImage: { width: scaleWidth(70), height: scaleHeight(58) },
-	headerTitle: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },
+	// 다른 화면 헤더(ScreenHeader)와 같은 타이틀 크기 — 탭을 오갈 때 글자 크기가 튀지 않게
+	headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },
 	headerSubText: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'right' },
 	headerCount: { fontWeight: '700', color: COLORS.warning, fontSize: FONT_SIZES.smPlus },
 	headerCountDelete: { fontWeight: '700', color: COLORS.danger, fontSize: FONT_SIZES.smPlus },
@@ -684,6 +663,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	miniCheckboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
 	listContent: { paddingTop: SPACING_H.xs, paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
+	// 선택 모드에서만 하단 삭제 바(absolute)가 뜨므로 그때만 그만큼 더 비운다.
+	listContentWithBar: { paddingBottom: scaleHeight(100) },
 	itemCard: {
 		backgroundColor: COLORS.surface,
 		paddingHorizontal: SPACING_W.lg,
@@ -747,13 +728,13 @@ const styles = themedStyles(() => StyleSheet.create({
 		left: 0,
 		right: 0,
 		backgroundColor: COLORS.surface,
-		borderWidth: 1,
-		borderColor: COLORS.border,
+		// 화면 좌우/아래에 붙는 바라 위쪽 구분선만 있으면 된다.
+		// (borderWidth 는 네 변을 모두 그려 좌우·아래에 선이 비쳤다)
+		borderTopWidth: 1,
+		borderTopColor: COLORS.border,
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.md,
 		paddingBottom: SPACING_H.xl,
-		borderTopWidth: 1,
-		borderTopColor: COLORS.surfaceAlt,
 	},
 	deleteActionBtn: {
 		flexDirection: 'row',

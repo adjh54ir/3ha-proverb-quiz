@@ -8,6 +8,7 @@ import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '
 import { LEVEL_DATA } from '@/const/ConstInfoData';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
 interface LevelModalProps {
 	visible: boolean;
@@ -19,29 +20,12 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 	const levelScrollRef = useRef<ScrollView>(null);
 	const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	// 모달 진입 애니메이션 (fade + scale)
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const scaleAnim = useRef(new Animated.Value(0.95)).current;
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(visible);
 
 	// 역순 정렬된 데이터
 	const reversedLevelData = useMemo(() => [...LEVEL_DATA].reverse(), []);
 
-	useEffect(() => {
-		if (!visible) {
-			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-			fadeAnim.setValue(0);
-			scaleAnim.setValue(0.95);
-			return;
-		}
-		fadeAnim.setValue(0);
-		scaleAnim.setValue(0.95);
-		const anim = Animated.parallel([
-			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-		]);
-		anim.start();
-		return () => anim.stop();
-	}, [visible, fadeAnim, scaleAnim]);
 
 	/**
 	 * 위치에 맞게 스크롤 이동
@@ -78,7 +62,7 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<View style={styles.modalOverlay}>
 				<Animated.View
-					style={[styles.levelModal, { maxHeight: scaleHeight(600), opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+					style={[styles.levelModal, { maxHeight: scaleHeight(600), ...enterStyle }]}>
 					<ModalCloseButton onPress={onClose} />
 
 					<Text style={styles.levelModalTitle}>등급 안내</Text>

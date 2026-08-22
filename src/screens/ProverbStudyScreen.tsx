@@ -5,7 +5,6 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ActivityIndicator, Animated, Dimensions, Easing, Image, InteractionManager, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import Carousel from 'react-native-reanimated-carousel';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
@@ -13,7 +12,8 @@ import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
-import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
+import { getCategoryColor, getLevelColorByNumber, LEVEL_NAME_BY_NUMBER } from '@/screens/common/CommonProverbModule';
+import { LEVEL_DROPDOWN_ITEMS, FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
@@ -23,122 +23,13 @@ import NewBadgeModal from '@/screens/modal/NewBadgeModal';
 import { playComplete, playFlip } from '@/utils/SoundUtils';
 import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { read, write } from '@/services/StorageService';
 
 // 기기 분류(태블릿 여부)용 1회 측정값. 실시간 레이아웃은 useWindowDimensions 를 쓴다.
 const { width: screenWidth } = Dimensions.get('window');
 
-// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
-const COMMON_ALL_OPTION = themedValue(() => ({
-	label: '전체',
-	value: '전체',
-	iconType: 'FontAwesome6',
-	badgeId: '',
-	iconName: 'clipboard-list',
-	iconColor: COLORS.textSecondary,
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />,
-	labelStyle: {
-		marginLeft: SPACING_W.xs,
-		fontSize: FONT_SIZES.md,
-	},
-}));
-const LEVEL_DROPDOWN_ITEMS = [
-	COMMON_ALL_OPTION,
-	{
-		label: '초급',
-		value: '초급',
-		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color={getLevelNameColor('초급')} />,
-	},
-	{
-		label: '중급',
-		value: '중급',
-		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color={getLevelNameColor('중급')} />,
-	},
-	{
-		label: '고급',
-		value: '고급',
-		icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color={getLevelNameColor('고급')} />,
-	},
-	{
-		label: '특급',
-		value: '특급',
-		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelNameColor('특급')} />,
-	},
-];
-export const FIELD_DROPDOWN_ITEMS = [
-	COMMON_ALL_OPTION,
-	{
-		label: '운/우연',
-		value: '운/우연',
-		badgeId: 'category_luck',
-		iconType: 'FontAwesome6',
-		iconName: 'dice',
-		iconColor: getCategoryColor('운/우연'),
-		icon: () => <IconComponent type="FontAwesome6" name="dice" size={scaledSize(16)} color={getCategoryColor('운/우연')} />,
-	},
-	{
-		label: '인간관계',
-		value: '인간관계',
-		badgeId: 'category_relation',
-		iconType: 'FontAwesome6',
-		iconName: 'users',
-		iconColor: getCategoryColor('인간관계'),
-		icon: () => <IconComponent type="FontAwesome6" name="users" size={scaledSize(16)} color={getCategoryColor('인간관계')} />,
-	},
-	{
-		label: '세상 이치',
-		value: '세상 이치',
-		badgeId: 'category_world',
-		iconType: 'FontAwesome5',
-		iconName: 'globe',
-		iconColor: getCategoryColor('세상 이치'),
-		icon: () => <IconComponent type="FontAwesome5" name="globe" size={scaledSize(16)} color={getCategoryColor('세상 이치')} />,
-	},
-	{
-		label: '근면/검소',
-		value: '근면/검소',
-		badgeId: 'category_diligence',
-		iconType: 'FontAwesome5',
-		iconName: 'hammer',
-		iconColor: getCategoryColor('근면/검소'),
-		icon: () => <IconComponent type="FontAwesome5" name="hammer" size={scaledSize(16)} color={getCategoryColor('근면/검소')} />,
-	},
-	{
-		label: '노력/성공',
-		value: '노력/성공',
-		badgeId: 'category_success',
-		iconType: 'FontAwesome5',
-		iconName: 'medal',
-		iconColor: getCategoryColor('노력/성공'),
-		icon: () => <IconComponent type="FontAwesome5" name="medal" size={scaledSize(16)} color={getCategoryColor('노력/성공')} />,
-	},
-	{
-		label: '경계/조심',
-		value: '경계/조심',
-		badgeId: 'category_caution',
-		iconType: 'FontAwesome5',
-		iconName: 'exclamation-triangle',
-		iconColor: getCategoryColor('경계/조심'),
-		icon: () => <IconComponent type="FontAwesome5" name="exclamation-triangle" size={scaledSize(16)} color={getCategoryColor('경계/조심')} />,
-	},
-	{
-		label: '욕심/탐욕',
-		value: '욕심/탐욕',
-		badgeId: 'category_greed',
-		iconType: 'FontAwesome5',
-		iconName: 'hand-holding-usd',
-		iconColor: getCategoryColor('욕심/탐욕'),
-		icon: () => <IconComponent type="FontAwesome5" name="hand-holding-usd" size={scaledSize(16)} color={getCategoryColor('욕심/탐욕')} />,
-	},
-	{
-		label: '배신/불신',
-		value: '배신/불신',
-		badgeId: 'category_betrayal',
-		iconType: 'FontAwesome5',
-		iconName: 'user-slash',
-		iconColor: getCategoryColor('배신/불신'),
-		icon: () => <IconComponent type="FontAwesome5" name="user-slash" size={scaledSize(16)} color={getCategoryColor('배신/불신')} />,
-	},
-];
+// 난이도/카테고리 드롭다운은 CommonMainData 단일 소스를 쓴다.
+// (이 화면에 복사돼 있던 사본은 badgeId 가 category_world/category_success 로 잘못돼 있었다)
 const mascotImages = [
 	require('@/assets/images/random/random_mascote1.png'),
 	require('@/assets/images/random/random_mascote2.png'),
@@ -317,15 +208,8 @@ const QuizStudyScreen = () => {
 		carouselRef.current?.scrollTo({ index: 0, animated: false });
 	}, [isFocused]);
 
-	// 레벨 이름/숫자 매핑(재사용용)
-	const LEVEL_NAME_MAP: Record<number, '초급' | '중급' | '고급' | '특급'> = {
-		1: '초급',
-		2: '중급',
-		3: '고급',
-		4: '특급',
-	};
 	// 레벨 색상 — 공통 난이도 램프 재사용
-	const getLevelColor = (level: number) => getLevelNameColor(LEVEL_NAME_MAP[level]);
+	const getLevelColor = getLevelColorByNumber;
 
 	// 레벨 아이콘
 	const getLevelIcon = (level: number) => {
@@ -357,9 +241,8 @@ const QuizStudyScreen = () => {
 			const proverbList2 = ProverbServices.selectProverbList();
 			setProverbList(proverbList2);
 
-			const savedData = await AsyncStorage.getItem(STORAGE_KEY);
-			if (savedData) {
-				const parsed = JSON.parse(savedData);
+			const parsed = await read<MainDataType.UserStudyHistory | null>(STORAGE_KEY, null);
+			if (parsed) {
 				const fixed: MainDataType.UserStudyHistory = {
 					studyProverbes: parsed.studyProverbes ?? [],
 					studyCounts: parsed.studyCounts ?? {},
@@ -500,7 +383,7 @@ const QuizStudyScreen = () => {
 			nextHistory = { ...updatedHistory, badges: [...new Set([...currentBadges, ...newBadges])] };
 		}
 
-		AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(nextHistory));
+		write(STORAGE_KEY, nextHistory);
 		setter(nextHistory);
 	};
 
@@ -769,7 +652,7 @@ const QuizStudyScreen = () => {
 										{/* 레벨 뱃지 */}
 										<View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.level) }]}>
 											{getLevelIcon(item.level)}
-											<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{LEVEL_NAME_MAP[item.level] || '알 수 없음'}</Text>
+											<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{LEVEL_NAME_BY_NUMBER[item.level] || '알 수 없음'}</Text>
 										</View>
 
 										{/* 카테고리 뱃지 */}

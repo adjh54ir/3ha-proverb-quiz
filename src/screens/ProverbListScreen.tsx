@@ -32,6 +32,7 @@ import ProverbDetailModal from './modal/ProverbDetailModal';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import { AnimatedListItem } from '@/components/animation/FadeInView';
 
 
 const PAGE_SIZE = 30;
@@ -71,37 +72,6 @@ const buildFieldItems = (fields: string[]) => [
 /**
  * FlatList 아이템 fade+slide-up 진입 애니메이션 래퍼
  */
-const AnimatedListItem = React.memo(({ children, index }: { children: React.ReactNode; index: number }) => {
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const translateY = useRef(new Animated.Value(scaleHeight(16))).current;
-
-	useEffect(() => {
-		// 처음 6개만 stagger, 이후는 즉시 표시 (스크롤 성능 보호)
-		const delay = index < 6 ? index * 40 : 0;
-		const anim = Animated.parallel([
-			Animated.timing(fadeAnim, {
-				toValue: 1,
-				duration: 250,
-				delay,
-				useNativeDriver: true,
-			}),
-			Animated.timing(translateY, {
-				toValue: 0,
-				duration: 250,
-				delay,
-				useNativeDriver: true,
-			}),
-		]);
-		anim.start();
-		return () => anim.stop();
-	}, []);
-
-	return (
-		<Animated.View style={{ opacity: fadeAnim, transform: [{ translateY }] }}>
-			{children}
-		</Animated.View>
-	);
-});
 
 const ProverbListScreen = () => {
 	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
@@ -342,7 +312,7 @@ const ProverbListScreen = () => {
 										/>
 									</View>
 									{(keyword.trim() !== '' || levelValue !== '전체' || categoryValue !== '전체') && (
-										<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset}>
+										<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset} hitSlop={HIT_SLOP}>
 											<Icon name="rotate-right" size={scaledSize(18)} color={COLORS.textSecondary} />
 										</TouchableOpacity>
 									)}
@@ -473,7 +443,7 @@ const ProverbListScreen = () => {
 									</View>
 
 									{/* 초기화 버튼 */}
-									{/* <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+									{/* <TouchableOpacity style={styles.resetButton} onPress={handleReset} hitSlop={HIT_SLOP}>
                   <Icon name='rotate-right' size={scaledSize(20)} color={COLORS.textSecondary} />
                 </TouchableOpacity> */}
 								</View>
@@ -529,7 +499,7 @@ const ProverbListScreen = () => {
 								contentContainerStyle={styles.flatListCotent}
 								renderItem={({ item, index }) => {
 									return (
-										<AnimatedListItem index={index}>
+										<AnimatedListItem index={index} offsetY={16}>
 										<TouchableOpacity
 											style={styles.itemBox}
 											activeOpacity={0.8}
@@ -603,7 +573,7 @@ const ProverbListScreen = () => {
 						<Animated.View
 							pointerEvents={showScrollTop ? 'auto' : 'none'}
 							style={[styles.scrollTopButton, { opacity: scrollTopAnim, transform: [{ scale: scrollTopAnim }] }]}>
-							<TouchableOpacity onPress={scrollToTop} activeOpacity={0.8} style={styles.scrollTopButtonInner}>
+							<TouchableOpacity onPress={scrollToTop} activeOpacity={0.8} style={styles.scrollTopButtonInner} hitSlop={HIT_SLOP}>
 								<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color={COLORS.textWhite} />
 							</TouchableOpacity>
 						</Animated.View>

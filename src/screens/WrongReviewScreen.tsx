@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Animated } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { useIsFocused } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
@@ -15,13 +13,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { useAppNavigation } from '@/navigation/conf/Types';
+import QuizHistoryService from '@/services/QuizHistoryService';
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
 const WrongReviewScreen = () => {
 	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
 	const guide = useCharacterGuideOnce('wrongReview', false);
-	const navigation = useNavigation();
+	const navigation = useAppNavigation();
 	const isFocused = useIsFocused();
 	const [loading, setLoading] = useState(true);
 	const scrollViewRef = useRef<ScrollView>(null);
@@ -80,12 +80,7 @@ const WrongReviewScreen = () => {
 	const fetchWrongData = async () => {
 		setLoading(true);
 		try {
-			const stored = await AsyncStorage.getItem(STORAGE_KEY);
-			if (!stored) {
-				setWrongProverbIds([]);
-				return;
-			}
-			const parsed: MainDataType.UserQuizHistory = JSON.parse(stored);
+			const parsed = await QuizHistoryService.getQuizHistoryOrEmpty();
 			const wrongCca3List: number[] = parsed.wrongProverbId ?? [];
 			const correctCca3List: number[] = parsed.correctProverbId ?? [];
 			setTotalSolvedCount(wrongCca3List.length + correctCca3List.length);
@@ -115,7 +110,6 @@ const WrongReviewScreen = () => {
 			return;
 		}
 
-		// @ts-ignore
 		navigation.push(Paths.QUIZ, {
 			questionPool: wrongProverbIds,
 			isWrongReview: true,

@@ -53,3 +53,19 @@ const FadeInView = ({ children, style, duration = 350, delay = 0, offsetY = 12 }
 };
 
 export default FadeInView;
+
+/**
+ * 리스트 진입 stagger 지연(ms).
+ * 처음 몇 개만 순차로 띄우고 이후는 즉시 표시한다(길게 스크롤할 때 성능 보호).
+ */
+export const staggerDelay = (index: number, max = 6, step = 40): number => (index < max ? index * step : 0);
+
+/**
+ * 리스트 아이템 진입 애니메이션 (fade + slide-up).
+ * 화면 4곳에 똑같은 컴포넌트가 복사돼 있어 하나로 모았다.
+ */
+export const AnimatedListItem = React.memo(({ children, index, offsetY }: { children: React.ReactNode; index: number; offsetY?: number }) => (
+	<FadeInView delay={staggerDelay(index)} duration={250} offsetY={offsetY}>
+		{children}
+	</FadeInView>
+));

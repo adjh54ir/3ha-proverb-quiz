@@ -7,6 +7,7 @@
 	"author": "adjh54ir <adjh54ir@gmail.com>",
 	"license": "MIT",
 	"scripts": {
+		"postinstall": "node scripts/patch-rn-sound.js",
 		"start": "npx react-native start --reset-cache",
 		"start:8082": "npx react-native start --reset-cache --port 8082",
 		"setup": "git pull && yarn install && yarn pod",
@@ -29,8 +30,9 @@
 		"babel:clean": "rimraf node_modules/.cache/babel-loader/*,",
 		"lint:clean": "eslint --cache --cache-location node_modules/.cache/eslint/ --cache-file .",
 		"watchman:clean": "watchman shutdown-server",
-		"build:apk": "cd android 2>/dev/null && ./gradlew assembleRelease || (cd .. && cd android && ./gradlew assembleRelease)",
-		"build:aab": "cd android 2>/dev/null && ./gradlew bundleRelease || (cd .. && cd android && ./gradlew bundleRelease)"
+		"build:apk": "node scripts/patch-rn-sound.js && (cd android 2>/dev/null && ./gradlew assembleRelease || (cd .. && cd android && ./gradlew assembleRelease))",
+		"build:aab": "node scripts/patch-rn-sound.js && (cd android 2>/dev/null && ./gradlew bundleRelease || (cd .. && cd android && ./gradlew bundleRelease))",
+		"tag": "V=v$(sed -n 's/.*versionName \"\\(.*\\)\"/\\1/p' android/app/build.gradle) && git tag -a \"$V\" -m \"$V\" && git push origin \"$V\" && echo \"tagged $V\""
 	},
 	"dependencies": {
 		"@notifee/react-native": "^9.1.8",

@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Animated } from 'react-native';
+import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
+import Skeleton from '@/screens/common/atomic/Skeleton';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import { Paths } from '@/navigation/conf/Paths';
 import { useIsFocused } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
@@ -102,7 +104,7 @@ const WrongReviewScreen = () => {
 	 */
 	const handleScroll = (event: any) => {
 		const offsetY = event.nativeEvent.contentOffset.y;
-		setShowScrollTop(offsetY > 100);
+		setShowScrollTop(offsetY > SCROLL_TOP_THRESHOLD);
 	};
 
 	const startWrongReview = () => {
@@ -121,10 +123,16 @@ const WrongReviewScreen = () => {
 	};
 
 	if (loading) {
+		// 들어올 내용(통계 카드 → 안내 카드 → 버튼)과 같은 형태를 미리 깔아 둔다.
 		return (
-			<View style={styles.center}>
-				<ActivityIndicator size="large" color={COLORS.primary} />
-			</View>
+			<SafeAreaView style={styles.safeArea} edges={['bottom']}>
+				<View style={styles.skeletonWrap}>
+					<Skeleton height={scaleHeight(72)} radius={RADIUS.lg} />
+					<Skeleton width="80%" height={scaleHeight(14)} style={styles.skeletonGap} />
+					<Skeleton height={scaleHeight(140)} radius={RADIUS.lg} style={styles.skeletonGap} />
+					<Skeleton height={scaleHeight(48)} radius={RADIUS.md} style={styles.skeletonGap} />
+				</View>
+			</SafeAreaView>
 		);
 	}
 
@@ -245,14 +253,7 @@ const WrongReviewScreen = () => {
 			</ScrollView>
 
 			{/* 최하단에 위치할것!! */}
-			{showScrollTop && (
-				<TouchableOpacity
-					style={styles.scrollTopButton}
-					activeOpacity={0.8}
-					onPress={() => scrollViewRef.current?.scrollTo({ y: 0, animated: true })}>
-					<IconComponent type="MaterialIcons" name="arrow-upward" size={scaledSize(24)} color={COLORS.textWhite} />
-				</TouchableOpacity>
-			)}
+			<ScrollTopButton visible={showScrollTop} onPress={() => scrollViewRef.current?.scrollTo({ y: 0, animated: true })} />
 
 			<ProverbDetailModal visible={detailVisible && !!detailProverb} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
 			<CharacterGuide
@@ -272,14 +273,10 @@ const WrongReviewScreen = () => {
 export default WrongReviewScreen;
 
 const styles = themedStyles(() => StyleSheet.create({
+	skeletonWrap: { flex: 1, paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.xl },
+	skeletonGap: { marginTop: SPACING_H.lg },
 	safeArea: {
 		flex: 1,
-		backgroundColor: COLORS.background,
-	},
-	center: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
 		backgroundColor: COLORS.background,
 	},
 	scrollContainer: {
@@ -503,15 +500,4 @@ const styles = themedStyles(() => StyleSheet.create({
 		lineHeight: scaledSize(21),
 	},
 	// ===== 최상단 이동 버튼 =====
-	scrollTopButton: {
-		position: 'absolute',
-		right: SPACING_W.xl,
-		bottom: scaleHeight(32),
-		backgroundColor: COLORS.secondary,
-		width: scaleWidth(48),
-		height: scaleWidth(48),
-		borderRadius: scaleWidth(48) / 2,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
 }));

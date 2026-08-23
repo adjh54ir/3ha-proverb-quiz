@@ -1,11 +1,12 @@
 // @/screens/TowerChallenge.tsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated } from 'react-native';
+import AppAlert from '@/screens/common/modal/AppAlert';
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { useAppNavigation } from '@/navigation/conf/Types';
@@ -109,7 +110,7 @@ const TowerChallengeScreen = () => {
 
 	const handleWatchAd = () => {
 		if (progress.adRewardUsed >= 3) {
-			Alert.alert('알림', '오늘은 더 이상 광고를 볼 수 없습니다.');
+			AppAlert.alert('알림', '오늘은 더 이상 광고를 볼 수 없습니다.');
 			return;
 		}
 		setShowAd(true);
@@ -124,18 +125,18 @@ const TowerChallengeScreen = () => {
 		}
 
 		if (progress.level < level) {
-			Alert.alert('알림', '이전 레벨을 먼저 클리어해주세요!');
+			AppAlert.alert('알림', '이전 레벨을 먼저 클리어해주세요!');
 			return;
 		}
 
 		if (progress.completedLevels.includes(level)) {
-			Alert.alert('알림', '이미 완료한 레벨입니다! 🎉');
+			AppAlert.alert('알림', '이미 완료한 레벨입니다! 🎉');
 			return;
 		}
 
 		// 도전 횟수가 없으면 광고 시청 유도
 		if (progress.attempts <= 0) {
-			Alert.alert('도전 횟수 부족', '광고를 시청하여 도전 기회를 얻으시겠습니까?', [
+			AppAlert.alert('도전 횟수 부족', '광고를 시청하여 도전 기회를 얻으시겠습니까?', [
 				{ text: '취소', style: 'cancel' },
 				{ text: '광고 시청', onPress: handleWatchAd },
 			]);
@@ -153,7 +154,7 @@ const TowerChallengeScreen = () => {
 		navigation.navigate(Paths.TOWER_QUIZ, { level });
 	};
 	const handleDevReset = () => {
-		Alert.alert('개발자 모드', '작업을 선택하세요', [
+		AppAlert.alert('개발자 모드', '작업을 선택하세요', [
 			{ text: '취소', style: 'cancel' },
 			...TOWER_LEVELS.map((t) => ({
 				text: `${t.level}단계 클리어`,
@@ -167,7 +168,7 @@ const TowerChallengeScreen = () => {
 						unlockedRewards: [...new Set([...progress.unlockedRewards, t.level])],
 					};
 					await saveProgress(clearedProgress);
-					Alert.alert('완료', `${t.level}단계 클리어 처리되었습니다.`);
+					AppAlert.alert('완료', `${t.level}단계 클리어 처리되었습니다.`);
 				},
 			})),
 			{
@@ -185,7 +186,7 @@ const TowerChallengeScreen = () => {
 						lastAttemptDate: DateUtils.getLocalDateString(),
 						unlockedRewards: [],
 					});
-					Alert.alert('완료', '초기화되었습니다.');
+					AppAlert.alert('완료', '초기화되었습니다.');
 				},
 			},
 		]);
@@ -219,7 +220,7 @@ const TowerChallengeScreen = () => {
 							</View>
 						) : (
 							<View style={styles.lockedBoss}>
-								<IconComponent type="materialIcons" name="lock" size={scaledSize(48)} color={COLORS.textSecondary} />
+								<IconComponent type="materialIcons" name="lock" size={scaledSize(48)} color={COLORS.darkTextSecondary} />
 								<Text style={styles.lockedText}>LOCKED</Text>
 							</View>
 						)}
@@ -388,15 +389,15 @@ const TowerChallengeScreen = () => {
 							};
 							saveProgress(newProgress);
 							setShowAd(false); // ← 여기서 오버레이 닫기
-							Alert.alert('성공!', '도전 기회 1회가 추가되었습니다! 🎉');
+							AppAlert.alert('성공!', '도전 기회 1회가 추가되었습니다! 🎉');
 						}}
 						onClosed={() => {
 							setShowAd(false);
-							Alert.alert('알림', '광고를 끝까지 시청해야 보상이 지급됩니다.');
+							AppAlert.alert('알림', '광고를 끝까지 시청해야 보상이 지급됩니다.');
 						}}
 						onFailed={() => {
 							setShowAd(false);
-							Alert.alert('알림', '광고를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+							AppAlert.alert('알림', '광고를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
 						}}
 					/>
 				)}
@@ -477,7 +478,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	adCardDisabled: {
 		borderColor: 'rgba(100, 116, 139, 0.4)',
-		backgroundColor: COLORS.textSecondary,
+		backgroundColor: COLORS.darkMuted,
 	},
 	adTextContainer: {
 		flexShrink: 1,
@@ -503,7 +504,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '500',
 	},
 	attemptCount: {
-		fontSize: scaledSize(26),
+		fontSize: displayFontSize(26),
 		fontWeight: '700',
 		color: COLORS.textWhite,
 		lineHeight: scaledSize(30),
@@ -607,7 +608,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	lockedText: {
 		fontSize: FONT_SIZES.sm,
-		color: COLORS.textSecondary,
+		color: COLORS.darkTextSecondary,
 		marginTop: SPACING_H.sm,
 		fontWeight: '600',
 	},
@@ -656,7 +657,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	rewardLockedText: {
 		fontSize: FONT_SIZES.md,
-		color: COLORS.textSecondary,
+		color: COLORS.darkTextSecondary,
 		fontWeight: '600',
 	},
 	bottomPadding: {
@@ -673,7 +674,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.secondary,
 	},
 	challengeButtonLocked: {
-		backgroundColor: COLORS.textSecondary,
+		backgroundColor: COLORS.darkMuted,
 	},
 	challengeButtonText: {
 		color: COLORS.textWhite,

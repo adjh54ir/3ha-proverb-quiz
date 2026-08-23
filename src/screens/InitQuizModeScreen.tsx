@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing, Alert } from 'react-native';
+import AppAlert from '@/screens/common/modal/AppAlert';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
@@ -121,7 +122,7 @@ const InitQuizModeScreen = () => {
 											activeOpacity={isComingSoon ? 1 : 0.85}
 											onPress={() => {
 												if (isComingSoon) {
-													Alert.alert('새로운 퀴즈 준비 중', '새로운 퀴즈를 준비 중에 있습니다.');
+													AppAlert.alert('새로운 퀴즈 준비 중', '새로운 퀴즈를 준비 중에 있습니다.');
 													return;
 												}
 												handleSelectMode(mode.key as 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank');

@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
 import { matchesKeyword } from '@/utils/SearchUtils';
 import {
 	View,
@@ -79,7 +80,6 @@ const ProverbListScreen = () => {
 	const scrollRef = useRef<FlatList>(null);
 	const searchInputRef = useRef<TextInput>(null);
 	const headerAnim = useRef(new Animated.Value(0)).current;
-	const scrollTopAnim = useRef(new Animated.Value(0)).current;
 
 	const emptyImage = require('@/assets/images/feature-states/empty-search.png');
 	const [refreshing, setRefreshing] = useState(false);
@@ -153,17 +153,6 @@ const ProverbListScreen = () => {
 		anim.start();
 		return () => anim.stop();
 	}, []);
-
-	// 최상단 이동 버튼 fade + scale
-	useEffect(() => {
-		const anim = Animated.timing(scrollTopAnim, {
-			toValue: showScrollTop ? 1 : 0,
-			duration: 200,
-			useNativeDriver: true,
-		});
-		anim.start();
-		return () => anim.stop();
-	}, [showScrollTop]);
 
 	// 🔄 화면 포커스 시 초기화 + 데이터 로드
 	// (handleReset() 만 부르던 중복 useFocusEffect 는 제거. 아래 블록이 같은 상태를 모두 리셋하면서
@@ -483,7 +472,7 @@ const ProverbListScreen = () => {
 								onEndReachedThreshold={0.5}
 								onScroll={(event) => {
 									const offsetY = event.nativeEvent.contentOffset.y;
-									setShowScrollTop(offsetY > 100);
+									setShowScrollTop(offsetY > SCROLL_TOP_THRESHOLD);
 								}}
 								scrollEventThrottle={16}
 								keyboardShouldPersistTaps="handled"
@@ -569,14 +558,8 @@ const ProverbListScreen = () => {
 							/>
 						</View>
 
-						{/* 스크롤 최상단 이동 버튼 - fade + scale 애니메이션 */}
-						<Animated.View
-							pointerEvents={showScrollTop ? 'auto' : 'none'}
-							style={[styles.scrollTopButton, { opacity: scrollTopAnim, transform: [{ scale: scrollTopAnim }] }]}>
-							<TouchableOpacity onPress={scrollToTop} activeOpacity={0.8} style={styles.scrollTopButtonInner} hitSlop={HIT_SLOP}>
-								<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color={COLORS.textWhite} />
-							</TouchableOpacity>
-						</Animated.View>
+						{/* 스크롤 최상단 이동 버튼 (공용) */}
+						<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 
 						<ProverbDetailModal
 							visible={showDetailModal}
@@ -634,23 +617,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: 0,
 		marginBottom: SPACING_H.md,
 		textAlignVertical: 'center',
-	},
-	scrollTopButton: {
-		position: 'absolute',
-		right: SPACING_W.lg,
-		bottom: SPACING_H.lg,
-		backgroundColor: COLORS.secondary,
-		width: scaleWidth(44),
-		height: scaleWidth(44),
-		borderRadius: scaleWidth(44) / 2,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	scrollTopButtonInner: {
-		flex: 1,
-		width: '100%',
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 	itemBox: {
 		backgroundColor: COLORS.surface,

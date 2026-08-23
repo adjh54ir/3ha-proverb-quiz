@@ -1,12 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Linking, StyleSheet, Switch, Text, View, TouchableOpacity, ScrollView, ActivityIndicator, Image } from 'react-native';
+import AppAlert from '@/screens/common/modal/AppAlert';
+import { Linking, StyleSheet, Switch, Text, View, TouchableOpacity, ScrollView, ActivityIndicator, Image } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
 import { read, write } from '@/services/StorageService';
@@ -485,7 +486,7 @@ const TodayQuizScreen = () => {
 				const hour = tempSelectedHour.toString().padStart(2, '0');
 				showToastMessage('⏰ 알림 설정 완료', `매일 ${hour}시에 오늘의 퀴즈가 찾아갑니다!`);
 			} else {
-				Alert.alert('알림 권한 필요', '설정에서 알림 권한을 허용해주세요.');
+				AppAlert.alert('알림 권한 필요', '설정에서 알림 권한을 허용해주세요.');
 				Linking.openSettings();
 			}
 		} else {
@@ -1534,7 +1535,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.md,
 	},
 	completedEmoji: {
-		fontSize: scaledSize(30),
+		fontSize: displayFontSize(30),
 	},
 	completedTitle: {
 		fontSize: FONT_SIZES.xl,

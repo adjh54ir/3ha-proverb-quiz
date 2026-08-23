@@ -2,7 +2,9 @@
 
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, Animated } from 'react-native';
+import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import AppAlert from '@/screens/common/modal/AppAlert';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {useRoute, RouteProp} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -218,7 +220,7 @@ const TowerQuizScreen = () => {
 
 	const handleAutoPass = () => {
 		if (!__DEV__) return;
-		Alert.alert('개발자 모드', '모든 문제를 정답 처리하시겠습니까?', [
+		AppAlert.alert('개발자 모드', '모든 문제를 정답 처리하시겠습니까?', [
 			{ text: '취소', style: 'cancel' },
 			{
 				text: '확인',
@@ -338,7 +340,7 @@ const TowerQuizScreen = () => {
 	};
 
 	const handleExit = () => {
-		Alert.alert('퀴즈 종료', '정말 종료하시겠습니까?\n도전 횟수는 차감됩니다.', [
+		AppAlert.alert('퀴즈 종료', '정말 종료하시겠습니까?\n도전 횟수는 차감됩니다.', [
 			{ text: '취소', style: 'cancel' },
 			{
 				text: '종료',
@@ -356,6 +358,9 @@ const TowerQuizScreen = () => {
 			},
 		]);
 	};
+
+	// 뒤로가기로 그냥 나가면 도전 횟수 차감 안내 없이 시도가 사라진다 — 종료 버튼과 같은 확인을 거친다.
+	useBlockBackHandler(true, handleExit);
 
 	if (isLoading) {
 		return (

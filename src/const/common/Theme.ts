@@ -17,6 +17,15 @@ import { scaledSize, scaleWidth, scaleHeight } from '@/utils/DementionUtils';
  * 설정 화면에서 사용자가 고른 값만 반영한다. (`useThemeMode` 훅 참고)
  */
 
+/**
+ * 모드와 무관하게 값이 같아야 하는 토큰.
+ * 앰버/골드처럼 두 모드 모두 '밝은' 배경 위에 올라가는 글자는 팔레트를 따라 뒤집으면 안 된다.
+ * (다크 팔레트의 text/textStrong/textDeep 은 흰색 계열이라 금색 위에서 그대로 사라진다)
+ */
+const FIXED_TOKENS = {
+	textOnAccent: '#1F2937', // 앰버/골드 등 밝은 액센트 배경 위 글자·아이콘
+};
+
 /** 타워/챌린지 화면 전용 다크 톤 — 라이트/다크 공통으로 같은 값을 쓴다. */
 const FIXED_DARK_SCREEN = {
 	darkBg: '#1a1a2e',
@@ -26,6 +35,7 @@ const FIXED_DARK_SCREEN = {
 	darkText: '#F1F5F9',
 	darkTextSecondary: '#CBD5E1',
 	darkAccent: '#60A5FA',
+	darkMuted: '#475569', // 잠김/비활성 요소 배경 (모드 무관 고정)
 	towerVictoryBg: '#064E3B',
 	towerDefeatBg: '#7F1D1D',
 };
@@ -112,6 +122,7 @@ const LIGHT_COLORS = {
 
 	// ===== Dark (타워/챌린지 다크 화면 전용) =====
 	...FIXED_DARK_SCREEN,
+	...FIXED_TOKENS,
 
 	// ===== Dim =====
 	dim: 'rgba(0, 0, 0, 0.5)',
@@ -210,6 +221,7 @@ const DARK_COLORS: AppColors = {
 
 	// ===== Dark (타워/챌린지 화면은 두 모드 동일) =====
 	...FIXED_DARK_SCREEN,
+	...FIXED_TOKENS,
 
 	// ===== Dim =====
 	dim: 'rgba(0, 0, 0, 0.65)',
@@ -277,6 +289,9 @@ export const TEXT_SIZE_MAX_MULTIPLIER: Record<TextSizeMode, number> = {
 };
 
 let activeTextSize: TextSizeMode = 'default';
+
+/** 현재 글자 크기 배율. FONT_SIZES 를 안 거치는 값(lineHeight 등)에 같은 배율을 먹일 때 쓴다. */
+export const getTextSizeFactor = (): number => TEXT_SIZE_FACTOR[activeTextSize];
 
 export const getTextSizeMode = (): TextSizeMode => activeTextSize;
 
@@ -423,6 +438,16 @@ export const FONT_SIZES: Record<keyof typeof BASE_FONT_SIZES, number> = defineLi
 	Reflect.ownKeys(BASE_FONT_SIZES),
 	(key) => scaledSize((BASE_FONT_SIZES as any)[key] * TEXT_SIZE_FACTOR[activeTextSize]),
 );
+
+/**
+ * FONT_SIZES 토큰 범위(최대 display=28)를 넘는 대형 수치 전용.
+ * 카운트다운·결과 점수처럼 한 화면에 한 번 쓰는 숫자라 토큰을 늘리지 않고 이 함수로 받는다.
+ *
+ * 화면에서 `scaledSize(72)` 를 직접 쓰면 '글자 크게' 배율(TEXT_SIZE_FACTOR)이 빠져서
+ * 접근성 설정을 켜도 이 숫자들만 그대로 남는다. 토큰과 같은 경로를 타도록 감싼다.
+ * (호출 시점 배율로 계산되므로 themedStyles 팩토리 안이나 인라인 스타일에서 쓸 것)
+ */
+export const displayFontSize = (size: number): number => scaledSize(size * TEXT_SIZE_FACTOR[activeTextSize]);
 
 /** 공통 radius 토큰 */
 export const RADIUS = {

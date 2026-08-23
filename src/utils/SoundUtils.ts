@@ -11,30 +11,35 @@
  *   재인코딩 방법은 scripts/encode-sounds.sh 참고.
  * - 효과음: Mixkit Free SFX — assets/sounds/LICENSE.txt 참고
  */
+import { Platform } from 'react-native';
 import Sound from 'react-native-sound';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import DateUtils from '@/utils/DateUtils';
 
 /**
- * 오디오 세션 설정 — 소리가 실제로 귀에 들리는 것을 최우선으로 한다.
+ * 오디오 세션 설정 — 다른 앱의 음악/영상을 끊지 않고 효과음만 얹는 것을 최우선으로 한다.
  *
- * 믹스(다른 앱 음악 유지)를 택하면 앱이 오디오 포커스를 잡지 않는데, 그러면
- * 볼륨 버튼이 미디어 볼륨이 아니라 벨소리 볼륨을 조절한다. 미디어 볼륨이 0으로
- * 내려가 있는 기기에서는 효과음이 0.1~1.7초라 볼륨을 올릴 틈도 없이 그냥 무음이 된다
- * (iOS·Android 모두에서 "앱 전체가 무음"으로 보이던 원인).
+ * iOS: Ambient
+ *   - 다른 앱 오디오와 섞이고 세션을 빼앗지 않는다(유튜브·음악 재생 중 앱에 들어와도 그대로 재생됨).
+ *   - Playback + mixWithOthers 조합은 쓸 수 없다. react-native-sound 가 mixWithOthers=true 일 때
+ *     AllowBluetooth 옵션을 함께 넣는데, 이 옵션은 Record/PlayAndRecord 에서만 유효해
+ *     setCategory 자체가 실패하고 세션이 기본값(SoloAmbient=끊김)으로 남는다.
+ *   - 대가: Ambient 는 무음 스위치를 따르므로 무음 모드에서는 효과음이 나지 않는다.
  *
- * iOS: Playback — 무음 스위치를 무시하고 미디어 볼륨을 쓴다.
- * Android: mixWithOthers=false — 재생할 때 오디오 포커스를 요청한다(STREAM_MUSIC).
+ * Android: Playback(STREAM_MUSIC) + mixWithOthers=true
+ *   - 재생할 때 오디오 포커스를 요청하지 않아 다른 앱 재생이 끊기지 않는다.
+ *   - 스트림은 STREAM_MUSIC 그대로라 미디어 볼륨을 따른다.
  *
- * 대가: 다른 앱의 음악/영상 재생이 끊긴다. 라이브러리가 Playback+믹스 조합에서
- * AllowBluetooth 옵션을 같이 넣어 setCategory 자체가 실패하므로 둘 다 갖는 방법은 없다.
- *
- * ponytail: 믹스까지 원하면 AVAudioSession(iOS)/AudioFocusRequest(Android)를 직접 다루는
- *           네이티브 모듈이 필요하다. 그때 Playback + MixWithOthers 로 올린다.
+ * ponytail: 무음 스위치까지 무시하면서 섞으려면 AVAudioSession 을 직접 다루는 네이티브 모듈이
+ *           필요하다(Playback + MixWithOthers, AllowBluetooth 제외). 요구되면 그때 올린다.
  */
 export const applyAudioCategory = () => {
-	Sound.setCategory('Playback', false);
+	if (Platform.OS === 'ios') {
+		Sound.setCategory('Ambient', false);
+		return;
+	}
+	Sound.setCategory('Playback', true);
 };
 
 const SOURCES = {

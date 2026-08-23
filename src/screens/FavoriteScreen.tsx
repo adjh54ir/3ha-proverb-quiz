@@ -266,7 +266,7 @@ const FavoriteScreen = () => {
 
 							{isSelectionMode ? (
 								<View style={[styles.checkbox, isSelected && styles.checkboxChecked]}>
-									{isSelected && <Icon name="check" size={scaledSize(12)} color={COLORS.textWhite} />}
+									{isSelected && <Icon name="check" size={scaledSize(12)} color={COLORS.textOnAccent} />}
 								</View>
 							) : (
 								<TouchableOpacity
@@ -441,7 +441,7 @@ const FavoriteScreen = () => {
 									{isSelectionMode && filteredList.length > 0 && (
 										<TouchableOpacity style={styles.selectAllBtn} onPress={handleSelectAll}>
 											<View style={[styles.miniCheckbox, isAllSelected && styles.miniCheckboxChecked]}>
-												{isAllSelected && <Icon name="check" size={scaledSize(9)} color={COLORS.textWhite} />}
+												{isAllSelected && <Icon name="check" size={scaledSize(9)} color={COLORS.textOnAccent} />}
 											</View>
 											<Text style={styles.selectAllText}>전체 선택</Text>
 										</TouchableOpacity>
@@ -486,7 +486,7 @@ const FavoriteScreen = () => {
 											<Text style={styles.emptyTitle}>아직 즐겨찾기가 없습니다</Text>
 											<Text style={styles.emptyDesc}>속담 목록에서 ★를 눌러{'\n'}원하는 속담을 저장해보세요!</Text>
 											<TouchableOpacity style={styles.emptyAddBtn} onPress={() => setShowAddModal(true)} activeOpacity={0.85}>
-												<Icon name="plus" size={scaledSize(14)} color={COLORS.textWhite} />
+												<Icon name="plus" size={scaledSize(14)} color={COLORS.textOnAccent} />
 												<Text style={styles.emptyAddBtnText}>즐겨찾기 추가하기</Text>
 											</TouchableOpacity>
 										</>
@@ -721,7 +721,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.warning,
 	},
-	emptyAddBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '700' },
+	emptyAddBtnText: { color: COLORS.textOnAccent, fontSize: FONT_SIZES.md, fontWeight: '700' },
 	bottomActionBar: {
 		position: 'absolute',
 		bottom: 0,

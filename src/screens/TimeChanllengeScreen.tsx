@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
 import { Alert, Text, TouchableOpacity, View, StyleSheet, Platform, ScrollView, Animated, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,7 +9,7 @@ import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize } from '@/const/common/Theme';
 import {useIsFocused} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { TimeChallengeInterceptor } from '@/services/interceptor/TimeChanllengeInterceptor';
@@ -93,6 +95,9 @@ const InfinityQuizScreen = () => {
 	const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
 	const [selectedChoice, setSelectedChoice] = useState<string | null>(null); // 사용자가 고른 보기
 	const [showExitModal, setShowExitModal] = useState(false);
+
+	// 뒤로가기로 도전이 그냥 끝나지 않게, 종료 버튼과 같은 확인 팝업을 띄운다.
+	useBlockBackHandler(true, () => setShowExitModal(true));
 	const [combo, setCombo] = useState(0);
 	const [maxCombo, setMaxCombo] = useState(0);
 	const [hasUsedSkip, setHasUsedSkip] = useState(false);
@@ -328,7 +333,7 @@ const InfinityQuizScreen = () => {
 			 */
 			onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
 				const offsetY = event.nativeEvent.contentOffset.y;
-				setShowScrollTop(offsetY > moderateScale(100));
+				setShowScrollTop(offsetY > SCROLL_TOP_THRESHOLD);
 			},
 			/**
 			 * 스크롤 최상단으로 이동
@@ -1223,11 +1228,7 @@ const InfinityQuizScreen = () => {
 			</Modal>
 
 			{/* 최하단에 위치할것!! */}
-			{showScrollTop && (
-				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop} activeOpacity={0.85} hitSlop={HIT_SLOP}>
-					<IconComponent type="MaterialIcons" name="arrow-upward" size={scaledSize(24)} color={COLORS.textWhite} />
-				</TouchableOpacity>
-			)}
+			<ScrollTopButton visible={showScrollTop} onPress={scrollHandler.toTop} />
 
 			{comboEffectText !== '' && (
 				<Animated.View
@@ -1253,10 +1254,10 @@ const InfinityQuizScreen = () => {
 					}}>
 					<Text
 						style={{
-							fontSize: scaledSize(36),
+							fontSize: displayFontSize(36),
 							fontWeight: '700',
 							color: COLORS.danger,
-							textShadowColor: COLORS.textDeep,
+							textShadowColor: 'rgba(0,0,0,0.4)',
 							textShadowOffset: { width: 1, height: 1 },
 							textShadowRadius: 2,
 						}}>
@@ -1786,7 +1787,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		zIndex: 999,
 	},
 	countdownText: {
-		fontSize: scaledSize(72),
+		fontSize: displayFontSize(72),
 		fontWeight: '700',
 		color: COLORS.textWhite,
 		textAlign: 'center',
@@ -1880,17 +1881,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xsPlus,
 		paddingHorizontal: SPACING_W.md,
 		zIndex: 2,
-	},
-	scrollTopButton: {
-		position: 'absolute',
-		right: SPACING_W.xxl,
-		bottom: scaleHeight(80), // 기존 16 → 80으로 조정하여 종료 버튼과 겹치지 않도록
-		backgroundColor: COLORS.secondary,
-		width: scaleWidth(40),
-		height: scaleWidth(40),
-		borderRadius: scaleWidth(20),
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 	leftFixed: {
 		position: 'absolute',
@@ -2172,7 +2162,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.border,
 	},
 	scoreHeroNumber: {
-		fontSize: scaledSize(56),
+		fontSize: displayFontSize(56),
 		fontWeight: '700',
 		color: COLORS.danger,
 	},

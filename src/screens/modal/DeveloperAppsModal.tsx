@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Platform, Alert, Linking, TextInput, KeyboardAvoidingView, Keyboard, Pressable } from 'react-native';
+import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
+import AppAlert from '@/screens/common/modal/AppAlert';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Platform, Linking, TextInput, KeyboardAvoidingView, Keyboard, Pressable } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
@@ -62,18 +64,18 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 	const onDownloadApp = async (app: CommonType.AppItem) => {
 		const url = appStoreUrl(app);
 		if (!url) {
-			Alert.alert('Coming Soon!', '아직 스토어 링크가 준비되지 않았습니다.');
+			AppAlert.alert('Coming Soon!', '아직 스토어 링크가 준비되지 않았습니다.');
 			return;
 		}
 		try {
 			const supported = await Linking.canOpenURL(url);
 			if (!supported) {
-				Alert.alert('오류', '링크를 열 수 없습니다.');
+				AppAlert.alert('오류', '링크를 열 수 없습니다.');
 				return;
 			}
 			Linking.openURL(url);
 		} catch {
-			Alert.alert('오류', '링크를 여는 중 문제가 발생했습니다.');
+			AppAlert.alert('오류', '링크를 여는 중 문제가 발생했습니다.');
 		}
 	};
 
@@ -93,9 +95,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 					<View style={styles.header}>
 						<View style={styles.headerTop}>
 							<Text style={styles.titleText}>📱 제작자의 다른 앱</Text>
-							<TouchableOpacity style={styles.closeButton} onPress={handleClose} activeOpacity={0.7} hitSlop={HIT_SLOP}>
-								<Text style={styles.closeText}>✕</Text>
-							</TouchableOpacity>
+							<ModalCloseButton onPress={handleClose} style={styles.closeButton} />
 						</View>
 
 						{/* 검색 */}
@@ -217,18 +217,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textStrong,
 	},
 	closeButton: {
-		width: scaleWidth(28),
-		height: scaleWidth(28),
-		borderRadius: scaleWidth(28) / 2,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	closeText: {
-		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.textSecondary,
-		fontWeight: '500',
+		// 공용 ModalCloseButton 은 카드 우상단 고정이 기본이라, 헤더 행 안에서는 흐름 배치로 되돌린다.
+		position: 'relative',
+		top: 0,
+		right: 0,
 	},
 	searchBox: {
 		flexDirection: 'row',

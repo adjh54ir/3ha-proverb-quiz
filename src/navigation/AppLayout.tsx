@@ -5,7 +5,7 @@ import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, T
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaleHeight } from '@/utils';
-import { COLORS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { COLORS, SPACING_H, themedStyles } from '@/const/common/Theme';
 import DeviceInfo from 'react-native-device-info';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
@@ -13,6 +13,7 @@ import BootSplash from 'react-native-bootsplash'; // 추가
 import notifee, { EventType } from '@notifee/react-native';
 import { takePendingRoute } from '@/utils/PendingNotification';
 import { useThemeMode } from '@/hooks/useThemeMode';
+import { AppAlertHost } from '@/screens/common/modal/AppAlert';
 
 const AD_ALLOWED_ROUTES = [
 	Paths.TODAY_QUIZ,
@@ -27,6 +28,9 @@ const AD_ALLOWED_ROUTES = [
 ];
 
 const DESIGN_HEIGHT = 812;
+
+/** 배너와 화면 콘텐츠 사이 최소 숨 쉴 공간. 배너 래퍼가 absolute 라 이 값이 실제 하단 여백이 된다. */
+const AD_BOTTOM_GAP = SPACING_H.smPlus;
 const AppLayout = () => {
 	const themeMode = useThemeMode(); // 모드 변경 시 배경색 재계산
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);
@@ -90,9 +94,9 @@ const AppLayout = () => {
 			// 배너 바로 아래에 화면이 붙지 않도록 여백을 둔다
 			switch (Platform.OS) {
 				case 'android':
-					return scaleHeight(32);
+					return scaleHeight(44) + AD_BOTTOM_GAP;
 				case 'ios':
-					return scaleHeight(24);
+					return scaleHeight(36) + AD_BOTTOM_GAP;
 				default:
 					return 0;
 			}
@@ -217,6 +221,8 @@ const AppLayout = () => {
 					</View>
 				</View>
 			</SafeAreaView>
+			{/* 앱 테마를 따르는 공용 알림창. 화면이 바뀌어도 살아 있도록 루트에 한 번만 둔다. */}
+			<AppAlertHost />
 		</NavigationContainer>
 	);
 };
@@ -234,7 +240,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		right: 0,
 		zIndex: 10,
 		paddingVertical: SPACING_H.xs,
-		marginHorizontal: SPACING_W.lg,
 		alignItems: 'center',
 		// borderWidth: 1,
 		// borderColor: '#bdc3c7',

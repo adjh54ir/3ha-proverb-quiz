@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
+import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
 import {
 	View,
 	Text,
@@ -290,8 +291,9 @@ const MyScoreScreen = () => {
 
 	useFocusEffect(
 		useCallback(() => {
-			const todayStr = moment().format('YYYY-MM-DD');
-			const todayData = todayQuizDataList.find((item) => moment(item.quizDate).format('YYYY-MM-DD') === todayStr);
+			// '오늘'은 기기 타임존 기준으로만 판단한다 (DateUtils 단일 진입점)
+			const todayStr = DateUtils.getLocalDateString();
+			const todayData = todayQuizDataList.find((item) => DateUtils.toLocalDateKey(item.quizDate) === todayStr);
 
 			if (todayData) {
 				setSelectedDate(todayStr);
@@ -459,6 +461,15 @@ const MyScoreScreen = () => {
 		scrollRef.current?.scrollTo({ y: 0, animated: true });
 	};
 
+	/**
+	 * 활동 탭 전환 — 탭을 바꾸면 이전 탭에서 보던 위치가 그대로 남아 엉뚱한 지점이 보인다.
+	 * 탭 값만 바꾸지 말고 스크롤도 최상단으로 되돌린다.
+	 */
+	const handleActivityTabPress = (tabKey: string) => {
+		setActiveTab(tabKey);
+		scrollRef.current?.scrollTo({ y: 0, animated: true });
+	};
+
 	const totalSolved = correctCount + wrongCount;
 	const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
 
@@ -473,7 +484,7 @@ const MyScoreScreen = () => {
 			 */
 			onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
 				const offsetY = event.nativeEvent.contentOffset.y;
-				setShowScrollTop(offsetY > scaleHeight(100));
+				setShowScrollTop(offsetY > SCROLL_TOP_THRESHOLD);
 			},
 			/**
 			 * 스크롤 최상단으로 이동
@@ -682,7 +693,7 @@ const MyScoreScreen = () => {
 							<TouchableOpacity
 								key={tab.key}
 								activeOpacity={0.8}
-								onPress={() => setActiveTab(tab.key)}
+								onPress={() => handleActivityTabPress(tab.key)}
 								style={[styles.activityTabChip, isActive && styles.activityTabChipActive]}>
 								<IconComponent
 									type="materialIcons"
@@ -1397,15 +1408,7 @@ const MyScoreScreen = () => {
 			<ProverbDetailModal visible={detailVisible && !!detailProverb} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
 
 			{/* 최하단에 위치할것!! */}
-			{showScrollTop && (
-				<TouchableOpacity
-					style={styles.scrollTopButton}
-					activeOpacity={0.85}
-					hitSlop={HIT_SLOP}
-					onPress={scrollHandler.toTop}>
-					<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color={COLORS.textWhite} />
-				</TouchableOpacity>
-			)}
+			<ScrollTopButton visible={showScrollTop} onPress={scrollHandler.toTop} />
 			<CharacterGuide
 				visible={guide.visible}
 				onClose={guide.close}
@@ -1744,7 +1747,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	modalOverlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
@@ -2102,17 +2105,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	regionTextActive: {
 		color: COLORS.primary,
 		fontWeight: '700',
-	},
-	scrollTopButton: {
-		position: 'absolute',
-		right: SPACING_W.lg,
-		bottom: SPACING_H.lg,
-		backgroundColor: COLORS.secondary,
-		width: scaleWidth(40),
-		height: scaleWidth(40),
-		borderRadius: scaleWidth(20),
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 	scoreBadge: {
 		flexDirection: 'row',

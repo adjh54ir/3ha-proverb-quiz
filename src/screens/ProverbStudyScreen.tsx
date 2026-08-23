@@ -2,7 +2,9 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { ActivityIndicator, Animated, Dimensions, Easing, Image, InteractionManager, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import { SkeletonCardList } from '@/screens/common/atomic/Skeleton';
+import { Animated, Dimensions, Easing, Image, InteractionManager, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import Carousel from 'react-native-reanimated-carousel';
 import IconComponent from './common/atomic/IconComponent';
@@ -132,6 +134,9 @@ const QuizStudyScreen = () => {
 	const [levelOpen, setLevelOpen] = useState(false);
 	const [regionOpen, setRegionOpen] = useState(false);
 	const [showExitModal, setShowExitModal] = useState(false);
+
+	// 뒤로가기로도 학습을 그냥 빠져나가지 않게, 종료 버튼과 같은 확인 팝업을 띄운다.
+	useBlockBackHandler(true, () => setShowExitModal(true));
 
 	const progress = proverbList.length > 0 ? (studyHistory.studyProverbes ?? []).length / proverbList.length : 0;
 
@@ -701,7 +706,7 @@ const QuizStudyScreen = () => {
 							disabled={isButtonDisabled}
 							hitSlop={HIT_SLOP} // 여유 클릭 범위
 						>
-							<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
+							<Text style={[styles.buttonText, isLearned && styles.buttonTextOnAmber]}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
 						</TouchableOpacity>
 					</Animated.View>
 
@@ -824,7 +829,7 @@ const QuizStudyScreen = () => {
 								disabled={isButtonDisabled}
 								hitSlop={HIT_SLOP} // 여유 클릭 범위
 							>
-								<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
+								<Text style={[styles.buttonText, isLearned && styles.buttonTextOnAmber]}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
 							</TouchableOpacity>
 						</View>
 					</Animated.View>
@@ -1039,15 +1044,8 @@ const QuizStudyScreen = () => {
 					</View>
 
 					{isLoading ? (
-						<View style={styles.loadingContainer}>
-							<FastImage
-								source={require('@/assets/images/screen-heroes/data-loading.png')}
-								style={styles.dataLoadingImage}
-								resizeMode={FastImage.resizeMode.contain}
-							/>
-							<ActivityIndicator size="large" color={COLORS.secondary} />
-							<Text style={styles.loadingText}>속담 정보를 불러오는 중...</Text>
-						</View>
+						// 카드가 세로로 쌓이는 화면이라, 같은 형태를 미리 깔아 두면 로딩이 끝나도 레이아웃이 안 흔들린다.
+						<SkeletonCardList count={4} />
 					) : getFilteredData().length === 0 ? (
 						<View style={styles.emptyWrapper}>
 							<Image source={require('@/assets/images/feature-states/empty-search.png')} style={styles.emptyImage} resizeMode="contain" />
@@ -1340,29 +1338,16 @@ const styles = themedStyles(() => StyleSheet.create({
 	learningButton: {
 		backgroundColor: COLORS.primary,
 	},
+	// 앰버(learnedButton) 배경 위에서는 흰 글자가 묻힌다 — 고정 잉크로 바꾼다.
+	buttonTextOnAmber: {
+		color: COLORS.textOnAccent,
+	},
 	buttonText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		letterSpacing: 0.5,
 		textAlign: 'center',
-	},
-	loadingContainer: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		paddingVertical: SPACING_H.xxxxl,
-	},
-	dataLoadingImage: {
-		width: scaleWidth(150),
-		height: scaleHeight(100),
-		marginBottom: SPACING_H.sm,
-	},
-	loadingText: {
-		marginTop: SPACING_H.md,
-		fontSize: FONT_SIZES.md,
-		color: COLORS.textSecondary,
-		lineHeight: scaledSize(21),
 	},
 	progressTopRow: {
 		flexDirection: 'row',

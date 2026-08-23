@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Image } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -390,7 +390,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		overflow: 'hidden', // ✅ 사각형 그림자 잘라냄
 	},
 	countdownText: {
-		fontSize: scaledSize(72),
+		fontSize: displayFontSize(72),
 		fontWeight: '700',
 		color: COLORS.textWhite,
 		textAlign: 'center',

@@ -145,7 +145,8 @@ const QuizScreen = () => {
 		'👏 대단합니다!\n이 속도라면 모든 속담을 금방 외울 수 있을 것 같습니다!',
 		'정말 똑똑합니다! 📚\n퀴즈를 척척 풀어가는 모습이 인상적입니다!',
 	];
-	useBlockBackHandler(true); // 뒤로가기 모션 막기
+	// 뒤로가기를 그냥 삼키면 앱이 멈춘 것처럼 보인다 — 화면의 종료 버튼과 같은 확인 팝업을 띄운다.
+	useBlockBackHandler(true, () => setShowExitModal(true));
 
 	useEffect(() => {
 		setSelectedLevel(normalizeRouteLevel(routeLevel));

@@ -1,5 +1,6 @@
 import react from 'react';
-import { Alert, Linking } from 'react-native';
+import AppAlert from '@/screens/common/modal/AppAlert';
+import { Linking } from 'react-native';
 import { check, Permission, request, RESULTS } from 'react-native-permissions';
 
 // 권한 체크를 위한 타입 정의
@@ -21,7 +22,7 @@ const checkSinglePermission = async (permissionType: PermissionType): Promise<bo
 
 		// 권한이 차단된 경우
 		if (status === RESULTS.BLOCKED) {
-			Alert.alert('권한 설정 필요', `${permissionType.title} 권한이 차단되어 있습니다. 설정에서 권한을 허용해주세요.`, [
+			AppAlert.alert('권한 설정 필요', `${permissionType.title} 권한이 차단되어 있습니다. 설정에서 권한을 허용해주세요.`, [
 				{
 					text: '설정으로 이동',
 					onPress: () => Linking.openSettings(),
@@ -43,7 +44,7 @@ const checkSinglePermission = async (permissionType: PermissionType): Promise<bo
 		return status === RESULTS.GRANTED;
 	} catch (error) {
 		console.error('Permission check error:', error);
-		Alert.alert('오류 발생', '권한 확인 중 문제가 발생했습니다.');
+		AppAlert.alert('오류 발생', '권한 확인 중 문제가 발생했습니다.');
 		return false;
 	}
 };
@@ -66,7 +67,7 @@ const checkMultiplePermissions = async (permissions: PermissionType[]): Promise<
 
 		// 차단된 권한이 있는 경우
 		if (blockedPermissions.length > 0) {
-			Alert.alert('권한 설정 필요', '일부 권한이 차단되어 있습니다. 설정에서 권한을 허용해주세요.', [
+			AppAlert.alert('권한 설정 필요', '일부 권한이 차단되어 있습니다. 설정에서 권한을 허용해주세요.', [
 				{
 					text: '설정으로 이동',
 					onPress: () => Linking.openSettings(),
@@ -93,7 +94,7 @@ const checkMultiplePermissions = async (permissions: PermissionType[]): Promise<
 		return true;
 	} catch (error) {
 		console.error('Permissions check error:', error);
-		Alert.alert('오류 발생', '권한 확인 중 문제가 발생했습니다.');
+		AppAlert.alert('오류 발생', '권한 확인 중 문제가 발생했습니다.');
 		return false;
 	}
 };

@@ -1,5 +1,6 @@
 // 추가 모달 컴포넌트 두 개 생성
 import React from 'react';
+import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
 import { Animated, View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { useModalEnter } from '@/hooks/useModalEnter';
@@ -220,13 +221,7 @@ export const TermsOfServiceModal = ({ visible, onClose }) => {
           <View style={modalStyles.header}>
             <View style={modalStyles.spacer} />
             <Text style={modalStyles.modalTitle}>개인정보처리방침 및 이용약관</Text>
-            <TouchableOpacity
-              style={modalStyles.closeIcon}
-              onPress={onClose}
-              activeOpacity={0.8}
-              hitSlop={HIT_SLOP}>
-              <IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
-            </TouchableOpacity>
+            <ModalCloseButton onPress={onClose} style={modalStyles.closeIcon} />
           </View>
 
           <ScrollView contentContainerStyle={modalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
@@ -304,13 +299,7 @@ export const OpenSourceModal = ({ visible, onClose }) => {
           <View style={modalStyles.header}>
             <View style={modalStyles.spacer} />
             <Text style={modalStyles.modalTitle}>오픈소스 라이선스</Text>
-            <TouchableOpacity
-              style={modalStyles.closeIcon}
-              onPress={onClose}
-              activeOpacity={0.8}
-              hitSlop={HIT_SLOP}>
-              <IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
-            </TouchableOpacity>
+            <ModalCloseButton onPress={onClose} style={modalStyles.closeIcon} />
           </View>
 
           <ScrollView contentContainerStyle={modalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
@@ -404,7 +393,10 @@ const modalStyles = themedStyles(() => StyleSheet.create({
     width: scaledSize(22) + SPACING_W.sm, // 닫기 아이콘 크기 + 여백만큼 확보
   },
   closeIcon: {
-    padding: SPACING_W.xs,
+    // 공용 ModalCloseButton 은 카드 우상단 고정이 기본이라, 헤더 행 안에 넣을 때는 흐름 배치로 되돌린다.
+    position: 'relative',
+    top: 0,
+    right: 0,
   },
 }));
 const styles = themedStyles(() => StyleSheet.create({

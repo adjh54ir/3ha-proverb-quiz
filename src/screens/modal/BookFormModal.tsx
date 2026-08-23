@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
 import { Animated, Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
@@ -125,9 +126,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 				<Pressable style={StyleSheet.absoluteFill} onPress={Keyboard.dismiss} />
 				<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
 					<Animated.View style={[styles.modal, enterStyle]}>
-						<TouchableOpacity style={styles.closeIcon} onPress={onClose} activeOpacity={0.7} hitSlop={HIT_SLOP}>
-							<IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
-						</TouchableOpacity>
+						<ModalCloseButton onPress={onClose} />
 
 						<Text style={styles.modalTitle}>{isEdit ? '속담집 편집' : '새 속담집 만들기'}</Text>
 						{!isEdit && <Image source={require('@/assets/images/home-actions/action-my-book.png')} style={styles.headerImage} resizeMode="contain" />}
@@ -195,7 +194,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	overlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'center', alignItems: 'center' },
 	scrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: SPACING_H.xl, width: '100%' },
 	modal: { width: '88%', backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.xl },
-	closeIcon: { position: 'absolute', top: SPACING_H.md, right: SPACING_W.md, zIndex: 2, padding: SPACING_W.xs },
 	modalTitle: { fontSize: FONT_SIZES.heading, fontWeight: '700', color: COLORS.textStrong },
 	modalSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'left', marginTop: SPACING_H.xs },
 	inputWrap: { flexDirection: 'row', alignItems: 'center', height: scaleHeight(48), borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, marginTop: SPACING_H.xs, marginBottom: SPACING_H.md, backgroundColor: COLORS.surface },

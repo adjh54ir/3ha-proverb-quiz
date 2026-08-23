@@ -112,7 +112,7 @@ export default BottomHomeButton;
 const modalStyles = themedStyles(() => StyleSheet.create({
 	overlay: {
 		flex: 1,
-		backgroundColor: 'rgba(15,23,42,0.5)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
 		paddingHorizontal: SPACING_W.xxl,

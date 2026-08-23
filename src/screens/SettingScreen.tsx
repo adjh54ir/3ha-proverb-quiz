@@ -3,8 +3,10 @@
 /* eslint-disable react-native/no-inline-styles */
 
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
+import AppAlert from '@/screens/common/modal/AppAlert';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Alert, Animated, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -404,10 +406,10 @@ const SettingScreen = () => {
 				setLatestVersion(updateNeeded.latestVersion);
 				setShowVersionModal(true);
 			} else {
-				Alert.alert('최신 버전', `현재 v${appVersion}이 최신 버전입니다`);
+				AppAlert.alert('최신 버전', `현재 v${appVersion}이 최신 버전입니다`);
 			}
 		} catch {
-			Alert.alert('오류', '버전 확인 중 문제가 발생했습니다.');
+			AppAlert.alert('오류', '버전 확인 중 문제가 발생했습니다.');
 		}
 	};
 
@@ -424,7 +426,7 @@ const SettingScreen = () => {
 			const iosUrl = appRes?.storeUrl || '';
 
 			if (!androidUrl && !iosUrl) {
-				Alert.alert('Coming Soon..!', '아직 안드로이드/iOS 스토어에 출시되지 않았습니다.');
+				AppAlert.alert('Coming Soon..!', '아직 안드로이드/iOS 스토어에 출시되지 않았습니다.');
 				return;
 			}
 
@@ -442,7 +444,7 @@ const SettingScreen = () => {
 
 			await Share.share(Platform.OS === 'ios' ? { message, url: iosUrl || androidUrl, title: APP_NAME } : { message, title: APP_NAME });
 		} catch {
-			Alert.alert('오류', '앱 정보를 불러오는 중 문제가 발생했습니다.');
+			AppAlert.alert('오류', '앱 정보를 불러오는 중 문제가 발생했습니다.');
 		}
 	};
 
@@ -522,11 +524,11 @@ const SettingScreen = () => {
 		rate: async () => {
 			const storeUrl = Platform.OS === 'android' ? GOOGLE_PLAY_STORE_URL : APP_STORE_URL;
 			if (!storeUrl) {
-				Alert.alert('Coming Soon..!', '아직 스토어에 출시되지 않았습니다.');
+				AppAlert.alert('Coming Soon..!', '아직 스토어에 출시되지 않았습니다.');
 				return;
 			}
 			const supported = await Linking.canOpenURL(storeUrl);
-			supported ? Linking.openURL(storeUrl) : Alert.alert('오류', '스토어 페이지를 열 수 없습니다.');
+			supported ? Linking.openURL(storeUrl) : AppAlert.alert('오류', '스토어 페이지를 열 수 없습니다.');
 		},
 		inquiry: async () => {
 			const version = await VersionCheck.getCurrentVersion();
@@ -578,7 +580,7 @@ const SettingScreen = () => {
 				return;
 			}
 		}
-		Linking.openSettings().catch(() => Alert.alert('오류', '설정 화면을 열 수 없습니다.'));
+		Linking.openSettings().catch(() => AppAlert.alert('오류', '설정 화면을 열 수 없습니다.'));
 	};
 
 	// ── renderItem ────────────────────────────────
@@ -925,7 +927,7 @@ const SettingScreen = () => {
 						renderItem={renderItem}
 						sections={BASE_SECTIONS.map((section, i) => ({ ...section, key: `section-${i}` }))}
 						stickySectionHeadersEnabled={false}
-						onScroll={(e) => setShowScrollTop(e.nativeEvent.contentOffset.y > 100)}
+						onScroll={(e) => setShowScrollTop(e.nativeEvent.contentOffset.y > SCROLL_TOP_THRESHOLD)}
 						scrollEventThrottle={16}
 						contentContainerStyle={styles.listContent}
 						ItemSeparatorComponent={() => <View style={styles.itemSpacing} />}
@@ -981,11 +983,11 @@ const SettingScreen = () => {
 										const handlePress = async () => {
 											const storeUrl = Platform.OS === 'android' ? item.android : item.ios;
 											if (!storeUrl) {
-												Alert.alert('Coming Soon..!', '아직 이 플랫폼에서는 출시되지 않았습니다.');
+												AppAlert.alert('Coming Soon..!', '아직 이 플랫폼에서는 출시되지 않았습니다.');
 												return;
 											}
 											const supported = await Linking.canOpenURL(storeUrl);
-											supported ? Linking.openURL(storeUrl) : Alert.alert('오류', '스토어 페이지를 열 수 없습니다.');
+											supported ? Linking.openURL(storeUrl) : AppAlert.alert('오류', '스토어 페이지를 열 수 없습니다.');
 										};
 										return (
 											<TouchableOpacity style={styles.footerAppCard} onPress={handlePress} activeOpacity={0.8}>
@@ -1018,13 +1020,7 @@ const SettingScreen = () => {
 			{showTermsModal && <TermsOfServiceModal visible={showTermsModal} onClose={() => setShowTermsModal(false)} />}
 			{showOpenSourceModal && <OpenSourceModal visible={showOpenSourceModal} onClose={() => setShowOpenSourceModal(false)} />}
 
-			{showScrollTop && (
-				<FadeInView style={styles.scrollTopWrap} duration={220} offsetY={8}>
-					<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop} activeOpacity={0.8} hitSlop={HIT_SLOP}>
-						<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color={COLORS.textWhite} />
-					</TouchableOpacity>
-				</FadeInView>
-			)}
+			<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 
 			<CmmDelConfirmModal
 				visible={modalVisible}
@@ -1232,19 +1228,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	textSizeSample: { fontWeight: '700', color: COLORS.textSecondary },
 	textSizeSampleActive: { color: COLORS.textWhite },
 
-	scrollTopWrap: {
-		position: 'absolute',
-		right: SPACING_W.lg,
-		bottom: SPACING_H.lg,
-	},
-	scrollTopButton: {
-		backgroundColor: COLORS.secondary,
-		width: scaleWidth(48),
-		height: scaleWidth(48),
-		borderRadius: scaleWidth(48) / 2,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
 
 	modalTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: SPACING_H.md },
 	modalTitleText: { fontSize: FONT_SIZES.xl, lineHeight: scaledSize(26), fontWeight: '700', color: COLORS.textStrong, textAlign: 'center' },

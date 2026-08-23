@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated, Easing, ScrollView } from 'react-native';
+import AppAlert from '@/screens/common/modal/AppAlert';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing, ScrollView } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import {useFocusEffect} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
@@ -59,6 +60,17 @@ const QuizModeScreen = () => {
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 	const [selectedLevelKey, setSelectedLevelKey] = useState<QuizLevelKey | null>(null);
 	const [tab, setTab] = useState<'level' | 'category'>('level');
+
+	/**
+	 * 탭 전환 — 이전 탭에서 고른 값과 스크롤 위치가 남아 있으면 새 탭이 엉뚱한 상태로 보인다.
+	 * 선택값을 비우고 목록 맨 위에서 시작한다.
+	 */
+	const handleTabPress = (nextTab: 'level' | 'category') => {
+		setTab(nextTab);
+		setSelectedLevelKey(null);
+		setSelectedCategory(null);
+		scrollRef.current?.scrollTo({ y: 0, animated: true });
+	};
 
 	const CATEGORIES = FIELD_DROPDOWN_ITEMS.filter((item) => item.label && item.value).map((item) => ({
 		key: item.value,
@@ -180,10 +192,10 @@ const QuizModeScreen = () => {
 			<View style={styles.container}>
 				<View style={styles.centerWrapper}>
 					<View style={styles.tabRow}>
-						<TouchableOpacity activeOpacity={0.8} onPress={() => setTab('level')} style={[styles.tabButton, tab === 'level' && styles.tabActive]}>
+						<TouchableOpacity activeOpacity={0.8} onPress={() => handleTabPress('level')} style={[styles.tabButton, tab === 'level' && styles.tabActive]}>
 							<Text style={[styles.tabText, tab === 'level' && styles.tabTextActive]}>난이도</Text>
 						</TouchableOpacity>
-						<TouchableOpacity activeOpacity={0.8} onPress={() => setTab('category')} style={[styles.tabButton, tab === 'category' && styles.tabActive]}>
+						<TouchableOpacity activeOpacity={0.8} onPress={() => handleTabPress('category')} style={[styles.tabButton, tab === 'category' && styles.tabActive]}>
 							<Text style={[styles.tabText, tab === 'category' && styles.tabTextActive]}>카테고리</Text>
 						</TouchableOpacity>
 					</View>
@@ -217,7 +229,7 @@ const QuizModeScreen = () => {
 												style={[styles.levelCardFull, styles.levelCardDisabled]}
 												activeOpacity={1}
 												onPress={() => {
-													Alert.alert('준비중..', '새로운 문제를 준비 중입니다. 조금만 기다려 주세요!');
+													AppAlert.alert('준비중..', '새로운 문제를 준비 중입니다. 조금만 기다려 주세요!');
 												}}>
 												<View style={[styles.levelIconChip, { backgroundColor: COLORS.borderDark }]}>
 													<IconComponent type={item.type} name={item.icon} size={scaledSize(24)} color={COLORS.textWhite} />

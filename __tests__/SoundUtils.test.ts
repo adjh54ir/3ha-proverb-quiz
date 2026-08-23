@@ -1,10 +1,11 @@
 /**
  * 오디오 세션 회귀 테스트
  *
- * "설정은 켜져 있는데 앱 전체가 무음"의 원인은 오디오 포커스였다.
- * 믹스(mixWithOthers=true)로 두면 앱이 포커스를 잡지 않아 볼륨 버튼이 미디어 볼륨이 아니라
- * 벨소리 볼륨을 움직인다. 미디어 볼륨이 0인 기기에서는 0.1~1.7초짜리 효과음이 그냥 안 들린다.
- * 그래서 Playback + 비믹스로 고정한다 — 되돌리면 같은 증상이 재발한다.
+ * 다른 앱의 음악·영상을 끊지 않으면서 효과음만 얹는 것이 요구사항이다.
+ * - iOS: Ambient (옵션 없음). Playback + mixWithOthers 는 라이브러리가 AllowBluetooth 를
+ *        함께 넣어 setCategory 자체가 실패하므로 쓸 수 없다.
+ * - Android: Playback + mixWithOthers=true (오디오 포커스를 뺏지 않는다).
+ * 되돌리면 "앱에 들어오면 재생 중이던 영상이 꺼진다" 증상이 재발한다.
  */
 import Sound from 'react-native-sound';
 
@@ -23,14 +24,26 @@ beforeEach(() => {
 	SoundMock.setCategory.mockClear();
 });
 
-test('오디오 세션은 Playback + 비믹스로 잡는다(오디오 포커스 확보)', () => {
+test('iOS 오디오 세션은 Ambient 로 잡는다(다른 앱 재생 유지)', () => {
 	load().applyAudioCategory();
-	expect(SoundMock.setCategory).toHaveBeenCalledWith('Playback', false);
+	expect(SoundMock.setCategory).toHaveBeenCalledWith('Ambient', false);
+});
+
+test('Android 오디오 세션은 Playback + 믹스로 잡는다(포커스 미요청)', () => {
+	const Platform = require('react-native').Platform;
+	const original = Platform.OS;
+	Platform.OS = 'android';
+	try {
+		load().applyAudioCategory();
+		expect(SoundMock.setCategory).toHaveBeenCalledWith('Playback', true);
+	} finally {
+		Platform.OS = original;
+	}
 });
 
 test('모듈이 올라오는 즉시 세션을 잡는다 — 플레이어보다 먼저여야 한다', () => {
 	load();
-	expect(SoundMock.setCategory).toHaveBeenCalledWith('Playback', false);
+	expect(SoundMock.setCategory).toHaveBeenCalledWith('Ambient', false);
 });
 
 test('효과음은 번들 경로 기준으로 로드한다', () => {

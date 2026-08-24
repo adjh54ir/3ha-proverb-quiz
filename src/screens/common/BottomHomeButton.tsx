@@ -10,6 +10,9 @@ import IconComponent from './atomic/IconComponent';
 /** 터치 영역 최소 44 확보 */
 const MIN_TOUCH = 44;
 
+/** 홈 버튼 자체 높이 — hitSlop 으로 터치 반경은 44 이상 유지하고 시각 높이만 줄인다 */
+const HOME_BUTTON_HEIGHT = 36;
+
 const BottomHomeButton = ({
 	paddingBottom,
 	backgroundColor = COLORS.surface,
@@ -40,10 +43,10 @@ const BottomHomeButton = ({
 					alignItems: 'center',
 					backgroundColor,
 					paddingHorizontal: SPACING_W.lg,
-					paddingTop: SPACING_H.md,
+					paddingTop: SPACING_H.xs,
 					// 부모 화면들이 SafeAreaView edges={['bottom']} 로 safe-area 를 이미 소비하므로
 					// 여기서 inset 을 다시 더하지 않고, 하단에 최소 여백만 확보한다.
-					paddingBottom: SPACING_H.md,
+					paddingBottom: SPACING_H.xs,
 				},
 				button: {
 					borderColor,
@@ -53,9 +56,9 @@ const BottomHomeButton = ({
 					gap: SPACING_W.sm,
 					borderWidth: 1,
 					borderRadius: RADIUS.round,
-					minHeight: scaleHeight(MIN_TOUCH),
+					minHeight: scaleHeight(HOME_BUTTON_HEIGHT),
 					minWidth: scaleWidth(120),
-					paddingVertical: SPACING_H.sm,
+					paddingVertical: SPACING_H.xs,
 					paddingHorizontal: SPACING_W.xxl,
 					backgroundColor,
 				},

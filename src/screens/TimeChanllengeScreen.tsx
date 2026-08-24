@@ -23,6 +23,7 @@ import { playCorrect, playWrong, playCombo, playTick, playWhoosh, playFinish } f
 import { startBgm, stopBgm, pauseBgm, resumeBgm } from '@/utils/BgmUtils';
 import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import { ToolTipComponent } from '@/screens/common/atomic/ToolTipComponent';
 import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import { update } from '@/services/StorageService';
@@ -186,21 +187,25 @@ const InfinityQuizScreen = () => {
 		return () => entrance.stop();
 	}, [currentIndex, isGameOver, questionFade, questionSlide]);
 
-	// 타이머가 멈춘 동안(찬스 팝업·안내·일시정지)에는 배경음도 함께 멈춘다
+	/**
+	 * 배경음(BGM) 한 곳 관리 — 화면 포커스 / 일시정지 / 게임 종료 세 조건이 서로 물려 있어
+	 * 조건마다 effect 를 따로 두면 "멈춘 채로 다시 들어오면 음악이 영영 안 나오는" 구멍이 생긴다.
+	 *
+	 * 시작 지점도 여기다. 카운트다운은 이전 화면(InitTimeChallengeScreen)에서 끝나고 넘어오기
+	 * 때문에, '다시 도전' 경로에만 있던 startBgm 으로는 첫 판에 배경음이 나오지 않았다.
+	 */
 	useEffect(() => {
-		if (isPaused) {
-			pauseBgm();
-		} else {
-			resumeBgm();
-		}
-	}, [isPaused]);
-
-	// 다른 화면으로 이동하면 BGM도 끈다 — 언마운트만으로는 남는 경우가 있다
-	useEffect(() => {
-		if (!isFocused) {
+		if (!isFocused || isGameOver) {
 			stopBgm();
+			return;
 		}
-	}, [isFocused]);
+		if (isPaused) {
+			pauseBgm(); // 찬스 팝업·안내 등 타이머가 멈춘 동안
+			return;
+		}
+		resumeBgm(); // 멈춘 적이 없으면 아무 일도 하지 않는다
+		startBgm('time'); // 🎵 타임챌린지 BGM (같은 트랙이 재생 중이면 내부에서 무시)
+	}, [isFocused, isGameOver, isPaused]);
 
 	// 언마운트 시 카운트다운 타이머 / 애니메이션 정리
 	useEffect(() => {
@@ -280,10 +285,9 @@ const InfinityQuizScreen = () => {
 		}
 	}, [timeLeftMs, isGameOver, isPaused]);
 
-	// 🎉 게임 종료 사운드 + BGM 정리
+	// 🎉 게임 종료 사운드 (BGM 정리는 위 배경음 effect 가 함께 처리한다)
 	useEffect(() => {
 		if (isGameOver) {
-			stopBgm();
 			playFinish();
 		}
 	}, [isGameOver]);
@@ -389,8 +393,7 @@ const InfinityQuizScreen = () => {
 				countdownTimeoutRef.current = setTimeout(() => {
 					setIsCountingDown(false);
 					playWhoosh(); // 🎬 챌린지 시작 사운드
-					startBgm('time'); // 🎵 타임챌린지 BGM
-					resetGame(); // 기존 resetGame 호출
+					resetGame(); // BGM 은 위 배경음 effect 가 isGameOver 해제와 함께 켠다
 				}, 800);
 				return;
 			}
@@ -715,6 +718,11 @@ const InfinityQuizScreen = () => {
 								{combo} Combo
 							</Animated.Text>
 						</View>
+
+						{/* 스코어 안내 — 줄 가장 오른쪽 끝 */}
+						<View style={styles.statusHelpButton}>
+							<ToolTipComponent text="점수는 정답마다 오르고, 연속으로 맞히면 콤보 보너스가 붙습니다. 100점마다 시간 +10초, 200·500점에서 하트 +1." />
+						</View>
 					</View>
 				)}
 				{!isGameOver && (
@@ -1010,7 +1018,7 @@ const InfinityQuizScreen = () => {
 							feedback === 'wrong' && styles.questionBoxWrong,
 							{ opacity: questionFade, transform: [{ translateY: questionSlide }] },
 						]}>
-						<View style={{ marginBottom: SPACING_H.lg, alignItems: 'center' }}>
+						<View style={{ marginBottom: SPACING_H.md, alignItems: 'center' }}>
 							<Text style={styles.questionText}>
 								<Text style={styles.questionIdiom}>
 									{current.proverb}
@@ -1543,6 +1551,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		gap: SPACING_W.xsPlus,
 	},
 	guideRow: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: SPACING_H.xs },
+	statusHelpButton: {
+		alignSelf: 'center',
+	},
 	statusBoxRow: {
 		marginTop: SPACING_H.sm,
 		flexDirection: 'row',
@@ -1560,28 +1571,29 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 
 	questionBox: {
-		marginTop: SPACING_H.md,
+		marginTop: SPACING_H.sm,
 		paddingHorizontal: SPACING_W.lg,
-		paddingVertical: SPACING_H.lg,
+		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.lg,
 		backgroundColor: COLORS.background,
 		borderWidth: 1,
 		borderColor: COLORS.secondarySoft,
 	},
 	questionText: {
-		fontSize: FONT_SIZES.mdPlus,
+		// 문제는 크게, 줄 간격은 좁게 — 글자만 키우면 카드가 위아래로 늘어난다
+		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
 		textAlign: 'center',
 		color: COLORS.text,
-		lineHeight: scaleHeight(26),
+		lineHeight: scaleHeight(28),
 	},
 	questionIdiom: {
-		fontSize: FONT_SIZES.lg,
+		fontSize: FONT_SIZES.xxl,
 		color: COLORS.secondary,
 		fontWeight: '800',
 	},
 	questionAsk: {
-		fontSize: FONT_SIZES.smPlus,
+		fontSize: FONT_SIZES.md,
 		color: COLORS.textSecondary,
 		fontWeight: '700',
 	},

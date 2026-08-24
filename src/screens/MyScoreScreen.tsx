@@ -45,6 +45,7 @@ import { FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { getLevelColor } from '@/screens/common/CommonProverbModule';
 import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { ToolTipComponent } from '@/screens/common/atomic/ToolTipComponent';
 import { buildDateMark, buildTodayPendingMark, buildSelectedMark } from '@/utils/CalendarMarkUtils';
 import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { read } from '@/services/StorageService';
@@ -543,6 +544,10 @@ const MyScoreScreen = () => {
 						progressBackgroundColor={COLORS.surface}
 					/>}>
 				<View style={styles.sectionBox}>
+					{/* 캐릭터 영역 안내 — 줄 가장 오른쪽 */}
+					<View style={styles.characterHelpButton}>
+						<ToolTipComponent text="퀴즈로 점수를 모으면 캐릭터 등급이 올라갑니다. 옆에 붙은 펫은 도전탑 보상으로 얻은 친구예요." />
+					</View>
 					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginTop: SPACING_H.mdPlus, marginBottom: scaleHeight(-8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
 						{/* ✅ 홈화면과 동일한 캐릭터/펫 배치 구조 (래퍼 높이 축소로 타이틀과 밀착) */}
 						<View style={{ width: scaleWidth(180), height: scaleWidth(150), alignItems: 'center', justifyContent: 'center' }}>
@@ -1506,6 +1511,13 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	badgeDescActive: {
 		color: COLORS.primary,
+	},
+	characterHelpButton: {
+		// absolute 자식은 부모의 padding 안쪽을 기준으로 잡히므로 0 이면 카드 내용과 오른쪽이 맞는다
+		position: 'absolute',
+		top: 0,
+		right: 0,
+		zIndex: 20,
 	},
 	sectionBox: {
 		backgroundColor: COLORS.background,

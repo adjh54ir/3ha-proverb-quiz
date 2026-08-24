@@ -281,6 +281,15 @@ const QuizModeScreen = () => {
 												<Text style={styles.levelDescFull} numberOfLines={2}>
 													{LEVEL_DESC[item.key] ?? '난이도를 선택해 퀴즈를 시작하세요'}
 												</Text>
+												{/* 난이도별 진행률 — 카테고리 카드와 같은 방식으로 보여준다 */}
+												<View style={styles.levelProgressBarBackground}>
+													<View
+														style={[
+															styles.levelProgressBarFill,
+															{ width: `${total > 0 ? (solved / total) * 100 : 0}%`, backgroundColor: item.color },
+														]}
+													/>
+												</View>
 											</View>
 											<View style={styles.levelProgressPill}>
 												<Text style={[styles.levelProgressText, { color: item.color }]}>{`${solved}/${total}`}</Text>
@@ -458,7 +467,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: '100%',
 		rowGap: SPACING_H.md,
 		// 난이도 카드가 화면 끝에 붙어 보이던 문제 — 카테고리 그리드 거터보다 살짝 작게 좌우를 띄운다
-		paddingHorizontal: SPACING_W.xsPlus,
+		paddingHorizontal: SPACING_W.md,
 	},
 	levelCardFull: {
 		width: '100%',
@@ -494,6 +503,18 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textSecondary,
 		fontSize: FONT_SIZES.sm,
 		lineHeight: scaledSize(18),
+	},
+	levelProgressBarBackground: {
+		width: '100%',
+		height: scaleHeight(6),
+		backgroundColor: COLORS.surfaceAlt,
+		borderRadius: RADIUS.round,
+		overflow: 'hidden',
+		marginTop: SPACING_H.sm,
+	},
+	levelProgressBarFill: {
+		height: '100%',
+		borderRadius: RADIUS.round,
 	},
 	levelProgressPill: {
 		backgroundColor: COLORS.surfaceAlt,

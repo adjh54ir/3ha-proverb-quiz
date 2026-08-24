@@ -25,6 +25,7 @@ import NewBadgeModal from '@/screens/modal/NewBadgeModal';
 import { playComplete, playFlip } from '@/utils/SoundUtils';
 import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { ToolTipComponent } from '@/screens/common/atomic/ToolTipComponent';
 import { read, write } from '@/services/StorageService';
 
 // 기기 분류(태블릿 여부)용 1회 측정값. 실시간 레이아웃은 useWindowDimensions 를 쓴다.
@@ -860,6 +861,10 @@ const QuizStudyScreen = () => {
 					]}>
 					<View style={styles.progressHeader}>
 						<View style={styles.progressTopRow}>
+							{/* 학습 현황 안내 — 줄 가장 오른쪽 */}
+							<View style={styles.progressHelpButton}>
+								<ToolTipComponent text="전체 속담 중 지금까지 학습한 개수입니다. 속담 카드를 펼쳐 보면 학습 완료로 기록돼요." />
+							</View>
 							<Text style={styles.progressTitle}>학습 현황</Text>
 							<View style={styles.progressBadge}>
 								<Text style={styles.progressBadgeText}>
@@ -1350,10 +1355,19 @@ const styles = themedStyles(() => StyleSheet.create({
 		textAlign: 'center',
 	},
 	progressTopRow: {
+		// 부모(progressHeader)가 alignItems: 'center' 라 stretch 를 주지 않으면 줄이 내용 폭으로 줄어들어
+		// 오른쪽 끝(물음표) 이 뱃지 바로 옆에 붙는다.
+		alignSelf: 'stretch',
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
+		paddingHorizontal: SPACING_W.md,
 		marginBottom: SPACING_H.xs,
+	},
+	progressHelpButton: {
+		position: 'absolute',
+		right: 0,
+		zIndex: 20,
 	},
 	progressBarWrapper: {
 		width: '80%',

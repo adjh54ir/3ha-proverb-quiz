@@ -30,7 +30,7 @@ const AD_ALLOWED_ROUTES = [
 const DESIGN_HEIGHT = 812;
 
 /** 배너와 화면 콘텐츠 사이 숨 쉴 공간. 배너 래퍼가 absolute 라 이 값이 실제 하단 여백이 된다. */
-const AD_BOTTOM_GAP = SPACING_H.lg;
+const AD_BOTTOM_GAP = SPACING_H.xs;
 const AppLayout = () => {
 	const themeMode = useThemeMode(); // 모드 변경 시 배경색 재계산
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);
@@ -94,9 +94,9 @@ const AppLayout = () => {
 			// 배너 바로 아래에 화면이 붙지 않도록 여백을 둔다
 			switch (Platform.OS) {
 				case 'android':
-					return scaleHeight(44) + AD_BOTTOM_GAP;
+					return scaleHeight(38) + AD_BOTTOM_GAP;
 				case 'ios':
-					return scaleHeight(36) + AD_BOTTOM_GAP;
+					return scaleHeight(32) + AD_BOTTOM_GAP;
 				default:
 					return 0;
 			}

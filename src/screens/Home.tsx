@@ -30,6 +30,7 @@ import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import TowerRewardSection from '@/components/TowerRewardSection';
 import { playFinish } from '@/utils/SoundUtils';
 import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { ToolTipComponent } from '@/screens/common/atomic/ToolTipComponent';
 
 const greetingMessages = [
 	'🎯 반갑습니다! 오늘도 똑똑해질 준비되셨습니까?',
@@ -452,6 +453,9 @@ const Home = () => {
 					<View style={styles.heroSection}>
 						<View style={styles.imageContainer}>
 							<View style={styles.streakChipWrapper}>
+								<View style={styles.streakHelpButton}>
+									<ToolTipComponent text="매일 앱에 들어와 출석하면 연속 출석일이 하루씩 쌓입니다. 하루라도 건너뛰면 1일부터 다시 시작해요." />
+								</View>
 								<View style={[styles.streakChip, streakInfo.current > 0 ? styles.streakChipActive : styles.streakChipIdle]}>
 									<IconComponent
 										name="local-fire-department"
@@ -851,8 +855,17 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	imageContainer: { alignItems: 'center' },
 	streakChipWrapper: {
+		alignSelf: 'stretch',
+		flexDirection: 'row',
+		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: SPACING_H.sm,
+	},
+	// 물음표는 줄 가장 오른쪽에 두고, 가운데 칩 위치는 건드리지 않는다
+	streakHelpButton: {
+		position: 'absolute',
+		right: 0,
+		zIndex: 20,
 	},
 	image: {
 		width: scaleWidth(150),

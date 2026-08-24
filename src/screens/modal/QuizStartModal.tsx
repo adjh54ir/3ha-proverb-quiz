@@ -7,6 +7,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import { isSoundEnabled, setSoundEnabled } from '@/utils/SoundUtils';
 import { isBgmEnabled, setBgmEnabled, startBgm, stopBgm, BgmTrack } from '@/utils/BgmUtils';
 import { useModalEnter } from '@/hooks/useModalEnter';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 export type QuizStartMode = 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' | 'arrange';
 
@@ -47,6 +48,8 @@ const QuizStartModal = ({
 	onStart,
 	onBack,
 }: Props) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(visible);
 	const meta = MODE_META[mode] ?? MODE_META.meaning;
@@ -97,7 +100,7 @@ const QuizStartModal = ({
 
 	return (
 		<Modal visible transparent animationType="fade" onRequestClose={onBack}>
-			<View style={styles.overlay}>
+			<View style={[styles.overlay, safePadding]}>
 				<Animated.View style={[styles.card, enterStyle]}>
 					<Image source={require('@/assets/images/home-mascot-moments/mascot-challenge-final.png')} style={styles.headerMascot} resizeMode="contain" />
 

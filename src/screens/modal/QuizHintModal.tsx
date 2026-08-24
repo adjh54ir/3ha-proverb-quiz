@@ -8,6 +8,7 @@ import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { useModalEnter } from '@/hooks/useModalEnter';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 interface QuizHintModalProps {
 	visible: boolean;
@@ -18,6 +19,8 @@ interface QuizHintModalProps {
 }
 
 const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, questionText, onClose }) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(visible);
 
@@ -37,7 +40,7 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-			<View style={styles.overlay}>
+			<View style={[styles.overlay, safePadding]}>
 				<Animated.View style={[styles.card, enterStyle]}>
 					<ModalCloseButton onPress={onClose} />
 

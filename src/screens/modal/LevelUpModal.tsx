@@ -9,6 +9,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { playComplete } from '@/utils/SoundUtils';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 export interface LevelUpInfo {
 	label: string;
@@ -27,6 +28,8 @@ interface LevelUpModalProps {
 }
 
 const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bonus = 0 }) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(visible);
 	/** 마스코트 pop-in (0 → 1.05 → 1) */
@@ -55,7 +58,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bo
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-			<View style={styles.overlay}>
+			<View style={[styles.overlay, safePadding]}>
 				{visible && (
 					<View style={styles.confetti} pointerEvents="none">
 						<ConfettiCannon count={80} origin={{ x: screenWidth / 2, y: 0 }} fadeOut explosionSpeed={450} fallSpeed={2600} />

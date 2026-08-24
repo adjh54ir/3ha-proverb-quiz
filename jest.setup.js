@@ -45,6 +45,7 @@ jest.mock('react-native-google-mobile-ads', () => ({
 	__esModule: true,
 	default: () => ({ initialize: jest.fn().mockResolvedValue([]) }),
 	BannerAd: () => null,
+	useForeground: jest.fn(),
 	BannerAdSize: { ANCHORED_ADAPTIVE_BANNER: 'ANCHORED_ADAPTIVE_BANNER' },
 	InterstitialAd: { createForAdRequest: () => ({ load: jest.fn(), show: jest.fn(), addAdEventListener: () => jest.fn() }) },
 	RewardedAd: { createForAdRequest: () => ({ load: jest.fn(), show: jest.fn(), addAdEventListener: () => jest.fn() }) },
@@ -63,6 +64,7 @@ jest.mock('@notifee/react-native', () => ({
 		getTriggerNotificationIds: jest.fn().mockResolvedValue([]),
 		createChannel: jest.fn().mockResolvedValue('channel'),
 		onForegroundEvent: jest.fn(() => jest.fn()),
+		getInitialNotification: jest.fn().mockResolvedValue(null),
 	},
 	TriggerType: { TIMESTAMP: 0 },
 	AndroidImportance: { HIGH: 4 },
@@ -107,3 +109,6 @@ jest.mock('react-native-permissions', () => ({
 }));
 
 jest.mock('react-native-bootsplash', () => ({ hide: jest.fn().mockResolvedValue(undefined), isVisible: jest.fn().mockResolvedValue(false) }));
+
+// 모달들이 useSafeAreaInsets 를 쓰므로 SafeAreaProvider 없이 렌더되는 테스트를 위해 공식 목을 쓴다.
+jest.mock('react-native-safe-area-context', () => require('react-native-safe-area-context/jest/mock').default);

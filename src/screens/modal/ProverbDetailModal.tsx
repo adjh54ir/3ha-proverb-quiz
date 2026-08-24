@@ -14,6 +14,7 @@ import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import SuccessToast from '../SuccessToast';
 import { useModalEnter } from '@/hooks/useModalEnter';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 type Props = {
 	visible: boolean;
@@ -23,6 +24,8 @@ type Props = {
 };
 
 const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Props) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	const [showToast, setShowToast] = useState(false);
 	const [isFavorite, setIsFavorite] = useState(false);
 	const [toastMessage, setToastMessage] = useState('');
@@ -112,7 +115,7 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 
 	return (
 		<Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
-			<View style={styles.modalOverlay}>
+			<View style={[styles.modalOverlay, safePadding]}>
 				<Animated.View style={[styles.modalContainer, enterStyle]}>
 					{/* ───────────── 헤더 ───────────── */}
 					<View style={styles.modalHeader}>

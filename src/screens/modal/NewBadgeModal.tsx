@@ -11,6 +11,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { playComplete } from '@/utils/SoundUtils';
 import { useModalEnterExit } from '@/hooks/useModalEnter';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 interface Props {
 	visible: boolean;
@@ -23,6 +24,8 @@ interface Props {
  * - 여러 화면(퀴즈/오늘의 퀴즈 등)에서 동일한 스타일로 재사용합니다.
  */
 const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	// 모달 공통 진입 애니메이션 (fade + scale) — 확인 시에는 되감고 나서 부모에 알린다
 	const { style: enterStyle, runExit } = useModalEnterExit(visible);
 	const iconPopAnim = useRef(new Animated.Value(0)).current;
@@ -68,7 +71,7 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={handleConfirm}>
-			<View style={styles.modalOverlay}>
+			<View style={[styles.modalOverlay, safePadding]}>
 				<ConfettiCannon
 					key={confettiKey.current}
 					count={100}

@@ -7,6 +7,7 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { useModalEnter } from '@/hooks/useModalEnter';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 const BadgeListModal = ({
 	visible,
@@ -21,6 +22,8 @@ const BadgeListModal = ({
 	onClose: () => void;
 	onSelectBadge?: (badge: (typeof CONST_BADGES)[number]) => void;
 }) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(visible);
 
@@ -55,7 +58,7 @@ const BadgeListModal = ({
 
 	return (
 		<Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
-			<View style={styles.modalOverlay}>
+			<View style={[styles.modalOverlay, safePadding]}>
 				<Animated.View style={[styles.badgeModalContent, enterStyle]}>
 					{/* 헤더 */}
 					<View style={styles.badgeModalHeader}>

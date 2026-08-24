@@ -5,6 +5,7 @@ import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import PopInView from '@/components/animation/PopInView';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 interface VersionModalProps {
     visible: boolean;
@@ -15,11 +16,13 @@ interface VersionModalProps {
 }
 
 const CurrentVersionModal = ({ visible, currentVersion, latestVersion, onClose, onUpdatePress }: VersionModalProps) => {
+    // AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+    const safePadding = useModalSafePadding();
     const isLatest = !latestVersion || currentVersion === latestVersion;
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-            <View style={styles.backdrop}>
+            <View style={[styles.backdrop, safePadding]}>
                 <PopInView visible={visible} style={styles.container}>
                     {/* ✅ 앱 아이콘 */}
                     <View style={styles.iconWrapper}>

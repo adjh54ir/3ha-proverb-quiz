@@ -12,6 +12,7 @@ import { useModalEnter } from '@/hooks/useModalEnter';
 import { read, update } from '@/services/StorageService';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import * as TodayQuizService from '@/services/TodayQuizService';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 interface DailyMissionModalProps {
 	visible: boolean;
@@ -24,6 +25,8 @@ interface DailyMissionModalProps {
 const MISSION_BONUS = 100;
 
 const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose, onClaimed }) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	const [missions, setMissions] = useState<DailyMission[]>([]);
 	const [claimedToday, setClaimedToday] = useState(false);
 	// 모달 공통 진입 애니메이션 (fade + scale)
@@ -84,7 +87,7 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-			<View style={styles.overlay}>
+			<View style={[styles.overlay, safePadding]}>
 				<Animated.View style={[styles.card, enterStyle]}>
 					<ModalCloseButton onPress={onClose} color={COLORS.textWhite} />
 

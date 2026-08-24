@@ -9,6 +9,7 @@ import { LEVEL_DATA } from '@/const/ConstInfoData';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { useModalEnter } from '@/hooks/useModalEnter';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 interface LevelModalProps {
 	visible: boolean;
@@ -17,6 +18,8 @@ interface LevelModalProps {
 }
 
 const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose }) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	const levelScrollRef = useRef<ScrollView>(null);
 	const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -60,9 +63,9 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-			<View style={styles.modalOverlay}>
+			<View style={[styles.modalOverlay, safePadding]}>
 				<Animated.View
-					style={[styles.levelModal, { maxHeight: scaleHeight(600), ...enterStyle }]}>
+					style={[styles.levelModal, { maxHeight: '100%', ...enterStyle }]}>
 					<ModalCloseButton onPress={onClose} />
 
 					<Text style={styles.levelModalTitle}>등급 안내</Text>

@@ -9,6 +9,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import { COMMON_APPS_DATA, appStoreUrl } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
 import PopInView from '@/components/animation/PopInView';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 type CategoryFilter = 'all' | CommonType.AppCategory;
 
@@ -38,6 +39,8 @@ interface Props {
 }
 
 const DeveloperAppsModal = ({ visible, onClose }: Props) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
 	const [searchQuery, setSearchQuery] = useState('');
 	const [searchFocused, setSearchFocused] = useState(false);
@@ -89,7 +92,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
 			{/* 모달은 Activity 가 아닌 별도 Dialog 윈도우라 매니페스트의 adjustResize 가 적용되지 않는다.
 			    화면(Screen)과 달리 안드로이드도 behavior 를 직접 줘야 키보드가 입력창을 가리지 않는다. */}
-			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.overlay}>
+			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.overlay, safePadding]}>
 				{/* 카드 밖(딤 영역)을 누르면 키보드를 닫는다 */}
 				<Pressable style={StyleSheet.absoluteFill} onPress={Keyboard.dismiss} />
 				<PopInView visible={visible} style={styles.container}>
@@ -195,7 +198,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	container: {
 		width: '100%',
-		maxHeight: scaleHeight(660),
+		maxHeight: '100%',
 		flexShrink: 1, // 키보드로 화면이 줄어들 때 모달이 넘치지 않도록
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,

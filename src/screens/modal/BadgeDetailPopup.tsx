@@ -10,6 +10,7 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { getBadgeProgress, BadgeProgress } from '@/utils/BadgeProgressUtils';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 
 interface Props {
@@ -22,6 +23,8 @@ interface Props {
 const TYPE_LABEL: Record<string, string> = { study: '학습 뱃지', quiz: '퀴즈 뱃지', attendance: '출석 뱃지' };
 
 const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	// 회전/폴더블 대응: 화면 크기가 바뀌면 컴포넌트가 다시 렌더된다.
 	const { width: screenWidth } = useWindowDimensions();
 	const backdrop = useRef(new Animated.Value(0)).current;
@@ -108,7 +111,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 
 	return (
 		<Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
-			<Animated.View style={[styles.backdrop, { opacity: backdrop }]}>
+			<Animated.View style={[styles.backdrop, safePadding, { opacity: backdrop }]}>
 				<TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
 
 				<Animated.View style={[styles.card, { transform: [{ scale }, { translateY }] }]}>

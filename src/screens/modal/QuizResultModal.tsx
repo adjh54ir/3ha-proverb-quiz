@@ -9,6 +9,7 @@ import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import SuccessToast from '../SuccessToast';
 import { useModalEnter } from '@/hooks/useModalEnter';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 type ResultType = 'correct' | 'wrong' | 'timeout' | 'done' | '';
 
@@ -37,6 +38,8 @@ const QuizResultModal = ({
 	onToggleFavorite,
 	onNext,
 }: Props) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	// ✅ Toast 상태
 	const [toastVisible, setToastVisible] = useState(false);
 	const [toastMessage, setToastMessage] = useState('');
@@ -141,7 +144,7 @@ const QuizResultModal = ({
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onNext}>
-			<View style={styles.overlay}>
+			<View style={[styles.overlay, safePadding]}>
 				<Animated.View style={[styles.card, enterStyle]}>
 					{/* 상단 결과 영역 */}
 					<View style={[styles.resultHeader, { backgroundColor: cardBg, borderColor: cardBorder }]}>

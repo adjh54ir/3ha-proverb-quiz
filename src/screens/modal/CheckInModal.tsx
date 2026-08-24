@@ -10,6 +10,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { PET_REWARDS } from '@/const/ConstInfoData';
 import { useModalEnter } from '@/hooks/useModalEnter';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 interface CheckInModalProps {
 	visible: boolean;
@@ -25,11 +26,13 @@ interface CheckInModalProps {
 const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, checkedInDates, mascot, showStamp, stampStyle, onClose, petLevel = -1 }) => {
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(visible);
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-			<View style={styles.modalOverlay}>
+			<View style={[styles.modalOverlay, safePadding]}>
 				<Animated.View style={[styles.modalContent, enterStyle]}>
 					<ModalCloseButton onPress={onClose} />
 
@@ -161,7 +164,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	modalContent: {
 		width: '100%',
 		maxWidth: scaleWidth(340),
-		maxHeight: scaleHeight(700),
+		maxHeight: '100%',
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,

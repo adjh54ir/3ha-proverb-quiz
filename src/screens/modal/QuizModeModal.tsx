@@ -7,6 +7,7 @@ import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyle
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { useModalEnter } from '@/hooks/useModalEnter';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 type QuizMode = 'meaning' | 'proverb' | 'blank' | 'example';
 
@@ -25,13 +26,15 @@ const MODES: { key: QuizMode; label: string; desc: string; icon: string; color: 
 ]));
 
 const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(!!book);
 
 
 	return (
 		<Modal visible={!!book} transparent animationType="fade" onRequestClose={onClose}>
-			<TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
+			<TouchableOpacity style={[styles.overlay, safePadding]} activeOpacity={1} onPress={onClose}>
 				<Animated.View style={{ width: '100%', alignItems: 'center', ...enterStyle }}>
 					<TouchableOpacity activeOpacity={1} style={styles.card}>
 						<View style={styles.headerRow}>

@@ -9,6 +9,7 @@ import { MainDataType } from '@/types/MainDataType';
 import { BOOK_COLORS, BOOK_ICONS } from '../common/CommonProverbModule';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 type PickerProps = {
 	selectedColor: string;
@@ -90,6 +91,8 @@ const pickerStyles = themedStyles(() => StyleSheet.create({
 }));
 
 const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
+	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+	const safePadding = useModalSafePadding();
 	const isEdit = !!editTarget;
 
 	const [title, setTitle] = useState('');
@@ -123,7 +126,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			{/* 모달은 Activity 가 아닌 별도 Dialog 윈도우라 매니페스트의 adjustResize 가 적용되지 않는다.
 			    화면(Screen)과 달리 안드로이드도 behavior 를 직접 줘야 키보드가 입력창을 가리지 않는다. */}
-			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.overlay}>
+			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.overlay, safePadding]}>
 				{/* 카드 밖(딤 영역)을 누르면 키보드를 닫는다 */}
 				<Pressable style={StyleSheet.absoluteFill} onPress={Keyboard.dismiss} />
 				<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">

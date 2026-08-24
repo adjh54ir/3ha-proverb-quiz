@@ -10,6 +10,7 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import IconComponent from '../common/atomic/IconComponent';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { useModalEnter, MODAL_ENTER_DURATION } from '@/hooks/useModalEnter';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 interface QuizCompletionModalProps {
     visible: boolean;
@@ -35,6 +36,8 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
     onRetry, // ✅ 추가
     onReviewWrong,
 }) => {
+    // AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
+    const safePadding = useModalSafePadding();
     // 모달 공통 진입 애니메이션 (fade + scale)
     const enterStyle = useModalEnter(visible);
     const mascotBounce = useRef(new Animated.Value(0)).current;
@@ -104,7 +107,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
     if (!isPracticeMode) {
         return (
             <Modal visible={visible} transparent animationType="fade" onRequestClose={onConfirm}>
-                <View style={styles.overlay}>
+                <View style={[styles.overlay, safePadding]}>
                     <ConfettiCannon
                         key={confettiKey}
                         count={150}
@@ -172,7 +175,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
     // ✅ 연습 모드 - AnimatedCircularProgress 적용
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onConfirm}>
-            <View style={styles.overlay}>
+            <View style={[styles.overlay, safePadding]}>
                 {accuracy >= 80 && (
                     <ConfettiCannon
                         key={confettiKey}

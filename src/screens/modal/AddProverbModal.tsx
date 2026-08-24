@@ -1,18 +1,20 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, FlatList, Keyboard, TouchableWithoutFeedback, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Keyboard, TouchableWithoutFeedback, Platform, KeyboardAvoidingView } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconComponent from '../common/atomic/IconComponent';
-import FadeInView from '@/components/animation/FadeInView';
+import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName } from '../common/CommonProverbModule';
+import { getLevelIconName } from '@/screens/common/CommonProverbModule';
 
 interface Props {
 	visible: boolean;
@@ -30,7 +32,6 @@ const LEVEL_ITEMS = themedValue(() => ([
 	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelColor('특급')} /> },
 ]));
 
-const LEVEL_ICON_MAP: Record<string, string> = { '초급': 'seedling', 중급: 'leaf', 고급: 'tree', 특급: 'trophy' };
 
 const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 	const emptyImage = require('@/assets/images/feature-states/empty-search.png');
@@ -136,12 +137,12 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 		const isSelected = selectedIds.includes(item.id);
 
 		return (
-			<FadeInView delay={index < 6 ? index * 40 : 0} duration={240} offsetY={10}>
+			<FadeInView delay={staggerDelay(index)} duration={240} offsetY={10}>
 			<TouchableOpacity style={[styles.itemCard, { marginBottom: isLast ? SPACING_H.xl : SPACING_H.md }, isSelected && styles.itemCardSelected]} activeOpacity={0.75} onPress={() => toggleSelection(item.id)}>
 				<View style={styles.itemHeader}>
 					<View style={styles.badgeRow}>
 						<View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.levelName) }]}>
-							<IconComponent type="FontAwesome6" name={LEVEL_ICON_MAP[item.levelName] ?? 'circle'} size={scaledSize(10)} color={COLORS.textWhite} />
+							<IconComponent type="FontAwesome6" name={getLevelIconName(item.levelName)} size={scaledSize(10)} color={COLORS.textWhite} />
 							<Text style={styles.badgeText}>{item.levelName}</Text>
 						</View>
 						<View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(item.category) }]}>
@@ -197,7 +198,7 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 											</TouchableOpacity>
 										)}
 									</View>
-									<TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8}>
+									<TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8} hitSlop={HIT_SLOP}>
 										<Icon name="rotate-right" size={scaledSize(15)} color={COLORS.textSecondary} />
 									</TouchableOpacity>
 								</View>

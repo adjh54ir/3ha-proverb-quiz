@@ -1,12 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, ScrollView, StyleSheet, Animated, Easing } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Animated, Easing } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import SuccessToast from '../SuccessToast';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
 type ResultType = 'correct' | 'wrong' | 'timeout' | 'done' | '';
 
@@ -40,9 +42,8 @@ const QuizResultModal = ({
 	const [toastMessage, setToastMessage] = useState('');
 	const toastTimer = useRef<NodeJS.Timeout | null>(null);
 
-	// ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
-	const cardFade = useRef(new Animated.Value(0)).current;
-	const cardScale = useRef(new Animated.Value(0.95)).current;
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(visible);
 
 	// ✅ 정답 카드 / 해설 카드 등장 애니메이션
 	const answerAnim = useRef(new Animated.Value(0)).current;
@@ -66,23 +67,15 @@ const QuizResultModal = ({
 				clearTimeout(toastTimer.current);
 			}
 			// 닫힐 때 초기화해야 다음 문제에서 열릴 때 첫 프레임이 opacity 0 으로 그려진다(이전 문제 잔상 방지)
-			cardFade.setValue(0);
-			cardScale.setValue(0.95);
 			answerAnim.setValue(0);
 			explainAnim.setValue(0);
 			return;
 		}
 
-		cardFade.setValue(0);
-		cardScale.setValue(0.95);
 		answerAnim.setValue(0);
 		explainAnim.setValue(0);
 
-		// ✅ 카드 진입 → 정답 카드 → 해설 카드 순서로 등장
-		const enterAnim = Animated.parallel([
-			Animated.timing(cardFade, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(cardScale, { toValue: 1, duration: 250, useNativeDriver: true }),
-		]);
+		// ✅ 카드 진입(useModalEnter) 에 이어 정답 카드 → 해설 카드 순서로 등장
 		const contentAnim = Animated.sequence([
 			Animated.timing(answerAnim, {
 				toValue: 1,
@@ -97,15 +90,11 @@ const QuizResultModal = ({
 				useNativeDriver: true,
 			}),
 		]);
-		enterAnim.start();
 		contentAnim.start();
 
 		// ✅ 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
-		return () => {
-			enterAnim.stop();
-			contentAnim.stop();
-		};
-	}, [visible, cardFade, cardScale, answerAnim, explainAnim]);
+		return () => contentAnim.stop();
+	}, [visible, answerAnim, explainAnim]);
 
 	// ✅ 타이머 정리 (언마운트 시)
 	useEffect(() => {
@@ -153,7 +142,7 @@ const QuizResultModal = ({
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onNext}>
 			<View style={styles.overlay}>
-				<Animated.View style={[styles.card, { opacity: cardFade, transform: [{ scale: cardScale }] }]}>
+				<Animated.View style={[styles.card, enterStyle]}>
 					{/* 상단 결과 영역 */}
 					<View style={[styles.resultHeader, { backgroundColor: cardBg, borderColor: cardBorder }]}>
 						<FastImage source={mascotSource} style={styles.mascot} resizeMode={FastImage.resizeMode.contain} />

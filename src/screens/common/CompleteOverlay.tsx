@@ -10,7 +10,7 @@ import Animated, {
     cancelAnimation,
 } from 'react-native-reanimated';
 import { scaledSize, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 
 const CompleteOverlay = () => {
     const opacity = useSharedValue(0);
@@ -86,7 +86,7 @@ const styles = themedStyles(() => StyleSheet.create({
         alignItems: 'center',
     },
     checkIcon: {
-        fontSize: scaledSize(36),
+        fontSize: displayFontSize(36),
         color: COLORS.primary,
         fontWeight: '700',
         lineHeight: scaledSize(44),

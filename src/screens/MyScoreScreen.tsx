@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
+import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
 import {
 	View,
 	Text,
@@ -21,12 +22,10 @@ import { RootStackParamList } from '@/navigation/conf/Types';
 import IconComponent from './common/atomic/IconComponent';
 import DonutChart from './common/atomic/DonutChart';
 import AnimatedCounter from './common/atomic/AnimatedCounter';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import FastImage from 'react-native-fast-image';
-import 'moment/locale/ko'; // 한국어 로케일 import
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
@@ -34,7 +33,8 @@ import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, theme
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
+import { Calendar } from 'react-native-calendars';
+import '@/utils/KoreanLocale'; // 달력/moment 한국어 설정 (단일 소스)
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { PET_REWARDS, getLevelByScore } from '@/const/ConstInfoData';
@@ -44,6 +44,11 @@ import LevelModal from './modal/LevelModal';
 import { FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { getLevelColor } from '@/screens/common/CommonProverbModule';
 import DateUtils from '@/utils/DateUtils';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { buildDateMark, buildTodayPendingMark, buildSelectedMark } from '@/utils/CalendarMarkUtils';
+import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
+import { read } from '@/services/StorageService';
+import QuizHistoryService from '@/services/QuizHistoryService';
 
 interface TodayQuizList {
 	quizDate: string;
@@ -95,40 +100,7 @@ const STYLE_MAP = {
 	},
 };
 
-LocaleConfig.locales.kr = {
-	monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-	monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-	dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-	dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
-};
 
-LocaleConfig.defaultLocale = 'kr';
-
-/**
- * 캘린더 셀의 기본(비선택) 마킹.
- * 날짜 선택을 해제할 때도 이 규칙으로 복원해야 출석 표시가 연파랑으로 덮어써지지 않는다.
- */
-const buildDateMark = (isCheckedIn: boolean, isToday: boolean) =>
-	isCheckedIn
-		? {
-				// 출석한 날 — 오늘은 앰버, 이전 날은 초록
-				marked: true,
-				dotColor: COLORS.textWhite,
-				customStyles: {
-					container: { backgroundColor: isToday ? COLORS.warning : COLORS.primary, borderRadius: scaleWidth(6) },
-					text: { color: COLORS.textWhite, fontWeight: 'bold' },
-				},
-		  }
-		: {
-				// 퀴즈 기록만 있고 출석은 안 한 날
-				marked: true,
-				dotColor: COLORS.primary,
-				customStyles: {
-					container: { backgroundColor: COLORS.secondaryBg },
-					text: { color: COLORS.primary, fontWeight: 'bold' },
-				},
-		  };
-moment.locale('ko'); // 로케일 설정
 
 const STORAGE_KEY_QUIZ = MainStorageKeyType.USER_QUIZ_HISTORY;
 const STORAGE_KEY_STUDY = MainStorageKeyType.USER_STUDY_HISTORY;
@@ -175,6 +147,8 @@ const ConquerHeader = ({
 );
 
 const MyScoreScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('myScore', false);
 	const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 	const isFocused = useIsFocused();
 	const scrollRef = useRef<ScrollView>(null);
@@ -195,12 +169,13 @@ const MyScoreScreen = () => {
 	const [levelMaster, setLevelMaster] = useState<string[]>([]);
 	const [correctCount, setCorrectCount] = useState<number>(0);
 	const [wrongCount, setWrongCount] = useState<number>(0);
-	const [lastAnsweredAt, setLastAnsweredAt] = useState<string>('');
+	// 저장값은 ISO 문자열이지만 방금 쓴 값은 Date 일 수 있다 (moment 는 둘 다 받는다)
+	const [lastAnsweredAt, setLastAnsweredAt] = useState<string | Date>('');
 	const [bestCombo, setBestCombo] = useState<number>(0);
 	const [showLevelModal, setShowLevelModal] = useState(false);
 	const [badgeFilter, setBadgeFilter] = useState<'all' | 'earned' | 'locked'>('all');
 	const [studyCountries, setStudyCountries] = useState<string[]>([]);
-	const [lastStudyAt, setLastStudyAt] = useState<string>('');
+	const [lastStudyAt, setLastStudyAt] = useState<string | Date>('');
 	const [totalStudyCount, setTotalStudyCount] = useState<number>(0);
 	const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -316,8 +291,9 @@ const MyScoreScreen = () => {
 
 	useFocusEffect(
 		useCallback(() => {
-			const todayStr = moment().format('YYYY-MM-DD');
-			const todayData = todayQuizDataList.find((item) => moment(item.quizDate).format('YYYY-MM-DD') === todayStr);
+			// '오늘'은 기기 타임존 기준으로만 판단한다 (DateUtils 단일 진입점)
+			const todayStr = DateUtils.getLocalDateString();
+			const todayData = todayQuizDataList.find((item) => DateUtils.toLocalDateKey(item.quizDate) === todayStr);
 
 			if (todayData) {
 				setSelectedDate(todayStr);
@@ -328,13 +304,11 @@ const MyScoreScreen = () => {
 
 	const loadData = async () => {
 		try {
-			const studyData = await AsyncStorage.getItem(STORAGE_KEY_STUDY);
-			const quizData = await AsyncStorage.getItem(STORAGE_KEY_QUIZ);
+			const studyJson = await read<MainDataType.UserStudyHistory | null>(STORAGE_KEY_STUDY, null);
+			const quizJson = await QuizHistoryService.getQuizHistory();
 
-			const studyBadges = studyData ? (JSON.parse(studyData)?.badges ?? []) : [];
-			const quizJson = quizData ? JSON.parse(quizData) : null;
+			const studyBadges = studyJson?.badges ?? [];
 			const quizBadges = quizJson?.badges ?? [];
-			const studyJson = studyData ? JSON.parse(studyData) : null;
 			const studiedIds: number[] = studyJson?.studyProverbes ?? [];
 			const studyCounts = studyJson?.studyCounts ?? {};
 			const lastDate = studyJson?.lastStudyAt ?? '';
@@ -347,9 +321,8 @@ const MyScoreScreen = () => {
 			const totalCount = (Object.values(studyCounts) as number[]).reduce((a, b) => a + b, 0);
 			setTotalStudyCount(totalCount);
 			// ✅ 수정 - 올바른 키 사용
-			const towerRaw = await AsyncStorage.getItem(MainStorageKeyType.TOWER_CHALLENGE_PROGRESS);
-			const towerParsed: TowerProgress = towerRaw ? JSON.parse(towerRaw) : {};
-			setUnlockedRewards(towerParsed.unlockedRewards ?? []);
+			const towerParsed = await read<TowerProgress | null>(MainStorageKeyType.TOWER_CHALLENGE_PROGRESS, null);
+			setUnlockedRewards(towerParsed?.unlockedRewards ?? []);
 
 			setTotalScore(quizJson?.totalScore ?? 0);
 			setCorrectCount(quizJson?.correctProverbId?.length ?? 0);
@@ -357,8 +330,7 @@ const MyScoreScreen = () => {
 			setLastAnsweredAt(quizJson?.lastAnsweredAt ?? '');
 			setBestCombo(quizJson?.bestCombo ?? 0);
 
-			const timeData = await AsyncStorage.getItem(STORAGE_KEY_TIME);
-			const timeResults: MainDataType.TimeChallengeResult[] = timeData ? JSON.parse(timeData) : [];
+			const timeResults = await read<MainDataType.TimeChallengeResult[]>(STORAGE_KEY_TIME, []);
 			// ⚠️ 예전에는 최근 3건만 남겨 두고 그 안에서 정렬해 'TOP 3' 로 표시했다(=최근 3판 중 1등).
 			//    전체 기록에서 점수 상위 3건을 뽑아야 실제 랭킹이 된다.
 			setTimeChallengeResults([...timeResults].sort((a, b) => b.finalScore - a.finalScore).slice(0, 3));
@@ -394,8 +366,7 @@ const MyScoreScreen = () => {
 			setLevelMaster(conqueredLevels);
 
 			// 타임 챌린지 정보
-			const todayJson = await AsyncStorage.getItem(STORAGE_KEY_TODAY);
-			const todayData: MainDataType.TodayQuizList[] = todayJson ? JSON.parse(todayJson) : [];
+			const todayData = await read<MainDataType.TodayQuizList[]>(STORAGE_KEY_TODAY, []);
 
 			// 캘린더 마킹은 여기 한 곳에서만 만든다.
 			// (예전에는 loadCheckedInDates() 가 별도 marked 를 만들고도 setMarkedQuizDates 를 호출하지 않아
@@ -417,18 +388,7 @@ const MyScoreScreen = () => {
 			// 오늘 출석 전이면 오늘 날짜를 파란색으로 강조 (출석 앰버 표시는 덮어쓰지 않는다)
 			const isTodayCheckedIn = todayData.some((item) => DateUtils.toLocalDateKey(item.quizDate) === todayStr && item.isCheckedIn);
 			if (!isTodayCheckedIn) {
-				marked[todayStr] = {
-					...(marked[todayStr] || {}),
-					customStyles: {
-						container: {
-							backgroundColor: COLORS.secondary,
-						},
-						text: {
-							color: COLORS.textWhite,
-							fontWeight: 'bold',
-						},
-					},
-				};
+				marked[todayStr] = { ...(marked[todayStr] || {}), ...buildTodayPendingMark() };
 			}
 
 			setTodayQuizDataList(todayData); // todayData를 상태로 저장
@@ -501,6 +461,15 @@ const MyScoreScreen = () => {
 		scrollRef.current?.scrollTo({ y: 0, animated: true });
 	};
 
+	/**
+	 * 활동 탭 전환 — 탭을 바꾸면 이전 탭에서 보던 위치가 그대로 남아 엉뚱한 지점이 보인다.
+	 * 탭 값만 바꾸지 말고 스크롤도 최상단으로 되돌린다.
+	 */
+	const handleActivityTabPress = (tabKey: string) => {
+		setActiveTab(tabKey);
+		scrollRef.current?.scrollTo({ y: 0, animated: true });
+	};
+
 	const totalSolved = correctCount + wrongCount;
 	const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
 
@@ -515,7 +484,7 @@ const MyScoreScreen = () => {
 			 */
 			onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
 				const offsetY = event.nativeEvent.contentOffset.y;
-				setShowScrollTop(offsetY > scaleHeight(100));
+				setShowScrollTop(offsetY > SCROLL_TOP_THRESHOLD);
 			},
 			/**
 			 * 스크롤 최상단으로 이동
@@ -548,18 +517,7 @@ const MyScoreScreen = () => {
 			}
 
 			// ✅ 새 선택 날짜 강조
-			updated[date] = {
-				...(updated[date] || {}),
-				customStyles: {
-					container: {
-						backgroundColor: COLORS.border,
-					},
-					text: {
-						color: COLORS.text,
-						fontWeight: 'bold',
-					},
-				},
-			};
+			updated[date] = { ...(updated[date] || {}), ...buildSelectedMark() };
 
 			return updated;
 		});
@@ -570,6 +528,7 @@ const MyScoreScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['top']}>
+		<FloatingGuideButton onPress={guide.open} />
 			<ScrollView
 				ref={scrollRef}
 				style={styles.container}
@@ -584,17 +543,6 @@ const MyScoreScreen = () => {
 						progressBackgroundColor={COLORS.surface}
 					/>}>
 				<View style={styles.sectionBox}>
-					<View style={styles.activityHero}>
-						<View style={styles.activityHeroCopy}>
-							<Text style={styles.activityHeroTitle}>배운 만큼 지혜가 쌓였습니다</Text>
-							<Text style={styles.activityHeroDescription}>오늘의 기록과 지금까지의 성장을 확인해보세요.</Text>
-						</View>
-						<FastImage
-							source={require('@/assets/images/screen-heroes/activity-achievement.png')}
-							style={styles.activityHeroImage}
-							resizeMode={FastImage.resizeMode.contain}
-						/>
-					</View>
 					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginTop: SPACING_H.mdPlus, marginBottom: scaleHeight(-8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
 						{/* ✅ 홈화면과 동일한 캐릭터/펫 배치 구조 (래퍼 높이 축소로 타이틀과 밀착) */}
 						<View style={{ width: scaleWidth(180), height: scaleWidth(150), alignItems: 'center', justifyContent: 'center' }}>
@@ -647,7 +595,7 @@ const MyScoreScreen = () => {
 						</View>
 
 						<View style={styles.scoreBadge}>
-							<IconComponent name="leaderboard" type="materialIcons" size={scaledSize(14)} color={COLORS.textWhite} />
+							<IconComponent name="leaderboard" type="materialIcons" size={scaledSize(13)} color={COLORS.textWhite} />
 							<Text style={styles.scoreBadgeText}>{totalScore.toLocaleString()}점</Text>
 						</View>
 					</View>
@@ -689,7 +637,7 @@ const MyScoreScreen = () => {
 							<View style={styles.scoreDashHeader}>
 								<View style={styles.scoreDashTitleRow}>
 									<View style={styles.scoreDashIconChip}>
-										<IconComponent type="materialIcons" name="insights" size={scaledSize(16)} color={COLORS.textWhite} />
+										<IconComponent type="materialIcons" name="insights" size={scaledSize(14)} color={COLORS.textWhite} />
 									</View>
 									<Text style={styles.scoreDashTitle}>전체 스코어</Text>
 								</View>
@@ -718,7 +666,7 @@ const MyScoreScreen = () => {
 										]}>
 										<View style={styles.scoreDashTileTop}>
 											<View style={[styles.scoreDashTileIcon, { backgroundColor: m.soft }]}>
-												<IconComponent type="materialIcons" name={m.icon} size={scaledSize(15)} color={m.color} />
+												<IconComponent type="materialIcons" name={m.icon} size={scaledSize(13)} color={m.color} />
 											</View>
 											<Text style={styles.scoreDashTileLabel}>{m.label}</Text>
 										</View>
@@ -745,7 +693,7 @@ const MyScoreScreen = () => {
 							<TouchableOpacity
 								key={tab.key}
 								activeOpacity={0.8}
-								onPress={() => setActiveTab(tab.key)}
+								onPress={() => handleActivityTabPress(tab.key)}
 								style={[styles.activityTabChip, isActive && styles.activityTabChipActive]}>
 								<IconComponent
 									type="materialIcons"
@@ -1369,7 +1317,8 @@ const MyScoreScreen = () => {
 									<View
 										style={{
 											width: scaleWidth(80),
-											backgroundColor: isCleared ? tower.backgroundColor : COLORS.surfaceAlt,
+											// 고정 파스텔 대신 보스 색에서 틴트를 만든다 — 다크모드에서도 배경에 어울린다
+											backgroundColor: isCleared ? withAlpha(tower.color, ALPHA.soft) : COLORS.surfaceAlt,
 											alignItems: 'center',
 											justifyContent: 'center',
 											padding: SPACING_W.sm,
@@ -1387,7 +1336,9 @@ const MyScoreScreen = () => {
 												paddingHorizontal: SPACING_W.sm,
 												paddingVertical: SPACING_H.xxs,
 											}}>
-											<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>LV.{tower.level}</Text>
+											<Text style={{ color: isCleared ? readableTextOn(tower.color) : COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>
+												LV.{tower.level}
+											</Text>
 										</View>
 									</View>
 
@@ -1457,15 +1408,17 @@ const MyScoreScreen = () => {
 			<ProverbDetailModal visible={detailVisible && !!detailProverb} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
 
 			{/* 최하단에 위치할것!! */}
-			{showScrollTop && (
-				<TouchableOpacity
-					style={styles.scrollTopButton}
-					activeOpacity={0.85}
-					hitSlop={HIT_SLOP}
-					onPress={scrollHandler.toTop}>
-					<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color={COLORS.textWhite} />
-				</TouchableOpacity>
-			)}
+			<ScrollTopButton visible={showScrollTop} onPress={scrollHandler.toTop} />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'나의 활동에서는 지금까지의 기록을 모아서 볼 수 있습니다.',
+					'전체 스코어로 학습 진척도와 정답률을 한눈에 확인하세요.',
+					'뱃지를 누르면 획득 조건과 상세 설명이 나옵니다!',
+				]}
+				title="나의 활동, 이렇게 봅니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -1563,22 +1516,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
-	activityHero: {
-		minHeight: scaleHeight(118),
-		marginBottom: SPACING_H.md,
-		paddingLeft: SPACING_W.lg,
-		backgroundColor: HERO.bg,
-		borderTopWidth: 3,
-		borderTopColor: HERO.accent,
-		borderRadius: RADIUS.lg,
-		flexDirection: 'row',
-		alignItems: 'center',
-		overflow: 'hidden',
-	},
-	activityHeroCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
-	activityHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
-	activityHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
-	activityHeroImage: { width: scaleWidth(142), height: scaleHeight(112), marginRight: scaleWidth(-8) },
 	scoreDashCard: {
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.lg,
@@ -1595,14 +1532,14 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	scoreDashTitleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm },
 	scoreDashIconChip: {
-		width: scaleWidth(28),
-		height: scaleWidth(28),
-		borderRadius: scaleWidth(9),
+		width: scaleWidth(24),
+		height: scaleWidth(24),
+		borderRadius: scaleWidth(8),
 		backgroundColor: COLORS.primary,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	scoreDashTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong },
+	scoreDashTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.textStrong },
 	scoreDashScorePill: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -1612,26 +1549,27 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.xs,
 	},
-	scoreDashScoreText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.warningDark },
-	scoreDashGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: SPACING_H.md },
+	scoreDashScoreText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.warningDark },
+	scoreDashGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: SPACING_H.sm },
 	scoreDashTile: {
 		width: '48%',
 		backgroundColor: COLORS.background,
 		borderRadius: RADIUS.md,
-		padding: SPACING_W.md,
+		paddingHorizontal: SPACING_W.smPlus,
+		paddingVertical: SPACING_H.smPlus,
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
-	scoreDashTileTop: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm, marginBottom: SPACING_H.sm },
+	scoreDashTileTop: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.xsPlus, marginBottom: SPACING_H.xs },
 	scoreDashTileIcon: {
-		width: scaleWidth(26),
-		height: scaleWidth(26),
-		borderRadius: scaleWidth(8),
+		width: scaleWidth(22),
+		height: scaleWidth(22),
+		borderRadius: scaleWidth(7),
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 	scoreDashTileLabel: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, flexShrink: 1 },
-	scoreDashTileValue: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
+	scoreDashTileValue: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.xs },
 	scoreDashBarTrack: {
 		height: scaleHeight(6),
 		borderRadius: scaleWidth(3),
@@ -1809,7 +1747,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	modalOverlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
@@ -2168,29 +2106,18 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.primary,
 		fontWeight: '700',
 	},
-	scrollTopButton: {
-		position: 'absolute',
-		right: SPACING_W.lg,
-		bottom: SPACING_H.lg,
-		backgroundColor: COLORS.secondary,
-		width: scaleWidth(40),
-		height: scaleWidth(40),
-		borderRadius: scaleWidth(20),
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
 	scoreBadge: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		backgroundColor: COLORS.primary,
 		borderRadius: RADIUS.round,
-		paddingHorizontal: SPACING_W.lg,
-		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
 		marginBottom: SPACING_H.md,
 	},
 	scoreBadgeText: {
 		color: COLORS.textWhite,
-		fontSize: FONT_SIZES.title,
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		marginLeft: SPACING_W.xsPlus,
 	},

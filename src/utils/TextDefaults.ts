@@ -12,8 +12,8 @@
  * index.js 최상단에서 App 보다 먼저 import 할 것.
  */
 import React from 'react';
-import { Text, TextInput } from 'react-native';
-import { COLORS, FONT_SIZES, getTextSizeMode, getThemeMode, TEXT_SIZE_MAX_MULTIPLIER, themedValue } from '@/const/common/Theme';
+import { StyleSheet, Text, TextInput } from 'react-native';
+import { COLORS, FONT_SIZES, getTextSizeFactor, getTextSizeMode, getThemeMode, TEXT_SIZE_MAX_MULTIPLIER, themedValue } from '@/const/common/Theme';
 
 /** <Text> 안에 중첩된 <Text> 인지 여부를 알려주는 RN 내부 컨텍스트 (public export 없음) */
 // @ts-ignore - RN 내부 모듈이라 타입 선언(.d.ts)이 없다.
@@ -33,6 +33,26 @@ const maxFontSizeMultiplier = () => TEXT_SIZE_MAX_MULTIPLIER[getTextSizeMode()];
  */
 const defaultTextStyle = themedValue(() => ({ fontSize: FONT_SIZES.md, color: COLORS.text }));
 
+/**
+ * '글자 크게' 모드에서 lineHeight 를 함께 키운다.
+ *
+ * FONT_SIZES 토큰은 배율(TEXT_SIZE_FACTOR)을 이미 품고 있지만, 화면의 lineHeight 는
+ * scaledSize()/scaleHeight() 로 직접 계산한 값이라 배율이 빠진다. 그대로 두면 글자만
+ * 커지고 줄 간격은 그대로라 줄이 서로 겹치거나 아래가 잘린다.
+ *
+ * 기본 모드에서는 아무것도 하지 않는다(플래튼 비용 0). 모드를 켠 사용자만 비용을 낸다.
+ */
+const withScaledLineHeight = (style: any): any => {
+	if (getTextSizeMode() === 'default' || !style) {
+		return style;
+	}
+	const flat = StyleSheet.flatten(style);
+	if (!flat || typeof flat.lineHeight !== 'number') {
+		return style;
+	}
+	return { ...flat, lineHeight: flat.lineHeight * getTextSizeFactor() };
+};
+
 // forwardRef 객체의 render 는 타입상 노출되지 않아 any 캐스팅이 필요하다.
 const TextAny = Text as any;
 const TextInputAny = TextInput as any;
@@ -48,7 +68,7 @@ TextAny.render = function patchedTextRender(props: any, ref: any) {
 			maxFontSizeMultiplier: maxFontSizeMultiplier(),
 			...props,
 			// 기본 스타일을 배열 앞쪽에 두어 호출부 style 이 항상 덮어쓰게 한다.
-			style: isNested ? props.style : [defaultTextStyle, props.style],
+			style: isNested ? withScaledLineHeight(props.style) : [defaultTextStyle, withScaledLineHeight(props.style)],
 		},
 		ref,
 	);
@@ -63,7 +83,7 @@ TextInputAny.render = function patchedTextInputRender(props: any, ref: any) {
 			// iOS 키보드 외형도 앱 테마를 따라간다(다크에서 흰 키보드가 튀는 문제).
 			keyboardAppearance: getThemeMode() === 'dark' ? 'dark' : 'light',
 			...props,
-			style: [defaultTextStyle, props.style],
+			style: [defaultTextStyle, withScaledLineHeight(props.style)],
 		},
 		ref,
 	);

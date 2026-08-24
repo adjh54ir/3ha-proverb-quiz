@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { Modal, View, Text, ScrollView, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { MainDataType } from '@/types/MainDataType';
@@ -9,6 +10,7 @@ import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { playComplete } from '@/utils/SoundUtils';
+import { useModalEnterExit } from '@/hooks/useModalEnter';
 
 interface Props {
 	visible: boolean;
@@ -21,33 +23,22 @@ interface Props {
  * - 여러 화면(퀴즈/오늘의 퀴즈 등)에서 동일한 스타일로 재사용합니다.
  */
 const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const scaleAnim = useRef(new Animated.Value(0.95)).current;
+	// 모달 공통 진입 애니메이션 (fade + scale) — 확인 시에는 되감고 나서 부모에 알린다
+	const { style: enterStyle, runExit } = useModalEnterExit(visible);
 	const iconPopAnim = useRef(new Animated.Value(0)).current;
 	const pulseAnim = useRef(new Animated.Value(0)).current;
 	const confettiKey = useRef(0);
 
 	useEffect(() => {
+		// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임부터 다시 재생된다(잔상 방지)
+		iconPopAnim.setValue(0);
+		pulseAnim.setValue(0);
 		if (!visible) {
-			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-			fadeAnim.setValue(0);
-			scaleAnim.setValue(0.95);
-			iconPopAnim.setValue(0);
-			pulseAnim.setValue(0);
 			return;
 		}
 		confettiKey.current += 1;
 		playComplete(); // 🏅 뱃지 획득 사운드
-		fadeAnim.setValue(0);
-		scaleAnim.setValue(0.95);
-		iconPopAnim.setValue(0);
-		pulseAnim.setValue(0);
 
-		// 진입: fade + scale
-		const enter = Animated.parallel([
-			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-		]);
 		// 축하 포인트: 뱃지 아이콘 spring pop-in (0 → 1.05 → 1)
 		const iconPop = Animated.spring(iconPopAnim, { toValue: 1, friction: 5, tension: 90, useNativeDriver: true });
 		// 주목 유도: 헤더 아이콘 글로우 펄스 루프
@@ -57,32 +48,19 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 				Animated.timing(pulseAnim, { toValue: 0, duration: 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
 			]),
 		);
-		enter.start();
 		iconPop.start();
 		pulse.start();
 		return () => {
-			enter.stop();
 			iconPop.stop();
 			pulse.stop();
 			pulseAnim.stopAnimation();
 		};
-	}, [visible, fadeAnim, scaleAnim, iconPopAnim, pulseAnim]);
+	}, [visible, iconPopAnim, pulseAnim]);
 
 	const glowScale = pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1.35] });
 	const glowOpacity = pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0] });
 
-	const handleConfirm = () => {
-		Animated.parallel([
-			Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
-			Animated.timing(scaleAnim, { toValue: 0.95, duration: 200, useNativeDriver: true }),
-		]).start(({ finished }) => {
-			// stop() 으로 중단된 경우에도 콜백이 호출되므로 완료된 경우에만 부모에 알린다
-			if (!finished) {
-				return;
-			}
-			onConfirm();
-		});
-	};
+	const handleConfirm = () => runExit(onConfirm);
 
 	if (!visible) {
 		return null;
@@ -100,7 +78,7 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 					explosionSpeed={350}
 				/>
 
-				<Animated.View style={[styles.badgeModal, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+				<Animated.View style={[styles.badgeModal, enterStyle]}>
 					<ModalCloseButton onPress={handleConfirm} color={COLORS.textSecondary} />
 					<View style={styles.headerIconStage}>
 						<Animated.View style={[styles.headerIconGlow, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]} />

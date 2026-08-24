@@ -1,14 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import React, { useCallback, useRef, useState, useMemo } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Animated, Image, KeyboardAvoidingView, Keyboard, Platform, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Animated, Image, KeyboardAvoidingView, Keyboard, Platform, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import BookFormModal from './modal/BookFormModal';
@@ -19,6 +19,11 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import DateUtils from '@/utils/DateUtils';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
+import { AnimatedListItem } from '@/components/animation/FadeInView';
+import ScreenHeader from '@/screens/common/ScreenHeader';
+import { read, write } from '@/services/StorageService';
 
 // 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const getDefaultColor = () => COLORS.primary;
@@ -35,25 +40,10 @@ const SORT_OPTIONS: { key: SortType; label: string }[] = [
 /**
  * 리스트 아이템 fade + slide-up 진입 애니메이션 래퍼
  */
-const AnimatedListItem = React.memo(({ children, index }: { children: React.ReactNode; index: number }) => {
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const translateY = useRef(new Animated.Value(scaleHeight(12))).current;
-
-	useEffect(() => {
-		// 처음 6개만 stagger, 이후는 즉시 표시 (스크롤 성능 보호)
-		const delay = index < 6 ? index * 40 : 0;
-		const anim = Animated.parallel([
-			Animated.timing(fadeAnim, { toValue: 1, duration: 250, delay, useNativeDriver: true }),
-			Animated.timing(translateY, { toValue: 0, duration: 250, delay, useNativeDriver: true }),
-		]);
-		anim.start();
-		return () => anim.stop();
-	}, []);
-
-	return <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY }] }}>{children}</Animated.View>;
-});
 
 const MyProverbBook = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('myProverbBook', false);
 	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
 	const handoff = useModalHandoff();
 	const navigation = useNavigation<any>();
@@ -97,22 +87,13 @@ const MyProverbBook = () => {
 	);
 
 	const loadBooks = async () => {
-		const json = await AsyncStorage.getItem(STORAGE_KEY);
-		if (json) {
-			const parsed: MainDataType.ProverbBook[] = JSON.parse(json).map((b: MainDataType.ProverbBook) => ({
-				...b,
-				color: b.color || getDefaultColor(),
-				icon: b.icon || DEFAULT_ICON,
-			}));
-			setBooks(parsed);
-		} else {
-			setBooks([]);
-		}
+		const stored = await read<MainDataType.ProverbBook[]>(STORAGE_KEY, []);
+		// 색/아이콘이 없던 예전 데이터는 기본값으로 채운다
+		setBooks(stored.map((b) => ({ ...b, color: b.color || getDefaultColor(), icon: b.icon || DEFAULT_ICON })));
 	};
 
-
 	const saveBooks = async (updated: MainDataType.ProverbBook[]) => {
-		await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+		await write(STORAGE_KEY, updated);
 		setBooks(updated);
 	};
 
@@ -183,35 +164,20 @@ const MyProverbBook = () => {
 				{/* 검색창 밖을 누르면 키보드가 닫힌다 */}
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 				<View style={styles.keyboardWrap}>
-				{/* 헤더 */}
-				<View style={styles.header}>
-					<TouchableOpacity onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME })} hitSlop={HIT_SLOP}>
-						<IconComponent type="materialIcons" name="arrow-back" size={scaledSize(22)} color={COLORS.text} />
-					</TouchableOpacity>
-					<Text style={styles.headerTitle}>나만의 속담집</Text>
-					{books.length > 0 ? (
-						<View style={styles.headerCountBadge}>
-							<Text style={styles.headerCountBadgeText}>{searchQuery ? `${filteredBooks.length}/${books.length}` : `${books.length}`}</Text>
-						</View>
-					) : (
-						<View style={{ width: scaleWidth(22) }} />
-					)}
-				</View>
+				<ScreenHeader
+					title="나만의 속담집"
+					onBack={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME })}
+					countLabel={books.length > 0 ? (searchQuery ? `${filteredBooks.length}/${books.length}` : `${books.length}`) : undefined}
+					right={<CharacterGuideButton onPress={guide.open} />}
+				/>
 
 				{books.length > 0 && (
 					<View style={styles.filterContainer}>
-						<View style={styles.libraryHero}>
-							<View style={styles.libraryHeroCopy}>
-								<Text style={styles.libraryHeroTitle}>나만의 지혜 책장을 채워보세요</Text>
-								<Text style={styles.libraryHeroDescription}>마음에 드는 속담을 주제별로 모을 수 있습니다.</Text>
-							</View>
-							<Image source={require('@/assets/images/screen-heroes/proverb-library.png')} style={styles.libraryHeroImage} resizeMode="contain" />
-						</View>
 						<View style={styles.searchBox}>
 							<IconComponent type="materialIcons" name="search" size={scaledSize(18)} color={COLORS.textLight} />
 							<TextInput style={styles.searchInput} placeholder="속담집 이름 또는 초성 검색" placeholderTextColor={COLORS.textLight} value={searchQuery} onChangeText={setSearchQuery} returnKeyType="search" />
 							{!!searchQuery && (
-								<TouchableOpacity onPress={() => setSearchQuery('')}>
+								<TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={HIT_SLOP}>
 									<IconComponent type="materialIcons" name="cancel" size={scaledSize(16)} color={COLORS.textLight} />
 								</TouchableOpacity>
 							)}
@@ -256,7 +222,7 @@ const MyProverbBook = () => {
 								<TouchableOpacity style={styles.bookCard} activeOpacity={0.8} onPress={() => navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: book.id })}>
 									<View style={styles.bookCardPreviewHeader}>
 										<View style={[styles.bookCardIconWrap, { backgroundColor: bookColor, }]}>
-											<IconComponent type="materialIcons" name={bookIcon} size={scaledSize(26)} color={COLORS.textWhite} />
+											<IconComponent type="materialIcons" name={bookIcon} size={scaledSize(26)} color={readableTextOn(bookColor)} />
 										</View>
 										<View style={{ flex: 1 }}>
 											<View style={{ flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.xs, overflow: 'hidden' }}>
@@ -345,7 +311,7 @@ const MyProverbBook = () => {
 					<TouchableOpacity activeOpacity={1} style={[styles.actionSheet, { paddingBottom: Math.max(insets.bottom, SPACING_H.xxl) }]}>
 						<View style={styles.actionSheetHandle} />
 						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; handoff(() => setActionSheet(null), () => b && navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: b.id })); }}>
-							<View style={[styles.actionItemIcon, { backgroundColor: (actionSheet?.color || getDefaultColor()) + '20' }]}>
+							<View style={[styles.actionItemIcon, { backgroundColor: withAlpha(actionSheet?.color || getDefaultColor(), ALPHA.soft) }]}>
 								<IconComponent type="materialIcons" name={actionSheet?.icon || DEFAULT_ICON} size={scaledSize(18)} color={actionSheet?.color || getDefaultColor()} />
 							</View>
 							<View style={{ flex: 1 }}>
@@ -393,6 +359,16 @@ const MyProverbBook = () => {
 					</TouchableOpacity>
 				</TouchableOpacity>
 			</Modal>
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'마음에 드는 속담을 주제별로 묶어 보관하는 곳입니다.',
+					'속담집을 만들고, 원하는 속담을 담아둘 수 있습니다.',
+					'속담집을 누르면 담아둔 속담을 모아서 볼 수 있습니다!',
+				]}
+				title="나만의 속담집, 이렇게 씁니다"
+			/>
 		</>
 	);
 };
@@ -402,43 +378,7 @@ export default MyProverbBook;
 const styles = themedStyles(() => StyleSheet.create({
 	keyboardWrap: { flex: 1 },
 	main: { flex: 1, backgroundColor: COLORS.background },
-	header: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		paddingHorizontal: SPACING_W.lg,
-		paddingVertical: SPACING_H.md,
-		backgroundColor: COLORS.surface,
-		borderBottomWidth: 1,
-		borderBottomColor: COLORS.surfaceAlt,
-	},
-	headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong },
-	headerCountBadge: {
-		minWidth: scaleWidth(24),
-		paddingHorizontal: SPACING_W.sm,
-		paddingVertical: SPACING_H.xs,
-		borderRadius: RADIUS.round,
-		backgroundColor: COLORS.secondaryBg,
-		alignItems: 'center',
-	},
-	headerCountBadgeText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.secondary },
 	filterContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, backgroundColor: COLORS.background },
-	libraryHero: {
-		minHeight: scaleHeight(112),
-		marginBottom: SPACING_H.md,
-		paddingLeft: SPACING_W.lg,
-		backgroundColor: HERO.bg,
-		borderTopWidth: 3,
-		borderTopColor: HERO.accent,
-		borderRadius: RADIUS.lg,
-		flexDirection: 'row',
-		alignItems: 'center',
-		overflow: 'hidden',
-	},
-	libraryHeroCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
-	libraryHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
-	libraryHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
-	libraryHeroImage: { width: scaleWidth(136), height: scaleHeight(108), marginRight: scaleWidth(-6) },
 	searchBox: {
 		flexDirection: 'row',
 		alignItems: 'center',

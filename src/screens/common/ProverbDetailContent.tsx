@@ -4,7 +4,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { scaledSize, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
-import { getCategoryColor, getLevelColor } from './CommonProverbModule';
+import { getCategoryColor, getLevelColorByNumber } from './CommonProverbModule';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './atomic/IconComponent';
 
@@ -26,7 +26,6 @@ const CATEGORY_ICON: Record<string, { type: string; name: string }> = {
 };
 
 /** 레벨 번호 → 난이도 이름 (공통 난이도 램프 조회용) */
-const LEVEL_NAME_BY_NUMBER: Record<number, string> = { 1: '초급', 2: '중급', 3: '고급', 4: '특급' };
 
 const getLevelIcon = (level: number) => {
 	switch (level) {
@@ -64,7 +63,7 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 
 			{/* 배지: 난이도 + 카테고리 */}
 			<View style={styles.badgeRow}>
-				<View style={[styles.levelBadge, { backgroundColor: getLevelColor(LEVEL_NAME_BY_NUMBER[proverb.level] ?? '') }]}>
+				<View style={[styles.levelBadge, { backgroundColor: getLevelColorByNumber(proverb.level) }]}>
 					{getLevelIcon(proverb.level)}
 					<Text style={styles.levelBadgeText}>{proverb.levelName}</Text>
 				</View>

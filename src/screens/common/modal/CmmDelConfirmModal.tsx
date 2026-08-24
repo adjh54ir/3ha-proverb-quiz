@@ -1,15 +1,10 @@
 // CommonConfirmModal.tsx
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
-import React, { FC, useEffect, useRef } from 'react';
-import {
-    Animated,
-    Modal,
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-} from 'react-native';
+import React, { FC } from 'react';
+import { Animated, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
 type IconType = 'MaterialCommunityIcons' | 'materialIcons';
 
@@ -50,30 +45,13 @@ const CmmDelConfirmModal: FC<Props> = ({
 }) => {
     const _onRequestClose = onRequestClose ?? onCancel;
 
-    // 진입 애니메이션 (fade + slide-up)
-    const enterAnim = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        if (!visible) {
-            enterAnim.setValue(0);
-            return;
-        }
-        const enter = Animated.timing(enterAnim, { toValue: 1, duration: 240, useNativeDriver: true });
-        enter.start();
-        return () => enter.stop();
-    }, [visible, enterAnim]);
+    // 모달 공통 진입 애니메이션 (fade + scale)
+    const enterStyle = useModalEnter(visible);
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={_onRequestClose}>
             <View style={styles.modalBackdrop}>
-                <Animated.View
-                    style={[
-                        styles.modalContainer,
-                        {
-                            opacity: enterAnim,
-                            transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
-                        },
-                    ]}>
+                <Animated.View style={[styles.modalContainer, enterStyle]}>
                     {renderTitle && renderTitle()}
                     <Text style={styles.modalSummary}>{summary}</Text>
                     <View style={styles.modalButtons}>

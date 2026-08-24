@@ -1,14 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Modal, StyleSheet, Animated, TouchableOpacity, Image } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Image } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
-import { MainDataType } from '@/types/MainDataType';
 import DateUtils from '@/utils/DateUtils';
 import { computeDailyMissions, countDoneMissions, allMissionsDone, DailyMission } from '@/utils/DailyMissionUtils';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
+import { useModalEnter } from '@/hooks/useModalEnter';
+import { read, update } from '@/services/StorageService';
+import QuizHistoryService from '@/services/QuizHistoryService';
+import * as TodayQuizService from '@/services/TodayQuizService';
 
 interface DailyMissionModalProps {
 	visible: boolean;
@@ -23,49 +26,26 @@ const MISSION_BONUS = 100;
 const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose, onClaimed }) => {
 	const [missions, setMissions] = useState<DailyMission[]>([]);
 	const [claimedToday, setClaimedToday] = useState(false);
-	const scaleAnim = useRef(new Animated.Value(0.95)).current;
-	const opacityAnim = useRef(new Animated.Value(0)).current;
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(visible);
 	// claimedToday 는 await 이후에야 true 가 되므로, 빠르게 두 번 누르면 보너스가 두 번 지급된다.
 	const claimingRef = useRef(false);
 
 	useEffect(() => {
 		if (!visible) {
-			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-			scaleAnim.setValue(0.95);
-			opacityAnim.setValue(0);
 			return;
 		}
 		// 오늘 미션 진행도 + 보상 수령 여부 로드
 		(async () => {
-			try {
-				const todayStr = DateUtils.getLocalDateString();
-				const [json, claimedJson] = await Promise.all([
-					AsyncStorage.getItem(MainStorageKeyType.TODAY_QUIZ_LIST),
-					AsyncStorage.getItem(MainStorageKeyType.DAILY_MISSION_CLAIMED),
-				]);
-				const list: MainDataType.TodayQuizList[] = json ? JSON.parse(json) : [];
-				const todayItem = list.find((q) => DateUtils.toLocalDateKey(q.quizDate) === todayStr) ?? null;
-				setMissions(computeDailyMissions(todayItem));
-				const claimed: string[] = claimedJson ? JSON.parse(claimedJson) : [];
-				setClaimedToday(claimed.includes(todayStr));
-			} catch {
-				setMissions(computeDailyMissions(null));
-				setClaimedToday(false);
-			}
+			const todayStr = DateUtils.getLocalDateString();
+			const [todayItem, claimed] = await Promise.all([
+				TodayQuizService.getToday(),
+				read<string[]>(MainStorageKeyType.DAILY_MISSION_CLAIMED, []),
+			]);
+			setMissions(computeDailyMissions(todayItem));
+			setClaimedToday(claimed.includes(todayStr));
 		})();
-
-		// 진입 애니메이션
-		scaleAnim.setValue(0.95);
-		opacityAnim.setValue(0);
-		const anim = Animated.parallel([
-			Animated.timing(opacityAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-		]);
-		anim.start();
-
-		// ✅ 정리
-		return () => anim.stop();
-	}, [visible, opacityAnim, scaleAnim]);
+	}, [visible]);
 
 	const doneCount = countDoneMissions(missions);
 	const allDone = allMissionsDone(missions);
@@ -78,26 +58,25 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 		claimingRef.current = true;
 		try {
 			const todayStr = DateUtils.getLocalDateString();
-			// 보너스 점수 지급 (다른 필드는 보존)
-			const quizJson = await AsyncStorage.getItem(MainStorageKeyType.USER_QUIZ_HISTORY);
-			const quiz = quizJson ? JSON.parse(quizJson) : {};
-			quiz.totalScore = (quiz.totalScore ?? 0) + MISSION_BONUS;
-			quiz.badges = quiz.badges ?? [];
-			await AsyncStorage.setItem(MainStorageKeyType.USER_QUIZ_HISTORY, JSON.stringify(quiz));
 
-			// 수령 날짜 기록
-			const claimedJson = await AsyncStorage.getItem(MainStorageKeyType.DAILY_MISSION_CLAIMED);
-			const claimed: string[] = claimedJson ? JSON.parse(claimedJson) : [];
-			await AsyncStorage.setItem(
-				MainStorageKeyType.DAILY_MISSION_CLAIMED,
-				JSON.stringify([...new Set([...claimed, todayStr])]),
-			);
+			// 수령 날짜를 먼저 기록한다. 이미 오늘이 들어 있으면(다른 경로에서 이미 받음)
+			// 점수를 두 번 주지 않도록 여기서 멈춘다.
+			let alreadyClaimed = false;
+			await update<string[]>(MainStorageKeyType.DAILY_MISSION_CLAIMED, [], (claimed) => {
+				alreadyClaimed = claimed.includes(todayStr);
+				return alreadyClaimed ? undefined : [...claimed, todayStr];
+			});
+			if (alreadyClaimed) {
+				setClaimedToday(true);
+				return;
+			}
+
+			// 보너스 점수 지급 — patch 라 다른 화면의 저장과 겹쳐도 서로 덮어쓰지 않는다
+			await QuizHistoryService.addScore(MISSION_BONUS);
 
 			setClaimedToday(true);
 			// ✅ 지급 보너스를 부모로 전달해 즉시 점수 반영 (스토리지 재조회 지연 방지)
 			onClaimed?.(MISSION_BONUS);
-		} catch {
-			// 무시
 		} finally {
 			claimingRef.current = false;
 		}
@@ -106,7 +85,7 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<View style={styles.overlay}>
-				<Animated.View style={[styles.card, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
+				<Animated.View style={[styles.card, enterStyle]}>
 					<ModalCloseButton onPress={onClose} color={COLORS.textWhite} />
 
 					{/* 헤더 */}

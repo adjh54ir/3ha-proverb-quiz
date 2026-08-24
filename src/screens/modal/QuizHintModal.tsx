@@ -1,11 +1,13 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Animated, ScrollView } from 'react-native';
+import React, {  } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
 interface QuizHintModalProps {
 	visible: boolean;
@@ -16,28 +18,9 @@ interface QuizHintModalProps {
 }
 
 const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, questionText, onClose }) => {
-	// ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
-	const scaleAnim = useRef(new Animated.Value(0.95)).current;
-	const fadeAnim = useRef(new Animated.Value(0)).current;
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(visible);
 
-	useEffect(() => {
-		if (!visible) {
-			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-			scaleAnim.setValue(0.95);
-			fadeAnim.setValue(0);
-			return;
-		}
-		scaleAnim.setValue(0.95);
-		fadeAnim.setValue(0);
-
-		const anim = Animated.parallel([
-			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-		]);
-		anim.start();
-		// ✅ 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
-		return () => anim.stop();
-	}, [visible, scaleAnim, fadeAnim]);
 
 	// 현재 화면에 출제된 문제 프롬프트를 그대로 보여줘 추론을 돕는다.
 	const questionPrompt = !question
@@ -55,7 +38,7 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<View style={styles.overlay}>
-				<Animated.View style={[styles.card, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+				<Animated.View style={[styles.card, enterStyle]}>
 					<ModalCloseButton onPress={onClose} />
 
 					{/* 헤더 */}

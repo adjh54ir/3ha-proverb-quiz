@@ -55,6 +55,11 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 	const adRef = useRef<InterstitialAd | null>(null);
 
 	useEffect(() => {
+		// 개발 빌드에서는 전면 광고를 띄우지 않는다 — 바로 닫힌 것으로 처리해 다음 흐름을 이어간다
+		if (__DEV__) {
+			onAdClosed?.();
+			return;
+		}
 		const ad = InterstitialAd.createForAdRequest(AD_UNIT_ID);
 		adRef.current = ad;
 
@@ -114,11 +119,13 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 		};
 	}, []);
 
+	if (__DEV__) return null;
+
 	return (
 		<View style={styles.adOverlay}>
 			<View style={styles.container}>
 				<ActivityIndicator size='large' color={COLORS.primary} />
-				<Text style={styles.loadingTxt}>광고를 준비 중이에요…</Text>
+				<Text style={styles.loadingTxt}>광고를 준비 중입니다…</Text>
 			</View>
 		</View>
 	);
@@ -131,10 +138,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.xl,
 		alignItems: 'center',
 		justifyContent: 'center',
-		shadowColor: COLORS.textDeep,
-		shadowOpacity: 0.1,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 6,
+		// 그림자 대신 테두리로 구분한다(앱 전역 규칙).
+		// shadowColor 로 쓰던 textDeep 은 다크 팔레트에서 흰색이라 그림자가 흰 광선으로 보였다.
+		borderWidth: 1,
+		borderColor: COLORS.border,
 	},
 
 	adOverlay: {

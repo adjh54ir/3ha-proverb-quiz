@@ -99,13 +99,13 @@ const styles = themedStyles(() => StyleSheet.create({
 	text: {
 		fontSize: FONT_SIZES.md,
 		fontWeight: '700',
-		color: COLORS.textStrong,
+		color: COLORS.textOnAccent,
 		flexWrap: 'wrap',
 	},
 	subText: {
 		marginTop: SPACING_H.xs,
 		fontSize: FONT_SIZES.sm,
 		fontWeight: '500',
-		color: COLORS.text,
+		color: COLORS.textOnAccent,
 	},
 }));

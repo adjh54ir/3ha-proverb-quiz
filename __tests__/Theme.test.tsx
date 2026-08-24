@@ -11,7 +11,9 @@ import {
 	HERO,
 	PALETTES,
 	TEXT_SIZE_MAX_MULTIPLIER,
+	displayFontSize,
 	getPickerTheme,
+	getTextSizeFactor,
 	getTextSizeMode,
 	getThemeMode,
 	setTextSizeMode,
@@ -136,4 +138,21 @@ test('스타일 객체를 Object.freeze 해도 값이 계속 모드를 따라간
 
 	expect(() => Object.freeze(COLORS)).not.toThrow();
 	expect(COLORS.text).toBe(PALETTES.dark.text);
+});
+
+test("'글자 크게' 배율이 displayFontSize 와 getTextSizeFactor 에 함께 반영된다", () => {
+	const beforeFactor = getTextSizeFactor();
+	const before = displayFontSize(72);
+
+	setTextSizeMode('large');
+
+	expect(getTextSizeFactor()).toBeGreaterThan(beforeFactor);
+	// FONT_SIZES 토큰과 같은 비율로 커져야 한다 (숫자만 그대로 남으면 접근성 설정이 반쪽이 된다)
+	expect(displayFontSize(72)).toBeGreaterThan(before);
+});
+
+test('밝은 액센트 위 잉크(textOnAccent)는 모드가 바뀌어도 같은 값이다', () => {
+	// 다크 팔레트에서 뒤집히면 금색/앰버 배경 위 글자가 그대로 사라진다.
+	expect(PALETTES.dark.textOnAccent).toBe(PALETTES.light.textOnAccent);
+	expect(PALETTES.dark.darkMuted).toBe(PALETTES.light.darkMuted);
 });

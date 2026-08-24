@@ -2,21 +2,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
-import {
-	View,
-	Text,
-	StyleSheet,
-	TextInput,
-	TouchableOpacity,
-	Keyboard,
-	TouchableWithoutFeedback,
-	FlatList,
-	KeyboardAvoidingView,
-	Platform,
-	RefreshControl,
-	Modal,
-	Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, TouchableWithoutFeedback, FlatList, KeyboardAvoidingView, Platform, RefreshControl, Animated } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -33,6 +20,9 @@ import ProverbDetailModal from './modal/ProverbDetailModal';
 import { useToast } from '@/hooks/useToast';
 import BottomHomeButton from './common/BottomHomeButton';
 import FavoriteAddModal from './modal/FavoriteAddModal';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import { LEVEL_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
+import { AnimatedListItem } from '@/components/animation/FadeInView';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const COMMON_ALL_OPTION = themedValue(() => ({
@@ -42,36 +32,14 @@ const COMMON_ALL_OPTION = themedValue(() => ({
 	labelStyle: { marginLeft: SPACING_W.xs, fontSize: FONT_SIZES.md },
 }));
 
-const LEVEL_DROPDOWN_ITEMS = [
-	COMMON_ALL_OPTION,
-	{ label: '초급', value: '초급', icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color={getLevelColor('초급')} /> },
-	{ label: '중급', value: '중급', icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color={getLevelColor('중급')} /> },
-	{ label: '고급', value: '고급', icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color={getLevelColor('고급')} /> },
-	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelColor('특급')} /> },
-];
 
 /**
  * FlatList 아이템 fade + slide-up 진입 애니메이션 래퍼
  */
-const AnimatedListItem = React.memo(({ children, index }: { children: React.ReactNode; index: number }) => {
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const translateY = useRef(new Animated.Value(scaleHeight(12))).current;
-
-	useEffect(() => {
-		// 처음 6개만 stagger, 이후는 즉시 표시 (스크롤 성능 보호)
-		const delay = index < 6 ? index * 40 : 0;
-		const anim = Animated.parallel([
-			Animated.timing(fadeAnim, { toValue: 1, duration: 250, delay, useNativeDriver: true }),
-			Animated.timing(translateY, { toValue: 0, duration: 250, delay, useNativeDriver: true }),
-		]);
-		anim.start();
-		return () => anim.stop();
-	}, []);
-
-	return <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY }] }}>{children}</Animated.View>;
-});
 
 const FavoriteScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('favorite', false);
 	const emptyFavoritesImage = require('@/assets/images/feature-states/empty-favorites.png');
 	const emptySearchImage = require('@/assets/images/feature-states/empty-search.png');
 	const flatListRef = useRef<FlatList>(null);
@@ -298,7 +266,7 @@ const FavoriteScreen = () => {
 
 							{isSelectionMode ? (
 								<View style={[styles.checkbox, isSelected && styles.checkboxChecked]}>
-									{isSelected && <Icon name="check" size={scaledSize(12)} color={COLORS.textWhite} />}
+									{isSelected && <Icon name="check" size={scaledSize(12)} color={COLORS.textOnAccent} />}
 								</View>
 							) : (
 								<TouchableOpacity
@@ -380,6 +348,7 @@ const FavoriteScreen = () => {
 											<Text style={styles.cancelBtnText}>취소</Text>
 										</TouchableOpacity>
 									)}
+									<CharacterGuideButton onPress={guide.open} />
 								</View>
 
 								<View style={styles.searchRow}>
@@ -397,7 +366,7 @@ const FavoriteScreen = () => {
 											}}
 										/>
 									</View>
-									<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset}>
+									<TouchableOpacity style={styles.resetButtonInline} onPress={handleReset} hitSlop={HIT_SLOP}>
 										<Icon name="rotate-right" size={scaledSize(16)} color={COLORS.textSecondary} />
 									</TouchableOpacity>
 								</View>
@@ -472,7 +441,7 @@ const FavoriteScreen = () => {
 									{isSelectionMode && filteredList.length > 0 && (
 										<TouchableOpacity style={styles.selectAllBtn} onPress={handleSelectAll}>
 											<View style={[styles.miniCheckbox, isAllSelected && styles.miniCheckboxChecked]}>
-												{isAllSelected && <Icon name="check" size={scaledSize(9)} color={COLORS.textWhite} />}
+												{isAllSelected && <Icon name="check" size={scaledSize(9)} color={COLORS.textOnAccent} />}
 											</View>
 											<Text style={styles.selectAllText}>전체 선택</Text>
 										</TouchableOpacity>
@@ -499,7 +468,7 @@ const FavoriteScreen = () => {
 							scrollEnabled={!fieldOpen && !levelOpen}
 							keyExtractor={(item) => item.id.toString()}
 							renderItem={renderItem}
-							contentContainerStyle={[styles.listContent, isSelectionMode && { paddingBottom: scaleHeight(120) }]}
+							contentContainerStyle={[styles.listContent, isSelectionMode && styles.listContentWithBar]}
 							keyboardShouldPersistTaps="handled"
 							keyboardDismissMode="on-drag"
 							refreshControl={<RefreshControl
@@ -517,7 +486,7 @@ const FavoriteScreen = () => {
 											<Text style={styles.emptyTitle}>아직 즐겨찾기가 없습니다</Text>
 											<Text style={styles.emptyDesc}>속담 목록에서 ★를 눌러{'\n'}원하는 속담을 저장해보세요!</Text>
 											<TouchableOpacity style={styles.emptyAddBtn} onPress={() => setShowAddModal(true)} activeOpacity={0.85}>
-												<Icon name="plus" size={scaledSize(14)} color={COLORS.textWhite} />
+												<Icon name="plus" size={scaledSize(14)} color={COLORS.textOnAccent} />
 												<Text style={styles.emptyAddBtnText}>즐겨찾기 추가하기</Text>
 											</TouchableOpacity>
 										</>
@@ -578,6 +547,16 @@ const FavoriteScreen = () => {
 
 			<ToastView />
 			{!isSelectionMode && <BottomHomeButton skipConfirm />}
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'즐겨찾기는 마음에 든 속담을 모아두는 곳입니다.',
+					'목록에서 별을 누르면 이곳에 바로 담깁니다.',
+					'담아둔 속담만 골라 다시 보고 복습할 수 있습니다!',
+				]}
+				title="즐겨찾기, 이렇게 씁니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -586,10 +565,11 @@ export default FavoriteScreen;
 
 const styles = themedStyles(() => StyleSheet.create({
 	main: { flex: 1, backgroundColor: COLORS.background },
-	headerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.md },
+	headerTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', columnGap: SPACING_W.sm, marginBottom: SPACING_H.md },
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
 	favoriteHeroImage: { width: scaleWidth(70), height: scaleHeight(58) },
-	headerTitle: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },
+	// 다른 화면 헤더(ScreenHeader)와 같은 타이틀 크기 — 탭을 오갈 때 글자 크기가 튀지 않게
+	headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },
 	headerSubText: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'right' },
 	headerCount: { fontWeight: '700', color: COLORS.warning, fontSize: FONT_SIZES.smPlus },
 	headerCountDelete: { fontWeight: '700', color: COLORS.danger, fontSize: FONT_SIZES.smPlus },
@@ -683,6 +663,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	miniCheckboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
 	listContent: { paddingTop: SPACING_H.xs, paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
+	// 선택 모드에서만 하단 삭제 바(absolute)가 뜨므로 그때만 그만큼 더 비운다.
+	listContentWithBar: { paddingBottom: scaleHeight(100) },
 	itemCard: {
 		backgroundColor: COLORS.surface,
 		paddingHorizontal: SPACING_W.lg,
@@ -739,20 +721,20 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.warning,
 	},
-	emptyAddBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '700' },
+	emptyAddBtnText: { color: COLORS.textOnAccent, fontSize: FONT_SIZES.md, fontWeight: '700' },
 	bottomActionBar: {
 		position: 'absolute',
 		bottom: 0,
 		left: 0,
 		right: 0,
 		backgroundColor: COLORS.surface,
-		borderWidth: 1,
-		borderColor: COLORS.border,
+		// 화면 좌우/아래에 붙는 바라 위쪽 구분선만 있으면 된다.
+		// (borderWidth 는 네 변을 모두 그려 좌우·아래에 선이 비쳤다)
+		borderTopWidth: 1,
+		borderTopColor: COLORS.border,
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.md,
 		paddingBottom: SPACING_H.xl,
-		borderTopWidth: 1,
-		borderTopColor: COLORS.surfaceAlt,
 	},
 	deleteActionBtn: {
 		flexDirection: 'row',

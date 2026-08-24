@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 
 interface TowerReward {
@@ -118,7 +119,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 						borderColor: i < correctCount ? accentColor : 'rgba(255,255,255,0.1)',
 					},
 				]}>
-				{i < correctCount && <IconComponent type="materialIcons" name="check" size={scaledSize(10)} color={COLORS.textDeep} />}
+				{i < correctCount && <IconComponent type="materialIcons" name="check" size={scaledSize(10)} color={COLORS.darkBg} />}
 			</View>
 		));
 
@@ -260,8 +261,8 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 						{isVictory ? (
 							onNext && (
 								<TouchableOpacity onPress={onNext} style={[styles.btnPrimary, { backgroundColor: COLORS.warning }]} activeOpacity={0.8}>
-									<Text style={[styles.btnPrimaryText, { color: COLORS.textDeep }]}>NEXT LEVEL</Text>
-									<IconComponent type="materialIcons" name="arrow-forward" size={scaledSize(20)} color={COLORS.textDeep} />
+									<Text style={[styles.btnPrimaryText, { color: COLORS.darkBg }]}>NEXT LEVEL</Text>
+									<IconComponent type="materialIcons" name="arrow-forward" size={scaledSize(20)} color={COLORS.darkBg} />
 								</TouchableOpacity>
 							)
 						) : (
@@ -344,7 +345,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: 'rgba(0,0,0,0.3)',
 	},
 	defeatOverlayText: {
-		fontSize: scaledSize(42),
+		fontSize: displayFontSize(42),
 		color: COLORS.danger,
 		fontWeight: '700',
 	},
@@ -392,7 +393,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'baseline',
 	},
 	scoreCorrect: {
-		fontSize: scaledSize(52),
+		fontSize: displayFontSize(52),
 		fontWeight: '700',
 	},
 	scoreSlash: {
@@ -401,7 +402,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '400',
 	},
 	scoreTotal: {
-		fontSize: scaledSize(32),
+		fontSize: displayFontSize(32),
 		fontWeight: '700',
 		color: 'rgba(255,255,255,0.6)',
 	},

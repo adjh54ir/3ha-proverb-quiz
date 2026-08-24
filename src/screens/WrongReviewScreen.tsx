@@ -1,24 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Animated } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
+import Skeleton from '@/screens/common/atomic/Skeleton';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import { Paths } from '@/navigation/conf/Paths';
 import { useIsFocused } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { useAppNavigation } from '@/navigation/conf/Types';
+import QuizHistoryService from '@/services/QuizHistoryService';
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
 const WrongReviewScreen = () => {
-	const navigation = useNavigation();
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('wrongReview', false);
+	const navigation = useAppNavigation();
 	const isFocused = useIsFocused();
 	const [loading, setLoading] = useState(true);
 	const scrollViewRef = useRef<ScrollView>(null);
@@ -77,12 +82,7 @@ const WrongReviewScreen = () => {
 	const fetchWrongData = async () => {
 		setLoading(true);
 		try {
-			const stored = await AsyncStorage.getItem(STORAGE_KEY);
-			if (!stored) {
-				setWrongProverbIds([]);
-				return;
-			}
-			const parsed: MainDataType.UserQuizHistory = JSON.parse(stored);
+			const parsed = await QuizHistoryService.getQuizHistoryOrEmpty();
 			const wrongCca3List: number[] = parsed.wrongProverbId ?? [];
 			const correctCca3List: number[] = parsed.correctProverbId ?? [];
 			setTotalSolvedCount(wrongCca3List.length + correctCca3List.length);
@@ -104,7 +104,7 @@ const WrongReviewScreen = () => {
 	 */
 	const handleScroll = (event: any) => {
 		const offsetY = event.nativeEvent.contentOffset.y;
-		setShowScrollTop(offsetY > 100);
+		setShowScrollTop(offsetY > SCROLL_TOP_THRESHOLD);
 	};
 
 	const startWrongReview = () => {
@@ -112,7 +112,6 @@ const WrongReviewScreen = () => {
 			return;
 		}
 
-		// @ts-ignore
 		navigation.push(Paths.QUIZ, {
 			questionPool: wrongProverbIds,
 			isWrongReview: true,
@@ -124,10 +123,16 @@ const WrongReviewScreen = () => {
 	};
 
 	if (loading) {
+		// 들어올 내용(통계 카드 → 안내 카드 → 버튼)과 같은 형태를 미리 깔아 둔다.
 		return (
-			<View style={styles.center}>
-				<ActivityIndicator size="large" color={COLORS.primary} />
-			</View>
+			<SafeAreaView style={styles.safeArea} edges={['bottom']}>
+				<View style={styles.skeletonWrap}>
+					<Skeleton height={scaleHeight(72)} radius={RADIUS.lg} />
+					<Skeleton width="80%" height={scaleHeight(14)} style={styles.skeletonGap} />
+					<Skeleton height={scaleHeight(140)} radius={RADIUS.lg} style={styles.skeletonGap} />
+					<Skeleton height={scaleHeight(48)} radius={RADIUS.md} style={styles.skeletonGap} />
+				</View>
+			</SafeAreaView>
 		);
 	}
 
@@ -155,6 +160,7 @@ const WrongReviewScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['bottom']}>
+		<FloatingGuideButton onPress={guide.open} />
 			<ScrollView
 				contentContainerStyle={styles.scrollContainer}
 				ref={scrollViewRef}
@@ -162,17 +168,6 @@ const WrongReviewScreen = () => {
 				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}>
 				<Animated.View style={{ width: '100%', opacity: contentFade, transform: [{ translateY: contentSlide }] }}>
-					<View style={styles.reviewHero}>
-						<View style={styles.reviewHeroCopy}>
-							<Text style={styles.reviewHeroTitle}>실수는 지혜가 자라는 순간입니다</Text>
-							<Text style={styles.reviewHeroDescription}>천천히 다시 보면 이번에는 분명 맞힐 수 있습니다.</Text>
-						</View>
-						<FastImage
-							source={require('@/assets/images/screen-heroes/wrong-review.png')}
-							style={styles.reviewHeroImage}
-							resizeMode="contain"
-						/>
-					</View>
 					{/* ✅ 컴팩트 통계 카드 */}
 					<View style={styles.statsCard}>
 						<View style={styles.statsItem}>
@@ -258,16 +253,19 @@ const WrongReviewScreen = () => {
 			</ScrollView>
 
 			{/* 최하단에 위치할것!! */}
-			{showScrollTop && (
-				<TouchableOpacity
-					style={styles.scrollTopButton}
-					activeOpacity={0.8}
-					onPress={() => scrollViewRef.current?.scrollTo({ y: 0, animated: true })}>
-					<IconComponent type="MaterialIcons" name="arrow-upward" size={scaledSize(24)} color={COLORS.textWhite} />
-				</TouchableOpacity>
-			)}
+			<ScrollTopButton visible={showScrollTop} onPress={() => scrollViewRef.current?.scrollTo({ y: 0, animated: true })} />
 
 			<ProverbDetailModal visible={detailVisible && !!detailProverb} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'틀린 문제만 모아 다시 도전하는 화면입니다.',
+					'위 카드에서 푼 문제 수와 정답률을 확인할 수 있습니다.',
+					'다시 맞히면 오답 목록에서 사라집니다!',
+				]}
+				title="오답 복습, 이렇게 씁니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -275,14 +273,10 @@ const WrongReviewScreen = () => {
 export default WrongReviewScreen;
 
 const styles = themedStyles(() => StyleSheet.create({
+	skeletonWrap: { flex: 1, paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.xl },
+	skeletonGap: { marginTop: SPACING_H.lg },
 	safeArea: {
 		flex: 1,
-		backgroundColor: COLORS.background,
-	},
-	center: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
 		backgroundColor: COLORS.background,
 	},
 	scrollContainer: {
@@ -292,23 +286,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: COLORS.background,
 	},
-	reviewHero: {
-		width: '100%',
-		minHeight: scaleHeight(124),
-		marginBottom: SPACING_H.md,
-		paddingLeft: SPACING_W.lg,
-		backgroundColor: HERO.bg,
-		borderTopWidth: 3,
-		borderTopColor: HERO.accent,
-		borderRadius: RADIUS.lg,
-		flexDirection: 'row',
-		alignItems: 'center',
-		overflow: 'hidden',
-	},
-	reviewHeroCopy: { flex: 1, paddingVertical: SPACING_H.lg, zIndex: 1 },
-	reviewHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
-	reviewHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
-	reviewHeroImage: { width: scaleWidth(138), height: scaleHeight(118), marginRight: scaleWidth(-8) },
 	// ===== 통계 카드 =====
 	statsCard: {
 		flexDirection: 'row',
@@ -523,15 +500,4 @@ const styles = themedStyles(() => StyleSheet.create({
 		lineHeight: scaledSize(21),
 	},
 	// ===== 최상단 이동 버튼 =====
-	scrollTopButton: {
-		position: 'absolute',
-		right: SPACING_W.xl,
-		bottom: scaleHeight(32),
-		backgroundColor: COLORS.secondary,
-		width: scaleWidth(48),
-		height: scaleWidth(48),
-		borderRadius: scaleWidth(48) / 2,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
 }));

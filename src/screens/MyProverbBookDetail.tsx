@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, Animated, Image } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
@@ -17,6 +17,11 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { useToast } from '@/hooks/useToast';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
+import { AnimatedListItem } from '@/components/animation/FadeInView';
+import ScreenHeader from '@/screens/common/ScreenHeader';
+import { read, update } from '@/services/StorageService';
 
 // 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const getDefaultColor = () => COLORS.primary;
@@ -27,25 +32,10 @@ const PRACTICE_RECORD_KEY = MainStorageKeyType.USER_PROVERB_PRACTICE_RECORDS;
 /**
  * FlatList 아이템 fade + slide-up 진입 애니메이션 래퍼
  */
-const AnimatedListItem = React.memo(({ children, index }: { children: React.ReactNode; index: number }) => {
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const translateY = useRef(new Animated.Value(scaleHeight(12))).current;
-
-	useEffect(() => {
-		// 처음 6개만 stagger, 이후는 즉시 표시 (스크롤 성능 보호)
-		const delay = index < 6 ? index * 40 : 0;
-		const anim = Animated.parallel([
-			Animated.timing(fadeAnim, { toValue: 1, duration: 250, delay, useNativeDriver: true }),
-			Animated.timing(translateY, { toValue: 0, duration: 250, delay, useNativeDriver: true }),
-		]);
-		anim.start();
-		return () => anim.stop();
-	}, []);
-
-	return <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY }] }}>{children}</Animated.View>;
-});
 
 const MyProverbBookDetail = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('myProverbBookDetail', false);
 	const navigation = useNavigation<any>();
 	const route = useRoute<any>();
 	const { bookId } = route.params as { bookId: string };
@@ -81,27 +71,20 @@ const MyProverbBookDetail = () => {
 	);
 
 	const loadBook = async () => {
-		const json = await AsyncStorage.getItem(STORAGE_KEY);
-		if (json) {
-			const books: MainDataType.ProverbBook[] = JSON.parse(json);
-			const found = books.find((b) => b.id === bookId);
-			setBook(found ?? null);
-		}
+		const books = await read<MainDataType.ProverbBook[]>(STORAGE_KEY, []);
+		setBook(books.find((b) => b.id === bookId) ?? null);
 	};
 
 	const loadPracticeRecord = async () => {
-		const json = await AsyncStorage.getItem(PRACTICE_RECORD_KEY);
-		if (json) {
-			const records: MainDataType.ProverbBookPracticeRecord[] = JSON.parse(json);
-			setPracticeRecord(records.find((r) => r.bookId === bookId) ?? null);
-		}
+		const records = await read<MainDataType.ProverbBookPracticeRecord[]>(PRACTICE_RECORD_KEY, []);
+		setPracticeRecord(records.find((r) => r.bookId === bookId) ?? null);
 	};
 
 	const saveBook = async (updated: MainDataType.ProverbBook) => {
-		const json = await AsyncStorage.getItem(STORAGE_KEY);
-		const books: MainDataType.ProverbBook[] = json ? JSON.parse(json) : [];
-		const next = books.map((b) => (b.id === updated.id ? updated : b));
-		await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+		// 목록 전체를 다시 쓰므로, 읽고 쓰는 사이 다른 저장이 끼어들지 않도록 update 를 쓴다
+		await update<MainDataType.ProverbBook[]>(STORAGE_KEY, [], (books) =>
+			books.map((b) => (b.id === updated.id ? updated : b)),
+		);
 		setBook(updated);
 	};
 
@@ -188,25 +171,30 @@ const MyProverbBookDetail = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.main} edges={['top', 'bottom']}>
-				{/* 헤더 */}
-				<View style={styles.header}>
-					<TouchableOpacity onPress={() => navigation.goBack()} hitSlop={HIT_SLOP}>
-						<IconComponent type="materialIcons" name="arrow-back" size={scaledSize(22)} color={COLORS.text} />
-					</TouchableOpacity>
-					<Text style={styles.headerTitle} numberOfLines={1}>{book?.title ?? '속담집'}</Text>
-					{proverbs.length > 0 ? (
-						<TouchableOpacity onPress={() => { setRemoveMode((v) => !v); setSelectedForRemove(new Set()); }} hitSlop={HIT_SLOP}>
-							<Text style={[styles.headerAction, removeMode && { color: COLORS.textSecondary }]}>{removeMode ? '취소' : '편집'}</Text>
-						</TouchableOpacity>
-					) : (
-						<View style={{ width: scaleWidth(28) }} />
-					)}
-				</View>
+				<ScreenHeader
+					title={book?.title ?? '속담집'}
+					onBack={() => navigation.goBack()}
+					right={
+						<>
+							{proverbs.length > 0 && (
+								<TouchableOpacity
+									onPress={() => {
+										setRemoveMode((v) => !v);
+										setSelectedForRemove(new Set());
+									}}
+									hitSlop={HIT_SLOP}>
+									<Text style={[styles.headerAction, removeMode && styles.headerActionActive]}>{removeMode ? '취소' : '편집'}</Text>
+								</TouchableOpacity>
+							)}
+							<CharacterGuideButton onPress={guide.open} />
+						</>
+					}
+				/>
 
 				{/* 요약 카드 */}
-				<View style={[styles.summaryCard, { borderColor: bookColor + '40' }]}>
+				<View style={[styles.summaryCard, { borderColor: withAlpha(bookColor, ALPHA.border) }]}>
 					<View style={[styles.summaryIcon, { backgroundColor: bookColor }]}>
-						<IconComponent type="materialIcons" name={book?.icon || DEFAULT_ICON} size={scaledSize(24)} color={COLORS.textWhite} />
+						<IconComponent type="materialIcons" name={book?.icon || DEFAULT_ICON} size={scaledSize(24)} color={readableTextOn(bookColor)} />
 					</View>
 					<View style={{ flex: 1 }}>
 						{!!book?.description && <Text style={styles.summaryDesc} numberOfLines={1}>{book.description}</Text>}
@@ -237,7 +225,7 @@ const MyProverbBookDetail = () => {
 					data={proverbs}
 					keyExtractor={(item) => item.id.toString()}
 					renderItem={renderItem}
-					contentContainerStyle={styles.listContent}
+					contentContainerStyle={[styles.listContent, removeMode && styles.listContentWithBar]}
 					ListEmptyComponent={() => (
 						<View style={styles.emptyView}>
 							<Image source={require('@/assets/images/feature-states/empty-proverb-book.png')} style={styles.emptyImage} resizeMode="contain" />
@@ -284,6 +272,16 @@ const MyProverbBookDetail = () => {
 			</Modal>
 
 			<ToastView />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'이 속담집에 담아둔 속담을 모아 보는 화면입니다.',
+					'속담을 누르면 뜻과 예문을 자세히 볼 수 있습니다.',
+					'편집을 누르면 담아둔 속담을 골라 뺄 수 있습니다!',
+				]}
+				title="속담집 상세, 이렇게 씁니다"
+			/>
 		</>
 	);
 };
@@ -292,19 +290,8 @@ export default MyProverbBookDetail;
 
 const styles = themedStyles(() => StyleSheet.create({
 	main: { flex: 1, backgroundColor: COLORS.background },
-	header: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		paddingHorizontal: SPACING_W.lg,
-		paddingVertical: SPACING_H.md,
-		backgroundColor: COLORS.surface,
-		borderBottomWidth: 1,
-		borderBottomColor: COLORS.surfaceAlt,
-		columnGap: SPACING_W.md,
-	},
-	headerTitle: { flex: 1, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, textAlign: 'center' },
 	headerAction: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.secondary },
+	headerActionActive: { color: COLORS.textSecondary },
 	summaryCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -341,7 +328,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 	},
 	actionBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700' },
-	listContent: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.xs, paddingBottom: scaleHeight(100), flexGrow: 1 },
+	listContent: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.xs, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
+	// 편집 모드에서만 하단 삭제 바(absolute)가 뜨므로 그때만 그만큼 더 비운다.
+	listContentWithBar: { paddingBottom: scaleHeight(100) },
 	itemCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -383,13 +372,13 @@ const styles = themedStyles(() => StyleSheet.create({
 		left: 0,
 		right: 0,
 		backgroundColor: COLORS.surface,
-		borderWidth: 1,
-		borderColor: COLORS.border,
+		// 화면 좌우/아래에 붙는 바라 위쪽 구분선만 있으면 된다.
+		// (borderWidth 는 네 변을 모두 그려 좌우·아래에 선이 비쳤다)
+		borderTopWidth: 1,
+		borderTopColor: COLORS.border,
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.md,
 		paddingBottom: SPACING_H.xl,
-		borderTopWidth: 1,
-		borderTopColor: COLORS.surfaceAlt,
 	},
 	removeBtn: {
 		flexDirection: 'row',

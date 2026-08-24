@@ -4,14 +4,14 @@
 /* eslint-disable curly */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Animated, FlatList, Modal, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { Animated, FlatList, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
+import {RouteProp, useIsFocused, useRoute} from '@react-navigation/native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import QuizResultModal from './modal/QuizResultModal';
 import QuizCompletionModal from './modal/QuizCompletionModal';
 import { QuizBadgeInterceptor } from '@/services/interceptor/QuizBadgeInterceptor';
@@ -21,7 +21,7 @@ import { Paths } from '@/navigation/conf/Paths';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
-import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
+import { getCategoryColor, getLevelColorByNumber } from '@/screens/common/CommonProverbModule';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import StartModal from './modal/QuizStartModal';
@@ -31,29 +31,22 @@ import QuizHintModal from './modal/QuizHintModal';
 import FastImage from 'react-native-fast-image';
 import { playCorrect, playWrong, playTimeout, playTick, playWhoosh, playFinish } from '@/utils/SoundUtils';
 import { startBgm, stopBgm } from '@/utils/BgmUtils';
-import { toggleFavorite } from '@/utils/favoriteUtils';
+import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import DateUtils from '@/utils/DateUtils';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import { useAppNavigation, QuizScreenParams } from '@/navigation/conf/Types';
+import QuizHistoryService from '@/services/QuizHistoryService';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const labelColors = themedValue(() => [COLORS.secondary, COLORS.primary, COLORS.accentTeal, COLORS.accentFlame]); // A, B, C, D 보기 라벨
-const LEVEL_NAME_BY_NUMBER: Record<number, string> = { 1: '초급', 2: '중급', 3: '고급', 4: '특급' };
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
 /** 문제당 제한시간(초) — 타이머 / 시작 안내 팝업이 같은 값을 쓰도록 한 곳에서 관리한다. */
 const QUESTION_TIME_LIMIT = 40;
 
-type QuizRouteParams = {
-	mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank';
-	questionPool?: MainDataType.Proverb[];
-	isWrongReview?: boolean;
-	title?: string;
-	selectedLevel?: number | 'all';
-	levelKey?: string;
-	selectedCategory?: string;
-};
-
-type QuizRoute = RouteProp<{ QUIZ: QuizRouteParams }, 'QUIZ'>;
+// 파라미터 정의는 RootStackParamList(단일 소스)에서 가져온다.
+type QuizRoute = RouteProp<{ QUIZ: QuizScreenParams }, 'QUIZ'>;
 
 const QuizScreen = () => {
 	const route = useRoute<QuizRoute>();
@@ -65,7 +58,7 @@ const QuizScreen = () => {
 	const { mode: routeMode, questionPool, isWrongReview = false, title, selectedLevel: routeLevel, selectedCategory: routeCategory } = route.params;
 
 	const isFocused = useIsFocused();
-	const navigation = useNavigation();
+	const navigation = useAppNavigation();
 
 	const comboAnim = useRef(new Animated.Value(0)).current;
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -111,6 +104,8 @@ const QuizScreen = () => {
 	const [showExitModal, setShowExitModal] = useState<boolean>(false);
 	const [badgeModalVisible, setBadgeModalVisible] = useState(false);
 	const [showHintModal, setShowHintModal] = useState(false);
+	// 진행 중인 퀴즈를 가로막지 않도록 자동 노출은 끄고, 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('quiz', false);
 	const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
 	const [hintAdWatchedQuestionId, setHintAdWatchedQuestionId] = useState<number | null>(null);
 
@@ -125,7 +120,7 @@ const QuizScreen = () => {
 
 	const [reviewIndex, setReviewIndex] = useState(0);
 
-	const normalizeRouteLevel = (level?: number | 'all'): string => {
+	const normalizeRouteLevel = (level?: QuizScreenParams['selectedLevel']): string => {
 		switch (level) {
 			case 1:
 				return '초급';
@@ -150,7 +145,8 @@ const QuizScreen = () => {
 		'👏 대단합니다!\n이 속도라면 모든 속담을 금방 외울 수 있을 것 같습니다!',
 		'정말 똑똑합니다! 📚\n퀴즈를 척척 풀어가는 모습이 인상적입니다!',
 	];
-	useBlockBackHandler(true); // 뒤로가기 모션 막기
+	// 뒤로가기를 그냥 삼키면 앱이 멈춘 것처럼 보인다 — 화면의 종료 버튼과 같은 확인 팝업을 띄운다.
+	useBlockBackHandler(true, () => setShowExitModal(true));
 
 	useEffect(() => {
 		setSelectedLevel(normalizeRouteLevel(routeLevel));
@@ -180,24 +176,8 @@ const QuizScreen = () => {
 
 	useEffect(() => {
 		(async () => {
-			const stored = await AsyncStorage.getItem(STORAGE_KEY);
-
-			if (stored) {
-				setQuizHistory(JSON.parse(stored));
-			} else {
-				// 최초 초기화
-				const initial: MainDataType.UserQuizHistory = {
-					correctProverbId: [],
-					wrongProverbId: [],
-					lastAnsweredAt: DateUtils.now(),
-					quizCounts: {},
-					badges: [],
-					totalScore: 0,
-					bestCombo: 0,
-				};
-				await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
-				setQuizHistory(initial);
-			}
+			// 기록이 없으면 빈 기록을 돌려주므로 화면에서 별도 초기화가 필요 없다
+			setQuizHistory(await QuizHistoryService.getQuizHistoryOrEmpty());
 		})();
 	}, []);
 	// 타이머 제어 useEffect 추가
@@ -215,6 +195,17 @@ const QuizScreen = () => {
 			}
 		}
 	}, [showHintModal]);
+	// 안내가 열려 있는 동안에도 타이머를 멈춘다(힌트 모달과 같은 규칙)
+	useEffect(() => {
+		if (guide.visible) {
+			if (timerRef.current) {
+				clearInterval(timerRef.current);
+				timerRef.current = null;
+			}
+		} else if (question && !selected) {
+			startTimer();
+		}
+	}, [guide.visible]); // eslint-disable-line react-hooks/exhaustive-deps
 	useEffect(() => {
 		if (quizHistory) setTotalScore(quizHistory.totalScore ?? 0);
 	}, [quizHistory]);
@@ -474,50 +465,49 @@ const QuizScreen = () => {
 		// ⚠️ 기록/뱃지 처리 중 어떤 오류가 나더라도 아래의 결과(해설) 모달은 반드시 노출되도록 try/catch 로 감쌉니다.
 		if (quizHistory && question) {
 			try {
-				// 기존 업데이트 로직 유지
-				const updated = { ...quizHistory };
 				const id = question.id;
+				// patch 안에서 최신 저장값을 받아 수정한다 —
+				// 화면 state 를 그대로 덮어쓰면 그 사이 다른 화면이 준 뱃지/점수가 사라진다.
+				let updated!: MainDataType.UserQuizHistory;
+				const finalUpdated = await QuizHistoryService.patch((stored) => {
+					updated = { ...stored };
 
-				// 누락 가능 필드 방어 (오래된 저장 데이터 대비)
-				updated.quizCounts = updated.quizCounts ?? {};
-				updated.correctProverbId = updated.correctProverbId ?? [];
-				updated.wrongProverbId = updated.wrongProverbId ?? [];
-				updated.badges = updated.badges ?? [];
-				updated.totalScore = updated.totalScore ?? 0;
-				updated.bestCombo = updated.bestCombo ?? 0;
+					// 누락 가능 필드 방어 (오래된 저장 데이터 대비)
+					updated.quizCounts = updated.quizCounts ?? {};
+					updated.correctProverbId = updated.correctProverbId ?? [];
+					updated.wrongProverbId = updated.wrongProverbId ?? [];
+					updated.badges = updated.badges ?? [];
+					updated.totalScore = updated.totalScore ?? 0;
+					updated.bestCombo = updated.bestCombo ?? 0;
 
-				updated.quizCounts[id] = (updated.quizCounts[id] || 0) + 1;
-				updated.lastAnsweredAt = DateUtils.now();
+					updated.quizCounts[id] = (updated.quizCounts[id] || 0) + 1;
+					updated.lastAnsweredAt = DateUtils.now();
 
-				// 오답 복습 모드일 경우 오답 → 정답 처리 먼저 실행
-				if (correct && isWrongReview && updated.wrongProverbId.includes(id)) {
-					updated.wrongProverbId = updated.wrongProverbId.filter((wrongId) => wrongId !== id);
-					if (!updated.correctProverbId.includes(id)) {
-						updated.correctProverbId.push(id);
+					// 오답 복습 모드일 경우 오답 → 정답 처리 먼저 실행
+					if (correct && isWrongReview && updated.wrongProverbId.includes(id)) {
+						updated.wrongProverbId = updated.wrongProverbId.filter((wrongId) => wrongId !== id);
+						if (!updated.correctProverbId.includes(id)) {
+							updated.correctProverbId.push(id);
+						}
 					}
-				}
 
-				// 정답/오답 처리 (quizCounts/lastAnsweredAt 는 위에서 이미 1회 반영)
-				if (correct) {
-					if (!updated.correctProverbId.includes(id)) {
-						updated.correctProverbId.push(id);
+					// 정답/오답 처리 (quizCounts/lastAnsweredAt 는 위에서 이미 1회 반영)
+					if (correct) {
+						if (!updated.correctProverbId.includes(id)) {
+							updated.correctProverbId.push(id);
+						}
+						updated.totalScore += 10;
+						updated.bestCombo = Math.max(updated.bestCombo || 0, combo + 1);
+					} else {
+						if (!updated.wrongProverbId.includes(id)) {
+							updated.wrongProverbId.push(id);
+						}
 					}
-					updated.totalScore += 10;
-					updated.bestCombo = Math.max(updated.bestCombo || 0, combo + 1);
-				} else {
-					if (!updated.wrongProverbId.includes(id)) {
-						updated.wrongProverbId.push(id);
-					}
-				}
 
-				acquiredBadges = QuizBadgeInterceptor(updated, ProverbServices.selectProverbList());
-
-				const finalUpdated = {
-					...updated,
-					badges: [...new Set([...(updated.badges || []), ...acquiredBadges])],
-				};
+					acquiredBadges = QuizBadgeInterceptor(updated, ProverbServices.selectProverbList());
+					return { ...updated, badges: [...new Set([...(updated.badges || []), ...acquiredBadges])] };
+				});
 				setQuizHistory(finalUpdated);
-				await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(finalUpdated));
 				setTotalScore(finalUpdated.totalScore); // ← 총점 상태 갱신 추가
 
 				if (acquiredBadges.length > 0) {
@@ -551,7 +541,7 @@ const QuizScreen = () => {
 		}, 600); // 약간
 	};
 	// 난이도 색상 — 공통 난이도 램프(CommonProverbModule) 단일 소스 사용
-	const getLevelColor = (level: number) => getLevelNameColor(LEVEL_NAME_BY_NUMBER[level] ?? '');
+	const getLevelColor = getLevelColorByNumber;
 
 	const triggerComboEffect = (comboValue: number) => {
 		if (comboValue >= 2) {
@@ -677,7 +667,6 @@ const QuizScreen = () => {
 
 	const handleReviewWrong = () => {
 		setShowCompletionModal(false);
-		// @ts-ignore
 		navigation.replace(Paths.QUIZ, {
 			mode: routeMode,
 			questionPool: wrongPool,
@@ -689,7 +678,6 @@ const QuizScreen = () => {
 	};
 
 	const safelyGoBack = () => {
-		// @ts-ignore
 		navigation.replace(Paths.MAIN_TAB, { screen: Paths.HOME });
 		// navigation.goBack(); // 그래도 예외적으로 강제로
 	};
@@ -824,18 +812,7 @@ const QuizScreen = () => {
 	// 기존의 throw Error 함수들 완전 제거 후 아래로 교체
 
 	const loadFavorites = async () => {
-		try {
-			const stored = await AsyncStorage.getItem(MainStorageKeyType.FAVORITES_STORAGE_KEY);
-			if (stored) {
-				// ✅ FavoriteItem[] 파싱 후 id만 추출
-				const favorites: { id: number; addedAt: number }[] = JSON.parse(stored);
-				setFavoriteIds(favorites.map((item) => item.id));
-			} else {
-				setFavoriteIds([]);
-			}
-		} catch (e) {
-			console.error('즐겨찾기 로드 실패', e);
-		}
+		setFavoriteIds(await getFavorites());
 	};
 
 	// 앱 진입 시 즐겨찾기 로드
@@ -935,6 +912,7 @@ const QuizScreen = () => {
 									)}
 									</View>
 									<FastImage source={require('@/assets/images/screen-heroes/quiz-coach.png')} style={styles.quizCoachImage} resizeMode="contain" />
+									<CharacterGuideButton onPress={guide.open} />
 								</View>
 
 								<View style={styles.progressBarWrapper}>
@@ -1283,6 +1261,16 @@ const QuizScreen = () => {
 					}}
 				/>
 			)}
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'문제를 읽고 아래 보기 중 알맞은 것을 고르면 됩니다.',
+					'시간이 다 되기 전에 답을 고르세요. 안내를 보는 동안에는 시간이 멈춥니다.',
+					'막히면 힌트 버튼을 눌러 실마리를 얻을 수 있습니다!',
+				]}
+				title="퀴즈, 이렇게 풉니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -1314,7 +1302,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
-	quizHeaderRow: { minHeight: scaleHeight(64), flexDirection: 'row', alignItems: 'center' },
+	quizHeaderRow: { minHeight: scaleHeight(64), flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
 	quizHeaderCopy: { flex: 1 },
 	quizCoachImage: { width: scaleWidth(72), height: scaleHeight(66), marginTop: scaleHeight(-6) },
 	progressText: {

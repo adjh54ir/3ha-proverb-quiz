@@ -1,27 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import {
-	Alert,
-	Text,
-	TouchableOpacity,
-	View,
-	StyleSheet,
-	Platform,
-	ScrollView,
-	Modal,
-	Animated,
-	NativeSyntheticEvent,
-	NativeScrollEvent,
-} from 'react-native';
+import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
+import { Alert, Text, TouchableOpacity, View, StyleSheet, Platform, ScrollView, Animated, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
-import { useNavigation } from '@react-navigation/native';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize } from '@/const/common/Theme';
+import {useIsFocused} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TimeChallengeInterceptor } from '@/services/interceptor/TimeChanllengeInterceptor';
 import AnimatedNumbers from 'react-native-animated-numbers';
 import ConfettiCannon from 'react-native-confetti-cannon';
@@ -30,8 +20,12 @@ import ProverbDetailModal from './modal/ProverbDetailModal';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import FastImage from 'react-native-fast-image';
 import { playCorrect, playWrong, playCombo, playTick, playWhoosh, playFinish } from '@/utils/SoundUtils';
-import { startBgm, stopBgm } from '@/utils/BgmUtils';
+import { startBgm, stopBgm, pauseBgm, resumeBgm } from '@/utils/BgmUtils';
 import DateUtils from '@/utils/DateUtils';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
+import { useAppNavigation } from '@/navigation/conf/Types';
+import { update } from '@/services/StorageService';
 
 const MAX_LIVES = 5;
 const CHOICE_COUNT = 4;
@@ -75,7 +69,8 @@ const getShuffledChoices = (correct: string, allMeanings: string[]) => {
 const InfinityQuizScreen = () => {
 	const TIME_CHALLENGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 
-	const navigation = useNavigation();
+	const navigation = useAppNavigation();
+	const isFocused = useIsFocused();
 
 	const scrollViewRef = useRef<ScrollView>(null);
 	const scoreAnim = useRef(new Animated.Value(1)).current;
@@ -100,6 +95,9 @@ const InfinityQuizScreen = () => {
 	const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
 	const [selectedChoice, setSelectedChoice] = useState<string | null>(null); // 사용자가 고른 보기
 	const [showExitModal, setShowExitModal] = useState(false);
+
+	// 뒤로가기로 도전이 그냥 끝나지 않게, 종료 버튼과 같은 확인 팝업을 띄운다.
+	useBlockBackHandler(true, () => setShowExitModal(true));
 	const [combo, setCombo] = useState(0);
 	const [maxCombo, setMaxCombo] = useState(0);
 	const [hasUsedSkip, setHasUsedSkip] = useState(false);
@@ -116,6 +114,8 @@ const InfinityQuizScreen = () => {
 
 	const formattedTime = `${(timeLeftMs / 1000).toFixed(2)}초`;
 	const [isPaused, setIsPaused] = useState(false);
+	// 진행 중인 챌린지를 가로막지 않도록 자동 노출은 끄고, 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('timeChallenge', false);
 	const [heartAnimations, setHeartAnimations] = useState(Array.from({ length: MAX_LIVES }, () => new Animated.Value(1)));
 
 	const [isCountingDown, setIsCountingDown] = useState(false);
@@ -186,6 +186,22 @@ const InfinityQuizScreen = () => {
 		return () => entrance.stop();
 	}, [currentIndex, isGameOver, questionFade, questionSlide]);
 
+	// 타이머가 멈춘 동안(찬스 팝업·안내·일시정지)에는 배경음도 함께 멈춘다
+	useEffect(() => {
+		if (isPaused) {
+			pauseBgm();
+		} else {
+			resumeBgm();
+		}
+	}, [isPaused]);
+
+	// 다른 화면으로 이동하면 BGM도 끈다 — 언마운트만으로는 남는 경우가 있다
+	useEffect(() => {
+		if (!isFocused) {
+			stopBgm();
+		}
+	}, [isFocused]);
+
 	// 언마운트 시 카운트다운 타이머 / 애니메이션 정리
 	useEffect(() => {
 		return () => {
@@ -249,15 +265,20 @@ const InfinityQuizScreen = () => {
 	}, [isGameOver, isPaused]); // isPaused 추가!
 
 	// ⏱️ 마지막 5초 카운트다운 효과음 (1초 단위로 한 번씩만)
+	// 의존성 배열에 계산식을 넣으면 lint 를 꺼야 하고 값이 되돌아갈 때 다시 울린다.
+	// 마지막으로 울린 '초'를 ref 에 남겨 같은 초에서는 한 번만 나게 한다.
+	const lastTickSecRef = useRef<number | null>(null);
 	useEffect(() => {
-		if (isGameOver || isPaused) {
+		const secondsLeft = Math.ceil(timeLeftMs / 1000);
+		if (isGameOver || isPaused || secondsLeft > 5 || secondsLeft <= 0) {
+			lastTickSecRef.current = null;
 			return;
 		}
-		const secondsLeft = Math.ceil(timeLeftMs / 1000);
-		if (secondsLeft > 0 && secondsLeft <= 5) {
+		if (lastTickSecRef.current !== secondsLeft) {
+			lastTickSecRef.current = secondsLeft;
 			playTick();
 		}
-	}, [Math.ceil(timeLeftMs / 1000), isGameOver, isPaused]); // eslint-disable-line react-hooks/exhaustive-deps
+	}, [timeLeftMs, isGameOver, isPaused]);
 
 	// 🎉 게임 종료 사운드 + BGM 정리
 	useEffect(() => {
@@ -312,7 +333,7 @@ const InfinityQuizScreen = () => {
 			 */
 			onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
 				const offsetY = event.nativeEvent.contentOffset.y;
-				setShowScrollTop(offsetY > moderateScale(100));
+				setShowScrollTop(offsetY > SCROLL_TOP_THRESHOLD);
 			},
 			/**
 			 * 스크롤 최상단으로 이동
@@ -335,14 +356,8 @@ const InfinityQuizScreen = () => {
 	})();
 
 	const saveChallengeResultToStorage = async (result: MainDataType.TimeChallengeResult) => {
-		try {
-			const existingData = await AsyncStorage.getItem(TIME_CHALLENGE_KEY);
-			const history: MainDataType.TimeChallengeHistory = existingData ? JSON.parse(existingData) : [];
-			const updated = [result, ...history]; // 최근 기록을 맨 앞에
-			await AsyncStorage.setItem(TIME_CHALLENGE_KEY, JSON.stringify(updated));
-		} catch (e) {
-			console.error('⚠️ Failed to save TimeChallenge result', e);
-		}
+		// 최근 기록을 맨 앞에 — update 라 다른 저장과 겹쳐도 기록이 사라지지 않는다
+		await update<MainDataType.TimeChallengeHistory>(TIME_CHALLENGE_KEY, [], (history) => [result, ...history]);
 	};
 
 	const animateScale = () => {
@@ -639,6 +654,15 @@ const InfinityQuizScreen = () => {
 				onScroll={scrollHandler.onScroll}
 				scrollEventThrottle={16}
 				keyboardShouldPersistTaps="handled">
+				{/* 도움말 — 결과 화면에서도 같은 자리에 둔다(화면마다 위치가 달라지지 않게) */}
+				<View style={styles.guideRow}>
+					<CharacterGuideButton
+						onPress={() => {
+							setIsPaused(true); // 안내를 보는 동안 시간이 흐르지 않게 멈춘다
+							guide.open();
+						}}
+					/>
+				</View>
 				{!isGameOver && (
 					<View style={styles.statusBoxRow}>
 						{/* 🎯 점수 */}
@@ -867,8 +891,7 @@ const InfinityQuizScreen = () => {
 										style={[styles.resultBtn, styles.resultBtnSecondary]}
 										activeOpacity={0.85}
 										onPress={() => {
-											//@ts-ignore
-											navigation.navigate(Paths.INIT_TIME_CHANLLENGE); // 실제 경로로 변경
+											navigation.navigate(Paths.INIT_TIME_CHANLLENGE);
 										}}>
 										<IconComponent
 											name="bar-chart"
@@ -1034,7 +1057,7 @@ const InfinityQuizScreen = () => {
 									<View
 										style={[
 											styles.choiceLabelBadge,
-											{ backgroundColor: labelColors[index] + '1A', borderColor: labelColors[index] + '55' },
+											{ backgroundColor: withAlpha(labelColors[index], ALPHA.faint), borderColor: withAlpha(labelColors[index], ALPHA.border) },
 										]}>
 										<Text style={[styles.choiceLabelText, { color: labelColors[index] }]}>{String.fromCharCode(65 + index)}</Text>
 									</View>
@@ -1177,7 +1200,6 @@ const InfinityQuizScreen = () => {
 									onPress={() => {
 										setShowExitModal(false);
 										setIsPaused(false); // 상태 초기화
-										//@ts-ignore
 										navigation.replace(Paths.MAIN_TAB, { screen: Paths.HOME });
 									}}>
 									<Text style={styles.modalButtonText}>종료하기</Text>
@@ -1206,11 +1228,7 @@ const InfinityQuizScreen = () => {
 			</Modal>
 
 			{/* 최하단에 위치할것!! */}
-			{showScrollTop && (
-				<TouchableOpacity style={styles.scrollTopButton} onPress={scrollHandler.toTop} activeOpacity={0.85}>
-					<IconComponent type="MaterialIcons" name="arrow-upward" size={scaledSize(24)} color={COLORS.textWhite} />
-				</TouchableOpacity>
-			)}
+			<ScrollTopButton visible={showScrollTop} onPress={scrollHandler.toTop} />
 
 			{comboEffectText !== '' && (
 				<Animated.View
@@ -1236,10 +1254,10 @@ const InfinityQuizScreen = () => {
 					}}>
 					<Text
 						style={{
-							fontSize: scaledSize(36),
+							fontSize: displayFontSize(36),
 							fontWeight: '700',
 							color: COLORS.danger,
-							textShadowColor: COLORS.textDeep,
+							textShadowColor: 'rgba(0,0,0,0.4)',
 							textShadowOffset: { width: 1, height: 1 },
 							textShadowRadius: 2,
 						}}>
@@ -1312,6 +1330,19 @@ const InfinityQuizScreen = () => {
 					</View>
 				</Animated.View>
 			)}
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={() => {
+					guide.close();
+					setIsPaused(false); // 안내를 닫으면 다시 시간이 흐른다
+				}}
+				lines={[
+					'제한 시간 안에 속담 뜻을 최대한 많이 맞히는 도전입니다.',
+					'연속으로 맞히면 콤보가 쌓여 점수가 더 많이 오릅니다.',
+					'스킵과 찬스는 각각 한 번씩만 쓸 수 있으니 아껴두세요!',
+				]}
+				title="타임 챌린지, 이렇게 합니다"
+			/>
 		</SafeAreaView>
 	);
 };
@@ -1511,6 +1542,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderBottomColor: COLORS.surfaceAlt,
 		gap: SPACING_W.xsPlus,
 	},
+	guideRow: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: SPACING_H.xs },
 	statusBoxRow: {
 		marginTop: SPACING_H.sm,
 		flexDirection: 'row',
@@ -1755,7 +1787,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		zIndex: 999,
 	},
 	countdownText: {
-		fontSize: scaledSize(72),
+		fontSize: displayFontSize(72),
 		fontWeight: '700',
 		color: COLORS.textWhite,
 		textAlign: 'center',
@@ -1849,17 +1881,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xsPlus,
 		paddingHorizontal: SPACING_W.md,
 		zIndex: 2,
-	},
-	scrollTopButton: {
-		position: 'absolute',
-		right: SPACING_W.xxl,
-		bottom: scaleHeight(80), // 기존 16 → 80으로 조정하여 종료 버튼과 겹치지 않도록
-		backgroundColor: COLORS.secondary,
-		width: scaleWidth(40),
-		height: scaleWidth(40),
-		borderRadius: scaleWidth(20),
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 	leftFixed: {
 		position: 'absolute',
@@ -2141,7 +2162,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.border,
 	},
 	scoreHeroNumber: {
-		fontSize: scaledSize(56),
+		fontSize: displayFontSize(56),
 		fontWeight: '700',
 		color: COLORS.danger,
 	},

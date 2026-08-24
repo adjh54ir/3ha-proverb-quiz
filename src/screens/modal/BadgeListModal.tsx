@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Animated } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import IconComponent from '../common/atomic/IconComponent';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
 const BadgeListModal = ({
 	visible,
@@ -19,25 +21,9 @@ const BadgeListModal = ({
 	onClose: () => void;
 	onSelectBadge?: (badge: (typeof CONST_BADGES)[number]) => void;
 }) => {
-	const scale = useRef(new Animated.Value(0.95)).current;
-	const opacity = useRef(new Animated.Value(0)).current;
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(visible);
 
-	useEffect(() => {
-		if (!visible) {
-			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-			scale.setValue(0.95);
-			opacity.setValue(0);
-			return;
-		}
-		scale.setValue(0.95);
-		opacity.setValue(0);
-		const enter = Animated.parallel([
-			Animated.timing(scale, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(opacity, { toValue: 1, duration: 250, useNativeDriver: true }),
-		]);
-		enter.start();
-		return () => enter.stop();
-	}, [visible, opacity, scale]);
 
 	const total = badges.length;
 	const earnedCount = earnedIds.length;
@@ -70,7 +56,7 @@ const BadgeListModal = ({
 	return (
 		<Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
 			<View style={styles.modalOverlay}>
-				<Animated.View style={[styles.badgeModalContent, { opacity, transform: [{ scale }] }]}>
+				<Animated.View style={[styles.badgeModalContent, enterStyle]}>
 					{/* 헤더 */}
 					<View style={styles.badgeModalHeader}>
 						<ModalCloseButton onPress={onClose} color={COLORS.textSecondary} />

@@ -1,10 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useRef } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import React, {  } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleWidth, scaleHeight } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
 type QuizMode = 'meaning' | 'proverb' | 'blank' | 'example';
 
@@ -23,31 +25,14 @@ const MODES: { key: QuizMode; label: string; desc: string; icon: string; color: 
 ]));
 
 const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
-	// ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const scaleAnim = useRef(new Animated.Value(0.95)).current;
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(!!book);
 
-	useEffect(() => {
-		if (!book) {
-			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-			fadeAnim.setValue(0);
-			scaleAnim.setValue(0.95);
-			return;
-		}
-		fadeAnim.setValue(0);
-		scaleAnim.setValue(0.95);
-		const anim = Animated.parallel([
-			Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-		]);
-		anim.start();
-		return () => anim.stop();
-	}, [book, fadeAnim, scaleAnim]);
 
 	return (
 		<Modal visible={!!book} transparent animationType="fade" onRequestClose={onClose}>
 			<TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
-				<Animated.View style={{ width: '100%', alignItems: 'center', opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
+				<Animated.View style={{ width: '100%', alignItems: 'center', ...enterStyle }}>
 					<TouchableOpacity activeOpacity={1} style={styles.card}>
 						<View style={styles.headerRow}>
 							<Text style={styles.title} numberOfLines={1}>{book?.title ? `${book.title} 퀴즈` : '퀴즈 모드 선택'}</Text>

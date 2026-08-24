@@ -3,13 +3,15 @@
 /* eslint-disable react-native/no-inline-styles */
 
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
+import AppAlert from '@/screens/common/modal/AppAlert';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Alert, Animated, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
-import { isSoundEnabled, setSoundEnabled, getSoundVolume, setSoundVolume, playCorrect } from '@/utils/SoundUtils';
+import { isSoundEnabled, setSoundEnabled, getSoundVolume, setSoundVolume, playCorrect, playPop } from '@/utils/SoundUtils';
 import { isBgmEnabled, setBgmEnabled, getBgmVolume, setBgmVolume } from '@/utils/BgmUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DeviceInfo from 'react-native-device-info';
@@ -33,6 +35,8 @@ import { AppPermissionInfo, loadAppPermissions, requestAppPermission } from '@/u
 import DateUtils from '@/utils/DateUtils';
 import { useToast } from '@/hooks/useToast';
 import { changeTextSizeMode, changeThemeMode, useTextSizeMode, useThemeMode } from '@/hooks/useThemeMode';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton, resetCharacterGuideSeen } from '@/screens/common/CharacterGuide';
+import { update, write } from '@/services/StorageService';
 
 // ─────────────────────────────────────────────
 // 상수
@@ -236,6 +240,8 @@ const TEXT_SIZE_OPTIONS = themedValue(() => [
 // 컴포넌트
 // ─────────────────────────────────────────────
 const SettingScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('setting', false);
 	const themeMode = useThemeMode(); // 화이트/다크 선택 상태
 	const textSizeMode = useTextSizeMode(); // 기본/글자 크게 선택 상태
 	const sectionRef = useRef<SectionList>(null);
@@ -264,6 +270,9 @@ const SettingScreen = () => {
 	const handleToggleSound = (value: boolean) => {
 		setSoundEnabled(value);
 		setSoundOn(value);
+		if (value) {
+			playPop(); // 켠 자리에서 바로 소리를 확인시켜 준다
+		}
 	};
 
 	const handleToggleBgm = (value: boolean) => {
@@ -271,9 +280,11 @@ const SettingScreen = () => {
 		setBgmOn(value);
 	};
 
+
 	/** 슬라이더를 놓는 순간에만 저장한다(드래그 중 매 프레임 AsyncStorage 쓰기 방지) */
 	const handleSfxVolumeCommit = (value: number) => {
 		setSoundVolume(value);
+		playPop(); // 조절한 크기를 바로 들려준다
 	};
 
 	const handleBgmVolumeCommit = (value: number) => {
@@ -325,26 +336,22 @@ const SettingScreen = () => {
 	};
 
 	const resetTodayQuizOnly = async () => {
-		const json = await AsyncStorage.getItem(STORAGE_KEYS.todayQuiz);
-		if (!json) {
-			return;
-		}
-
 		const todayStr = DateUtils.getLocalDateString();
-		const updated = (JSON.parse(json) as MainDataType.TodayQuizList[]).map((item) =>
-			DateUtils.toLocalDateKey(item.quizDate) === todayStr
-				? {
-						...item,
-						todayQuizIdArr: [],
-						correctQuizIdArr: [],
-						worngQuizIdArr: [],
-						answerResults: {},
-						selectedAnswers: {},
-						isCheckedIn: item.isCheckedIn ?? false,
-					}
-				: item,
+		await update<MainDataType.TodayQuizList[]>(STORAGE_KEYS.todayQuiz, [], (list) =>
+			list.map((item) =>
+				DateUtils.toLocalDateKey(item.quizDate) === todayStr
+					? {
+							...item,
+							todayQuizIdArr: [],
+							correctQuizIdArr: [],
+							worngQuizIdArr: [],
+							answerResults: {},
+							selectedAnswers: {},
+							isCheckedIn: item.isCheckedIn ?? false,
+						}
+					: item,
+			),
 		);
-		await AsyncStorage.setItem(STORAGE_KEYS.todayQuiz, JSON.stringify(updated));
 	};
 
 	const RESET_ACTIONS: Record<ResetType, () => Promise<void>> = {
@@ -371,6 +378,8 @@ const SettingScreen = () => {
 		},
 		all: async () => {
 			await AsyncStorage.multiRemove(RESET_ALL_KEYS);
+			// 화면 안내를 '본 적 있음' 기록도 함께 지워 처음 상태로 되돌린다
+			await resetCharacterGuideSeen();
 			showToast('전체 초기화 완료', '앱의 모든 기록을 지웠습니다.');
 		},
 	};
@@ -397,10 +406,10 @@ const SettingScreen = () => {
 				setLatestVersion(updateNeeded.latestVersion);
 				setShowVersionModal(true);
 			} else {
-				Alert.alert('최신 버전', `현재 v${appVersion}이 최신 버전입니다`);
+				AppAlert.alert('최신 버전', `현재 v${appVersion}이 최신 버전입니다`);
 			}
 		} catch {
-			Alert.alert('오류', '버전 확인 중 문제가 발생했습니다.');
+			AppAlert.alert('오류', '버전 확인 중 문제가 발생했습니다.');
 		}
 	};
 
@@ -417,7 +426,7 @@ const SettingScreen = () => {
 			const iosUrl = appRes?.storeUrl || '';
 
 			if (!androidUrl && !iosUrl) {
-				Alert.alert('Coming Soon..!', '아직 안드로이드/iOS 스토어에 출시되지 않았습니다.');
+				AppAlert.alert('Coming Soon..!', '아직 안드로이드/iOS 스토어에 출시되지 않았습니다.');
 				return;
 			}
 
@@ -435,7 +444,7 @@ const SettingScreen = () => {
 
 			await Share.share(Platform.OS === 'ios' ? { message, url: iosUrl || androidUrl, title: APP_NAME } : { message, title: APP_NAME });
 		} catch {
-			Alert.alert('오류', '앱 정보를 불러오는 중 문제가 발생했습니다.');
+			AppAlert.alert('오류', '앱 정보를 불러오는 중 문제가 발생했습니다.');
 		}
 	};
 
@@ -458,7 +467,7 @@ const SettingScreen = () => {
 			lastAnsweredAt: DateUtils.now(),
 			quizCounts,
 		};
-		await AsyncStorage.setItem(STORAGE_KEYS.quiz, JSON.stringify(parsed));
+		await write(STORAGE_KEYS.quiz, parsed);
 		showToast('퀴즈 전체 완료 처리', `${allProverbs.length.toLocaleString()}문제 / ${fullScore.toLocaleString()}점 반영했습니다.`);
 	};
 
@@ -475,7 +484,7 @@ const SettingScreen = () => {
 			lastStudyAt: DateUtils.now(),
 			studyCounts,
 		};
-		await AsyncStorage.setItem(STORAGE_KEYS.study, JSON.stringify(parsed));
+		await write(STORAGE_KEYS.study, parsed);
 		showToast('학습 전체 완료 처리', `${allProverbs.length.toLocaleString()}개 학습 완료로 반영했습니다.`);
 	};
 
@@ -492,7 +501,7 @@ const SettingScreen = () => {
 			lastAttemptDate: DateUtils.getLocalDateString(),
 			unlockedRewards: allLevels,
 		};
-		await AsyncStorage.setItem(STORAGE_KEYS.towerChallenge, JSON.stringify(towerProgress));
+		await write(STORAGE_KEYS.towerChallenge, towerProgress);
 		showToast('타워 전체 클리어 처리', '모든 층을 클리어 상태로 반영했습니다.');
 	};
 
@@ -515,11 +524,11 @@ const SettingScreen = () => {
 		rate: async () => {
 			const storeUrl = Platform.OS === 'android' ? GOOGLE_PLAY_STORE_URL : APP_STORE_URL;
 			if (!storeUrl) {
-				Alert.alert('Coming Soon..!', '아직 스토어에 출시되지 않았습니다.');
+				AppAlert.alert('Coming Soon..!', '아직 스토어에 출시되지 않았습니다.');
 				return;
 			}
 			const supported = await Linking.canOpenURL(storeUrl);
-			supported ? Linking.openURL(storeUrl) : Alert.alert('오류', '스토어 페이지를 열 수 없습니다.');
+			supported ? Linking.openURL(storeUrl) : AppAlert.alert('오류', '스토어 페이지를 열 수 없습니다.');
 		},
 		inquiry: async () => {
 			const version = await VersionCheck.getCurrentVersion();
@@ -571,7 +580,7 @@ const SettingScreen = () => {
 				return;
 			}
 		}
-		Linking.openSettings().catch(() => Alert.alert('오류', '설정 화면을 열 수 없습니다.'));
+		Linking.openSettings().catch(() => AppAlert.alert('오류', '설정 화면을 열 수 없습니다.'));
 	};
 
 	// ── renderItem ────────────────────────────────
@@ -910,6 +919,7 @@ const SettingScreen = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.container} edges={['top']}>
+			<FloatingGuideButton onPress={guide.open} />
 				<FadeInView style={{ flex: 1 }}>
 					<SectionList
 						ref={sectionRef}
@@ -917,7 +927,7 @@ const SettingScreen = () => {
 						renderItem={renderItem}
 						sections={BASE_SECTIONS.map((section, i) => ({ ...section, key: `section-${i}` }))}
 						stickySectionHeadersEnabled={false}
-						onScroll={(e) => setShowScrollTop(e.nativeEvent.contentOffset.y > 100)}
+						onScroll={(e) => setShowScrollTop(e.nativeEvent.contentOffset.y > SCROLL_TOP_THRESHOLD)}
 						scrollEventThrottle={16}
 						contentContainerStyle={styles.listContent}
 						ItemSeparatorComponent={() => <View style={styles.itemSpacing} />}
@@ -945,7 +955,7 @@ const SettingScreen = () => {
 									</View>
 									<Text style={styles.recommendSubtitle}>가족이나 친구, 지인에게 유용한 앱을 함께 나눠보세요!</Text>
 									<View style={styles.appIconWrapper}>
-										<Image source={require('@/assets/images/screen-heroes/settings-helper.png')} style={styles.appIcon} resizeMode="contain" />
+										<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
 									</View>
 									<View style={styles.storeButtons}>
 										<TouchableOpacity style={[styles.storeButton, { backgroundColor: COLORS.primary }]} onPress={shareApp} activeOpacity={0.8}>
@@ -973,11 +983,11 @@ const SettingScreen = () => {
 										const handlePress = async () => {
 											const storeUrl = Platform.OS === 'android' ? item.android : item.ios;
 											if (!storeUrl) {
-												Alert.alert('Coming Soon..!', '아직 이 플랫폼에서는 출시되지 않았습니다.');
+												AppAlert.alert('Coming Soon..!', '아직 이 플랫폼에서는 출시되지 않았습니다.');
 												return;
 											}
 											const supported = await Linking.canOpenURL(storeUrl);
-											supported ? Linking.openURL(storeUrl) : Alert.alert('오류', '스토어 페이지를 열 수 없습니다.');
+											supported ? Linking.openURL(storeUrl) : AppAlert.alert('오류', '스토어 페이지를 열 수 없습니다.');
 										};
 										return (
 											<TouchableOpacity style={styles.footerAppCard} onPress={handlePress} activeOpacity={0.8}>
@@ -1010,13 +1020,7 @@ const SettingScreen = () => {
 			{showTermsModal && <TermsOfServiceModal visible={showTermsModal} onClose={() => setShowTermsModal(false)} />}
 			{showOpenSourceModal && <OpenSourceModal visible={showOpenSourceModal} onClose={() => setShowOpenSourceModal(false)} />}
 
-			{showScrollTop && (
-				<FadeInView style={styles.scrollTopWrap} duration={220} offsetY={8}>
-					<TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop} activeOpacity={0.8} hitSlop={HIT_SLOP}>
-						<IconComponent type="fontawesome6" name="arrow-up" size={scaledSize(20)} color={COLORS.textWhite} />
-					</TouchableOpacity>
-				</FadeInView>
-			)}
+			<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 
 			<CmmDelConfirmModal
 				visible={modalVisible}
@@ -1036,6 +1040,17 @@ const SettingScreen = () => {
 			/>
 
 			<ToastView />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'앱의 알림·소리·화면 설정을 바꾸는 곳입니다.',
+					'효과음과 배경음은 각각 켜고 끄거나 크기를 조절할 수 있습니다.',
+					'소리가 나는 동안에는 다른 앱의 음악·영상이 잠시 멈춥니다.',
+					'아래쪽에서 앱 버전과 다른 앱들도 확인할 수 있습니다!',
+				]}
+				title="설정, 이렇게 씁니다"
+			/>
 		</>
 	);
 };
@@ -1213,19 +1228,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	textSizeSample: { fontWeight: '700', color: COLORS.textSecondary },
 	textSizeSampleActive: { color: COLORS.textWhite },
 
-	scrollTopWrap: {
-		position: 'absolute',
-		right: SPACING_W.lg,
-		bottom: SPACING_H.lg,
-	},
-	scrollTopButton: {
-		backgroundColor: COLORS.secondary,
-		width: scaleWidth(48),
-		height: scaleWidth(48),
-		borderRadius: scaleWidth(48) / 2,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
 
 	modalTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: SPACING_H.md },
 	modalTitleText: { fontSize: FONT_SIZES.xl, lineHeight: scaledSize(26), fontWeight: '700', color: COLORS.textStrong, textAlign: 'center' },

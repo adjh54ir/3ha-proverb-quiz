@@ -2,17 +2,20 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { ActivityIndicator, Animated, Dimensions, Easing, Image, InteractionManager, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
+import { SkeletonCardList } from '@/screens/common/atomic/Skeleton';
+import { Animated, Dimensions, Easing, Image, InteractionManager, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import Carousel from 'react-native-reanimated-carousel';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
-import { getCategoryColor, getLevelColor as getLevelNameColor } from '@/screens/common/CommonProverbModule';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { getCategoryColor, getLevelColorByNumber, LEVEL_NAME_BY_NUMBER } from '@/screens/common/CommonProverbModule';
+import { LEVEL_DROPDOWN_ITEMS, FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
@@ -21,122 +24,14 @@ import ProverbServices from '@/services/ProverbServices';
 import NewBadgeModal from '@/screens/modal/NewBadgeModal';
 import { playComplete, playFlip } from '@/utils/SoundUtils';
 import DateUtils from '@/utils/DateUtils';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { read, write } from '@/services/StorageService';
 
 // 기기 분류(태블릿 여부)용 1회 측정값. 실시간 레이아웃은 useWindowDimensions 를 쓴다.
 const { width: screenWidth } = Dimensions.get('window');
 
-// themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
-const COMMON_ALL_OPTION = themedValue(() => ({
-	label: '전체',
-	value: '전체',
-	iconType: 'FontAwesome6',
-	badgeId: '',
-	iconName: 'clipboard-list',
-	iconColor: COLORS.textSecondary,
-	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />,
-	labelStyle: {
-		marginLeft: SPACING_W.xs,
-		fontSize: FONT_SIZES.md,
-	},
-}));
-const LEVEL_DROPDOWN_ITEMS = [
-	COMMON_ALL_OPTION,
-	{
-		label: '초급',
-		value: '초급',
-		icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color={getLevelNameColor('초급')} />,
-	},
-	{
-		label: '중급',
-		value: '중급',
-		icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color={getLevelNameColor('중급')} />,
-	},
-	{
-		label: '고급',
-		value: '고급',
-		icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color={getLevelNameColor('고급')} />,
-	},
-	{
-		label: '특급',
-		value: '특급',
-		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelNameColor('특급')} />,
-	},
-];
-export const FIELD_DROPDOWN_ITEMS = [
-	COMMON_ALL_OPTION,
-	{
-		label: '운/우연',
-		value: '운/우연',
-		badgeId: 'category_luck',
-		iconType: 'FontAwesome6',
-		iconName: 'dice',
-		iconColor: getCategoryColor('운/우연'),
-		icon: () => <IconComponent type="FontAwesome6" name="dice" size={scaledSize(16)} color={getCategoryColor('운/우연')} />,
-	},
-	{
-		label: '인간관계',
-		value: '인간관계',
-		badgeId: 'category_relation',
-		iconType: 'FontAwesome6',
-		iconName: 'users',
-		iconColor: getCategoryColor('인간관계'),
-		icon: () => <IconComponent type="FontAwesome6" name="users" size={scaledSize(16)} color={getCategoryColor('인간관계')} />,
-	},
-	{
-		label: '세상 이치',
-		value: '세상 이치',
-		badgeId: 'category_world',
-		iconType: 'FontAwesome5',
-		iconName: 'globe',
-		iconColor: getCategoryColor('세상 이치'),
-		icon: () => <IconComponent type="FontAwesome5" name="globe" size={scaledSize(16)} color={getCategoryColor('세상 이치')} />,
-	},
-	{
-		label: '근면/검소',
-		value: '근면/검소',
-		badgeId: 'category_diligence',
-		iconType: 'FontAwesome5',
-		iconName: 'hammer',
-		iconColor: getCategoryColor('근면/검소'),
-		icon: () => <IconComponent type="FontAwesome5" name="hammer" size={scaledSize(16)} color={getCategoryColor('근면/검소')} />,
-	},
-	{
-		label: '노력/성공',
-		value: '노력/성공',
-		badgeId: 'category_success',
-		iconType: 'FontAwesome5',
-		iconName: 'medal',
-		iconColor: getCategoryColor('노력/성공'),
-		icon: () => <IconComponent type="FontAwesome5" name="medal" size={scaledSize(16)} color={getCategoryColor('노력/성공')} />,
-	},
-	{
-		label: '경계/조심',
-		value: '경계/조심',
-		badgeId: 'category_caution',
-		iconType: 'FontAwesome5',
-		iconName: 'exclamation-triangle',
-		iconColor: getCategoryColor('경계/조심'),
-		icon: () => <IconComponent type="FontAwesome5" name="exclamation-triangle" size={scaledSize(16)} color={getCategoryColor('경계/조심')} />,
-	},
-	{
-		label: '욕심/탐욕',
-		value: '욕심/탐욕',
-		badgeId: 'category_greed',
-		iconType: 'FontAwesome5',
-		iconName: 'hand-holding-usd',
-		iconColor: getCategoryColor('욕심/탐욕'),
-		icon: () => <IconComponent type="FontAwesome5" name="hand-holding-usd" size={scaledSize(16)} color={getCategoryColor('욕심/탐욕')} />,
-	},
-	{
-		label: '배신/불신',
-		value: '배신/불신',
-		badgeId: 'category_betrayal',
-		iconType: 'FontAwesome5',
-		iconName: 'user-slash',
-		iconColor: getCategoryColor('배신/불신'),
-		icon: () => <IconComponent type="FontAwesome5" name="user-slash" size={scaledSize(16)} color={getCategoryColor('배신/불신')} />,
-	},
-];
+// 난이도/카테고리 드롭다운은 CommonMainData 단일 소스를 쓴다.
+// (이 화면에 복사돼 있던 사본은 badgeId 가 category_world/category_success 로 잘못돼 있었다)
 const mascotImages = [
 	require('@/assets/images/random/random_mascote1.png'),
 	require('@/assets/images/random/random_mascote2.png'),
@@ -185,6 +80,8 @@ const reviewPraiseMessages = [
 const DETAIL_FILTER_HEIGHT = scaleHeight(60);
 const IMAGE_HEIGHT = isAndroid ? scaleHeight(220) : scaleHeight(200);
 const QuizStudyScreen = () => {
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('study', false);
 	// 회전/폴더블 대응: 캐러셀 높이는 실시간 화면 높이를 따른다.
 	const { height: windowHeight } = useWindowDimensions();
 	const STORAGE_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
@@ -237,6 +134,9 @@ const QuizStudyScreen = () => {
 	const [levelOpen, setLevelOpen] = useState(false);
 	const [regionOpen, setRegionOpen] = useState(false);
 	const [showExitModal, setShowExitModal] = useState(false);
+
+	// 뒤로가기로도 학습을 그냥 빠져나가지 않게, 종료 버튼과 같은 확인 팝업을 띄운다.
+	useBlockBackHandler(true, () => setShowExitModal(true));
 
 	const progress = proverbList.length > 0 ? (studyHistory.studyProverbes ?? []).length / proverbList.length : 0;
 
@@ -313,15 +213,8 @@ const QuizStudyScreen = () => {
 		carouselRef.current?.scrollTo({ index: 0, animated: false });
 	}, [isFocused]);
 
-	// 레벨 이름/숫자 매핑(재사용용)
-	const LEVEL_NAME_MAP: Record<number, '초급' | '중급' | '고급' | '특급'> = {
-		1: '초급',
-		2: '중급',
-		3: '고급',
-		4: '특급',
-	};
 	// 레벨 색상 — 공통 난이도 램프 재사용
-	const getLevelColor = (level: number) => getLevelNameColor(LEVEL_NAME_MAP[level]);
+	const getLevelColor = getLevelColorByNumber;
 
 	// 레벨 아이콘
 	const getLevelIcon = (level: number) => {
@@ -353,9 +246,8 @@ const QuizStudyScreen = () => {
 			const proverbList2 = ProverbServices.selectProverbList();
 			setProverbList(proverbList2);
 
-			const savedData = await AsyncStorage.getItem(STORAGE_KEY);
-			if (savedData) {
-				const parsed = JSON.parse(savedData);
+			const parsed = await read<MainDataType.UserStudyHistory | null>(STORAGE_KEY, null);
+			if (parsed) {
 				const fixed: MainDataType.UserStudyHistory = {
 					studyProverbes: parsed.studyProverbes ?? [],
 					studyCounts: parsed.studyCounts ?? {},
@@ -496,7 +388,7 @@ const QuizStudyScreen = () => {
 			nextHistory = { ...updatedHistory, badges: [...new Set([...currentBadges, ...newBadges])] };
 		}
 
-		AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(nextHistory));
+		write(STORAGE_KEY, nextHistory);
 		setter(nextHistory);
 	};
 
@@ -765,7 +657,7 @@ const QuizStudyScreen = () => {
 										{/* 레벨 뱃지 */}
 										<View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.level) }]}>
 											{getLevelIcon(item.level)}
-											<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{LEVEL_NAME_MAP[item.level] || '알 수 없음'}</Text>
+											<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{LEVEL_NAME_BY_NUMBER[item.level] || '알 수 없음'}</Text>
 										</View>
 
 										{/* 카테고리 뱃지 */}
@@ -814,7 +706,7 @@ const QuizStudyScreen = () => {
 							disabled={isButtonDisabled}
 							hitSlop={HIT_SLOP} // 여유 클릭 범위
 						>
-							<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
+							<Text style={[styles.buttonText, isLearned && styles.buttonTextOnAmber]}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
 						</TouchableOpacity>
 					</Animated.View>
 
@@ -937,7 +829,7 @@ const QuizStudyScreen = () => {
 								disabled={isButtonDisabled}
 								hitSlop={HIT_SLOP} // 여유 클릭 범위
 							>
-								<Text style={styles.buttonText}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
+								<Text style={[styles.buttonText, isLearned && styles.buttonTextOnAmber]}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
 							</TouchableOpacity>
 						</View>
 					</Animated.View>
@@ -950,6 +842,7 @@ const QuizStudyScreen = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.main} edges={['top']}>
+			<FloatingGuideButton onPress={guide.open} />
 				<Animated.View
 					style={[
 						styles.container,
@@ -966,17 +859,6 @@ const QuizStudyScreen = () => {
 						},
 					]}>
 					<View style={styles.progressHeader}>
-						<View style={styles.studyHeroRow}>
-							<View style={styles.studyHeroCopy}>
-								<Text style={styles.studyHeroTitle}>한 장씩 넘기며 지혜를 익힙니다</Text>
-								<Text style={styles.studyHeroDescription}>카드를 눌러 뜻과 유래를 살펴보세요.</Text>
-							</View>
-							<FastImage
-								source={require('@/assets/images/screen-heroes/proverb-study.png')}
-								style={styles.studyHeroImage}
-								resizeMode="contain"
-							/>
-						</View>
 						<View style={styles.progressTopRow}>
 							<Text style={styles.progressTitle}>학습 현황</Text>
 							<View style={styles.progressBadge}>
@@ -1162,15 +1044,8 @@ const QuizStudyScreen = () => {
 					</View>
 
 					{isLoading ? (
-						<View style={styles.loadingContainer}>
-							<FastImage
-								source={require('@/assets/images/screen-heroes/data-loading.png')}
-								style={styles.dataLoadingImage}
-								resizeMode={FastImage.resizeMode.contain}
-							/>
-							<ActivityIndicator size="large" color={COLORS.secondary} />
-							<Text style={styles.loadingText}>속담 정보를 불러오는 중...</Text>
-						</View>
+						// 카드가 세로로 쌓이는 화면이라, 같은 형태를 미리 깔아 두면 로딩이 끝나도 레이아웃이 안 흔들린다.
+						<SkeletonCardList count={4} />
 					) : getFilteredData().length === 0 ? (
 						<View style={styles.emptyWrapper}>
 							<Image source={require('@/assets/images/feature-states/empty-search.png')} style={styles.emptyImage} resizeMode="contain" />
@@ -1343,6 +1218,16 @@ const QuizStudyScreen = () => {
 				})()}
 
 			<NewBadgeModal visible={badgeModalVisible && newlyEarnedBadges.length > 0} badges={newlyEarnedBadges} onConfirm={() => setBadgeModalVisible(false)} />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'학습은 속담 카드를 한 장씩 넘기며 익히는 곳입니다.',
+					'카드를 누르면 뜻과 유래, 예문까지 펼쳐집니다.',
+					'읽은 카드는 학습 완료로 기록되어 진도가 쌓입니다!',
+				]}
+				title="학습, 이렇게 씁니다"
+			/>
 		</>
 	);
 };
@@ -1387,29 +1272,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		paddingBottom: 0,
 		marginHorizontal: SPACING_W.lg,
-	},
-	studyHeroRow: {
-		width: '100%',
-		minHeight: scaleHeight(92),
-		paddingLeft: SPACING_W.lg,
-		marginBottom: SPACING_H.md,
-		backgroundColor: HERO.bg,
-		borderTopWidth: 3,
-		borderTopColor: HERO.accent,
-		borderRadius: RADIUS.md,
-		flexDirection: 'row',
-		alignItems: 'center',
-		overflow: 'hidden',
-	},
-	studyHeroCopy: { flex: 1, paddingVertical: SPACING_H.md, zIndex: 1 },
-	studyHeroTitle: { fontSize: FONT_SIZES.lg, lineHeight: scaledSize(22), fontWeight: '800', color: HERO.title, marginBottom: SPACING_H.xs },
-	studyHeroDescription: { fontSize: FONT_SIZES.sm, lineHeight: scaledSize(18), color: HERO.description },
-	studyHeroImage: { width: scaleWidth(124), height: scaleHeight(88), marginRight: scaleWidth(-6) },
-	progressTopRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginBottom: SPACING_H.xs,
 	},
 	progressTitle: {
 		fontSize: FONT_SIZES.lg,
@@ -1476,6 +1338,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	learningButton: {
 		backgroundColor: COLORS.primary,
 	},
+	// 앰버(learnedButton) 배경 위에서는 흰 글자가 묻힌다 — 고정 잉크로 바꾼다.
+	buttonTextOnAmber: {
+		color: COLORS.textOnAccent,
+	},
 	buttonText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.lg,
@@ -1483,22 +1349,11 @@ const styles = themedStyles(() => StyleSheet.create({
 		letterSpacing: 0.5,
 		textAlign: 'center',
 	},
-	loadingContainer: {
-		flex: 1,
-		justifyContent: 'center',
+	progressTopRow: {
+		flexDirection: 'row',
 		alignItems: 'center',
-		paddingVertical: SPACING_H.xxxxl,
-	},
-	dataLoadingImage: {
-		width: scaleWidth(150),
-		height: scaleHeight(100),
-		marginBottom: SPACING_H.sm,
-	},
-	loadingText: {
-		marginTop: SPACING_H.md,
-		fontSize: FONT_SIZES.md,
-		color: COLORS.textSecondary,
-		lineHeight: scaledSize(21),
+		justifyContent: 'center',
+		marginBottom: SPACING_H.xs,
 	},
 	progressBarWrapper: {
 		width: '80%',

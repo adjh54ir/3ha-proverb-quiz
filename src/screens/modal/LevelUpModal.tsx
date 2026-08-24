@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Modal, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
+import { useModalEnter } from '@/hooks/useModalEnter';
 import { playComplete } from '@/utils/SoundUtils';
 
 export interface LevelUpInfo {
@@ -25,36 +27,27 @@ interface LevelUpModalProps {
 }
 
 const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bonus = 0 }) => {
-	const scaleAnim = useRef(new Animated.Value(0.95)).current;
-	const opacityAnim = useRef(new Animated.Value(0)).current;
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(visible);
 	/** 마스코트 pop-in (0 → 1.05 → 1) */
 	const mascotAnim = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
+		mascotAnim.setValue(0);
 		if (!visible) {
-			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-			scaleAnim.setValue(0.95);
-			opacityAnim.setValue(0);
-			mascotAnim.setValue(0);
 			return;
 		}
 		playComplete(); // 🎖️ 레벨업 사운드
-		scaleAnim.setValue(0.95);
-		opacityAnim.setValue(0);
-		mascotAnim.setValue(0);
-		const anim = Animated.parallel([
-			Animated.timing(opacityAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.timing(scaleAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-			Animated.sequence([
-				Animated.delay(150),
-				Animated.spring(mascotAnim, { toValue: 1.05, friction: 5, tension: 120, useNativeDriver: true }),
-				Animated.spring(mascotAnim, { toValue: 1, friction: 6, tension: 140, useNativeDriver: true }),
-			]),
+		// 카드가 뜬 뒤(150ms) 마스코트가 통통 튀어나온다
+		const anim = Animated.sequence([
+			Animated.delay(150),
+			Animated.spring(mascotAnim, { toValue: 1.05, friction: 5, tension: 120, useNativeDriver: true }),
+			Animated.spring(mascotAnim, { toValue: 1, friction: 6, tension: 140, useNativeDriver: true }),
 		]);
 		anim.start();
 		// ✅ 정리
 		return () => anim.stop();
-	}, [visible, scaleAnim, opacityAnim, mascotAnim]);
+	}, [visible, mascotAnim]);
 
 	if (!level) {
 		return null;
@@ -68,7 +61,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bo
 						<ConfettiCannon count={80} origin={{ x: screenWidth / 2, y: 0 }} fadeOut explosionSpeed={450} fallSpeed={2600} />
 					</View>
 				)}
-				<Animated.View style={[styles.card, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
+				<Animated.View style={[styles.card, enterStyle]}>
 					<ModalCloseButton onPress={onClose} />
 
 					<View style={styles.ribbon}>

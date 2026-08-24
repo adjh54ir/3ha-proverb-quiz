@@ -26,6 +26,10 @@ export const COMMON_APPS_DATA: {
 		},
 		{
 			id: 21,
+<<<<<<< HEAD
+=======
+			// icon: require('@/assets/appicons/main_mindCare.png'),
+>>>>>>> 4150e62f19bd5becc2dca74ba99708cdc497fc61
 			icon: require('@/assets/appicons/main_mindCare.png'),
 			title: '마음:숲',
 			desc:

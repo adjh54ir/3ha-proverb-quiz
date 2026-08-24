@@ -1,39 +1,13 @@
 // 추가 모달 컴포넌트 두 개 생성
-import React, { useEffect, useRef } from 'react';
-import {
-  Animated,
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Linking,
-} from 'react-native';
+import React from 'react';
+import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
+import { Animated, View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
+import { useModalEnter } from '@/hooks/useModalEnter';
 import { scaledSize, scaleHeight } from '@/utils/DementionUtils';
 import Markdown from 'react-native-markdown-display';
 import IconComponent from '../atomic/IconComponent';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue, getThemeMode } from '@/const/common/Theme';
-
-/** 모달 진입 애니메이션 (fade + slide-up) — 두 모달에서 공용 */
-const useModalEnterAnim = (visible: boolean) => {
-  const anim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (!visible) {
-      anim.setValue(0);
-      return;
-    }
-    const enter = Animated.timing(anim, { toValue: 1, duration: 260, useNativeDriver: true });
-    enter.start();
-    return () => enter.stop();
-  }, [visible, anim]);
-
-  return {
-    opacity: anim,
-    transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
-  };
-};
 
 const markdown = `
 # 1) 개인정보처리방침
@@ -238,7 +212,7 @@ Wi-Fi 외 환경에서 사용 시 발생하는 데이터 요금 및 로밍 요�
 
 
 export const TermsOfServiceModal = ({ visible, onClose }) => {
-  const enterStyle = useModalEnterAnim(visible);
+  const enterStyle = useModalEnter(visible);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -247,13 +221,7 @@ export const TermsOfServiceModal = ({ visible, onClose }) => {
           <View style={modalStyles.header}>
             <View style={modalStyles.spacer} />
             <Text style={modalStyles.modalTitle}>개인정보처리방침 및 이용약관</Text>
-            <TouchableOpacity
-              style={modalStyles.closeIcon}
-              onPress={onClose}
-              activeOpacity={0.8}
-              hitSlop={HIT_SLOP}>
-              <IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
-            </TouchableOpacity>
+            <ModalCloseButton onPress={onClose} style={modalStyles.closeIcon} />
           </View>
 
           <ScrollView contentContainerStyle={modalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
@@ -322,7 +290,7 @@ const openSourceData = [
 ];
 
 export const OpenSourceModal = ({ visible, onClose }) => {
-  const enterStyle = useModalEnterAnim(visible);
+  const enterStyle = useModalEnter(visible);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -331,13 +299,7 @@ export const OpenSourceModal = ({ visible, onClose }) => {
           <View style={modalStyles.header}>
             <View style={modalStyles.spacer} />
             <Text style={modalStyles.modalTitle}>오픈소스 라이선스</Text>
-            <TouchableOpacity
-              style={modalStyles.closeIcon}
-              onPress={onClose}
-              activeOpacity={0.8}
-              hitSlop={HIT_SLOP}>
-              <IconComponent type="materialIcons" name="close" size={scaledSize(22)} color={COLORS.textSecondary} />
-            </TouchableOpacity>
+            <ModalCloseButton onPress={onClose} style={modalStyles.closeIcon} />
           </View>
 
           <ScrollView contentContainerStyle={modalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
@@ -431,7 +393,10 @@ const modalStyles = themedStyles(() => StyleSheet.create({
     width: scaledSize(22) + SPACING_W.sm, // 닫기 아이콘 크기 + 여백만큼 확보
   },
   closeIcon: {
-    padding: SPACING_W.xs,
+    // 공용 ModalCloseButton 은 카드 우상단 고정이 기본이라, 헤더 행 안에 넣을 때는 흐름 배치로 되돌린다.
+    position: 'relative',
+    top: 0,
+    right: 0,
   },
 }));
 const styles = themedStyles(() => StyleSheet.create({

@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Text, View, Linking, TouchableOpacity } from 'r
 import { scaleHeight, scaledSize } from '@/utils/DementionUtils';
 import Icon from 'react-native-vector-icons/Feather';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
-import FadeInView from '@/components/animation/FadeInView';
+import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import { OPEN_SOURCE_LIBS } from '@/const/common/OpenSourceData';
 
 
@@ -14,7 +14,7 @@ const OpenSourceScreen = () => {
 				<Text style={styles.summary}>이 앱은 아래 {OPEN_SOURCE_LIBS.length}개의 오픈소스를 사용합니다.</Text>
 				{OPEN_SOURCE_LIBS.map((lib, index) => (
 					// 앞쪽 6개까지만 stagger — 그 뒤는 동시에 등장
-					<FadeInView key={lib.name} delay={Math.min(index, 5) * 40} offsetY={10}>
+					<FadeInView key={lib.name} delay={staggerDelay(index)} offsetY={10}>
 						<View style={styles.card}>
 							<View style={styles.cardHeader}>
 								<Icon name="package" size={scaledSize(16)} color={COLORS.textStrong} style={styles.icon} />

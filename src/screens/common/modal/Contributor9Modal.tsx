@@ -1,5 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Modal, View, Text, Image, StyleSheet, TouchableOpacity, Linking, ScrollView } from 'react-native';
+import React from 'react';
+import { Animated, View, Text, Image, StyleSheet, TouchableOpacity, Linking, ScrollView } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
+import { useModalEnter } from '@/hooks/useModalEnter';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import IconComponent from '../atomic/IconComponent';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
@@ -88,23 +90,8 @@ const LINK_ROWS = [
 const Contributor9Modal = ({ visible, onClose }: Props) => {
 	const handleOpenUrl = (url: string) => Linking.openURL(url);
 
-	// 진입 애니메이션 (fade + slide-up)
-	const enterAnim = useRef(new Animated.Value(0)).current;
-
-	useEffect(() => {
-		if (!visible) {
-			enterAnim.setValue(0);
-			return;
-		}
-		const enter = Animated.timing(enterAnim, { toValue: 1, duration: 260, useNativeDriver: true });
-		enter.start();
-		return () => enter.stop();
-	}, [visible, enterAnim]);
-
-	const enterStyle = {
-		opacity: enterAnim,
-		transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
-	};
+	// 모달 공통 진입 애니메이션 (fade + scale)
+	const enterStyle = useModalEnter(visible);
 
 	return (
 		<Modal animationType="fade" transparent visible={visible} onRequestClose={onClose}>
@@ -154,7 +141,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
-		paddingVertical: SPACING_H.lg,
+		paddingVertical: SPACING_H.xl,
 		paddingHorizontal: SPACING_W.lg,
 	},
 	scroll: {

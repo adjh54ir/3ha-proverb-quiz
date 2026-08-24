@@ -3,18 +3,13 @@
 import { scaleWidth, scaleHeight, scaledSize, screenWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import React, { useRef, useEffect } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    Modal,
-    TouchableOpacity,
-    Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import IconComponent from '../common/atomic/IconComponent';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import { useModalEnter, MODAL_ENTER_DURATION } from '@/hooks/useModalEnter';
 
 interface QuizCompletionModalProps {
     visible: boolean;
@@ -40,9 +35,8 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
     onRetry, // ✅ 추가
     onReviewWrong,
 }) => {
-    // ✅ 모달 공통 진입 애니메이션 (fade + scale 0.95 → 1)
-    const scaleAnim = useRef(new Animated.Value(0.95)).current;
-    const fadeAnim = useRef(new Animated.Value(0)).current;
+    // 모달 공통 진입 애니메이션 (fade + scale)
+    const enterStyle = useModalEnter(visible);
     const mascotBounce = useRef(new Animated.Value(0)).current;
     const confettiKey = useRef(Math.random()).current;
     // ✅ 루프 애니메이션 핸들 (cleanup 에서 stop)
@@ -50,30 +44,12 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
 
     useEffect(() => {
         if (!visible) {
-            // 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-            scaleAnim.setValue(0.95);
-            fadeAnim.setValue(0);
             return;
         }
-        scaleAnim.setValue(0.95);
-        fadeAnim.setValue(0);
-        const enterAnim = Animated.parallel([
-            Animated.timing(scaleAnim, {
-                toValue: 1,
-                duration: 250,
-                useNativeDriver: true,
-            }),
-            Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: 250,
-                useNativeDriver: true,
-            }),
-        ]);
-        enterAnim.start(({ finished }) => {
-            if (!finished) {
-                return;
-            }
-            loopRef.current = Animated.loop(
+        // 카드 등장(useModalEnter)이 끝난 뒤부터 마스코트가 위아래로 흔들린다
+        loopRef.current = Animated.sequence([
+            Animated.delay(MODAL_ENTER_DURATION),
+            Animated.loop(
                 Animated.sequence([
                     Animated.timing(mascotBounce, {
                         toValue: -scaleHeight(10),
@@ -86,18 +62,17 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                         useNativeDriver: true,
                     }),
                 ])
-            );
-            loopRef.current.start();
-        });
+            ),
+        ]);
+        loopRef.current.start();
 
         // ✅ 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
         return () => {
-            enterAnim.stop();
             loopRef.current?.stop();
             loopRef.current = null;
             mascotBounce.setValue(0);
         };
-    }, [visible, scaleAnim, fadeAnim, mascotBounce]);
+    }, [visible, mascotBounce]);
 
     const getPerformanceMessage = () => {
         if (accuracy >= 90) return '완벽합니다!';
@@ -139,14 +114,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                         explosionSpeed={400}
                     />
 
-                    <Animated.View
-                        style={[
-                            styles.card,
-                            {
-                                transform: [{ scale: scaleAnim }],
-                                opacity: fadeAnim,
-                            },
-                        ]}>
+                    <Animated.View style={[styles.card, enterStyle]}>
 
                         <View style={styles.bgCircle1} />
                         <View style={styles.bgCircle2} />
@@ -216,14 +184,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                     />
                 )}
 
-                <Animated.View
-                    style={[
-                        styles.card,
-                        {
-                            transform: [{ scale: scaleAnim }],
-                            opacity: fadeAnim,
-                        },
-                    ]}>
+                <Animated.View style={[styles.card, enterStyle]}>
 
                     <View style={styles.practiceHeader}>
                         <Animated.View

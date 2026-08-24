@@ -5,7 +5,7 @@ import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, T
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaleHeight } from '@/utils';
-import { COLORS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { COLORS, SPACING_H, themedStyles } from '@/const/common/Theme';
 import DeviceInfo from 'react-native-device-info';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
@@ -13,6 +13,7 @@ import BootSplash from 'react-native-bootsplash'; // 추가
 import notifee, { EventType } from '@notifee/react-native';
 import { takePendingRoute } from '@/utils/PendingNotification';
 import { useThemeMode } from '@/hooks/useThemeMode';
+import { AppAlertHost } from '@/screens/common/modal/AppAlert';
 
 const AD_ALLOWED_ROUTES = [
 	Paths.TODAY_QUIZ,
@@ -27,6 +28,9 @@ const AD_ALLOWED_ROUTES = [
 ];
 
 const DESIGN_HEIGHT = 812;
+
+/** 배너와 화면 콘텐츠 사이 최소 숨 쉴 공간. 배너 래퍼가 absolute 라 이 값이 실제 하단 여백이 된다. */
+const AD_BOTTOM_GAP = SPACING_H.smPlus;
 const AppLayout = () => {
 	const themeMode = useThemeMode(); // 모드 변경 시 배경색 재계산
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);
@@ -63,13 +67,19 @@ const AppLayout = () => {
 			return 0;
 		}
 
-		// ponytail: 태블릿만 배너 실측 높이 사용. adaptive 배너 높이가 기기별 50~90dp로 갈려 고정값이 안 맞음.
-		//           폰은 adaptive가 사실상 50dp 고정이라 기존 튜닝값 유지.
+		// adaptive 배너 높이는 기기별로 50~90dp까지 갈린다. 고정값을 쓰면 어떤 기기에선 남고
+		// 어떤 기기에선 모자라 배너가 화면을 덮는다 — 실측 높이가 오면 그 값을 그대로 쓴다.
 		if (DeviceInfo.isTablet()) {
 			return bannerHeight || scaleHeight(60); // 태블릿 (로드 전엔 기존값)
 		}
 		if (Platform.OS === 'android') {
-			return scaleHeight(50); // 안드로이드
+			return bannerHeight || scaleHeight(50); // 안드로이드 폰 (로드 전엔 기존값)
+		}
+		// iOS 는 배너를 상단 세이프에어리어(노치) 영역에 얹는 구조라 실측 높이를 그대로 더하면
+		// 여백이 두 번 들어간다. 폴백보다 실제 배너가 더 클 때만 그 차이를 반영한다.
+		if (bannerHeight) {
+			const iosFallback = screenHeight < DESIGN_HEIGHT ? scaleHeight(40) : 0;
+			return Math.max(iosFallback, bannerHeight - scaleHeight(50));
 		}
 		if (screenHeight < DESIGN_HEIGHT) {
 			return scaleHeight(40); // 작은 화면
@@ -81,11 +91,12 @@ const AppLayout = () => {
 	const getNavigatorPaddingTop = (shouldShowAd: boolean): number => {
 		// [CASE1] 광고가 있는 경우
 		if (shouldShowAd) {
+			// 배너 바로 아래에 화면이 붙지 않도록 여백을 둔다
 			switch (Platform.OS) {
 				case 'android':
-					return scaleHeight(20);
+					return scaleHeight(44) + AD_BOTTOM_GAP;
 				case 'ios':
-					return scaleHeight(12);
+					return scaleHeight(36) + AD_BOTTOM_GAP;
 				default:
 					return 0;
 			}
@@ -210,6 +221,8 @@ const AppLayout = () => {
 					</View>
 				</View>
 			</SafeAreaView>
+			{/* 앱 테마를 따르는 공용 알림창. 화면이 바뀌어도 살아 있도록 루트에 한 번만 둔다. */}
+			<AppAlertHost />
 		</NavigationContainer>
 	);
 };
@@ -221,12 +234,12 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	adWrapperAbsolute: {
 		position: 'absolute',
-		top: Platform.OS === 'android' ? scaleHeight(20) : scaleHeight(6),
+		// 배너가 화면 상단에 바짝 붙어 보이던 문제 — 화면 기준으로 더 띄운다
+		top: Platform.OS === 'android' ? scaleHeight(28) : scaleHeight(14),
 		left: 0,
 		right: 0,
 		zIndex: 10,
 		paddingVertical: SPACING_H.xs,
-		marginHorizontal: SPACING_W.lg,
 		alignItems: 'center',
 		// borderWidth: 1,
 		// borderColor: '#bdc3c7',

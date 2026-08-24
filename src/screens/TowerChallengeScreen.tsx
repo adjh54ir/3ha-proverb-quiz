@@ -1,28 +1,35 @@
 // @/screens/TowerChallenge.tsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated } from 'react-native';
+import AppAlert from '@/screens/common/modal/AppAlert';
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
+import { useFocusEffect } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
+import { useAppNavigation } from '@/navigation/conf/Types';
 import FastImage from 'react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
-import Carousel from 'react-native-reanimated-carousel';
+import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
 import AdmobRewardAd from './common/ads/AdmobRewardAd';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import CompleteOverlay from './common/CompleteOverlay';
 import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
+import { read, write } from '@/services/StorageService';
 
 const TOWER_STORAGE_KEY = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
 const SCREEN_WIDTH = screenWidth;
 
 const TowerChallengeScreen = () => {
-	const navigation = useNavigation();
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('towerChallenge', false);
+	const navigation = useAppNavigation();
 	const [progress, setProgress] = useState<TowerProgress>({
 		level: 1,
 		attempts: 1,
@@ -41,12 +48,25 @@ const TowerChallengeScreen = () => {
 	const headerAnim = useRef(new Animated.Value(0)).current;
 	const infoAnim = useRef(new Animated.Value(0)).current;
 
+	// 캐러셀은 항상 1단계부터 보여주고 있었다. 클리어하고 돌아와도 다시 1단계라
+	// 매번 손으로 넘겨야 했으므로, 도전할 차례인 단계로 맞춰 준다.
+	const carouselRef = useRef<ICarouselInstance>(null);
+	/** 도전할 차례인 단계의 캐러셀 인덱스 (마지막 단계까지 깼으면 마지막 카드) */
+	const currentIndex = Math.min(Math.max(progress.level, 1), TOWER_LEVELS.length) - 1;
+
 	// 타워 퀴즈를 끝내고 goBack 으로 돌아오면 이 화면은 언마운트되지 않는다.
 	// 진행도를 포커스마다 다시 읽어야 클리어/도전 횟수가 즉시 반영된다.
 	useFocusEffect(
 		useCallback(() => {
 			loadProgress();
 		}, []),
+	);
+
+	// 진행도를 읽은 뒤(=level 이 정해진 뒤) 도전할 단계로 캐러셀을 옮긴다.
+	useFocusEffect(
+		useCallback(() => {
+			carouselRef.current?.scrollTo({ index: currentIndex, animated: true });
+		}, [currentIndex]),
 	);
 
 	useEffect(() => {
@@ -60,9 +80,8 @@ const TowerChallengeScreen = () => {
 
 	const loadProgress = async () => {
 		try {
-			const saved = await AsyncStorage.getItem(TOWER_STORAGE_KEY);
-			if (saved) {
-				const parsed = JSON.parse(saved);
+			const parsed = await read<TowerProgress | null>(TOWER_STORAGE_KEY, null);
+			if (parsed) {
 				const today = DateUtils.getLocalDateString();
 
 				if (DateUtils.toLocalDateKey(parsed.lastAttemptDate) !== today) {
@@ -82,7 +101,7 @@ const TowerChallengeScreen = () => {
 
 	const saveProgress = async (newProgress: TowerProgress) => {
 		try {
-			await AsyncStorage.setItem(TOWER_STORAGE_KEY, JSON.stringify(newProgress));
+			await write(TOWER_STORAGE_KEY, newProgress);
 			setProgress(newProgress);
 		} catch (error) {
 			console.error('탑 도전 데이터 저장 실패:', error);
@@ -91,7 +110,7 @@ const TowerChallengeScreen = () => {
 
 	const handleWatchAd = () => {
 		if (progress.adRewardUsed >= 3) {
-			Alert.alert('알림', '오늘은 더 이상 광고를 볼 수 없습니다.');
+			AppAlert.alert('알림', '오늘은 더 이상 광고를 볼 수 없습니다.');
 			return;
 		}
 		setShowAd(true);
@@ -106,18 +125,18 @@ const TowerChallengeScreen = () => {
 		}
 
 		if (progress.level < level) {
-			Alert.alert('알림', '이전 레벨을 먼저 클리어해주세요!');
+			AppAlert.alert('알림', '이전 레벨을 먼저 클리어해주세요!');
 			return;
 		}
 
 		if (progress.completedLevels.includes(level)) {
-			Alert.alert('알림', '이미 완료한 레벨입니다! 🎉');
+			AppAlert.alert('알림', '이미 완료한 레벨입니다! 🎉');
 			return;
 		}
 
 		// 도전 횟수가 없으면 광고 시청 유도
 		if (progress.attempts <= 0) {
-			Alert.alert('도전 횟수 부족', '광고를 시청하여 도전 기회를 얻으시겠습니까?', [
+			AppAlert.alert('도전 횟수 부족', '광고를 시청하여 도전 기회를 얻으시겠습니까?', [
 				{ text: '취소', style: 'cancel' },
 				{ text: '광고 시청', onPress: handleWatchAd },
 			]);
@@ -132,12 +151,10 @@ const TowerChallengeScreen = () => {
 		// ⚠️ 저장 완료 전에 이동하면 퀴즈 화면이 진행도를 못 읽어 결과가 저장되지 않는다.
 		await saveProgress(newProgress);
 
-		// 타입 안전하게 네비게이션
-		// @ts-ignore
 		navigation.navigate(Paths.TOWER_QUIZ, { level });
 	};
 	const handleDevReset = () => {
-		Alert.alert('개발자 모드', '작업을 선택하세요', [
+		AppAlert.alert('개발자 모드', '작업을 선택하세요', [
 			{ text: '취소', style: 'cancel' },
 			...TOWER_LEVELS.map((t) => ({
 				text: `${t.level}단계 클리어`,
@@ -151,7 +168,7 @@ const TowerChallengeScreen = () => {
 						unlockedRewards: [...new Set([...progress.unlockedRewards, t.level])],
 					};
 					await saveProgress(clearedProgress);
-					Alert.alert('완료', `${t.level}단계 클리어 처리되었습니다.`);
+					AppAlert.alert('완료', `${t.level}단계 클리어 처리되었습니다.`);
 				},
 			})),
 			{
@@ -169,7 +186,7 @@ const TowerChallengeScreen = () => {
 						lastAttemptDate: DateUtils.getLocalDateString(),
 						unlockedRewards: [],
 					});
-					Alert.alert('완료', '초기화되었습니다.');
+					AppAlert.alert('완료', '초기화되었습니다.');
 				},
 			},
 		]);
@@ -185,7 +202,7 @@ const TowerChallengeScreen = () => {
 					{isCompleted && <CompleteOverlay />}
 					{/* 레벨 배지 */}
 					<View style={[styles.levelBadge, { backgroundColor: tower.color }]}>
-						<Text style={styles.levelText}>LV.{tower.level}</Text>
+						<Text style={[styles.levelText, { color: readableTextOn(tower.color) }]}>LV.{tower.level}</Text>
 						{isCompleted && (
 							<IconComponent type="materialIcons" name="check-circle" size={scaledSize(18)} color={COLORS.textWhite} style={styles.badgeIcon} />
 						)}
@@ -196,14 +213,14 @@ const TowerChallengeScreen = () => {
 					<View style={styles.bossContainer}>
 						{!isLocked ? (
 							<View style={styles.bossWrapper}>
-								<View style={[styles.bossGlow, { backgroundColor: tower.color + '30' }]} />
+								<View style={[styles.bossGlow, { backgroundColor: withAlpha(tower.color, ALPHA.border) }]} />
 								<View style={[styles.bossImageContainer, { borderColor: tower.color }]}>
 									<FastImage source={tower.bossImage} style={styles.bossImage} resizeMode="contain" />
 								</View>
 							</View>
 						) : (
 							<View style={styles.lockedBoss}>
-								<IconComponent type="materialIcons" name="lock" size={scaledSize(48)} color={COLORS.textSecondary} />
+								<IconComponent type="materialIcons" name="lock" size={scaledSize(48)} color={COLORS.darkTextSecondary} />
 								<Text style={styles.lockedText}>LOCKED</Text>
 							</View>
 						)}
@@ -267,6 +284,7 @@ const TowerChallengeScreen = () => {
 			<LinearGradient colors={COLORS.darkGradient} style={StyleSheet.absoluteFillObject} />
 
 			<SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+			<FloatingGuideButton onPress={guide.open} tone="onDark" />
 				{/* 타워 메인 헤더 */}
 				<Animated.View
 					style={[
@@ -292,6 +310,8 @@ const TowerChallengeScreen = () => {
 				{/* 캐러셀 */}
 				<View style={styles.carouselContainer}>
 					<Carousel
+						ref={carouselRef}
+						defaultIndex={currentIndex}
 						loop={false}
 						width={SCREEN_WIDTH * 0.9}
 						height={scaleHeight(480)} // 620 → 480
@@ -369,19 +389,29 @@ const TowerChallengeScreen = () => {
 							};
 							saveProgress(newProgress);
 							setShowAd(false); // ← 여기서 오버레이 닫기
-							Alert.alert('성공!', '도전 기회 1회가 추가되었습니다! 🎉');
+							AppAlert.alert('성공!', '도전 기회 1회가 추가되었습니다! 🎉');
 						}}
 						onClosed={() => {
 							setShowAd(false);
-							Alert.alert('알림', '광고를 끝까지 시청해야 보상이 지급됩니다.');
+							AppAlert.alert('알림', '광고를 끝까지 시청해야 보상이 지급됩니다.');
 						}}
 						onFailed={() => {
 							setShowAd(false);
-							Alert.alert('알림', '광고를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+							AppAlert.alert('알림', '광고를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
 						}}
 					/>
 				)}
 			</SafeAreaView>
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'타워 챌린지는 층마다 보스를 만나 문제를 푸는 도전입니다.',
+					'한 층을 깨야 다음 층이 열리고, 층마다 보상이 있습니다.',
+					'정상까지 올라가 마지막 보스를 이겨보세요!',
+				]}
+				title="타워 챌린지, 이렇게 씁니다"
+			/>
 		</View>
 	);
 };
@@ -448,7 +478,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	adCardDisabled: {
 		borderColor: 'rgba(100, 116, 139, 0.4)',
-		backgroundColor: COLORS.textSecondary,
+		backgroundColor: COLORS.darkMuted,
 	},
 	adTextContainer: {
 		flexShrink: 1,
@@ -474,7 +504,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '500',
 	},
 	attemptCount: {
-		fontSize: scaledSize(26),
+		fontSize: displayFontSize(26),
 		fontWeight: '700',
 		color: COLORS.textWhite,
 		lineHeight: scaledSize(30),
@@ -578,7 +608,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	lockedText: {
 		fontSize: FONT_SIZES.sm,
-		color: COLORS.textSecondary,
+		color: COLORS.darkTextSecondary,
 		marginTop: SPACING_H.sm,
 		fontWeight: '600',
 	},
@@ -627,7 +657,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	rewardLockedText: {
 		fontSize: FONT_SIZES.md,
-		color: COLORS.textSecondary,
+		color: COLORS.darkTextSecondary,
 		fontWeight: '600',
 	},
 	bottomPadding: {
@@ -644,7 +674,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.secondary,
 	},
 	challengeButtonLocked: {
-		backgroundColor: COLORS.textSecondary,
+		backgroundColor: COLORS.darkMuted,
 	},
 	challengeButtonText: {
 		color: COLORS.textWhite,

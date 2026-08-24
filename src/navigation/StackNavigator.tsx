@@ -7,9 +7,8 @@ import MyProverbBook from '@/screens/MyProverbBook';
 import MyProverbBookDetail from '@/screens/MyProverbBookDetail';
 import Home from '@/screens/Home';
 import BottomTabNavigator from './BottomTabNavigator';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
 import WrongReviewScreen from '@/screens/WrongReviewScreen';
 import { scaledSize } from '@/utils';
@@ -24,6 +23,24 @@ import TowerChallengeScreen from '@/screens/TowerChallengeScreen';
 import TowerQuizScreen from '@/screens/TowerQuizScreen';
 import { withThemedScreen } from './withThemedScreen';
 import { useThemeMode } from '@/hooks/useThemeMode';
+
+
+/**
+ * 헤더 좌측 뒤로가기 버튼 — 화면마다 똑같이 반복되던 블록을 한 곳으로 모았다.
+ * (터치 반경/여백/아이콘 색이 화면마다 어긋나지 않도록)
+ */
+const headerBackButton = (navigation: { goBack: () => void }) => () => (
+	<TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBack} hitSlop={HIT_SLOP}>
+		<IconComponent type="MaterialIcons" name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
+	</TouchableOpacity>
+);
+
+/** 헤더 좌/우를 비워 둘 때 (버튼 자리만 없앤다) */
+const headerEmpty = () => <></>;
+
+const styles = StyleSheet.create({
+	headerBack: { marginLeft: SPACING_W.lg },
+});
 
 /**
  * 화이트/다크 전환 시 각 화면만 새 팔레트로 다시 그린다.
@@ -76,35 +93,30 @@ const StackNavigator = () => {
 			<Stack.Screen
 				name={Paths.TIME_CHANLLENGE}
 				component={ThemedTimeChallenge}
-				options={({ navigation }) => ({
+				options={{
 					headerShown: false,
 					title: '타임 챌린지',
-					headerLeft: () => <></>,
-				})}
+					headerLeft: headerEmpty,
+				}}
 			/>
 			<Stack.Screen
 				name={Paths.INIT_TIME_CHANLLENGE}
 				component={ThemedInitTimeChallenge}
-				options={({ navigation }) => ({
+				options={{
 					headerShown: true,
 					title: '타임 챌린지',
-					headerLeft: () => <></>,
-					// headerLeft: () => (
-					// 	<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: SPACING_W.lg }}>
-					// 		<IconComponent type="MaterialIcons" name="arrow-back" size={scaledSize(24)} color="#2c3e50" />
-					// 	</TouchableOpacity>
-					// ),
-				})}
+					headerLeft: headerEmpty,
+				}}
 			/>
 
 			<Stack.Screen
 				name={Paths.QUIZ}
 				component={ThemedQuiz}
-				options={({ navigation }) => ({
+				options={{
 					headerShown: false,
 					title: '속담 찾기',
-					headerLeft: () => <></>,
-				})}
+					headerLeft: headerEmpty,
+				}}
 			/>
 
 			<Stack.Screen
@@ -113,47 +125,29 @@ const StackNavigator = () => {
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '퀴즈 모드 선택',
-					headerLeft: () => (
-						<TouchableOpacity
-							onPress={() => navigation.goBack()}
-							style={{ marginLeft: SPACING_W.lg }}
-							hitSlop={HIT_SLOP}>
-							<Icon name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
-						</TouchableOpacity>
-					),
-					headerRight: () => <></>,
-					// headerRight: () => (
-					// 	//@ts-ignore
-					// 	<TouchableOpacity onPress={() => navigation.navigate(Paths.HOME, { showGuide: true })} style={{ marginRight: SPACING_W.lg }}>
-					// 		<IconComponent type='materialIcons' name='info-outline' size={scaledSize(24)} color='#3498db' />
-					// 	</TouchableOpacity>
-					// ),
+					headerLeft: headerBackButton(navigation),
+					headerRight: headerEmpty,
 				})}
 			/>
 
 			<Stack.Screen
 				name={Paths.QUIZ_MODE}
 				component={ThemedQuizMode}
-				options={({ navigation }) => ({
+				options={{
 					headerShown: false,
 					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
 					title: '카테고리 선택',
-					headerLeft: () => <></>,
-				})}
+					headerLeft: headerEmpty,
+				}}
 			/>
 			<Stack.Screen
 				name={Paths.PROVERB_STUDY}
 				component={ThemedProverbStudy}
-				options={({ navigation }) => ({
+				options={{
 					headerShown: false,
 					title: '속담 학습',
-					headerLeft: () => (
-						<></>
-						// <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: SPACING_W.lg }}>
-						// 	<Icon name='arrow-back' size={24} color='#2c3e50' />
-						// </TouchableOpacity>
-					),
-				})}
+					headerLeft: headerEmpty,
+				}}
 			/>
 			<Stack.Screen
 				name={Paths.QUIZ_WRONG_REVIEW}
@@ -161,14 +155,7 @@ const StackNavigator = () => {
 				options={({ navigation }) => ({
 					headerShown: true,
 					title: '오답 복습',
-					headerLeft: () => (
-						<TouchableOpacity
-							onPress={() => navigation.goBack()}
-							style={{ marginLeft: SPACING_W.lg }}
-							hitSlop={HIT_SLOP}>
-							<Icon name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
-						</TouchableOpacity>
-					),
+					headerLeft: headerBackButton(navigation),
 				})}
 			/>
 			<Stack.Screen
@@ -178,14 +165,7 @@ const StackNavigator = () => {
 					headerShown: false,
 					title: '타워 챌린지',
 					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
-					headerLeft: () => (
-						<TouchableOpacity
-							onPress={() => navigation.goBack()}
-							style={{ marginLeft: SPACING_W.lg }}
-							hitSlop={HIT_SLOP}>
-							<IconComponent type="MaterialIcons" name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
-						</TouchableOpacity>
-					),
+					headerLeft: headerBackButton(navigation),
 				})}
 			/>
 			<Stack.Screen
@@ -195,14 +175,7 @@ const StackNavigator = () => {
 					headerShown: false,
 					title: '타워퀴즈',
 					gestureEnabled: false, // ✅ 제스처로 뒤로 가기 방지
-					headerLeft: () => (
-						<TouchableOpacity
-							onPress={() => navigation.goBack()}
-							style={{ marginLeft: SPACING_W.lg }}
-							hitSlop={HIT_SLOP}>
-							<IconComponent type="MaterialIcons" name="arrow-back" size={scaledSize(24)} color={COLORS.textStrong} />
-						</TouchableOpacity>
-					),
+					headerLeft: headerBackButton(navigation),
 				})}
 			/>
 			<Stack.Screen name={Paths.HOME} component={ThemedHome} />

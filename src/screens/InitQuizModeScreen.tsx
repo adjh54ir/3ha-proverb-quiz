@@ -1,16 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing, Alert } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import AppAlert from '@/screens/common/modal/AppAlert';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing } from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import FastImage from 'react-native-fast-image';
-import { QUIZ_MODES, getLevelByScore } from '@/const/ConstInfoData';
+import { getLevelByScore } from '@/const/ConstInfoData';
+import { QUIZ_MODES } from '@/const/common/CommonMainData';
 import BottomHomeButton from './common/BottomHomeButton';
+import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import { useAppNavigation } from '@/navigation/conf/Types';
+import QuizHistoryService from '@/services/QuizHistoryService';
 
 /** 모드별 설명 (카드 서브텍스트) */
 const MODE_DESC: Record<string, string> = {
@@ -25,7 +29,9 @@ const MODE_DESC: Record<string, string> = {
  * 퀴즈 모드 선택
  */
 const InitQuizModeScreen = () => {
-	const navigation = useNavigation();
+	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
+	const guide = useCharacterGuideOnce('initQuizMode', false);
+	const navigation = useAppNavigation();
 	const USER_QUIZ_HISTORY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
 	const [accordionOpen, setAccordionOpen] = useState(false);
@@ -68,14 +74,10 @@ const InitQuizModeScreen = () => {
 	}, [cardAnims]);
 
 	const loadData = async () => {
-		const quizRaw = await AsyncStorage.getItem(USER_QUIZ_HISTORY);
-		const quiz = quizRaw ? JSON.parse(quizRaw) : {};
-		const totalScoreFromQuiz = typeof quiz.totalScore === 'number' ? quiz.totalScore : 0;
-		setTotalScore(totalScoreFromQuiz);
+		setTotalScore(await QuizHistoryService.getTotalScore());
 	};
 
 	const handleSelectMode = (mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank') => {
-		// @ts-ignore
 		navigation.navigate(Paths.QUIZ_MODE, { mode });
 	};
 
@@ -83,6 +85,7 @@ const InitQuizModeScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.main} edges={['bottom']}>
+		<FloatingGuideButton onPress={guide.open} />
 			<View style={styles.container}>
 				<Animated.View style={[styles.animatedWrap, { opacity: enterAnim }]}>
 					<ScrollView ref={scrollRef} style={styles.scrollArea} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
@@ -119,7 +122,7 @@ const InitQuizModeScreen = () => {
 											activeOpacity={isComingSoon ? 1 : 0.85}
 											onPress={() => {
 												if (isComingSoon) {
-													Alert.alert('새로운 퀴즈 준비 중', '새로운 퀴즈를 준비 중에 있습니다.');
+													AppAlert.alert('새로운 퀴즈 준비 중', '새로운 퀴즈를 준비 중에 있습니다.');
 													return;
 												}
 												handleSelectMode(mode.key as 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank');
@@ -163,7 +166,6 @@ const InitQuizModeScreen = () => {
 									<TouchableOpacity
 										style={[styles.accordionButton, { backgroundColor: COLORS.accentFlame }]}
 										activeOpacity={0.85}
-										// @ts-ignore
 										onPress={() => navigation.navigate(Paths.QUIZ_WRONG_REVIEW)}>
 										<IconComponent type="FontAwesome5" name="book" size={scaledSize(16)} color={COLORS.textWhite} />
 										<Text style={styles.accordionButtonText}>오답 복습</Text>
@@ -171,7 +173,6 @@ const InitQuizModeScreen = () => {
 									<TouchableOpacity
 										style={[styles.accordionButton, { backgroundColor: COLORS.secondary }]}
 										activeOpacity={0.85}
-										// @ts-ignore
 										onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.SETTING })}>
 										<IconComponent type="MaterialCommunityIcons" name="reload" size={scaledSize(18)} color={COLORS.textWhite} />
 										<Text style={styles.accordionButtonText}>다시 풀기</Text>
@@ -183,6 +184,16 @@ const InitQuizModeScreen = () => {
 				</Animated.View>
 			</View>
 			<BottomHomeButton backgroundColor={COLORS.background} />
+			<CharacterGuide
+				visible={guide.visible}
+				onClose={guide.close}
+				lines={[
+					'풀어볼 퀴즈 모드를 고르는 화면입니다.',
+					'모드마다 문제가 나오는 방식이 다릅니다.',
+					'고른 뒤에는 난이도나 카테고리를 정하면 바로 시작합니다!',
+				]}
+				title="퀴즈 모드 고르기"
+			/>
 		</SafeAreaView>
 	);
 };

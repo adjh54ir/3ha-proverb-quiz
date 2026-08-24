@@ -18,8 +18,11 @@ jest.mock('react-native-device-info', () => ({
 
 jest.mock('react-native-sound', () => {
 	class SoundMock {
-		static setCategory() {}
-		constructor(_file, _basePath, cb) {
+		// 오디오 세션 설정은 테스트에서 검증 대상이라 호출을 기록한다
+		static setCategory = jest.fn();
+		static MAIN_BUNDLE = '/bundle';
+		constructor(file, basePath, cb) {
+			SoundMock.lastArgs = { file, basePath };
 			cb?.(null);
 		}
 		play(cb) {
@@ -31,6 +34,8 @@ jest.mock('react-native-sound', () => {
 		release() {}
 		setVolume() {}
 		setNumberOfLoops() {}
+		setPitch() {}
+		setSpeed() {}
 	}
 	return SoundMock;
 	// 로컬에 미설치여도 테스트가 돌도록 virtual mock 으로 등록한다.

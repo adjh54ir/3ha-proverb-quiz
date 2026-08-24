@@ -19,7 +19,7 @@ import { scaleHeight, scaleWidth } from '@/utils/DementionUtils';
  *
  * ```ts
  * AppAlert.alert('알림', '이미 완료한 레벨입니다!');
- * AppAlert.alert('퀴즈 종료', '정말 종료할까요?', [
+ * AppAlert.alert('퀴즈 종료', '정말 종료하시겠습니까?', [
  *   { text: '취소', style: 'cancel' },
  *   { text: '종료', style: 'destructive', onPress: quit },
  * ]);

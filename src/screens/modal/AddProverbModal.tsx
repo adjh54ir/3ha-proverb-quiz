@@ -162,7 +162,9 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 	return (
 		<Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
 			<View style={styles.overlay}>
-				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.sheet}>
+				{/* 모달은 Activity 가 아닌 별도 Dialog 윈도우라 매니페스트의 adjustResize 가 적용되지 않는다.
+				    화면(Screen)과 달리 안드로이드도 behavior 를 직접 줘야 키보드가 입력창을 가리지 않는다. */}
+				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.sheet}>
 					<View style={styles.modalHeader}>
 						<View style={styles.handleBar} />
 						<View style={styles.headerRow}>

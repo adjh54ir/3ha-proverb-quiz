@@ -29,8 +29,8 @@ const AD_ALLOWED_ROUTES = [
 
 const DESIGN_HEIGHT = 812;
 
-/** 배너와 화면 콘텐츠 사이 최소 숨 쉴 공간. 배너 래퍼가 absolute 라 이 값이 실제 하단 여백이 된다. */
-const AD_BOTTOM_GAP = SPACING_H.smPlus;
+/** 배너와 화면 콘텐츠 사이 숨 쉴 공간. 배너 래퍼가 absolute 라 이 값이 실제 하단 여백이 된다. */
+const AD_BOTTOM_GAP = SPACING_H.lg;
 const AppLayout = () => {
 	const themeMode = useThemeMode(); // 모드 변경 시 배경색 재계산
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);

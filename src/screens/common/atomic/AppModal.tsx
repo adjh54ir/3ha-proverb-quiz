@@ -12,8 +12,6 @@ import { Modal, ModalProps } from 'react-native';
  * 각 모달이 `useSafeAreaInsets()` 로 여백을 준다.
  *
  * navigationBarTranslucent 는 statusBarTranslucent 가 함께 켜져 있어야 동작한다(RN 문서).
- * (전역 defaultProps 주입인 `@/utils/ModalDefaults` 는 첫 렌더에서 누락되는 경우가 있어
- *  화면에서는 이 래퍼를 쓴다.)
  */
 const AppModal = ({ children, ...props }: ModalProps) => (
 	<Modal statusBarTranslucent navigationBarTranslucent {...props}>

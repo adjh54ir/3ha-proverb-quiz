@@ -26,10 +26,6 @@ export const COMMON_APPS_DATA: {
 		},
 		{
 			id: 21,
-<<<<<<< HEAD
-=======
-			// icon: require('@/assets/appicons/main_mindCare.png'),
->>>>>>> 4150e62f19bd5becc2dca74ba99708cdc497fc61
 			icon: require('@/assets/appicons/main_mindCare.png'),
 			title: '마음:숲',
 			desc:
@@ -78,7 +74,7 @@ export const COMMON_APPS_DATA: {
 			id: 16,
 			icon: require('@/assets/appicons/main_emotionalEmoticon.png'),
 			title: '갬티콘: 감성 이모티콘',
-			desc: '2,000개 이상의 텍스트 이모티콘이 기다리고 있어요. 탭 한 번으로 바로 복사, 어디서든 바로 붙여넣기를 해보세요!',
+			desc: '2,000개 이상의 텍스트 이모티콘이 기다리고 있습니다. 탭 한 번으로 바로 복사, 어디서든 바로 붙여넣기를 해보세요!',
 			category: 'utility',
 			android: 'https://play.google.com/store/apps/details?id=com.tha.emotionalemoticon',
 			ios: 'https://apps.apple.com/us/app/id6760441156',

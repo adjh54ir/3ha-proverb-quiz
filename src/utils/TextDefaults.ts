@@ -29,9 +29,14 @@ const maxFontSizeMultiplier = () => TEXT_SIZE_MAX_MULTIPLIER[getTextSizeMode()];
  * 기본 텍스트 스타일.
  * - fontSize: 미지정 <Text> 가 RN 기본값 14(스케일 미적용)로 작아지는 문제 방지.
  * - color: 미지정 <Text> 는 RN 기본이 검정이라 다크모드에서 배경에 묻힌다 → 테마 본문색 사용.
+ * - includeFontPadding: Android 는 글꼴 위/아래에 서로 다른 여백을 자동으로 붙인다.
+ *   그래서 `flexDirection: 'row' + alignItems: 'center'` 로 아이콘과 텍스트를 나란히 두면
+ *   텍스트만 아래로 밀려 중앙이 어긋난다(iOS 는 이 여백이 없어 정상). 전역으로 꺼서
+ *   아이콘 박스와 텍스트 박스의 세로 중앙이 실제로 일치하게 만든다.
+ *   react-native-vector-icons 도 내부적으로 <Text> 라 같은 기본값을 함께 받는다.
  * themedValue 로 감싸 모드별로 캐싱한다(모듈 로드 시점 값으로 굳지 않는다).
  */
-const defaultTextStyle = themedValue(() => ({ fontSize: FONT_SIZES.md, color: COLORS.text }));
+const defaultTextStyle = themedValue(() => ({ fontSize: FONT_SIZES.md, color: COLORS.text, includeFontPadding: false }));
 
 /**
  * '글자 크게' 모드에서 lineHeight 를 함께 키운다.

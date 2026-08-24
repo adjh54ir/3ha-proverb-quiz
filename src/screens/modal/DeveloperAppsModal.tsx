@@ -87,7 +87,9 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.overlay}>
+			{/* 모달은 Activity 가 아닌 별도 Dialog 윈도우라 매니페스트의 adjustResize 가 적용되지 않는다.
+			    화면(Screen)과 달리 안드로이드도 behavior 를 직접 줘야 키보드가 입력창을 가리지 않는다. */}
+			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.overlay}>
 				{/* 카드 밖(딤 영역)을 누르면 키보드를 닫는다 */}
 				<Pressable style={StyleSheet.absoluteFill} onPress={Keyboard.dismiss} />
 				<PopInView visible={visible} style={styles.container}>

@@ -12,7 +12,6 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
-import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import { read } from '@/services/StorageService';
 
@@ -29,13 +28,12 @@ const RuleRow = ({ iconType, iconName, iconColor, chipColor, text }: { iconType:
 );
 
 const InitTimeChallengeScreen = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('initTimeChallenge', false);
 	const STORAGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 	const navigation = useAppNavigation();
 	const scaleAnim = useRef(new Animated.Value(1)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
 	const slideAnim = useRef(new Animated.Value(scaleHeight(12))).current;
+	const scrollRef = useRef<ScrollView>(null);
 	const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const countdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -49,9 +47,16 @@ const InitTimeChallengeScreen = () => {
 	const shouldShowAdRef = useRef(Math.random() < 0.5);
 
 	// 챌린지를 마치고 돌아오면 방금 기록이 랭킹에 바로 보여야 한다 → 포커스마다 다시 읽는다.
+	// 이 화면은 goBack 으로 돌아와도 언마운트되지 않으므로, 펼쳐 둔 규칙·광고 상태·스크롤을 함께 되돌린다.
 	useFocusEffect(
 		useCallback(() => {
 			fetchTopHistory();
+			setShowAllRules(false);
+			setShowAd(false);
+			setAdWatched(false);
+			setIsCountingDown(false);
+			setCount(3);
+			scrollRef.current?.scrollTo({ y: 0, animated: false });
 		}, []),
 	);
 
@@ -170,9 +175,8 @@ const InitTimeChallengeScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.container} edges={['bottom']}>
-		<FloatingGuideButton onPress={guide.open} />
 			<Animated.View style={[styles.contentWrapper, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-				<ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+				<ScrollView ref={scrollRef} contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
 					{/* 🎯 대표 이미지 영역 */}
 					<View style={styles.heroImageContainer}>
 						<Image source={require('@/assets/images/feature-states/time-challenge-hero.png')} style={styles.heroImage} resizeMode="contain" />
@@ -342,16 +346,6 @@ const InitTimeChallengeScreen = () => {
 					}}
 				/>
 			)}
-			<CharacterGuide
-				visible={guide.visible}
-				onClose={guide.close}
-				lines={[
-					'타임 챌린지는 제한 시간 안에 최대한 많이 맞히는 도전입니다.',
-					'오답이 쌓이면 하트가 줄고, 하트가 없으면 종료됩니다.',
-					'규칙을 확인했다면 아래 버튼으로 도전을 시작하세요!',
-				]}
-				title="타임 챌린지 준비하기"
-			/>
 		</SafeAreaView>
 	);
 };

@@ -21,7 +21,6 @@ import TowerResultModal from './modal/TowerResultModal';
 import DateUtils from '@/utils/DateUtils';
 import { playCorrect, playWrong, playWhoosh, playFinish } from '@/utils/SoundUtils';
 import { startBgm, stopBgm } from '@/utils/BgmUtils';
-import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import { read, write } from '@/services/StorageService';
@@ -43,8 +42,6 @@ type RouteParams = {
 };
 
 const TowerQuizScreen = () => {
-	// 진행 중인 도전을 가로막지 않도록 자동 노출은 끄고, 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('towerQuiz', false);
 	const navigation = useAppNavigation();
 	const route = useRoute<RouteProp<RouteParams, 'TowerQuiz'>>();
 	const level = route.params?.level || 1; // number (TOWER_LEVELS 기준)
@@ -443,7 +440,6 @@ const TowerQuizScreen = () => {
 								/>
 							))}
 						</View>
-						<CharacterGuideButton onPress={guide.open} tone="onDark" />
 					</View>
 				</View>
 
@@ -597,16 +593,6 @@ const TowerQuizScreen = () => {
 				onRetry={handleRetry}
 				onHome={handleGoHome}
 				onNext={hasNextLevel ? handleNextLevel : undefined}
-			/>
-			<CharacterGuide
-				visible={guide.visible}
-				onClose={guide.close}
-				lines={[
-					'타워 퀴즈는 이 층의 보스가 내는 문제를 푸는 곳입니다.',
-					'오른쪽 표시로 지금까지 맞힌 개수를 확인할 수 있습니다.',
-					'기준을 넘기면 다음 층과 보상이 열립니다!',
-				]}
-				title="타워 퀴즈, 이렇게 풉니다"
 			/>
 		</View>
 	);

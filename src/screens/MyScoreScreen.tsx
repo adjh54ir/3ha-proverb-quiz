@@ -44,7 +44,7 @@ import LevelModal from './modal/LevelModal';
 import { FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { getLevelColor } from '@/screens/common/CommonProverbModule';
 import DateUtils from '@/utils/DateUtils';
-import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { ToolTipComponent } from '@/screens/common/atomic/ToolTipComponent';
 import { buildDateMark, buildTodayPendingMark, buildSelectedMark } from '@/utils/CalendarMarkUtils';
 import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
@@ -148,8 +148,8 @@ const ConquerHeader = ({
 );
 
 const MyScoreScreen = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('myScore', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const guide = useCharacterGuideOnce('myScore');
 	const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 	const isFocused = useIsFocused();
 	const scrollRef = useRef<ScrollView>(null);
@@ -529,7 +529,6 @@ const MyScoreScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['top']}>
-		<FloatingGuideButton onPress={guide.open} />
 			<ScrollView
 				ref={scrollRef}
 				style={styles.container}
@@ -546,7 +545,7 @@ const MyScoreScreen = () => {
 				<View style={styles.sectionBox}>
 					{/* 캐릭터 영역 안내 — 줄 가장 오른쪽 */}
 					<View style={styles.characterHelpButton}>
-						<ToolTipComponent text="퀴즈로 점수를 모으면 캐릭터 등급이 올라갑니다. 옆에 붙은 펫은 도전탑 보상으로 얻은 친구예요." />
+						<ToolTipComponent text="퀴즈로 점수를 모으면 캐릭터 등급이 올라갑니다. 옆에 붙은 펫은 도전탑 보상으로 얻은 친구입니다." />
 					</View>
 					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginTop: SPACING_H.mdPlus, marginBottom: scaleHeight(-8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
 						{/* ✅ 홈화면과 동일한 캐릭터/펫 배치 구조 (래퍼 높이 축소로 타이틀과 밀착) */}
@@ -1513,10 +1512,11 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.primary,
 	},
 	characterHelpButton: {
-		// absolute 자식은 부모의 padding 안쪽을 기준으로 잡히므로 0 이면 카드 내용과 오른쪽이 맞는다
+		// absolute 자식은 부모의 padding 안쪽을 기준으로 잡힌다.
+		// 0 이면 카드 모서리에 딱 붙어 답답해 보여 위·오른쪽을 한 단계 더 띄운다.
 		position: 'absolute',
-		top: 0,
-		right: 0,
+		top: SPACING_H.sm,
+		right: SPACING_W.sm,
 		zIndex: 20,
 	},
 	sectionBox: {

@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
 import { isSoundEnabled, setSoundEnabled, getSoundVolume, setSoundVolume, playCorrect, playPop } from '@/utils/SoundUtils';
-import { isBgmEnabled, setBgmEnabled, getBgmVolume, setBgmVolume } from '@/utils/BgmUtils';
+import { isBgmEnabled, setBgmEnabled, getBgmVolume, setBgmVolume, startBgm, stopBgm } from '@/utils/BgmUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DeviceInfo from 'react-native-device-info';
 import IconComponent from './common/atomic/IconComponent';
@@ -35,7 +35,7 @@ import { AppPermissionInfo, loadAppPermissions, requestAppPermission } from '@/u
 import DateUtils from '@/utils/DateUtils';
 import { useToast } from '@/hooks/useToast';
 import { changeTextSizeMode, changeThemeMode, useTextSizeMode, useThemeMode } from '@/hooks/useThemeMode';
-import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton, resetCharacterGuideSeen } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce, resetCharacterGuideSeen } from '@/screens/common/CharacterGuide';
 import { update, write } from '@/services/StorageService';
 
 // ─────────────────────────────────────────────
@@ -126,6 +126,9 @@ const ACCORDION_CONFIG = themedValue(() => ({
 // ─────────────────────────────────────────────
 type IconType = 'MaterialCommunityIcons' | 'materialIcons';
 
+/** 배경음 미리듣기 자동 정지까지의 시간 */
+const BGM_PREVIEW_MS = 8_000;
+
 const SETTINGS_MAP: Record<string, { label: string; icon: { type: IconType; name: string }; isDanger?: boolean }> = {
 	rate: { label: '앱 리뷰 남기기', icon: { type: 'MaterialCommunityIcons', name: 'star-outline' } },
 	inquiry: { label: '문의하기', icon: { type: 'MaterialCommunityIcons', name: 'email-outline' } },
@@ -134,6 +137,7 @@ const SETTINGS_MAP: Record<string, { label: string; icon: { type: IconType; name
 	privacyPolicy: { label: '개인정보 처리방침 및 이용약관', icon: { type: 'MaterialCommunityIcons', name: 'shield-lock-outline' } },
 	openSource: { label: '오픈소스 라이브러리', icon: { type: 'MaterialCommunityIcons', name: 'file-code-outline' } },
 	checkVersion: { label: '최신 버전 확인', icon: { type: 'MaterialCommunityIcons', name: 'update' } },
+	guideReset: { label: '화면 사용법 안내 다시보기', icon: { type: 'MaterialCommunityIcons', name: 'help-circle-outline' } },
 	...(IS_DEV && {
 		completeAllQuiz: { label: '모든 퀴즈 완료 설정', icon: { type: 'materialIcons', name: 'check-circle' } },
 		completeAllStudy: { label: '모든 학습 완료로 설정', icon: { type: 'materialIcons', name: 'school' } },
@@ -161,6 +165,15 @@ const BASE_SECTIONS = themedValue(() => ([
 		iconColor: COLORS.primaryDark,
 		iconBg: COLORS.primarySoft,
 		data: ['__sound__'],
+	},
+	// 화면마다 있던 물음표 버튼을 지우면서 안내를 다시 볼 통로가 사라졌다 — 여기 한 곳으로 모은다.
+	{
+		titleText: '화면 안내',
+		iconType: 'materialIcons',
+		icon: 'help-outline',
+		iconColor: COLORS.secondaryDark,
+		iconBg: COLORS.secondarySoft,
+		data: ['guideReset'],
 	},
 	{
 		titleText: '사용자 정보 초기화',
@@ -240,8 +253,8 @@ const TEXT_SIZE_OPTIONS = themedValue(() => [
 // 컴포넌트
 // ─────────────────────────────────────────────
 const SettingScreen = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('setting', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const guide = useCharacterGuideOnce('setting');
 	const themeMode = useThemeMode(); // 화이트/다크 선택 상태
 	const textSizeMode = useTextSizeMode(); // 기본/글자 크게 선택 상태
 	const sectionRef = useRef<SectionList>(null);
@@ -275,9 +288,40 @@ const SettingScreen = () => {
 		}
 	};
 
+	/**
+	 * 배경음 미리듣기.
+	 * 배경음은 퀴즈·챌린지에서만 흐르기 때문에, 설정 화면에서 볼륨 슬라이더를 아무리 움직여도
+	 * 들리는 것이 없었다 — 몇 %가 적당한지 가늠할 방법이 없다. 여기서 실제 트랙을 잠깐 틀어 준다.
+	 */
+	const [bgmPreviewing, setBgmPreviewing] = useState(false);
+	const bgmPreviewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const stopBgmPreview = useCallback(() => {
+		if (bgmPreviewTimer.current) {
+			clearTimeout(bgmPreviewTimer.current);
+			bgmPreviewTimer.current = null;
+		}
+		stopBgm();
+		setBgmPreviewing(false);
+	}, []);
+
+	const toggleBgmPreview = () => {
+		if (bgmPreviewing) {
+			stopBgmPreview();
+			return;
+		}
+		startBgm('quiz');
+		setBgmPreviewing(true);
+		// 끄는 것을 잊어도 알아서 멎는다
+		bgmPreviewTimer.current = setTimeout(stopBgmPreview, BGM_PREVIEW_MS);
+	};
+
 	const handleToggleBgm = (value: boolean) => {
-		setBgmEnabled(value);
+		setBgmEnabled(value); // false 면 내부에서 stopBgm() 까지 처리한다
 		setBgmOn(value);
+		if (!value) {
+			stopBgmPreview();
+		}
 	};
 
 
@@ -323,8 +367,10 @@ const SettingScreen = () => {
 			});
 			return () => {
 				isActive = false;
+				// 미리듣기를 켠 채 화면을 나가면 다른 화면까지 음악이 따라간다
+				stopBgmPreview();
 			};
-		}, []),
+		}, [stopBgmPreview]),
 	);
 
 	const scrollToTop = () => sectionRef.current?.getScrollResponder()?.scrollTo({ x: 0, y: 0, animated: true });
@@ -514,6 +560,10 @@ const SettingScreen = () => {
 		resetTowerChallenge: () => openResetModal('towerChallenge'),
 		resetAll: () => openResetModal('all'),
 		checkVersion: checkIsLatestVersion,
+		guideReset: async () => {
+			await resetCharacterGuideSeen();
+			showToast('안내 초기화', '각 화면에 다시 들어가면 사용법 안내가 한 번씩 나옵니다.');
+		},
 		developerInfo: () => setShowDevModal(true),
 		developerApps: () => setShowAppsModal(true),
 		privacyPolicy: () => setShowTermsModal(true),
@@ -749,6 +799,7 @@ const SettingScreen = () => {
 					onVolumeChange: setSfxVolume,
 					onVolumeCommit: handleSfxVolumeCommit,
 					onPreview: playCorrect,
+					previewing: false,
 				},
 				{
 					key: 'bgm',
@@ -760,7 +811,8 @@ const SettingScreen = () => {
 					volume: bgmVolume,
 					onVolumeChange: setBgmVolumeState,
 					onVolumeCommit: handleBgmVolumeCommit,
-					onPreview: undefined, // BGM은 볼륨 조절 시 바로 들리므로 미리듣기 불필요
+					onPreview: toggleBgmPreview,
+					previewing: bgmPreviewing,
 				},
 			];
 
@@ -820,8 +872,13 @@ const SettingScreen = () => {
 												hitSlop={HIT_SLOP}
 												activeOpacity={0.7}
 												accessibilityRole="button"
-												accessibilityLabel="효과음 미리듣기">
-												<IconComponent type="MaterialCommunityIcons" name="play-circle-outline" size={scaledSize(20)} color={COLORS.primaryDark} />
+												accessibilityLabel={`${row.label} 미리듣기`}>
+												<IconComponent
+													type="MaterialCommunityIcons"
+													name={row.previewing ? 'stop-circle-outline' : 'play-circle-outline'}
+													size={scaledSize(20)}
+													color={COLORS.primaryDark}
+												/>
 											</TouchableOpacity>
 										)}
 									</View>
@@ -919,7 +976,6 @@ const SettingScreen = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.container} edges={['top']}>
-			<FloatingGuideButton onPress={guide.open} />
 				<FadeInView style={{ flex: 1 }}>
 					<SectionList
 						ref={sectionRef}

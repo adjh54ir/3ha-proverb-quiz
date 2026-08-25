@@ -19,7 +19,7 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import DateUtils from '@/utils/DateUtils';
-import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 import ScreenHeader from '@/screens/common/ScreenHeader';
@@ -42,8 +42,8 @@ const SORT_OPTIONS: { key: SortType; label: string }[] = [
  */
 
 const MyProverbBook = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('myProverbBook', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const guide = useCharacterGuideOnce('myProverbBook');
 	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
 	const handoff = useModalHandoff();
 	const navigation = useNavigation<any>();
@@ -168,7 +168,6 @@ const MyProverbBook = () => {
 					title="나만의 속담집"
 					onBack={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.HOME })}
 					countLabel={books.length > 0 ? (searchQuery ? `${filteredBooks.length}/${books.length}` : `${books.length}`) : undefined}
-					right={<CharacterGuideButton onPress={guide.open} />}
 				/>
 
 				{books.length > 0 && (

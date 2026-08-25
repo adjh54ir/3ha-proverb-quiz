@@ -24,7 +24,7 @@ import ProverbServices from '@/services/ProverbServices';
 import NewBadgeModal from '@/screens/modal/NewBadgeModal';
 import { playComplete, playFlip } from '@/utils/SoundUtils';
 import DateUtils from '@/utils/DateUtils';
-import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { ToolTipComponent } from '@/screens/common/atomic/ToolTipComponent';
 import { read, write } from '@/services/StorageService';
 
@@ -81,8 +81,8 @@ const reviewPraiseMessages = [
 const DETAIL_FILTER_HEIGHT = scaleHeight(60);
 const IMAGE_HEIGHT = isAndroid ? scaleHeight(220) : scaleHeight(200);
 const QuizStudyScreen = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('study', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const guide = useCharacterGuideOnce('study');
 	// 회전/폴더블 대응: 캐러셀 높이는 실시간 화면 높이를 따른다.
 	const { height: windowHeight } = useWindowDimensions();
 	const STORAGE_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
@@ -843,7 +843,6 @@ const QuizStudyScreen = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.main} edges={['top']}>
-			<FloatingGuideButton onPress={guide.open} />
 				<Animated.View
 					style={[
 						styles.container,
@@ -863,7 +862,7 @@ const QuizStudyScreen = () => {
 						<View style={styles.progressTopRow}>
 							{/* 학습 현황 안내 — 줄 가장 오른쪽 */}
 							<View style={styles.progressHelpButton}>
-								<ToolTipComponent text="전체 속담 중 지금까지 학습한 개수입니다. 속담 카드를 펼쳐 보면 학습 완료로 기록돼요." />
+								<ToolTipComponent text="전체 속담 중 지금까지 학습한 개수입니다. 속담 카드를 펼쳐 보면 학습 완료로 기록됩니다." />
 							</View>
 							<Text style={styles.progressTitle}>학습 현황</Text>
 							<View style={styles.progressBadge}>
@@ -1365,8 +1364,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.xs,
 	},
 	progressHelpButton: {
+		// 0 이면 카드 오른쪽 모서리에 붙어 '우측으로 쏠린' 인상을 준다 — 한 단계 안쪽으로 들인다
 		position: 'absolute',
-		right: 0,
+		right: SPACING_W.sm,
 		zIndex: 20,
 	},
 	progressBarWrapper: {

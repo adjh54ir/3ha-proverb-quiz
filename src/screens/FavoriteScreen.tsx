@@ -20,7 +20,7 @@ import ProverbDetailModal from './modal/ProverbDetailModal';
 import { useToast } from '@/hooks/useToast';
 import BottomHomeButton from './common/BottomHomeButton';
 import FavoriteAddModal from './modal/FavoriteAddModal';
-import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { LEVEL_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 
@@ -38,8 +38,8 @@ const COMMON_ALL_OPTION = themedValue(() => ({
  */
 
 const FavoriteScreen = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('favorite', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const guide = useCharacterGuideOnce('favorite');
 	const emptyFavoritesImage = require('@/assets/images/feature-states/empty-favorites.png');
 	const emptySearchImage = require('@/assets/images/feature-states/empty-search.png');
 	const flatListRef = useRef<FlatList>(null);
@@ -348,7 +348,6 @@ const FavoriteScreen = () => {
 											<Text style={styles.cancelBtnText}>취소</Text>
 										</TouchableOpacity>
 									)}
-									<CharacterGuideButton onPress={guide.open} />
 								</View>
 
 								<View style={styles.searchRow}>

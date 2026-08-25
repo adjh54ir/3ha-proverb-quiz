@@ -29,7 +29,7 @@ import { PET_REWARDS, getLevelByScore, getProgressPercent, getQuestionsToNext } 
 import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import TowerRewardSection from '@/components/TowerRewardSection';
 import { playFinish } from '@/utils/SoundUtils';
-import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { ToolTipComponent } from '@/screens/common/atomic/ToolTipComponent';
 
 const greetingMessages = [
@@ -125,6 +125,7 @@ const MascotMoment = ({
 );
 
 const Home = () => {
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('home');
 	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
 	const handoff = useModalHandoff();
@@ -429,7 +430,6 @@ const Home = () => {
 	};
 	return (
 		<SafeAreaView style={styles.main} edges={['top']}>
-		<FloatingGuideButton onPress={guide.open} />
 			{showConfetti && (
 				<View style={styles.globalConfettiWrapper}>
 					<ConfettiCannon count={60} origin={{ x: scaleWidth(180), y: 0 }} fadeOut explosionSpeed={500} fallSpeed={2500} />
@@ -454,7 +454,7 @@ const Home = () => {
 						<View style={styles.imageContainer}>
 							<View style={styles.streakChipWrapper}>
 								<View style={styles.streakHelpButton}>
-									<ToolTipComponent text="매일 앱에 들어와 출석하면 연속 출석일이 하루씩 쌓입니다. 하루라도 건너뛰면 1일부터 다시 시작해요." />
+									<ToolTipComponent text="매일 앱에 들어와 출석하면 연속 출석일이 하루씩 쌓입니다. 하루라도 건너뛰면 1일부터 다시 시작합니다." />
 								</View>
 								<View style={[styles.streakChip, streakInfo.current > 0 ? styles.streakChipActive : styles.streakChipIdle]}>
 									<IconComponent

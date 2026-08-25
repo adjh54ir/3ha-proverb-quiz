@@ -30,6 +30,8 @@ let volumeRatio = 1; // 사용자 설정 볼륨 0~1
 
 let currentPlayer: Sound | null = null;
 let currentTrack: BgmTrack | null = null;
+/** 재생 배속(= 음정). 1 이 원본. 타임챌린지 막판 고조에만 쓴다. */
+let rate = 1;
 // 로드가 끝나기 전에 stopBgm()이 불릴 수 있다 — 그 경우 재생하지 않기 위한 세대 번호
 let generation = 0;
 
@@ -55,6 +57,32 @@ export const setBgmVolume = (ratio: number) => {
 /** 현재 BGM 볼륨 (0~1) */
 export const getBgmVolume = () => volumeRatio;
 
+/**
+ * 배속(= 음정) 지정. 남은 시간이 얼마 없다는 것을 숫자 대신 몸으로 느끼게 하는 용도.
+ * 플랫폼마다 먹는 API 가 달라 둘 다 건다(효과음 playCombo 와 같은 방식).
+ *
+ * @param next 1 = 원본. 0.5~1.5 로 잘린다.
+ */
+export const setBgmRate = (next: number) => {
+	const clamped = Math.min(1.5, Math.max(0.5, next));
+	if (rate === clamped) {
+		return;
+	}
+	rate = clamped;
+	applyRate(currentPlayer);
+};
+
+/** 현재 배속 */
+export const getBgmRate = () => rate;
+
+const applyRate = (player: Sound | null) => {
+	if (!player) {
+		return;
+	}
+	player.setPitch(rate); // Android 전용
+	player.setSpeed(rate); // iOS 전용
+};
+
 /** 앱 시작 시 저장된 BGM 설정 로드 (기본: on / 100%) */
 export const loadBgmSetting = async () => {
 	try {
@@ -75,11 +103,13 @@ export const loadBgmSetting = async () => {
 let pausedByScreen = false;
 
 export const pauseBgm = () => {
-	if (!currentPlayer || pausedByScreen) {
+	if (!currentTrack || pausedByScreen) {
 		return;
 	}
+	// 아직 로드 중일 수 있다(currentPlayer 가 null). 그때도 플래그는 세워 둬야
+	// 로드가 끝나는 순간 일시정지 상태인데 음악이 터져 나오는 일이 없다.
 	pausedByScreen = true;
-	currentPlayer.pause();
+	currentPlayer?.pause();
 };
 
 /** pauseBgm 으로 멈춘 BGM 재개. 멈춘 적이 없으면 아무것도 하지 않는다. */
@@ -97,6 +127,7 @@ export const resumeBgm = () => {
 export const stopBgm = () => {
 	generation += 1; // 로딩 중인 트랙이 있으면 재생되지 않도록 무효화
 	pausedByScreen = false;
+	rate = 1; // 다음 트랙이 앞 화면의 고조 상태를 물려받지 않게 되돌린다
 	const player = currentPlayer;
 	currentPlayer = null;
 	currentTrack = null;
@@ -114,9 +145,13 @@ export const startBgm = (track: BgmTrack) => {
 	if (!bgmEnabled || volumeRatio === 0) {
 		return;
 	}
-	if (currentTrack === track && currentPlayer) {
+	// currentTrack 은 로드가 끝나기 전(currentPlayer 가 아직 null)에도 이미 track 으로 잡혀 있다.
+	// 여기서 currentPlayer 까지 같이 보면, 로딩 중에 들어온 같은 트랙 요청이 아래 stopBgm() 으로
+	// 로딩을 무효화(generation++)하고 처음부터 다시 로드한다. 타임챌린지처럼 포커스·일시정지가
+	// 자주 바뀌어 effect 가 여러 번 도는 화면에서는 1.2MB 트랙이 매번 취소돼 배경음이 영영 안 나온다.
+	if (currentTrack === track) {
 		return;
-	} // 이미 재생 중
+	} // 이미 재생 중이거나 로드 중
 	stopBgm(); // 다른 트랙 정리
 
 	// 다른 앱 음악과 섞이도록 보장 (효과음과 동일한 세션 설정을 재사용한다)
@@ -143,8 +178,12 @@ export const startBgm = (track: BgmTrack) => {
 			}
 			player.setNumberOfLoops(-1);
 			player.setVolume(MAX_VOLUME * volumeRatio);
+			applyRate(player);
 			currentPlayer = player;
-			player.play();
+			// 로딩 도중 pauseBgm() 이 걸렸으면 재개는 resumeBgm() 이 맡는다
+			if (!pausedByScreen) {
+				player.play();
+			}
 		});
 	});
 };
@@ -166,4 +205,16 @@ AppState.addEventListener('change', (state) => {
 	}
 });
 
-export default { startBgm, stopBgm, pauseBgm, resumeBgm, setBgmEnabled, isBgmEnabled, setBgmVolume, getBgmVolume, loadBgmSetting };
+export default {
+	startBgm,
+	stopBgm,
+	pauseBgm,
+	resumeBgm,
+	setBgmEnabled,
+	isBgmEnabled,
+	setBgmVolume,
+	getBgmVolume,
+	setBgmRate,
+	getBgmRate,
+	loadBgmSetting,
+};

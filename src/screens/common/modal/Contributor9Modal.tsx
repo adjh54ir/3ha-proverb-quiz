@@ -74,7 +74,7 @@ interface Props {
 
 /** 프로필 링크 행 — 행 디자인 통일을 위해 데이터로 관리 */
 const LINK_ROWS = [
-	{ label: '🏠 공식 홈페이지', iconType: 'materialIcons', icon: 'home', action: '바로가기', url: 'https://www.ecodelab.im' },
+	{ label: '🏠 공식 홈페이지', iconType: 'materialIcons', icon: 'home', action: '바로가기', url: 'https://ecodelab.im/main' },
 	{
 		label: '📱 개발자가 만든 앱 소개',
 		iconType: 'materialIcons',

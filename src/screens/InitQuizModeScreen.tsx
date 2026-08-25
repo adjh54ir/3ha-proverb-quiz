@@ -12,7 +12,7 @@ import FastImage from 'react-native-fast-image';
 import { getLevelByScore } from '@/const/ConstInfoData';
 import { QUIZ_MODES } from '@/const/common/CommonMainData';
 import BottomHomeButton from './common/BottomHomeButton';
-import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
 
@@ -29,8 +29,8 @@ const MODE_DESC: Record<string, string> = {
  * 퀴즈 모드 선택
  */
 const InitQuizModeScreen = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('initQuizMode', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const guide = useCharacterGuideOnce('initQuizMode');
 	const navigation = useAppNavigation();
 	const USER_QUIZ_HISTORY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
@@ -85,7 +85,6 @@ const InitQuizModeScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.main} edges={['bottom']}>
-		<FloatingGuideButton onPress={guide.open} />
 			<View style={styles.container}>
 				<Animated.View style={[styles.animatedWrap, { opacity: enterAnim }]}>
 					<ScrollView ref={scrollRef} style={styles.scrollArea} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>

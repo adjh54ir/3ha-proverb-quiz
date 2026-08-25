@@ -21,11 +21,16 @@ jest.mock('react-native-sound', () => {
 		// 오디오 세션 설정은 테스트에서 검증 대상이라 호출을 기록한다
 		static setCategory = jest.fn();
 		static MAIN_BUNDLE = '/bundle';
+		// 같은 트랙을 중복 로드하지 않는지 세기 위한 카운터 (BgmUtils 회귀 테스트)
+		static created = 0;
+		static played = 0;
 		constructor(file, basePath, cb) {
 			SoundMock.lastArgs = { file, basePath };
+			SoundMock.created += 1;
 			cb?.(null);
 		}
 		play(cb) {
+			SoundMock.played += 1;
 			cb?.(true);
 		}
 		stop(cb) {
@@ -34,8 +39,12 @@ jest.mock('react-native-sound', () => {
 		release() {}
 		setVolume() {}
 		setNumberOfLoops() {}
-		setPitch() {}
-		setSpeed() {}
+		setPitch(v) {
+			SoundMock.pitch = v;
+		}
+		setSpeed(v) {
+			SoundMock.speed = v;
+		}
 	}
 	return SoundMock;
 	// 로컬에 미설치여도 테스트가 돌도록 virtual mock 으로 등록한다.

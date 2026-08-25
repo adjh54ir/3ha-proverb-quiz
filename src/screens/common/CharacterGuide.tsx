@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
@@ -17,6 +16,14 @@ const SEEN_PREFIX = 'CHAR_GUIDE_SEEN_';
 
 /**
  * 화면당 1회만 노출되는 캐릭터 안내 훅.
+ *
+ * 앱 전체 안내 정책 (한 가지만 쓴다)
+ *  1. 화면에 **처음 들어갈 때 1회** 자동으로 뜬다.
+ *  2. 화면 안에는 안내를 여는 물음표 버튼을 두지 않는다 —
+ *     화면마다 위치가 달라지고, 배너 광고와 겹치고, 데이터 설명용 툴팁과 헷갈렸다.
+ *  3. 다시 보려면 **설정 > 화면 안내 > 화면 사용법 안내 다시보기** 한 곳뿐이다.
+ *  4. 문제를 푸는 중(퀴즈·타워퀴즈·타임챌린지)에는 안내를 두지 않는다.
+ *     그 화면들의 규칙은 시작 팝업(QuizStartModal)·규칙 화면이 이미 설명한다.
  *
  * @param id 화면 식별자 (예: 'favorite'). 이 값으로 노출 여부가 기록된다.
  * @param enabled false 면 판단 자체를 하지 않는다 (데이터 로딩 전 등)
@@ -41,51 +48,8 @@ export const useCharacterGuideOnce = (id: string, enabled = true) => {
 		setVisible(false);
 		AsyncStorage.setItem(SEEN_PREFIX + id, '1').catch(() => {});
 	}, [id]);
-	/** 도움말 버튼 등으로 다시 열기 */
-	const open = useCallback(() => setVisible(true), []);
-	return { visible, close, open };
+	return { visible, close };
 };
-
-/**
- * '도움말 다시보기' 버튼 — 앱 전역에서 같은 모양(원형 칩)으로 쓴다.
- *
- * 화면마다 아이콘만 덩그러니 놓으면 배경 위에서 잘 안 보이고 화면마다 인상이 달라진다.
- * 모양을 한 곳에 고정해 두고, 배치는 항상 화면 우측 상단(헤더 행의 끝 또는 고정 배치)으로 통일한다.
- *
- * @param onPress useCharacterGuideOnce 의 open 을 연결한다
- * @param color 아이콘 색 (어두운 화면에서는 흰색 등으로 바꿔 쓴다)
- * @param tone 'light' 는 어두운 배경 위에 올릴 때 쓰는 반투명 칩
- */
-export const CharacterGuideButton: React.FC<{ onPress: () => void; color?: string; tone?: 'default' | 'onDark' }> = ({
-	onPress,
-	color,
-	tone = 'default',
-}) => (
-	<TouchableOpacity
-		style={[styles.chip, tone === 'onDark' && styles.chipOnDark]}
-		onPress={onPress}
-		hitSlop={{ top: scaleHeight(10), bottom: scaleHeight(10), left: scaleWidth(10), right: scaleWidth(10) }}
-		activeOpacity={0.7}
-		accessibilityRole="button"
-		accessibilityLabel="이 화면 사용법 다시 보기">
-		<IconComponent
-			type="materialicons"
-			name="help-outline"
-			size={scaledSize(18)}
-			color={color ?? (tone === 'onDark' ? COLORS.textWhite : COLORS.textSecondary)}
-		/>
-	</TouchableOpacity>
-);
-
-/**
- * 화면에 마땅한 헤더 행이 없을 때 쓰는 우측 상단 고정 도움말 버튼.
- * 부모(보통 화면 루트)를 기준으로 붙으므로 콘텐츠 레이아웃을 건드리지 않는다.
- */
-export const FloatingGuideButton: React.FC<{ onPress: () => void; tone?: 'default' | 'onDark' }> = ({ onPress, tone }) => (
-	<View style={styles.floating}>
-		<CharacterGuideButton onPress={onPress} tone={tone} />
-	</View>
-);
 
 /** 저장해 둔 '본 적 있음' 기록 초기화 (데이터 초기화에서 사용) */
 export const resetCharacterGuideSeen = async () => {
@@ -285,28 +249,6 @@ const CHAR = scaleWidth(112);
 
 const styles = themedStyles(() =>
 	StyleSheet.create({
-		// 공통 칩 — 어디에 놓든 같은 크기·같은 테두리
-		chip: {
-			width: scaleWidth(30),
-			height: scaleWidth(30),
-			borderRadius: scaleWidth(15),
-			alignItems: 'center',
-			justifyContent: 'center',
-			backgroundColor: COLORS.surface,
-			borderWidth: 1,
-			borderColor: COLORS.border,
-		},
-		// 타워처럼 어두운 화면 위에서는 흰 칩이 튀어 보인다 — 반투명으로 낮춘다
-		chipOnDark: {
-			backgroundColor: 'rgba(255,255,255,0.12)',
-			borderColor: 'rgba(255,255,255,0.28)',
-		},
-		floating: {
-			position: 'absolute',
-			top: SPACING_H.sm,
-			right: SPACING_W.lg,
-			zIndex: 20,
-		},
 		backdrop: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'flex-end' },
 		wrap: { paddingHorizontal: SPACING_W.xl, alignItems: 'flex-start' },
 		bubble: {

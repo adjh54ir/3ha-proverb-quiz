@@ -32,7 +32,7 @@ import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName, getLev
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
-import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 
 
@@ -75,8 +75,8 @@ const buildFieldItems = (fields: string[]) => [
  */
 
 const ProverbListScreen = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('proverbList', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const guide = useCharacterGuideOnce('proverbList');
 	const scrollRef = useRef<FlatList>(null);
 	const searchInputRef = useRef<TextInput>(null);
 	const headerAnim = useRef(new Animated.Value(0)).current;
@@ -305,9 +305,6 @@ const ProverbListScreen = () => {
 											<Icon name="rotate-right" size={scaledSize(18)} color={COLORS.textSecondary} />
 										</TouchableOpacity>
 									)}
-									<View style={styles.searchGuideButton}>
-										<CharacterGuideButton onPress={guide.open} />
-									</View>
 								</View>
 								<View style={styles.filterDropdownRow}>
 									<View style={[styles.dropdownWrapper, { zIndex: levelOpen ? 3000 : 1000 }]}>
@@ -774,7 +771,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		columnGap: SPACING_W.sm,
 	},
 	// 검색 입력창과 같은 줄에 두되, 입력창의 아래 여백만큼 함께 올린다
-	searchGuideButton: { marginBottom: SPACING_H.md },
 	searchInputWrapper: {
 		flex: 1,
 		position: 'relative',

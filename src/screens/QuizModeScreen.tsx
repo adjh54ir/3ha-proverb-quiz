@@ -21,7 +21,7 @@ import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
 import FastImage from 'react-native-fast-image';
-import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
@@ -41,8 +41,8 @@ const LEVEL_DESC: Record<string, string> = {
 };
 
 const QuizModeScreen = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('quizMode', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const guide = useCharacterGuideOnce('quizMode');
 	const navigation = useAppNavigation();
 
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
@@ -188,7 +188,6 @@ const QuizModeScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: COLORS.surface }} edges={['top', 'bottom']}>
-		<FloatingGuideButton onPress={guide.open} />
 			<View style={styles.container}>
 				<View style={styles.centerWrapper}>
 					<View style={styles.tabRow}>
@@ -466,8 +465,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	levelListWrap: {
 		width: '100%',
 		rowGap: SPACING_H.md,
-		// 난이도 카드가 화면 끝에 붙어 보이던 문제 — 카테고리 그리드 거터보다 살짝 작게 좌우를 띄운다
-		paddingHorizontal: SPACING_W.md,
+		// 난이도 카드가 화면 끝에 붙어 보이던 문제 — 최소한 카테고리 그리드 거터(카드 사이 4%) 만큼은 좌우를 띄운다
+		paddingHorizontal: SPACING_W.lg,
 	},
 	levelCardFull: {
 		width: '100%',
@@ -533,6 +532,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'space-between',
 		width: '100%',
 		rowGap: SPACING_H.md,
+		// 난이도 목록과 같은 좌우 인셋 — 탭을 오갈 때 카드 좌우 끝이 어긋나지 않게 한다
+		paddingHorizontal: SPACING_W.lg,
 	},
 	categoryRowButton: {
 		width: '48%',

@@ -276,12 +276,6 @@ const openSourceData = [
     url: 'https://github.com/react-native-async-storage/async-storage',
   },
   {
-    name: 'axios',
-    license: 'MIT',
-    version: '1.8.3',
-    url: 'https://github.com/axios/axios',
-  },
-  {
     name: 'react-redux',
     license: 'MIT',
     version: '9.2.0',

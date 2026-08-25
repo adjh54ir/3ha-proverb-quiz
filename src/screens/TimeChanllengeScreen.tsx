@@ -20,16 +20,18 @@ import ProverbDetailModal from './modal/ProverbDetailModal';
 import AdmobFrontAd from './common/ads/AdmobFrontAd';
 import FastImage from 'react-native-fast-image';
 import { playCorrect, playWrong, playCombo, playTick, playWhoosh, playFinish } from '@/utils/SoundUtils';
-import { startBgm, stopBgm, pauseBgm, resumeBgm } from '@/utils/BgmUtils';
+import { startBgm, stopBgm, pauseBgm, resumeBgm, setBgmRate } from '@/utils/BgmUtils';
 import DateUtils from '@/utils/DateUtils';
-import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
-import { ToolTipComponent } from '@/screens/common/atomic/ToolTipComponent';
 import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import { update } from '@/services/StorageService';
 
 const MAX_LIVES = 5;
 const CHOICE_COUNT = 4;
+/** 남은 시간이 이 아래로 떨어지면 '막판' — 배경음 템포를 올린다 */
+const FINAL_SPURT_MS = 10_000;
+/** 막판 배경음 배속(= 음정). 1.12 는 조급함은 주되 곡이 우스워지지 않는 선 */
+const FINAL_SPURT_RATE = 1.12;
 
 const SCORE_ENCOURAGEMENTS: { min: number; messages: string[] }[] = [
 	{
@@ -115,8 +117,6 @@ const InfinityQuizScreen = () => {
 
 	const formattedTime = `${(timeLeftMs / 1000).toFixed(2)}초`;
 	const [isPaused, setIsPaused] = useState(false);
-	// 진행 중인 챌린지를 가로막지 않도록 자동 노출은 끄고, 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('timeChallenge', false);
 	const [heartAnimations, setHeartAnimations] = useState(Array.from({ length: MAX_LIVES }, () => new Animated.Value(1)));
 
 	const [isCountingDown, setIsCountingDown] = useState(false);
@@ -284,6 +284,16 @@ const InfinityQuizScreen = () => {
 			playTick();
 		}
 	}, [timeLeftMs, isGameOver, isPaused]);
+
+	/**
+	 * ⏫ 마지막 10초 — 배경음 템포(= 음정)를 살짝 올린다.
+	 * 남은 시간을 숫자로 읽기 전에 몸으로 먼저 느끼게 하는 장치다(콤보 효과음과 같은 기법).
+	 * 시간 보너스(+10초)로 10초를 다시 넘기면 원래 속도로 돌아온다.
+	 * setBgmRate 는 값이 같으면 아무 일도 하지 않으므로 100ms 마다 불려도 부담이 없다.
+	 */
+	useEffect(() => {
+		setBgmRate(isGameOver || timeLeftMs > FINAL_SPURT_MS ? 1 : FINAL_SPURT_RATE);
+	}, [timeLeftMs, isGameOver]);
 
 	// 🎉 게임 종료 사운드 (BGM 정리는 위 배경음 effect 가 함께 처리한다)
 	useEffect(() => {
@@ -657,15 +667,6 @@ const InfinityQuizScreen = () => {
 				onScroll={scrollHandler.onScroll}
 				scrollEventThrottle={16}
 				keyboardShouldPersistTaps="handled">
-				{/* 도움말 — 결과 화면에서도 같은 자리에 둔다(화면마다 위치가 달라지지 않게) */}
-				<View style={styles.guideRow}>
-					<CharacterGuideButton
-						onPress={() => {
-							setIsPaused(true); // 안내를 보는 동안 시간이 흐르지 않게 멈춘다
-							guide.open();
-						}}
-					/>
-				</View>
 				{!isGameOver && (
 					<View style={styles.statusBoxRow}>
 						{/* 🎯 점수 */}
@@ -717,11 +718,6 @@ const InfinityQuizScreen = () => {
 								]}>
 								{combo} Combo
 							</Animated.Text>
-						</View>
-
-						{/* 스코어 안내 — 줄 가장 오른쪽 끝 */}
-						<View style={styles.statusHelpButton}>
-							<ToolTipComponent text="점수는 정답마다 오르고, 연속으로 맞히면 콤보 보너스가 붙습니다. 100점마다 시간 +10초, 200·500점에서 하트 +1." />
 						</View>
 					</View>
 				)}
@@ -1338,19 +1334,6 @@ const InfinityQuizScreen = () => {
 					</View>
 				</Animated.View>
 			)}
-			<CharacterGuide
-				visible={guide.visible}
-				onClose={() => {
-					guide.close();
-					setIsPaused(false); // 안내를 닫으면 다시 시간이 흐른다
-				}}
-				lines={[
-					'제한 시간 안에 속담 뜻을 최대한 많이 맞히는 도전입니다.',
-					'연속으로 맞히면 콤보가 쌓여 점수가 더 많이 오릅니다.',
-					'스킵과 찬스는 각각 한 번씩만 쓸 수 있으니 아껴두세요!',
-				]}
-				title="타임 챌린지, 이렇게 합니다"
-			/>
 		</SafeAreaView>
 	);
 };
@@ -1504,7 +1487,7 @@ const styles = themedStyles(() => StyleSheet.create({
 
 	statusBox: {
 		flex: 1,
-		marginHorizontal: SPACING_W.xs,
+		// 가로 간격은 부모(statusBoxRow) 의 gap 하나로만 준다 — margin 과 겹쳐 박스마다 여백이 달라 보이던 문제
 		backgroundColor: COLORS.background,
 		borderRadius: RADIUS.md,
 		paddingVertical: SPACING_H.smPlus,
@@ -1549,10 +1532,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderBottomWidth: 1,
 		borderBottomColor: COLORS.surfaceAlt,
 		gap: SPACING_W.xsPlus,
-	},
-	guideRow: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: SPACING_H.xs },
-	statusHelpButton: {
-		alignSelf: 'center',
 	},
 	statusBoxRow: {
 		marginTop: SPACING_H.sm,
@@ -2057,6 +2036,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.accentFlame,
 	},
 	quizScrollContent: {
+		// 도움말 버튼 행을 걷어내며 상태 박스가 화면 위쪽에 바짝 붙었다 — 그만큼 위를 띄운다
+		paddingTop: SPACING_H.md,
 		paddingBottom: SPACING_H.xxxxl,
 	},
 	resultScrollContent: {

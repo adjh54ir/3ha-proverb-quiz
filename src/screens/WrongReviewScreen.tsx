@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
 import Skeleton from '@/screens/common/atomic/Skeleton';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
@@ -8,21 +8,72 @@ import IconComponent from './common/atomic/IconComponent';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
-import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
+import { LEVEL_NAME_BY_NUMBER, getLevelColorByNumber, getCategoryColor } from '@/screens/common/CommonProverbModule';
+import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
+/** 필터 '전체' 값 — 난이도(숫자)·카테고리(문자열) 어느 쪽과도 겹치지 않게 심볼 대신 상수 하나만 쓴다 */
+const ALL = 'all' as const;
+type ALL = typeof ALL;
+
+type FilterChip<T> = { value: T | ALL; label: string; count: number; color: string };
+
+/**
+ * 필터 칩 한 줄 (난이도 / 주제).
+ * 두 줄이 같은 모양이어야 "같은 성격의 선택지" 로 읽힌다 — 그리는 곳을 하나로 둔다.
+ * 선택된 칩만 자기 색(난이도 램프·카테고리 팔레트)을 옅게 입어 어느 축을 좁혔는지 한눈에 보인다.
+ */
+const FilterChipRow = <T extends number | string>({
+	label,
+	chips,
+	selected,
+	total,
+	onSelect,
+}: {
+	label: string;
+	chips: FilterChip<T>[];
+	selected: T | ALL;
+	total: number;
+	onSelect: (value: T | ALL) => void;
+}) => (
+	<View style={styles.chipRow}>
+		<Text style={styles.chipRowLabel}>{label}</Text>
+		<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRowScroll}>
+			{[{ value: ALL, label: '전체', count: total, color: COLORS.textSecondary } as FilterChip<T>, ...chips].map((chip) => {
+				const active = selected === chip.value;
+				return (
+					<TouchableOpacity
+						key={String(chip.value)}
+						style={[styles.chip, active && { backgroundColor: withAlpha(chip.color, ALPHA.faint), borderColor: withAlpha(chip.color, ALPHA.border) }]}
+						onPress={() => onSelect(chip.value)}
+						activeOpacity={0.8}
+						accessibilityRole="button"
+						accessibilityState={{ selected: active }}
+						accessibilityLabel={`${label} ${chip.label} ${chip.count}개`}>
+						<Text style={[styles.chipText, active && { color: chip.color, fontWeight: '700' }]} numberOfLines={1}>
+							{chip.label}
+						</Text>
+						<Text style={[styles.chipCount, active && { color: chip.color }]}>{chip.count}</Text>
+					</TouchableOpacity>
+				);
+			})}
+		</ScrollView>
+	</View>
+);
+
 const WrongReviewScreen = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('wrongReview', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const guide = useCharacterGuideOnce('wrongReview');
 	const navigation = useAppNavigation();
 	const isFocused = useIsFocused();
 	const [loading, setLoading] = useState(true);
@@ -34,6 +85,9 @@ const WrongReviewScreen = () => {
 	const [showWrongList, setShowWrongList] = useState(false);
 	const [detailProverb, setDetailProverb] = useState<MainDataType.Proverb | null>(null);
 	const [detailVisible, setDetailVisible] = useState(false);
+	// 복습 범위 — 오답이 쌓일수록 '전부 다시 풀기'는 부담이 커진다. 약한 구간만 골라 풀 수 있게 한다.
+	const [levelFilter, setLevelFilter] = useState<number | ALL>(ALL);
+	const [categoryFilter, setCategoryFilter] = useState<string | ALL>(ALL);
 
 	// ✅ 화면 진입 애니메이션 (fade + slide-up)
 	const contentFade = useRef(new Animated.Value(0)).current;
@@ -48,8 +102,10 @@ const WrongReviewScreen = () => {
 			return;
 		}
 		fetchWrongData();
-		// 다시 들어올 때는 목록을 접고 맨 위에서 시작한다
+		// 다시 들어올 때는 목록을 접고 필터를 풀고 맨 위에서 시작한다
 		setShowWrongList(false);
+		setLevelFilter(ALL);
+		setCategoryFilter(ALL);
 		setDetailVisible(false);
 		setShowScrollTop(false);
 		scrollViewRef.current?.scrollTo({ y: 0, animated: false });
@@ -98,6 +154,57 @@ const WrongReviewScreen = () => {
 		}
 	};
 
+	/** 난이도 칩 — 오답이 하나도 없는 난이도는 아예 만들지 않는다(누를 수 없는 칩은 소음이다) */
+	const levelChips = useMemo(() => {
+		const counts = new Map<number, number>();
+		wrongProverbIds.forEach((p) => counts.set(p.level, (counts.get(p.level) ?? 0) + 1));
+		return [...counts.entries()]
+			.sort((a, b) => a[0] - b[0])
+			.map(([level, count]) => ({
+				value: level as number | ALL,
+				label: LEVEL_NAME_BY_NUMBER[level] ?? '기타',
+				count,
+				color: getLevelColorByNumber(level),
+			}));
+	}, [wrongProverbIds]);
+
+	/** 난이도로 한 번 거른 목록 — 카테고리 칩 개수도 이 기준으로 세야 빈 조합이 생기지 않는다 */
+	const levelFiltered = useMemo(
+		() => (levelFilter === ALL ? wrongProverbIds : wrongProverbIds.filter((p) => p.level === levelFilter)),
+		[wrongProverbIds, levelFilter],
+	);
+
+	const categoryChips = useMemo(() => {
+		const counts = new Map<string, number>();
+		levelFiltered.forEach((p) => counts.set(p.category, (counts.get(p.category) ?? 0) + 1));
+		return [...counts.entries()]
+			.sort((a, b) => b[1] - a[1])
+			.map(([category, count]) => ({
+				value: category as string | ALL,
+				label: category,
+				count,
+				color: getCategoryColor(category),
+			}));
+	}, [levelFiltered]);
+
+	const filteredWrong = useMemo(
+		() => (categoryFilter === ALL ? levelFiltered : levelFiltered.filter((p) => p.category === categoryFilter)),
+		[levelFiltered, categoryFilter],
+	);
+
+	const isFiltered = levelFilter !== ALL || categoryFilter !== ALL;
+
+	/** 난이도를 바꾸면 이전 카테고리가 그 난이도에 없을 수 있다 — 같이 풀어 빈 목록을 막는다 */
+	const handleLevelPress = (value: number | ALL) => {
+		setLevelFilter(value);
+		setCategoryFilter(ALL);
+	};
+
+	const resetFilters = () => {
+		setLevelFilter(ALL);
+		setCategoryFilter(ALL);
+	};
+
 	/**
 	 * 스크롤을 움직일때 동작을 합니다. 하단으로 스크롤을 내릴때 아이콘 생성
 	 * @param event
@@ -108,16 +215,16 @@ const WrongReviewScreen = () => {
 	};
 
 	const startWrongReview = () => {
-		if (wrongProverbIds.length === 0) {
+		if (filteredWrong.length === 0) {
 			return;
 		}
 
 		navigation.push(Paths.QUIZ, {
-			questionPool: wrongProverbIds,
+			questionPool: filteredWrong,
 			isWrongReview: true,
 			title: '오답 복습',
 			mode: 'meaning',
-			selectedLevel: '전체',
+			selectedLevel: levelFilter === ALL ? '전체' : levelFilter,
 			levelKey: 'all',
 		});
 	};
@@ -160,7 +267,6 @@ const WrongReviewScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['bottom']}>
-		<FloatingGuideButton onPress={guide.open} />
 			<ScrollView
 				contentContainerStyle={styles.scrollContainer}
 				ref={scrollViewRef}
@@ -202,9 +308,49 @@ const WrongReviewScreen = () => {
 						</Text>
 					</View>
 
-					<TouchableOpacity style={styles.startButton} onPress={startWrongReview} activeOpacity={0.8}>
+					{/* ✅ 복습 범위 — 난이도/카테고리로 좁혀서 약한 구간만 집중 복습 */}
+					{(levelChips.length > 1 || categoryChips.length > 1) && (
+						<View style={styles.filterCard}>
+							<View style={styles.filterHeadRow}>
+								<Text style={styles.filterTitle}>복습 범위</Text>
+								{isFiltered && (
+									<TouchableOpacity onPress={resetFilters} hitSlop={HIT_SLOP} activeOpacity={0.7} style={styles.filterResetButton}>
+										<IconComponent type="MaterialIcons" name="restart-alt" size={scaledSize(14)} color={COLORS.textSecondary} />
+										<Text style={styles.filterResetText}>전체</Text>
+									</TouchableOpacity>
+								)}
+							</View>
+
+							{levelChips.length > 1 && (
+								<FilterChipRow
+									label="난이도"
+									chips={levelChips}
+									selected={levelFilter}
+									total={wrongProverbIds.length}
+									onSelect={handleLevelPress}
+								/>
+							)}
+							{categoryChips.length > 1 && (
+								<FilterChipRow
+									label="주제"
+									chips={categoryChips}
+									selected={categoryFilter}
+									total={levelFiltered.length}
+									onSelect={setCategoryFilter}
+								/>
+							)}
+						</View>
+					)}
+
+					<TouchableOpacity
+						style={[styles.startButton, filteredWrong.length === 0 && styles.startButtonDisabled]}
+						onPress={startWrongReview}
+						disabled={filteredWrong.length === 0}
+						activeOpacity={0.8}>
 						<IconComponent type="MaterialIcons" name="refresh" size={scaledSize(18)} color={COLORS.textWhite} />
-						<Text style={styles.buttonText}>오답 다시 풀기</Text>
+						<Text style={styles.buttonText}>
+							{isFiltered ? `선택한 ${filteredWrong.length}문제 다시 풀기` : '오답 다시 풀기'}
+						</Text>
 					</TouchableOpacity>
 				</Animated.View>
 
@@ -214,7 +360,7 @@ const WrongReviewScreen = () => {
 						<IconComponent type="MaterialIcons" name="format-list-bulleted" size={scaledSize(18)} color={COLORS.text} />
 						<Text style={styles.toggleButtonText}>오답 목록</Text>
 						<View style={styles.toggleCountBadge}>
-							<Text style={styles.toggleCountText}>{wrongProverbIds.length}</Text>
+							<Text style={styles.toggleCountText}>{filteredWrong.length}</Text>
 						</View>
 					</View>
 					<IconComponent
@@ -227,7 +373,7 @@ const WrongReviewScreen = () => {
 
 				{showWrongList && (
 					<Animated.View style={[styles.reviewCardList, { opacity: listFade }]}>
-						{wrongProverbIds.map((proverb, idx) => (
+						{filteredWrong.map((proverb, idx) => (
 							<TouchableOpacity
 								key={proverb.id}
 								style={styles.reviewCard}
@@ -360,6 +506,79 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.primaryDark,
 	},
 	// ===== 주요 액션 =====
+	// ===== 복습 범위 필터 =====
+	filterCard: {
+		width: '100%',
+		backgroundColor: COLORS.surface,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		borderRadius: RADIUS.lg,
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.md,
+		paddingBottom: SPACING_H.sm,
+		marginBottom: SPACING_H.lg,
+		rowGap: SPACING_H.sm,
+	},
+	filterHeadRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	},
+	filterTitle: {
+		fontSize: FONT_SIZES.md,
+		fontWeight: '700',
+		color: COLORS.textStrong,
+	},
+	filterResetButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.xxs,
+	},
+	filterResetText: {
+		fontSize: FONT_SIZES.xs,
+		fontWeight: '600',
+		color: COLORS.textSecondary,
+	},
+	chipRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.sm,
+	},
+	chipRowLabel: {
+		width: scaleWidth(38),
+		fontSize: FONT_SIZES.xs,
+		fontWeight: '600',
+		color: COLORS.textLight,
+	},
+	chipRowScroll: {
+		columnGap: SPACING_W.xs,
+		paddingVertical: SPACING_H.xs,
+		paddingRight: SPACING_W.lg,
+	},
+	chip: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.xs,
+		paddingHorizontal: SPACING_W.md,
+		paddingVertical: SPACING_H.xs,
+		borderRadius: RADIUS.round,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.background,
+	},
+	chipText: {
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '600',
+		color: COLORS.textSecondary,
+	},
+	chipCount: {
+		fontSize: FONT_SIZES.xxs,
+		fontWeight: '700',
+		color: COLORS.textLight,
+	},
+	startButtonDisabled: {
+		backgroundColor: COLORS.borderDark,
+	},
 	startButton: {
 		flexDirection: 'row',
 		alignItems: 'center',

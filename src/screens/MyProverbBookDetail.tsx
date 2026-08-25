@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,7 +17,7 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { useToast } from '@/hooks/useToast';
-import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 import ScreenHeader from '@/screens/common/ScreenHeader';
@@ -34,8 +34,9 @@ const PRACTICE_RECORD_KEY = MainStorageKeyType.USER_PROVERB_PRACTICE_RECORDS;
  */
 
 const MyProverbBookDetail = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('myProverbBookDetail', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const listRef = useRef<FlatList<MainDataType.Proverb>>(null);
+	const guide = useCharacterGuideOnce('myProverbBookDetail');
 	const navigation = useNavigation<any>();
 	const route = useRoute<any>();
 	const { bookId } = route.params as { bookId: string };
@@ -67,6 +68,7 @@ const MyProverbBookDetail = () => {
 			setAddModalVisible(false);
 			setQuizModeModal(null);
 			setShowDetailModal(false);
+			listRef.current?.scrollToOffset({ offset: 0, animated: false });
 		}, [bookId]),
 	);
 
@@ -186,7 +188,6 @@ const MyProverbBookDetail = () => {
 									<Text style={[styles.headerAction, removeMode && styles.headerActionActive]}>{removeMode ? '취소' : '편집'}</Text>
 								</TouchableOpacity>
 							)}
-							<CharacterGuideButton onPress={guide.open} />
 						</>
 					}
 				/>
@@ -222,6 +223,7 @@ const MyProverbBookDetail = () => {
 				</View>
 
 				<FlatList
+					ref={listRef}
 					data={proverbs}
 					keyExtractor={(item) => item.id.toString()}
 					renderItem={renderItem}

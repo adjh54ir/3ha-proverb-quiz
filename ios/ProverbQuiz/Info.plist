@@ -30,6 +30,13 @@
 	<true/>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>사용자님께 더 관련성 높은 광고를 제공하기 위해 기기의 광고 식별자 사용 권한이 필요합니다.</string>
+	<!--
+	  ITMS-90683 대응. 이 앱은 사진 라이브러리를 직접 쓰지 않지만, 심사 도구는 앱에 포함된
+	  외부 SDK(광고 등)가 참조하는 API 까지 훑어 목적 문자열을 요구한다.
+	  문자열이 있어도 앱이 API 를 부르지 않으면 권한 팝업은 절대 뜨지 않는다.
+	-->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>이 앱은 사진 라이브러리에 접근하지 않습니다. 광고 SDK가 참조하는 시스템 기능 때문에 표시되는 안내입니다.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

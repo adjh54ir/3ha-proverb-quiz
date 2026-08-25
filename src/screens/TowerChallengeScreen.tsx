@@ -19,7 +19,7 @@ import CompleteOverlay from './common/CompleteOverlay';
 import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
-import CharacterGuide, { useCharacterGuideOnce, FloatingGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { read, write } from '@/services/StorageService';
 
@@ -27,8 +27,8 @@ const TOWER_STORAGE_KEY = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
 const SCREEN_WIDTH = screenWidth;
 
 const TowerChallengeScreen = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('towerChallenge', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const guide = useCharacterGuideOnce('towerChallenge');
 	const navigation = useAppNavigation();
 	const [progress, setProgress] = useState<TowerProgress>({
 		level: 1,
@@ -59,6 +59,7 @@ const TowerChallengeScreen = () => {
 	useFocusEffect(
 		useCallback(() => {
 			loadProgress();
+			setShowAd(false); // 광고를 띄운 채 나갔다 돌아오면 다시 뜨는 것을 막는다
 		}, []),
 	);
 
@@ -284,7 +285,6 @@ const TowerChallengeScreen = () => {
 			<LinearGradient colors={COLORS.darkGradient} style={StyleSheet.absoluteFillObject} />
 
 			<SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-			<FloatingGuideButton onPress={guide.open} tone="onDark" />
 				{/* 타워 메인 헤더 */}
 				<Animated.View
 					style={[

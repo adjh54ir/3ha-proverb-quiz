@@ -28,7 +28,7 @@ import Icon from 'react-native-vector-icons/FontAwesome6';
 import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import { playCorrect, playWrong, playFinish } from '@/utils/SoundUtils';
 import { scheduleDailyQuizReminder, cancelDailyQuizReminder, DAILY_QUIZ_NOTIFICATION_ID } from '@/utils/NotifactionHelper';
-import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import * as TodayQuizService from '@/services/TodayQuizService';
 
@@ -70,8 +70,8 @@ type GroupedPrevQuiz = {
 };
 
 const TodayQuizScreen = () => {
-	// 첫 실행 안내는 홈에서 한 번만 띄운다 — 화면마다 뜨면 성가시다. 여기선 물음표 버튼으로만 연다
-	const guide = useCharacterGuideOnce('todayQuiz', false);
+	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
+	const guide = useCharacterGuideOnce('todayQuiz');
 	const STORAGE_KEY = MainStorageKeyType.TODAY_QUIZ_LIST;
 	const SETTING_KEY = MainStorageKeyType.SETTING_INFO;
 
@@ -723,7 +723,6 @@ const TodayQuizScreen = () => {
 							</TouchableOpacity>
 						</View>
 					)}
-					<CharacterGuideButton onPress={guide.open} />
 				</View>
 
 				<View style={styles.rightAlignedRow} />

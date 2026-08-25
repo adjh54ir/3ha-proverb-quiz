@@ -1,6 +1,7 @@
 import React from 'react';
 import { Animated, View, Text, Image, StyleSheet, TouchableOpacity, Linking, ScrollView } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
+import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import IconComponent from '../atomic/IconComponent';
@@ -92,10 +93,11 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(visible);
+	const safePadding = useModalSafePadding();
 
 	return (
 		<Modal animationType="fade" transparent visible={visible} onRequestClose={onClose}>
-			<View style={styles.overlay}>
+			<View style={[styles.overlay, safePadding]}>
 				<Animated.View style={[styles.container, enterStyle]}>
 					<ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 						<View style={styles.profileSection}>
@@ -136,7 +138,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	container: {
 		width: '100%',
-		maxHeight: scaleHeight(680),
+		maxHeight: '100%',
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,

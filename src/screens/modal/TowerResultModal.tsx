@@ -5,6 +5,7 @@ import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
+import useModalSafePadding from '@/hooks/useModalSafePadding';
 
 interface TowerReward {
 	name: string;
@@ -43,6 +44,8 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 }) => {
 	// 회전/폴더블 대응: 화면 크기가 바뀌면 모달 크기도 따라간다.
 	const { width, height } = useWindowDimensions();
+	// 오버레이는 시스템 바를 포함한 screen 크기라 카드가 그 밑까지 파고든다(CLAUDE.md 모달 규칙 1·4).
+	const safePadding = useModalSafePadding();
 	const scaleAnim = useRef(new Animated.Value(0)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
 	const starAnims = useRef([new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)]).current;
@@ -126,7 +129,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 	return (
 		<Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onHome}>
 			{/* 오버레이 */}
-			<Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
+			<Animated.View style={[styles.overlay, safePadding, { opacity: fadeAnim }]}>
 				{/* 모달 전체 컨테이너: 화면 높이의 일정 비율로 고정 */}
 				<Animated.View
 					style={[
@@ -289,6 +292,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	modalContainer: {
 		// 크기(width/height)는 useWindowDimensions 값으로 호출부에서 지정한다.
+		// 오버레이 안전 여백을 뺀 높이를 넘지 않도록 상한을 둔다(고정 height 만으로는 잘린다).
+		maxHeight: '100%',
 		borderRadius: RADIUS.xl,
 		overflow: 'hidden',
 		borderWidth: 1.5,

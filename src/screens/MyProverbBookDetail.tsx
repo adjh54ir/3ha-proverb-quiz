@@ -12,6 +12,7 @@ import BottomHomeButton from './common/BottomHomeButton';
 import AddProverbModal from './modal/AddProverbModal';
 import QuizModeModal from './modal/QuizModeModal';
 import ProverbDetailModal from './modal/ProverbDetailModal';
+import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
 import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
@@ -56,6 +57,7 @@ const MyProverbBookDetail = () => {
 	const [removeMode, setRemoveMode] = useState(false);
 	const [selectedForRemove, setSelectedForRemove] = useState<Set<number>>(new Set());
 	const [removeConfirmVisible, setRemoveConfirmVisible] = useState(false);
+	const [showScrollTop, setShowScrollTop] = useState(false);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -225,6 +227,8 @@ const MyProverbBookDetail = () => {
 				<FlatList
 					ref={listRef}
 					data={proverbs}
+					onScroll={(event) => setShowScrollTop(event.nativeEvent.contentOffset.y > SCROLL_TOP_THRESHOLD)}
+					scrollEventThrottle={16}
 					keyExtractor={(item) => item.id.toString()}
 					renderItem={renderItem}
 					contentContainerStyle={[styles.listContent, removeMode && styles.listContentWithBar]}
@@ -235,6 +239,11 @@ const MyProverbBookDetail = () => {
 							<Text style={styles.emptyDesc}>속담 추가 버튼을 눌러 채워보세요!</Text>
 						</View>
 					)}
+				/>
+
+				<ScrollTopButton
+					visible={showScrollTop}
+					onPress={() => listRef.current?.scrollToOffset({ offset: 0, animated: true })}
 				/>
 
 				{removeMode && (

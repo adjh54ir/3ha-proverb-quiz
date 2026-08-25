@@ -272,7 +272,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 												marginTop: '25%',
 												width: '85%',
 												alignSelf: 'center',
-												maxHeight: scaleHeight(500),
+												maxHeight: '60%',
 												backgroundColor: COLORS.surface,
 												borderRadius: RADIUS.xl,
 												paddingVertical: SPACING_H.xl,

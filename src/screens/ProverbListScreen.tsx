@@ -80,6 +80,8 @@ const ProverbListScreen = () => {
 	const scrollRef = useRef<FlatList>(null);
 	const searchInputRef = useRef<TextInput>(null);
 	const headerAnim = useRef(new Animated.Value(0)).current;
+	// 필터 초기화 지연 타이머 — 언마운트 시 정리해서 unmounted setState 를 막는다
+	const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const emptyImage = require('@/assets/images/feature-states/empty-search.png');
 	const [refreshing, setRefreshing] = useState(false);
@@ -151,7 +153,10 @@ const ProverbListScreen = () => {
 	useEffect(() => {
 		const anim = Animated.timing(headerAnim, { toValue: 1, duration: 300, useNativeDriver: true });
 		anim.start();
-		return () => anim.stop();
+		return () => {
+			anim.stop();
+			if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+		};
 	}, []);
 
 	// 🔄 화면 포커스 시 초기화 + 데이터 로드
@@ -236,7 +241,8 @@ const ProverbListScreen = () => {
 		Keyboard.dismiss();
 
 		// 3. 약간의 지연 후 값 초기화 (포커싱 이슈 방지)
-		setTimeout(() => {
+		if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+		resetTimerRef.current = setTimeout(() => {
 			setKeyword('');
 			setCategoryValue('전체');
 			setLevelValue('전체');

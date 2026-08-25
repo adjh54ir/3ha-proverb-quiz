@@ -1010,7 +1010,7 @@ const QuizStudyScreen = () => {
 												marginTop: '25%',
 												width: '85%',
 												alignSelf: 'center',
-												maxHeight: scaleHeight(500),
+												maxHeight: '60%',
 												backgroundColor: COLORS.surface,
 												borderWidth: 1,
 												borderColor: COLORS.border,

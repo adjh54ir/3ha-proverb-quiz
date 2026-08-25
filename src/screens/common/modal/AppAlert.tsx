@@ -2,6 +2,7 @@ import React, { useCallback, useSyncExternalStore } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Modal from '@/screens/common/atomic/AppModal';
+import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import { scaleHeight, scaleWidth } from '@/utils/DementionUtils';
@@ -83,6 +84,7 @@ export const AppAlert = { alert, dismiss };
 export const AppAlertHost = (): React.ReactElement | null => {
 	const current = useSyncExternalStore(subscribe, getState, getState);
 	const enterStyle = useModalEnter(current.visible);
+	const safePadding = useModalSafePadding();
 
 	const handlePress = useCallback((button: AppAlertButton) => {
 		dismiss();
@@ -108,7 +110,7 @@ export const AppAlertHost = (): React.ReactElement | null => {
 
 	return (
 		<Modal visible transparent animationType="fade" onRequestClose={handleRequestClose}>
-			<View style={styles.overlay}>
+			<View style={[styles.overlay, safePadding]}>
 				<Animated.View style={[styles.card, enterStyle]}>
 					<Text style={styles.title}>{current.title}</Text>
 					{!!current.message && <Text style={styles.message}>{current.message}</Text>}
@@ -154,6 +156,7 @@ const styles = themedStyles(() =>
 		},
 		card: {
 			width: '100%',
+			maxHeight: '100%',
 			maxWidth: scaleWidth(340),
 			backgroundColor: COLORS.surface,
 			borderRadius: RADIUS.xl,

@@ -26,6 +26,7 @@ import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
+import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { playCorrect, playWrong, playFinish } from '@/utils/SoundUtils';
 import { scheduleDailyQuizReminder, cancelDailyQuizReminder, DAILY_QUIZ_NOTIFICATION_ID } from '@/utils/NotifactionHelper';
 import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
@@ -70,6 +71,8 @@ type GroupedPrevQuiz = {
 };
 
 const TodayQuizScreen = () => {
+	// 모달 카드가 상태바·내비게이션바 밑으로 파고들지 않도록 하는 오버레이 여백
+	const safePadding = useModalSafePadding();
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('todayQuiz');
 	const STORAGE_KEY = MainStorageKeyType.TODAY_QUIZ_LIST;
@@ -932,7 +935,7 @@ const TodayQuizScreen = () => {
 			</FadeInView>
 
 			<Modal visible={showAlarmModal} transparent animationType="fade" onRequestClose={() => setShowAlarmModal(false)}>
-				<View style={styles.modalOverlay}>
+				<View style={[styles.modalOverlay, safePadding]}>
 					<View style={styles.alarmModalCard}>
 						<Text style={styles.modalTitle2}>🔔 오늘의 퀴즈 알림 설정</Text>
 
@@ -1030,7 +1033,7 @@ const TodayQuizScreen = () => {
 				</View>
 			</Modal>
 			<Modal visible={showPrevQuizModal} transparent animationType="fade" onRequestClose={() => setShowPrevQuizModal(false)}>
-				<View style={styles.modalOverlay}>
+				<View style={[styles.modalOverlay, safePadding]}>
 					<View style={styles.alarmModalCard}>
 						{/* 닫기 아이콘 */}
 						<TouchableOpacity
@@ -1703,6 +1706,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	alarmModalCard: {
 		width: '100%',
 		maxWidth: scaleWidth(420),
+		maxHeight: '100%',
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,
@@ -1810,7 +1814,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.text,
 	},
 	scrollView: {
-		maxHeight: scaleHeight(520),
+		// scaleHeight(520) 은 '화면 높이의 64%' 라 큰 기기에서 카드가 같이 커졌다.
+		// 카드 maxHeight: '100%' 안에서 남는 높이만 차지하도록 flexShrink 로 바꾼다.
+		flexShrink: 1,
 		width: '100%',
 	},
 	scrollContent: {

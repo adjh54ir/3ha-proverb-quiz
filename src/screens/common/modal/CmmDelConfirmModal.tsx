@@ -4,6 +4,7 @@ import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '
 import React, { FC } from 'react';
 import { Animated, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
+import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
 
 type IconType = 'MaterialCommunityIcons' | 'materialIcons';
@@ -47,10 +48,11 @@ const CmmDelConfirmModal: FC<Props> = ({
 
     // 모달 공통 진입 애니메이션 (fade + scale)
     const enterStyle = useModalEnter(visible);
+    const safePadding = useModalSafePadding();
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={_onRequestClose}>
-            <View style={styles.modalBackdrop}>
+            <View style={[styles.modalBackdrop, safePadding]}>
                 <Animated.View style={[styles.modalContainer, enterStyle]}>
                     {renderTitle && renderTitle()}
                     <Text style={styles.modalSummary}>{summary}</Text>
@@ -79,6 +81,7 @@ const styles = themedStyles(() => StyleSheet.create({
     modalContainer: {
         width: '100%',
         maxWidth: scaleWidth(360),
+        maxHeight: '100%',
         backgroundColor: COLORS.surface,
         borderRadius: RADIUS.xl,
         paddingHorizontal: SPACING_W.lg,

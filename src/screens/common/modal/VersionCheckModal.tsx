@@ -5,6 +5,7 @@ import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, AppState, View, Text, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Linking, Platform, Image } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
+import useModalSafePadding from '@/hooks/useModalSafePadding';
 import VersionCheck from 'react-native-version-check';
 import { useThemeMode } from '@/hooks/useThemeMode';
 import { useDispatch } from 'react-redux';
@@ -77,6 +78,7 @@ const VersionCheckModal = () => {
 
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(visible);
+	const safePadding = useModalSafePadding();
 
 	useEffect(() => {
 		let mounted = true;
@@ -156,7 +158,7 @@ const VersionCheckModal = () => {
 			presentationStyle="overFullScreen" // ✅ iOS에서도 안정적
 			onRequestClose={isForce ? () => {} : handleClose}>
 			<TouchableWithoutFeedback onPress={handleClose}>
-				<View style={styles.overlay}>
+				<View style={[styles.overlay, safePadding]}>
 					<TouchableWithoutFeedback onPress={() => {}}>
 						<Animated.View style={[styles.card, enterStyle]}>
 							<View style={[styles.iconWrap, isForce && styles.iconWrapForce]}>

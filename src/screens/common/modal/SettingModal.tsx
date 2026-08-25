@@ -3,6 +3,7 @@ import React from 'react';
 import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
 import { Animated, View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
+import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { scaledSize, scaleHeight } from '@/utils/DementionUtils';
 import Markdown from 'react-native-markdown-display';
@@ -213,10 +214,11 @@ Wi-Fi 외 환경에서 사용 시 발생하는 데이터 요금 및 로밍 요�
 
 export const TermsOfServiceModal = ({ visible, onClose }) => {
   const enterStyle = useModalEnter(visible);
+  const safePadding = useModalSafePadding();
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={modalStyles.overlay}>
+      <View style={[modalStyles.overlay, safePadding]}>
         <Animated.View style={[modalStyles.container, enterStyle]}>
           <View style={modalStyles.header}>
             <View style={modalStyles.spacer} />
@@ -285,10 +287,11 @@ const openSourceData = [
 
 export const OpenSourceModal = ({ visible, onClose }) => {
   const enterStyle = useModalEnter(visible);
+  const safePadding = useModalSafePadding();
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={modalStyles.overlay}>
+      <View style={[modalStyles.overlay, safePadding]}>
         <Animated.View style={[modalStyles.container, enterStyle]}>
           <View style={modalStyles.header}>
             <View style={modalStyles.spacer} />
@@ -349,7 +352,7 @@ const modalStyles = themedStyles(() => StyleSheet.create({
   },
   container: {
     width: '100%',
-    maxHeight: scaleHeight(680),
+    maxHeight: '100%',
     backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,

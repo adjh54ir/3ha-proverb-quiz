@@ -17,6 +17,7 @@ import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import ProverbDetailModal from './modal/ProverbDetailModal';
+import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
 import { useToast } from '@/hooks/useToast';
 import BottomHomeButton from './common/BottomHomeButton';
 import FavoriteAddModal from './modal/FavoriteAddModal';
@@ -44,6 +45,8 @@ const FavoriteScreen = () => {
 	const emptySearchImage = require('@/assets/images/feature-states/empty-search.png');
 	const flatListRef = useRef<FlatList>(null);
 	const headerAnim = useRef(new Animated.Value(0)).current;
+	// 필터 초기화 지연 타이머 — 언마운트 시 정리해서 unmounted setState 를 막는다
+	const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
 	const [allFavorites, setAllFavorites] = useState<MainDataType.Proverb[]>([]);
@@ -62,6 +65,7 @@ const FavoriteScreen = () => {
 	const [isSelectionMode, setIsSelectionMode] = useState(false);
 	const [selectedIds, setSelectedIds] = useState<number[]>([]);
 	const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+	const [showScrollTop, setShowScrollTop] = useState(false);
 
 	// ─── 드롭다운 상태 ─────────────────────────────────────────
 	const [fieldOpen, setFieldOpen] = useState(false);
@@ -75,7 +79,10 @@ const FavoriteScreen = () => {
 	useEffect(() => {
 		const anim = Animated.timing(headerAnim, { toValue: 1, duration: 300, useNativeDriver: true });
 		anim.start();
-		return () => anim.stop();
+		return () => {
+			anim.stop();
+			if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+		};
 	}, []);
 
 	// 카테고리 항목을 데이터에서 동적 구성
@@ -151,7 +158,8 @@ const FavoriteScreen = () => {
 		setFieldOpen(false);
 		setLevelOpen(false);
 		Keyboard.dismiss();
-		setTimeout(() => {
+		if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+		resetTimerRef.current = setTimeout(() => {
 			setKeyword('');
 			setCategoryValue('전체');
 			setLevelValue('전체');
@@ -464,6 +472,8 @@ const FavoriteScreen = () => {
 						<FlatList
 							ref={flatListRef}
 							data={filteredList}
+							onScroll={(event) => setShowScrollTop(event.nativeEvent.contentOffset.y > SCROLL_TOP_THRESHOLD)}
+							scrollEventThrottle={16}
 							scrollEnabled={!fieldOpen && !levelOpen}
 							keyExtractor={(item) => item.id.toString()}
 							renderItem={renderItem}
@@ -498,6 +508,11 @@ const FavoriteScreen = () => {
 									)}
 								</View>
 							)}
+						/>
+
+						<ScrollTopButton
+							visible={showScrollTop}
+							onPress={() => flatListRef.current?.scrollToOffset({ offset: 0, animated: true })}
 						/>
 
 						{isSelectionMode && (

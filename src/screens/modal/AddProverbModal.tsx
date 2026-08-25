@@ -235,7 +235,7 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 												</TouchableOpacity>
 											)}
 											modalProps={{ animationType: 'fade', presentationStyle: 'overFullScreen', transparent: true }}
-											modalContentContainerStyle={{ marginTop: '25%', width: '85%', alignSelf: 'center', maxHeight: scaleHeight(500), backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, paddingVertical: SPACING_H.xl }}
+											modalContentContainerStyle={{ marginTop: '25%', width: '85%', alignSelf: 'center', maxHeight: '60%', backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, paddingVertical: SPACING_H.xl }}
 											modalTitleStyle={{ fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, textAlign: 'center', paddingVertical: SPACING_H.md, paddingHorizontal: SPACING_W.lg }}
 										/>
 									</View>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, Animated, StyleSheet, Image, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, Animated, StyleSheet, Image, Switch, ScrollView } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
@@ -102,57 +102,60 @@ const QuizStartModal = ({
 		<Modal visible transparent animationType="fade" onRequestClose={onBack}>
 			<View style={[styles.overlay, safePadding]}>
 				<Animated.View style={[styles.card, enterStyle]}>
-					<Image source={require('@/assets/images/home-mascot-moments/mascot-challenge-final.png')} style={styles.headerMascot} resizeMode="contain" />
+					{/* 작은 기기에서 내용이 카드 높이를 넘으면 버튼은 고정한 채 위쪽만 스크롤된다. */}
+					<ScrollView style={styles.body} contentContainerStyle={styles.bodyContent} showsVerticalScrollIndicator={false}>
+						<Image source={require('@/assets/images/home-mascot-moments/mascot-challenge-final.png')} style={styles.headerMascot} resizeMode="contain" />
 
-					<Text style={styles.title}>{meta.title}</Text>
-					<Text style={styles.desc}>{meta.desc}</Text>
+						<Text style={styles.title}>{meta.title}</Text>
+						<Text style={styles.desc}>{meta.desc}</Text>
 
-					{isPracticeMode && (
-						<View style={styles.practiceBanner}>
-							<IconComponent type="materialIcons" name="info" size={scaledSize(14)} color={COLORS.warningDark} />
-							<Text style={styles.practiceText}>연습 모드 · 점수와 뱃지가 기록되지 않습니다.</Text>
+						{isPracticeMode && (
+							<View style={styles.practiceBanner}>
+								<IconComponent type="materialIcons" name="info" size={scaledSize(14)} color={COLORS.warningDark} />
+								<Text style={styles.practiceText}>연습 모드 · 점수와 뱃지가 기록되지 않습니다.</Text>
+							</View>
+						)}
+
+						<View style={styles.infoBox}>
+							{infoRows.map((row, i) => (
+								<View key={i} style={[styles.infoRow, i === infoRows.length - 1 && { marginBottom: 0 }]}>
+									<View style={styles.infoIconChip}>
+										<IconComponent type="materialIcons" name={row.icon} size={scaledSize(15)} color={COLORS.primary} />
+									</View>
+									<Text style={styles.infoText}>{row.text}</Text>
+								</View>
+							))}
 						</View>
-					)}
 
-					<View style={styles.infoBox}>
-						{infoRows.map((row, i) => (
-							<View key={i} style={[styles.infoRow, i === infoRows.length - 1 && { marginBottom: 0 }]}>
-								<View style={styles.infoIconChip}>
-									<IconComponent type="materialIcons" name={row.icon} size={scaledSize(15)} color={COLORS.primary} />
-								</View>
-								<Text style={styles.infoText}>{row.text}</Text>
-							</View>
-						))}
-					</View>
-
-					{/* 🔊 시작 전 소리 설정 — 설정 화면까지 나가지 않고 바로 끄고 켠다 */}
-					<View style={styles.soundBox}>
-						{[
-							{ key: 'sfx', on: sfxOn, onChange: toggleSfx, icon: sfxOn ? 'volume-up' : 'volume-off', label: '효과음' },
-							{ key: 'bgm', on: bgmOn, onChange: toggleBgm, icon: bgmOn ? 'music-note' : 'music-off', label: '배경음악' },
-						].map((row, i) => (
-							<View key={row.key} style={[styles.soundRow, i === 0 && styles.soundRowDivider]}>
-								<View style={styles.soundLabelWrap}>
-									<IconComponent
-										type="materialIcons"
-										name={row.icon}
-										size={scaledSize(16)}
-										color={row.on ? COLORS.primary : COLORS.textLight}
+						{/* 🔊 시작 전 소리 설정 — 설정 화면까지 나가지 않고 바로 끄고 켠다 */}
+						<View style={styles.soundBox}>
+							{[
+								{ key: 'sfx', on: sfxOn, onChange: toggleSfx, icon: sfxOn ? 'volume-up' : 'volume-off', label: '효과음' },
+								{ key: 'bgm', on: bgmOn, onChange: toggleBgm, icon: bgmOn ? 'music-note' : 'music-off', label: '배경음악' },
+							].map((row, i) => (
+								<View key={row.key} style={[styles.soundRow, i === 0 && styles.soundRowDivider]}>
+									<View style={styles.soundLabelWrap}>
+										<IconComponent
+											type="materialIcons"
+											name={row.icon}
+											size={scaledSize(16)}
+											color={row.on ? COLORS.primary : COLORS.textLight}
+										/>
+										<Text style={styles.soundLabel} numberOfLines={1} ellipsizeMode="tail">
+											{row.label}
+										</Text>
+									</View>
+									<Switch
+										value={row.on}
+										onValueChange={row.onChange}
+										trackColor={{ false: COLORS.borderDark, true: COLORS.primaryLight }}
+										thumbColor={row.on ? COLORS.primaryDark : COLORS.surfaceAlt}
+										accessibilityLabel={row.label}
 									/>
-									<Text style={styles.soundLabel} numberOfLines={1} ellipsizeMode="tail">
-										{row.label}
-									</Text>
 								</View>
-								<Switch
-									value={row.on}
-									onValueChange={row.onChange}
-									trackColor={{ false: COLORS.borderDark, true: COLORS.primaryLight }}
-									thumbColor={row.on ? COLORS.primaryDark : COLORS.surfaceAlt}
-									accessibilityLabel={row.label}
-								/>
-							</View>
-						))}
-					</View>
+							))}
+						</View>
+					</ScrollView>
 
 					<View style={styles.buttonRow}>
 						<TouchableOpacity style={styles.secondaryButton} onPress={onBack} activeOpacity={0.8}>
@@ -180,9 +183,17 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: SPACING_W.lg,
 	},
+	body: {
+		width: '100%',
+		flexGrow: 0,
+	},
+	bodyContent: {
+		alignItems: 'center',
+	},
 	card: {
 		width: '100%',
 		maxWidth: scaleWidth(340),
+		maxHeight: '100%', // 카드가 시스템 바를 넘지 않도록(모달 레이아웃 규칙 2)
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,

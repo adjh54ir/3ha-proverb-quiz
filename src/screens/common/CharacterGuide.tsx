@@ -19,9 +19,9 @@ const SEEN_PREFIX = 'CHAR_GUIDE_SEEN_';
  *
  * 앱 전체 안내 정책 (한 가지만 쓴다)
  *  1. 화면에 **처음 들어갈 때 1회** 자동으로 뜬다.
- *  2. 화면 안에는 안내를 여는 물음표 버튼을 두지 않는다 —
- *     화면마다 위치가 달라지고, 배너 광고와 겹치고, 데이터 설명용 툴팁과 헷갈렸다.
- *  3. 다시 보려면 **설정 > 화면 안내 > 화면 사용법 안내 다시보기** 한 곳뿐이다.
+ *  2. 다시 보려면 화면 안 물음표 버튼(CharacterGuideButton)을 누른다 — open() 으로 같은 안내를 다시 연다.
+ *     검은 툴팁 대신 캐릭터가 말풍선으로 설명해 앱 전체 안내 방식이 하나로 통일된다.
+ *  3. 설정 > 화면 안내 > 화면 사용법 안내 다시보기 에서 '처음 본 적 없음' 상태로 되돌릴 수 있다.
  *  4. 문제를 푸는 중(퀴즈·타워퀴즈·타임챌린지)에는 안내를 두지 않는다.
  *     그 화면들의 규칙은 시작 팝업(QuizStartModal)·규칙 화면이 이미 설명한다.
  *
@@ -48,8 +48,31 @@ export const useCharacterGuideOnce = (id: string, enabled = true) => {
 		setVisible(false);
 		AsyncStorage.setItem(SEEN_PREFIX + id, '1').catch(() => {});
 	}, [id]);
-	return { visible, close };
+	/** 물음표 버튼으로 안내를 다시 열 때 사용 */
+	const open = useCallback(() => setVisible(true), []);
+	return { visible, close, open };
 };
+
+/**
+ * 화면 안에 놓는 '이 화면 사용법 다시 보기' 물음표 버튼.
+ * useCharacterGuideOnce 의 open 을 연결해 쓴다.
+ *
+ * @example <CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
+ */
+export const CharacterGuideButton: React.FC<{ onPress: () => void; color?: string; size?: number }> = ({
+	onPress,
+	color = COLORS.textSecondary,
+	size = scaledSize(20),
+}) => (
+	<TouchableOpacity
+		onPress={onPress}
+		hitSlop={{ top: scaleHeight(10), bottom: scaleHeight(10), left: scaleWidth(10), right: scaleWidth(10) }}
+		activeOpacity={0.7}
+		accessibilityRole="button"
+		accessibilityLabel="이 화면 사용법 다시 보기">
+		<IconComponent type="materialIcons" name="help-outline" size={size} color={color} />
+	</TouchableOpacity>
+);
 
 /** 저장해 둔 '본 적 있음' 기록 초기화 (데이터 초기화에서 사용) */
 export const resetCharacterGuideSeen = async () => {

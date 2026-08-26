@@ -13,38 +13,28 @@
  */
 import Sound from 'react-native-sound';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import DateUtils from '@/utils/DateUtils';
 
 /**
- * 오디오 세션 설정 — 다른 앱의 음악·영상을 절대 끊지 않는 것을 최우선으로 한다.
+ * 오디오 세션 설정 — 소리가 실제로 귀에 들리는 것을 최우선으로 한다.
  *
- * 이전에는 Playback + 오디오 포커스 획득이었는데, 그러면 앱을 켜는 순간 사용자가 보던
- * 유튜브/음악이 그대로 멈춘다. 효과음 0.1~1.7초 때문에 남의 재생을 죽이는 건 과하다.
+ * 믹스(다른 앱 음악 유지)를 택하면 앱이 오디오 포커스를 잡지 않는데, 그러면
+ * 볼륨 버튼이 미디어 볼륨이 아니라 벨소리 볼륨을 조절한다. 미디어 볼륨이 0으로
+ * 내려가 있는 기기에서는 효과음이 0.1~1.7초라 볼륨을 올릴 틈도 없이 그냥 무음이 된다
+ * (iOS·Android 모두에서 "앱 전체가 무음"으로 보이던 원인).
  *
- * 플랫폼마다 인자가 다르다 — 같은 문자열이 서로 다른 뜻이라 통일할 수 없다.
+ * iOS: Playback — 무음 스위치를 무시하고 미디어 볼륨을 쓴다.
+ * Android: mixWithOthers=false — 재생할 때 오디오 포커스를 요청한다(STREAM_MUSIC).
  *
- * iOS: Ambient + mixWithOthers=false.
- *      Ambient 카테고리 자체가 '다른 앱과 섞임'이라 옵션 없이도 믹스된다.
- *      mixWithOthers=true 를 주면 라이브러리가 AllowBluetooth 를 같이 넣는데, 이 옵션은
- *      Record/PlayAndRecord 전용이라 setCategory 가 통째로 실패한다(= 기본 세션 유지).
- *      대가: 무음 스위치를 켜면 효과음이 안 난다 — 게임 효과음의 일반적인 동작이다.
- * Android: Playback + mixWithOthers=true.
- *      mixWithOthers=true 라 requestAudioFocus 를 아예 호출하지 않는다(Sound.kt:202)
- *      = 남의 재생을 뺏지 않는다. 카테고리는 스트림 선택에만 쓰이는데
- *      'Playback' 만 STREAM_MUSIC 이고 'Ambient' 는 STREAM_NOTIFICATION(벨소리 볼륨)이라
- *      여기서 Ambient 를 쓰면 안 된다(Sound.kt:58).
+ * 대가: 다른 앱의 음악/영상 재생이 끊긴다. 라이브러리가 Playback+믹스 조합에서
+ * AllowBluetooth 옵션을 같이 넣어 setCategory 자체가 실패하므로 둘 다 갖는 방법은 없다.
  *
- * 볼륨 버튼이 벨소리 볼륨을 잡던 문제는 세션이 아니라 액티비티 설정이라,
- * MainActivity 의 volumeControlStream = STREAM_MUSIC 으로 따로 해결한다.
+ * ponytail: 믹스까지 원하면 AVAudioSession(iOS)/AudioFocusRequest(Android)를 직접 다루는
+ *           네이티브 모듈이 필요하다. 그때 Playback + MixWithOthers 로 올린다.
  */
 export const applyAudioCategory = () => {
-	if (Platform.OS === 'android') {
-		Sound.setCategory('Playback', true);
-		return;
-	}
-	Sound.setCategory('Ambient', false);
+	Sound.setCategory('Playback', false);
 };
 
 const SOURCES = {

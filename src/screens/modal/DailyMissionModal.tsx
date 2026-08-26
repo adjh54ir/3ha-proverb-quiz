@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Image, ScrollView } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
@@ -110,8 +110,8 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 						</View>
 					</View>
 
-					{/* 미션 목록 */}
-					<View style={styles.list}>
+					{/* 미션 목록 — 작은 기기에서는 헤더·보상은 고정하고 목록만 스크롤한다. */}
+					<ScrollView style={styles.listScroll} contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
 						{allDone ? (
 							<Image
 								source={require('@/assets/images/feature-states/daily-mission-complete.png')}
@@ -146,7 +146,7 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 								/>
 							</View>
 						))}
-					</View>
+					</ScrollView>
 
 					{/* 보상 영역 */}
 					<View style={styles.rewardWrap}>
@@ -185,6 +185,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	card: {
 		width: '100%',
 		maxWidth: scaleWidth(340),
+		maxHeight: '100%', // 카드가 시스템 바를 넘지 않도록(모달 레이아웃 규칙 2)
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,
@@ -232,6 +233,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		height: '100%',
 		borderRadius: RADIUS.round,
 		backgroundColor: COLORS.textWhite,
+	},
+	listScroll: {
+		flexGrow: 0,
 	},
 	list: {
 		paddingHorizontal: SPACING_W.lg,

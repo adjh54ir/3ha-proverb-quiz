@@ -29,8 +29,7 @@ import { PET_REWARDS, getLevelByScore, getProgressPercent, getQuestionsToNext } 
 import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import TowerRewardSection from '@/components/TowerRewardSection';
 import { playFinish } from '@/utils/SoundUtils';
-import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
-import { ToolTipComponent } from '@/screens/common/atomic/ToolTipComponent';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 
 const greetingMessages = [
 	'🎯 반갑습니다! 오늘도 똑똑해질 준비되셨습니까?',
@@ -454,7 +453,7 @@ const Home = () => {
 						<View style={styles.imageContainer}>
 							<View style={styles.streakChipWrapper}>
 								<View style={styles.streakHelpButton}>
-									<ToolTipComponent text="매일 앱에 들어와 출석하면 연속 출석일이 하루씩 쌓입니다. 하루라도 건너뛰면 1일부터 다시 시작합니다." />
+									<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
 								</View>
 								<View style={[styles.streakChip, streakInfo.current > 0 ? styles.streakChipActive : styles.streakChipIdle]}>
 									<IconComponent
@@ -830,6 +829,7 @@ const Home = () => {
 				onClose={guide.close}
 				lines={[
 					'여기는 홈입니다. 오늘 할 학습과 도전을 한눈에 볼 수 있습니다.',
+					'매일 들어와 출석하면 연속 출석일이 하루씩 쌓입니다. 하루라도 건너뛰면 1일부터 다시 시작합니다.',
 					'캐릭터를 누르면 지금 등급과 성장 상태를 확인할 수 있습니다.',
 					'아래 메뉴에서 학습·퀴즈·도전 중 하나를 골라 시작해보세요!',
 				]}

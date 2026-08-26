@@ -44,8 +44,7 @@ import LevelModal from './modal/LevelModal';
 import { FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { getLevelColor } from '@/screens/common/CommonProverbModule';
 import DateUtils from '@/utils/DateUtils';
-import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
-import { ToolTipComponent } from '@/screens/common/atomic/ToolTipComponent';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import { buildDateMark, buildTodayPendingMark, buildSelectedMark } from '@/utils/CalendarMarkUtils';
 import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { read } from '@/services/StorageService';
@@ -545,7 +544,7 @@ const MyScoreScreen = () => {
 				<View style={styles.sectionBox}>
 					{/* 캐릭터 영역 안내 — 줄 가장 오른쪽 */}
 					<View style={styles.characterHelpButton}>
-						<ToolTipComponent text="퀴즈로 점수를 모으면 캐릭터 등급이 올라갑니다. 옆에 붙은 펫은 도전탑 보상으로 얻은 친구입니다." />
+						<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
 					</View>
 					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginTop: SPACING_H.mdPlus, marginBottom: scaleHeight(-8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
 						{/* ✅ 홈화면과 동일한 캐릭터/펫 배치 구조 (래퍼 높이 축소로 타이틀과 밀착) */}
@@ -1418,6 +1417,7 @@ const MyScoreScreen = () => {
 				onClose={guide.close}
 				lines={[
 					'나의 활동에서는 지금까지의 기록을 모아서 볼 수 있습니다.',
+					'퀴즈로 점수를 모으면 캐릭터 등급이 올라갑니다. 옆에 붙은 펫은 도전탑 보상으로 얻은 친구입니다.',
 					'전체 스코어로 학습 진척도와 정답률을 한눈에 확인하세요.',
 					'뱃지를 누르면 획득 조건과 상세 설명이 나옵니다!',
 				]}

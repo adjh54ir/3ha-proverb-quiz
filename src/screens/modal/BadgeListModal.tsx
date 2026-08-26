@@ -261,8 +261,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textWhite,
 	},
 	badgeList: {
+		// scaleHeight(440) 은 상수가 아니라 '화면 높이의 54%' 라 큰 기기에서 목록이 같이 커져
+		// 헤더·필터와 합쳐 카드 maxHeight 를 넘었다. 카드가 남겨 준 높이만 쓰게 둔다.
 		width: '100%',
-		maxHeight: scaleHeight(440),
 		marginTop: SPACING_H.xs,
 	},
 	badgeListContent: {

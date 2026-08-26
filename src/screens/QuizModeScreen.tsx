@@ -201,6 +201,7 @@ const QuizModeScreen = () => {
 					<Animated.ScrollView
 						ref={scrollRef}
 						style={{
+							flex: 1,
 							opacity: enterAnim,
 							transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
 						}}
@@ -398,8 +399,9 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	centerWrapper: {
 		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
+		// alignItems: 'center' 로 두면 ScrollView 폭이 내용에 맞춰 줄어들어(shrink-to-fit)
+		// 그 안의 width:'100%' 카드까지 같이 좁아진다 → 난이도 라벨이 한 글자씩 줄바꿈됨.
+		alignItems: 'stretch',
 		paddingHorizontal: SPACING_W.lg,
 	},
 	// ===== 탭 =====

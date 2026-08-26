@@ -218,6 +218,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingBottom: SPACING_H.lg,
 		paddingHorizontal: SPACING_W.lg,
 		width: '100%',
+		maxHeight: '100%', // 카드가 시스템 바를 넘지 않도록(모달 레이아웃 규칙 2)
 		maxWidth: scaleWidth(340),
 		alignItems: 'center',
 	},

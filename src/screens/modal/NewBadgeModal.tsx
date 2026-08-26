@@ -217,8 +217,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		textAlign: 'center',
 	},
 	badgeScroll: {
+		// scaleHeight(380) 은 '화면 높이의 47%' 라 큰 기기에서 같이 커진다. 카드 maxHeight 안에서
+		// 남는 높이만 쓰게 둔다.
 		width: '100%',
-		maxHeight: scaleHeight(380),
 	},
 	badgeScrollContent: {
 		paddingHorizontal: SPACING_W.xs,

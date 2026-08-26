@@ -90,6 +90,7 @@ const styles = themedStyles(() => StyleSheet.create({
     container: {
         width: '100%',
         maxWidth: scaleWidth(340),
+        maxHeight: '100%', // 카드가 시스템 바를 넘지 않도록(모달 레이아웃 규칙 2)
         backgroundColor: COLORS.surface,
         borderRadius: RADIUS.xl,
         paddingHorizontal: SPACING_W.lg,

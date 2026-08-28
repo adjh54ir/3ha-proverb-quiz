@@ -1,17 +1,18 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Animated, Easing, StyleSheet, useWindowDimensions } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { MainDataType } from '@/types/MainDataType';
 import { BADGE_RARITY_META } from '@/const/ConstBadges';
-import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils/DementionUtils';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { playComplete } from '@/utils/SoundUtils';
 import { useModalEnterExit } from '@/hooks/useModalEnter';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import useReducedMotion from '@/hooks/useReducedMotion';
 
 interface Props {
 	visible: boolean;
@@ -24,6 +25,8 @@ interface Props {
  * - 여러 화면(퀴즈/오늘의 퀴즈 등)에서 동일한 스타일로 재사용합니다.
  */
 const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
+	const { width: windowWidth } = useWindowDimensions();
+	const reducedMotion = useReducedMotion();
 	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
 	const safePadding = useModalSafePadding();
 	// 모달 공통 진입 애니메이션 (fade + scale) — 확인 시에는 되감고 나서 부모에 알린다
@@ -41,6 +44,10 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 		}
 		confettiKey.current += 1;
 		playComplete(); // 🏅 뱃지 획득 사운드
+		if (reducedMotion) {
+			iconPopAnim.setValue(1);
+			return;
+		}
 
 		// 축하 포인트: 뱃지 아이콘 spring pop-in (0 → 1.05 → 1)
 		const iconPop = Animated.spring(iconPopAnim, { toValue: 1, friction: 5, tension: 90, useNativeDriver: true });
@@ -58,7 +65,7 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 			pulse.stop();
 			pulseAnim.stopAnimation();
 		};
-	}, [visible, iconPopAnim, pulseAnim]);
+	}, [visible, iconPopAnim, pulseAnim, reducedMotion]);
 
 	const glowScale = pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1.35] });
 	const glowOpacity = pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0] });
@@ -72,14 +79,14 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={handleConfirm}>
 			<View style={[styles.modalOverlay, safePadding]}>
-				<ConfettiCannon
+				{!reducedMotion && <ConfettiCannon
 					key={confettiKey.current}
 					count={100}
-					origin={{ x: screenWidth / 2, y: 0 }}
+					origin={{ x: windowWidth / 2, y: 0 }}
 					fadeOut
 					autoStart
 					explosionSpeed={350}
-				/>
+				/>}
 
 				<Animated.View style={[styles.badgeModal, enterStyle]}>
 					<ModalCloseButton onPress={handleConfirm} color={COLORS.textSecondary} />

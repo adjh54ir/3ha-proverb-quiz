@@ -159,6 +159,18 @@ const InitTimeChallengeScreen = () => {
 		countdownTimerRef.current = timer;
 	};
 
+	const cancelCountdown = () => {
+		if (countdownTimerRef.current) {
+			clearInterval(countdownTimerRef.current);
+			countdownTimerRef.current = null;
+		}
+		if (countdownTimeoutRef.current) {
+			clearTimeout(countdownTimeoutRef.current);
+			countdownTimeoutRef.current = null;
+		}
+		setIsCountingDown(false);
+	};
+
 	const handleStartChallenge = () => {
 		// 타임 챌린지 시작 시 광고 미노출
 		startCountdown();
@@ -324,7 +336,7 @@ const InitTimeChallengeScreen = () => {
 			</Animated.View>
 			<BottomHomeButton />
 
-			<Modal visible={isCountingDown} transparent animationType="fade" statusBarTranslucent>
+			<Modal visible={isCountingDown} transparent animationType="fade" onRequestClose={cancelCountdown}>
 				<View style={styles.countdownOverlay}>
 					<Animated.View style={[styles.countdownCircle, { transform: [{ scale: scaleAnim }] }]}>
 						<Text style={styles.countdownText}>{count === 0 ? '시작!' : String(count)}</Text>

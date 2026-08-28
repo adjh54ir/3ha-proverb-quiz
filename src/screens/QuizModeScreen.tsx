@@ -25,6 +25,7 @@ import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/Characte
 import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 type QuizModeScreenRouteParams = {
 	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' };
@@ -41,6 +42,7 @@ const LEVEL_DESC: Record<string, string> = {
 };
 
 const QuizModeScreen = () => {
+	const modalSafePadding = useModalSafePadding();
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('quizMode');
 	const navigation = useAppNavigation();
@@ -350,7 +352,7 @@ const QuizModeScreen = () => {
 			{/* 안내 팝업: 화면 안 절대배치 View 로 두면 SafeAreaView 안쪽까지만 딤이 깔려
 			    상태바/네비게이션바 영역이 비어 보인다 → RN Modal 로 띄워 화면 끝까지 채운다 */}
 			<Modal visible={showInfoModal} transparent animationType="fade" onRequestClose={() => setShowInfoModal(false)}>
-				<View style={styles.modalOverlay}>
+				<View style={[styles.modalOverlay, modalSafePadding]}>
 					<View style={styles.modalContent}>
 						<TouchableOpacity style={styles.modalCloseIcon} hitSlop={HIT_SLOP} onPress={() => setShowInfoModal(false)}>
 							<IconComponent type="materialIcons" name="close" size={scaledSize(24)} color={COLORS.textSecondary} />

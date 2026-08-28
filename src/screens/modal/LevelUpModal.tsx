@@ -1,15 +1,16 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, useWindowDimensions } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { playComplete } from '@/utils/SoundUtils';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import useReducedMotion from '@/hooks/useReducedMotion';
 
 export interface LevelUpInfo {
 	label: string;
@@ -28,6 +29,8 @@ interface LevelUpModalProps {
 }
 
 const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bonus = 0 }) => {
+	const { width: windowWidth } = useWindowDimensions();
+	const reducedMotion = useReducedMotion();
 	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
 	const safePadding = useModalSafePadding();
 	// 모달 공통 진입 애니메이션 (fade + scale)
@@ -41,6 +44,10 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bo
 			return;
 		}
 		playComplete(); // 🎖️ 레벨업 사운드
+		if (reducedMotion) {
+			mascotAnim.setValue(1);
+			return;
+		}
 		// 카드가 뜬 뒤(150ms) 마스코트가 통통 튀어나온다
 		const anim = Animated.sequence([
 			Animated.delay(150),
@@ -50,7 +57,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bo
 		anim.start();
 		// ✅ 정리
 		return () => anim.stop();
-	}, [visible, mascotAnim]);
+	}, [visible, mascotAnim, reducedMotion]);
 
 	if (!level) {
 		return null;
@@ -59,9 +66,9 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bo
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<View style={[styles.overlay, safePadding]}>
-				{visible && (
+				{visible && !reducedMotion && (
 					<View style={styles.confetti} pointerEvents="none">
-						<ConfettiCannon count={80} origin={{ x: screenWidth / 2, y: 0 }} fadeOut explosionSpeed={450} fallSpeed={2600} />
+						<ConfettiCannon count={80} origin={{ x: windowWidth / 2, y: 0 }} fadeOut explosionSpeed={450} fallSpeed={2600} />
 					</View>
 				)}
 				<Animated.View style={[styles.card, enterStyle]}>

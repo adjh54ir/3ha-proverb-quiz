@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleProp, ViewStyle } from 'react-native';
+import useReducedMotion from '@/hooks/useReducedMotion';
 
 interface FadeInViewProps {
 	children: React.ReactNode;
@@ -18,22 +19,25 @@ interface FadeInViewProps {
  * - 언마운트 시 진행 중인 애니메이션을 정지하여 메모리 누수 방지
  */
 const FadeInView = ({ children, style, duration = 350, delay = 0, offsetY = 12 }: FadeInViewProps) => {
+	const reducedMotion = useReducedMotion();
 	const opacity = useRef(new Animated.Value(0)).current;
 	const translateY = useRef(new Animated.Value(offsetY)).current;
 
 	useEffect(() => {
+		const resolvedDuration = reducedMotion ? 0 : duration;
+		const resolvedDelay = reducedMotion ? 0 : delay;
 		const animation = Animated.parallel([
 			Animated.timing(opacity, {
 				toValue: 1,
-				duration,
-				delay,
+				duration: resolvedDuration,
+				delay: resolvedDelay,
 				easing: Easing.out(Easing.cubic),
 				useNativeDriver: true,
 			}),
 			Animated.timing(translateY, {
 				toValue: 0,
-				duration,
-				delay,
+				duration: resolvedDuration,
+				delay: resolvedDelay,
 				easing: Easing.out(Easing.cubic),
 				useNativeDriver: true,
 			}),
@@ -46,8 +50,7 @@ const FadeInView = ({ children, style, duration = 350, delay = 0, offsetY = 12 }
 			opacity.stopAnimation();
 			translateY.stopAnimation();
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [delay, duration, opacity, reducedMotion, translateY]);
 
 	return <Animated.View style={[style, { opacity, transform: [{ translateY }] }]}>{children}</Animated.View>;
 };

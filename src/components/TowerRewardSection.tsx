@@ -6,6 +6,8 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { TOWER_LEVELS } from '@/const/ConstTowerData';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import useReducedMotion from '@/hooks/useReducedMotion';
 
 interface Props {
     unlockedRewards: number[];
@@ -13,6 +15,7 @@ interface Props {
 
 // ✅ 컴포넌트 외부로 분리 (useRef/useEffect 정상 동작)
 const ClearBadge = ({ color, name }: { color: string; name: string }) => {
+	const reducedMotion = useReducedMotion();
     const scale = useRef(new Animated.Value(0)).current;
     const opacity = useRef(new Animated.Value(0)).current;
     const shimmer = useRef(new Animated.Value(0)).current;
@@ -21,6 +24,11 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
     const glowScale = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
+		if (reducedMotion) {
+			scale.setValue(1);
+			opacity.setValue(1);
+			return;
+		}
         const animation = Animated.sequence([
             Animated.parallel([
                 Animated.spring(scale, {
@@ -37,8 +45,7 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
             ]),
             Animated.delay(200),
             Animated.parallel([
-                Animated.loop(
-                    Animated.sequence([
+				Animated.sequence([
                         Animated.timing(shimmer, {
                             toValue: 1,
                             duration: 1200,
@@ -51,27 +58,20 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
                             easing: Easing.inOut(Easing.sin),
                             useNativeDriver: true,
                         }),
-                    ])
-                ),
-                Animated.loop(
+				]),
                     Animated.timing(star1Rotate, {
                         toValue: 1,
                         duration: 2400,
                         easing: Easing.linear,
                         useNativeDriver: true,
-                    })
-                ),
-                // ✅ 수정
-                Animated.loop(
+				}),
                     Animated.timing(star2Rotate, {
                         toValue: 1,  // 양수로 변경
                         duration: 3000,
                         easing: Easing.linear,
                         useNativeDriver: true,
-                    })
-                ),
-                Animated.loop(
-                    Animated.sequence([
+				}),
+				Animated.sequence([
                         Animated.timing(glowScale, {
                             toValue: 1.06,
                             duration: 1400,
@@ -84,8 +84,7 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
                             easing: Easing.inOut(Easing.ease),
                             useNativeDriver: true,
                         }),
-                    ])
-                ),
+				]),
             ]),
         ]);
         animation.start();
@@ -95,8 +94,7 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
             animation.stop();
             [scale, opacity, shimmer, star1Rotate, star2Rotate, glowScale].forEach((v) => v.stopAnimation());
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [glowScale, opacity, reducedMotion, scale, shimmer, star1Rotate, star2Rotate]);
 
     const textOpacity = shimmer.interpolate({
         inputRange: [0, 1],
@@ -148,6 +146,7 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
 };
 
 const TowerRewardSection = ({ unlockedRewards }: Props) => {
+	const modalSafePadding = useModalSafePadding();
     const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
     // 팝업 진입 애니메이션 (fade + slide-up)
     const popupAnim = useRef(new Animated.Value(0)).current;
@@ -208,7 +207,7 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
                 transparent
                 animationType="fade"
                 onRequestClose={() => setSelectedLevel(null)}>
-                <Pressable style={styles.overlay} onPress={() => setSelectedLevel(null)}>
+				<Pressable style={[styles.overlay, modalSafePadding]} onPress={() => setSelectedLevel(null)}>
                     <Animated.View
                         style={{
                             opacity: popupAnim,

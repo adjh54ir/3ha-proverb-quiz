@@ -4,7 +4,7 @@ import { Store, persistor } from './store/Store';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { Provider } from 'react-redux';
-import { LogBox } from 'react-native';
+import { LogBox, StyleSheet } from 'react-native';
 import ApplicationNavigator from './navigation/ApplicationNavigator';
 import VersionCheckModal from './screens/common/modal/VersionCheckModal';
 import { IAP_REMOVE_AD_KEY, REACT_NATIVE_APP_MODE } from '@env';
@@ -23,6 +23,8 @@ import { scheduleDailyQuizReminder } from './utils/NotifactionHelper';
 import { Paths } from './navigation/conf/Paths';
 import { loadBgmSetting } from './utils/BgmUtils';
 import mobileAds from 'react-native-google-mobile-ads';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 // import * as RNIap from 'react-native-iap';
 
 /**
@@ -189,15 +191,23 @@ const App = () => {
 	};
 
 	return (
-		<Provider store={Store}>
-			<PersistGate persistor={persistor}>
-				<I18nextProvider i18n={i18n}>
-					<ApplicationNavigator />
-				</I18nextProvider>
-				<VersionCheckModal />
-			</PersistGate>
-		</Provider>
+		<GestureHandlerRootView style={styles.root}>
+			<SafeAreaProvider>
+				<Provider store={Store}>
+					<PersistGate persistor={persistor}>
+						<I18nextProvider i18n={i18n}>
+							<ApplicationNavigator />
+						</I18nextProvider>
+						<VersionCheckModal />
+					</PersistGate>
+				</Provider>
+			</SafeAreaProvider>
+		</GestureHandlerRootView>
 	);
 };
+
+const styles = StyleSheet.create({
+	root: { flex: 1 },
+});
 
 export default App;

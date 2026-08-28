@@ -6,6 +6,7 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import IconComponent from './atomic/IconComponent';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 /** 터치 영역 최소 44 확보 */
 const MIN_TOUCH = 44;
@@ -32,6 +33,7 @@ const BottomHomeButton = ({
 	confirmMessage?: string;
 	skipConfirm?: boolean; // ✅ true면 확인 팝업 없이 바로 홈으로 이동
 }) => {
+	const modalSafePadding = useModalSafePadding();
 	const navigation = useNavigation<any>();
 	const [showConfirm, setShowConfirm] = useState(false);
 
@@ -88,7 +90,7 @@ const BottomHomeButton = ({
 			</TouchableOpacity>
 
 			<Modal visible={showConfirm} transparent animationType="fade" onRequestClose={() => setShowConfirm(false)}>
-				<View style={modalStyles.overlay}>
+				<View style={[modalStyles.overlay, modalSafePadding]}>
 					<View style={modalStyles.card}>
 						<View style={modalStyles.iconCircle}>
 							<IconComponent type="materialIcons" name="logout" size={scaledSize(26)} color={COLORS.danger} />

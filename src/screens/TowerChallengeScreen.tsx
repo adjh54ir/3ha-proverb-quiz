@@ -1,11 +1,11 @@
 // @/screens/TowerChallenge.tsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import AppAlert from '@/screens/common/modal/AppAlert';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
-import { scaledSize, scaleHeight, scaleWidth, screenWidth } from '@/utils';
+import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
@@ -24,9 +24,8 @@ import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { read, write } from '@/services/StorageService';
 
 const TOWER_STORAGE_KEY = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
-const SCREEN_WIDTH = screenWidth;
-
 const TowerChallengeScreen = () => {
+	const { width: windowWidth } = useWindowDimensions();
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('towerChallenge');
 	const navigation = useAppNavigation();
@@ -313,7 +312,7 @@ const TowerChallengeScreen = () => {
 						ref={carouselRef}
 						defaultIndex={currentIndex}
 						loop={false}
-						width={SCREEN_WIDTH * 0.9}
+						width={Math.min(windowWidth * 0.9, scaleWidth(520))}
 						height={scaleHeight(480)} // 620 → 480
 						data={TOWER_LEVELS}
 						renderItem={renderTowerCard}

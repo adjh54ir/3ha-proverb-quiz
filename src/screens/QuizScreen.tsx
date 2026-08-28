@@ -35,6 +35,7 @@ import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import DateUtils from '@/utils/DateUtils';
 import { useAppNavigation, QuizScreenParams } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const labelColors = themedValue(() => [COLORS.secondary, COLORS.primary, COLORS.accentTeal, COLORS.accentFlame]); // A, B, C, D 보기 라벨
@@ -48,6 +49,7 @@ const QUESTION_TIME_LIMIT = 40;
 type QuizRoute = RouteProp<{ QUIZ: QuizScreenParams }, 'QUIZ'>;
 
 const QuizScreen = () => {
+	const modalSafePadding = useModalSafePadding();
 	const route = useRoute<QuizRoute>();
 	const { width: screenWidth } = useWindowDimensions();
 	const flatListRef = useRef<FlatList<string>>(null);
@@ -243,9 +245,11 @@ const QuizScreen = () => {
 		return proverbs.filter((p) => {
 			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
 			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-			return levelMatch && categoryMatch;
+			// 빈칸 모드에서 어절이 하나뿐인 속담('화무십일홍이라')은 가릴 곳을 빼면 문제가 통째로 '(____)' 가 된다 → 출제 제외
+			const blankable = routeMode !== 'blank' || p.proverb.split(' ').filter(Boolean).length >= 2;
+			return levelMatch && categoryMatch && blankable;
 		});
-	}, [proverbs, selectedLevel, selectedCategory]);
+	}, [proverbs, selectedLevel, selectedCategory, routeMode]);
 
 	const remainingProverbs = useMemo(() => {
 		const solvedSet = new Set([...(quizHistory?.correctProverbId ?? []), ...(quizHistory?.wrongProverbId ?? [])]);
@@ -337,7 +341,14 @@ const QuizScreen = () => {
 				}
 			}
 			allOptions = [...wrongWords, blank];
-			displayText = newQuestion.proverb.replace(blank, '(____)');
+			// ⚠️ replace(blank) 는 첫 번째 하나만 바꾼다.
+			//    '가는 말이 고와야 오는 말이 곱다' 처럼 같은 어절이 두 번 나오는 속담(3,001개 중 248개)에서는
+			//    두 번째가 그대로 남아 정답이 문제에 노출됐다.
+			//    어절 단위로 전부 가린다 — 부분 문자열이 잘못 걸리는 것도 함께 막힌다.
+			displayText = newQuestion.proverb
+				.split(' ')
+				.map((w) => (w === blank ? '(____)' : w))
+				.join(' ');
 			setBlankWord(blank);
 		} else if (routeMode === 'example' || routeMode === 'exampleBlank') {
 			allOptions = [...shuffledDistractors.map((p) => p.proverb), newQuestion.proverb];
@@ -1171,7 +1182,7 @@ const QuizScreen = () => {
 			<QuizHintModal visible={showHintModal} question={question} mode={routeMode} questionText={questionText} onClose={() => setShowHintModal(false)} />
 			{/* ======================= 퀴즈 종료 ============================ */}
 			<Modal visible={showExitModal} transparent animationType='fade' onRequestClose={() => setShowExitModal(false)}>
-				<View style={styles.modalOverlay}>
+				<View style={[styles.modalOverlay, modalSafePadding]}>
 					<View style={styles.exitModal}>
 						<Text style={styles.exitModalTitle}>퀴즈를 종료하시겠습니까?</Text>
 						<Text style={styles.exitModalMessage}>진행 중인 퀴즈가 저장되지 않습니다.</Text>

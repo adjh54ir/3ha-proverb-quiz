@@ -23,6 +23,7 @@ import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 import ScreenHeader from '@/screens/common/ScreenHeader';
 import { read, update } from '@/services/StorageService';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 // 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const getDefaultColor = () => COLORS.primary;
@@ -35,6 +36,7 @@ const PRACTICE_RECORD_KEY = MainStorageKeyType.USER_PROVERB_PRACTICE_RECORDS;
  */
 
 const MyProverbBookDetail = () => {
+	const modalSafePadding = useModalSafePadding();
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const listRef = useRef<FlatList<MainDataType.Proverb>>(null);
 	const guide = useCharacterGuideOnce('myProverbBookDetail');
@@ -264,8 +266,8 @@ const MyProverbBookDetail = () => {
 			<QuizModeModal book={quizModeModal} onClose={() => setQuizModeModal(null)} onSelect={(b, mode) => startQuiz(b, mode)} />
 			<ProverbDetailModal visible={showDetailModal && !!selectedProverb} proverb={selectedProverb} onClose={() => setShowDetailModal(false)} />
 
-			<Modal visible={removeConfirmVisible} transparent animationType="fade">
-				<View style={styles.modalOverlay}>
+			<Modal visible={removeConfirmVisible} transparent animationType="fade" onRequestClose={() => setRemoveConfirmVisible(false)}>
+				<View style={[styles.modalOverlay, modalSafePadding]}>
 					<View style={styles.confirmModal}>
 						<IconComponent type="materialIcons" name="remove-circle-outline" size={scaledSize(40)} color={COLORS.danger} />
 						<Text style={styles.confirmTitle}>선택한 속담을 빼시겠습니까?</Text>

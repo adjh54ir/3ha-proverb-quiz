@@ -26,6 +26,7 @@ import { playComplete, playFlip } from '@/utils/SoundUtils';
 import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import { read, write } from '@/services/StorageService';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 // 기기 분류(태블릿 여부)용 1회 측정값. 실시간 레이아웃은 useWindowDimensions 를 쓴다.
 const { width: screenWidth } = Dimensions.get('window');
@@ -80,6 +81,7 @@ const reviewPraiseMessages = [
 const DETAIL_FILTER_HEIGHT = scaleHeight(60);
 const IMAGE_HEIGHT = isAndroid ? scaleHeight(220) : scaleHeight(200);
 const QuizStudyScreen = () => {
+	const modalSafePadding = useModalSafePadding();
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('study');
 	// 회전/폴더블 대응: 캐러셀 높이는 실시간 화면 높이를 따른다.
@@ -647,7 +649,7 @@ const QuizStudyScreen = () => {
 							// JSX 내부
 							<View style={styles.cardMiddle}>
 								{/* 대표 속담: 가독성이 핵심이라 축소 하한(0.85)을 둬 안드로이드 과축소를 막는다 */}
-								<Text style={styles.hanjaText} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.85}>
+								<Text style={styles.hanjaText} numberOfLines={3}>
 									{item.proverb}
 								</Text>
 
@@ -1113,8 +1115,8 @@ const QuizStudyScreen = () => {
 				</Animated.View>
 			</SafeAreaView>
 
-			<Modal visible={showExitModal} transparent animationType="fade">
-				<View style={styles.modalOverlay}>
+			<Modal visible={showExitModal} transparent animationType="fade" onRequestClose={() => setShowExitModal(false)}>
+				<View style={[styles.modalOverlay, modalSafePadding]}>
 					<View style={styles.exitModalBox}>
 						{/* 헤더 아이콘 + 타이틀 */}
 						<View style={styles.exitHeader}>

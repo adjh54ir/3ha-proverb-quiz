@@ -24,6 +24,7 @@ import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 import ScreenHeader from '@/screens/common/ScreenHeader';
 import { read, write } from '@/services/StorageService';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 // 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const getDefaultColor = () => COLORS.primary;
@@ -42,6 +43,7 @@ const SORT_OPTIONS: { key: SortType; label: string }[] = [
  */
 
 const MyProverbBook = () => {
+	const modalSafePadding = useModalSafePadding();
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('myProverbBook');
 	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
@@ -284,8 +286,8 @@ const MyProverbBook = () => {
 			<ToastView />
 
 			{/* 삭제 확인 */}
-			<Modal visible={!!deleteConfirm} transparent animationType="fade">
-				<View style={styles.modalOverlay}>
+			<Modal visible={!!deleteConfirm} transparent animationType="fade" onRequestClose={() => setDeleteConfirm(null)}>
+				<View style={[styles.modalOverlay, modalSafePadding]}>
 					<View style={styles.confirmModal}>
 						<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(40)} color={COLORS.danger} />
 						<Text style={styles.confirmTitle}>속담집을 삭제하시겠습니까?</Text>
@@ -305,7 +307,7 @@ const MyProverbBook = () => {
 			</Modal>
 
 			{/* 액션시트 */}
-			<Modal visible={!!actionSheet} transparent animationType="slide">
+			<Modal visible={!!actionSheet} transparent animationType="slide" onRequestClose={() => setActionSheet(null)}>
 				<TouchableOpacity style={styles.actionSheetOverlay} activeOpacity={1} onPress={() => setActionSheet(null)}>
 					<TouchableOpacity activeOpacity={1} style={[styles.actionSheet, { paddingBottom: Math.max(insets.bottom, SPACING_H.xxl) }]}>
 						<View style={styles.actionSheetHandle} />

@@ -24,6 +24,7 @@ import FavoriteAddModal from './modal/FavoriteAddModal';
 import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { LEVEL_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const COMMON_ALL_OPTION = themedValue(() => ({
@@ -39,6 +40,7 @@ const COMMON_ALL_OPTION = themedValue(() => ({
  */
 
 const FavoriteScreen = () => {
+	const modalSafePadding = useModalSafePadding();
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('favorite');
 	const emptyFavoritesImage = require('@/assets/images/feature-states/empty-favorites.png');
@@ -537,7 +539,7 @@ const FavoriteScreen = () => {
 			<ProverbDetailModal visible={showDetailModal && !!selectedProverb} proverb={selectedProverb} onClose={() => setShowDetailModal(false)} onFavoriteChange={loadFavorites} />
 
 			<Modal visible={showDeleteConfirmModal} transparent animationType="fade" onRequestClose={() => setShowDeleteConfirmModal(false)}>
-				<View style={styles.confirmOverlay}>
+				<View style={[styles.confirmOverlay, modalSafePadding]}>
 					<View style={styles.confirmBox}>
 						<View style={styles.confirmIconWrapper}>
 							<Icon name="triangle-exclamation" size={scaledSize(28)} color={COLORS.danger} />

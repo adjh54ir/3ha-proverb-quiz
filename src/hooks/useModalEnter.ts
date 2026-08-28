@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
+import useReducedMotion from './useReducedMotion';
 
 /** 모달 카드 등장 모션 기본값 — 앱 전체가 같은 리듬으로 열리도록 여기 한 곳에서만 조정한다. */
 const ENTER_DURATION = 250;
@@ -24,6 +25,7 @@ const EXIT_DURATION = 200;
  * @returns Animated.View 에 그대로 펼쳐 넣는 스타일 객체
  */
 export const useModalEnter = (visible: boolean) => {
+	const reducedMotion = useReducedMotion();
 	const opacity = useRef(new Animated.Value(0)).current;
 	const scale = useRef(new Animated.Value(ENTER_FROM_SCALE)).current;
 
@@ -33,14 +35,15 @@ export const useModalEnter = (visible: boolean) => {
 		if (!visible) {
 			return;
 		}
+		const duration = reducedMotion ? 0 : ENTER_DURATION;
 		const enter = Animated.parallel([
-			Animated.timing(opacity, { toValue: 1, duration: ENTER_DURATION, useNativeDriver: true }),
-			Animated.timing(scale, { toValue: 1, duration: ENTER_DURATION, useNativeDriver: true }),
+			Animated.timing(opacity, { toValue: 1, duration, useNativeDriver: true }),
+			Animated.timing(scale, { toValue: 1, duration, useNativeDriver: true }),
 		]);
 		enter.start();
 		// 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
 		return () => enter.stop();
-	}, [visible, opacity, scale]);
+	}, [visible, opacity, scale, reducedMotion]);
 
 	return { opacity, transform: [{ scale }] };
 };
@@ -56,15 +59,17 @@ export const useModalEnter = (visible: boolean) => {
  * ```
  */
 export const useModalEnterExit = (visible: boolean) => {
+	const reducedMotion = useReducedMotion();
 	const style = useModalEnter(visible);
 	const opacity = style.opacity;
 	const scale = style.transform[0].scale;
 
 	/** 카드를 되감은 뒤 콜백을 호출한다. 중간에 끊기면 콜백을 부르지 않는다. */
 	const runExit = (onDone: () => void) => {
+		const duration = reducedMotion ? 0 : EXIT_DURATION;
 		Animated.parallel([
-			Animated.timing(opacity, { toValue: 0, duration: EXIT_DURATION, useNativeDriver: true }),
-			Animated.timing(scale, { toValue: ENTER_FROM_SCALE, duration: EXIT_DURATION, useNativeDriver: true }),
+			Animated.timing(opacity, { toValue: 0, duration, useNativeDriver: true }),
+			Animated.timing(scale, { toValue: ENTER_FROM_SCALE, duration, useNativeDriver: true }),
 		]).start(({ finished }) => {
 			// stop() 으로 중단된 경우에도 콜백이 호출되므로 완료된 경우에만 부모에 알린다
 			if (finished) {

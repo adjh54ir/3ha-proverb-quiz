@@ -1,9 +1,9 @@
 // QuizCompletionModal.tsx 수정
 
-import { scaleWidth, scaleHeight, scaledSize, screenWidth } from '@/utils';
+import { scaleWidth, scaleHeight, scaledSize } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, useWindowDimensions } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import ConfettiCannon from 'react-native-confetti-cannon';
@@ -11,6 +11,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { useModalEnter, MODAL_ENTER_DURATION } from '@/hooks/useModalEnter';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import useReducedMotion from '@/hooks/useReducedMotion';
 
 interface QuizCompletionModalProps {
     visible: boolean;
@@ -36,6 +37,8 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
     onRetry, // ✅ 추가
     onReviewWrong,
 }) => {
+	const { width: windowWidth } = useWindowDimensions();
+	const reducedMotion = useReducedMotion();
     // AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
     const safePadding = useModalSafePadding();
     // 모달 공통 진입 애니메이션 (fade + scale)
@@ -49,6 +52,10 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
         if (!visible) {
             return;
         }
+		if (reducedMotion) {
+			mascotBounce.setValue(0);
+			return;
+		}
         // 카드 등장(useModalEnter)이 끝난 뒤부터 마스코트가 위아래로 흔들린다
         loopRef.current = Animated.sequence([
             Animated.delay(MODAL_ENTER_DURATION),
@@ -75,7 +82,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
             loopRef.current = null;
             mascotBounce.setValue(0);
         };
-    }, [visible, mascotBounce]);
+    }, [visible, mascotBounce, reducedMotion]);
 
     const getPerformanceMessage = () => {
         if (accuracy >= 90) return '완벽합니다!';
@@ -108,14 +115,14 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
         return (
             <Modal visible={visible} transparent animationType="fade" onRequestClose={onConfirm}>
                 <View style={[styles.overlay, safePadding]}>
-                    <ConfettiCannon
+					{!reducedMotion && <ConfettiCannon
                         key={confettiKey}
                         count={150}
-                        origin={{ x: screenWidth / 2, y: 0 }}
+                        origin={{ x: windowWidth / 2, y: 0 }}
                         fadeOut
                         autoStart
                         explosionSpeed={400}
-                    />
+					/>}
 
                     <Animated.View style={[styles.card, enterStyle]}>
 
@@ -176,11 +183,11 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onConfirm}>
             <View style={[styles.overlay, safePadding]}>
-                {accuracy >= 80 && (
+                {accuracy >= 80 && !reducedMotion && (
                     <ConfettiCannon
                         key={confettiKey}
                         count={100}
-                        origin={{ x: screenWidth / 2, y: 0 }}
+                        origin={{ x: windowWidth / 2, y: 0 }}
                         fadeOut
                         autoStart
                         explosionSpeed={350}

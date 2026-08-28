@@ -4,6 +4,7 @@ import Modal from '@/screens/common/atomic/AppModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useReducedMotion from '@/hooks/useReducedMotion';
 import FastImage from 'react-native-fast-image';
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
@@ -115,6 +116,7 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 	// 스택 화면은 포커스를 잃어도 마운트된 채 남는다.
 	// 그때 안내 모달이 살아 있으면 다른 화면 위에서 터치를 통째로 먹는다 — 포커스 없으면 렌더하지 않는다.
 	const focused = useIsFocused();
+	const reducedMotion = useReducedMotion();
 	// 안드로이드 3버튼 내비게이션 바와 캐릭터가 겹치던 문제 — 하단 인셋만큼 더 띄운다
 	const insets = useSafeAreaInsets();
 	const [charImg, setCharImg] = useState<ReturnType<typeof require> | null>(null);
@@ -151,6 +153,11 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 			return;
 		}
 		enter.setValue(0);
+		if (reducedMotion) {
+			enter.setValue(1);
+			bob.setValue(0);
+			return;
+		}
 		Animated.spring(enter, { toValue: 1, friction: 7, tension: 70, useNativeDriver: true }).start();
 		const loop = Animated.loop(
 			Animated.sequence([
@@ -160,13 +167,17 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 		);
 		loop.start();
 		return () => loop.stop();
-	}, [visible, enter, bob]);
+	}, [visible, enter, bob, reducedMotion]);
 
 	// 문장 타이핑 — 한 글자씩 노출
 	const line = lines[step] ?? '';
 	useEffect(() => {
 		if (!visible) return;
 		if (typingRef.current) clearInterval(typingRef.current);
+		if (reducedMotion) {
+			setTyped(line);
+			return;
+		}
 		setTyped('');
 		let i = 0;
 		typingRef.current = setInterval(() => {
@@ -181,7 +192,7 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 			if (typingRef.current) clearInterval(typingRef.current);
 			typingRef.current = null;
 		};
-	}, [line, visible]);
+	}, [line, visible, reducedMotion]);
 
 	if (!visible || !focused) return null;
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
-import { Alert, Text, TouchableOpacity, View, StyleSheet, Platform, ScrollView, Animated, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
+import { Text, TouchableOpacity, View, StyleSheet, Platform, ScrollView, Animated, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
@@ -25,6 +25,7 @@ import DateUtils from '@/utils/DateUtils';
 import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import { update } from '@/services/StorageService';
+import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 const MAX_LIVES = 5;
 const CHOICE_COUNT = 4;
@@ -70,6 +71,7 @@ const getShuffledChoices = (correct: string, allMeanings: string[]) => {
 };
 
 const InfinityQuizScreen = () => {
+	const modalSafePadding = useModalSafePadding();
 	const TIME_CHALLENGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 
 	const navigation = useAppNavigation();
@@ -413,6 +415,18 @@ const InfinityQuizScreen = () => {
 			playTick(); // ⏱️ 3·2·1 카운트다운
 		}, 1000);
 		countdownTimerRef.current = timer;
+	};
+
+	const cancelCountdown = () => {
+		if (countdownTimerRef.current) {
+			clearInterval(countdownTimerRef.current);
+			countdownTimerRef.current = null;
+		}
+		if (countdownTimeoutRef.current) {
+			clearTimeout(countdownTimeoutRef.current);
+			countdownTimeoutRef.current = null;
+		}
+		setIsCountingDown(false);
 	};
 
 	const handleGameOver = () => {
@@ -1116,7 +1130,7 @@ const InfinityQuizScreen = () => {
 					setChanceModalVisible(false);
 					setIsPaused(false); // ✅ 닫힐 때 타이머 재개
 				}}>
-				<View style={styles.modalOverlay}>
+				<View style={[styles.modalOverlay, modalSafePadding]}>
 					<View style={styles.chanceModalCard}>
 						<View style={styles.chanceModalHeaderIcon}>
 							<IconComponent name="magic" type="FontAwesome" color={COLORS.textWhite} size={scaledSize(22)} />
@@ -1184,7 +1198,7 @@ const InfinityQuizScreen = () => {
 						setShowExitModal(false);
 						setIsPaused(false);
 					}}>
-					<View style={styles.modalOverlay}>
+					<View style={[styles.modalOverlay, modalSafePadding]}>
 						<View style={styles.exitModal}>
 							<Text style={styles.exitModalTitle}>타임 챌린지를 종료하시겠습니까?</Text>
 							<Text style={styles.exitModalMessage}>진행 중인 퀴즈는 저장되지 않습니다.</Text>
@@ -1216,7 +1230,7 @@ const InfinityQuizScreen = () => {
 
 			{/* 카운트다운: 절대배치 View 는 SafeAreaView(bottom) 안쪽까지만 덮여
 			    하단 네비게이션바 영역이 비어 보인다 → Modal 로 띄워 화면 끝까지 채운다 */}
-			<Modal visible={isCountingDown} transparent animationType="fade">
+			<Modal visible={isCountingDown} transparent animationType="fade" onRequestClose={cancelCountdown}>
 				<View style={StyleSheet.absoluteFillObject}>
 					<View style={styles.countdownOverlay}>
 						<Animated.View style={[styles.countdownCircle, { transform: [{ scale: scaleAnim }] }]}>

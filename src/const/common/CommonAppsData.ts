@@ -7,6 +7,15 @@ export const COMMON_APPS_DATA: {
 } = {
 	Apps: [
 		{
+			id: 24,
+			icon: require('@/assets/appicons/main_koreaquiz.png'),
+			title: '한국어 상식 퀴즈',
+			desc: '한국어 상식 퀴즈는 사자성어·속담·순우리말·위인 등 한국인이라면 알아야 할 한국어 상식을 퀴즈로 풀며 익히고, 틀린 문제는 오답 복습으로 반복 학습할 수 있는 한국어 학습 앱입니다.',
+			category: 'quiz',
+			android: 'https://play.google.com/store/apps/details?id=com.tha.koreaquiz',
+			ios: '',
+		},
+		{
 			id: 23,
 			icon: require('@/assets/appicons/main_hanpick.png'),
 			title: '한자 급수 퀴즈',
@@ -74,7 +83,7 @@ export const COMMON_APPS_DATA: {
 			id: 16,
 			icon: require('@/assets/appicons/main_emotionalEmoticon.png'),
 			title: '갬티콘: 감성 이모티콘',
-			desc: '2,000개 이상의 텍스트 이모티콘이 기다리고 있습니다. 탭 한 번으로 바로 복사, 어디서든 바로 붙여넣기를 해보세요!',
+			desc: '2,000개 이상의 텍스트 이모티콘이 기다리고 있어요. 탭 한 번으로 바로 복사, 어디서든 바로 붙여넣기를 해보세요!',
 			category: 'utility',
 			android: 'https://play.google.com/store/apps/details?id=com.tha.emotionalemoticon',
 			ios: 'https://apps.apple.com/us/app/id6760441156',

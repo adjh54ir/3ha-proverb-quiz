@@ -1,12 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { AppState, Platform, StyleSheet, View } from 'react-native';
 import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, Theme } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scaleHeight } from '@/utils';
 import { COLORS, SPACING_H, themedStyles } from '@/const/common/Theme';
-import DeviceInfo from 'react-native-device-info';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 import BootSplash from 'react-native-bootsplash'; // 추가
@@ -27,19 +26,47 @@ const AD_ALLOWED_ROUTES = [
 	// 필요하면 추가
 ];
 
-const DESIGN_HEIGHT = 812;
+/**
+ * 배너 래퍼(absolute)가 화면 상단에서 떨어지는 거리. 스타일과 오프셋 계산이 같은 값을 봐야 하므로
+ * 상수로 빼서 한 곳에서만 정의한다.
+ */
+const AD_WRAPPER_TOP = Platform.OS === 'android' ? scaleHeight(28) : scaleHeight(14);
+
+/** 배너 래퍼의 위/아래 안쪽 여백 (styles.adWrapperAbsolute.paddingVertical 과 동일해야 한다) */
+const AD_WRAPPER_PADDING = SPACING_H.xs;
+
+/** onSizeChange 로 실측 높이가 오기 전에 쓸 임시 높이 (adaptive 배너 최소치) */
+const AD_FALLBACK_HEIGHT = scaleHeight(50);
 
 /**
  * 배너와 화면 콘텐츠 사이 숨 쉴 공간. 배너 래퍼가 absolute 라 이 값이 실제 하단 여백이 된다.
- * xs(4) 는 배너와 콘텐츠가 붙어 보여 광고와 화면의 경계가 흐렸다 — 한 단계 올린다.
+ * xs(4) → sm(8) 로도 배너와 콘텐츠가 붙어 보였다. xl(20) 로 광고와 화면의 경계를 확실히 띄운다.
+ * (플랫폼별 고정값을 쓰던 시절 안드로이드에서 우연히 나오던 18~23dp 여백보다 좁아지지 않는 값)
  */
-const AD_BOTTOM_GAP = SPACING_H.sm;
+const AD_BOTTOM_GAP = SPACING_H.xl;
+
+/**
+ * 배너 영역의 실측값 묶음. 화면은 `contentTopOffset` 만 쓰고, 테스트는 이 값들로
+ * "콘텐츠가 배너를 파고들지 않는다"를 검증한다.
+ */
+export const AD_LAYOUT = {
+	wrapperTop: AD_WRAPPER_TOP,
+	wrapperPadding: AD_WRAPPER_PADDING,
+	fallbackHeight: AD_FALLBACK_HEIGHT,
+	bottomGap: AD_BOTTOM_GAP,
+	/** 배너 래퍼의 아래쪽 끝 (컨테이너 상단 기준) */
+	bannerBottom: (bannerHeight: number) =>
+		AD_WRAPPER_TOP + AD_WRAPPER_PADDING + (bannerHeight || AD_FALLBACK_HEIGHT) + AD_WRAPPER_PADDING,
+	/** 콘텐츠가 시작해야 하는 위치 */
+	contentTopOffset: (bannerHeight: number) =>
+		AD_WRAPPER_TOP + AD_WRAPPER_PADDING * 2 + (bannerHeight || AD_FALLBACK_HEIGHT) + AD_BOTTOM_GAP,
+};
+
 const AppLayout = () => {
 	const themeMode = useThemeMode(); // 모드 변경 시 배경색 재계산
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);
 	const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
 	const [bannerHeight, setBannerHeight] = useState(0);
-	const { height: screenHeight } = useWindowDimensions();
 
 	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute as Paths), [currentRoute]);
 	// const shouldShowAd = false
@@ -62,65 +89,18 @@ const AppLayout = () => {
 	}, [currentRoute, themeMode]);
 
 	/**
-	 * 배너 높이에 따른 패딩 계산 함수
-	 * @returns
+	 * 배너 아래에서 콘텐츠가 시작해야 하는 위치.
+	 *
+	 * 예전에는 플랫폼·태블릿별 고정값을 더해 맞췄는데, adaptive 배너 높이가 기기마다 50~90dp 로
+	 * 갈리는 탓에 어떤 기기에선 여백이 남고 어떤 기기에선 콘텐츠가 배너를 파고들었다
+	 * (iPhone 14/15/16 계열에서 약 20dp 겹침). 실측 높이 하나로 계산하면 분기 없이 항상 맞는다.
 	 */
-	const getAdPaddingTop = () => {
+	const contentTopOffset = useMemo(() => {
 		if (!shouldShowAd) {
 			return 0;
 		}
-
-		// adaptive 배너 높이는 기기별로 50~90dp까지 갈린다. 고정값을 쓰면 어떤 기기에선 남고
-		// 어떤 기기에선 모자라 배너가 화면을 덮는다 — 실측 높이가 오면 그 값을 그대로 쓴다.
-		if (DeviceInfo.isTablet()) {
-			return bannerHeight || scaleHeight(60); // 태블릿 (로드 전엔 기존값)
-		}
-		if (Platform.OS === 'android') {
-			return bannerHeight || scaleHeight(50); // 안드로이드 폰 (로드 전엔 기존값)
-		}
-		// iOS 는 배너를 상단 세이프에어리어(노치) 영역에 얹는 구조라 실측 높이를 그대로 더하면
-		// 여백이 두 번 들어간다. 폴백보다 실제 배너가 더 클 때만 그 차이를 반영한다.
-		if (bannerHeight) {
-			const iosFallback = screenHeight < DESIGN_HEIGHT ? scaleHeight(40) : 0;
-			return Math.max(iosFallback, bannerHeight - scaleHeight(50));
-		}
-		if (screenHeight < DESIGN_HEIGHT) {
-			return scaleHeight(40); // 작은 화면
-		}
-		return 0; // 기본
-	};
-
-	// 👇 광고 유무 + 플랫폼별 패딩 계산 함수
-	const getNavigatorPaddingTop = (shouldShowAd: boolean): number => {
-		// [CASE1] 광고가 있는 경우
-		if (shouldShowAd) {
-			// 배너 바로 아래에 화면이 붙지 않도록 여백을 둔다
-			switch (Platform.OS) {
-				case 'android':
-					return scaleHeight(38) + AD_BOTTOM_GAP;
-				case 'ios':
-					return scaleHeight(32) + AD_BOTTOM_GAP;
-				default:
-					return 0;
-			}
-		}
-		// [CASE2] 광고가 없는 경우
-		else {
-			const isAdAllowed = AD_ALLOWED_ROUTES.includes(currentRoute as Paths);
-			// 광고가 없고 허용된 경로일 때만 패딩 적용
-			if (isAdAllowed) {
-				switch (Platform.OS) {
-					case 'android':
-						return scaleHeight(40);
-					case 'ios':
-						return scaleHeight(0);
-					default:
-						return 0;
-				}
-			}
-		}
-		return 0;
-	};
+		return AD_LAYOUT.contentTopOffset(bannerHeight);
+	}, [shouldShowAd, bannerHeight]);
 
 	const handleBannerHeight = useCallback((height: number) => setBannerHeight(height), []);
 
@@ -216,10 +196,9 @@ const AppLayout = () => {
 			<SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={shouldShowAd ? ['top'] : []}>
 				<View style={styles.container}>
 					<View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]}>
-						<AdmobBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} onHeightChange={handleBannerHeight} />
+						<AdmobBannerAd visible={shouldShowAd} onHeightChange={handleBannerHeight} />
 					</View>
-					{shouldShowAd && <View style={{ paddingTop: getAdPaddingTop() }} />}
-					<View style={[styles.navigatorWrapper, { paddingTop: getNavigatorPaddingTop(shouldShowAd), backgroundColor }]}>
+					<View style={[styles.navigatorWrapper, { paddingTop: contentTopOffset, backgroundColor }]}>
 						<StackNavigator />
 					</View>
 				</View>
@@ -238,11 +217,11 @@ const styles = themedStyles(() => StyleSheet.create({
 	adWrapperAbsolute: {
 		position: 'absolute',
 		// 배너가 화면 상단에 바짝 붙어 보이던 문제 — 화면 기준으로 더 띄운다
-		top: Platform.OS === 'android' ? scaleHeight(28) : scaleHeight(14),
+		top: AD_WRAPPER_TOP,
 		left: 0,
 		right: 0,
 		zIndex: 10,
-		paddingVertical: SPACING_H.xs,
+		paddingVertical: AD_WRAPPER_PADDING,
 		alignItems: 'center',
 		// borderWidth: 1,
 		// borderColor: '#bdc3c7',

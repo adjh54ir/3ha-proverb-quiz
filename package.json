@@ -32,12 +32,11 @@
 		"watchman:clean": "watchman shutdown-server",
 		"build:apk": "node scripts/patch-rn-sound.js && (cd android 2>/dev/null && ./gradlew assembleRelease || (cd .. && cd android && ./gradlew assembleRelease))",
 		"build:aab": "node scripts/patch-rn-sound.js && (cd android 2>/dev/null && ./gradlew bundleRelease || (cd .. && cd android && ./gradlew bundleRelease))",
-		"tag": "V=v$(sed -n 's/.*versionName \\\"\\(.*\\)\\\"/\\1/p' android/app/build.gradle) && git tag -a \"$V\" -m \"$V\" && git push origin \"$V\" && echo \"tagged $V\""
+		"tag": "V=v$(sed -n 's/.*versionName \"\\(.*\\)\"/\\1/p' android/app/build.gradle) && git tag -a \"$V\" -m \"$V\" && git push origin \"$V\" && echo \"tagged $V\""
 	},
 	"dependencies": {
 		"@notifee/react-native": "^9.1.8",
 		"@react-native-async-storage/async-storage": "^2.1.2",
-		"@react-native-community/eslint-config": "^3.2.0",
 		"@react-native-community/slider": "^5.2.0",
 		"@react-native-firebase/analytics": "^22.4.0",
 		"@react-native-firebase/app": "^22.4.0",

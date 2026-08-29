@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, Platform, StyleSheet, View } from 'react-native';
+import { AppState, LayoutChangeEvent, StyleSheet, View } from 'react-native';
 import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, Theme } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,27 +27,29 @@ const AD_ALLOWED_ROUTES = [
 ];
 
 /**
- * 배너 래퍼(absolute)가 화면 상단에서 떨어지는 거리. 스타일과 오프셋 계산이 같은 값을 봐야 하므로
- * 상수로 빼서 한 곳에서만 정의한다.
+ * 배너 래퍼(absolute)가 화면 위에서 떨어진 거리.
+ *
+ * 상태바/노치는 이미 SafeAreaView(edges: top)가 밀어 준다 —
+ * 안드로이드도 edge-to-edge(MainActivity.setDecorFitsSystemWindows(false))라 인셋이 항상 들어온다.
+ * 예전에는 여기서 android 28 / ios 14 를 또 더해 배너 위아래로 죽은 공간이 생겼다.
  */
-const AD_WRAPPER_TOP = Platform.OS === 'android' ? scaleHeight(28) : scaleHeight(14);
+const AD_WRAPPER_TOP = SPACING_H.xs;
 
 /** 배너 래퍼의 위/아래 안쪽 여백 (styles.adWrapperAbsolute.paddingVertical 과 동일해야 한다) */
 const AD_WRAPPER_PADDING = SPACING_H.xs;
 
-/** onSizeChange 로 실측 높이가 오기 전에 쓸 임시 높이 (adaptive 배너 최소치) */
-const AD_FALLBACK_HEIGHT = scaleHeight(50);
+/** 배너 래퍼를 실측하기 전 한 프레임 동안 쓰는 값 (표준 앵커 배너 높이 + 래퍼 여백) */
+const AD_FALLBACK_HEIGHT = scaleHeight(50) + AD_WRAPPER_PADDING * 2;
 
-/**
- * 배너와 화면 콘텐츠 사이 숨 쉴 공간. 배너 래퍼가 absolute 라 이 값이 실제 하단 여백이 된다.
- * xs(4) → sm(8) 로도 배너와 콘텐츠가 붙어 보였다. xl(20) 로 광고와 화면의 경계를 확실히 띄운다.
- * (플랫폼별 고정값을 쓰던 시절 안드로이드에서 우연히 나오던 18~23dp 여백보다 좁아지지 않는 값)
- */
-const AD_BOTTOM_GAP = SPACING_H.xl;
+/** 배너와 그 아래 콘텐츠 사이의 숨 쉴 틈 — 배너 하단 간격은 이 값 하나로만 조절한다. */
+const AD_BOTTOM_GAP = SPACING_H.md;
 
 /**
  * 배너 영역의 실측값 묶음. 화면은 `contentTopOffset` 만 쓰고, 테스트는 이 값들로
  * "콘텐츠가 배너를 파고들지 않는다"를 검증한다.
+ *
+ * 인자는 래퍼(paddingVertical 포함)의 onLayout 실측 높이다. onSizeChange 가 알려주는
+ * 광고 높이는 실제 렌더 높이와 어긋날 때가 있어(테스트 광고 등) 그만큼 하단 여백이 벌어졌다.
  */
 export const AD_LAYOUT = {
 	wrapperTop: AD_WRAPPER_TOP,
@@ -55,18 +57,17 @@ export const AD_LAYOUT = {
 	fallbackHeight: AD_FALLBACK_HEIGHT,
 	bottomGap: AD_BOTTOM_GAP,
 	/** 배너 래퍼의 아래쪽 끝 (컨테이너 상단 기준) */
-	bannerBottom: (bannerHeight: number) =>
-		AD_WRAPPER_TOP + AD_WRAPPER_PADDING + (bannerHeight || AD_FALLBACK_HEIGHT) + AD_WRAPPER_PADDING,
+	bannerBottom: (adBoxHeight: number) => AD_WRAPPER_TOP + (adBoxHeight || AD_FALLBACK_HEIGHT),
 	/** 콘텐츠가 시작해야 하는 위치 */
-	contentTopOffset: (bannerHeight: number) =>
-		AD_WRAPPER_TOP + AD_WRAPPER_PADDING * 2 + (bannerHeight || AD_FALLBACK_HEIGHT) + AD_BOTTOM_GAP,
+	contentTopOffset: (adBoxHeight: number) => AD_WRAPPER_TOP + (adBoxHeight || AD_FALLBACK_HEIGHT) + AD_BOTTOM_GAP,
 };
 
 const AppLayout = () => {
 	const themeMode = useThemeMode(); // 모드 변경 시 배경색 재계산
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);
 	const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
-	const [bannerHeight, setBannerHeight] = useState(0);
+	// 배너 래퍼의 실측 높이(래퍼 여백 포함). 광고가 알려주는 높이 대신 래퍼를 그대로 재는 편이 정확하다.
+	const [adBoxHeight, setAdBoxHeight] = useState(0);
 
 	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute as Paths), [currentRoute]);
 	// const shouldShowAd = false
@@ -99,10 +100,18 @@ const AppLayout = () => {
 		if (!shouldShowAd) {
 			return 0;
 		}
-		return AD_LAYOUT.contentTopOffset(bannerHeight);
-	}, [shouldShowAd, bannerHeight]);
+		return AD_LAYOUT.contentTopOffset(adBoxHeight);
+	}, [shouldShowAd, adBoxHeight]);
 
-	const handleBannerHeight = useCallback((height: number) => setBannerHeight(height), []);
+	// 배너를 숨긴 경로에서는 래퍼 높이가 0 이라 측정하지 않는다 (다시 보일 때 폴백으로 되돌아가지 않게)
+	const handleAdBoxLayout = useCallback(
+		(e: LayoutChangeEvent) => {
+			if (shouldShowAd) {
+				setAdBoxHeight(e.nativeEvent.layout.height);
+			}
+		},
+		[shouldShowAd],
+	);
 
 	/**
 	 * 알림 탭 → 지정 화면 이동.
@@ -195,8 +204,8 @@ const AppLayout = () => {
 			}}>
 			<SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={shouldShowAd ? ['top'] : []}>
 				<View style={styles.container}>
-					<View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]}>
-						<AdmobBannerAd visible={shouldShowAd} onHeightChange={handleBannerHeight} />
+					<View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]} onLayout={handleAdBoxLayout}>
+						<AdmobBannerAd visible={shouldShowAd} />
 					</View>
 					<View style={[styles.navigatorWrapper, { paddingTop: contentTopOffset, backgroundColor }]}>
 						<StackNavigator />
@@ -216,7 +225,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	adWrapperAbsolute: {
 		position: 'absolute',
-		// 배너가 화면 상단에 바짝 붙어 보이던 문제 — 화면 기준으로 더 띄운다
 		top: AD_WRAPPER_TOP,
 		left: 0,
 		right: 0,

@@ -13,28 +13,33 @@
  */
 import Sound from 'react-native-sound';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import DateUtils from '@/utils/DateUtils';
 
 /**
- * 오디오 세션 설정 — 소리가 실제로 귀에 들리는 것을 최우선으로 한다.
+ * 오디오 세션 설정 — 다른 앱의 음악/영상을 끊지 않으면서 효과음이 들리게 한다.
  *
- * 믹스(다른 앱 음악 유지)를 택하면 앱이 오디오 포커스를 잡지 않는데, 그러면
- * 볼륨 버튼이 미디어 볼륨이 아니라 벨소리 볼륨을 조절한다. 미디어 볼륨이 0으로
- * 내려가 있는 기기에서는 효과음이 0.1~1.7초라 볼륨을 올릴 틈도 없이 그냥 무음이 된다
- * (iOS·Android 모두에서 "앱 전체가 무음"으로 보이던 원인).
+ * 예전에는 두 플랫폼 모두 Playback + mixWithOthers=false 였다. 그러면 앱이 오디오 포커스를
+ * 빼앗아 듣고 있던 음악/영상이 앱에 들어오는 순간 꺼졌다. 플랫폼마다 "섞이면서도 미디어
+ * 볼륨을 쓰는" 조합이 달라 분기한다.
  *
- * iOS: Playback — 무음 스위치를 무시하고 미디어 볼륨을 쓴다.
- * Android: mixWithOthers=false — 재생할 때 오디오 포커스를 요청한다(STREAM_MUSIC).
+ * iOS: Ambient — 옵션 없이 카테고리만 지정되며, Ambient 자체가 다른 앱 오디오와 섞인다.
+ *      ('Playback', true) 를 쓰면 라이브러리가 AllowBluetooth 옵션을 같이 넣는데
+ *      이 옵션은 Playback 에서 유효하지 않아 setCategory 가 조용히 실패한다(RNSound.mm 은
+ *      error:nil 로 삼킨다). 그러면 세션이 기본값(SoloAmbient)에 머물러 오히려 남의 음악을 끊는다.
+ *      대가: 무음 스위치를 켜면 효과음도 같이 꺼진다(게임 효과음의 일반적인 동작).
  *
- * 대가: 다른 앱의 음악/영상 재생이 끊긴다. 라이브러리가 Playback+믹스 조합에서
- * AllowBluetooth 옵션을 같이 넣어 setCategory 자체가 실패하므로 둘 다 갖는 방법은 없다.
- *
- * ponytail: 믹스까지 원하면 AVAudioSession(iOS)/AudioFocusRequest(Android)를 직접 다루는
- *           네이티브 모듈이 필요하다. 그때 Playback + MixWithOthers 로 올린다.
+ * Android: Playback + mixWithOthers=true — 카테고리 'Playback' 이 STREAM_MUSIC 을 잡아
+ *      볼륨 버튼이 벨소리가 아니라 미디어 볼륨을 조절하고, mixWithOthers=true 라
+ *      play() 에서 requestAudioFocus 를 부르지 않아 남의 재생이 유지된다(Sound.kt:202).
  */
 export const applyAudioCategory = () => {
-	Sound.setCategory('Playback', false);
+	if (Platform.OS === 'ios') {
+		Sound.setCategory('Ambient', false);
+		return;
+	}
+	Sound.setCategory('Playback', true);
 };
 
 const SOURCES = {

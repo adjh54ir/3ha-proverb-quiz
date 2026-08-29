@@ -13,9 +13,10 @@
  *       at com.zmxv.RNSound.Sound.stop(Sound.kt:272)
  *
  * @ReactMethod 안에서 던져지므로 JS try/catch 로 못 잡고 앱이 그대로 죽는다.
- * 우리 앱은 setCategory('Playback', false) 라 mixWithOthers 가 false 이고,
+ * 예전에 setCategory('Playback', false) 를 쓰던 시절 mixWithOthers 가 false 였고,
  * SoundUtils.play() 가 재생 전에 항상 stop() 을 부르기 때문에 효과음이 있는
- * 화면에 들어가는 즉시 100% 재현됐다.
+ * 화면에 들어가는 즉시 100% 재현됐다. 지금은 Android 가 mixWithOthers=true 라
+ * 이 분기를 타지 않지만, 설정이 되돌아가면 바로 크래시로 돌아오므로 패치는 유지한다.
  *
  * 덤으로 === 를 == 로 바꾼다. 박싱된 Double 의 참조 비교는 항상 false 라
  * abandonAudioFocus() 가 한 번도 호출되지 않고 있었다.

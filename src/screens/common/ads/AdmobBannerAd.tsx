@@ -9,19 +9,16 @@ import DeviceInfo from 'react-native-device-info';
 type AdUnitIdType = string;
 
 const AD_UNIT_ID: AdUnitIdType = Platform.select({
-	ios: __DEV__ ? TestIds.ADAPTIVE_BANNER : GOOGLE_ADMOV_IOS_BANNER!,
-	android: __DEV__ ? TestIds.ADAPTIVE_BANNER : GOOGLE_ADMOV_ANDROID_BANNER!,
+	ios: __DEV__ ? TestIds.BANNER : GOOGLE_ADMOV_IOS_BANNER!,
+	android: __DEV__ ? TestIds.BANNER : GOOGLE_ADMOV_ANDROID_BANNER!,
 }) as AdUnitIdType;
 
 interface AdmobBannerAdProps {
 	visible?: boolean;
-	/** 배너 실측 높이(dp) 콜백. 레이아웃 여백 계산용 */
-	onHeightChange?: (height: number) => void;
 }
 
 const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({
 	visible = true, // 표시 여부
-	onHeightChange,
 }) => {
 	const bannerRef = useRef<BannerAd | null>(null);
 
@@ -67,7 +64,8 @@ const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({
 				unitId={AD_UNIT_ID}
 				size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
 				onAdOpened={handleAdOpened}
-				onSizeChange={({ height }) => onHeightChange?.(height)}
+				onAdLoaded={() => console.log('Banner ad loaded:', AD_UNIT_ID)}
+				onAdFailedToLoad={(error) => console.warn('Banner ad failed to load:', error?.message ?? error)}
 			/>
 		</View>
 	);

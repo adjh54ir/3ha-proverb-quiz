@@ -4,7 +4,7 @@ import { PERMISSIONS, RESULTS, check, checkNotifications, request, requestNotifi
 /**
  * 앱이 실제로 사용하는 권한
  * - notifications : 오늘의 퀴즈 / 학습 리마인더 (notifee)
- * - tracking      : iOS ATT (광고 식별자, AdMob·LevelPlay 용) — iOS 14+ 전용
+ * - tracking      : iOS ATT (광고 식별자, AdMob 용) — iOS 14+ 전용
  */
 export type AppPermissionKey = 'notifications' | 'tracking';
 

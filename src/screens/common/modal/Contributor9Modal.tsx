@@ -196,6 +196,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	rightButton: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		// 라벨이 길어지면 라벨만 줄바꿈되고 버튼은 원래 폭을 지킨다(버튼 글자가 세로로 쪼개지는 것 방지)
+		flexShrink: 0,
 		backgroundColor: COLORS.secondaryBg,
 		paddingVertical: SPACING_H.sm,
 		paddingHorizontal: SPACING_W.md,

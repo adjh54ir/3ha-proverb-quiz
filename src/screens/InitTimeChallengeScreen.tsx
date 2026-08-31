@@ -14,6 +14,7 @@ import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import { read } from '@/services/StorageService';
+import useCountdownTimers from '@/hooks/useCountdownTimers';
 
 // 규칙 한 줄 행 (아이콘 + 한 줄 텍스트)
 const RuleRow = ({ iconType, iconName, iconColor, chipColor, text }: { iconType: string; iconName: string; iconColor: string; chipColor: string; text: string }) => (
@@ -34,8 +35,7 @@ const InitTimeChallengeScreen = () => {
 	const fadeAnim = useRef(new Animated.Value(0)).current;
 	const slideAnim = useRef(new Animated.Value(scaleHeight(12))).current;
 	const scrollRef = useRef<ScrollView>(null);
-	const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const countdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const { countdownTimerRef, countdownTimeoutRef, clearCountdownTimers } = useCountdownTimers();
 
 	const [count, setCount] = useState(3);
 	const [showAllRules, setShowAllRules] = useState(false);
@@ -73,12 +73,7 @@ const InitTimeChallengeScreen = () => {
 	// 언마운트 시 카운트다운 타이머 정리
 	useEffect(() => {
 		return () => {
-			if (countdownTimerRef.current) {
-				clearInterval(countdownTimerRef.current);
-			}
-			if (countdownTimeoutRef.current) {
-				clearTimeout(countdownTimeoutRef.current);
-			}
+			clearCountdownTimers();
 			scaleAnim.stopAnimation();
 		};
 	}, [scaleAnim]);
@@ -138,9 +133,7 @@ const InitTimeChallengeScreen = () => {
 		setCount(countdown);
 		animateScale();
 
-		if (countdownTimerRef.current) {
-			clearInterval(countdownTimerRef.current);
-		}
+		clearCountdownTimers();
 		const timer = setInterval(() => {
 			countdown--;
 
@@ -160,14 +153,7 @@ const InitTimeChallengeScreen = () => {
 	};
 
 	const cancelCountdown = () => {
-		if (countdownTimerRef.current) {
-			clearInterval(countdownTimerRef.current);
-			countdownTimerRef.current = null;
-		}
-		if (countdownTimeoutRef.current) {
-			clearTimeout(countdownTimeoutRef.current);
-			countdownTimeoutRef.current = null;
-		}
+		clearCountdownTimers();
 		setIsCountingDown(false);
 	};
 

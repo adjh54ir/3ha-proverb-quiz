@@ -649,7 +649,7 @@ const QuizStudyScreen = () => {
 							// JSX 내부
 							<View style={styles.cardMiddle}>
 								{/* 대표 속담: 가독성이 핵심이라 축소 하한(0.85)을 둬 안드로이드 과축소를 막는다 */}
-								<Text style={styles.hanjaText} numberOfLines={3}>
+								<Text style={styles.hanjaText} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.85}>
 									{item.proverb}
 								</Text>
 

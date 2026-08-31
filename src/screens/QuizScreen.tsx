@@ -45,6 +45,15 @@ const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 /** 문제당 제한시간(초) — 타이머 / 시작 안내 팝업이 같은 값을 쓰도록 한 곳에서 관리한다. */
 const QUESTION_TIME_LIMIT = 40;
 
+/**
+ * 해당 모드로 출제 가능한 속담인지 판정한다.
+ * 빈칸 모드는 서로 다른 어절이 2개 미만인 속담('화무십일홍이라')을 뺀다.
+ * 정답 어절을 가리는 순간 문제가 통째로 '(____)' 가 되기 때문이다.
+ * 랜덤 출제 / 오답 복습 / 진행률이 모두 이 한 곳을 쓴다.
+ */
+export const isQuizzable = (proverb: MainDataType.Proverb, mode: QuizScreenParams['mode']) =>
+	mode !== 'blank' || new Set(proverb.proverb.split(' ').filter(Boolean)).size >= 2;
+
 // 파라미터 정의는 RootStackParamList(단일 소스)에서 가져온다.
 type QuizRoute = RouteProp<{ QUIZ: QuizScreenParams }, 'QUIZ'>;
 
@@ -144,6 +153,17 @@ const QuizScreen = () => {
 		'👏 대단합니다!\n이 속도라면 모든 속담을 금방 외울 수 있을 것 같습니다!',
 		'정말 똑똑합니다! 📚\n퀴즈를 척척 풀어가는 모습이 인상적입니다!',
 	];
+	const filteredProverbs = useMemo(() => {
+		return proverbs.filter((p) => {
+			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+			return levelMatch && categoryMatch && isQuizzable(p, routeMode);
+		});
+	}, [proverbs, selectedLevel, selectedCategory, routeMode]);
+
+	// 오답 복습 풀도 같은 기준으로 걸러야 진행률(index/length)과 실제 출제 문항 수가 어긋나지 않는다.
+	const activePool = useMemo(() => questionPool?.filter((p) => isQuizzable(p, routeMode)), [questionPool, routeMode]);
+
 	// 뒤로가기를 그냥 삼키면 앱이 멈춘 것처럼 보인다 — 화면의 종료 버튼과 같은 확인 팝업을 띄운다.
 	useBlockBackHandler(true, () => setShowExitModal(true));
 
@@ -158,9 +178,9 @@ const QuizScreen = () => {
 		if (filteredProverbs.length === 0) return;
 		if (isAnswerLocked) return;
 
-		if (questionPool && questionPool.length > 0) {
-			setProverbs(questionPool);
-			loadQuestion(questionPool);
+		if (activePool && activePool.length > 0) {
+			setProverbs(activePool);
+			loadQuestion(activePool);
 		} else {
 			const all = ProverbServices.selectProverbList();
 			const filtered = all.filter((p) => {
@@ -171,7 +191,7 @@ const QuizScreen = () => {
 			setProverbs(filtered);
 			if (filtered.length > 0) loadQuestion(filtered);
 		}
-	}, [quizHistory, showStartModal, isAnswerLocked, questionPool, selectedLevel, selectedCategory]); // ✅ showStartModal 의존성 추가
+	}, [quizHistory, showStartModal, isAnswerLocked, activePool, selectedLevel, selectedCategory]); // ✅ showStartModal 의존성 추가
 
 	useEffect(() => {
 		(async () => {
@@ -220,7 +240,7 @@ const QuizScreen = () => {
 	}, [options]);
 
 	useEffect(() => {
-		if (isWrongReview && questionPool) {
+		if (isWrongReview && activePool) {
 			loadQuestion();
 		}
 	}, [reviewIndex]);
@@ -241,15 +261,6 @@ const QuizScreen = () => {
 		}
 	}, [badgeModalVisible]);
 
-	const filteredProverbs = useMemo(() => {
-		return proverbs.filter((p) => {
-			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-			// 빈칸 모드에서 어절이 하나뿐인 속담('화무십일홍이라')은 가릴 곳을 빼면 문제가 통째로 '(____)' 가 된다 → 출제 제외
-			const blankable = routeMode !== 'blank' || p.proverb.split(' ').filter(Boolean).length >= 2;
-			return levelMatch && categoryMatch && blankable;
-		});
-	}, [proverbs, selectedLevel, selectedCategory, routeMode]);
 
 	const remainingProverbs = useMemo(() => {
 		const solvedSet = new Set([...(quizHistory?.correctProverbId ?? []), ...(quizHistory?.wrongProverbId ?? [])]);
@@ -284,19 +295,20 @@ const QuizScreen = () => {
 		setBlankWord('');
 		setQuestion(null);
 
-		if (isWrongReview && questionPool && questionPool.length > 0) {
-			if (reviewIndex >= questionPool.length) {
+		if (isWrongReview && activePool && activePool.length > 0) {
+			if (reviewIndex >= activePool.length) {
 				setResultType('done');
 				showCompletion();
 				return;
 			}
-			setupQuestion(questionPool[reviewIndex], questionPool);
+			setupQuestion(activePool[reviewIndex], activePool);
 			return;
 		}
 
 		// ✅ pool 파라미터 우선 사용 (stale closure 방지)
-		const source = pool ?? filteredProverbs;
-		if (!source || source.length === 0) return;
+		// onStart 처럼 필터를 거치지 않은 pool 이 직접 넘어오는 경로가 있어 여기서 한 번 더 같은 기준을 적용한다.
+		const source = (pool ?? filteredProverbs).filter((p) => isQuizzable(p, routeMode));
+		if (source.length === 0) return;
 
 		const solvedSet = new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]);
 		if (question) solvedSet.add(question.id);
@@ -568,31 +580,20 @@ const QuizScreen = () => {
 		return fallback.length > 0 ? fallback.reduce((a, b) => (b.length > a.length ? b : a)) : text;
 	};
 	const getSolvedCount = () => {
-		if (isWrongReview && questionPool) {
+		if (isWrongReview && activePool) {
 			return reviewIndex; // ✅ 오답 복습 모드는 index 기반
 		}
 
 		if (!quizHistory) return 0;
 
 		const solvedSet = new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]);
-
-		const filteredProverbs = proverbs.filter((p) => {
-			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-			return levelMatch && categoryMatch;
-		});
-
-		const filteredSolved = filteredProverbs.filter((p) => solvedSet.has(p.id));
-		return filteredSolved.length;
+		// 분모(totalCount)와 같은 filteredProverbs 를 써야 '완료' 시점에 진행률이 100% 로 맞는다.
+		return filteredProverbs.filter((p) => solvedSet.has(p.id)).length;
 	};
 	const totalCount =
-		isWrongReview && questionPool
-			? questionPool.length // ✅ 오답 복습 모드일 땐 고정
-			: proverbs.filter((p) => {
-					const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-					const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-					return levelMatch && categoryMatch;
-				}).length;
+		isWrongReview && activePool
+			? activePool.length // ✅ 오답 복습 모드일 땐 고정
+			: filteredProverbs.length;
 
 	const triggerComboAnimation = () => {
 		comboAnim.setValue(0);

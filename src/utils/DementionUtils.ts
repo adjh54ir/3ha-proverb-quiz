@@ -17,7 +17,7 @@ const MAX_FONT_SCALE = 1.25;
 
 const widthScale = Math.min(screenWidth / designWidth, MAX_WIDTH_SCALE);
 const heightScale = Math.min(screenHeight / designHeight, MAX_HEIGHT_SCALE);
-const fontScale = Math.min(Math.min(screenWidth / designWidth, screenHeight / designHeight), MAX_FONT_SCALE);
+const fontScale = Math.min(screenWidth / designWidth, screenHeight / designHeight, MAX_FONT_SCALE);
 
 const scaleWidth = (val: number) => {
     return val * widthScale;
@@ -37,6 +37,4 @@ export {
     scaledSize,
     scaleHeight,
     scaleWidth,
-    screenHeight,
-    screenWidth,
 };

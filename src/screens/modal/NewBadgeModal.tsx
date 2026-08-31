@@ -35,6 +35,16 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 	const pulseAnim = useRef(new Animated.Value(0)).current;
 	const confettiKey = useRef(0);
 
+	// 사운드/컨페티 키는 visible 에만 반응해야 한다.
+	// 모션 이펙트에 같이 두면 reducedMotion 이 뒤늦게 확정될 때 이펙트가 다시 돌아
+	// 소리가 두 번 나고 confettiKey 도 두 번 증가한다.
+	useEffect(() => {
+		if (visible) {
+			confettiKey.current += 1;
+			playComplete(); // 🏅 뱃지 획득 사운드
+		}
+	}, [visible]);
+
 	useEffect(() => {
 		// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임부터 다시 재생된다(잔상 방지)
 		iconPopAnim.setValue(0);
@@ -42,8 +52,6 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 		if (!visible) {
 			return;
 		}
-		confettiKey.current += 1;
-		playComplete(); // 🏅 뱃지 획득 사운드
 		if (reducedMotion) {
 			iconPopAnim.setValue(1);
 			return;

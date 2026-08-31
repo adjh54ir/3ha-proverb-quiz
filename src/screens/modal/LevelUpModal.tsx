@@ -38,12 +38,19 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bo
 	/** 마스코트 pop-in (0 → 1.05 → 1) */
 	const mascotAnim = useRef(new Animated.Value(0)).current;
 
+	// 사운드는 visible 에만 반응해야 한다.
+	// 모션 이펙트에 같이 두면 reducedMotion 이 뒤늦게 확정될 때 이펙트가 다시 돌아 소리가 두 번 난다.
+	useEffect(() => {
+		if (visible) {
+			playComplete(); // 🎖️ 레벨업 사운드
+		}
+	}, [visible]);
+
 	useEffect(() => {
 		mascotAnim.setValue(0);
 		if (!visible) {
 			return;
 		}
-		playComplete(); // 🎖️ 레벨업 사운드
 		if (reducedMotion) {
 			mascotAnim.setValue(1);
 			return;

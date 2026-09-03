@@ -8,9 +8,8 @@ import SettingScreen from '@/screens/SettingScreen';
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import ProverbListScreen from '@/screens/ProverbListScreen';
 import MyScoreScreen from '@/screens/MyScoreScreen';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, SPACING_H } from '@/const/common/Theme';
-import DeviceInfo from 'react-native-device-info';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import TodayQuizScreen from '@/screens/TodayQuizScreen';
 import { withThemedScreen } from './withThemedScreen';
@@ -89,11 +88,10 @@ const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
 	useThemeMode(); // 모드 변경 시 탭바 색상 재적용
-	const isTablet = DeviceInfo.isTablet();
 	const insets = useSafeAreaInsets();
 
-	// 📌 공통 스타일 함수
-	const getScreenOptions = (isTablet: boolean, insets: any) => ({
+	// 📌 공통 스타일 함수 — 태블릿 여부는 공용 판정(DementionUtils.isTablet)을 그대로 읽는다.
+	const getScreenOptions = (insets: any) => ({
 		tabBarActiveTintColor: COLORS.primary,
 		tabBarInactiveTintColor: COLORS.textLight,
 		tabBarStyle: {
@@ -114,10 +112,9 @@ const BottomTabNavigator = () => {
 	/**
 	 * 반응형 태블릿 처리에 대한 Helper
 	 * @param iconName
-	 * @param isTablet
 	 * @returns
 	 */
-	const getTabBarIcon = (iconType: Parameters<typeof IconComponent>[0]['type'], iconName: string, isTablet: boolean) => {
+	const getTabBarIcon = (iconType: Parameters<typeof IconComponent>[0]['type'], iconName: string) => {
 		return ({ color, focused }: { color: string; size: number; focused: boolean }) => (
 			<TabIconPop focused={focused}>
 				<IconComponent
@@ -136,7 +133,7 @@ const BottomTabNavigator = () => {
 			screenOptions={{
 				headerTitleAlign: 'center',
 				tabBarLabelPosition: 'below-icon',
-				...getScreenOptions(isTablet, insets),
+				...getScreenOptions(insets),
 			}}>
 			<Tab.Screen
 				name={Paths.PROVERB_LIST}
@@ -144,7 +141,7 @@ const BottomTabNavigator = () => {
 				options={{
 					title: '속담 사전',
 					tabBarLabel: '속담 사전',
-					tabBarIcon: getTabBarIcon('materialicons', 'menu-book', isTablet),
+					tabBarIcon: getTabBarIcon('materialicons', 'menu-book'),
 					headerShown: false, // 헤더 숨김
 				}}
 			/>
@@ -156,7 +153,7 @@ const BottomTabNavigator = () => {
 					title: '오늘의 퀴즈',
 					tabBarLabel: '오늘의 퀴즈',
 					headerShown: false, // 헤더 숨김
-					tabBarIcon: getTabBarIcon('MaterialCommunityIcons', 'calendar-question', isTablet),
+					tabBarIcon: getTabBarIcon('MaterialCommunityIcons', 'calendar-question'),
 				}}
 			/>
 
@@ -166,7 +163,7 @@ const BottomTabNavigator = () => {
 				options={{
 					title: '홈',
 					tabBarLabel: '홈',
-					tabBarIcon: getTabBarIcon('materialicons', 'home', isTablet),
+					tabBarIcon: getTabBarIcon('materialicons', 'home'),
 					headerShown: false, // 헤더 숨김
 				}}
 			/>
@@ -177,7 +174,7 @@ const BottomTabNavigator = () => {
 				options={{
 					title: '나의 활동',
 					tabBarLabel: '나의 활동',
-					tabBarIcon: getTabBarIcon('materialicons', 'emoji-events', isTablet),
+					tabBarIcon: getTabBarIcon('materialicons', 'emoji-events'),
 					headerShown: false, // 헤더 숨김
 				}}
 			/>
@@ -188,7 +185,7 @@ const BottomTabNavigator = () => {
 				options={{
 					title: '설정',
 					tabBarLabel: '설정',
-					tabBarIcon: getTabBarIcon('materialicons', 'settings', isTablet),
+					tabBarIcon: getTabBarIcon('materialicons', 'settings'),
 					headerShown: false, // 헤더 숨김
 				}}
 			/>

@@ -1,6 +1,27 @@
 import notifee, { AndroidImportance, AndroidVisibility, AuthorizationStatus, RepeatFrequency, TriggerType } from "@notifee/react-native";
 import DateUtils from '@/utils/DateUtils';
 
+/**
+ * 알림 채널 ID.
+ *
+ * 안드로이드 채널은 **한 번 만들면 설정이 바뀌지 않는다** — 코드에서 vibration 을 꺼도
+ * 이미 만들어진 채널은 계속 진동한다. 그래서 진동을 끌 때 ID 에 `-v2` 를 붙여 새로 만들고,
+ * 진동이 켜진 구버전 채널은 `deleteLegacyVibrationChannels()` 로 지운다.
+ * 앞으로 채널 설정을 바꿀 때도 같은 방식으로 버전을 올려야 기존 사용자에게 반영된다.
+ */
+const LEGACY_VIBRATION_CHANNEL_IDS = ['quiz-reminder', 'immediate-notification', 'daily-notification', 'weekly-notification'];
+
+/** 진동이 켜진 구버전 채널 삭제. 앱 시작 시 1회 호출한다(없으면 조용히 무시된다). */
+const deleteLegacyVibrationChannels = async (): Promise<void> => {
+    await Promise.all(
+        LEGACY_VIBRATION_CHANNEL_IDS.map((id) =>
+            notifee.deleteChannel(id).catch(() => {
+                // 채널이 없거나 iOS 면 할 일이 없다.
+            }),
+        ),
+    );
+};
+
 /** 반복 알림은 고정 ID 를 써야 재예약 시 취소/덮어쓰기가 된다. */
 const DAILY_NOTIFICATION_ID = 'daily-notification';
 const WEEKLY_NOTIFICATION_ID = 'weekly-notification';
@@ -52,9 +73,10 @@ const DAILY_QUIZ_NOTIFICATION_ID = 'daily-quiz-reminder';
  */
 const scheduleDailyQuizReminder = async (hour: number, moveToScreen: string) => {
     const channelId = await notifee.createChannel({
-        id: 'quiz-reminder',
+        id: 'quiz-reminder-v2',
         name: '퀴즈 알림',
         importance: AndroidImportance.HIGH,
+        vibration: false,
     });
 
     // 재예약 전 항상 기존 예약 취소 (중복 예약 방지)
@@ -106,9 +128,10 @@ const RequestNotificationPermission = async (): Promise<boolean> => {
 const DirectNotification = async (title: string, body: string) => {
     try {
         const channelId = await notifee.createChannel({
-            id: 'immediate-notification',
+            id: 'immediate-notification-v2',
             name: 'Immediate Notifications',
             importance: AndroidImportance.HIGH,
+            vibration: false,
         });
 
         await notifee.displayNotification({
@@ -148,9 +171,10 @@ const TriggerDailyNotification = async (
 ) => {
     try {
         const channelId = await notifee.createChannel({
-            id: 'daily-notification',
+            id: 'daily-notification-v2',
             name: 'Daily Notifications',
             importance: AndroidImportance.HIGH,
+            vibration: false,
         });
 
         // 같은 ID 로 재예약해야 중복 예약이 쌓이지 않는다.
@@ -203,9 +227,10 @@ const TriggerWeeklyNotification = async (
 ) => {
     try {
         const channelId = await notifee.createChannel({
-            id: 'weekly-notification',
+            id: 'weekly-notification-v2',
             name: 'Weekly Notifications',
             importance: AndroidImportance.HIGH,
+            vibration: false,
         });
 
         // 같은 ID 로 재예약해야 중복 예약이 쌓이지 않는다.
@@ -243,6 +268,7 @@ const TriggerWeeklyNotification = async (
 
 export {
     DAILY_QUIZ_NOTIFICATION_ID,
+    deleteLegacyVibrationChannels,
     scheduleDailyQuizReminder,
     cancelDailyQuizReminder,
     getNextTriggerTimestamp,

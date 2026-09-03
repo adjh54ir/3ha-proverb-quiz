@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
 import AppAlert from '@/screens/common/modal/AppAlert';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Platform, Linking, TextInput, KeyboardAvoidingView, Keyboard, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Linking, TextInput, KeyboardAvoidingView, Keyboard, Pressable } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
-import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
+import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { COMMON_APPS_DATA, appStoreUrl } from '@/const/common/CommonAppsData';
@@ -90,9 +90,8 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-			{/* 모달은 Activity 가 아닌 별도 Dialog 윈도우라 매니페스트의 adjustResize 가 적용되지 않는다.
-			    화면(Screen)과 달리 안드로이드도 behavior 를 직접 줘야 키보드가 입력창을 가리지 않는다. */}
-			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.overlay, safePadding]}>
+			{/* 키보드 회피 규칙은 common/modal/README.md 참고 — behavior 는 두 플랫폼 모두 'padding' 으로 통일한다. */}
+			<KeyboardAvoidingView behavior="padding" style={[styles.overlay, safePadding]}>
 				{/* 카드 밖(딤 영역)을 누르면 키보드를 닫는다 */}
 				<Pressable style={StyleSheet.absoluteFill} onPress={Keyboard.dismiss} />
 				<PopInView visible={visible} style={styles.container}>
@@ -198,6 +197,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	container: {
 		width: '100%',
+		// 태블릿에서 카드가 화면 폭만큼 늘어나면 대화상자로 읽히지 않는다. 폰은 화면이 더 좁아 영향 없음.
+		maxWidth: MODAL_MAX_WIDTH,
 		maxHeight: '100%',
 		flexShrink: 1, // 키보드로 화면이 줄어들 때 모달이 넘치지 않도록
 		backgroundColor: COLORS.surface,

@@ -19,7 +19,7 @@ import DateUtils from './utils/DateUtils';
 import { sampleSize } from './utils/ArrayUtils';
 import { loadSoundSetting, preloadSounds } from './utils/SoundUtils';
 import notifee from '@notifee/react-native';
-import { scheduleDailyQuizReminder } from './utils/NotifactionHelper';
+import { deleteLegacyVibrationChannels, scheduleDailyQuizReminder } from './utils/NotifactionHelper';
 import { Paths } from './navigation/conf/Paths';
 import { loadBgmSetting } from './utils/BgmUtils';
 import mobileAds from 'react-native-google-mobile-ads';
@@ -130,6 +130,10 @@ const App = () => {
 	 */
 	const rearmDailyQuizReminder = async () => {
 		try {
+			// 진동이 켜진 구버전 채널 제거. 안드로이드 채널은 생성 후 설정이 불변이라
+			// 새 ID(-v2)로 다시 만들고 옛 채널을 지워야 기존 사용자에게도 진동이 사라진다.
+			await deleteLegacyVibrationChannels();
+
 			const json = await AsyncStorage.getItem(MainStorageKeyType.SETTING_INFO);
 			if (!json) {
 				return;

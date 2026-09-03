@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
-import { Animated, Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Animated, Image, Keyboard, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
@@ -124,9 +124,8 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-			{/* 모달은 Activity 가 아닌 별도 Dialog 윈도우라 매니페스트의 adjustResize 가 적용되지 않는다.
-			    화면(Screen)과 달리 안드로이드도 behavior 를 직접 줘야 키보드가 입력창을 가리지 않는다. */}
-			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.overlay, safePadding]}>
+			{/* 키보드 회피 규칙은 common/modal/README.md 참고 — behavior 는 두 플랫폼 모두 'padding' 으로 통일한다. */}
+			<KeyboardAvoidingView behavior="padding" style={[styles.overlay, safePadding]}>
 				{/* 카드 밖(딤 영역)을 누르면 키보드를 닫는다 */}
 				<Pressable style={StyleSheet.absoluteFill} onPress={Keyboard.dismiss} />
 				<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
@@ -198,7 +197,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	headerImage: { width: scaleWidth(72), height: scaleWidth(72), alignSelf: 'center', marginTop: SPACING_H.sm },
 	overlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'center', alignItems: 'center' },
 	scrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: SPACING_H.xl, width: '100%' },
-	modal: { width: '88%', backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.xl },
+	// maxWidth: 태블릿에서 카드가 화면 폭만큼 늘어나면 대화상자로 읽히지 않는다(폰은 88% 가 더 좁아 영향 없음).
+	modal: { width: '88%', maxWidth: MODAL_MAX_WIDTH, backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.xl },
 	modalTitle: { fontSize: FONT_SIZES.heading, fontWeight: '700', color: COLORS.textStrong },
 	modalSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'left', marginTop: SPACING_H.xs },
 	inputWrap: { flexDirection: 'row', alignItems: 'center', height: scaleHeight(48), borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, marginTop: SPACING_H.xs, marginBottom: SPACING_H.md, backgroundColor: COLORS.surface },

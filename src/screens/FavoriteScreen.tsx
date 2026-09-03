@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, TouchableWithoutFeedback, FlatList, KeyboardAvoidingView, Platform, RefreshControl, Animated } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, TouchableWithoutFeedback, FlatList, KeyboardAvoidingView, RefreshControl, Animated } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -309,7 +309,8 @@ const FavoriteScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.main} edges={['top', 'bottom']}>
-			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+			{/* 키보드 회피 규칙은 common/modal/README.md 참고 — behavior 는 두 플랫폼 모두 'padding' 으로 통일한다. */}
+			<KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 					<View style={{ flex: 1 }}>
 						<Animated.View

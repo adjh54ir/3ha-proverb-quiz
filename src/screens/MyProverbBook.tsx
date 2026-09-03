@@ -2,7 +2,7 @@
 import React, { useCallback, useRef, useState, useMemo } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Animated, Image, KeyboardAvoidingView, Keyboard, Platform, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Animated, Image, KeyboardAvoidingView, Keyboard, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -162,7 +162,8 @@ const MyProverbBook = () => {
 	return (
 		<>
 			<SafeAreaView style={styles.main} edges={['top', 'bottom']}>
-				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboardWrap}>
+				{/* 키보드 회피 규칙은 common/modal/README.md 참고 — behavior 는 두 플랫폼 모두 'padding' 으로 통일한다. */}
+				<KeyboardAvoidingView behavior="padding" style={styles.keyboardWrap}>
 				{/* 검색창 밖을 누르면 키보드가 닫힌다 */}
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 				<View style={styles.keyboardWrap}>

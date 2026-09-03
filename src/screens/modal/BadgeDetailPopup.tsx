@@ -11,6 +11,7 @@ import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { getBadgeProgress, BadgeProgress } from '@/utils/BadgeProgressUtils';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 
 interface Props {
@@ -23,6 +24,7 @@ interface Props {
 const TYPE_LABEL: Record<string, string> = { study: '학습 뱃지', quiz: '퀴즈 뱃지', attendance: '출석 뱃지' };
 
 const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
+	const reducedMotion = useReducedMotion();
 	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
 	const safePadding = useModalSafePadding();
 	// 회전/폴더블 대응: 화면 크기가 바뀌면 컴포넌트가 다시 렌더된다.
@@ -69,6 +71,15 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 		spin.setValue(0);
 		glow.setValue(0);
 
+		if (reducedMotion) {
+			// '애니메이션 줄이기': 카드는 최종 위치로 바로 세우고, 회전·글로우 루프와 컨페티는 생략한다.
+			backdrop.setValue(1);
+			scale.setValue(1);
+			translateY.setValue(0);
+			glow.setValue(0.5);
+			return;
+		}
+
 		// 진입: 딤은 페이드, 카드는 아래에서 튀어 오르듯 스프링
 		const enter = Animated.parallel([
 			Animated.timing(backdrop, { toValue: 1, duration: 220, useNativeDriver: true }),
@@ -100,7 +111,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 				confettiTimer.current = null;
 			}
 		};
-	}, [visible, isEarned, backdrop, scale, translateY, spin, glow]);
+	}, [visible, isEarned, backdrop, scale, translateY, spin, glow, reducedMotion]);
 
 	if (!badge) {return null;}
 
@@ -240,7 +251,8 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 					</View>
 				</Animated.View>
 
-				{isEarned && (
+				{/* 컨페티는 화면 전체를 덮는 큰 모션이라 '애니메이션 줄이기'에서는 생략한다. */}
+				{isEarned && !reducedMotion && (
 					<ConfettiCannon
 						ref={confettiRef}
 						count={80}

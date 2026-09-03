@@ -11,6 +11,7 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import ConfettiCannon from 'react-native-confetti-cannon';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import QuizResultModal from './modal/QuizResultModal';
 import QuizCompletionModal from './modal/QuizCompletionModal';
@@ -49,6 +50,7 @@ const QUESTION_TIME_LIMIT = 40;
 type QuizRoute = RouteProp<{ QUIZ: QuizScreenParams }, 'QUIZ'>;
 
 const QuizScreen = () => {
+	const reducedMotion = useReducedMotion();
 	const modalSafePadding = useModalSafePadding();
 	const route = useRoute<QuizRoute>();
 	const { width: screenWidth } = useWindowDimensions();
@@ -826,7 +828,9 @@ const QuizScreen = () => {
 	}, [remainingTime, question, selected]);
 
 	useEffect(() => {
-		const inWarning = remainingTime <= 20 && remainingTime > 0 && !!question && selected === null;
+		// 깜빡임은 남은 시간을 알리는 보조 신호다(숫자 타이머가 본 신호).
+		// '애니메이션 줄이기'에서는 정보 손실 없이 깜빡임만 뺀다.
+		const inWarning = !reducedMotion && remainingTime <= 20 && remainingTime > 0 && !!question && selected === null;
 		if (inWarning) {
 			if (!hintGlowLoopRef.current) {
 				hintGlowLoopRef.current = Animated.loop(
@@ -848,7 +852,7 @@ const QuizScreen = () => {
 				hintGlowLoopRef.current = null;
 			}
 		};
-	}, [remainingTime, question, selected, hintGlowAnim]);
+	}, [remainingTime, question, selected, hintGlowAnim, reducedMotion]);
 
 	// 🎞 문제가 바뀔 때 문제/보기 영역 페이드 + 살짝 슬라이드 업
 	useEffect(() => {
@@ -1139,7 +1143,7 @@ const QuizScreen = () => {
 							</Animated.View>
 						)}
 
-						{confettiKey > 0 && <ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart />}
+						{confettiKey > 0 && !reducedMotion && <ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart />}
 					</View>
 			{/* 뱃지 모달 */}
 			<NewBadgeModal

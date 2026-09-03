@@ -30,6 +30,7 @@ import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import TowerRewardSection from '@/components/TowerRewardSection';
 import { playFinish } from '@/utils/SoundUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 const greetingMessages = [
 	'🎯 반갑습니다! 오늘도 똑똑해질 준비되셨습니까?',
@@ -124,6 +125,7 @@ const MascotMoment = ({
 );
 
 const Home = () => {
+	const reducedMotion = useReducedMotion();
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('home');
 	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
@@ -238,6 +240,11 @@ const Home = () => {
 
 	// 🏅 뱃지 리스트 은은한 펄스 애니메이션 루프
 	useEffect(() => {
+		if (reducedMotion) {
+			// 끊임없이 맥박치는 요소는 '애니메이션 줄이기'에서 가장 먼저 빠져야 한다.
+			badgePulse.setValue(0);
+			return;
+		}
 		const loop = Animated.loop(
 			Animated.sequence([
 				Animated.timing(badgePulse, { toValue: 1, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
@@ -246,7 +253,7 @@ const Home = () => {
 		);
 		loop.start();
 		return () => loop.stop();
-	}, [badgePulse]);
+	}, [badgePulse, reducedMotion]);
 
 	// 펫 통통 튀는 모션
 	const bouncePet = useCallback(() => {
@@ -429,7 +436,8 @@ const Home = () => {
 	};
 	return (
 		<SafeAreaView style={styles.main} edges={['top']}>
-			{showConfetti && (
+			{/* 컨페티는 화면 전체를 덮는 큰 모션이라 '애니메이션 줄이기'에서는 생략한다. */}
+			{showConfetti && !reducedMotion && (
 				<View style={styles.globalConfettiWrapper}>
 					<ConfettiCannon count={60} origin={{ x: scaleWidth(180), y: 0 }} fadeOut explosionSpeed={500} fallSpeed={2500} />
 				</View>

@@ -29,3 +29,60 @@
 
 5. 테스트에서 모달을 `SafeAreaProvider` 없이 렌더하면 `useSafeAreaInsets` 가 throw 한다.
    `jest.setup.js` 에 `react-native-safe-area-context/jest/mock` 이 등록돼 있으니 그대로 두면 된다.
+
+## 태블릿/아이패드 반응형 규칙
+
+전제는 하나다 — **폰 레이아웃은 바뀌지 않는다.** 태블릿 전용 레이아웃을 따로 짜지 않고
+배율 상한 + 본문 기둥 폭 두 가지로 처리한다. 값은 모두 `src/utils/DementionUtils.ts` 에 있다.
+
+1. 태블릿 판정은 `isTablet` (짧은 변 600dp 이상, 안드로이드 sw600dp 와 동일 기준) 하나만 쓴다.
+   화면에서 `screenWidth > 600` 이나 `DeviceInfo.isTablet()` 을 새로 만들지 않는다.
+   판정은 창(`window`)이 아니라 기기(`screen`) 기준이다 — 분할 화면에서 값이 흔들리지 않게.
+
+2. `scaleWidth` / `scaleHeight` / `scaledSize` 의 배율에는 상한이 있다.
+   폰 `MAX_SCALE = 1.25`, 태블릿 `TABLET_MAX_SCALE = 1.35`.
+   태블릿이 너무 작거나 크게 느껴지면 **레이아웃을 새로 짜기 전에 이 값부터** 조정한다.
+
+3. 화면 본문은 `AppLayout` 의 `navigatorWrapper` 가 `CONTENT_MAX_WIDTH` 로 묶고 가운데 정렬한다.
+   화면 코드에서 따로 폭을 제한할 필요가 없다.
+
+4. 모달 카드 폭은 `maxWidth` 를 반드시 준다.
+   - 가운데 뜨는 다이얼로그: `scaleWidth(340)` 계열 또는 `MODAL_MAX_WIDTH`
+   - 바텀시트·전체폭 카드: `CONTENT_MAX_WIDTH` + `alignSelf: 'center'`
+   `width: '100%'` 만 두면 아이패드에서 카드가 화면 폭을 다 먹어 대화상자로 읽히지 않는다.
+
+5. 네이티브 스위치 네 개가 세트다 (`__tests__/tabletLayout.test.ts` 가 확인한다).
+   - `TARGETED_DEVICE_FAMILY = "1,2"` (Debug/Release 둘 다)
+   - `UIRequiresFullScreen` = true (멀티태스킹을 지원하면 애플이 4방향 회전을 요구한다)
+   - `UISupportedInterfaceOrientations~ipad` = Portrait 만
+   - Android `PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY` = true
+     (targetSdk 36 부터 sw600dp 이상에서 `screenOrientation` 이 무시된다. targetSdk 37 부터는
+     이 속성도 무효라 그때는 가로 대응 레이아웃이 필요하다.)
+
+## TextInput / 키보드 규칙
+
+1. 스크롤·빈 영역 탭으로 키보드를 닫는 동작은 **전역 기본값**이다
+   (`src/utils/ScrollDefaults.ts`, `index.js` 최상단에서 import).
+   화면에서 `keyboardDismissMode` / `keyboardShouldPersistTaps` 를 다시 붙이지 않는다.
+
+2. `KeyboardAvoidingView` 의 `behavior` 는 **항상 `"padding"`** 이다.
+   `Platform.OS === 'ios' ? 'padding' : 'height'` 를 쓰지 않는다 — 이유는
+   `src/screens/common/modal/README.md` 참고 (edge-to-edge / 바텀시트 하단 잘림).
+
+3. 스크롤 영역이 없는 카드형 모달은 딤에 `Keyboard.dismiss` 를 붙인다.
+   `<Pressable style={StyleSheet.absoluteFill} onPress={Keyboard.dismiss} />`
+
+## 진동/햅틱 금지
+
+이 앱은 진동 피드백을 쓰지 않는다. `Vibration` API·햅틱 라이브러리를 넣지 않고,
+notifee `createChannel` 에는 **반드시 `vibration: false`** 를 준다(기본값이 `true` 다).
+
+안드로이드 알림 채널은 생성 후 설정이 불변이다. 채널 설정을 바꿀 때는 ID 에 버전을 올리고
+(`quiz-reminder-v2`) 구버전 채널을 `deleteLegacyVibrationChannels()` 처럼 지워야 기존 사용자에게 반영된다.
+`__tests__/noHaptics.test.ts` 가 세 가지(코드/채널/매니페스트 권한)를 모두 확인한다.
+
+## 애니메이션 부담 규칙
+
+끝나지 않는 루프(`Animated.loop`)와 컨페티는 `useReducedMotion()` 으로 반드시 게이트한다.
+OS '애니메이션 줄이기'를 켠 사용자에게는 **정보를 잃지 않는 선에서 모션만** 뺀다
+(예: 퀴즈 타이머 깜빡임은 빼도 숫자 타이머가 남는다, 결과 모달은 최종 상태로 바로 세운다).

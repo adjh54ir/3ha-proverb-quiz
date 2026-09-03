@@ -4,7 +4,7 @@ import { AppState, LayoutChangeEvent, StyleSheet, View } from 'react-native';
 import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, Theme } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { scaleHeight } from '@/utils';
+import { CONTENT_MAX_WIDTH, isTablet, scaleHeight } from '@/utils';
 import { COLORS, SPACING_H, themedStyles } from '@/const/common/Theme';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
@@ -38,8 +38,14 @@ const AD_WRAPPER_TOP = SPACING_H.xs;
 /** 배너 래퍼의 위/아래 안쪽 여백 (styles.adWrapperAbsolute.paddingVertical 과 동일해야 한다) */
 const AD_WRAPPER_PADDING = SPACING_H.xs;
 
-/** 배너 래퍼를 실측하기 전 한 프레임 동안 쓰는 값 (표준 앵커 배너 높이 + 래퍼 여백) */
-const AD_FALLBACK_HEIGHT = scaleHeight(50) + AD_WRAPPER_PADDING * 2;
+/**
+ * 배너 래퍼를 실측하기 전 한 프레임 동안 쓰는 값 (앵커 배너 높이 + 래퍼 여백).
+ *
+ * 구글은 기기 세로 길이로 앵커드 어댑티브 배너 높이를 정한다(720dp 초과 = 90dp).
+ * 태블릿은 항상 그 구간이라 폰 기준 50dp 를 쓰면 첫 프레임에 본문이 배너를 파고든다.
+ * 실측(onLayout)이 곧 덮어쓰지만, 그 한 프레임의 깜빡임을 없애려고 기기별 값을 쓴다.
+ */
+const AD_FALLBACK_HEIGHT = (isTablet ? 90 : scaleHeight(50)) + AD_WRAPPER_PADDING * 2;
 
 /** 배너와 그 아래 콘텐츠 사이의 숨 쉴 틈 — 배너 하단 간격은 이 값 하나로만 조절한다. */
 const AD_BOTTOM_GAP = SPACING_H.md;
@@ -241,6 +247,12 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	navigatorWrapper: {
 		flex: 1,
+		// 태블릿에서 화면 폭을 다 쓰면 한 줄이 지나치게 길고 카드가 늘어져 읽기 어렵다.
+		// 본문을 가운데 기둥으로 묶고 남는 좌우는 배경색으로 둔다.
+		// 폰은 화면 폭이 CONTENT_MAX_WIDTH 보다 좁아 아무 영향이 없다.
+		width: '100%',
+		maxWidth: CONTENT_MAX_WIDTH,
+		alignSelf: 'center',
 	},
 }));
 

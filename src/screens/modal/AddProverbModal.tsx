@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Keyboard, TouchableWithoutFeedback, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import FastImage from 'react-native-fast-image';
@@ -9,7 +9,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconComponent from '../common/atomic/IconComponent';
 import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
@@ -162,9 +162,8 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 	return (
 		<Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
 			<View style={styles.overlay}>
-				{/* 모달은 Activity 가 아닌 별도 Dialog 윈도우라 매니페스트의 adjustResize 가 적용되지 않는다.
-				    화면(Screen)과 달리 안드로이드도 behavior 를 직접 줘야 키보드가 입력창을 가리지 않는다. */}
-				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.sheet}>
+				{/* 키보드 회피 규칙은 common/modal/README.md 참고 — behavior 는 두 플랫폼 모두 'padding' 으로 통일한다. */}
+				<KeyboardAvoidingView behavior="padding" style={styles.sheet}>
 					<View style={styles.modalHeader}>
 						<View style={styles.handleBar} />
 						<View style={styles.headerRow}>
@@ -288,7 +287,9 @@ export default AddProverbModal;
 
 const styles = themedStyles(() => StyleSheet.create({
 	overlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'flex-end' },
-	sheet: { height: '92%', backgroundColor: COLORS.background, borderTopLeftRadius: RADIUS.xl, borderTopRightRadius: RADIUS.xl, overflow: 'hidden' },
+	// 태블릿에서 시트가 화면 폭을 다 쓰면 한 줄이 지나치게 길어진다. 본문 기둥 폭으로 묶고 가운데 정렬.
+	// 폰은 화면 폭이 CONTENT_MAX_WIDTH 보다 좁아 아무 영향이 없다.
+	sheet: { width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center', height: '92%', backgroundColor: COLORS.background, borderTopLeftRadius: RADIUS.xl, borderTopRightRadius: RADIUS.xl, overflow: 'hidden' },
 	modalHeader: { backgroundColor: COLORS.surface, paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.sm, paddingBottom: SPACING_H.md, borderBottomWidth: 1, borderBottomColor: COLORS.surfaceAlt },
 	handleBar: { width: scaleWidth(40), height: scaleHeight(4), borderRadius: RADIUS.round, backgroundColor: COLORS.border, alignSelf: 'center', marginBottom: SPACING_H.md },
 	headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.xs },

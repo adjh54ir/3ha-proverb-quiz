@@ -5,7 +5,7 @@ import { Animated, View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking
 import Modal from '@/screens/common/atomic/AppModal';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
-import { scaledSize, scaleHeight } from '@/utils/DementionUtils';
+import { MODAL_MAX_WIDTH, scaledSize, scaleHeight } from '@/utils/DementionUtils';
 import Markdown from 'react-native-markdown-display';
 import IconComponent from '../atomic/IconComponent';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue, getThemeMode } from '@/const/common/Theme';
@@ -352,6 +352,8 @@ const modalStyles = themedStyles(() => StyleSheet.create({
   },
   container: {
     width: '100%',
+    // 태블릿에서 카드가 화면 폭만큼 늘어나면 대화상자로 읽히지 않는다. 폰은 화면이 더 좁아 영향 없음.
+    maxWidth: MODAL_MAX_WIDTH,
     maxHeight: '100%',
     backgroundColor: COLORS.surface,
     borderWidth: 1,

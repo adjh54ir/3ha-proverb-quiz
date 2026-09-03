@@ -193,8 +193,8 @@ const MyScoreScreen = () => {
 		{ key: 'quiz', label: '퀴즈 활동', icon: 'play-arrow' },
 		{ key: 'today', label: '오늘의 퀴즈', icon: 'calendar-today' },
 		{ key: 'time', label: '타임 챌린지', icon: 'timer' },
-		{ key: 'badge', label: '획득 뱃지', icon: 'emoji-events' },
 		{ key: 'tower', label: '타워 챌린지', icon: 'apartment' },
+		{ key: 'badge', label: '획득 뱃지', icon: 'emoji-events' },
 	];
 	const [activeTab, setActiveTab] = useState<string>('all');
 
@@ -1199,86 +1199,6 @@ const MyScoreScreen = () => {
 					</View>
 				)}
 
-				{/* 1. 나의 뱃지 (전체 / 획득 / 미획득 필터) */}
-				{(activeTab === 'all' || activeTab === 'badge') && (
-					<>
-						<View style={styles.sectionHeaderStatic}>
-							<View style={styles.iconCircle5}>
-								<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(16)} color={COLORS.textWhite} />
-							</View>
-							<Text style={styles.sectionTitle}>나의 뱃지</Text>
-						</View>
-
-						<View style={styles.badgeFilterRow}>
-							{([
-								{ key: 'all', label: `전체 ${CONST_BADGES.length}` },
-								{ key: 'earned', label: `획득 ${earnedBadgeIds.length}` },
-								{ key: 'locked', label: `미획득 ${CONST_BADGES.length - earnedBadgeIds.length}` },
-							] as const).map((ff) => {
-								const active = badgeFilter === ff.key;
-								return (
-									<TouchableOpacity
-										key={ff.key}
-										activeOpacity={0.8}
-										onPress={() => setBadgeFilter(ff.key)}
-										style={[styles.badgeFilterChip, active && styles.badgeFilterChipActive]}>
-										<Text style={[styles.badgeFilterText, active && styles.badgeFilterTextActive]}>{ff.label}</Text>
-									</TouchableOpacity>
-								);
-							})}
-						</View>
-
-						<View style={[styles.sectionBox, { minHeight: scaleHeight(360) }]}>
-							{(() => {
-								const list = CONST_BADGES.filter((b) => {
-									const earned = earnedBadgeIds.includes(b.id);
-									if (badgeFilter === 'earned') { return earned; }
-									if (badgeFilter === 'locked') { return !earned; }
-									return true;
-								});
-								if (list.length === 0) {
-									return <Text style={styles.emptyText}> - 표시할 뱃지가 없습니다.</Text>;
-								}
-								return list.map((badge) => {
-									const earned = earnedBadgeIds.includes(badge.id);
-									const rarity = BADGE_RARITY_META[badge.rarity] ?? BADGE_RARITY_META.common;
-									return (
-										<TouchableOpacity
-											key={badge.id}
-											activeOpacity={0.7}
-											style={[styles.badgeCard, earned && styles.badgeCardActive]}
-											onPress={() => openBadgePopup(badge)}>
-											<View style={[styles.iconBox, earned && { backgroundColor: rarity.soft }]}>
-												<IconComponent
-													name={earned ? badge.icon : 'lock'}
-													type={earned ? badge.iconType : 'materialIcons'}
-													size={scaledSize(20)}
-													color={earned ? rarity.color : COLORS.textLight}
-												/>
-											</View>
-											<View style={styles.textBox}>
-												<View style={styles.badgeTitleRow}>
-													<Text style={[styles.badgeTitle, earned && styles.badgeTitleActive]} numberOfLines={1}>{badge.name}</Text>
-													<View style={[styles.badgeRarityTag, { backgroundColor: earned ? rarity.soft : COLORS.surfaceAlt }]}>
-														<IconComponent type="materialIcons" name="auto-awesome" size={scaledSize(9)} color={rarity.color} />
-														<Text style={[styles.badgeRarityTagText, { color: rarity.color }]}>{rarity.label}</Text>
-													</View>
-												</View>
-												<Text style={[styles.badgeDesc, earned && styles.badgeDescActive]} numberOfLines={1}>{badge.description}</Text>
-												<View style={styles.badgeCondRow}>
-													<IconComponent type="materialIcons" name="flag" size={scaledSize(10)} color={COLORS.textLight} />
-													<Text style={styles.badgeCondText} numberOfLines={1}>{badge.condition}</Text>
-												</View>
-											</View>
-											<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={earned ? COLORS.primary : COLORS.borderDark} style={{ alignSelf: 'center' }} />
-										</TouchableOpacity>
-									);
-								});
-							})()}
-						</View>
-					</>
-				)}
-
 				{/* 나의 타워 챌린지 내역 */}
 				{(activeTab === 'all' || activeTab === 'tower') && (
 				<View style={styles.sectionHeaderStatic}>
@@ -1394,6 +1314,86 @@ const MyScoreScreen = () => {
 							);
 						})}
 					</View>
+				)}
+
+				{/* 나의 뱃지 (전체 / 획득 / 미획득 필터) */}
+				{(activeTab === 'all' || activeTab === 'badge') && (
+					<>
+						<View style={styles.sectionHeaderStatic}>
+							<View style={styles.iconCircle5}>
+								<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(16)} color={COLORS.textWhite} />
+							</View>
+							<Text style={styles.sectionTitle}>나의 뱃지</Text>
+						</View>
+
+						<View style={styles.badgeFilterRow}>
+							{([
+								{ key: 'all', label: `전체 ${CONST_BADGES.length}` },
+								{ key: 'earned', label: `획득 ${earnedBadgeIds.length}` },
+								{ key: 'locked', label: `미획득 ${CONST_BADGES.length - earnedBadgeIds.length}` },
+							] as const).map((ff) => {
+								const active = badgeFilter === ff.key;
+								return (
+									<TouchableOpacity
+										key={ff.key}
+										activeOpacity={0.8}
+										onPress={() => setBadgeFilter(ff.key)}
+										style={[styles.badgeFilterChip, active && styles.badgeFilterChipActive]}>
+										<Text style={[styles.badgeFilterText, active && styles.badgeFilterTextActive]}>{ff.label}</Text>
+									</TouchableOpacity>
+								);
+							})}
+						</View>
+
+						<View style={[styles.sectionBox, { minHeight: scaleHeight(360) }]}>
+							{(() => {
+								const list = CONST_BADGES.filter((b) => {
+									const earned = earnedBadgeIds.includes(b.id);
+									if (badgeFilter === 'earned') { return earned; }
+									if (badgeFilter === 'locked') { return !earned; }
+									return true;
+								});
+								if (list.length === 0) {
+									return <Text style={styles.emptyText}> - 표시할 뱃지가 없습니다.</Text>;
+								}
+								return list.map((badge) => {
+									const earned = earnedBadgeIds.includes(badge.id);
+									const rarity = BADGE_RARITY_META[badge.rarity] ?? BADGE_RARITY_META.common;
+									return (
+										<TouchableOpacity
+											key={badge.id}
+											activeOpacity={0.7}
+											style={[styles.badgeCard, earned && styles.badgeCardActive]}
+											onPress={() => openBadgePopup(badge)}>
+											<View style={[styles.iconBox, earned && { backgroundColor: rarity.soft }]}>
+												<IconComponent
+													name={earned ? badge.icon : 'lock'}
+													type={earned ? badge.iconType : 'materialIcons'}
+													size={scaledSize(20)}
+													color={earned ? rarity.color : COLORS.textLight}
+												/>
+											</View>
+											<View style={styles.textBox}>
+												<View style={styles.badgeTitleRow}>
+													<Text style={[styles.badgeTitle, earned && styles.badgeTitleActive]} numberOfLines={1}>{badge.name}</Text>
+													<View style={[styles.badgeRarityTag, { backgroundColor: earned ? rarity.soft : COLORS.surfaceAlt }]}>
+														<IconComponent type="materialIcons" name="auto-awesome" size={scaledSize(9)} color={rarity.color} />
+														<Text style={[styles.badgeRarityTagText, { color: rarity.color }]}>{rarity.label}</Text>
+													</View>
+												</View>
+												<Text style={[styles.badgeDesc, earned && styles.badgeDescActive]} numberOfLines={1}>{badge.description}</Text>
+												<View style={styles.badgeCondRow}>
+													<IconComponent type="materialIcons" name="flag" size={scaledSize(10)} color={COLORS.textLight} />
+													<Text style={styles.badgeCondText} numberOfLines={1}>{badge.condition}</Text>
+												</View>
+											</View>
+											<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={earned ? COLORS.primary : COLORS.borderDark} style={{ alignSelf: 'center' }} />
+										</TouchableOpacity>
+									);
+								});
+							})()}
+						</View>
+					</>
 				)}
 				</View>
 			</ScrollView>
@@ -1515,8 +1515,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		// absolute 자식은 부모의 padding 안쪽을 기준으로 잡힌다.
 		// 0 이면 카드 모서리에 딱 붙어 답답해 보여 위·오른쪽을 한 단계 더 띄운다.
 		position: 'absolute',
-		top: SPACING_H.sm,
-		right: SPACING_W.sm,
+		top: SPACING_H.md,
+		right: SPACING_W.md,
 		zIndex: 20,
 	},
 	sectionBox: {

@@ -4,7 +4,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { SkeletonCardList } from '@/screens/common/atomic/Skeleton';
-import { Animated, Dimensions, Easing, Image, InteractionManager, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Animated, Easing, Image, InteractionManager, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import Carousel from 'react-native-reanimated-carousel';
 import IconComponent from './common/atomic/IconComponent';
@@ -12,7 +12,7 @@ import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber, LEVEL_NAME_BY_NUMBER } from '@/screens/common/CommonProverbModule';
 import { LEVEL_DROPDOWN_ITEMS, FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
@@ -27,9 +27,6 @@ import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import { read, write } from '@/services/StorageService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
-
-// 기기 분류(태블릿 여부)용 1회 측정값. 실시간 레이아웃은 useWindowDimensions 를 쓴다.
-const { width: screenWidth } = Dimensions.get('window');
 
 // 난이도/카테고리 드롭다운은 CommonMainData 단일 소스를 쓴다.
 // (이 화면에 복사돼 있던 사본은 badgeId 가 category_world/category_success 로 잘못돼 있었다)
@@ -49,7 +46,7 @@ const mascotImages = [
 	require('@/assets/images/random/random_mascote13.png'),
 ];
 
-const isTablet = screenWidth > 600;
+// 태블릿 판정은 DementionUtils 의 공용 기준(짧은 변 600dp)을 쓴다 — 화면마다 기준이 갈리지 않게.
 // 예시: 카드 높이 다르게 적용
 const isAndroid = Platform.OS === 'android';
 const CARD_HEIGHT = isTablet
@@ -861,15 +858,15 @@ const QuizStudyScreen = () => {
 					]}>
 					<View style={styles.progressHeader}>
 						<View style={styles.progressTopRow}>
-							{/* 학습 현황 안내 — 줄 가장 오른쪽 */}
-							<View style={styles.progressHelpButton}>
-								<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
-							</View>
 							<Text style={styles.progressTitle}>학습 현황</Text>
 							<View style={styles.progressBadge}>
 								<Text style={styles.progressBadgeText}>
 									{studyHistory.studyProverbes.length} / {proverbList.length}
 								</Text>
+							</View>
+							{/* 학습 현황 안내 — 제목·뱃지와 한 덩어리로 가운데 정렬한다 */}
+							<View style={styles.progressHelpButton}>
+								<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
 							</View>
 						</View>
 
@@ -1355,8 +1352,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		textAlign: 'center',
 	},
 	progressTopRow: {
-		// 부모(progressHeader)가 alignItems: 'center' 라 stretch 를 주지 않으면 줄이 내용 폭으로 줄어들어
-		// 오른쪽 끝(물음표) 이 뱃지 바로 옆에 붙는다.
 		alignSelf: 'stretch',
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -1365,10 +1360,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.xs,
 	},
 	progressHelpButton: {
-		// 0 이면 카드 오른쪽 모서리에 붙어 '우측으로 쏠린' 인상을 준다 — 한 단계 안쪽으로 들인다
-		position: 'absolute',
-		right: SPACING_W.sm,
-		zIndex: 20,
+		// 카드 오른쪽 모서리에 절대 배치하면 제목과 떨어져 '우측으로 쏠린' 인상을 준다.
+		// 제목·뱃지 뒤에 그대로 흘려 두어 세 요소가 한 덩어리로 가운데 정렬되게 한다.
+		marginLeft: SPACING_W.sm,
 	},
 	progressBarWrapper: {
 		width: '80%',

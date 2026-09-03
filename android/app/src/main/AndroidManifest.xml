@@ -29,6 +29,17 @@
     android:allowBackup="false"
     android:theme="@style/AppTheme"
     android:supportsRtl="true">
+    <!--
+      targetSdk 36(Android 16)부터는 최소 너비 600dp 이상 화면에서 시스템이
+      android:screenOrientation 과 resizeableActivity 지정을 무시하고 앱을 강제로
+      회전·리사이즈 가능하게 만든다. 이 앱은 세로 한 컬럼 설계라 그대로 두면
+      태블릿에서 가로로 돌아가며 레이아웃이 깨진다.
+      아래 속성으로 기존 세로 고정을 유지한다. targetSdk 37 부터는 무효가 되므로
+      그때는 가로 대응 레이아웃이 필요하다.
+    -->
+    <property
+      android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+      android:value="true" />
     <activity
       android:name=".MainActivity"
       android:label="@string/app_name"

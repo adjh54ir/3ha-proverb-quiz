@@ -2,10 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface TowerReward {
 	name: string;
@@ -46,6 +47,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 	const { width, height } = useWindowDimensions();
 	// 오버레이는 시스템 바를 포함한 screen 크기라 카드가 그 밑까지 파고든다(CLAUDE.md 모달 규칙 1·4).
 	const safePadding = useModalSafePadding();
+	const reducedMotion = useReducedMotion();
 	const scaleAnim = useRef(new Animated.Value(0)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
 	const starAnims = useRef([new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)]).current;
@@ -55,6 +57,16 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 
 	useEffect(() => {
 		let glowLoop: Animated.CompositeAnimation | null = null;
+		if (visible && reducedMotion) {
+			// '애니메이션 줄이기': 결과는 즉시 최종 상태로 보여주고 글로우 루프는 돌리지 않는다.
+			scaleAnim.setValue(1);
+			fadeAnim.setValue(1);
+			bossAnim.setValue(1);
+			scoreCountAnim.setValue(correctCount);
+			glowAnim.setValue(1);
+			starAnims.forEach((anim) => anim.setValue(isVictory ? 1 : 0));
+			return;
+		}
 		if (visible) {
 			glowLoop = Animated.loop(
 				Animated.sequence([
@@ -103,7 +115,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 			glowAnim.stopAnimation();
 			starAnims.forEach((anim) => anim.stopAnimation());
 		};
-	}, [visible, isVictory]);
+	}, [visible, isVictory, reducedMotion]);
 
 	const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
 	const accentColor = isVictory ? COLORS.gold : COLORS.dangerLight;
@@ -135,7 +147,8 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 					style={[
 						styles.modalContainer,
 						{
-							width: width * 0.9,
+							// 태블릿에서 화면의 90% 는 지나치게 넓다 — 본문 기둥 폭을 넘지 않게 묶는다(폰은 상한에 닿지 않음).
+							width: Math.min(width * 0.9, CONTENT_MAX_WIDTH),
 							// 화면 높이의 80%로 고정 → 버튼이 항상 화면 안에 들어옴
 							height: height * 0.8,
 							transform: [{ scale: scaleAnim }],

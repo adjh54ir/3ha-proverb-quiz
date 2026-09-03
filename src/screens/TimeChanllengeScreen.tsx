@@ -26,6 +26,7 @@ import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import { update } from '@/services/StorageService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 const MAX_LIVES = 5;
 const CHOICE_COUNT = 4;
@@ -71,6 +72,7 @@ const getShuffledChoices = (correct: string, allMeanings: string[]) => {
 };
 
 const InfinityQuizScreen = () => {
+	const reducedMotion = useReducedMotion();
 	const modalSafePadding = useModalSafePadding();
 	const TIME_CHALLENGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 
@@ -133,6 +135,9 @@ const InfinityQuizScreen = () => {
 	const [showScrollTop, setShowScrollTop] = useState(false);
 	const labelColors = [COLORS.secondary, COLORS.primary, COLORS.accentFlame, COLORS.accentPink]; // A, B, C, D 색상 (각각 다르게)
 	const solvedProverbs = questionList.slice(0, currentIndex + 1).filter((q) => resultMap[q.id]);
+	// 해설 헤더에 접힌 상태에서도 성적을 보여주기 위한 요약
+	const solvedCorrectCount = solvedProverbs.filter((q) => resultMap[q.id] === 'correct').length;
+	const solvedWrongCount = solvedProverbs.length - solvedCorrectCount;
 
 	const [bonusHistory, setBonusHistory] = useState<number[]>([]);
 	const [toastMessage, setToastMessage] = useState('');
@@ -815,7 +820,8 @@ const InfinityQuizScreen = () => {
 				{/* 👇 스킵 버튼을 문제 텍스트 위에 둠 */}
 				{isGameOver ? (
 					<>
-						{showConfetti && (
+						{/* 컨페티 200발은 이 앱에서 가장 큰 모션이다 — '애니메이션 줄이기'에서는 생략한다. */}
+						{showConfetti && !reducedMotion && (
 							<View style={styles.globalConfettiWrapper}>
 								<ConfettiCannon
 									count={200}
@@ -939,42 +945,38 @@ const InfinityQuizScreen = () => {
 							</View>
 						</View>
 
+						{/* 정답과 해설 — 접힌 상태에서도 성적이 보이는 카드 */}
 						<TouchableOpacity
-							activeOpacity={0.8}
+							activeOpacity={0.85}
 							onPress={() => setIsFeedbackOpen(!isFeedbackOpen)}
-							style={{
-								backgroundColor: COLORS.surfaceAlt,
-								borderRadius: RADIUS.sm,
-								paddingVertical: SPACING_H.smPlus,
-								paddingHorizontal: SPACING_W.lg,
-								marginTop: SPACING_H.md,
-								flexDirection: 'row',
-								justifyContent: 'space-between',
-								alignItems: 'center',
-							}}>
-							<Text
-								style={{
-									fontSize: FONT_SIZES.mdPlus,
-									fontWeight: '600',
-									color: COLORS.text,
-									marginRight: SPACING_W.xs,
-								}}>
-								정답과 해설 보기
-							</Text>
+							style={[styles.feedbackToggle, isFeedbackOpen && styles.feedbackToggleOpen]}>
+							<View style={styles.feedbackToggleIcon}>
+								<IconComponent type="materialIcons" name="menu-book" size={scaledSize(15)} color={COLORS.primaryDark} />
+							</View>
+							<View style={styles.feedbackToggleTextWrap}>
+								<Text style={styles.feedbackToggleTitle}>정답과 해설 보기</Text>
+								<Text style={styles.feedbackToggleSub}>
+									<Text style={styles.feedbackToggleCorrect}>정답 {solvedCorrectCount}</Text>
+									{'   ·   '}
+									<Text style={styles.feedbackToggleWrong}>오답 {solvedWrongCount}</Text>
+								</Text>
+							</View>
 							<IconComponent
-								name={isFeedbackOpen ? 'angle-up' : 'angle-down'}
-								type="FontAwesome"
-								color={COLORS.text}
-								size={scaledSize(18)}
+								name={isFeedbackOpen ? 'expand-less' : 'expand-more'}
+								type="materialIcons"
+								color={COLORS.textSecondary}
+								size={scaledSize(22)}
 							/>
 						</TouchableOpacity>
 
-						{/* 문제 피드백 리스트 */}
-						{/* 문제 피드백 리스트 */}
+						{/* 문제별 정오답 + 의미 */}
 						{isFeedbackOpen && (
 							<View style={styles.feedbackList}>
 								{solvedProverbs.map((q, i) => {
 									const isCorrect = resultMap[q.id] === 'correct';
+									const tint = isCorrect ? COLORS.success : COLORS.danger;
+									const soft = isCorrect ? COLORS.primarySoft : COLORS.dangerBg;
+									const deep = isCorrect ? COLORS.primaryDark : COLORS.dangerDark;
 									return (
 										<TouchableOpacity
 											key={q.id}
@@ -983,37 +985,38 @@ const InfinityQuizScreen = () => {
 												setSelectedProverb(q);
 												setDetailModalVisible(true);
 											}}
-											style={[styles.feedbackItem, { backgroundColor: isCorrect ? COLORS.secondaryBg : COLORS.dangerSoftBg }]}>
-											<View style={styles.feedbackContent}>
-												<View style={{ flex: 1 }}>
-													<View style={styles.feedbackTitleRow}>
-														<Text style={[styles.feedbackTitle, { color: COLORS.textStrong, flex: 1 }]} numberOfLines={1}>
-															{i + 1}. {q.proverb}
-														</Text>
-														<View style={[styles.feedbackResultBadge, { backgroundColor: isCorrect ? COLORS.primarySoft : COLORS.dangerBg }]}>
-															<IconComponent
-																type="materialIcons"
-																name={isCorrect ? 'check-circle' : 'cancel'}
-																size={scaledSize(12)}
-																color={isCorrect ? COLORS.primaryDark : COLORS.dangerDark}
-															/>
-															<Text style={[styles.feedbackResultBadgeText, { color: isCorrect ? COLORS.primaryDark : COLORS.dangerDark }]}>
-																{isCorrect ? '정답' : '오답'}
-															</Text>
-														</View>
+											style={styles.feedbackItem}>
+											{/* 왼쪽 색 띠 하나로 정오답을 구분한다 — 카드 전체를 물들이지 않아 글자가 선명하다 */}
+											<View style={[styles.feedbackAccent, { backgroundColor: tint }]} />
+											<View style={styles.feedbackBody}>
+												<View style={styles.feedbackTitleRow}>
+													<View style={[styles.feedbackNoChip, { backgroundColor: soft }]}>
+														<Text style={[styles.feedbackNoText, { color: deep }]}>{i + 1}</Text>
 													</View>
-													<Text style={styles.feedbackMeaning}>
-														의미: <Text style={{ fontWeight: '700' }}>{q.longMeaning || q.meaning}</Text>
+													<Text style={styles.feedbackTitle} numberOfLines={1}>
+														{q.proverb}
 													</Text>
+													<View style={[styles.feedbackResultBadge, { backgroundColor: soft }]}>
+														<IconComponent
+															type="materialIcons"
+															name={isCorrect ? 'check-circle' : 'cancel'}
+															size={scaledSize(12)}
+															color={deep}
+														/>
+														<Text style={[styles.feedbackResultBadgeText, { color: deep }]}>{isCorrect ? '정답' : '오답'}</Text>
+													</View>
 												</View>
-												<IconComponent
-													name="chevron-right"
-													type="FontAwesome"
-													size={scaledSize(16)}
-													color={COLORS.textLight}
-													style={styles.feedbackArrow}
-												/>
+												<Text style={styles.feedbackMeaning} numberOfLines={2}>
+													{q.longMeaning || q.meaning}
+												</Text>
 											</View>
+											<IconComponent
+												name="chevron-right"
+												type="materialIcons"
+												size={scaledSize(20)}
+												color={COLORS.textLight}
+												style={styles.feedbackArrow}
+											/>
 										</TouchableOpacity>
 									);
 								})}
@@ -1739,33 +1742,70 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '700',
 	},
 
+	/* ===== 결과 화면: 정답과 해설 ===== */
+	feedbackToggle: {
+		width: '100%',
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.md,
+		marginTop: SPACING_H.lg,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
+		borderRadius: RADIUS.lg,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surface,
+	},
+	feedbackToggleOpen: { borderColor: COLORS.primary },
+	feedbackToggleIcon: {
+		width: scaleWidth(30),
+		height: scaleWidth(30),
+		borderRadius: RADIUS.md,
+		backgroundColor: COLORS.primarySoft,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	feedbackToggleTextWrap: { flex: 1 },
+	feedbackToggleTitle: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong },
+	feedbackToggleSub: { marginTop: SPACING_H.xxs, fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
+	feedbackToggleCorrect: { fontWeight: '700', color: COLORS.primaryDark },
+	feedbackToggleWrong: { fontWeight: '700', color: COLORS.dangerDark },
 	feedbackList: {
 		width: '100%',
-		marginTop: SPACING_H.xl,
-		padding: SPACING_W.md,
-		borderWidth: 1,
-		borderColor: COLORS.borderDark,
-		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.background,
+		marginTop: SPACING_H.smPlus,
+		rowGap: SPACING_H.smPlus,
 	},
 	feedbackItem: {
-		padding: SPACING_W.md,
-		borderRadius: RADIUS.sm,
-		marginBottom: SPACING_H.smPlus,
+		flexDirection: 'row',
+		alignItems: 'center',
+		borderRadius: RADIUS.lg,
 		borderWidth: 1,
-		borderColor: COLORS.borderDark,
+		borderColor: COLORS.border,
+		backgroundColor: COLORS.surface,
+		overflow: 'hidden',
 	},
+	feedbackAccent: { width: scaleWidth(4), alignSelf: 'stretch' },
+	feedbackBody: { flex: 1, paddingVertical: SPACING_H.md, paddingHorizontal: SPACING_W.md },
 	feedbackTitleRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: SPACING_W.sm,
-		marginBottom: SPACING_H.smPlus,
+		columnGap: SPACING_W.sm,
+		marginBottom: SPACING_H.xs,
 	},
+	feedbackNoChip: {
+		minWidth: scaleWidth(22),
+		height: scaleWidth(22),
+		borderRadius: RADIUS.round,
+		paddingHorizontal: SPACING_W.xs,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	feedbackNoText: { fontSize: FONT_SIZES.xs, fontWeight: '800' },
 	feedbackResultBadge: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: SPACING_W.xs,
-		borderRadius: RADIUS.sm,
+		columnGap: SPACING_W.xs,
+		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: SPACING_H.xxs,
 	},
@@ -1774,14 +1814,11 @@ const styles = themedStyles(() => StyleSheet.create({
 		flex: 1,
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
+		color: COLORS.textStrong,
 	},
 	feedbackMeaning: {
 		fontSize: FONT_SIZES.md,
-		marginBottom: SPACING_H.xxs,
-		color: COLORS.text,
-	},
-	feedbackResult: {
-		fontSize: FONT_SIZES.smPlus,
+		lineHeight: scaledSize(19),
 		color: COLORS.textSecondary,
 	},
 	countdownOverlay: {
@@ -2270,12 +2307,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		zIndex: 999,
 		pointerEvents: 'none',
 	},
-	feedbackContent: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-	},
 	feedbackArrow: {
-		marginLeft: SPACING_W.smPlus,
+		marginRight: SPACING_W.md,
 	},
 }));

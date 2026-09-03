@@ -3,20 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
 import { matchesKeyword } from '@/utils/SearchUtils';
-import {
-	View,
-	Text,
-	StyleSheet,
-	TextInput,
-	RefreshControl,
-	TouchableOpacity,
-	Keyboard,
-	TouchableWithoutFeedback,
-	FlatList,
-	KeyboardAvoidingView,
-	Platform,
-	Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, TextInput, RefreshControl, TouchableOpacity, Keyboard, TouchableWithoutFeedback, FlatList, KeyboardAvoidingView, Animated } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -275,7 +262,8 @@ const ProverbListScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.main} edges={['top']}>
-			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+			{/* 키보드 회피 규칙은 common/modal/README.md 참고 — behavior 는 두 플랫폼 모두 'padding' 으로 통일한다. */}
+			<KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
 				<TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
 					<View style={{ flex: 1 }}>
 						{/* 필터 + 드롭다운 영역 */}

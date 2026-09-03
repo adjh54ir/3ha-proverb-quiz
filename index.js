@@ -11,6 +11,9 @@ import './src/utils/TextDefaults';
 // 전역 TouchableOpacity 기본 프롭 (누름 강도를 앱 전체에서 통일)
 import './src/utils/TouchableDefaults';
 
+// 전역 ScrollView 기본 프롭 (스크롤/빈 영역 탭으로 키보드 닫기 + iOS 키보드 인셋)
+import './src/utils/ScrollDefaults';
+
 import notifee, {EventType} from '@notifee/react-native';
 import {setPendingRoute} from './src/utils/PendingNotification';
 import {AppRegistry} from 'react-native';

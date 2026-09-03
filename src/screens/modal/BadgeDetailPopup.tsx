@@ -27,7 +27,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 	const safePadding = useModalSafePadding();
 	// 회전/폴더블 대응: 화면 크기가 바뀌면 컴포넌트가 다시 렌더된다.
 	const { width: screenWidth } = useWindowDimensions();
-	const backdrop = useRef(new Animated.Value(0)).current;
+	// 딤은 애니메이션하지 않는다 — JS 로 0 → 1 페이드하면 첫 프레임이 투명해서 앱 화면이 그대로 보인다.
 	const scale = useRef(new Animated.Value(0.6)).current;
 	const translateY = useRef(new Animated.Value(40)).current;
 	const spin = useRef(new Animated.Value(0)).current;
@@ -55,23 +55,20 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 
 	useEffect(() => {
 		if (!visible) {
-			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 opacity 0 으로 그려진다(잔상 방지)
-			backdrop.setValue(0);
+			// 닫힐 때 초기화해야 다음에 열릴 때 첫 프레임이 작게/아래에서 시작한다(잔상 방지)
 			scale.setValue(0.6);
 			translateY.setValue(40);
 			spin.setValue(0);
 			glow.setValue(0);
 			return;
 		}
-		backdrop.setValue(0);
 		scale.setValue(0.6);
 		translateY.setValue(40);
 		spin.setValue(0);
 		glow.setValue(0);
 
-		// 진입: 딤은 페이드, 카드는 아래에서 튀어 오르듯 스프링
+		// 진입: 딤은 처음부터 깔려 있고, 카드만 아래에서 튀어 오르듯 스프링
 		const enter = Animated.parallel([
-			Animated.timing(backdrop, { toValue: 1, duration: 220, useNativeDriver: true }),
 			Animated.spring(scale, { toValue: 1, friction: 6, tension: 90, useNativeDriver: true }),
 			Animated.spring(translateY, { toValue: 0, friction: 7, tension: 80, useNativeDriver: true }),
 		]);
@@ -100,9 +97,10 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 				confettiTimer.current = null;
 			}
 		};
-	}, [visible, isEarned, backdrop, scale, translateY, spin, glow]);
+	}, [visible, isEarned, scale, translateY, spin, glow]);
 
-	if (!badge) {return null;}
+	// visible 을 함께 봐야 한다 — 닫힌 채로 남아 있으면 다음에 열릴 때 이전 뱃지가 한 프레임 스친다
+	if (!visible || !badge) {return null;}
 
 	const meta = BADGE_RARITY_META[badge.rarity] ?? BADGE_RARITY_META.common;
 	const rotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
@@ -111,7 +109,8 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 
 	return (
 		<Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
-			<Animated.View style={[styles.backdrop, safePadding, { opacity: backdrop }]}>
+			{/* 딤은 첫 프레임부터 화면을 덮는다(불투명 고정) — 카드만 애니메이션한다 */}
+			<View style={[styles.backdrop, safePadding]}>
 				<TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
 
 				<Animated.View style={[styles.card, { transform: [{ scale }, { translateY }] }]}>
@@ -251,7 +250,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 						explosionSpeed={350}
 					/>
 				)}
-			</Animated.View>
+			</View>
 		</Modal>
 	);
 };

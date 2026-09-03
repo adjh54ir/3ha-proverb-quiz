@@ -46,3 +46,22 @@ test('모달 오버레이는 안전 여백을 직접 준다', () => {
 		.map(({ name }) => name);
 	expect(offenders).toEqual([]);
 });
+
+/**
+ * 위 테스트는 `useSafeAreaInsets` 를 import 만 해 둬도 통과한다. 실제로 그랬다 —
+ * AddProverbModal / FavoriteAddModal 은 insets 를 footer 에만 쓰고 오버레이에는 아무 여백이
+ * 없어서, 두 파일은 규칙을 어긴 채로 테스트를 통과하고 있었다.
+ *
+ * 아래에 붙는 바텀시트는 `useModalSafePadding()` 을 그대로 쓸 수 없다. 이 훅은
+ * paddingBottom 까지 주기 때문에 `justifyContent: 'flex-end'` 인 시트가 화면 하단에서 떠서
+ * 시트와 화면 끝 사이에 딤 띠가 생긴다(하단 시스템 바는 footer 가 이미 피한다).
+ * 그래서 훅 대신 insets 를 직접 쓰는 것은 허용하되, **상단 여백을 실제로 적용했는지**는 확인한다.
+ */
+test('훅 대신 insets 를 직접 쓰는 모달은 상단 여백을 실제로 적용한다', () => {
+	const offenders = modalFiles
+		.filter(({ source }) => source.includes('atomic/AppModal'))
+		.filter(({ source }) => !source.includes('useModalSafePadding'))
+		.filter(({ source }) => !/paddingTop:\s*insets\.top/.test(source))
+		.map(({ name }) => name);
+	expect(offenders).toEqual([]);
+});

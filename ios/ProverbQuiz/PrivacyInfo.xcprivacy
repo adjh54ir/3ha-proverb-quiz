@@ -41,9 +41,72 @@
 			</array>
 		</dict>
 	</array>
-	<key>NSPrivacyCollectedDataTypes</key>
-	<array/>
+	<!--
+	  AdMob(react-native-google-mobile-ads) + Firebase Analytics 는 광고 식별자(IDFA)를 사용해
+	  타사 데이터와 연결하므로 Apple 기준의 '추적(tracking)' 에 해당한다. 그래서
+	  NSPrivacyTracking 은 true 여야 하고, ATT 프롬프트(NSUserTrackingUsageDescription,
+	  PermissionUtils.requestTrackingPermission)를 앱 시작 시 띄운다.
+
+	  NSPrivacyTracking 이 false 인 채로 NSPrivacyTrackingDomains 를 넣으면 Apple 검증이
+	  불일치로 거절한다(둘은 항상 같이 간다).
+	-->
 	<key>NSPrivacyTracking</key>
-	<false/>
+	<true/>
+	<!--
+	  추적에 쓰이는 도메인 목록. ATT 를 거부한 사용자에게는 iOS 가 이 도메인들의 연결을
+	  자동 차단한다. 광고 SDK 를 추가·교체하면 여기도 갱신해야 한다.
+	-->
+	<key>NSPrivacyTrackingDomains</key>
+	<array>
+		<string>app-measurement.com</string>
+		<string>googleads.g.doubleclick.net</string>
+		<string>pagead2.googlesyndication.com</string>
+		<string>tpc.googlesyndication.com</string>
+		<string>www.googleadservices.com</string>
+	</array>
+	<!--
+	  NSPrivacyTracking = true 면 추적에 쓰이는 수집 항목을 반드시 선언해야 한다.
+	  이 앱이 직접 수집하는 것은 없고, 전부 광고/분석 SDK 가 가져간다.
+	-->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeDeviceID</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<true/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+				<string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeCrashData</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeProductInteraction</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

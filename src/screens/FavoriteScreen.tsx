@@ -25,6 +25,7 @@ import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/Characte
 import { LEVEL_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const COMMON_ALL_OPTION = themedValue(() => ({
@@ -310,7 +311,8 @@ const FavoriteScreen = () => {
 	return (
 		<SafeAreaView style={styles.main} edges={['top', 'bottom']}>
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+				{/* accessible={false} — 없으면 화면 전체가 접근성 요소 하나로 묶여 스크린리더가 개별 항목을 못 읽는다. */}
+				<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 					<View style={{ flex: 1 }}>
 						<Animated.View
 							style={[
@@ -422,18 +424,8 @@ const FavoriteScreen = () => {
 											iconContainerStyle={{ marginRight: SPACING_W.sm }}
 											showArrowIcon={true}
 											showTickIcon={false}
-											modalProps={{ animationType: 'fade', presentationStyle: 'overFullScreen', transparent: true }}
-											modalContentContainerStyle={{
-												marginTop: '25%',
-												width: '85%',
-												alignSelf: 'center',
-												maxHeight: scaleHeight(500),
-												backgroundColor: COLORS.surface,
-												borderWidth: 1,
-												borderColor: COLORS.borderDark,
-												borderRadius: RADIUS.xl,
-												paddingVertical: SPACING_H.xl,
-											}}
+											modalProps={DROPDOWN_MODAL_PROPS}
+											modalContentContainerStyle={[DROPDOWN_MODAL_CONTENT_STYLE, { borderWidth: 1, borderColor: COLORS.borderDark }]}
 											modalTitleStyle={{
 												fontSize: FONT_SIZES.lg,
 												fontWeight: '700',
@@ -479,7 +471,7 @@ const FavoriteScreen = () => {
 							scrollEnabled={!fieldOpen && !levelOpen}
 							keyExtractor={(item) => item.id.toString()}
 							renderItem={renderItem}
-							contentContainerStyle={[styles.listContent, isSelectionMode && styles.listContentWithBar]}
+							contentContainerStyle={[styles.listContent, isSelectionMode && styles.listContentWithBar, filteredList.length === 0 && styles.listContentEmpty]}
 							keyboardShouldPersistTaps="handled"
 							keyboardDismissMode="on-drag"
 							refreshControl={<RefreshControl
@@ -681,6 +673,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	listContent: { paddingTop: SPACING_H.xs, paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
 	// 선택 모드에서만 하단 삭제 바(absolute)가 뜨므로 그때만 그만큼 더 비운다.
 	listContentWithBar: { paddingBottom: scaleHeight(100) },
+	// 위아래 여백은 스크롤되는 목록을 위한 것이라, 비었을 때는 중앙 정렬만 어긋나게 한다.
+	listContentEmpty: { paddingTop: 0, paddingBottom: 0 },
 	itemCard: {
 		backgroundColor: COLORS.surface,
 		paddingHorizontal: SPACING_W.lg,
@@ -723,7 +717,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	checkboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
-	emptyWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: SPACING_H.xxxxl },
+	// 빈 영역 전체를 채우고 그 정중앙에 놓인다. 위쪽 여백을 따로 주면 그만큼 아래로 밀린다.
+	emptyWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl },
 	emptyImage: { width: scaleWidth(160), height: scaleWidth(160), marginBottom: SPACING_H.lg },
 	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', lineHeight: scaledSize(20) },

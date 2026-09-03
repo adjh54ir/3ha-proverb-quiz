@@ -1092,9 +1092,13 @@ const InfinityQuizScreen = () => {
 				</TouchableOpacity>
 			</View>
 			<ProverbDetailModal
-				visible={detailModalVisible}
+				visible={detailModalVisible && !!selectedProverb}
 				proverb={selectedProverb}
-				onClose={() => setDetailModalVisible(false)}
+				onClose={() => {
+					// 닫을 때 속담도 비운다 — 남겨 두면 다음에 열 때 이전 속담이 한 프레임 스친다
+					setDetailModalVisible(false);
+					setSelectedProverb(null);
+				}}
 			/>
 
 			{/* ✅ 찬스 광고 (광고 종료 후 힌트 모달 표시) */}

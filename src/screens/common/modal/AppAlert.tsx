@@ -4,6 +4,7 @@ import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native
 import Modal from '@/screens/common/atomic/AppModal';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
+import { useModalHandoff } from '@/hooks/useModalHandoff';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import { scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 
@@ -61,7 +62,13 @@ const subscribe = (listener: () => void): (() => void) => {
 
 const getState = (): AlertState => state;
 
-/** 팝업을 띄운다. 시그니처는 RN 의 Alert.alert 과 동일하다. */
+/**
+ * 팝업을 띄운다. 시그니처는 RN 의 Alert.alert 과 동일하다.
+ *
+ * ⚠️ 버튼의 `onPress` 는 팝업이 **완전히 닫힌 뒤**(MODAL_HANDOFF_DELAY) 실행된다.
+ *    콜백에서 또 다른 팝업/모달을 열어도 이전 팝업이 깜빡이지 않게 하기 위한 것으로,
+ *    호출부에서 따로 딜레이를 줄 필요가 없다.
+ */
 const alert = (title: string, message?: string, buttons?: AppAlertButton[], options?: { cancelable?: boolean }): void => {
 	emit({
 		visible: true,
@@ -85,11 +92,24 @@ export const AppAlertHost = (): React.ReactElement | null => {
 	const current = useSyncExternalStore(subscribe, getState, getState);
 	const enterStyle = useModalEnter(current.visible);
 	const safePadding = useModalSafePadding();
+	// 버튼 콜백이 또 다른 팝업/모달을 여는 경우가 많아 '닫은 뒤 실행'이 필수다.
+	const handoff = useModalHandoff();
 
-	const handlePress = useCallback((button: AppAlertButton) => {
-		dismiss();
-		button.onPress?.();
-	}, []);
+	/**
+	 * 버튼을 누르면 팝업을 먼저 닫고, 닫힘이 끝난 뒤에 콜백을 실행한다.
+	 *
+	 * 같은 틱에 `dismiss(); onPress()` 를 하면
+	 *  - 콜백이 또 다른 AppAlert 을 여는 경우: host 가 visible:false 로 한 번도 그려지지 않아
+	 *    useModalEnter 가 다시 돌지 않고, 이전 제목/본문이 그대로 남은 채 내용만 바뀐다.
+	 *  - 콜백이 다른 모달을 여는 경우: 네이티브 창 두 개가 함께 커밋되어 이전 팝업이 깜빡인다.
+	 * 그래서 화면 쪽 호출부를 고치지 않아도 되도록 host 한 곳에서 전환을 넘겨받는다.
+	 */
+	const handlePress = useCallback(
+		(button: AppAlertButton) => {
+			handoff(dismiss, () => button.onPress?.());
+		},
+		[handoff],
+	);
 
 	const handleRequestClose = useCallback(() => {
 		if (!current.cancelable) {
@@ -97,9 +117,8 @@ export const AppAlertHost = (): React.ReactElement | null => {
 		}
 		// 백버튼은 '취소' 버튼과 같은 동작으로 취급한다(없으면 그냥 닫는다).
 		const cancelButton = current.buttons.find((button) => button.style === 'cancel');
-		dismiss();
-		cancelButton?.onPress?.();
-	}, [current.cancelable, current.buttons]);
+		handoff(dismiss, () => cancelButton?.onPress?.());
+	}, [current.cancelable, current.buttons, handoff]);
 
 	if (!current.visible) {
 		return null;

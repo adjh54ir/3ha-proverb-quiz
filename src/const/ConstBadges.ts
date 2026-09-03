@@ -1,18 +1,37 @@
 import { MainDataType } from '@/types/MainDataType';
+import { themedValue } from '@/const/common/Theme';
+import { ALPHA, withAlpha } from '@/utils/ColorAlphaUtils';
+
+interface BadgeRarityMeta {
+	label: string;
+	color: string;
+	/** 칩·카드 배경으로 쓰는 옅은 틴트 */
+	soft: string;
+	gradient: [string, string];
+	stars: number;
+}
 
 /**
  * 희귀도별 표시 메타 (라벨 / 색상 / 그라데이션 / 별 개수)
  * BadgeDetailPopup, 나의 활동 등에서 공통 사용합니다.
+ *
+ * ── soft 를 리터럴로 두면 안 되는 이유 ────────────────────────────
+ * 예전에는 `soft: '#D1FAE5'` 처럼 거의 흰색인 파스텔을 박아 뒀다. 이 값은 테마를 따르는
+ * `COLORS.surface` 카드 위에 배경으로 깔리는데, 다크모드에서 카드만 `#1B2536` 으로 뒤집히고
+ * 칩은 밝은 채로 남아 어두운 카드 위에 흰 조각이 떠 보였다. (MyScoreScreen 의 뱃지 목록은
+ * `earned ? rarity.soft : COLORS.surfaceAlt` 라, 한 줄 안에서 한쪽만 라이트로 굳어 있었다)
+ *
+ * `withAlpha` 는 다크모드에서 알파를 올려 두 모드에서 같은 정도로 보이게 맞춰 준다.
+ * 다만 모듈 로드 시점에 부르면 그때의 모드로 값이 굳으므로, 앱의 다른 토큰들과 같이
+ * `themedValue` 로 감싸 **읽는 시점**에 계산한다. gradient/color 는 두 모드 모두 잘 보이는
+ * 중간 톤이라 그대로 둔다.
  */
-export const BADGE_RARITY_META: Record<
-	MainDataType.BadgeRarity,
-	{ label: string; color: string; soft: string; gradient: [string, string]; stars: number }
-> = {
-	common: { label: '일반', color: '#10B981', soft: '#D1FAE5', gradient: ['#34D399', '#059669'], stars: 1 },
-	rare: { label: '희귀', color: '#3B82F6', soft: '#DBEAFE', gradient: ['#60A5FA', '#2563EB'], stars: 2 },
-	epic: { label: '영웅', color: '#F59E0B', soft: '#FEF3C7', gradient: ['#FBBF24', '#D97706'], stars: 3 },
-	legendary: { label: '전설', color: '#EF4444', soft: '#FEE2E2', gradient: ['#FB7185', '#E11D48'], stars: 4 },
-};
+export const BADGE_RARITY_META: Record<MainDataType.BadgeRarity, BadgeRarityMeta> = themedValue(() => ({
+	common: { label: '일반', color: '#10B981', soft: withAlpha('#10B981', ALPHA.soft), gradient: ['#34D399', '#059669'], stars: 1 },
+	rare: { label: '희귀', color: '#3B82F6', soft: withAlpha('#3B82F6', ALPHA.soft), gradient: ['#60A5FA', '#2563EB'], stars: 2 },
+	epic: { label: '영웅', color: '#F59E0B', soft: withAlpha('#F59E0B', ALPHA.soft), gradient: ['#FBBF24', '#D97706'], stars: 3 },
+	legendary: { label: '전설', color: '#EF4444', soft: withAlpha('#EF4444', ALPHA.soft), gradient: ['#FB7185', '#E11D48'], stars: 4 },
+}));
 
 /*
 =========================================

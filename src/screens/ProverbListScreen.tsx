@@ -34,6 +34,7 @@ import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
 import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
+import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
 
 
 const PAGE_SIZE = 30;
@@ -276,7 +277,9 @@ const ProverbListScreen = () => {
 	return (
 		<SafeAreaView style={styles.main} edges={['top']}>
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-				<TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
+				{/* accessible={false} — 없으면 화면 전체가 접근성 요소 하나로 묶여 스크린리더가 개별 항목을 못 읽는다.
+				    style 은 주지 않는다. TouchableWithoutFeedback 은 자기 style 을 무시하고 자식만 clone 한다. */}
+				<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 					<View style={{ flex: 1 }}>
 						{/* 필터 + 드롭다운 영역 */}
 						<Animated.View
@@ -392,24 +395,8 @@ const ProverbListScreen = () => {
 													<Text style={{ fontSize: FONT_SIZES.mdPlus, color: COLORS.text, flex: 1 }}>{item.label}</Text>
 												</TouchableOpacity>
 											)}
-											modalProps={{
-												animationType: 'fade',
-												presentationStyle: 'overFullScreen',
-												transparent: true,
-											}}
-											modalContentContainerStyle={{
-												marginTop: '25%',
-												width: '85%',
-												alignSelf: 'center',
-												maxHeight: scaleHeight(500),
-												backgroundColor: COLORS.surface,
-												borderWidth: 1,
-												borderColor: COLORS.borderDark,
-												borderRadius: RADIUS.xl,
-												paddingHorizontal: 0,
-												paddingVertical: SPACING_H.xl,
-												position: 'relative',
-											}}
+											modalProps={DROPDOWN_MODAL_PROPS}
+											modalContentContainerStyle={[DROPDOWN_MODAL_CONTENT_STYLE, { borderWidth: 1, borderColor: COLORS.borderDark }]}
 											modalTitleStyle={{
 												fontSize: FONT_SIZES.lg,
 												fontWeight: '700',
@@ -481,14 +468,14 @@ const ProverbListScreen = () => {
 								keyboardShouldPersistTaps="handled"
 								keyboardDismissMode="on-drag"
 								ListEmptyComponent={() => (
-									<View style={[styles.emptyWrapper, { height: '100%', marginTop: SPACING_H.xxxxl }]}>
+									<View style={styles.emptyWrapper}>
 										<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
 										<Text style={styles.emptyText}>
 											앗! 조건에 맞는 속담이 없습니다.{'\n'}다른 검색어나 필터를 사용해보세요!
 										</Text>
 									</View>
 								)}
-								contentContainerStyle={styles.flatListCotent}
+								contentContainerStyle={[styles.flatListCotent, visibleList.length === 0 && styles.flatListContentEmpty]}
 								renderItem={({ item, index }) => {
 									return (
 										<AnimatedListItem index={index} offsetY={16}>
@@ -679,7 +666,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: scaleWidth(44),
 		borderRadius: RADIUS.md,
 	},
+	// 빈 목록 자리표시자 — contentContainer 의 flexGrow 로 받은 빈 영역 전체를 채우고 그 정중앙에 놓인다.
 	emptyWrapper: {
+		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
 		paddingHorizontal: SPACING_W.xl,
@@ -766,10 +755,18 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		overflow: 'visible',
 	},
+	// flexGrow 가 있어야 목록이 비었을 때 contentContainer 가 스크롤 영역 높이까지 늘어난다.
+	// (없으면 자리표시자가 자기 높이로 줄어들어 justifyContent 와 무관하게 위쪽에 붙는다)
 	flatListCotent: {
 		paddingTop: SPACING_H.md,
 		paddingHorizontal: SPACING_W.lg,
 		paddingBottom: SPACING_H.xxxxl,
+		flexGrow: 1,
+	},
+	// 위아래 여백은 스크롤되는 목록을 위한 것이라, 비었을 때는 중앙 정렬만 어긋나게 한다.
+	flatListContentEmpty: {
+		paddingTop: 0,
+		paddingBottom: 0,
 	},
 	searchRow: {
 		flexDirection: 'row',

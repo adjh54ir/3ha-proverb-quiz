@@ -39,6 +39,18 @@ const maxFontSizeMultiplier = () => TEXT_SIZE_MAX_MULTIPLIER[getTextSizeMode()];
 const defaultTextStyle = themedValue(() => ({ fontSize: FONT_SIZES.md, color: COLORS.text, includeFontPadding: false }));
 
 /**
+ * <Text> 전용 추가 기본값.
+ *
+ * textAlignVertical: 높이가 고정되거나 stretch 된 <Text> 는 Android 에서 글자가 위쪽에 붙는다.
+ * includeFontPadding 을 끄면 대부분 해결되지만, 아이콘과 나란히 두고 행 높이를 지정한
+ * 배지/칩에서는 이 값까지 있어야 아이콘 중앙과 정확히 맞는다.
+ *
+ * ⚠️ TextInput 에는 넣지 않는다. multiline 입력의 글자가 위가 아니라 세로 중앙에서
+ *    시작해 버린다(여러 줄 입력창이 아래로 자라지 않고 가운데에 뭉치는 문제).
+ */
+const defaultTextOnlyStyle = { textAlignVertical: 'center' } as const;
+
+/**
  * '글자 크게' 모드에서 lineHeight 를 함께 키운다.
  *
  * FONT_SIZES 토큰은 배율(TEXT_SIZE_FACTOR)을 이미 품고 있지만, 화면의 lineHeight 는
@@ -73,7 +85,9 @@ TextAny.render = function patchedTextRender(props: any, ref: any) {
 			maxFontSizeMultiplier: maxFontSizeMultiplier(),
 			...props,
 			// 기본 스타일을 배열 앞쪽에 두어 호출부 style 이 항상 덮어쓰게 한다.
-			style: isNested ? withScaledLineHeight(props.style) : [defaultTextStyle, withScaledLineHeight(props.style)],
+			style: isNested
+				? withScaledLineHeight(props.style)
+				: [defaultTextStyle, defaultTextOnlyStyle, withScaledLineHeight(props.style)],
 		},
 		ref,
 	);

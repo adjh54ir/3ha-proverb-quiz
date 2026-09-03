@@ -16,6 +16,7 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber, LEVEL_NAME_BY_NUMBER } from '@/screens/common/CommonProverbModule';
 import { LEVEL_DROPDOWN_ITEMS, FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
+import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
@@ -1002,24 +1003,8 @@ const QuizStudyScreen = () => {
 													<Text style={{ fontSize: FONT_SIZES.mdPlus, color: COLORS.textStrong, flex: 1 }}>{item.label}</Text>
 												</TouchableOpacity>
 											)}
-											modalProps={{
-												animationType: 'fade',
-												presentationStyle: 'overFullScreen',
-												transparent: true,
-											}}
-											modalContentContainerStyle={{
-												marginTop: '25%',
-												width: '85%',
-												alignSelf: 'center',
-												maxHeight: '60%',
-												backgroundColor: COLORS.surface,
-												borderWidth: 1,
-												borderColor: COLORS.border,
-												borderRadius: RADIUS.xl,
-												paddingHorizontal: 0,
-												paddingVertical: SPACING_H.xl,
-												position: 'relative',
-											}}
+											modalProps={DROPDOWN_MODAL_PROPS}
+											modalContentContainerStyle={[DROPDOWN_MODAL_CONTENT_STYLE, { borderWidth: 1, borderColor: COLORS.border }]}
 											modalTitleStyle={{
 												fontSize: FONT_SIZES.lg,
 												fontWeight: '700',

@@ -245,7 +245,9 @@ const WrongReviewScreen = () => {
 
 	if (wrongProverbIds.length === 0) {
 		return (
-			<View style={styles.emptyWrap}>
+			// 다른 분기와 같이 SafeAreaView 로 감싼다. 하단 시스템 바를 뺀 '실제 남는 영역'
+			// 기준으로 가운데를 잡아야 카드가 화면 정중앙에 놓인다.
+			<SafeAreaView style={styles.emptyWrap} edges={['bottom']}>
 				<Animated.View style={[styles.emptyCard, { opacity: contentFade, transform: [{ translateY: contentSlide }] }]}>
 					<FastImage
 						source={require('@/assets/images/correct_mascote.png')}
@@ -259,7 +261,7 @@ const WrongReviewScreen = () => {
 						이곳에서 모아 다시 복습할 수 있습니다.
 					</Text>
 				</Animated.View>
-			</View>
+			</SafeAreaView>
 		);
 	}
 

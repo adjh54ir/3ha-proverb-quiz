@@ -41,8 +41,11 @@ const AD_WRAPPER_PADDING = SPACING_H.xs;
 /** 배너 래퍼를 실측하기 전 한 프레임 동안 쓰는 값 (표준 앵커 배너 높이 + 래퍼 여백) */
 const AD_FALLBACK_HEIGHT = scaleHeight(50) + AD_WRAPPER_PADDING * 2;
 
-/** 배너와 그 아래 콘텐츠 사이의 숨 쉴 틈 — 배너 하단 간격은 이 값 하나로만 조절한다. */
-const AD_BOTTOM_GAP = SPACING_H.md;
+/**
+ * 배너와 그 아래 콘텐츠 사이의 숨 쉴 틈 — 배너 하단 간격은 이 값 하나로만 조절한다.
+ * 12(md) 로는 배너가 화면 콘텐츠에 붙어 보여서 광고와 본문의 경계가 흐렸다.
+ */
+const AD_BOTTOM_GAP = SPACING_H.xl;
 
 /**
  * 배너 영역의 실측값 묶음. 화면은 `contentTopOffset` 만 쓰고, 테스트는 이 값들로

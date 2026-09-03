@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
 import AppAlert from '@/screens/common/modal/AppAlert';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Platform, Linking, TextInput, KeyboardAvoidingView, Keyboard, Pressable } from 'react-native';
@@ -10,6 +10,7 @@ import { COMMON_APPS_DATA, appStoreUrl } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
 import PopInView from '@/components/animation/PopInView';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { useModalHandoff } from '@/hooks/useModalHandoff';
 
 type CategoryFilter = 'all' | CommonType.AppCategory;
 
@@ -41,9 +42,23 @@ interface Props {
 const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
 	const safePadding = useModalSafePadding();
+	// 모달 → 알림창 전환 시 이전 모달 깜빡임 방지
+	const handoff = useModalHandoff();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
 	const [searchQuery, setSearchQuery] = useState('');
 	const [searchFocused, setSearchFocused] = useState(false);
+
+	// AppModal 은 visible=false 면 '내용'만 언마운트하고 이 컴포넌트는 계속 살아 있다.
+	// 그래서 닫는 경로(닫기 버튼 / 백버튼 / 부모가 visible 을 내리는 경우)에 상관없이
+	// 여기서 한 번만 초기화해야 다음에 열 때 이전 필터·검색어가 남지 않는다.
+	useEffect(() => {
+		if (visible) {
+			return;
+		}
+		setSelectedCategory('all');
+		setSearchQuery('');
+		setSearchFocused(false);
+	}, [visible]);
 
 	const filteredApps = useMemo(() => {
 		return COMMON_APPS_DATA.Apps.filter((app) => {
@@ -64,32 +79,35 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 			),
 		[],
 	);
+	/**
+	 * 이 모달 위에 알림창을 바로 띄우면 RN Modal(네이티브 창)이 두 개가 되어
+	 * 이전 모달이 한 프레임 다시 보이고, iOS 에서는 알림창이 아예 뜨지 않을 수 있다.
+	 * 모달을 먼저 닫고 닫힘 애니메이션이 끝난 뒤에 알림창을 띄운다.
+	 */
+	const alertAfterClose = (title: string, message: string) => {
+		handoff(onClose, () => AppAlert.alert(title, message));
+	};
+
 	const onDownloadApp = async (app: CommonType.AppItem) => {
 		const url = appStoreUrl(app);
 		if (!url) {
-			AppAlert.alert('Coming Soon!', '아직 스토어 링크가 준비되지 않았습니다.');
+			alertAfterClose('Coming Soon!', '아직 스토어 링크가 준비되지 않았습니다.');
 			return;
 		}
 		try {
 			const supported = await Linking.canOpenURL(url);
 			if (!supported) {
-				AppAlert.alert('오류', '링크를 열 수 없습니다.');
+				alertAfterClose('오류', '링크를 열 수 없습니다.');
 				return;
 			}
 			Linking.openURL(url);
 		} catch {
-			AppAlert.alert('오류', '링크를 여는 중 문제가 발생했습니다.');
+			alertAfterClose('오류', '링크를 여는 중 문제가 발생했습니다.');
 		}
 	};
 
-	const handleClose = () => {
-		setSelectedCategory('all');
-		setSearchQuery('');
-		onClose();
-	};
-
 	return (
-		<Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
+		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			{/* 모달은 Activity 가 아닌 별도 Dialog 윈도우라 매니페스트의 adjustResize 가 적용되지 않는다.
 			    화면(Screen)과 달리 안드로이드도 behavior 를 직접 줘야 키보드가 입력창을 가리지 않는다. */}
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.overlay, safePadding]}>
@@ -100,7 +118,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 					<View style={styles.header}>
 						<View style={styles.headerTop}>
 							<Text style={styles.titleText}>📱 제작자의 다른 앱</Text>
-							<ModalCloseButton onPress={handleClose} style={styles.closeButton} />
+							<ModalCloseButton onPress={onClose} style={styles.closeButton} />
 						</View>
 
 						{/* 검색 */}
@@ -139,7 +157,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 					<Text style={styles.countLabel}>{filteredApps.length}개 앱</Text>
 
 					{/* 리스트 */}
-					<ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
+					<ScrollView contentContainerStyle={[styles.scroll, filteredApps.length === 0 && styles.scrollEmpty]} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
 						{filteredApps.length === 0 ? (
 							<View style={styles.emptyState}>
 								<Text style={styles.emptyText}>검색 결과가 없습니다</Text>
@@ -292,6 +310,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.xs,
 		paddingBottom: SPACING_H.xxxxl,
+	},
+	// 위아래 여백은 스크롤되는 목록을 위한 것이라, 비었을 때는 안내 문구가 위로 치우쳐 보이게 한다.
+	// (카드가 내용 높이만큼만 늘어나므로 emptyState 의 상하 여백만 남아 정중앙이 된다)
+	scrollEmpty: {
+		paddingTop: 0,
+		paddingBottom: 0,
 	},
 	appCard: {
 		flexDirection: 'row',

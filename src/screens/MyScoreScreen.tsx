@@ -22,7 +22,6 @@ import { RootStackParamList } from '@/navigation/conf/Types';
 import IconComponent from './common/atomic/IconComponent';
 import DonutChart from './common/atomic/DonutChart';
 import AnimatedCounter from './common/atomic/AnimatedCounter';
-import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import FastImage from 'react-native-fast-image';
@@ -169,7 +168,7 @@ const MyScoreScreen = () => {
 	const [levelMaster, setLevelMaster] = useState<string[]>([]);
 	const [correctCount, setCorrectCount] = useState<number>(0);
 	const [wrongCount, setWrongCount] = useState<number>(0);
-	// 저장값은 ISO 문자열이지만 방금 쓴 값은 Date 일 수 있다 (moment 는 둘 다 받는다)
+	// 저장값은 ISO 문자열이지만 방금 쓴 값은 Date 일 수 있다 (DateUtils 는 둘 다 받는다)
 	const [lastAnsweredAt, setLastAnsweredAt] = useState<string | Date>('');
 	const [bestCombo, setBestCombo] = useState<number>(0);
 	const [showLevelModal, setShowLevelModal] = useState(false);
@@ -592,7 +591,7 @@ const MyScoreScreen = () => {
 									name="info-outline"
 									size={scaledSize(18)}
 									color={COLORS.textSecondary}
-									style={{ marginLeft: SPACING_W.xs, marginTop: scaleHeight(1) }}
+									style={{ marginLeft: SPACING_W.xs }}
 								/>
 							</TouchableOpacity>
 						</View>
@@ -768,7 +767,7 @@ const MyScoreScreen = () => {
 								<View style={[styles.statIconChip, { backgroundColor: COLORS.secondarySoft }]}>
 									<IconComponent type="materialIcons" name="event-note" size={scaledSize(18)} color={COLORS.secondary} />
 								</View>
-								<Text style={styles.statValue}> {lastStudyAt ? moment(lastStudyAt).format('YY.MM.DD') : '없음'} </Text>
+								<Text style={styles.statValue}> {lastStudyAt ? DateUtils.formatLocal(lastStudyAt, 'type6') : '없음'} </Text>
 								<Text style={styles.statLabel}> 마지막 학습일 </Text>
 							</View>
 						</View>
@@ -842,7 +841,7 @@ const MyScoreScreen = () => {
 								<View style={[styles.statIconChip, { backgroundColor: COLORS.accentTealBg }]}>
 									<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(16)} color={COLORS.accentTeal} />
 								</View>
-								<Text style={styles.statValue}> {lastAnsweredAt ? moment(lastAnsweredAt).format('YY.MM.DD') : '없음'} </Text>
+								<Text style={styles.statValue}> {lastAnsweredAt ? DateUtils.formatLocal(lastAnsweredAt, 'type6') : '없음'} </Text>
 								<Text style={styles.statLabel}> 마지막 퀴즈일 </Text>
 							</View>
 						</View>
@@ -999,7 +998,7 @@ const MyScoreScreen = () => {
 							style={[styles.calendarStyle, { width: '100%' }]}
 							onDayPress={(day) => {
 								const date = day.dateString;
-								const matchedData = todayQuizDataList.find((item) => moment(item.quizDate).format('YYYY-MM-DD') === date);
+								const matchedData = todayQuizDataList.find((item) => DateUtils.toLocalDateKey(item.quizDate) === date);
 								setSelectedDate(date);
 								setSelectedQuizData(matchedData ?? null);
 
@@ -1113,7 +1112,7 @@ const MyScoreScreen = () => {
 														</Text>
 													)}
 												</View>
-												<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.textLight} style={{ marginTop: SPACING_H.xxs }} />
+												<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.textLight} style={{ alignSelf: 'center' }} />
 											</View>
 										</TouchableOpacity>
 									);
@@ -1406,7 +1405,11 @@ const MyScoreScreen = () => {
 				visible={badgePopupVisible}
 				badge={badgePopupBadge}
 				isEarned={badgePopupBadge ? earnedBadgeIds.includes(badgePopupBadge.id) : false}
-				onClose={() => setBadgePopupVisible(false)}
+				onClose={() => {
+					// 닫을 때 뱃지도 비운다 — 남겨 두면 다음에 열 때 이전 뱃지가 한 프레임 스친다
+					setBadgePopupVisible(false);
+					setBadgePopupBadge(null);
+				}}
 			/>
 			<ProverbDetailModal visible={detailVisible && !!detailProverb} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
 

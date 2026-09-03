@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { RewardedAd, TestIds, RewardedAdEventType, AdEventType } from 'react-native-google-mobile-ads';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { recordAdClick } from '@/utils/AdGuardUtils';
 
 const AD_UNIT_ID = Platform.select({
   ios: __DEV__ ? TestIds.REWARDED : GOOGLE_ADMOV_IOS_REWARD!,
@@ -51,6 +52,12 @@ const AdmobRewardAd: React.FC<{
       onFailed();
     });
 
+    // 리워드 광고는 사용자가 보상을 기대하고 직접 연 것이라 막지 않는다.
+    // 다만 클릭은 같은 카운터에 쌓아야 전면 광고 가드가 정확해진다(AdMob 도 형식을 나눠 보지 않는다).
+    const unsubscribeClicked = ad.addAdEventListener(AdEventType.CLICKED, () => {
+      recordAdClick();
+    });
+
     ad.load();
 
     return () => {
@@ -58,6 +65,7 @@ const AdmobRewardAd: React.FC<{
       unsubscribeEarned();
       unsubscribeClosed();
       unsubscribeFailed();
+      unsubscribeClicked();
     };
   }, []);
 

@@ -1,11 +1,9 @@
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { Paths } from '@/navigation/conf/Paths';
-import SettingScreen from '@/screens/SettingScreen';
 import FavoriteScreen from '@/screens/FavoriteScreen';
 import MyProverbBook from '@/screens/MyProverbBook';
 import MyProverbBookDetail from '@/screens/MyProverbBookDetail';
-import Home from '@/screens/Home';
 import BottomTabNavigator from './BottomTabNavigator';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
@@ -55,8 +53,6 @@ const ThemedProverbStudy = withThemedScreen(ProverbStudyScreen);
 const ThemedWrongReview = withThemedScreen(WrongReviewScreen);
 const ThemedTowerChallenge = withThemedScreen(TowerChallengeScreen);
 const ThemedTowerQuiz = withThemedScreen(TowerQuizScreen);
-const ThemedHome = withThemedScreen(Home);
-const ThemedSetting = withThemedScreen(SettingScreen);
 const ThemedFavorite = withThemedScreen(FavoriteScreen);
 const ThemedMyProverbBook = withThemedScreen(MyProverbBook);
 const ThemedMyProverbBookDetail = withThemedScreen(MyProverbBookDetail);
@@ -178,8 +174,13 @@ const StackNavigator = () => {
 					headerLeft: headerBackButton(navigation),
 				})}
 			/>
-			<Stack.Screen name={Paths.HOME} component={ThemedHome} />
-			<Stack.Screen name={Paths.SETTING} component={ThemedSetting} />
+			{/*
+			  ⚠️ HOME / SETTING 은 여기에 등록하지 않는다.
+			  두 화면은 BottomTabNavigator 소유다(탭 바와 함께, withFreshMount 로 감싸져
+			  탭을 누를 때마다 상태가 초기화된다). 스택에도 같은 이름으로 등록해 두면
+			  navigate(Paths.HOME) 한 번으로 탭 바도 없고 초기화도 안 되는 '두 번째 홈'이
+			  스택 위에 쌓인다. 이동은 항상 navigate(Paths.MAIN_TAB, { screen: Paths.HOME }) 로 한다.
+			*/}
 			<Stack.Screen name={Paths.FAVORITE} component={ThemedFavorite} options={{ headerShown: false }} />
 			<Stack.Screen name={Paths.MY_PROVERB_BOOK} component={ThemedMyProverbBook} options={{ headerShown: false }} />
 			<Stack.Screen name={Paths.MY_PROVERB_BOOK_DETAIL} component={ThemedMyProverbBookDetail} options={{ headerShown: false }} />

@@ -10,7 +10,7 @@ import Sound from 'react-native-sound';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
-import { applyAudioCategory } from './SoundUtils';
+import { applyAudioCategory, applyPlaybackRate } from './SoundUtils';
 
 const SOURCES = {
 	quiz: 'bgm_quiz.m4a',
@@ -32,6 +32,8 @@ let currentPlayer: Sound | null = null;
 let currentTrack: BgmTrack | null = null;
 /** 재생 배속(= 음정). 1 이 원본. 타임챌린지 막판 고조에만 쓴다. */
 let rate = 1;
+/** 지금 흐르는 트랙을 "미리듣기"로 이 모듈이 틀었는지 (startBgmPreview 참고) */
+let previewOwned = false;
 // 로드가 끝나기 전에 stopBgm()이 불릴 수 있다 — 그 경우 재생하지 않기 위한 세대 번호
 let generation = 0;
 
@@ -59,7 +61,6 @@ export const getBgmVolume = () => volumeRatio;
 
 /**
  * 배속(= 음정) 지정. 남은 시간이 얼마 없다는 것을 숫자 대신 몸으로 느끼게 하는 용도.
- * 플랫폼마다 먹는 API 가 달라 둘 다 건다(효과음 playCombo 와 같은 방식).
  *
  * @param next 1 = 원본. 0.5~1.5 로 잘린다.
  */
@@ -75,12 +76,13 @@ export const setBgmRate = (next: number) => {
 /** 현재 배속 */
 export const getBgmRate = () => rate;
 
+// 여기도 setPitch/setSpeed 를 무방비로 같이 부르고 있었다. Android 에선 둘 다
+// MediaPlayer.playbackParams 에 그대로 써서 일부 OEM 디코더가 던지면 앱이 죽는다.
+// 방어 로직은 효과음과 하나로 합쳐 SoundUtils.applyPlaybackRate 에 두었다(주석 참고).
 const applyRate = (player: Sound | null) => {
-	if (!player) {
-		return;
+	if (player) {
+		applyPlaybackRate(player, rate);
 	}
-	player.setPitch(rate); // Android 전용
-	player.setSpeed(rate); // iOS 전용
 };
 
 /** 앱 시작 시 저장된 BGM 설정 로드 (기본: on / 100%) */
@@ -127,6 +129,7 @@ export const resumeBgm = () => {
 export const stopBgm = () => {
 	generation += 1; // 로딩 중인 트랙이 있으면 재생되지 않도록 무효화
 	pausedByScreen = false;
+	previewOwned = false; // 트랙이 사라지므로 미리듣기 소유권도 같이 내린다
 	rate = 1; // 다음 트랙이 앞 화면의 고조 상태를 물려받지 않게 되돌린다
 	const player = currentPlayer;
 	currentPlayer = null;
@@ -188,6 +191,34 @@ export const startBgm = (track: BgmTrack) => {
 	});
 };
 
+/**
+ * 설정 화면 "미리듣기" 전용 시작/정지.
+ *
+ * 미리듣기는 startBgm() + stopBgm() 으로 구현돼 있었다. 그런데 stopBgm() 은 전역이라
+ * "지금 흐르는 BGM이 누구 것인지" 를 보지 않는다. 미리듣기를 켠 적이 없어도 설정 화면을
+ * 벗어날 때(useFocusEffect 정리)와 BGM 토글을 끌 때 stopBgm() 이 그대로 불리므로,
+ * 다른 곳(퀴즈 시작 팝업의 BGM 토글 등)이 틀어 둔 트랙까지 같이 꺼진다.
+ *
+ * 그래서 "이 모듈이 미리듣기로 직접 시작한 트랙" 만 정지 대상으로 표시해 둔다.
+ * 이미 남이 같은 트랙을 틀어 둔 상태면 소유권을 갖지 않고 얹혀 듣기만 한다.
+ * 호출부는 startBgm/stopBgm 대신 이 두 개를 쓰면 남의 BGM 을 끄지 않는다.
+ */
+export const startBgmPreview = (track: BgmTrack) => {
+	if (currentTrack === track) {
+		return; // 이미 흐르는 트랙 — 내 것이 아니므로 끌 권리도 없다
+	}
+	startBgm(track);
+	// 설정이 off 거나 볼륨 0 이면 startBgm 이 아무것도 하지 않는다 — 그때는 소유권도 없다
+	previewOwned = currentTrack === track;
+};
+
+/** startBgmPreview 로 시작한 미리듣기만 정지한다. 남이 틀어 둔 BGM 이면 아무것도 하지 않는다. */
+export const stopBgmPreview = () => {
+	if (previewOwned) {
+		stopBgm(); // previewOwned 는 stopBgm 안에서 내려간다
+	}
+};
+
 // 앱이 백그라운드로 가면 BGM을 멈추고, 돌아오면 이어서 재생한다.
 // (없으면 홈 버튼을 눌러도 음악이 계속 흘러 배터리를 먹는다)
 let pausedByBackground = false;
@@ -208,6 +239,8 @@ AppState.addEventListener('change', (state) => {
 export default {
 	startBgm,
 	stopBgm,
+	startBgmPreview,
+	stopBgmPreview,
 	pauseBgm,
 	resumeBgm,
 	setBgmEnabled,

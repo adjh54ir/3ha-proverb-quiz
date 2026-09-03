@@ -1,6 +1,7 @@
 // 추가 모달 컴포넌트 두 개 생성
 import React from 'react';
 import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
+import { OPEN_SOURCE_LIBS } from '@/const/common/OpenSourceData';
 import { Animated, View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
@@ -13,7 +14,7 @@ import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyle
 const markdown = `
 # 1) 개인정보처리방침
 
-본 개인정보처리방침은 모바일 기기용 **'속픽: 속담 퀴즈'** 애플리케이션(이하 "애플리케이션")에 적용되며, 해당 애플리케이션은 **EcodeLab**(이하 "서비스 제공자")에 의해 **무료 서비스**로 제작되었습니다. 본 서비스는 "있는 그대로(AS IS)" 제공됩니다.
+본 개인정보처리방침은 모바일 기기용 **"속픽: 속담 퀴즈"** 애플리케이션(이하 "애플리케이션")에 적용되며, 해당 애플리케이션은 **EcodeLab**(이하 "서비스 제공자")에 의해 **무료 서비스**로 제작되었습니다. 본 서비스는 "있는 그대로(AS IS)" 제공됩니다.
 
 ---
 
@@ -108,7 +109,7 @@ const markdown = `
 
 # 2) 이용약관
 
-본 이용약관은 모바일 기기용 애플리케이션인 **'속픽: 속담 퀴즈'**(이하 "애플리케이션")에 적용되며, 본 애플리케이션은 **EcodeLab**(이하 "서비스 제공자")에 의해 **무료 서비스**로 제공됩니다.
+본 이용약관은 모바일 기기용 애플리케이션인 **"속픽: 속담 퀴즈"**(이하 "애플리케이션")에 적용되며, 본 애플리케이션은 **EcodeLab**(이하 "서비스 제공자")에 의해 **무료 서비스**로 제공됩니다.
 
 ---
 
@@ -240,50 +241,6 @@ export const TermsOfServiceModal = ({ visible, onClose }) => {
   );
 };
 
-const openSourceData = [
-  {
-    name: 'React Native',
-    license: 'MIT',
-    version: '0.78.0',
-    url: 'https://github.com/facebook/react-native',
-  },
-  {
-    name: 'react',
-    license: 'MIT',
-    version: '19.0.0',
-    url: 'https://github.com/facebook/react',
-  },
-  {
-    name: 'react-native-vector-icons',
-    license: 'MIT',
-    version: '10.2.0',
-    url: 'https://github.com/oblador/react-native-vector-icons',
-  },
-  {
-    name: 'react-native-version-check',
-    license: 'MIT',
-    version: '3.4.7',
-    url: 'https://github.com/kimxogus/react-native-version-check',
-  },
-  {
-    name: '@react-navigation/native',
-    license: 'MIT',
-    version: '7.0.15',
-    url: 'https://github.com/react-navigation/react-navigation',
-  },
-  {
-    name: '@react-native-async-storage/async-storage',
-    license: 'MIT',
-    version: '2.1.2',
-    url: 'https://github.com/react-native-async-storage/async-storage',
-  },
-  {
-    name: 'react-redux',
-    license: 'MIT',
-    version: '9.2.0',
-    url: 'https://github.com/reduxjs/react-redux',
-  },
-];
 
 export const OpenSourceModal = ({ visible, onClose }) => {
   const enterStyle = useModalEnter(visible);
@@ -301,7 +258,7 @@ export const OpenSourceModal = ({ visible, onClose }) => {
 
           <ScrollView contentContainerStyle={modalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
             <View style={styles.wrapperBox}>
-              {openSourceData.map((lib, index) => (
+              {OPEN_SOURCE_LIBS.map((lib, index) => (
                 <View key={index} style={styles.card}>
                   <View style={styles.cardHeader}>
                     <IconComponent

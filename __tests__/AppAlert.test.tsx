@@ -3,6 +3,7 @@ import { Text, TouchableOpacity } from 'react-native';
 import { act, create, ReactTestRenderer } from 'react-test-renderer';
 
 import AppAlert, { AppAlertHost } from '@/screens/common/modal/AppAlert';
+import { MODAL_HANDOFF_DELAY } from '@/hooks/useModalHandoff';
 
 /**
  * 공용 알림창 회귀 테스트.
@@ -29,6 +30,7 @@ afterEach(() => {
 	act(() => {
 		AppAlert.dismiss();
 	});
+	jest.useRealTimers();
 });
 
 test('호출하면 host 가 제목/본문을 그린다 (화면에 state 를 두지 않아도 된다)', async () => {
@@ -46,7 +48,11 @@ test('호출하면 host 가 제목/본문을 그린다 (화면에 state 를 두�
 	expect(texts).toContain('확인');
 });
 
-test('버튼을 누르면 콜백이 실행되고 팝업이 닫힌다', async () => {
+test('버튼을 누르면 팝업이 먼저 닫히고, 닫힘이 끝난 뒤 콜백이 실행된다', async () => {
+	// 콜백이 또 다른 팝업/모달을 여는 호출부가 많다. 같은 틱에 닫고 열면 네이티브 창이 겹쳐
+	// 이전 팝업이 깜빡이므로, host 가 닫힘(MODAL_HANDOFF_DELAY) 뒤에 콜백을 부른다.
+	jest.useFakeTimers();
+
 	const tree = await renderHost();
 	const onPress = jest.fn();
 
@@ -64,6 +70,13 @@ test('버튼을 누르면 콜백이 실행되고 팝업이 닫힌다', async () 
 		buttons[1].props.onPress();
 	});
 
-	expect(onPress).toHaveBeenCalledTimes(1);
+	// 팝업은 누른 즉시 닫힌다(콜백을 기다리지 않는다)
 	expect(tree.toJSON()).toBeNull();
+	expect(onPress).not.toHaveBeenCalled();
+
+	await act(async () => {
+		jest.advanceTimersByTime(MODAL_HANDOFF_DELAY);
+	});
+
+	expect(onPress).toHaveBeenCalledTimes(1);
 });

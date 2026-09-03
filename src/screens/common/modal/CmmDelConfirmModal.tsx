@@ -7,33 +7,22 @@ import Modal from '@/screens/common/atomic/AppModal';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
 
-type IconType = 'MaterialCommunityIcons' | 'materialIcons';
-
 type Props = {
     visible: boolean;
     onCancel: () => void;
     onConfirm?: () => void;
     onRequestClose?: () => void; // Android 백버튼 대응 (없으면 onCancel로 fallback)
 
-    // 제목은 문자열 또는 커스텀 노드(아이콘 포함 타이틀 등) 모두 지원
-    title?: string;
+    // 제목은 커스텀 노드로 받는다(아이콘 포함 타이틀 등).
+    // 내부에서 IconComponent 를 의존하지 않도록 호출부가 그려서 넘긴다.
     renderTitle?: () => React.ReactNode;
 
     // 본문 요약/설명
     summary?: string;
-    children?: React.ReactNode; // 커스텀 콘텐츠가 필요할 때 사용
 
-    // 버튼 텍스트와 스타일
-    cancelText?: string;
+    /** 확인 버튼 문구. 초기화/해제처럼 삭제가 아닌 동작에는 반드시 넘길 것 */
     confirmText?: string;
-    confirmVariant?: 'default' | 'delete'; // delete는 빨강 버튼 적용
-
-    // 상단 닫기 아이콘 표시 여부 (필요 시)
-    showClose?: boolean;
-    onPressClose?: () => void;
-
-    // 아이콘을 쓰고 싶다면 외부에서 렌더링해서 title에 전달 권장.
-    // (내부에서 IconComponent를 의존하지 않도록 decouple)
+    cancelText?: string;
 };
 
 const CmmDelConfirmModal: FC<Props> = ({
@@ -43,6 +32,8 @@ const CmmDelConfirmModal: FC<Props> = ({
     onRequestClose,
     renderTitle,
     summary,
+    cancelText = '취소',
+    confirmText = '삭제',
 }) => {
     const _onRequestClose = onRequestClose ?? onCancel;
 
@@ -58,10 +49,10 @@ const CmmDelConfirmModal: FC<Props> = ({
                     <Text style={styles.modalSummary}>{summary}</Text>
                     <View style={styles.modalButtons}>
                         <TouchableOpacity style={[styles.modalButton, styles.modalCancel]} onPress={onCancel} activeOpacity={0.8}>
-                            <Text style={[styles.modalButtonText, styles.modalCancelText]}>취소</Text>
+                            <Text style={[styles.modalButtonText, styles.modalCancelText]}>{cancelText}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.modalButton, styles.modalDelete]} onPress={onConfirm} activeOpacity={0.8}>
-                            <Text style={styles.modalButtonText}>삭제</Text>
+                            <Text style={styles.modalButtonText}>{confirmText}</Text>
                         </TouchableOpacity>
                     </View>
                 </Animated.View>

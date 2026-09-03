@@ -29,11 +29,39 @@ const normalizeUrl = (raw) => {
 	return url.startsWith('http') ? url : '';
 };
 
-const readLicense = (meta) => {
+/**
+ * package.json 에 license 필드가 없는 패키지의 LICENSE 파일 첫 줄에서 종류를 읽는다.
+ *
+ * 필드만 보면 react-native-confetti-cannon 처럼 LICENSE 파일에는 'MIT License' 가
+ * 분명히 적혀 있는데도 'UNKNOWN' 으로 고지된다. 라이선스 검토에서 바로 지적받는 형태다.
+ */
+const LICENSE_FILES = ['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'license', 'LICENCE'];
+const SPDX_PATTERNS = [
+	[/\bMIT\b/i, 'MIT'],
+	[/\bApache License\b/i, 'Apache-2.0'],
+	[/\bBSD 3-Clause\b/i, 'BSD-3-Clause'],
+	[/\bBSD 2-Clause\b/i, 'BSD-2-Clause'],
+	[/\bISC\b/i, 'ISC'],
+	[/\bMozilla Public License\b/i, 'MPL-2.0'],
+];
+
+const readLicenseFile = (name) => {
+	for (const file of LICENSE_FILES) {
+		const candidate = path.join(ROOT, 'node_modules', name, file);
+		if (!fs.existsSync(candidate)) continue;
+		// 종류는 항상 앞머리에 나온다. 본문 전체를 훑으면 인용된 다른 라이선스에 걸린다.
+		const head = fs.readFileSync(candidate, 'utf8').slice(0, 400);
+		const hit = SPDX_PATTERNS.find(([pattern]) => pattern.test(head));
+		if (hit) return hit[1];
+	}
+	return '';
+};
+
+const readLicense = (name, meta) => {
 	if (typeof meta.license === 'string') return meta.license;
 	if (meta.license && meta.license.type) return meta.license.type;
 	if (Array.isArray(meta.licenses) && meta.licenses[0]) return meta.licenses[0].type;
-	return 'UNKNOWN';
+	return readLicenseFile(name) || 'UNKNOWN';
 };
 
 /** node_modules 에 없어 메타를 읽지 못한 의존성 */
@@ -54,7 +82,7 @@ const rows = Object.keys(pkg.dependencies || {})
 		const repo = meta.repository;
 		return {
 			name,
-			license: readLicense(meta),
+			license: readLicense(name, meta),
 			version: meta.version || '',
 			url: normalizeUrl(typeof repo === 'string' ? repo : repo && repo.url) || normalizeUrl(meta.homepage),
 		};

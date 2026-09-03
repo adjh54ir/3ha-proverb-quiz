@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Animated, useWindowDimensions } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import ConfettiCannon from 'react-native-confetti-cannon';
@@ -66,7 +66,8 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bo
 		return () => anim.stop();
 	}, [visible, mascotAnim, reducedMotion]);
 
-	if (!level) {
+	// visible 을 함께 봐야 한다 — 닫힌 채로 남아 있으면 다음에 열릴 때 이전 등급이 한 프레임 스친다
+	if (!visible || !level) {
 		return null;
 	}
 
@@ -81,28 +82,34 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ visible, onClose, level, bo
 				<Animated.View style={[styles.card, enterStyle]}>
 					<ModalCloseButton onPress={onClose} />
 
-					<View style={styles.ribbon}>
-						<IconComponent type="materialIcons" name="auto-awesome" size={scaledSize(16)} color={COLORS.textWhite} />
-						<Text style={styles.ribbonText}>LEVEL UP</Text>
-						<IconComponent type="materialIcons" name="auto-awesome" size={scaledSize(16)} color={COLORS.textWhite} />
-					</View>
-
-					<Animated.View style={{ transform: [{ scale: mascotAnim }] }}>
-						<View style={styles.mascotWrap}>
-							<FastImage source={level.mascot} style={styles.mascot} resizeMode={FastImage.resizeMode.contain} />
+					{/* 카드가 안전 영역에 맞춰 줄어들면(작은 기기) 내용은 잘리지 않고 스크롤된다 — 버튼은 항상 하단 고정 */}
+					<ScrollView
+						style={styles.contentScroll}
+						contentContainerStyle={styles.contentScrollInner}
+						showsVerticalScrollIndicator={false}>
+						<View style={styles.ribbon}>
+							<IconComponent type="materialIcons" name="auto-awesome" size={scaledSize(16)} color={COLORS.textWhite} />
+							<Text style={styles.ribbonText}>LEVEL UP</Text>
+							<IconComponent type="materialIcons" name="auto-awesome" size={scaledSize(16)} color={COLORS.textWhite} />
 						</View>
-					</Animated.View>
 
-					<Text style={styles.congrats}>새로운 등급 달성!</Text>
-					<Text style={styles.gradeLabel}>{level.label}</Text>
-					<Text style={styles.encourage}>{level.encouragement}</Text>
+						<Animated.View style={{ transform: [{ scale: mascotAnim }] }}>
+							<View style={styles.mascotWrap}>
+								<FastImage source={level.mascot} style={styles.mascot} resizeMode={FastImage.resizeMode.contain} />
+							</View>
+						</Animated.View>
 
-					{bonus > 0 && (
-						<View style={styles.bonusChip}>
-							<IconComponent type="materialIcons" name="card-giftcard" size={scaledSize(16)} color={COLORS.primaryDeep} />
-							<Text style={styles.bonusText}>레벨업 보너스 +{bonus}점</Text>
-						</View>
-					)}
+						<Text style={styles.congrats}>새로운 등급 달성!</Text>
+						<Text style={styles.gradeLabel}>{level.label}</Text>
+						<Text style={styles.encourage}>{level.encouragement}</Text>
+
+						{bonus > 0 && (
+							<View style={styles.bonusChip}>
+								<IconComponent type="materialIcons" name="card-giftcard" size={scaledSize(16)} color={COLORS.primaryDeep} />
+								<Text style={styles.bonusText}>레벨업 보너스 +{bonus}점</Text>
+							</View>
+						)}
+					</ScrollView>
 
 					<TouchableOpacity style={styles.confirmBtn} onPress={onClose} activeOpacity={0.85}>
 						<Text style={styles.confirmText}>계속하기</Text>
@@ -127,12 +134,20 @@ const styles = themedStyles(() => StyleSheet.create({
 	card: {
 		width: '100%',
 		maxWidth: scaleWidth(340),
+		maxHeight: '100%', // 카드가 시스템 바를 넘지 않도록(모달 레이아웃 규칙 2)
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
+		alignItems: 'center',
+	},
+	// 카드 maxHeight 안에서 남는 높이만 쓴다(높이를 직접 주면 큰 기기에서 같이 커진다)
+	contentScroll: {
+		width: '100%',
+	},
+	contentScrollInner: {
 		alignItems: 'center',
 	},
 	ribbon: {

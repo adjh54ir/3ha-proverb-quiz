@@ -4,7 +4,7 @@ import AppAlert from '@/screens/common/modal/AppAlert';
 import { Linking, StyleSheet, Switch, Text, View, TouchableOpacity, ScrollView, ActivityIndicator, Image } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
+import notifee, { AuthorizationStatus } from '@notifee/react-native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
@@ -28,30 +28,10 @@ import Icon from 'react-native-vector-icons/FontAwesome6';
 import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { playCorrect, playWrong, playFinish } from '@/utils/SoundUtils';
-import { scheduleDailyQuizReminder, cancelDailyQuizReminder, DAILY_QUIZ_NOTIFICATION_ID } from '@/utils/NotifactionHelper';
+import { scheduleDailyQuizReminder, cancelDailyQuizReminder, parseAlarmHour, DEFAULT_ALARM_HOUR } from '@/utils/NotifactionHelper';
 import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import * as TodayQuizService from '@/services/TodayQuizService';
-
-const NOTIFICATION_ID = DAILY_QUIZ_NOTIFICATION_ID;
-const DEFAULT_ALARM_HOUR = 15;
-
-/**
- * 저장된 알림 시각을 로컬 '시(hour)' 로 읽는다.
- * - 신규 포맷: 'HH:mm' (로컬 시/분. 타임존/날짜가 섞이지 않는다)
- * - 구버전 포맷: ISO 절대시각 → 기기 로컬 시각으로 환산해서 읽는다(하위 호환)
- */
-const parseAlarmHour = (stored?: string | null): number => {
-	if (!stored) {
-		return DEFAULT_ALARM_HOUR;
-	}
-	const hhmm = /^(\d{1,2}):(\d{2})$/.exec(stored);
-	if (hhmm) {
-		return Number(hhmm[1]);
-	}
-	const parsed = new Date(stored);
-	return Number.isNaN(parsed.getTime()) ? DEFAULT_ALARM_HOUR : parsed.getHours();
-};
 
 /** 저장 포맷('HH:mm') 으로 변환 */
 const toAlarmTimeString = (hour: number) => `${String(hour).padStart(2, '0')}:00`;
@@ -128,7 +108,7 @@ const TodayQuizScreen = () => {
 
 	const isQuizCompleted = Object.keys(answerResults).length === quizList.length;
 
-	const { getLocalDateString, getLocalParamDateToString } = DateUtils;
+	const { getLocalDateString, toLocalDateKey } = DateUtils;
 
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
@@ -165,7 +145,6 @@ const TodayQuizScreen = () => {
 			//    1~4문제만 푼 상태로 탭을 벗어났다 돌아오면 진행도가 통째로 날아갔다.
 			//    복원/생성은 initQuiz 가 이미 정확히 처리하므로 초기화하지 않는다.
 			loadSetting();
-			getScheduledAlarmTime();
 			// 다시 들어올 때는 접힌 상태 + 맨 위에서 시작한다 (진행 중인 답안은 유지)
 			setShowTodayReview(false);
 			setShowPrevQuizModal(false);
@@ -195,10 +174,15 @@ const TodayQuizScreen = () => {
 		return () => clearTimeout(timer);
 	}, [currentIndex]);
 
-	/** 현재 알림 권한 보유 여부 (알림 '예약' 에만 쓴다) */
+	/**
+	 * 현재 알림 권한 보유 여부 (알림 '예약' 에만 쓴다)
+	 *
+	 * ⚠️ `=== 1`(AUTHORIZED) 로 비교하면 안 된다. iOS 의 PROVISIONAL(2) 도 알림이 실제로 배달되는데
+	 *    등호 비교 때문에 권한 있는 사용자에게 예약이 조용히 스킵돼 리마인더가 영영 오지 않았다.
+	 */
 	const hasNotificationPermission = async () => {
 		const settings = await notifee.getNotificationSettings();
-		return settings.authorizationStatus === 1;
+		return settings.authorizationStatus >= AuthorizationStatus.AUTHORIZED;
 	};
 
 	const loadSetting = async () => {
@@ -206,7 +190,8 @@ const TodayQuizScreen = () => {
 			const parseJson = await read<MainDataType.SettingInfo | null>(SETTING_KEY, null);
 
 			if (parseJson !== null) {
-				const hour = parseAlarmHour(parseJson.alarmTime);
+				// 저장값이 없거나 범위를 벗어났으면(구버전/깨진 값) 기본 시각으로 되돌린다.
+				const hour = parseAlarmHour(parseJson.alarmTime) ?? DEFAULT_ALARM_HOUR;
 
 				setIsAlarmEnabled(parseJson.isUseAlarm); // ✅ 수정
 				setAlarmTime(hourToDate(hour));
@@ -245,7 +230,7 @@ const TodayQuizScreen = () => {
 	};
 
 	const formatQuizDate = (isoDate: string) => {
-		const date = new Date(isoDate);
+		const date = DateUtils.toLocalDate(isoDate) ?? DateUtils.now();
 		const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
 		const month = date.getMonth() + 1;
 		const day = date.getDate();
@@ -262,10 +247,11 @@ const TodayQuizScreen = () => {
 	const loadLastTodayQuizList = async () => {
 		const stored = await TodayQuizService.getAll();
 
-		const sorted = [...stored].sort((a, b) => new Date(b.quizDate).getTime() - new Date(a.quizDate).getTime());
+		// 저장 포맷이 ISO / 'YYYY-MM-DD' 두 가지로 섞여 있어 로컬 자정 기준으로 통일해 비교한다.
+		const sorted = [...stored].sort((a, b) => DateUtils.toLocalTime(b.quizDate) - DateUtils.toLocalTime(a.quizDate));
 
-		const todayStr = getLocalParamDateToString(todayDate);
-		const pastQuizzes = sorted.filter((q) => getLocalParamDateToString(q.quizDate) !== todayStr);
+		const todayStr = toLocalDateKey(todayDate);
+		const pastQuizzes = sorted.filter((q) => toLocalDateKey(q.quizDate) !== todayStr);
 
 		const grouped: GroupedPrevQuiz[] = pastQuizzes.map((entry) => {
 			const formatted = formatQuizDate(entry.quizDate);
@@ -305,7 +291,7 @@ const TodayQuizScreen = () => {
 		setIsTodayUnsolved(unsolved);
 
 		const shouldGenerateNewQuiz =
-			!todayData || todayData.todayQuizIdArr.length < 5 || getLocalParamDateToString(todayData.quizDate) !== getLocalParamDateToString(todayDate);
+			!todayData || todayData.todayQuizIdArr.length < 5 || toLocalDateKey(todayData.quizDate) !== toLocalDateKey(todayDate);
 
 		if (shouldGenerateNewQuiz) {
 			// 새로운 퀴즈 생성
@@ -394,39 +380,21 @@ const TodayQuizScreen = () => {
 	};
 
 	/**
-	 * 알림 지정 확인
-	 */
-	const getScheduledAlarmTime = async () => {
-		const notifications = await notifee.getTriggerNotifications();
-		const scheduled = notifications.find((n) => n.notification.id === NOTIFICATION_ID);
-
-		if (scheduled && scheduled.trigger.type === TriggerType.TIMESTAMP) {
-			const timestamp = (scheduled.trigger as TimestampTrigger).timestamp;
-			const date = new Date(timestamp);
-			console.log('📌 예약된 알림 시간:', date.toLocaleString());
-		} else {
-			console.log('🚫 예약된 알림이 없습니다.');
-		}
-	};
-
-	/**
 	 * 매일 지정한 '로컬 시각' 에 반복 알림을 예약한다.
 	 * @param hour 0-23 (로컬 기준). 저장된 값만 넘길 것 — 현재 시각으로 재계산하지 않는다.
+	 * @returns 예약 성공 여부. 실패했는데 성공 토스트를 띄우면 사용자는 알림이 온다고 믿는다.
 	 */
 	// 예약 로직은 NotifactionHelper 로 일원화했다 — 앱 부팅 시 재예약(드리프트 보정)과 같은 코드를 쓴다.
-	const scheduleDailyQuizNotification = async (hour: number) => {
-		await scheduleDailyQuizReminder(hour, Paths.TODAY_QUIZ);
-	};
+	const scheduleDailyQuizNotification = (hour: number) => scheduleDailyQuizReminder(hour, Paths.TODAY_QUIZ);
 
 	const cancelScheduledNotification = async () => {
 		await cancelDailyQuizReminder();
 	};
 
+	/** PROVISIONAL(2) 도 알림이 배달되므로 등호(=== 1) 가 아니라 이상(>=) 비교를 해야 한다. */
 	const requestPermission = async () => {
 		const settings = await notifee.requestPermission();
-
-		console.log('settings :: ', settings);
-		return settings.authorizationStatus === 1;
+		return settings.authorizationStatus >= AuthorizationStatus.AUTHORIZED;
 	};
 
 	/**
@@ -479,20 +447,29 @@ const TodayQuizScreen = () => {
 					setHasStarted(true); // ✅ 바로 문제 시작
 				}
 
-				await scheduleDailyQuizNotification(tempSelectedHour);
+				const scheduled = await scheduleDailyQuizNotification(tempSelectedHour);
 				setAlarmTime(hourToDate(tempSelectedHour));
 				setTempIsAlarmEnabled(true);
 				setIsAlarmEnabled(true);
-				await getScheduledAlarmTime();
 
-				// ✅ 알림 설정 완료 팝업 추가
+				// 예약이 실패했는데 "설정 완료" 를 띄우면 사용자는 알림이 온다고 믿는다. 성패를 그대로 알린다.
 				const hour = tempSelectedHour.toString().padStart(2, '0');
-				showToastMessage('⏰ 알림 설정 완료', `매일 ${hour}시에 오늘의 퀴즈가 찾아갑니다!`);
+				if (scheduled) {
+					showToastMessage('⏰ 알림 설정 완료', `매일 ${hour}시에 오늘의 퀴즈가 찾아갑니다!`);
+				} else {
+					showToastMessage('⚠️ 알림 예약 실패', `${hour}시로 저장은 됐지만 예약에 실패했습니다. 앱을 다시 실행해 주세요.`);
+				}
 			} else {
 				AppAlert.alert('알림 권한 필요', '설정에서 알림 권한을 허용해주세요.');
 				Linking.openSettings();
 			}
 		} else {
+			// 저장을 먼저 한다 — 취소가 실패해도 '끔' 설정은 남아야 다음 실행에서 다시 예약되지 않는다.
+			await saveSettingInfo({
+				isUseAlarm: false,
+				alarmTime: toAlarmTimeString(DEFAULT_ALARM_HOUR),
+			});
+
 			await cancelScheduledNotification();
 
 			setAlarmTime(hourToDate(DEFAULT_ALARM_HOUR));
@@ -500,13 +477,6 @@ const TodayQuizScreen = () => {
 			setTempSelectedHour(DEFAULT_ALARM_HOUR);
 			setTempIsAlarmEnabled(false);
 			setIsAlarmEnabled(false);
-
-			await saveSettingInfo({
-				isUseAlarm: false,
-				alarmTime: toAlarmTimeString(DEFAULT_ALARM_HOUR),
-			});
-
-			await getScheduledAlarmTime();
 		}
 	};
 
@@ -1006,15 +976,11 @@ const TodayQuizScreen = () => {
 
 									const finalHour = tempIsAlarmEnabled ? tempSelectedHour : DEFAULT_ALARM_HOUR;
 
-									if (!tempIsAlarmEnabled) {
-										setTempSelectedHour(DEFAULT_ALARM_HOUR);
-										await cancelScheduledNotification();
-										// ✅ 알림 끈 경우엔 별도 메시지 없이 저장만
-									} else {
-										await scheduleDailyQuizNotification(finalHour);
-										showToastMessage('⏰ 알림 저장 완료', `${finalHour.toString().padStart(2, '0')}시에 오늘의 퀴즈 알람이 지정되었습니다.`);
-									}
-
+									// ⚠️ 저장이 항상 먼저다. 예전에는 예약 → 토스트 → 저장 순서였는데, notifee 예약이
+									//    throw 하면(권한 회수, 과거 timestamp 등) 이 async onPress 가 그 자리에서 끊겨
+									//    저장이 아예 실행되지 않았다. 그러면 다음 실행 때 '이전에 저장된 시각' 으로 재예약돼
+									//    사용자 눈에는 "내가 지정한 시간이 자꾸 원래대로 돌아간다" 로 보였다.
+									//    handleToggleAlarm 도 같은 순서(저장 → 예약)를 쓴다.
 									await saveSettingInfo({
 										isUseAlarm: tempIsAlarmEnabled,
 										alarmTime: toAlarmTimeString(finalHour),
@@ -1024,7 +990,20 @@ const TodayQuizScreen = () => {
 									setIsAlarmEnabled(tempIsAlarmEnabled);
 									setShowTodayReview(false);
 
-									await getScheduledAlarmTime();
+									if (!tempIsAlarmEnabled) {
+										setTempSelectedHour(DEFAULT_ALARM_HOUR);
+										await cancelScheduledNotification();
+										// ✅ 알림 끈 경우엔 별도 메시지 없이 저장만
+										return;
+									}
+
+									// 예약 성패를 그대로 알린다 — 실패했는데 "저장 완료" 를 띄우면 오지 않는 알림을 기다리게 된다.
+									const hourLabel = finalHour.toString().padStart(2, '0');
+									if (await scheduleDailyQuizNotification(finalHour)) {
+										showToastMessage('⏰ 알림 저장 완료', `${hourLabel}시에 오늘의 퀴즈 알람이 지정되었습니다.`);
+									} else {
+										showToastMessage('⚠️ 알림 예약 실패', `${hourLabel}시로 저장은 됐지만 예약에 실패했습니다. 앱을 다시 실행해 주세요.`);
+									}
 								}}>
 								<Text style={styles.saveButtonText}>저장</Text>
 							</TouchableOpacity>

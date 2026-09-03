@@ -12,9 +12,9 @@ import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
-import SuccessToast from '../SuccessToast';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { useToast } from '@/hooks/useToast';
 
 type Props = {
 	visible: boolean;
@@ -26,10 +26,9 @@ type Props = {
 const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Props) => {
 	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
 	const safePadding = useModalSafePadding();
-	const [showToast, setShowToast] = useState(false);
 	const [isFavorite, setIsFavorite] = useState(false);
-	const [toastMessage, setToastMessage] = useState('');
-	const [toastSubMessage, setToastSubMessage] = useState('');
+	// 토스트 상태·자동 숨김은 공통 훅이 담당
+	const { showToast, hideToast, ToastView } = useToast();
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(visible);
 
@@ -44,10 +43,16 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 
 	// ✅ useEffect를 early return 위로 올림
 	useEffect(() => {
-		if (visible && proverb) {
+		if (!visible) {
+			// 닫힐 때 초기화한다. 안 그러면 다시 열 때 이전 속담의 토스트/별표가 한 프레임 그려진다.
+			hideToast();
+			setIsFavorite(false);
+			return;
+		}
+		if (proverb) {
 			loadFavoriteStatus();
 		}
-	}, [visible, proverb, loadFavoriteStatus]);
+	}, [visible, proverb, loadFavoriteStatus, hideToast]);
 
 	// ✅ early return은 모든 Hook 선언 이후에
 	if (!proverb) {
@@ -108,9 +113,10 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 		onFavoriteChange?.();
 
 		// 추가/해제 양쪽 모두 토스트로 알린다.
-		setToastMessage(isNowFavorite ? '즐겨찾기 추가' : '즐겨찾기 해제');
-		setToastSubMessage(isNowFavorite ? '속담 사전에서 확인 할 수 있습니다.' : '즐겨찾기 목록에서 제거되었습니다.');
-		setShowToast(true);
+		showToast(
+			isNowFavorite ? '즐겨찾기 추가' : '즐겨찾기 해제',
+			isNowFavorite ? '속담 사전에서 확인 할 수 있습니다.' : '즐겨찾기 목록에서 제거되었습니다.',
+		);
 	};
 
 	return (
@@ -193,7 +199,7 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 					</View>
 				</Animated.View>
 				{/* 토스트는 Modal 안 + overflow:hidden 카드 밖에 둔다. 카드 안이면 잘리고, Modal 밖이면 모달에 가려진다. */}
-				<SuccessToast visible={showToast} message={toastMessage} subMessage={toastSubMessage} onHide={() => setShowToast(false)} />
+				<ToastView />
 			</View>
 		</Modal>
 	);

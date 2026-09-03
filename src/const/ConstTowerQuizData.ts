@@ -32,7 +32,7 @@ export function generateTowerQuiz(level: MainDataType.Proverb['level'], question
 		const correctAnswer = allOptions.indexOf(correctMeaning);
 
 		return {
-			question: `'${item.proverb}'의 뜻은 무엇입니까?`,
+			question: `"${item.proverb}"의 뜻은 무엇입니까?`,
 			options: allOptions,
 			correctAnswer,
 			explanation: `${item.longMeaning || item.meaning}\n\n예시: ${item.example[0] ?? ''}`,
@@ -65,7 +65,7 @@ export function generateCategoryQuiz(category: MainDataType.Proverb['category'],
 		const correctAnswer = allOptions.indexOf(item.meaning);
 
 		return {
-			question: `'${item.proverb}'의 뜻은 무엇입니까?`,
+			question: `"${item.proverb}"의 뜻은 무엇입니까?`,
 			options: allOptions,
 			correctAnswer,
 			explanation: `${item.meaning}\n\n예시: ${item.example[0] ?? ''}`,

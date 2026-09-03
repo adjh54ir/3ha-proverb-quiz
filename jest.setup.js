@@ -50,19 +50,38 @@ jest.mock('react-native-sound', () => {
 	// 로컬에 미설치여도 테스트가 돌도록 virtual mock 으로 등록한다.
 }, { virtual: true });
 
-jest.mock('react-native-google-mobile-ads', () => ({
+jest.mock('react-native-google-mobile-ads', () => {
+	/**
+	 * mobileAds() 는 호출마다 같은 객체를 돌려줘야 한다.
+	 * 매번 새 jest.fn() 을 만들면 "setAppMuted 가 initialize 뒤에 불렸는지" 를 검증할 수 없다.
+	 * (안드로이드는 초기화 전에 부르면 네이티브에서 죽는다 — App.test.tsx 가 순서를 못박는다)
+	 */
+	const calls = [];
+	const instance = {
+		initialize: jest.fn(() => {
+			calls.push('initialize');
+			return Promise.resolve([]);
+		}),
+		setAppMuted: jest.fn(() => calls.push('setAppMuted')),
+		setAppVolume: jest.fn(() => calls.push('setAppVolume')),
+	};
+	const mobileAds = () => instance;
+	mobileAds.__calls = calls;
+	mobileAds.__instance = instance;
+	return {
 	__esModule: true,
-	default: () => ({ initialize: jest.fn().mockResolvedValue([]) }),
+	default: mobileAds,
 	BannerAd: () => null,
 	useForeground: jest.fn(),
 	BannerAdSize: { ANCHORED_ADAPTIVE_BANNER: 'ANCHORED_ADAPTIVE_BANNER' },
 	InterstitialAd: { createForAdRequest: () => ({ load: jest.fn(), show: jest.fn(), addAdEventListener: () => jest.fn() }) },
 	RewardedAd: { createForAdRequest: () => ({ load: jest.fn(), show: jest.fn(), addAdEventListener: () => jest.fn() }) },
 	TestIds: { BANNER: 'banner', INTERSTITIAL: 'interstitial', REWARDED: 'rewarded' },
-	AdEventType: { LOADED: 'loaded', CLOSED: 'closed', ERROR: 'error' },
+	AdEventType: { LOADED: 'loaded', CLOSED: 'closed', ERROR: 'error', CLICKED: 'clicked', OPENED: 'opened', PAID: 'paid' },
 	RewardedAdEventType: { LOADED: 'loaded', EARNED_REWARD: 'earned_reward' },
 	MaxAdContentRating: { G: 'G' },
-}));
+	};
+});
 
 jest.mock('@notifee/react-native', () => ({
 	__esModule: true,
@@ -77,6 +96,8 @@ jest.mock('@notifee/react-native', () => ({
 	},
 	TriggerType: { TIMESTAMP: 0 },
 	AndroidImportance: { HIGH: 4 },
+	// 권한 판정을 === 1 대신 enum 으로 비교하므로 목에도 있어야 한다(PROVISIONAL 도 배달됨).
+	AuthorizationStatus: { NOT_DETERMINED: -1, DENIED: 0, AUTHORIZED: 1, PROVISIONAL: 2 },
 	EventType: { PRESS: 1 },
 	RepeatFrequency: { DAILY: 2 },
 }));

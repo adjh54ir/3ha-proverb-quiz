@@ -233,7 +233,7 @@ const MyProverbBookDetail = () => {
 					scrollEventThrottle={16}
 					keyExtractor={(item) => item.id.toString()}
 					renderItem={renderItem}
-					contentContainerStyle={[styles.listContent, removeMode && styles.listContentWithBar]}
+					contentContainerStyle={[styles.listContent, removeMode && styles.listContentWithBar, proverbs.length === 0 && styles.listContentEmpty]}
 					ListEmptyComponent={() => (
 						<View style={styles.emptyView}>
 							<Image source={require('@/assets/images/feature-states/empty-proverb-book.png')} style={styles.emptyImage} resizeMode="contain" />
@@ -344,6 +344,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	listContent: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.xs, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
 	// 편집 모드에서만 하단 삭제 바(absolute)가 뜨므로 그때만 그만큼 더 비운다.
 	listContentWithBar: { paddingBottom: scaleHeight(100) },
+	// 위아래 여백은 스크롤되는 목록을 위한 것이라, 비었을 때는 중앙 정렬만 어긋나게 한다.
+	listContentEmpty: { paddingTop: 0, paddingBottom: 0 },
 	itemCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -375,7 +377,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	itemBadges: { rowGap: SPACING_H.xs, alignItems: 'flex-end' },
 	miniBadge: { paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs, borderRadius: RADIUS.round },
 	miniBadgeText: { color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' },
-	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: SPACING_H.xxxxl },
+	// 빈 영역 전체를 채우고 그 정중앙에 놓인다. 위쪽 여백을 따로 주면 그만큼 아래로 밀린다.
+	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl },
 	emptyImage: { width: scaleWidth(164), height: scaleWidth(164) },
 	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textLight, textAlign: 'center', lineHeight: scaledSize(20) },

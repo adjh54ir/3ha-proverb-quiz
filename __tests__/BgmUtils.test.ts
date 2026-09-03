@@ -76,6 +76,46 @@ test('막판 배속은 재생 중인 트랙에 즉시 걸리고, 정지하면 �
 	expect(bgm.getBgmRate()).toBe(1);
 });
 
+/**
+ * Sound.kt 의 setSpeed/setPitch 는 MediaPlayer.playbackParams 에 try/catch 없이 쓴다.
+ * 일부 OEM 디코더가 던지면 @ReactMethod 라 앱이 그대로 죽으므로, 배속이 기본값인 동안에는
+ * 아예 부르지 않는다(효과음과 같은 방어 — SoundUtils.applyPlaybackRate).
+ */
+test('배속이 1 인 동안은 네이티브 배속 API 를 건드리지 않는다', async () => {
+	const bgm = load();
+	bgm.startBgm('quiz');
+	await flush();
+	expect(SoundMock.pitch).toBeUndefined();
+	expect(SoundMock.speed).toBeUndefined();
+});
+
+test('미리듣기 정지는 자기가 틀지 않은 BGM 을 끄지 않는다', async () => {
+	const bgm = load();
+	bgm.startBgm('quiz'); // 다른 화면·팝업이 틀어 둔 트랙
+	await flush();
+
+	bgm.startBgmPreview('quiz'); // 설정 화면 미리듣기 — 이미 흐르므로 소유권이 없다
+	bgm.stopBgmPreview();
+
+	// 아직 재생 중이면 같은 트랙 요청은 무시된다(새로 로드하지 않는다)
+	bgm.startBgm('quiz');
+	await flush();
+	expect(SoundMock.created).toBe(1);
+});
+
+test('자기가 시작한 미리듣기는 정지한다', async () => {
+	const bgm = load();
+	bgm.startBgmPreview('quiz');
+	await flush();
+	expect(SoundMock.played).toBe(1);
+
+	bgm.stopBgmPreview();
+	// 정지됐으므로 같은 트랙 요청이 새 플레이어를 만든다
+	bgm.startBgm('quiz');
+	await flush();
+	expect(SoundMock.created).toBe(2);
+});
+
 test('배속은 0.5~1.5 로 잘린다 — 곡이 알아들을 수 없게 되지 않도록', () => {
 	const bgm = load();
 	bgm.setBgmRate(9);

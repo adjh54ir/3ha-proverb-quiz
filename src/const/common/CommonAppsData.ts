@@ -7,10 +7,30 @@ export const COMMON_APPS_DATA: {
 } = {
 	Apps: [
 		{
+			id: 26,
+			icon: require('@/assets/appicons/main_qrmaker.png'),
+			title: 'QRMaker',
+			desc: 'QRMaker는 QR코드와 바코드를 간편하게 만들고 스캔해, 이미지·PDF로 저장하고 이력·메모로 관리할 수 있는 QR·바코드 생성기 앱입니다.',
+			category: 'utility',
+			android: '',
+			ios: '',
+		},
+		{
+			id: 25,
+			icon: require('@/assets/appicons/main_spitogenie.png'),
+			title: '스피또 지니',
+			desc:
+				'스피또 지니는 동행복권 발행내역을 바탕으로 남은 당첨금과 잔여 매수로 회차별 기대값·환급률을 계산해, 지금 사기 좋은 스피또 회차를 알려 주는 즉석복권 분석 앱입니다.',
+			category: 'utility',
+			android: 'https://play.google.com/store/apps/details?id=com.tha.spitogenie',
+			ios: '',
+		},
+		{
 			id: 24,
 			icon: require('@/assets/appicons/main_koreaquiz.png'),
 			title: '한국어 상식 퀴즈',
-			desc: '한국어 상식 퀴즈는 사자성어·속담·순우리말·위인 등 한국인이라면 알아야 할 한국어 상식을 퀴즈로 풀며 익히고, 틀린 문제는 오답 복습으로 반복 학습할 수 있는 한국어 학습 앱입니다.',
+			desc:
+				'한국어 상식 퀴즈는 사자성어·속담·순우리말·위인 등 한국인이라면 알아야 할 한국어 상식을 퀴즈로 풀며 익히고, 틀린 문제는 오답 복습으로 반복 학습할 수 있는 한국어 학습 앱입니다.',
 			category: 'quiz',
 			android: 'https://play.google.com/store/apps/details?id=com.tha.koreaquiz',
 			ios: '',
@@ -35,6 +55,7 @@ export const COMMON_APPS_DATA: {
 		},
 		{
 			id: 21,
+			// icon: require('@/assets/appicons/main_mindCare.png'),
 			icon: require('@/assets/appicons/main_mindCare.png'),
 			title: '마음:숲',
 			desc:
@@ -83,7 +104,7 @@ export const COMMON_APPS_DATA: {
 			id: 16,
 			icon: require('@/assets/appicons/main_emotionalEmoticon.png'),
 			title: '갬티콘: 감성 이모티콘',
-			desc: '2,000개 이상의 텍스트 이모티콘이 기다리고 있습니다. 탭 한 번으로 바로 복사, 어디서든 바로 붙여넣기를 해보세요!',
+			desc: '2,000개 이상의 텍스트 이모티콘이 기다리고 있어요. 탭 한 번으로 바로 복사, 어디서든 바로 붙여넣기를 해보세요!',
 			category: 'utility',
 			android: 'https://play.google.com/store/apps/details?id=com.tha.emotionalemoticon',
 			ios: 'https://apps.apple.com/us/app/id6760441156',

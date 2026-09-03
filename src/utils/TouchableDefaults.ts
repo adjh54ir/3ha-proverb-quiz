@@ -17,14 +17,12 @@ import { TouchableOpacity } from 'react-native';
 
 /** 앱 공통 누름 강도. 화면에서 값을 바꾸고 싶을 때만 activeOpacity 를 직접 준다. */
 export const DEFAULT_ACTIVE_OPACITY = 0.8;
-const DEFAULT_HIT_SLOP = { top: 6, bottom: 6, left: 6, right: 6 } as const;
-
 // forwardRef 객체의 render 는 타입상 노출되지 않아 any 캐스팅이 필요하다.
 const TouchableAny = TouchableOpacity as any;
 const baseRender = TouchableAny.render;
 
 TouchableAny.render = function patchedTouchableRender(props: any, ref: any) {
-	return baseRender.call(this, { activeOpacity: DEFAULT_ACTIVE_OPACITY, hitSlop: DEFAULT_HIT_SLOP, ...props }, ref);
+	return baseRender.call(this, { activeOpacity: DEFAULT_ACTIVE_OPACITY, ...props }, ref);
 };
 
 export {};

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Animated, Easing } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
@@ -7,9 +7,9 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
-import SuccessToast from '../SuccessToast';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { useToast } from '@/hooks/useToast';
 
 type ResultType = 'correct' | 'wrong' | 'timeout' | 'done' | '';
 
@@ -40,10 +40,8 @@ const QuizResultModal = ({
 }: Props) => {
 	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
 	const safePadding = useModalSafePadding();
-	// ✅ Toast 상태
-	const [toastVisible, setToastVisible] = useState(false);
-	const [toastMessage, setToastMessage] = useState('');
-	const toastTimer = useRef<NodeJS.Timeout | null>(null);
+	// ✅ Toast (자동 숨김·애니메이션은 공통 훅이 담당)
+	const { showToast, hideToast, ToastView } = useToast();
 
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(visible);
@@ -65,10 +63,7 @@ const QuizResultModal = ({
 
 	useEffect(() => {
 		if (!visible) {
-			setToastVisible(false);
-			if (toastTimer.current) {
-				clearTimeout(toastTimer.current);
-			}
+			hideToast();
 			// 닫힐 때 초기화해야 다음 문제에서 열릴 때 첫 프레임이 opacity 0 으로 그려진다(이전 문제 잔상 방지)
 			answerAnim.setValue(0);
 			explainAnim.setValue(0);
@@ -97,32 +92,15 @@ const QuizResultModal = ({
 
 		// ✅ 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
 		return () => contentAnim.stop();
-	}, [visible, answerAnim, explainAnim]);
+	}, [visible, answerAnim, explainAnim, hideToast]);
 
-	// ✅ 타이머 정리 (언마운트 시)
-	useEffect(() => {
-		return () => {
-			if (toastTimer.current) {
-				clearTimeout(toastTimer.current);
-			}
-		};
-	}, []);
-
-	// ✅ 즐겨찾기 토글 + Toast (타이머로 자동 숨김)
+	// ✅ 즐겨찾기 토글 + Toast
 	const handleToggleFavoriteWithToast = async () => {
 		const wasFavorited = question?.id !== undefined && favoriteIds.includes(question.id);
 		await onToggleFavorite();
 
-		const msg = wasFavorited ? '즐겨찾기 제거' : '즐겨찾기 추가';
-		setToastMessage(msg);
-		setToastVisible(true);
-
-		if (toastTimer.current) {
-			clearTimeout(toastTimer.current);
-		}
-		toastTimer.current = setTimeout(() => {
-			setToastVisible(false);
-		}, 2000);
+		// 보조 문구는 넘기지 않는다(제거 케이스에 기본 문구가 잘못 붙는 것을 막는다 — TodayQuizScreen 과 동일)
+		showToast(wasFavorited ? '즐겨찾기 제거' : '즐겨찾기 추가');
 	};
 
 	const isFavorited = question?.id !== undefined && favoriteIds.includes(question.id);
@@ -273,7 +251,7 @@ const QuizResultModal = ({
 					<TouchableOpacity style={styles.primaryButton} onPress={onNext} activeOpacity={0.8}>
 						<Text style={styles.primaryButtonText}>다음 퀴즈</Text>
 					</TouchableOpacity>
-					<SuccessToast visible={toastVisible} message={toastMessage} onHide={() => setToastVisible(false)} />
+					<ToastView />
 				</Animated.View>
 			</View>
 		</Modal>

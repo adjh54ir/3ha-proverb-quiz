@@ -152,12 +152,12 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 			setStep(0);
 			return;
 		}
-		enter.setValue(0);
 		if (reducedMotion) {
 			enter.setValue(1);
 			bob.setValue(0);
 			return;
 		}
+		enter.setValue(0);
 		Animated.spring(enter, { toValue: 1, friction: 7, tension: 70, useNativeDriver: true }).start();
 		const loop = Animated.loop(
 			Animated.sequence([
@@ -173,7 +173,10 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 	const line = lines[step] ?? '';
 	useEffect(() => {
 		if (!visible) return;
-		if (typingRef.current) clearInterval(typingRef.current);
+		if (typingRef.current) {
+			clearInterval(typingRef.current);
+			typingRef.current = null; // 아래 reducedMotion 분기가 cleanup 등록 전에 return 하므로 여기서 비워 둔다
+		}
 		if (reducedMotion) {
 			setTyped(line);
 			return;

@@ -20,12 +20,16 @@
 2. 카드 높이는 `maxHeight: '100%'` 를 기본으로 한다. 여백을 뺀 실제 가용 높이에 맞춰 스스로 줄어든다.
    `'85%'` 같은 퍼센트도 안전 영역 기준으로 계산되므로 괜찮다.
 
-3. 세로 크기에 `scaleHeight(고정값)` 을 쓰지 않는다. `scaleHeight` 는 `기기 높이 × 값 / 812` 라서
-   화면 높이에 비례한다. 즉 `scaleHeight(700)` 은 상수가 아니라 "화면 높이의 86%" 이고, 큰 기기에서
-   카드가 같이 커져 위아래가 잘린다. 세로는 퍼센트로, `scaleHeight` 는 아이콘·이미지 같은 작은 고정 요소에만.
+3. 세로 크기에 `scaleHeight(고정값)` 을 쓰지 않는다. `scaleHeight` 는 `값 × min(기기 높이 / 812, 상한)`
+   이라서 화면 높이에 비례한다. 즉 `scaleHeight(700)` 은 상수가 아니라 "화면 높이의 86%"(상한에 걸리기
+   전까지)이고, 큰 기기에서 카드가 같이 커져 위아래가 잘린다.
+   세로는 퍼센트로, `scaleHeight` 는 아이콘·이미지 같은 작은 고정 요소에만.
+   상한은 폰 `MAX_SCALE = 1.25` / 태블릿 `TABLET_MAX_SCALE = 1.35` 이고 가로·세로·폰트가 같은 값을
+   쓴다 (`src/utils/DementionUtils.ts`, 아래 "태블릿/아이패드 반응형 규칙" 참고).
 
-4. 카드 높이를 직접 계산하는 모달(예: `TowerResultModal` 의 `height * 0.8`)은 오버레이 패딩이 먹지 않는다.
-   그런 경우는 계산식에서 insets 를 빼야 한다.
+4. 카드 높이를 직접 계산하는 모달(예: `TowerResultModal`)은 오버레이 패딩이 먹지 않는다.
+   그런 경우는 계산식에서 insets 를 빼야 한다
+   (`(height - safePadding.paddingTop - safePadding.paddingBottom) * 0.8`).
 
 5. 테스트에서 모달을 `SafeAreaProvider` 없이 렌더하면 `useSafeAreaInsets` 가 throw 한다.
    `jest.setup.js` 에 `react-native-safe-area-context/jest/mock` 이 등록돼 있으니 그대로 두면 된다.
@@ -61,9 +65,10 @@
 
 ## TextInput / 키보드 규칙
 
-1. 스크롤·빈 영역 탭으로 키보드를 닫는 동작은 **전역 기본값**이다
+1. 스크롤·빈 영역 탭으로 키보드를 닫는 동작과 iOS 키보드 인셋은 **전역 기본값**이다
    (`src/utils/ScrollDefaults.ts`, `index.js` 최상단에서 import).
-   화면에서 `keyboardDismissMode` / `keyboardShouldPersistTaps` 를 다시 붙이지 않는다.
+   화면에서 `keyboardDismissMode` / `keyboardShouldPersistTaps` /
+   `automaticallyAdjustKeyboardInsets` 를 다시 붙이지 않는다.
 
 2. `KeyboardAvoidingView` 의 `behavior` 는 **항상 `"padding"`** 이다.
    `Platform.OS === 'ios' ? 'padding' : 'height'` 를 쓰지 않는다 — 이유는

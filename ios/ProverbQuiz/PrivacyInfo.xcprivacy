@@ -42,8 +42,54 @@
 		</dict>
 	</array>
 	<key>NSPrivacyCollectedDataTypes</key>
-	<array/>
+	<array>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeDeviceID</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+				<string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+			</array>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeCrashData</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeProductInteraction</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+			</array>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+		</dict>
+	</array>
 	<key>NSPrivacyTracking</key>
-	<false/>
+	<true/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array>
+		<string>app-measurement.com</string>
+		<string>googleads.g.doubleclick.net</string>
+		<string>pagead2.googlesyndication.com</string>
+		<string>tpc.googlesyndication.com</string>
+		<string>www.googleadservices.com</string>
+	</array>
 </dict>
 </plist>

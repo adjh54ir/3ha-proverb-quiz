@@ -153,11 +153,11 @@ const InitQuizModeScreen = () => {
 							<View style={styles.accordionContent}>
 								<View style={styles.accordionDescBox}>
 									<View style={styles.accordionRow}>
-										<IconComponent type="FontAwesome5" name="book" size={scaledSize(16)} color={COLORS.accentFlame} />
+										<IconComponent type="FontAwesome5" name="book" size={scaledSize(16)} color={COLORS.accentFlame} style={styles.accordionIcon} />
 										<Text style={styles.accordionText}>틀린 문제는 오답 복습에서 다시 확인할 수 있습니다.</Text>
 									</View>
 									<View style={styles.accordionRow}>
-										<IconComponent type="MaterialCommunityIcons" name="reload" size={scaledSize(18)} color={COLORS.primary} />
+										<IconComponent type="MaterialCommunityIcons" name="reload" size={scaledSize(18)} color={COLORS.primary} style={styles.accordionIcon} />
 										<Text style={[styles.accordionText, styles.warningText]}>다시 풀기는 설정 탭에서 '퀴즈 다시 풀기'에서 할 수 있지만, 이전 기록이 초기화되니 꼭 참고하세요!</Text>
 									</View>
 								</View>
@@ -288,6 +288,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	accordionDescBox: { width: '100%', rowGap: SPACING_H.sm, marginBottom: SPACING_H.md },
 	accordionRow: { flexDirection: 'row', alignItems: 'flex-start', columnGap: SPACING_W.sm },
 	accordionText: { flex: 1, fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, lineHeight: scaledSize(20) },
+	// 아이콘도 <Text> 라 줄 높이를 accordionText 와 같게 주면 첫 줄과 세로 중앙이 맞는다.
+	accordionIcon: { lineHeight: scaledSize(20) },
 	warningText: { color: COLORS.dangerDark, fontWeight: '600' },
 	accordionButtonsRow: { flexDirection: 'row', columnGap: SPACING_W.md, justifyContent: 'center', alignItems: 'center' },
 	accordionButton: {

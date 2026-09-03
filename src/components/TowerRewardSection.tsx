@@ -45,7 +45,8 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
             ]),
             Animated.delay(200),
             Animated.parallel([
-				Animated.sequence([
+                Animated.loop(
+                    Animated.sequence([
                         Animated.timing(shimmer, {
                             toValue: 1,
                             duration: 1200,
@@ -58,20 +59,26 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
                             easing: Easing.inOut(Easing.sin),
                             useNativeDriver: true,
                         }),
-				]),
+                    ])
+                ),
+                Animated.loop(
                     Animated.timing(star1Rotate, {
                         toValue: 1,
                         duration: 2400,
                         easing: Easing.linear,
                         useNativeDriver: true,
-				}),
+                    })
+                ),
+                Animated.loop(
                     Animated.timing(star2Rotate, {
                         toValue: 1,  // 양수로 변경
                         duration: 3000,
                         easing: Easing.linear,
                         useNativeDriver: true,
-				}),
-				Animated.sequence([
+                    })
+                ),
+                Animated.loop(
+                    Animated.sequence([
                         Animated.timing(glowScale, {
                             toValue: 1.06,
                             duration: 1400,
@@ -84,7 +91,8 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
                             easing: Easing.inOut(Easing.ease),
                             useNativeDriver: true,
                         }),
-				]),
+                    ])
+                ),
             ]),
         ]);
         animation.start();
@@ -210,6 +218,8 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
 				<Pressable style={[styles.overlay, modalSafePadding]} onPress={() => setSelectedLevel(null)}>
                     <Animated.View
                         style={{
+                            // 카드가 안전 여백 안에서 스스로 줄어들도록 중간 래퍼에도 상한을 준다.
+                            maxHeight: '100%',
                             opacity: popupAnim,
                             transform: [
                                 { translateY: popupAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) },
@@ -233,7 +243,7 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
 
                                 <ClearBadge color={selectedTower.color} name={selectedTower.name} />
 
-                                <View style={styles.popupBody}>
+                                <ScrollView style={styles.popupBodyScroll} contentContainerStyle={styles.popupBody}>
                                     <Text style={styles.sectionTitle}>🏆 클리어 조건</Text>
                                     <Text style={styles.infoText}>
                                         <Text style={styles.highlight}>{selectedTower.clearCondition}</Text>
@@ -255,7 +265,7 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
                                             <Text style={styles.rewardName}>{selectedTower.reward.name}</Text>
                                         </View>
                                     </View>
-                                </View>
+                                </ScrollView>
 
                                 <TouchableOpacity
                                     style={[styles.closeBtn, { backgroundColor: selectedTower.color }]}
@@ -332,6 +342,8 @@ const styles = themedStyles(() => StyleSheet.create({
     popup: {
         width: scaleWidth(300),
         maxWidth: '100%',
+        // 작은 화면에서 헤더+보스+클리어 조건이 안전 영역을 넘기면 본문만 스크롤된다.
+        maxHeight: '100%',
         backgroundColor: COLORS.surface,
         borderRadius: RADIUS.xl,
         overflow: 'hidden',
@@ -432,6 +444,9 @@ const styles = themedStyles(() => StyleSheet.create({
         letterSpacing: 4,
     },
 
+    popupBodyScroll: {
+        flexShrink: 1,
+    },
     popupBody: {
         paddingHorizontal: SPACING_W.lg,
         paddingVertical: SPACING_H.lg,

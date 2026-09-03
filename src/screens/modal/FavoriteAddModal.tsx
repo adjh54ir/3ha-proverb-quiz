@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView } from 'react-native';
+import { Animated, Dimensions, Easing, View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Keyboard, TouchableWithoutFeedback, Pressable, KeyboardAvoidingView } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import FastImage from 'react-native-fast-image';
@@ -15,6 +15,15 @@ import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from '../common/CommonProverbModule';
 import { getLevelIconName } from '@/screens/common/CommonProverbModule';
+import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
+import useReducedMotion from '@/hooks/useReducedMotion';
+
+// 시트가 아래에서 올라오는 거리. 시트 높이보다 크기만 하면 되므로 화면 높이를 쓴다(세로 고정 앱).
+const SHEET_SLIDE_FROM = Dimensions.get('screen').height;
+const SHEET_SLIDE_DURATION = 260;
+
+// behavior="padding" 을 유지하면서 transform 을 얹으려면 애니메이션 컴포넌트로 감싸야 한다.
+const AnimatedKeyboardAvoidingView = Animated.createAnimatedComponent(KeyboardAvoidingView);
 
 interface Props {
 	visible: boolean;
@@ -50,6 +59,29 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 	const [categoryItems, setCategoryItems] = useState<any[]>([]);
 
 	const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	// 시트 등장 모션. animationType="slide" 는 딤까지 함께 밀어 올려 전환 내내 화면 위쪽이
+	// 딤 없이 비친다. 그래서 모달은 animationType="fade" 로 딤을 화면 전체에 고르게 깔고
+	// (닫을 때도 같은 페이드로 사라진다), 시트만 여기서 아래에서 위로 올린다.
+	const reducedMotion = useReducedMotion();
+	const slideAnim = useRef(new Animated.Value(SHEET_SLIDE_FROM)).current;
+
+	useEffect(() => {
+		// 닫힐 때 값을 되돌려 둬야 다음에 열릴 때 첫 프레임이 화면 밖에서 시작한다(잔상 방지).
+		slideAnim.setValue(SHEET_SLIDE_FROM);
+		if (!visible) {
+			return;
+		}
+		const anim = Animated.timing(slideAnim, {
+			toValue: 0,
+			duration: reducedMotion ? 0 : SHEET_SLIDE_DURATION,
+			easing: Easing.out(Easing.cubic),
+			useNativeDriver: true,
+		});
+		anim.start();
+		// 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
+		return () => anim.stop();
+	}, [visible, slideAnim, reducedMotion]);
 
 	useEffect(() => {
 		return () => {
@@ -170,10 +202,22 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 	};
 
 	return (
-		<Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-			<View style={styles.overlay}>
-				{/* 키보드 회피 규칙은 common/modal/README.md 참고 — behavior 는 두 플랫폼 모두 'padding' 으로 통일한다. */}
-				<KeyboardAvoidingView behavior="padding" style={styles.sheet}>
+		<Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
+			{/* AppModal 은 딤이 잘리지 않도록 화면(screen) 실측 크기로 깔린다. 그래서 오버레이에
+			    상단 안전 여백을 직접 줘야 시트가 상태바 밑으로 파고들지 않는다(CLAUDE.md 규칙 1).
+			    ⚠️ paddingBottom 은 주지 않는다 — 아래에 붙는 시트라 여백을 주면 시트와 화면 하단
+			    사이에 딤 띠가 생긴다. 하단 시스템 바는 footer 의 insets.bottom 이 이미 피한다. */}
+			<View style={[styles.overlay, { paddingTop: insets.top }]}>
+				{/* 시트 위쪽 딤 영역. 여기를 눌러도 키보드가 닫혀야 한다(헤더/푸터는 아래 래퍼 밖이다). */}
+				<Pressable style={styles.dimArea} onPress={Keyboard.dismiss} accessible={false} />
+				{/* 모달은 Activity 가 아닌 별도 Dialog 윈도우라 매니페스트의 adjustResize 가 적용되지 않는다.
+				    화면(Screen)과 달리 안드로이드도 behavior 를 직접 줘야 키보드가 입력창을 가리지 않는다.
+
+				    ⚠️ 'height' 를 쓰면 안 된다. 이 시트는 overlay 의 justifyContent:'flex-end' 로
+				    아래쪽에 붙어 있어서, height 를 줄이면 아래가 아니라 **위쪽**이 깎인다.
+				    시트 하단의 확인 버튼은 그대로 키보드 밑에 남는다. 'padding' 은 paddingBottom 을
+				    키보드 높이만큼 넣어 내용 전체를 위로 밀어 올리므로 두 플랫폼 모두 이 값을 쓴다. */}
+				<AnimatedKeyboardAvoidingView behavior="padding" style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}>
 					<View style={styles.modalHeader}>
 						<View style={styles.handleBar} />
 						<View style={styles.headerRow}>
@@ -190,7 +234,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 						</Text>
 					</View>
 
-					<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+					<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 						<View style={styles.body}>
 							<View style={styles.filterWrap}>
 								<View style={styles.searchRow}>
@@ -266,16 +310,8 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 													<Text style={{ fontSize: FONT_SIZES.mdPlus, color: COLORS.text, flex: 1 }}>{item.label}</Text>
 												</TouchableOpacity>
 											)}
-											modalProps={{ animationType: 'fade', presentationStyle: 'overFullScreen', transparent: true }}
-											modalContentContainerStyle={{
-												marginTop: '25%',
-												width: '85%',
-												alignSelf: 'center',
-												maxHeight: '60%',
-												backgroundColor: COLORS.surface,
-												borderRadius: RADIUS.xl,
-												paddingVertical: SPACING_H.xl,
-											}}
+											modalProps={DROPDOWN_MODAL_PROPS}
+											modalContentContainerStyle={DROPDOWN_MODAL_CONTENT_STYLE}
 											modalTitleStyle={{ fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, textAlign: 'center', paddingVertical: SPACING_H.md, paddingHorizontal: SPACING_W.lg }}
 										/>
 									</View>
@@ -301,7 +337,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 								scrollEnabled={!levelOpen && !categoryOpen}
 								keyboardShouldPersistTaps="handled"
 								keyboardDismissMode="on-drag"
-								contentContainerStyle={styles.listContent}
+								contentContainerStyle={[styles.listContent, filteredList.length === 0 && styles.listContentEmpty]}
 								showsVerticalScrollIndicator={false}
 								ListEmptyComponent={() => (
 									<View style={styles.emptyWrap}>
@@ -326,7 +362,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 							</Text>
 						</TouchableOpacity>
 					</View>
-				</KeyboardAvoidingView>
+				</AnimatedKeyboardAvoidingView>
 			</View>
 		</Modal>
 	);
@@ -335,10 +371,14 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 export default FavoriteAddModal;
 
 const styles = themedStyles(() => StyleSheet.create({
+	// paddingTop 은 useSafeAreaInsets 로 런타임 주입 (시트가 상태바 밑으로 파고드는 것 방지)
 	overlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'flex-end' },
+	dimArea: { flex: 1 },
+	// 92% 는 오버레이의 '안전 여백을 뺀' 높이 기준이다(퍼센트는 부모 content box 로 계산된다).
+	// 그래서 전체 화면 92% 였던 예전과 달리 상태바를 침범하지 않고, 남는 8% 는 위쪽 딤 영역이 된다.
 	// 태블릿에서 시트가 화면 폭을 다 쓰면 한 줄이 지나치게 길어진다. 본문 기둥 폭으로 묶고 가운데 정렬.
 	// 폰은 화면 폭이 CONTENT_MAX_WIDTH 보다 좁아 아무 영향이 없다.
-	sheet: { width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center', height: '92%', backgroundColor: COLORS.background, borderTopLeftRadius: RADIUS.xl, borderTopRightRadius: RADIUS.xl, overflow: 'hidden' },
+	sheet: { width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center', height: '92%', maxHeight: '100%', backgroundColor: COLORS.background, borderTopLeftRadius: RADIUS.xl, borderTopRightRadius: RADIUS.xl, overflow: 'hidden' },
 	modalHeader: { backgroundColor: COLORS.surface, paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.sm, paddingBottom: SPACING_H.md, borderBottomWidth: 1, borderBottomColor: COLORS.surfaceAlt },
 	handleBar: { width: scaleWidth(40), height: scaleHeight(4), borderRadius: RADIUS.round, backgroundColor: COLORS.border, alignSelf: 'center', marginBottom: SPACING_H.md },
 	headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.xs },
@@ -366,6 +406,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	miniCheckboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
 	listCountText: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary },
 	listContent: { paddingTop: SPACING_H.md, paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
+	// 위아래 여백은 스크롤되는 목록을 위한 것이라, 비었을 때는 중앙 정렬만 어긋나게 한다.
+	listContentEmpty: { paddingTop: 0, paddingBottom: 0 },
 	itemCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.md, borderWidth: 1, borderColor: COLORS.surfaceAlt, },
 	itemCardSelected: { borderColor: COLORS.warning, backgroundColor: COLORS.warningSoft },
 	itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.sm },
@@ -377,7 +419,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	checkboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
 	hanjaText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.xs },
 	meaningText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, lineHeight: scaledSize(19) },
-	emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: SPACING_H.xxxxl },
+	// 빈 영역 전체를 채우고 그 정중앙에 놓인다. 위쪽 여백을 따로 주면 그만큼 아래로 밀린다.
+	emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 	emptyImage: { width: scaleWidth(140), height: scaleWidth(140), marginBottom: SPACING_H.md },
 	emptyTitle: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.xs },
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', lineHeight: scaledSize(20) },

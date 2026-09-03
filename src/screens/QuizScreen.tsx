@@ -37,6 +37,7 @@ import DateUtils from '@/utils/DateUtils';
 import { useAppNavigation, QuizScreenParams } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { useModalHandoff } from '@/hooks/useModalHandoff';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const labelColors = themedValue(() => [COLORS.secondary, COLORS.primary, COLORS.accentTeal, COLORS.accentFlame]); // A, B, C, D 보기 라벨
@@ -46,12 +47,23 @@ const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 /** 문제당 제한시간(초) — 타이머 / 시작 안내 팝업이 같은 값을 쓰도록 한 곳에서 관리한다. */
 const QUESTION_TIME_LIMIT = 40;
 
+/**
+ * 해당 모드로 출제 가능한 속담인지 판정한다.
+ * 빈칸 모드는 서로 다른 어절이 2개 미만인 속담('화무십일홍이라')을 뺀다.
+ * 정답 어절을 가리는 순간 문제가 통째로 '(____)' 가 되기 때문이다.
+ * 랜덤 출제 / 오답 복습 / 진행률이 모두 이 한 곳을 쓴다.
+ */
+export const isQuizzable = (proverb: MainDataType.Proverb, mode: QuizScreenParams['mode']) =>
+	mode !== 'blank' || new Set(proverb.proverb.split(' ').filter(Boolean)).size >= 2;
+
 // 파라미터 정의는 RootStackParamList(단일 소스)에서 가져온다.
 type QuizRoute = RouteProp<{ QUIZ: QuizScreenParams }, 'QUIZ'>;
 
 const QuizScreen = () => {
 	const reducedMotion = useReducedMotion();
 	const modalSafePadding = useModalSafePadding();
+	// 모달 → 모달 전환 시 이전 모달 깜빡임 방지
+	const handoff = useModalHandoff();
 	const route = useRoute<QuizRoute>();
 	const { width: screenWidth } = useWindowDimensions();
 	const flatListRef = useRef<FlatList<string>>(null);
@@ -146,6 +158,17 @@ const QuizScreen = () => {
 		'👏 대단합니다!\n이 속도라면 모든 속담을 금방 외울 수 있을 것 같습니다!',
 		'정말 똑똑합니다! 📚\n퀴즈를 척척 풀어가는 모습이 인상적입니다!',
 	];
+	const filteredProverbs = useMemo(() => {
+		return proverbs.filter((p) => {
+			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
+			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
+			return levelMatch && categoryMatch && isQuizzable(p, routeMode);
+		});
+	}, [proverbs, selectedLevel, selectedCategory, routeMode]);
+
+	// 오답 복습 풀도 같은 기준으로 걸러야 진행률(index/length)과 실제 출제 문항 수가 어긋나지 않는다.
+	const activePool = useMemo(() => questionPool?.filter((p) => isQuizzable(p, routeMode)), [questionPool, routeMode]);
+
 	// 뒤로가기를 그냥 삼키면 앱이 멈춘 것처럼 보인다 — 화면의 종료 버튼과 같은 확인 팝업을 띄운다.
 	useBlockBackHandler(true, () => setShowExitModal(true));
 
@@ -154,15 +177,40 @@ const QuizScreen = () => {
 		setSelectedCategory(routeCategory ?? '전체');
 	}, [routeLevel, routeCategory]);
 
+	/**
+	 * 모달이 하나라도 열려 있는지.
+	 * 열려 있는 동안에는 새 문제를 로드하지도, 남은 시간을 깎지도 않는다.
+	 */
+	const isAnyModalOpen = showStartModal || showResultModal || showCompletionModal || badgeModalVisible || showHintModal || showExitModal;
+	// 1초 인터벌 콜백은 만들어진 시점의 클로저라 최신 state 를 못 본다 → ref 로 읽는다.
+	const isAnyModalOpenRef = useRef(isAnyModalOpen);
+	isAnyModalOpenRef.current = isAnyModalOpen;
+
+	/**
+	 * 데이터/필터가 준비되면 **첫 문제**를 올리는 effect.
+	 * 두 번째 문제부터는 handleNextQuestion() 이 담당한다(아래 question 가드).
+	 *
+	 * ⚠️ deps 에 `isAnswerLocked` 를 다시 넣지 말 것 — 아래 버그가 되살아난다.
+	 *    답을 고르면 handleSelect 가 600ms 뒤에 `setShowResultModal(true)` 와
+	 *    `setIsAnswerLocked(false)` 를 **같은 배치**에서 호출한다. isAnswerLocked 가 deps 에 있으면
+	 *    그 순간 이 effect 가 다시 돌아, 해설 모달이 열려 있는데도 새 문제를 로드해 버렸다.
+	 *      - 모달에 보이는 정답/해설/즐겨찾기가 다음 문제 것으로 바뀐다
+	 *      - setupQuestion 이 40초 타이머를 모달 뒤에서 다시 돌려 자동 오답(handleSelect(''))까지 된다
+	 *      - 마지막 문제였다면 완료 팝업이 해설 모달과 같은 틱에 떠서 이전 모달이 깜빡인다
+	 *    isAnswerLocked 는 '트리거'가 아니라 '가드'다 — deps 에 넣지 않고 조건으로만 읽는다.
+	 */
 	useEffect(() => {
 		if (!quizHistory) return;
-		if (showStartModal) return; // ✅ 시작 모달이 열려있으면 문제 로드 금지
+		// ✅ 모달(시작/해설/완료/뱃지/힌트/종료)이 떠 있으면 문제 로드 금지
+		if (isAnyModalOpen) return;
 		if (filteredProverbs.length === 0) return;
+		// ✅ 이미 문제가 올라와 있으면 새로 뽑지 않는다 (다음 문제는 '다음' 버튼 흐름에서만 로드)
+		if (question) return;
 		if (isAnswerLocked) return;
 
-		if (questionPool && questionPool.length > 0) {
-			setProverbs(questionPool);
-			loadQuestion(questionPool);
+		if (activePool && activePool.length > 0) {
+			setProverbs(activePool);
+			loadQuestion(activePool);
 		} else {
 			const all = ProverbServices.selectProverbList();
 			const filtered = all.filter((p) => {
@@ -173,7 +221,7 @@ const QuizScreen = () => {
 			setProverbs(filtered);
 			if (filtered.length > 0) loadQuestion(filtered);
 		}
-	}, [quizHistory, showStartModal, isAnswerLocked, questionPool, selectedLevel, selectedCategory]); // ✅ showStartModal 의존성 추가
+	}, [quizHistory, showStartModal, activePool, selectedLevel, selectedCategory]); // ✅ showStartModal 의존성 추가
 
 	useEffect(() => {
 		(async () => {
@@ -222,7 +270,7 @@ const QuizScreen = () => {
 	}, [options]);
 
 	useEffect(() => {
-		if (isWrongReview && questionPool) {
+		if (isWrongReview && activePool) {
 			loadQuestion();
 		}
 	}, [reviewIndex]);
@@ -243,15 +291,6 @@ const QuizScreen = () => {
 		}
 	}, [badgeModalVisible]);
 
-	const filteredProverbs = useMemo(() => {
-		return proverbs.filter((p) => {
-			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-			// 빈칸 모드에서 어절이 하나뿐인 속담('화무십일홍이라')은 가릴 곳을 빼면 문제가 통째로 '(____)' 가 된다 → 출제 제외
-			const blankable = routeMode !== 'blank' || p.proverb.split(' ').filter(Boolean).length >= 2;
-			return levelMatch && categoryMatch && blankable;
-		});
-	}, [proverbs, selectedLevel, selectedCategory, routeMode]);
 
 	const remainingProverbs = useMemo(() => {
 		const solvedSet = new Set([...(quizHistory?.correctProverbId ?? []), ...(quizHistory?.wrongProverbId ?? [])]);
@@ -272,7 +311,16 @@ const QuizScreen = () => {
 		const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
 		setCompletionData({ correct, wrong, total, accuracy });
 		playFinish(); // 🎉 퀴즈 완료 사운드
-		setShowCompletionModal(true);
+
+		// 완료 팝업은 loadQuestion() 이 "남은 문제 없음"을 확인한 순간 열리는데,
+		// 그 시점은 항상 결과 모달 / 시작 모달이 방금 닫힌 직후다.
+		// 예전엔 100ms 뒤에 곧바로 열려서 이전 모달의 네이티브 닫힘(iOS 350ms / 안드로이드 250ms)이
+		// 끝나기 전에 새 창이 떠서 이전 모달이 한 프레임 다시 보였다(깜빡임).
+		// 닫기는 호출부에서 이미 했으므로 여기서는 '열기'만 닫힘 애니메이션 뒤로 미룬다.
+		handoff(
+			() => {},
+			() => setShowCompletionModal(true),
+		);
 	};
 
 	const loadQuestion = (pool?: MainDataType.Proverb[]) => {
@@ -286,19 +334,20 @@ const QuizScreen = () => {
 		setBlankWord('');
 		setQuestion(null);
 
-		if (isWrongReview && questionPool && questionPool.length > 0) {
-			if (reviewIndex >= questionPool.length) {
+		if (isWrongReview && activePool && activePool.length > 0) {
+			if (reviewIndex >= activePool.length) {
 				setResultType('done');
 				showCompletion();
 				return;
 			}
-			setupQuestion(questionPool[reviewIndex], questionPool);
+			setupQuestion(activePool[reviewIndex], activePool);
 			return;
 		}
 
 		// ✅ pool 파라미터 우선 사용 (stale closure 방지)
-		const source = pool ?? filteredProverbs;
-		if (!source || source.length === 0) return;
+		// onStart 처럼 필터를 거치지 않은 pool 이 직접 넘어오는 경로가 있어 여기서 한 번 더 같은 기준을 적용한다.
+		const source = (pool ?? filteredProverbs).filter((p) => isQuizzable(p, routeMode));
+		if (source.length === 0) return;
 
 		const solvedSet = new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]);
 		if (question) solvedSet.add(question.id);
@@ -373,6 +422,12 @@ const QuizScreen = () => {
 		// 타이머 새로 시작
 		if (timerRef.current) clearInterval(timerRef.current);
 		timerRef.current = setInterval(() => {
+			// 모달이 떠 있는 동안에는 남은 시간을 깎지 않는다. 해설/완료/뱃지 팝업을 읽는 중에
+			// 뒤에서 시간이 흘러 handleSelect('') 로 자동 오답 처리되던 문제를 막는다.
+			// (힌트 모달은 아래 effect 가 인터벌 자체를 멈추지만, 나머지 팝업은 여기서 막는다)
+			if (isAnyModalOpenRef.current) {
+				return;
+			}
 			setRemainingTime((prev) => {
 				if (prev <= 1) {
 					clearInterval(timerRef.current!);
@@ -389,6 +444,10 @@ const QuizScreen = () => {
 		if (!question || selected !== null || timerRef.current) return;
 
 		timerRef.current = setInterval(() => {
+			// setupQuestion 의 인터벌과 같은 이유로 모달이 떠 있으면 카운트다운을 멈춘다.
+			if (isAnyModalOpenRef.current) {
+				return;
+			}
 			setRemainingTime((prev) => {
 				if (prev <= 1) {
 					clearInterval(timerRef.current!);
@@ -570,31 +629,20 @@ const QuizScreen = () => {
 		return fallback.length > 0 ? fallback.reduce((a, b) => (b.length > a.length ? b : a)) : text;
 	};
 	const getSolvedCount = () => {
-		if (isWrongReview && questionPool) {
+		if (isWrongReview && activePool) {
 			return reviewIndex; // ✅ 오답 복습 모드는 index 기반
 		}
 
 		if (!quizHistory) return 0;
 
 		const solvedSet = new Set([...(quizHistory.correctProverbId ?? []), ...(quizHistory.wrongProverbId ?? [])]);
-
-		const filteredProverbs = proverbs.filter((p) => {
-			const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-			const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-			return levelMatch && categoryMatch;
-		});
-
-		const filteredSolved = filteredProverbs.filter((p) => solvedSet.has(p.id));
-		return filteredSolved.length;
+		// 분모(totalCount)와 같은 filteredProverbs 를 써야 '완료' 시점에 진행률이 100% 로 맞는다.
+		return filteredProverbs.filter((p) => solvedSet.has(p.id)).length;
 	};
 	const totalCount =
-		isWrongReview && questionPool
-			? questionPool.length // ✅ 오답 복습 모드일 땐 고정
-			: proverbs.filter((p) => {
-					const levelMatch = selectedLevel === '전체' || p.levelName === selectedLevel;
-					const categoryMatch = selectedCategory === '전체' || p.category === selectedCategory;
-					return levelMatch && categoryMatch;
-				}).length;
+		isWrongReview && activePool
+			? activePool.length // ✅ 오답 복습 모드일 땐 고정
+			: filteredProverbs.length;
 
 	const triggerComboAnimation = () => {
 		comboAnim.setValue(0);
@@ -699,6 +747,9 @@ const QuizScreen = () => {
 		}
 
 		// ✅ 100ms 정도 딜레이 후 다음 문제 로드
+		// (여기서 열리는 건 '다음 문제 화면'뿐이라 짧아도 된다.
+		//  남은 문제가 없어 완료 팝업이 열리는 경우는 showCompletion() 이 결과 모달의
+		//  닫힘 애니메이션이 끝날 때까지 기다리므로 여기서 딜레이를 늘리지 않는다.)
 		runLater(() => {
 			if (isFinal) {
 				safelyGoBack();
@@ -1150,9 +1201,6 @@ const QuizScreen = () => {
 				visible={badgeModalVisible}
 				badges={newlyEarnedBadges}
 				onConfirm={() => {
-					setBadgeModalVisible(false);
-					setNewlyEarnedBadges([]);
-
 					// 결과 모달 표시 (정답/오답/타임아웃)
 					const isTimeout = selected === '';
 					const correct = isCorrect === true;
@@ -1163,12 +1211,20 @@ const QuizScreen = () => {
 							? praiseMessages[Math.floor(Math.random() * praiseMessages.length)]
 							: '앗, 다음에는 맞힐 수 있습니다!';
 
-					runLater(() => {
-						setResultTitle(titleText);
-						setResultMessage(message);
-						setShowResultModal(true);
-						setIsAnswerLocked(false);
-					}, 300);
+					// 뱃지 모달이 완전히 닫힌 뒤 결과 모달을 연다.
+					// 예전 300ms 는 iOS 닫힘 시간(350ms)보다 짧아 뱃지 모달이 한 프레임 다시 보였다.
+					handoff(
+						() => {
+							setBadgeModalVisible(false);
+							setNewlyEarnedBadges([]);
+						},
+						() => {
+							setResultTitle(titleText);
+							setResultMessage(message);
+							setShowResultModal(true);
+							setIsAnswerLocked(false);
+						},
+					);
 				}}
 			/>
 			<StartModal

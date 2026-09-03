@@ -27,6 +27,7 @@ import { useAppNavigation } from '@/navigation/conf/Types';
 import { update } from '@/services/StorageService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import useCountdownTimers from '@/hooks/useCountdownTimers';
 
 const MAX_LIVES = 5;
 const CHOICE_COUNT = 4;
@@ -150,8 +151,7 @@ const InfinityQuizScreen = () => {
 	const questionFade = useRef(new Animated.Value(0)).current;
 	const questionSlide = useRef(new Animated.Value(scaleHeight(12))).current;
 	// 타이머 정리를 위한 ref (카운트다운 / 결과 점수 딜레이)
-	const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const countdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const { countdownTimerRef, countdownTimeoutRef, clearCountdownTimers } = useCountdownTimers();
 	const scoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	// 화면 안에서 예약되는 일회성 setTimeout 을 모아 두었다가 언마운트 시 일괄 정리
 	const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -217,12 +217,7 @@ const InfinityQuizScreen = () => {
 	// 언마운트 시 카운트다운 타이머 / 애니메이션 정리
 	useEffect(() => {
 		return () => {
-			if (countdownTimerRef.current) {
-				clearInterval(countdownTimerRef.current);
-			}
-			if (countdownTimeoutRef.current) {
-				clearTimeout(countdownTimeoutRef.current);
-			}
+			clearCountdownTimers();
 			timersRef.current.forEach(clearTimeout);
 			timersRef.current = [];
 			scaleAnim.stopAnimation();
@@ -398,9 +393,7 @@ const InfinityQuizScreen = () => {
 		setCount(countdown); // 시작 시 3 한 번만 세팅
 		animateScale(); // 첫 애니메이션도 같이 실행
 
-		if (countdownTimerRef.current) {
-			clearInterval(countdownTimerRef.current);
-		}
+		clearCountdownTimers();
 		const timer = setInterval(() => {
 			countdown--;
 
@@ -423,14 +416,7 @@ const InfinityQuizScreen = () => {
 	};
 
 	const cancelCountdown = () => {
-		if (countdownTimerRef.current) {
-			clearInterval(countdownTimerRef.current);
-			countdownTimerRef.current = null;
-		}
-		if (countdownTimeoutRef.current) {
-			clearTimeout(countdownTimeoutRef.current);
-			countdownTimeoutRef.current = null;
-		}
+		clearCountdownTimers();
 		setIsCountingDown(false);
 	};
 
@@ -1109,9 +1095,13 @@ const InfinityQuizScreen = () => {
 				</TouchableOpacity>
 			</View>
 			<ProverbDetailModal
-				visible={detailModalVisible}
+				visible={detailModalVisible && !!selectedProverb}
 				proverb={selectedProverb}
-				onClose={() => setDetailModalVisible(false)}
+				onClose={() => {
+					// 닫을 때 속담도 비운다 — 남겨 두면 다음에 열 때 이전 속담이 한 프레임 스친다
+					setDetailModalVisible(false);
+					setSelectedProverb(null);
+				}}
 			/>
 
 			{/* ✅ 찬스 광고 (광고 종료 후 힌트 모달 표시) */}

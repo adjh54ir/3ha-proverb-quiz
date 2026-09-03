@@ -18,12 +18,12 @@ import { requestTrackingPermission } from './utils/PermissionUtils';
 import DateUtils from './utils/DateUtils';
 import { sampleSize } from './utils/ArrayUtils';
 import { loadSoundSetting, preloadSounds } from './utils/SoundUtils';
-import notifee from '@notifee/react-native';
-import { deleteLegacyVibrationChannels, scheduleDailyQuizReminder } from './utils/NotifactionHelper';
+import notifee, { AuthorizationStatus } from '@notifee/react-native';
+import { deleteLegacyVibrationChannels, parseAlarmHour, scheduleDailyQuizReminder } from './utils/NotifactionHelper';
 import { Paths } from './navigation/conf/Paths';
 import { loadBgmSetting } from './utils/BgmUtils';
 import mobileAds from 'react-native-google-mobile-ads';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 // import * as RNIap from 'react-native-iap';
 
@@ -48,6 +48,24 @@ const App = () => {
 			try {
 				// AdMob SDK 초기화. 전면/리워드 광고는 초기화 완료 후에만 load() 동작함
 				await mobileAds().initialize();
+
+				/**
+				 * 광고 소리를 끈다 — 다른 앱의 오디오를 끊지 않기 위한 조치다.
+				 *
+				 * 효과음 쪽은 이미 세션을 공유하도록 맞춰 뒀다(SoundUtils.applyAudioCategory:
+				 * iOS 'Ambient', Android mixWithOthers). 그런데 소리가 있는 동영상 광고가 뜨면
+				 * GMA SDK 가 자기 세션을 활성화해(iOS non-mixing playback / Android audio focus)
+				 * 사용자가 듣고 있던 음악·영상이 그 시점에 끊긴다. 앱을 열자마자 배너/전면 광고가
+				 * 붙는 구조라 "앱에 들어오면 영상이 꺼진다"로 보였다.
+				 * 음소거 상태에서는 SDK 가 오디오 세션을 잡지 않는다.
+				 *
+				 * ⚠️ 반드시 initialize() 가 끝난 **뒤에** 부를 것.
+				 *    안드로이드는 초기화 전에 부르면 네이티브에서 IllegalStateException 이 나면서
+				 *    앱이 그대로 죽는다(JS try/catch 로 못 잡는다). 첫 배너/전면 광고는 이 초기화
+				 *    프로미스 이후에 요청되므로 첫 광고부터 음소거가 적용된다.
+				 */
+				mobileAds().setAppMuted(true);
+				mobileAds().setAppVolume(0);
 				console.log('✅ AdMob SDK 초기화 완료');
 			} catch (e) {
 				console.warn('❌ AdMob SDK 초기화 실패:', e);
@@ -144,16 +162,18 @@ const App = () => {
 			}
 
 			// 권한이 없으면 예약해도 울리지 않는다 — 조용히 건너뛴다.
+			// === 1(AUTHORIZED) 로 비교하면 안 된다. iOS 의 PROVISIONAL(2) 도 알림이 배달되는데
+			// 등호 비교 때문에 권한이 있는 사용자에게 예약이 조용히 스킵됐다.
 			const settings = await notifee.getNotificationSettings();
-			if (settings.authorizationStatus !== 1) {
+			if (settings.authorizationStatus < AuthorizationStatus.AUTHORIZED) {
 				return;
 			}
 
-			// 'HH:mm' 신규 포맷 우선, 구버전 ISO 문자열도 로컬 시각으로 환산해 읽는다.
-			const stored = setting.alarmTime;
-			const hhmm = /^(\d{1,2}):(\d{2})$/.exec(stored ?? '');
-			const hour = hhmm ? Number(hhmm[1]) : new Date(stored).getHours();
-			if (!Number.isFinite(hour)) {
+			// 'HH:mm' 신규 포맷 + 구버전 ISO 문자열을 모두 받고 0~23 범위까지 검사한다.
+			// (예전에는 여기에 같은 파서를 따로 두고 범위 검사가 없어서, 저장값이 '99:00' 으로
+			//  깨지면 setHours(99) 가 알람을 4일 뒤로 밀어 버렸다 — "시간이 계속 바뀐다"의 한 원인)
+			const hour = parseAlarmHour(setting.alarmTime);
+			if (hour === null) {
 				return;
 			}
 
@@ -196,7 +216,12 @@ const App = () => {
 
 	return (
 		<GestureHandlerRootView style={styles.root}>
-			<SafeAreaProvider>
+			{/*
+			  initialMetrics 를 주면 첫 렌더부터 실측 인셋으로 그린다. 없으면 provider 가 값을
+			  받기 전 한 프레임을 비우고, 그 사이에 만들어진 트리(모달 포함)가 측정 전 Dimensions
+			  기준으로 잡혀 첫 표시에서 딤이 시스템 바 영역을 못 덮는 일이 생긴다.
+			*/}
+			<SafeAreaProvider initialMetrics={initialWindowMetrics}>
 				<Provider store={Store}>
 					<PersistGate persistor={persistor}>
 						<I18nextProvider i18n={i18n}>

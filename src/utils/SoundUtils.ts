@@ -42,6 +42,51 @@ export const applyAudioCategory = () => {
 	Sound.setCategory('Playback', true);
 };
 
+/**
+ * 재생 배속(= 음정) 적용. 기본값(1)이면 네이티브를 아예 건드리지 않는다. (BGM 도 같이 쓴다)
+ *
+ * 예전 주석은 setPitch 를 "Android 전용", setSpeed 를 "iOS 전용" 이라고 적어 두고 매 재생마다
+ * 둘 다 불렀는데, 사실이 아니다. JS 래퍼(react-native-sound/src/index.ts:299-313)를 보면
+ * setSpeed 는 Windows 를 뺀 모든 플랫폼에서, setPitch 는 Android 에서 네이티브로 내려간다.
+ * 즉 Android 는 한 번 재생할 때마다 MediaPlayer.playbackParams 를 두 번 덮어쓴다.
+ *
+ *   // Sound.kt:343-356 — try/catch 가 없다
+ *   player.playbackParams = player.playbackParams.setSpeed(speed!!)
+ *   player.playbackParams = player.playbackParams.setPitch(pitch!!)
+ *
+ * MediaPlayer.setPlaybackParams() 는 prepare 는 됐지만 start 전인 플레이어에서 일부 OEM
+ * 디코더가 IllegalStateException/IllegalArgumentException 을 던진다. @ReactMethod 안에서
+ * 던져지므로 앱이 그대로 죽는다 — scripts/patch-rn-sound.js 가 기록한 stop() NPE 와 같은 부류로,
+ * 효과음이 있는 화면에 들어가는 순간 재현됐다.
+ *
+ * 효과음 11 개 중 배속을 쓰는 것은 playCombo 하나뿐인데 나머지 10 개도 매번 이 두 호출을
+ * 태우고 있었다. 그래서
+ *   1) 배속이 실제로 바뀔 때만 부른다. 플레이어의 기본값이 1 이라 계속 1 이면 한 번도 안 부른다
+ *      — 크래시 표면의 대부분이 여기서 사라진다.
+ *   2) 그래도 부를 때는 try/catch 로 감싼다. 신아키텍처(TurboModule)에선 호출이 동기라 여기서
+ *      잡히고, 구 브리지에선 네이티브 스레드에서 던져져 못 잡는다 — 그래서 (1)이 본 방어다.
+ * 던지면 배속만 포기하고 소리는 원본 속도로 낸다(기록을 남기지 않아 다음번에 다시 시도한다).
+ *
+ * "1 이면 건너뛴다"가 아니라 "바뀔 때만"인 이유: 플레이어는 캐시돼 계속 재사용되므로,
+ * 콤보로 1.18 까지 올라간 뒤 콤보가 끊겨 1 로 돌아오는 것도 네이티브에 내려보내야 한다.
+ */
+const appliedRate = new WeakMap<Sound, number>();
+
+export const applyPlaybackRate = (player: Sound, rate: number) => {
+	if ((appliedRate.get(player) ?? 1) === rate) {
+		return;
+	}
+	try {
+		player.setPitch(rate);
+		player.setSpeed(rate);
+		appliedRate.set(player, rate);
+	} catch (e) {
+		if (__DEV__) {
+			console.warn('🔇 배속 적용 실패 — 원본 속도로 재생한다', e);
+		}
+	}
+};
+
 const SOURCES = {
 	correct: 'correct.m4a',
 	wrong: 'wrong.m4a',
@@ -179,7 +224,7 @@ const passExclusiveGate = (key: SoundKey): boolean => {
 
 /**
  * @param key   재생할 효과음
- * @param pitch 1보다 크면 더 높고 빠르게 (콤보 고조용). Android는 pitch, iOS는 speed로 반영된다.
+ * @param pitch 1보다 크면 더 높고 빠르게 (콤보 고조용). 1 이면 배속 API 를 건드리지 않는다.
  */
 const play = (key: SoundKey, pitch = 1) => {
 	if (!soundEnabled || volumeRatio === 0) {
@@ -189,8 +234,7 @@ const play = (key: SoundKey, pitch = 1) => {
 		return;
 	}
 	load(key, (player) => {
-		player.setPitch(pitch); // Android 전용
-		player.setSpeed(pitch); // iOS 전용
+		applyPlaybackRate(player, pitch);
 		// 연속 재생 시 앞선 재생을 끊고 처음부터
 		player.stop(() => player.play());
 	});

@@ -32,8 +32,10 @@
 
 ### 2. 스크롤/빈 영역 탭으로 키보드 닫기 : 전역 기본값이라 화면에서 붙이지 않는다
 
-`src/utils/ScrollDefaults.ts` 가 `ScrollView.defaultProps` 를 바꿔 앱 전체에 적용한다
-(`FlatList` / `SectionList` / `Animated.ScrollView` 도 내부적으로 이 ScrollView 를 쓴다).
+`src/utils/ScrollDefaults.ts` 가 `ScrollView` 의 `forwardRef.render` 를 감싸 앱 전체에 적용한다
+(`FlatList` / `SectionList` / `VirtualizedList` 도 내부적으로 이 ScrollView 를 쓴다).
+값을 채울 때 `props.X ?? 기본값` 을 쓰는 이유 — VirtualizedList 는 지정하지 않은 키까지
+`undefined` 값으로 실어 보내서 `{ 기본값, ...props }` 스프레드로는 기본값이 덮인다.
 
 | 프롭 | 값 | 효과 |
 | --- | --- | --- |

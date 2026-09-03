@@ -1,8 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useRef, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { matchesKeyword } from '@/utils/SearchUtils';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Animated, Image, KeyboardAvoidingView, Keyboard, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import useReducedMotion from '@/hooks/useReducedMotion';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Animated, Dimensions, Easing, Image, KeyboardAvoidingView, Keyboard, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -23,6 +24,10 @@ import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/Characte
 import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 import ScreenHeader from '@/screens/common/ScreenHeader';
+
+// 액션시트가 아래에서 올라오는 거리. 시트 높이보다 크기만 하면 되므로 화면 높이를 쓴다(세로 고정 앱).
+const SHEET_SLIDE_FROM = Dimensions.get('screen').height;
+const SHEET_SLIDE_DURATION = 260;
 import { read, write } from '@/services/StorageService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
@@ -54,6 +59,28 @@ const MyProverbBook = () => {
 
 	const [books, setBooks] = useState<MainDataType.ProverbBook[]>([]);
 	const [actionSheet, setActionSheet] = useState<MainDataType.ProverbBook | null>(null);
+
+	// 액션시트 등장 모션.
+	// animationType="slide" 는 딤까지 함께 밀어 올려 전환 내내 화면 위쪽이 딤 없이 비친다.
+	// 그래서 모달은 animationType="fade" 로 딤을 화면 전체에 고르게 깔고, 시트만 여기서 올린다.
+	const reducedMotion = useReducedMotion();
+	const sheetSlide = useRef(new Animated.Value(SHEET_SLIDE_FROM)).current;
+
+	useEffect(() => {
+		// 닫힐 때 값을 되돌려 둬야 다음에 열릴 때 첫 프레임이 화면 밖에서 시작한다(잔상 방지).
+		sheetSlide.setValue(SHEET_SLIDE_FROM);
+		if (!actionSheet) {
+			return;
+		}
+		const anim = Animated.timing(sheetSlide, {
+			toValue: 0,
+			duration: reducedMotion ? 0 : SHEET_SLIDE_DURATION,
+			easing: Easing.out(Easing.cubic),
+			useNativeDriver: true,
+		});
+		anim.start();
+		return () => anim.stop();
+	}, [actionSheet, sheetSlide, reducedMotion]);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortType, setSortType] = useState<SortType>('latest');
 	const [formTarget, setFormTarget] = useState<MainDataType.ProverbBook | null | undefined>(undefined);
@@ -194,7 +221,7 @@ const MyProverbBook = () => {
 					</View>
 				)}
 
-				<Animated.ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ opacity: fadeAnim }} contentContainerStyle={styles.booksContainer} showsVerticalScrollIndicator={false}>
+				<Animated.ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ opacity: fadeAnim }} contentContainerStyle={[styles.booksContainer, filteredBooks.length === 0 && styles.booksContainerEmpty]} showsVerticalScrollIndicator={false}>
 					{books.length === 0 ? (
 						<View style={styles.emptyView}>
 							<Image source={require('@/assets/images/screen-heroes/library-shelf.png')} style={styles.emptyShelfImage} resizeMode="contain" />
@@ -208,7 +235,7 @@ const MyProverbBook = () => {
 						<View style={styles.emptyView}>
 							<Image source={require('@/assets/images/feature-states/empty-search.png')} style={styles.emptyImage} resizeMode="contain" />
 							<Text style={styles.emptyTitle}>검색 결과가 없습니다</Text>
-							<Text style={styles.emptyDesc}>{`'${searchQuery}'와 일치하는\n속담집이 없습니다.`}</Text>
+							<Text style={styles.emptyDesc}>{`"${searchQuery}"와 일치하는\n속담집이 없습니다.`}</Text>
 							<TouchableOpacity style={styles.emptyBtn} onPress={() => setSearchQuery('')}>
 								<Text style={styles.emptyBtnText}>검색 초기화</Text>
 							</TouchableOpacity>
@@ -308,8 +335,9 @@ const MyProverbBook = () => {
 			</Modal>
 
 			{/* 액션시트 */}
-			<Modal visible={!!actionSheet} transparent animationType="slide" onRequestClose={() => setActionSheet(null)}>
+			<Modal visible={!!actionSheet} transparent animationType="fade" onRequestClose={() => setActionSheet(null)}>
 				<TouchableOpacity style={styles.actionSheetOverlay} activeOpacity={1} onPress={() => setActionSheet(null)}>
+					<Animated.View style={{ transform: [{ translateY: sheetSlide }] }}>
 					<TouchableOpacity activeOpacity={1} style={[styles.actionSheet, { paddingBottom: Math.max(insets.bottom, SPACING_H.xxl) }]}>
 						<View style={styles.actionSheetHandle} />
 						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; handoff(() => setActionSheet(null), () => b && navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: b.id })); }}>
@@ -359,6 +387,7 @@ const MyProverbBook = () => {
 							<Text style={styles.actionCancelText}>취소</Text>
 						</TouchableOpacity>
 					</TouchableOpacity>
+					</Animated.View>
 				</TouchableOpacity>
 			</Modal>
 			<CharacterGuide
@@ -406,7 +435,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	sortChipText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary },
 	sortChipTextActive: { color: COLORS.textWhite },
 	booksContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, paddingBottom: scaleHeight(120), flexGrow: 1 },
-	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl, paddingTop: SPACING_H.xxxxl },
+	// 위아래 여백(하단은 FAB 회피용)은 카드가 있을 때만 필요하다. 비었을 때 두면 중앙 정렬이 위로 밀린다.
+	booksContainerEmpty: { paddingTop: 0, paddingBottom: 0 },
+	// 빈 영역 전체를 채우고 그 정중앙에 놓인다. 위쪽 여백을 따로 주면 그만큼 아래로 밀린다.
+	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl },
 	emptyImage: { width: scaleWidth(176), height: scaleWidth(176) },
 	emptyShelfImage: { width: scaleWidth(220), height: scaleHeight(140) },
 	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },

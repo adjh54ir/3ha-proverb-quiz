@@ -7,6 +7,7 @@ import { InterstitialAd, TestIds, AdEventType } from 'react-native-google-mobile
 import analytics from '@react-native-firebase/analytics'; // Firebase Analytics
 import DeviceInfo from 'react-native-device-info';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { isInterstitialBlocked, recordAdClick } from '@/utils/AdGuardUtils';
 
 const AD_UNIT_ID = Platform.select({
 	ios: __DEV__ ? TestIds.INTERSTITIAL : GOOGLE_ADMOV_IOS_FRONT!,
@@ -52,14 +53,12 @@ const AD_UNIT_ID = Platform.select({
  */
 const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => {
 	const [loaded, setLoaded] = useState(false);
+	/** 하루 클릭 한도에 걸려 광고를 건너뛴 상태 — 로딩 오버레이도 그리지 않는다. */
+	const [skipped, setSkipped] = useState(false);
 	const adRef = useRef<InterstitialAd | null>(null);
 
-	useEffect(() => {
-		// 개발 빌드에서는 전면 광고를 띄우지 않는다 — 바로 닫힌 것으로 처리해 다음 흐름을 이어간다
-		if (__DEV__) {
-			onAdClosed?.();
-			return;
-		}
+	/** 전면 광고 요청 + 이벤트 구독. 구독 해제 함수를 돌려준다. */
+	const setupAd = () => {
 		const ad = InterstitialAd.createForAdRequest(AD_UNIT_ID);
 		adRef.current = ad;
 
@@ -108,6 +107,12 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 			onAdClosed?.();
 		});
 
+		// 클릭을 기록해 하루 한도를 넘으면 그날은 전면 광고를 멈춘다(무효 트래픽 방지)
+		const unsubscribeClicked = ad.addAdEventListener(AdEventType.CLICKED, () => {
+			logEvent('ad_interstitial_clicked');
+			recordAdClick();
+		});
+
 		console.log('📦 전면 광고 로드 시작');
 		logEvent('ad_interstitial_request');
 		ad.load();
@@ -116,10 +121,46 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 			unsubscribeLoaded();
 			unsubscribeClosed();
 			unsubscribeFailed();
+			unsubscribeClicked();
+		};
+	};
+
+	useEffect(() => {
+		// 개발 빌드에서는 전면 광고를 띄우지 않는다 — 바로 닫힌 것으로 처리해 다음 흐름을 이어간다
+		if (__DEV__) {
+			onAdClosed?.();
+			return;
+		}
+
+		let cancelled = false;
+		let teardown = () => {};
+
+		/**
+		 * 오늘 광고 클릭이 한도를 넘었으면 전면 광고를 아예 요청하지 않는다.
+		 * 요청 자체를 막아야 노출도 클릭도 발생하지 않아 무효 트래픽 신호가 더 쌓이지 않는다.
+		 * 사용자 입장에서는 광고 없이 다음 화면으로 넘어갈 뿐이라 흐름이 끊기지 않는다.
+		 */
+		isInterstitialBlocked().then((blocked) => {
+			if (cancelled) {
+				return;
+			}
+			if (blocked) {
+				console.log('🛡️ 광고 클릭 한도 도달 — 전면 광고 건너뜀');
+				setSkipped(true);
+				onAdClosed?.();
+				return;
+			}
+			teardown = setupAd();
+		});
+
+		return () => {
+			cancelled = true;
+			teardown();
 		};
 	}, []);
 
-	if (__DEV__) return null;
+
+	if (__DEV__ || skipped) return null;
 
 	return (
 		<View style={styles.adOverlay}>

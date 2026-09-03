@@ -50,6 +50,7 @@ const TowerChallengeScreen = () => {
 	// 캐러셀은 항상 1단계부터 보여주고 있었다. 클리어하고 돌아와도 다시 1단계라
 	// 매번 손으로 넘겨야 했으므로, 도전할 차례인 단계로 맞춰 준다.
 	const carouselRef = useRef<ICarouselInstance>(null);
+	const carouselWidth = Math.min(windowWidth * 0.9, scaleWidth(520));
 	/** 도전할 차례인 단계의 캐러셀 인덱스 (마지막 단계까지 깼으면 마지막 카드) */
 	const currentIndex = Math.min(Math.max(progress.level, 1), TOWER_LEVELS.length) - 1;
 
@@ -309,10 +310,13 @@ const TowerChallengeScreen = () => {
 				{/* 캐러셀 */}
 				<View style={styles.carouselContainer}>
 					<Carousel
+						// reanimated-carousel 은 width 프롭이 바뀌어도 내부 오프셋을 다시 재지 않는다.
+						// 회전/폴더블 펼침에서 카드가 어긋나므로 폭을 key 로 걸어 새로 마운트시킨다(defaultIndex 로 위치 유지).
+						key={carouselWidth}
 						ref={carouselRef}
 						defaultIndex={currentIndex}
 						loop={false}
-						width={Math.min(windowWidth * 0.9, scaleWidth(520))}
+						width={carouselWidth}
 						height={scaleHeight(480)} // 620 → 480
 						data={TOWER_LEVELS}
 						renderItem={renderTowerCard}

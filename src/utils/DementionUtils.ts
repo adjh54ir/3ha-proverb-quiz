@@ -137,6 +137,4 @@ export {
 	scaledSize,
 	scaleHeight,
 	scaleWidth,
-	screenHeight,
-	screenWidth,
 };

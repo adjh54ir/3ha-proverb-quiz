@@ -6,6 +6,7 @@ import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils'
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
+import { useModalEnter } from '@/hooks/useModalEnter';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface TowerReward {
@@ -48,8 +49,11 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 	// 오버레이는 시스템 바를 포함한 screen 크기라 카드가 그 밑까지 파고든다(CLAUDE.md 모달 규칙 1·4).
 	const safePadding = useModalSafePadding();
 	const reducedMotion = useReducedMotion();
-	const scaleAnim = useRef(new Animated.Value(0)).current;
-	const fadeAnim = useRef(new Animated.Value(0)).current;
+	// 카드 높이를 직접 계산하므로 오버레이 안전 여백을 뺀 높이에서 비율을 잡는다(모달 규칙 4).
+	// 그냥 height * 0.8 로 하면 maxHeight 에 걸려 의도한 80% 보다 작게 잘린다.
+	const cardHeight = (height - safePadding.paddingTop - safePadding.paddingBottom) * 0.8;
+	// 카드 등장은 앱 공통 모션(fade + scale)을 쓴다 — 딤은 첫 프레임부터 불투명해야 해서 애니메이션하지 않는다.
+	const enterStyle = useModalEnter(visible);
 	const starAnims = useRef([new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)]).current;
 	const scoreCountAnim = useRef(new Animated.Value(0)).current;
 	const glowAnim = useRef(new Animated.Value(0.4)).current;
@@ -59,8 +63,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 		let glowLoop: Animated.CompositeAnimation | null = null;
 		if (visible && reducedMotion) {
 			// '애니메이션 줄이기': 결과는 즉시 최종 상태로 보여주고 글로우 루프는 돌리지 않는다.
-			scaleAnim.setValue(1);
-			fadeAnim.setValue(1);
+			// (카드 등장 모션은 useModalEnter 가 같은 설정을 이미 반영한다)
 			bossAnim.setValue(1);
 			scoreCountAnim.setValue(correctCount);
 			glowAnim.setValue(1);
@@ -76,11 +79,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 			);
 			glowLoop.start();
 
-			Animated.parallel([
-				Animated.spring(scaleAnim, { toValue: 1, tension: 50, friction: 7, useNativeDriver: true }),
-				Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
-				Animated.timing(bossAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
-			]).start();
+			Animated.timing(bossAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
 
 			Animated.timing(scoreCountAnim, {
 				toValue: correctCount,
@@ -98,8 +97,6 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 				});
 			}
 		} else {
-			scaleAnim.setValue(0);
-			fadeAnim.setValue(0);
 			scoreCountAnim.setValue(0);
 			bossAnim.setValue(0);
 			glowAnim.setValue(0.4);
@@ -108,8 +105,6 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 		// ✅ 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
 		return () => {
 			glowLoop?.stop();
-			scaleAnim.stopAnimation();
-			fadeAnim.stopAnimation();
 			scoreCountAnim.stopAnimation();
 			bossAnim.stopAnimation();
 			glowAnim.stopAnimation();
@@ -140,21 +135,21 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 
 	return (
 		<Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onHome}>
-			{/* 오버레이 */}
-			<Animated.View style={[styles.overlay, safePadding, { opacity: fadeAnim }]}>
-				{/* 모달 전체 컨테이너: 화면 높이의 일정 비율로 고정 */}
+			{/* 오버레이 — 딤은 첫 프레임부터 화면을 덮는다(불투명 고정) */}
+			<View style={[styles.overlay, safePadding]}>
+				{/* 모달 전체 컨테이너: 안전 여백을 뺀 높이의 일정 비율로 고정 */}
 				<Animated.View
 					style={[
 						styles.modalContainer,
 						{
 							// 태블릿에서 화면의 90% 는 지나치게 넓다 — 본문 기둥 폭을 넘지 않게 묶는다(폰은 상한에 닿지 않음).
 							width: Math.min(width * 0.9, CONTENT_MAX_WIDTH),
-							// 화면 높이의 80%로 고정 → 버튼이 항상 화면 안에 들어옴
-							height: height * 0.8,
-							transform: [{ scale: scaleAnim }],
+							// 쓸 수 있는 높이의 80% → 버튼이 항상 화면 안에 들어옴
+							height: cardHeight,
 							backgroundColor: bgColor,
 							borderColor,
 						},
+						enterStyle,
 					]}>
 					{/* 헤더 - 고정 */}
 					<View style={[styles.titleBanner, { backgroundColor: headerBgColor }]}>
@@ -289,7 +284,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 						)}
 					</View>
 				</Animated.View>
-			</Animated.View>
+			</View>
 		</Modal>
 	);
 };
@@ -304,8 +299,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	modalContainer: {
-		// 크기(width/height)는 useWindowDimensions 값으로 호출부에서 지정한다.
-		// 오버레이 안전 여백을 뺀 높이를 넘지 않도록 상한을 둔다(고정 height 만으로는 잘린다).
+		// 크기(width/height)는 안전 여백을 뺀 화면 크기로 호출부에서 지정한다.
+		// 회전 직후처럼 값이 아직 갱신되지 않은 순간을 대비한 상한(모달 레이아웃 규칙 2).
 		maxHeight: '100%',
 		borderRadius: RADIUS.xl,
 		overflow: 'hidden',

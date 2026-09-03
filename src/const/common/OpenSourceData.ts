@@ -30,7 +30,7 @@ export const OPEN_SOURCE_LIBS: OpenSourceLib[] = [
 	{ name: 'react-native-bootsplash', license: 'MIT', version: '7.3.2', url: 'https://github.com/zoontek/react-native-bootsplash' },
 	{ name: 'react-native-calendars', license: 'MIT', version: '1.1314.0', url: 'https://github.com/wix/react-native-calendars' },
 	{ name: 'react-native-circular-progress', license: 'MIT', version: '1.4.1', url: 'https://github.com/bgryszko/react-native-circular-progress' },
-	{ name: 'react-native-confetti-cannon', license: 'UNKNOWN', version: '1.5.2', url: 'https://github.com/vincentcatillon/react-native-confetti-cannon' },
+	{ name: 'react-native-confetti-cannon', license: 'MIT', version: '1.5.2', url: 'https://github.com/vincentcatillon/react-native-confetti-cannon' },
 	{ name: 'react-native-device-info', license: 'MIT', version: '14.1.1', url: 'https://github.com/react-native-device-info/react-native-device-info' },
 	{ name: 'react-native-dotenv', license: 'MIT', version: '3.4.11', url: 'https://github.com/goatandsheep/react-native-dotenv' },
 	{ name: 'react-native-dropdown-picker', license: 'MIT', version: '5.4.6', url: 'https://github.com/hossein-zare/react-native-dropdown-picker' },
@@ -48,5 +48,6 @@ export const OPEN_SOURCE_LIBS: OpenSourceLib[] = [
 	{ name: 'react-native-vector-icons', license: 'MIT', version: '10.3.0', url: 'https://github.com/oblador/react-native-vector-icons' },
 	{ name: 'react-native-version-check', license: 'MIT', version: '3.5.0', url: 'https://github.com/kimxogus/react-native-version-check' },
 	{ name: 'react-redux', license: 'MIT', version: '9.3.0', url: 'https://github.com/reduxjs/react-redux' },
+	{ name: 'redux-persist', license: 'MIT', version: '6.0.0', url: 'https://github.com/rt2zz/redux-persist#readme' },
 	{ name: 'zod', license: 'MIT', version: '3.25.76', url: 'https://github.com/colinhacks/zod' },
 ];

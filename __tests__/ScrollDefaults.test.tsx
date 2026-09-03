@@ -1,81 +1,64 @@
 /**
  * ScrollDefaults 회귀 테스트
+ * - 키보드가 떠 있을 때 목록 항목을 두 번 눌러야 눌리는 문제(keyboardShouldPersistTaps: 'never').
+ * - 스크롤해도 키보드가 안 닫히는 문제(keyboardDismissMode: 'none').
+ * - iOS 에서 키보드가 입력창을 덮는 문제(automaticallyAdjustKeyboardInsets: false).
+ * 세 기본값을 화면마다 붙이는 대신 전역으로 바꿨다.
  *
- * TextInput 이 있는 화면마다 키보드 프롭을 손으로 붙이면 새 화면에서 또 빠진다.
- * 기본값을 전역으로 바꿨으니 (1) 실제로 붙는지, (2) 화면에서 준 값이 우선하는지를 못박는다.
- *
- * 세 번째 테스트는 "화면에서 KeyboardAvoidingView 를 쓸 때 android 만 빼놓지 않는다"는
- * 규칙을 소스로 확인한다 — 이 앱은 edge-to-edge 라 behavior 를 비우면 안드로이드에서
- * 키보드 회피가 아예 동작하지 않는다(common/modal/README.md 참고).
+ * TouchableDefaults 테스트와 같은 방식으로, 패치된 forwardRef.render 를 직접 호출해
+ * 원본 구현에 실제로 어떤 props 가 넘어가는지 확인한다.
  */
-import fs from 'fs';
-import path from 'path';
-import React from 'react';
-import { FlatList, ScrollView } from 'react-native';
-import { act, create } from 'react-test-renderer';
+import { ScrollView } from 'react-native';
+import { DEFAULT_AUTO_KEYBOARD_INSETS, DEFAULT_KEYBOARD_DISMISS_MODE, DEFAULT_KEYBOARD_SHOULD_PERSIST_TAPS } from '../src/utils/ScrollDefaults';
 
-import '@/utils/ScrollDefaults';
-
-const defaults = () => (ScrollView as any).defaultProps as Record<string, unknown>;
-
-/**
- * 네이티브 뷰(RCTScrollView)에 실제로 넘어간 props.
- *
- * `defaultProps` 를 확인하는 것만으로는 부족하다 — React 19 는 함수 컴포넌트의
- * defaultProps 지원을 없앴고, 클래스는 엘리먼트가 아니라 렌더 시점에 채워진다.
- * 그래서 렌더 트리에서 직접 읽어 "정말 적용됐는지"를 본다.
- */
-const nativeProps = (element: React.ReactElement): Record<string, unknown> => {
-	let tree: ReturnType<typeof create>;
-	act(() => {
-		tree = create(element);
-	});
-	const findScroll = (node: any): any => {
-		if (!node) {
-			return null;
-		}
-		if (node.type === 'RCTScrollView') {
-			return node;
-		}
-		return (node.children ?? []).reduce((found: any, child: any) => found ?? findScroll(child), null);
-	};
-	const scroll = findScroll(tree!.toJSON());
-	expect(scroll).not.toBeNull();
-	return scroll.props;
+const renderedProps = (props: Record<string, unknown>) => {
+	const element = (ScrollView as any).render({ children: null, ...props }, null);
+	return element.props as Record<string, unknown>;
 };
 
-test('아무 프롭도 주지 않은 ScrollView 에 세 기본값이 모두 적용된다', () => {
-	expect(nativeProps(<ScrollView />)).toMatchObject({
-		// 스크롤을 움직이면 키보드가 닫힌다
-		keyboardDismissMode: 'on-drag',
-		// RN 기본값 'never' 는 첫 탭을 삼켜 버튼을 두 번 눌러야 한다
-		keyboardShouldPersistTaps: 'handled',
-		// iOS 는 키보드와 겹치는 만큼만 인셋을 넣는다
-		automaticallyAdjustKeyboardInsets: true,
+test('지정하지 않으면 키보드를 내리는 기본값이 들어간다', () => {
+	expect(renderedProps({})).toMatchObject({
+		keyboardShouldPersistTaps: DEFAULT_KEYBOARD_SHOULD_PERSIST_TAPS,
+		keyboardDismissMode: DEFAULT_KEYBOARD_DISMISS_MODE,
+		automaticallyAdjustKeyboardInsets: DEFAULT_AUTO_KEYBOARD_INSETS,
+	});
+});
+
+test('undefined 로 명시돼 들어와도 기본값이 살아남는다', () => {
+	// FlatList/VirtualizedList 는 지정하지 않은 키까지 undefined 값으로 ScrollView 에 실어 보낸다.
+	// `{ 기본값, ...props }` 스프레드로 구현하면 여기서 undefined 에 덮여 버린다.
+	expect(
+		renderedProps({ keyboardShouldPersistTaps: undefined, keyboardDismissMode: undefined, automaticallyAdjustKeyboardInsets: undefined }),
+	).toMatchObject({
+		keyboardShouldPersistTaps: DEFAULT_KEYBOARD_SHOULD_PERSIST_TAPS,
+		keyboardDismissMode: DEFAULT_KEYBOARD_DISMISS_MODE,
+		automaticallyAdjustKeyboardInsets: DEFAULT_AUTO_KEYBOARD_INSETS,
 	});
 });
 
 test('화면에서 지정한 값이 기본값을 덮는다', () => {
-	expect(nativeProps(<ScrollView keyboardDismissMode="none" />)).toMatchObject({ keyboardDismissMode: 'none' });
-});
-
-test('FlatList 도 같은 기본값을 받는다 (내부적으로 ScrollView 로 렌더된다)', () => {
-	expect(nativeProps(<FlatList data={[]} renderItem={() => null} />)).toMatchObject({
-		keyboardDismissMode: 'on-drag',
-		keyboardShouldPersistTaps: 'handled',
-		automaticallyAdjustKeyboardInsets: true,
+	expect(renderedProps({ keyboardShouldPersistTaps: 'always', keyboardDismissMode: 'none' })).toMatchObject({
+		keyboardShouldPersistTaps: 'always',
+		keyboardDismissMode: 'none',
 	});
 });
 
-test('전역 기본값은 ScrollView 자체에 박혀 있다 (화면마다 붙일 필요가 없다)', () => {
-	expect(defaults()).toMatchObject({
-		keyboardDismissMode: 'on-drag',
-		keyboardShouldPersistTaps: 'handled',
-		automaticallyAdjustKeyboardInsets: true,
-	});
+test('나머지 props 는 그대로 전달된다', () => {
+	const onScroll = () => {};
+	expect(renderedProps({ onScroll, horizontal: true })).toMatchObject({ onScroll, horizontal: true });
 });
 
+/**
+ * KeyboardAvoidingView 규칙.
+ *
+ * 이 앱은 edge-to-edge(MainActivity 의 setDecorFitsSystemWindows(false))라 매니페스트의
+ * adjustResize 로 창이 줄지 않는다. `behavior` 를 android 에서 비워 두면 키보드 회피가
+ * 아예 동작하지 않고, `'height'` 는 바텀시트를 짧게만 만들어 하단 버튼이 계속 덮인다.
+ * 그래서 두 플랫폼 모두 `'padding'` 으로 통일한다(common/modal/README.md 참고).
+ */
 describe('KeyboardAvoidingView behavior', () => {
+	const fs = require('fs') as typeof import('fs');
+	const path = require('path') as typeof import('path');
 	const SOURCE_DIR = path.join(__dirname, '..', 'src');
 
 	const walk = (dir: string): string[] =>
@@ -85,7 +68,9 @@ describe('KeyboardAvoidingView behavior', () => {
 		});
 
 	test('behavior 를 플랫폼 분기로 주는 곳이 없다', () => {
-		const offenders = walk(SOURCE_DIR).filter((file) => /behavior=\{Platform\.OS/.test(fs.readFileSync(file, 'utf8')));
+		const offenders = walk(SOURCE_DIR)
+			.filter((file) => /behavior=\{Platform\.OS/.test(fs.readFileSync(file, 'utf8')))
+			.map((file) => path.relative(SOURCE_DIR, file));
 		expect(offenders).toEqual([]);
 	});
 
@@ -94,10 +79,10 @@ describe('KeyboardAvoidingView behavior', () => {
 			const source = fs.readFileSync(file, 'utf8');
 			return [...source.matchAll(/<KeyboardAvoidingView([^>]*)>/g)].map((m) => ({
 				file: path.relative(SOURCE_DIR, file),
-				behavior: /behavior="padding"/.test(m[1]),
+				ok: /behavior="padding"/.test(m[1]),
 			}));
 		});
 		expect(uses.length).toBeGreaterThan(0);
-		expect(uses.filter((use) => !use.behavior)).toEqual([]);
+		expect(uses.filter((use) => !use.ok)).toEqual([]);
 	});
 });

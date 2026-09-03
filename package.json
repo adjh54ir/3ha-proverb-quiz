@@ -1,6 +1,6 @@
 {
 	"name": "proverbquiz",
-	"version": "0.0.1",
+	"version": "2.0.1",
 	"private": true,
 	"description": "300개의 앱을 만들기 위한 기본 템플릿",
 	"main": "index.js",
@@ -32,6 +32,7 @@
 		"watchman:clean": "watchman shutdown-server",
 		"build:apk": "node scripts/patch-rn-sound.js && (cd android 2>/dev/null && ./gradlew assembleRelease || (cd .. && cd android && ./gradlew assembleRelease))",
 		"build:aab": "node scripts/patch-rn-sound.js && (cd android 2>/dev/null && ./gradlew bundleRelease || (cd .. && cd android && ./gradlew bundleRelease))",
+		"opensource": "node scripts/genOpenSource.js",
 		"tag": "V=v$(sed -n 's/.*versionName \"\\(.*\\)\"/\\1/p' android/app/build.gradle) && git tag -a \"$V\" -m \"$V\" && git push origin \"$V\" && echo \"tagged $V\""
 	},
 	"dependencies": {
@@ -75,6 +76,7 @@
 		"react-native-vector-icons": "^10.2.0",
 		"react-native-version-check": "^3.4.7",
 		"react-redux": "^9.2.0",
+		"redux-persist": "^6.0.0",
 		"zod": "^3.24.2"
 	},
 	"devDependencies": {

@@ -5,14 +5,14 @@
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
 import AppAlert from '@/screens/common/modal/AppAlert';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Animated, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, AppState, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
 import { isSoundEnabled, setSoundEnabled, getSoundVolume, setSoundVolume, playCorrect, playPop } from '@/utils/SoundUtils';
-import { isBgmEnabled, setBgmEnabled, getBgmVolume, setBgmVolume, startBgm, stopBgm } from '@/utils/BgmUtils';
+import { isBgmEnabled, setBgmEnabled, getBgmVolume, setBgmVolume, startBgmPreview, stopBgmPreview } from '@/utils/BgmUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DeviceInfo from 'react-native-device-info';
 import IconComponent from './common/atomic/IconComponent';
@@ -243,6 +243,74 @@ const AnimatedPressCard = ({ children, onPress }: { children: React.ReactNode; o
 	);
 };
 
+// ─────────────────────────────────────────────
+// 볼륨 조절 한 줄 (효과음·배경음 공용)
+// ─────────────────────────────────────────────
+/**
+ * 예전에는 onValueChange 가 화면 상태(setSfxVolume/setBgmVolumeState)를 드래그 매 프레임 갱신했다.
+ * 그래서 두 가지가 터졌다.
+ *  1. 상태가 화면(SectionList) 최상단에 있어 프레임마다 목록 전체가 다시 그려지고 — renderItem 은
+ *     인라인 함수라 아이템도 매번 새로 만들어진다 — 소리 설정 주변 줄이 눈에 보이게 출렁였다.
+ *  2. 그 값이 value prop 으로 되돌아가면서 네이티브 썸과 싸웠다. 안드로이드에서 썸이 튀거나
+ *     손을 뗀 자리에서 이전 값으로 되감기는 게 이것이다.
+ * 이제 드래그 중 값은 이 줄 안(dragValue)에만 머문다 — 다시 그려지는 것은 퍼센트 글자뿐이고,
+ * value prop 에는 '저장된 값' 만 물려 JS 가 드래그에 개입하지 않는다.
+ * 저장·볼륨 반영·미리듣기는 손을 뗄 때(onSlidingComplete) 한 번만 한다.
+ */
+const VolumeSliderRow = ({
+	label,
+	value,
+	onCommit,
+	previewing,
+	onPreview,
+}: {
+	label: string;
+	value: number;
+	onCommit: (value: number) => void;
+	previewing: boolean;
+	onPreview: () => void;
+}) => {
+	// null = 드래그 중이 아님 → 저장된 값을 그대로 보여준다(다른 화면에서 바뀐 값도 자동 반영)
+	const [dragValue, setDragValue] = useState<number | null>(null);
+
+	return (
+		<View style={styles.volumeRow}>
+			<Text style={styles.volumeLabel}>볼륨</Text>
+			<Slider
+				style={styles.volumeSlider}
+				minimumValue={0}
+				maximumValue={1}
+				step={0.05}
+				value={value}
+				onValueChange={setDragValue}
+				onSlidingComplete={(next) => {
+					setDragValue(null); // 같은 이벤트에서 함께 처리돼 저장값으로 자연히 이어진다
+					onCommit(next);
+				}}
+				minimumTrackTintColor={COLORS.primary}
+				maximumTrackTintColor={COLORS.borderDark}
+				thumbTintColor={COLORS.primaryDark}
+				accessibilityLabel={`${label} 볼륨`}
+			/>
+			<Text style={styles.volumeValue}>{Math.round((dragValue ?? value) * 100)}%</Text>
+			<TouchableOpacity
+				style={styles.volumePreviewButton}
+				onPress={onPreview}
+				hitSlop={HIT_SLOP}
+				activeOpacity={0.7}
+				accessibilityRole="button"
+				accessibilityLabel={`${label} 미리듣기`}>
+				<IconComponent
+					type="MaterialCommunityIcons"
+					name={previewing ? 'stop-circle-outline' : 'play-circle-outline'}
+					size={scaledSize(20)}
+					color={COLORS.primaryDark}
+				/>
+			</TouchableOpacity>
+		</View>
+	);
+};
+
 /** 글자 크기 선택지 — 미리보기 '가' 글자 크기까지 함께 보여준다. */
 const TEXT_SIZE_OPTIONS = themedValue(() => [
 	{ key: 'default' as const, label: '기본', desc: '표준 크기', sampleSize: FONT_SIZES.md },
@@ -296,44 +364,87 @@ const SettingScreen = () => {
 	const [bgmPreviewing, setBgmPreviewing] = useState(false);
 	const bgmPreviewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	const stopBgmPreview = useCallback(() => {
+	// 이름이 BgmUtils.stopBgmPreview 와 겹치지 않도록 화면 쪽 정리 함수는 endPreview 로 둔다.
+	const endPreview = useCallback(() => {
 		if (bgmPreviewTimer.current) {
 			clearTimeout(bgmPreviewTimer.current);
 			bgmPreviewTimer.current = null;
 		}
-		stopBgm();
+		// 전역 stopBgm() 을 부르면 미리듣기를 켠 적이 없어도(아래 화면 이탈 정리가 무조건 부른다)
+		// 퀴즈·챌린지가 틀어 둔 배경음까지 같이 죽었다. BgmUtils 의 stopBgmPreview 는
+		// 미리듣기로 직접 시작한 트랙만 끈다.
+		stopBgmPreview();
 		setBgmPreviewing(false);
 	}, []);
 
 	const toggleBgmPreview = () => {
 		if (bgmPreviewing) {
-			stopBgmPreview();
+			endPreview();
 			return;
 		}
-		startBgm('quiz');
+		startBgmPreview('quiz');
 		setBgmPreviewing(true);
 		// 끄는 것을 잊어도 알아서 멎는다
-		bgmPreviewTimer.current = setTimeout(stopBgmPreview, BGM_PREVIEW_MS);
+		bgmPreviewTimer.current = setTimeout(endPreview, BGM_PREVIEW_MS);
 	};
 
 	const handleToggleBgm = (value: boolean) => {
 		setBgmEnabled(value); // false 면 내부에서 stopBgm() 까지 처리한다
 		setBgmOn(value);
 		if (!value) {
-			stopBgmPreview();
+			endPreview();
 		}
 	};
 
 
-	/** 슬라이더를 놓는 순간에만 저장한다(드래그 중 매 프레임 AsyncStorage 쓰기 방지) */
+	/**
+	 * 슬라이더를 놓는 순간에만 저장한다(드래그 중 매 프레임 AsyncStorage 쓰기 방지).
+	 * 드래그 중에는 VolumeSliderRow 안에서만 값이 돌기 때문에(목록 전체 리렌더 방지),
+	 * 슬라이더가 물고 있는 화면 상태도 여기서 함께 맞춘다.
+	 */
 	const handleSfxVolumeCommit = (value: number) => {
+		setSfxVolume(value);
 		setSoundVolume(value);
 		playPop(); // 조절한 크기를 바로 들려준다
 	};
 
 	const handleBgmVolumeCommit = (value: number) => {
+		setBgmVolumeState(value);
 		setBgmVolume(value);
 	};
+
+	// ── 권한 상태 다시 읽기 ────────────────────────
+	// 조회는 세 곳(포커스 복귀 / 앱 복귀 / 시스템 팝업 응답)에서 들어와 겹칠 수 있다.
+	// alive : 언마운트 뒤 도착한 응답으로 setState 하지 않는다.
+	// req   : 나중에 시작한 조회만 반영한다 — 먼저 시작한 조회가 늦게 도착해 최신 상태를 덮으면
+	//         방금 허용한 권한이 다시 '거부' 로 보인다.
+	const permissionRead = useRef({ alive: true, req: 0 });
+
+	const refreshPermissions = useCallback(async () => {
+		const req = (permissionRead.current.req += 1);
+		const list = await loadAppPermissions();
+		if (permissionRead.current.alive && permissionRead.current.req === req) {
+			setPermissions(list);
+		}
+	}, []);
+
+	/**
+	 * OS 설정 앱에 다녀온 경우.
+	 * React Navigation 의 포커스는 화면 단위라, 설정 앱으로 나가도 이 화면은 blur 되지 않는다.
+	 * 그래서 돌아와도 useFocusEffect 가 다시 돌지 않고, 방금 알림을 켜고 왔는데도 뱃지는 '거부' 로 남았다.
+	 * 앱이 다시 active 가 되는 시점에 한 번 더 읽는다(VersionCheckModal·AppLayout 과 같은 방식).
+	 */
+	useEffect(() => {
+		const subscription = AppState.addEventListener('change', (state) => {
+			if (state === 'active') {
+				refreshPermissions();
+			}
+		});
+		return () => {
+			subscription.remove();
+			permissionRead.current.alive = false;
+		};
+	}, [refreshPermissions]);
 
 	// ── 파생 상태 (RESET_CONFIG 기반) ──────────────
 	const resetConfig = resetType ? RESET_CONFIG[resetType] : null;
@@ -358,19 +469,14 @@ const SettingScreen = () => {
 			setSfxVolume(getSoundVolume());
 			setBgmVolumeState(getBgmVolume());
 
-			// 설정 앱에서 권한을 바꾸고 돌아오는 경우가 있어 포커스마다 다시 읽는다
-			let isActive = true;
-			loadAppPermissions().then((list) => {
-				if (isActive) {
-					setPermissions(list);
-				}
-			});
+			// 다른 탭에 있는 동안 권한이 바뀌었을 수 있어 포커스마다 다시 읽는다.
+			// (설정 앱에 다녀온 경우는 위 AppState 리스너가 맡는다 — 겹쳐 들어와도 req 가드가 정리한다)
+			refreshPermissions();
 			return () => {
-				isActive = false;
 				// 미리듣기를 켠 채 화면을 나가면 다른 화면까지 음악이 따라간다
-				stopBgmPreview();
+				endPreview();
 			};
-		}, [stopBgmPreview]),
+		}, [refreshPermissions, endPreview]),
 	);
 
 	const scrollToTop = () => sectionRef.current?.getScrollResponder()?.scrollTo({ x: 0, y: 0, animated: true });
@@ -625,7 +731,7 @@ const SettingScreen = () => {
 				return;
 			}
 			// 팝업에서 거부했다면 이후로는 설정 앱에서만 바꿀 수 있다
-			setPermissions(await loadAppPermissions());
+			await refreshPermissions();
 			if (next !== 'blocked') {
 				return;
 			}
@@ -796,7 +902,6 @@ const SettingScreen = () => {
 					label: '효과음',
 					desc: '정답·오답·완료 등 상황별 소리',
 					volume: sfxVolume,
-					onVolumeChange: setSfxVolume,
 					onVolumeCommit: handleSfxVolumeCommit,
 					onPreview: playCorrect,
 					previewing: false,
@@ -809,7 +914,6 @@ const SettingScreen = () => {
 					label: '배경음악',
 					desc: '퀴즈·챌린지 진행 중 흐르는 음악',
 					volume: bgmVolume,
-					onVolumeChange: setBgmVolumeState,
 					onVolumeCommit: handleBgmVolumeCommit,
 					onPreview: toggleBgmPreview,
 					previewing: bgmPreviewing,
@@ -849,39 +953,13 @@ const SettingScreen = () => {
 
 								{/* 볼륨 슬라이더 — 켜져 있을 때만 노출 */}
 								{row.on && (
-									<View style={styles.volumeRow}>
-										<Text style={styles.volumeLabel}>볼륨</Text>
-										<Slider
-											style={styles.volumeSlider}
-											minimumValue={0}
-											maximumValue={1}
-											step={0.05}
-											value={row.volume}
-											onValueChange={row.onVolumeChange}
-											onSlidingComplete={row.onVolumeCommit}
-											minimumTrackTintColor={COLORS.primary}
-											maximumTrackTintColor={COLORS.borderDark}
-											thumbTintColor={COLORS.primaryDark}
-											accessibilityLabel={`${row.label} 볼륨`}
-										/>
-										<Text style={styles.volumeValue}>{Math.round((row.volume ?? 0) * 100)}%</Text>
-										{row.onPreview && (
-											<TouchableOpacity
-												style={styles.volumePreviewButton}
-												onPress={row.onPreview}
-												hitSlop={HIT_SLOP}
-												activeOpacity={0.7}
-												accessibilityRole="button"
-												accessibilityLabel={`${row.label} 미리듣기`}>
-												<IconComponent
-													type="MaterialCommunityIcons"
-													name={row.previewing ? 'stop-circle-outline' : 'play-circle-outline'}
-													size={scaledSize(20)}
-													color={COLORS.primaryDark}
-												/>
-											</TouchableOpacity>
-										)}
-									</View>
+									<VolumeSliderRow
+										label={row.label}
+										value={row.volume}
+										onCommit={row.onVolumeCommit}
+										previewing={row.previewing}
+										onPreview={row.onPreview}
+									/>
 								)}
 							</View>
 						))}
@@ -1078,6 +1156,8 @@ const SettingScreen = () => {
 
 			<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 
+			{/* RESET_CONFIG 는 전부 '초기화/다시 시작' 동작이다. 확인 버튼 기본 문구가 '삭제' 라
+			    "학습을 다시 시작하시겠습니까?" 아래에 [삭제] 가 떠서 동작과 어긋나 있었다. */}
 			<CmmDelConfirmModal
 				visible={modalVisible}
 				onCancel={() => setModalVisible(false)}
@@ -1085,6 +1165,7 @@ const SettingScreen = () => {
 				onRequestClose={() => setModalVisible(false)}
 				renderTitle={renderModalTitle}
 				summary={resetConfig?.summary ?? ''}
+				confirmText="초기화"
 			/>
 
 			<CurrentVersionModal

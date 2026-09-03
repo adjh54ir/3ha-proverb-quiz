@@ -1,43 +1,51 @@
 /**
  * 전역 ScrollView 기본 프롭 (부수효과 모듈)
  *
- * TextInput 이 있는 화면마다 아래 세 프롭을 손으로 붙이면 새로 만드는 화면에서 또 빠진다.
- * 기본값 자체를 바꿔 앱 전체에서 같은 키보드 동작을 보장한다.
- * 호출부에서 값을 준 곳은 그대로 우선한다(React 가 undefined 일 때만 기본값을 채운다).
+ * TextInput 에 포커스가 있는 상태에서 목록을 스크롤하거나 다른 항목을 누르면
+ * 키보드가 닫혀야 한다. RN 기본값은 그 반대다.
+ *  - keyboardShouldPersistTaps: 'never'  → 키보드가 떠 있으면 **첫 탭이 키보드 닫기로 먹힌다**.
+ *    버튼/목록 항목을 두 번 눌러야 눌리는 문제(특히 DropDownPicker 리스트).
+ *  - keyboardDismissMode: 'none'         → 스크롤해도 키보드가 그대로 화면을 덮는다.
+ *  - automaticallyAdjustKeyboardInsets: false → iOS 는 키보드가 스크롤뷰 위로 그냥 덮는다.
+ *    켜 두면 스크롤뷰와 키보드가 **실제로 겹치는 만큼만** contentInset 을 넣고,
+ *    포커스된 입력창을 보이는 영역으로 끌어올린다(RCTScrollView 의 `_keyboardWillChangeFrame`).
+ *    겹침을 네이티브가 재므로 KeyboardAvoidingView 와 같이 써도 이중으로 밀리지 않고,
+ *    가로 스크롤(탭 바 등)은 네이티브가 먼저 걸러낸다. 안드로이드는 이 프롭이 없어 무시된다.
  *
- * - `keyboardDismissMode: 'on-drag'`
- *   스크롤을 움직이면 키보드가 닫힌다.
+ * 화면마다 프롭을 붙여 메우는 방식은 이미 절반쯤 누락돼 있었고(라이브러리 내부
+ * ScrollView/FlatList 는 손댈 수도 없다), 새 화면에서 또 빠진다. 그래서 기본값을 바꾼다.
+ * FlatList / SectionList / VirtualizedList 도 내부적으로 이 ScrollView 를 쓰므로 함께 적용된다.
  *
- * - `keyboardShouldPersistTaps: 'handled'`
- *   RN 기본값 `'never'` 는 키보드가 떠 있을 때의 첫 탭을 '키보드 닫기'로 삼켜서 버튼이
- *   한 번 더 눌러야 동작한다. `'handled'` 는 버튼 탭은 그대로 전달하고, 아무것도 처리하지
- *   않는 빈 영역 탭에서만 키보드를 닫는다 → "다른 영역을 선택하면 닫힌다"가 성립한다.
- *
- * - `automaticallyAdjustKeyboardInsets: true` (iOS)
- *   스크롤뷰와 키보드가 실제로 겹치는 만큼만 contentInset 을 넣고, 포커스된 입력창을
- *   보이는 영역으로 끌어올린다(RCTScrollView 의 `_keyboardWillChangeFrame`).
- *   겹치는 양을 네이티브가 계산하므로 KeyboardAvoidingView 와 같이 써도 이중으로
- *   밀리지 않는다(컨테이너가 이미 줄었으면 겹침이 0 이라 아무 일도 하지 않는다).
- *   안드로이드는 이 프롭이 없어 무시된다 — 그쪽은 KeyboardAvoidingView 가 담당한다.
- *
- * 가로 스크롤(탭 바 등)은 네이티브가 먼저 걸러내므로 인셋이 붙지 않는다.
- *
- * ScrollView 는 클래스 컴포넌트라 `defaultProps` 가 그대로 동작한다
- * (React 19 에서 없어진 건 함수 컴포넌트의 defaultProps 다).
- * FlatList / SectionList / Animated.ScrollView 는 내부에서 이 ScrollView 로 렌더되고,
- * 지정하지 않은 프롭은 undefined 로 넘어오므로 이 기본값을 함께 받는다.
+ * ⚠️ `{ 기본값, ...props }` 스프레드로는 안 된다. VirtualizedList 는 props 를 그대로
+ *    ScrollView 로 넘기면서 지정하지 않은 키도 `undefined` 값으로 실어 보낸다.
+ *    그러면 스프레드가 기본값을 undefined 로 덮어쓴다. `?? 기본값` 으로 채운다.
  *
  * index.js 최상단에서 App 보다 먼저 import 할 것.
  */
 import { ScrollView } from 'react-native';
 
-const ScrollViewAny = ScrollView as any;
+/** 키보드가 떠 있어도 자식이 처리한 탭은 그대로 전달한다(두 번 눌러야 하는 문제 방지). */
+export const DEFAULT_KEYBOARD_SHOULD_PERSIST_TAPS = 'handled';
+/** 목록을 끌면 키보드를 내린다. */
+export const DEFAULT_KEYBOARD_DISMISS_MODE = 'on-drag';
+/** iOS: 키보드와 겹치는 만큼 인셋 + 포커스된 입력창 자동 스크롤 (안드로이드는 무시). */
+export const DEFAULT_AUTO_KEYBOARD_INSETS = true;
 
-ScrollViewAny.defaultProps = {
-	...ScrollViewAny.defaultProps,
-	keyboardDismissMode: 'on-drag',
-	keyboardShouldPersistTaps: 'handled',
-	automaticallyAdjustKeyboardInsets: true,
+// forwardRef 객체의 render 는 타입상 노출되지 않아 any 캐스팅이 필요하다.
+const ScrollAny = ScrollView as any;
+const baseRender = ScrollAny.render;
+
+ScrollAny.render = function patchedScrollViewRender(props: any, ref: any) {
+	return baseRender.call(
+		this,
+		{
+			...props,
+			keyboardShouldPersistTaps: props.keyboardShouldPersistTaps ?? DEFAULT_KEYBOARD_SHOULD_PERSIST_TAPS,
+			keyboardDismissMode: props.keyboardDismissMode ?? DEFAULT_KEYBOARD_DISMISS_MODE,
+			automaticallyAdjustKeyboardInsets: props.automaticallyAdjustKeyboardInsets ?? DEFAULT_AUTO_KEYBOARD_INSETS,
+		},
+		ref,
+	);
 };
 
 export {};

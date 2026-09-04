@@ -15,7 +15,7 @@ import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from '../common/CommonProverbModule';
 import { getLevelIconName } from '@/screens/common/CommonProverbModule';
-import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
+import { DROPDOWN_MODAL_CONTENT_STYLE, useDropdownModalProps } from '@/const/common/DropdownModal';
 import useReducedMotion from '@/hooks/useReducedMotion';
 
 // 시트가 아래에서 올라오는 거리. 시트 높이보다 크기만 하면 되므로 화면 높이를 쓴다(세로 고정 앱).
@@ -45,6 +45,8 @@ const LEVEL_ITEMS = themedValue(() => ([
 const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 	const emptyImage = require('@/assets/images/feature-states/empty-search.png');
 	const insets = useSafeAreaInsets();
+	// 카테고리 팝업은 AppModal 을 안 거치므로 같은 처리를 훅으로 받는다.
+	const dropdownModalProps = useDropdownModalProps();
 
 	const [keyword, setKeyword] = useState('');
 	const [searchFocused, setSearchFocused] = useState(false);
@@ -310,7 +312,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 													<Text style={{ fontSize: FONT_SIZES.mdPlus, color: COLORS.text, flex: 1 }}>{item.label}</Text>
 												</TouchableOpacity>
 											)}
-											modalProps={DROPDOWN_MODAL_PROPS}
+											modalProps={dropdownModalProps}
 											modalContentContainerStyle={DROPDOWN_MODAL_CONTENT_STYLE}
 											modalTitleStyle={{ fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, textAlign: 'center', paddingVertical: SPACING_H.md, paddingHorizontal: SPACING_W.lg }}
 										/>

@@ -9,7 +9,6 @@ import {
 	TouchableOpacity,
 	RefreshControl,
 	Alert,
-	Modal,
 	FlatList,
 	NativeSyntheticEvent,
 	NativeScrollEvent,

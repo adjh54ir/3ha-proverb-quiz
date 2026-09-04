@@ -43,9 +43,12 @@ const AD_FALLBACK_HEIGHT = scaleHeight(50) + AD_WRAPPER_PADDING * 2;
 
 /**
  * 배너와 그 아래 콘텐츠 사이의 숨 쉴 틈 — 배너 하단 간격은 이 값 하나로만 조절한다.
- * 12(md) 로는 배너가 화면 콘텐츠에 붙어 보여서 광고와 본문의 경계가 흐렸다.
+ *
+ * 실제로 배너 아래에 보이는 흰 여백은 `AD_WRAPPER_PADDING + AD_BOTTOM_GAP` 이다.
+ * xl(20) 일 때는 래퍼 여백까지 더해 24dp 가 비어 광고와 본문 사이가 뚝 끊겨 보였다.
+ * sm(8) 이면 합계 12dp — 경계는 남기고 죽은 공간만 덜어낸다.
  */
-const AD_BOTTOM_GAP = SPACING_H.xl;
+const AD_BOTTOM_GAP = SPACING_H.sm;
 
 /**
  * 배너 영역의 실측값 묶음. 화면은 `contentTopOffset` 만 쓰고, 테스트는 이 값들로

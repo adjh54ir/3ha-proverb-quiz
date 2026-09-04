@@ -65,3 +65,47 @@ test('훅 대신 insets 를 직접 쓰는 모달은 상단 여백을 실제로 �
 		.map(({ name }) => name);
 	expect(offenders).toEqual([]);
 });
+
+/**
+ * 첫 표시에서 딤이 잘리는 문제는 AppModal 안에서만 고칠 수 있다
+ * (창이 뜬 뒤 네이티브 프롭을 다시 흘려보내 edge-to-edge 를 재적용한다).
+ * 어딘가에서 react-native 의 Modal 을 직접 쓰면 그 팝업만 조용히 다시 잘린다.
+ */
+test('react-native 의 Modal 을 직접 쓰는 파일은 AppModal 뿐이다', () => {
+	const walk = (dir: string): string[] =>
+		fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+			const full = path.join(dir, entry.name);
+			return entry.isDirectory() ? walk(full) : full.endsWith('.tsx') || full.endsWith('.ts') ? [full] : [];
+		});
+
+	const src = path.join(__dirname, '..', 'src');
+	const offenders = walk(src)
+		.filter((file) => /^import\s[^;]*\bModal\b[^;]*from\s'react-native'/m.test(fs.readFileSync(file, 'utf8')))
+		.map((file) => path.relative(src, file))
+		// ModalProps 타입만 가져다 쓰는 파일은 대상이 아니다.
+		.filter((rel) => !/^const\//.test(rel))
+		.filter((rel) => rel !== path.join('screens', 'common', 'atomic', 'AppModal.tsx'));
+
+	expect(offenders).toEqual([]);
+});
+
+/**
+ * DropDownPicker(listMode="MODAL") 는 라이브러리가 RN Modal 을 직접 렌더해서 AppModal 을 안 거친다.
+ * 공용 훅으로 같은 처리를 받지 않으면 그 팝업만 처음 열 때 다시 밀린다.
+ */
+test('listMode="MODAL" 인 화면은 useDropdownModalProps 를 쓴다', () => {
+	const src = path.join(__dirname, '..', 'src');
+	const walk = (dir: string): string[] =>
+		fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+			const full = path.join(dir, entry.name);
+			return entry.isDirectory() ? walk(full) : full.endsWith('.tsx') ? [full] : [];
+		});
+
+	const offenders = walk(src)
+		.map((file) => ({ rel: path.relative(src, file), source: fs.readFileSync(file, 'utf8') }))
+		.filter(({ source }) => source.includes('listMode="MODAL"'))
+		.filter(({ source }) => !source.includes('useDropdownModalProps'))
+		.map(({ rel }) => rel);
+
+	expect(offenders).toEqual([]);
+});

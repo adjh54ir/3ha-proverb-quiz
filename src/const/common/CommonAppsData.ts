@@ -33,7 +33,7 @@ export const COMMON_APPS_DATA: {
 				'한국어 상식 퀴즈는 사자성어·속담·순우리말·위인 등 한국인이라면 알아야 할 한국어 상식을 퀴즈로 풀며 익히고, 틀린 문제는 오답 복습으로 반복 학습할 수 있는 한국어 학습 앱입니다.',
 			category: 'quiz',
 			android: 'https://play.google.com/store/apps/details?id=com.tha.koreaquiz',
-			ios: '',
+			ios: 'https://apps.apple.com/kr/app/id6785823631',
 		},
 		{
 			id: 23,

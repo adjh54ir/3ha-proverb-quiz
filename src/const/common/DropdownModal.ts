@@ -1,12 +1,13 @@
 import { Dimensions, ModalProps, ViewStyle } from 'react-native';
 import { COLORS, RADIUS, SPACING_H, themedValue } from '@/const/common/Theme';
+import useModalReapply from '@/hooks/useModalReapply';
 
 /**
  * DropDownPicker(listMode="MODAL") 카테고리 팝업 공통 설정.
  *
  * 이 팝업은 앱 공용 `AppModal` 을 거치지 않는다. 라이브러리가 RN `<Modal>` 을 직접 렌더하기
  * 때문이다(`react-native-dropdown-picker/src/components/Picker.js`). 그래서 AppModal 이
- * 한곳에서 막아 둔 두 가지가 이 팝업에는 적용되지 않아, 같은 문제가 화면마다 다시 새어 나왔다.
+ * 한곳에서 막아 둔 것들이 이 팝업에는 적용되지 않아, 같은 문제가 화면마다 다시 새어 나왔다.
  *
  *  1. `statusBarTranslucent` / `navigationBarTranslucent` 가 없으면 팝업 창이 상태바·
  *     내비게이션바를 **비켜서** 열려 딤이 화면 위아래 끝까지 닿지 않는다.
@@ -45,6 +46,23 @@ export const DROPDOWN_MODAL_PROPS: ModalProps = {
 	transparent: true,
 	statusBarTranslucent: true,
 	navigationBarTranslucent: true,
+};
+
+/**
+ * 카테고리 팝업에 실제로 넘길 `modalProps`.
+ *
+ * 위 상수만 넘기면 AppModal 이 하는 "창이 뜬 뒤 재적용"(3번)이 빠진다. edge-to-edge 설정은
+ * 첫 표시에 적용되지 않아서, 그대로 두면 이 팝업만 처음 열 때 카드가 상태바 높이만큼 밀려
+ * 내려간다. 훅이 붙여 주는 프롭을 함께 넘겨 AppModal 과 같은 처리를 받는다.
+ *
+ * ```tsx
+ * const dropdownModalProps = useDropdownModalProps();
+ * <DropDownPicker listMode="MODAL" modalProps={dropdownModalProps} />
+ * ```
+ */
+export const useDropdownModalProps = (): ModalProps => {
+	const { supportedOrientations, markShown } = useModalReapply();
+	return { ...DROPDOWN_MODAL_PROPS, supportedOrientations, onShow: markShown };
 };
 
 /**

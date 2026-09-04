@@ -108,8 +108,8 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 	const glowOpacity = glow.interpolate({ inputRange: [0, 1], outputRange: [0.25, 0.55] });
 
 	return (
-		<Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
-			{/* 딤은 첫 프레임부터 화면을 덮는다(불투명 고정) — 카드만 애니메이션한다 */}
+		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+			{/* 딤은 창 페이드에 실려 통째로 들어온다 — JS 쪽에서는 카드만 애니메이션한다 */}
 			<View style={[styles.backdrop, safePadding]}>
 				<TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
 

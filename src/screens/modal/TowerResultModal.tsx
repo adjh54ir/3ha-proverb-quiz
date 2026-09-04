@@ -123,8 +123,8 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 		));
 
 	return (
-		<Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onHome}>
-			{/* 오버레이 — 딤은 첫 프레임부터 화면을 덮는다(불투명 고정) */}
+		<Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onHome}>
+			{/* 오버레이 — 딤은 창 페이드에 실려 통째로 들어온다. JS 쪽에서 따로 애니메이션하지 않는다. */}
 			<View style={[styles.overlay, safePadding]}>
 				{/* 모달 전체 컨테이너: 안전 여백을 뺀 높이의 일정 비율로 고정 */}
 				<Animated.View

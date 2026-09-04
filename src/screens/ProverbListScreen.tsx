@@ -34,7 +34,7 @@ import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
 import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
-import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
+import { DROPDOWN_MODAL_CONTENT_STYLE, useDropdownModalProps } from '@/const/common/DropdownModal';
 
 
 const PAGE_SIZE = 30;
@@ -103,6 +103,8 @@ const ProverbListScreen = () => {
 	const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 	// 주요 CRUD 피드백은 공통 토스트 훅으로 통일한다.
 	const { showToast, ToastView } = useToast();
+	// 카테고리 팝업은 AppModal 을 안 거치므로 같은 처리를 훅으로 받는다.
+	const dropdownModalProps = useDropdownModalProps();
 
 	const [levelItems, setLevelItems] = useState([{ label: '', value: '' }]);
 	const [categoryItems, setCategoryItems] = useState([{ label: '', value: '' }]);
@@ -395,7 +397,7 @@ const ProverbListScreen = () => {
 													<Text style={{ fontSize: FONT_SIZES.mdPlus, color: COLORS.text, flex: 1 }}>{item.label}</Text>
 												</TouchableOpacity>
 											)}
-											modalProps={DROPDOWN_MODAL_PROPS}
+											modalProps={dropdownModalProps}
 											modalContentContainerStyle={[DROPDOWN_MODAL_CONTENT_STYLE, { borderWidth: 1, borderColor: COLORS.borderDark }]}
 											modalTitleStyle={{
 												fontSize: FONT_SIZES.lg,

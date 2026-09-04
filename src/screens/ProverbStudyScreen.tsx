@@ -16,7 +16,7 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber, LEVEL_NAME_BY_NUMBER } from '@/screens/common/CommonProverbModule';
 import { LEVEL_DROPDOWN_ITEMS, FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
-import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
+import { DROPDOWN_MODAL_CONTENT_STYLE, useDropdownModalProps } from '@/const/common/DropdownModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StudyBadgeInterceptor } from '@/services/interceptor/StudyBadgeInterceptor';
 import { CONST_BADGES } from '@/const/ConstBadges';
@@ -83,6 +83,8 @@ const DETAIL_FILTER_HEIGHT = scaleHeight(60);
 const IMAGE_HEIGHT = isAndroid ? scaleHeight(220) : scaleHeight(200);
 const QuizStudyScreen = () => {
 	const modalSafePadding = useModalSafePadding();
+	// 카테고리 팝업은 AppModal 을 안 거치므로 같은 처리를 훅으로 받는다.
+	const dropdownModalProps = useDropdownModalProps();
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('study');
 	// 회전/폴더블 대응: 캐러셀 높이는 실시간 화면 높이를 따른다.
@@ -1003,7 +1005,7 @@ const QuizStudyScreen = () => {
 													<Text style={{ fontSize: FONT_SIZES.mdPlus, color: COLORS.textStrong, flex: 1 }}>{item.label}</Text>
 												</TouchableOpacity>
 											)}
-											modalProps={DROPDOWN_MODAL_PROPS}
+											modalProps={dropdownModalProps}
 											modalContentContainerStyle={[DROPDOWN_MODAL_CONTENT_STYLE, { borderWidth: 1, borderColor: COLORS.border }]}
 											modalTitleStyle={{
 												fontSize: FONT_SIZES.lg,

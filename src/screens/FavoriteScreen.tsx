@@ -25,7 +25,7 @@ import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/Characte
 import { LEVEL_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
-import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
+import { DROPDOWN_MODAL_CONTENT_STYLE, useDropdownModalProps } from '@/const/common/DropdownModal';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const COMMON_ALL_OPTION = themedValue(() => ({
@@ -42,6 +42,8 @@ const COMMON_ALL_OPTION = themedValue(() => ({
 
 const FavoriteScreen = () => {
 	const modalSafePadding = useModalSafePadding();
+	// 카테고리 팝업은 AppModal 을 안 거치므로 같은 처리를 훅으로 받는다.
+	const dropdownModalProps = useDropdownModalProps();
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('favorite');
 	const emptyFavoritesImage = require('@/assets/images/feature-states/empty-favorites.png');
@@ -424,7 +426,7 @@ const FavoriteScreen = () => {
 											iconContainerStyle={{ marginRight: SPACING_W.sm }}
 											showArrowIcon={true}
 											showTickIcon={false}
-											modalProps={DROPDOWN_MODAL_PROPS}
+											modalProps={dropdownModalProps}
 											modalContentContainerStyle={[DROPDOWN_MODAL_CONTENT_STYLE, { borderWidth: 1, borderColor: COLORS.borderDark }]}
 											modalTitleStyle={{
 												fontSize: FONT_SIZES.lg,

@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, LayoutChangeEvent, StyleSheet, View } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { AppState, Dimensions, Platform, StyleSheet, View } from 'react-native';
 import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, Theme } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CONTENT_MAX_WIDTH, isTablet, scaleHeight } from '@/utils';
-import { COLORS, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 import BootSplash from 'react-native-bootsplash'; // 추가
@@ -26,57 +26,22 @@ const AD_ALLOWED_ROUTES = [
 	// 필요하면 추가
 ];
 
+const DESIGN_HEIGHT = 812;
+
 /**
- * 배너 래퍼(absolute)가 화면 위에서 떨어진 거리.
+ * 태블릿에서 앵커드 어댑티브 배너가 실제로 차지하는 높이(dp).
  *
- * 상태바/노치는 이미 SafeAreaView(edges: top)가 밀어 준다 —
- * 안드로이드도 edge-to-edge(MainActivity.setDecorFitsSystemWindows(false))라 인셋이 항상 들어온다.
- * 예전에는 여기서 android 28 / ios 14 를 또 더해 배너 위아래로 죽은 공간이 생겼다.
+ * 구글은 기기의 세로 길이로 배너 높이를 정한다(720dp 초과 = 90dp). 태블릿은 항상 이 구간이라
+ * 값이 고정이다. scaleHeight 로 계산하면 배율 상한(MAX_SCALE)에 걸려 배너보다 작은 여백이
+ * 나와 본문이 배너에 가린다. 그래서 실측값을 그대로 쓴다.
  */
-const AD_WRAPPER_TOP = SPACING_H.xs;
-
-/** 배너 래퍼의 위/아래 안쪽 여백 (styles.adWrapperAbsolute.paddingVertical 과 동일해야 한다) */
-const AD_WRAPPER_PADDING = SPACING_H.xs;
-
-/**
- * 배너 래퍼를 실측하기 전 한 프레임 동안 쓰는 값 (앵커 배너 높이 + 래퍼 여백).
- *
- * 구글은 기기 세로 길이로 앵커드 어댑티브 배너 높이를 정한다(720dp 초과 = 90dp).
- * 태블릿은 항상 그 구간이라 폰 기준 50dp 를 쓰면 첫 프레임에 본문이 배너를 파고든다.
- * 실측(onLayout)이 곧 덮어쓰지만, 그 한 프레임의 깜빡임을 없애려고 기기별 값을 쓴다.
- */
-const AD_FALLBACK_HEIGHT = (isTablet ? 90 : scaleHeight(50)) + AD_WRAPPER_PADDING * 2;
-
-/**
- * 배너와 그 아래 콘텐츠 사이의 숨 쉴 틈 — 배너 하단 간격은 이 값 하나로만 조절한다.
- * 12(md) 로는 배너가 화면 콘텐츠에 붙어 보여서 광고와 본문의 경계가 흐렸다.
- */
-const AD_BOTTOM_GAP = SPACING_H.xl;
-
-/**
- * 배너 영역의 실측값 묶음. 화면은 `contentTopOffset` 만 쓰고, 테스트는 이 값들로
- * "콘텐츠가 배너를 파고들지 않는다"를 검증한다.
- *
- * 인자는 래퍼(paddingVertical 포함)의 onLayout 실측 높이다. onSizeChange 가 알려주는
- * 광고 높이는 실제 렌더 높이와 어긋날 때가 있어(테스트 광고 등) 그만큼 하단 여백이 벌어졌다.
- */
-export const AD_LAYOUT = {
-	wrapperTop: AD_WRAPPER_TOP,
-	wrapperPadding: AD_WRAPPER_PADDING,
-	fallbackHeight: AD_FALLBACK_HEIGHT,
-	bottomGap: AD_BOTTOM_GAP,
-	/** 배너 래퍼의 아래쪽 끝 (컨테이너 상단 기준) */
-	bannerBottom: (adBoxHeight: number) => AD_WRAPPER_TOP + (adBoxHeight || AD_FALLBACK_HEIGHT),
-	/** 콘텐츠가 시작해야 하는 위치 */
-	contentTopOffset: (adBoxHeight: number) => AD_WRAPPER_TOP + (adBoxHeight || AD_FALLBACK_HEIGHT) + AD_BOTTOM_GAP,
-};
+const TABLET_BANNER_HEIGHT = 90;
 
 const AppLayout = () => {
 	const themeMode = useThemeMode(); // 모드 변경 시 배경색 재계산
 	const navigationRef = useRef<NavigationContainerRef<any>>(null);
 	const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
-	// 배너 래퍼의 실측 높이(래퍼 여백 포함). 광고가 알려주는 높이 대신 래퍼를 그대로 재는 편이 정확하다.
-	const [adBoxHeight, setAdBoxHeight] = useState(0);
+	const { height: screenHeight } = Dimensions.get('window');
 
 	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute as Paths), [currentRoute]);
 	// const shouldShowAd = false
@@ -98,29 +63,41 @@ const AppLayout = () => {
 		// themeMode 가 바뀌면 COLORS 가 다른 팔레트를 가리키므로 다시 계산해야 한다.
 	}, [currentRoute, themeMode]);
 
-	/**
-	 * 배너 아래에서 콘텐츠가 시작해야 하는 위치.
-	 *
-	 * 예전에는 플랫폼·태블릿별 고정값을 더해 맞췄는데, adaptive 배너 높이가 기기마다 50~90dp 로
-	 * 갈리는 탓에 어떤 기기에선 여백이 남고 어떤 기기에선 콘텐츠가 배너를 파고들었다
-	 * (iPhone 14/15/16 계열에서 약 20dp 겹침). 실측 높이 하나로 계산하면 분기 없이 항상 맞는다.
-	 */
-	const contentTopOffset = useMemo(() => {
+	const getAdPaddingTop = () => {
 		if (!shouldShowAd) {
 			return 0;
 		}
-		return AD_LAYOUT.contentTopOffset(adBoxHeight);
-	}, [shouldShowAd, adBoxHeight]);
+		if (isTablet) {
+			return TABLET_BANNER_HEIGHT + SPACING_H.sm;
+		}
+		if (Platform.OS === 'android') {
+			return scaleHeight(50);
+		}
+		if (screenHeight < DESIGN_HEIGHT) {
+			return 40;
+		}
+		return 0;
+	};
 
-	// 배너를 숨긴 경로에서는 래퍼 높이가 0 이라 측정하지 않는다 (다시 보일 때 폴백으로 되돌아가지 않게)
-	const handleAdBoxLayout = useCallback(
-		(e: LayoutChangeEvent) => {
-			if (shouldShowAd) {
-				setAdBoxHeight(e.nativeEvent.layout.height);
+	const getNavigatorPaddingTop = (shouldShowAd: boolean): number => {
+		if (shouldShowAd) {
+			// 배너와 본문이 맞붙어 보이지 않게 한 칸 띄운다 — 배너는 absolute 라 본문이 직접 밀어내지 못한다.
+			return SPACING_H.xxl;
+		} else {
+			const isAdAllowed = AD_ALLOWED_ROUTES.includes(currentRoute as Paths);
+			if (isAdAllowed) {
+				switch (Platform.OS) {
+					case 'android':
+						return scaleHeight(40);
+					case 'ios':
+						return scaleHeight(0);
+					default:
+						return 0;
+				}
 			}
-		},
-		[shouldShowAd],
-	);
+		}
+		return 0;
+	};
 
 	/**
 	 * 알림 탭 → 지정 화면 이동.
@@ -212,11 +189,17 @@ const AppLayout = () => {
 				}
 			}}>
 			<SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={shouldShowAd ? ['top'] : []}>
-				<View style={styles.container}>
-					<View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]} onLayout={handleAdBoxLayout}>
-						<AdmobBannerAd visible={shouldShowAd} />
+				<View style={[styles.container, { backgroundColor }]}>
+					{/*
+						배너는 본문 기둥(CONTENT_MAX_WIDTH)에 맞추지 않는다.
+						앵커드 어댑티브 배너의 네이티브 뷰는 컨테이너가 아니라 '기기 폭'으로 크기를 정해
+						래퍼를 씌워도 그대로 삐져나온다. 좁히면 더 작은 광고 규격이 잡혀 손해만 본다.
+					*/}
+					<View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]}>
+						<AdmobBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} />
 					</View>
-					<View style={[styles.navigatorWrapper, { paddingTop: contentTopOffset, backgroundColor }]}>
+					{shouldShowAd && <View style={{ paddingTop: getAdPaddingTop() }} />}
+					<View style={[styles.navigatorWrapper, { paddingTop: getNavigatorPaddingTop(shouldShowAd), backgroundColor }]}>
 						<StackNavigator />
 					</View>
 				</View>
@@ -234,19 +217,16 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	adWrapperAbsolute: {
 		position: 'absolute',
-		top: AD_WRAPPER_TOP,
+		top: Platform.OS === 'android' ? scaleHeight(20) : scaleHeight(6),
 		left: 0,
 		right: 0,
 		zIndex: 10,
-		paddingVertical: AD_WRAPPER_PADDING,
+		paddingVertical: SPACING_H.xs,
+		marginHorizontal: SPACING_W.lg,
 		alignItems: 'center',
-		// borderWidth: 1,
-		// borderColor: '#bdc3c7',
-		// borderRadius: scaleWidth(6),
 	},
 	container: {
 		flex: 1,
-		backgroundColor: 'transparent',
 	},
 	navigatorWrapper: {
 		flex: 1,

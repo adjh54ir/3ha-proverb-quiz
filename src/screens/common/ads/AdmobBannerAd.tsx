@@ -15,10 +15,14 @@ const AD_UNIT_ID: AdUnitIdType = Platform.select({
 }) as AdUnitIdType;
 
 interface AdmobBannerAdProps {
+	paramMarginTop?: number;
+	paramMarginBottom?: number;
 	visible?: boolean;
 }
 
 const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({
+	paramMarginTop = 6,
+	paramMarginBottom = 6,
 	visible = true, // 표시 여부
 }) => {
 	const bannerRef = useRef<BannerAd | null>(null);
@@ -59,6 +63,8 @@ const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({
 			style={[
 				styles.container,
 				{
+					marginTop: paramMarginTop,
+					marginBottom: paramMarginBottom,
 					opacity: visible ? 1 : 0, // 렌더링 유지 + 가시성만 제어
 					height: visible ? undefined : 0,
 				},

@@ -7,7 +7,7 @@
 	"author": "adjh54ir <adjh54ir@gmail.com>",
 	"license": "MIT",
 	"scripts": {
-		"postinstall": "node scripts/patch-rn-sound.js",
+		"postinstall": "node scripts/patch-rn-sound.js && node scripts/patch-rn-view-bg.js",
 		"start": "npx react-native start --reset-cache",
 		"start:8082": "npx react-native start --reset-cache --port 8082",
 		"setup": "git pull && yarn install && yarn pod",

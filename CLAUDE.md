@@ -34,6 +34,10 @@
 5. 테스트에서 모달을 `SafeAreaProvider` 없이 렌더하면 `useSafeAreaInsets` 가 throw 한다.
    `jest.setup.js` 에 `react-native-safe-area-context/jest/mock` 이 등록돼 있으니 그대로 두면 된다.
 
+6. iOS(Fabric) 에서 테두리 있는 카드가 `scale` 로 등장할 때(`useModalEnter`) 첫 노출에만 흰 배경이
+   테두리보다 작게(95%) 그려지는 건 RN 0.78 의 `RCTViewComponentView` 버그다.
+   `scripts/patch-rn-view-bg.js`(postinstall) 가 업스트림 수정을 백포트한다 — 모달 코드로 우회하지 말 것.
+
 ## 태블릿/아이패드 반응형 규칙
 
 전제는 하나다 — **폰 레이아웃은 바뀌지 않는다.** 태블릿 전용 레이아웃을 따로 짜지 않고

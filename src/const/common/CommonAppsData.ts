@@ -23,7 +23,7 @@ export const COMMON_APPS_DATA: {
 				'스피또 지니는 동행복권 발행내역을 바탕으로 남은 당첨금과 잔여 매수로 회차별 기대값·환급률을 계산해, 지금 사기 좋은 스피또 회차를 알려 주는 즉석복권 분석 앱입니다.',
 			category: 'utility',
 			android: 'https://play.google.com/store/apps/details?id=com.tha.spitogenie',
-			ios: '',
+			ios: 'https://apps.apple.com/us/app/id6807646866',
 		},
 		{
 			id: 24,
@@ -33,7 +33,7 @@ export const COMMON_APPS_DATA: {
 				'한국어 상식 퀴즈는 사자성어·속담·순우리말·위인 등 한국인이라면 알아야 할 한국어 상식을 퀴즈로 풀며 익히고, 틀린 문제는 오답 복습으로 반복 학습할 수 있는 한국어 학습 앱입니다.',
 			category: 'quiz',
 			android: 'https://play.google.com/store/apps/details?id=com.tha.koreaquiz',
-			ios: '',
+			ios: 'https://apps.apple.com/kr/app/id6785823631',
 		},
 		{
 			id: 23,
@@ -41,7 +41,7 @@ export const COMMON_APPS_DATA: {
 			title: '한자 급수 퀴즈',
 			desc: '한자 급수 퀴즈는 한국어문회·한자교육진흥회 급수별 배정한자 6,182자를 훈음·부수·총획 퀴즈로 익히는 한자 급수 학습 앱입니다.',
 			category: 'quiz',
-			android: '',
+			android: 'https://play.google.com/store/apps/details?id=com.tha.hanpick',
 			ios: 'https://apps.apple.com/us/app/id6801430351',
 		},
 		{

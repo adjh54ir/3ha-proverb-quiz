@@ -31,20 +31,37 @@ import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 // 난이도/카테고리 드롭다운은 CommonMainData 단일 소스를 쓴다.
 // (이 화면에 복사돼 있던 사본은 badgeId 가 category_world/category_success 로 잘못돼 있었다)
-const mascotImages = [
-	require('@/assets/images/random/random_mascote1.png'),
-	require('@/assets/images/random/random_mascote2.png'),
-	require('@/assets/images/random/random_mascote3.png'),
-	require('@/assets/images/random/random_mascote4.png'),
-	require('@/assets/images/random/random_mascote5.png'),
-	require('@/assets/images/random/random_mascote6.png'),
-	require('@/assets/images/random/random_mascote7.png'),
-	require('@/assets/images/random/random_mascote8.png'),
-	require('@/assets/images/random/random_mascote9.png'),
-	require('@/assets/images/random/random_mascote10.png'),
-	require('@/assets/images/random/random_mascote11.png'),
-	require('@/assets/images/random/random_mascote12.png'),
-	require('@/assets/images/random/random_mascote13.png'),
+const proverbSceneImages = [
+	require('@/assets/images/proverb-scenes/01-frog-in-well.png'),
+	require('@/assets/images/proverb-scenes/02-repair-after-losing-cow.png'),
+	require('@/assets/images/proverb-scenes/03-monkey-falls-from-tree.png'),
+	require('@/assets/images/proverb-scenes/04-tap-stone-bridge.png'),
+	require('@/assets/images/proverb-scenes/05-egg-against-rock.png'),
+	require('@/assets/images/proverb-scenes/06-dog-looks-at-roof.png'),
+	require('@/assets/images/proverb-scenes/07-whales-fight-shrimp-suffers.png'),
+	require('@/assets/images/proverb-scenes/08-speak-of-the-tiger.png'),
+	require('@/assets/images/proverb-scenes/09-puppy-fears-no-tiger.png'),
+	require('@/assets/images/proverb-scenes/10-crayfish-sides-with-crab.png'),
+	require('@/assets/images/proverb-scenes/11-dragon-from-stream.png'),
+	require('@/assets/images/proverb-scenes/12-too-many-boatmen.png'),
+	require('@/assets/images/proverb-scenes/13-rice-cake-in-picture.png'),
+	require('@/assets/images/proverb-scenes/14-others-rice-cake-looks-bigger.png'),
+	require('@/assets/images/proverb-scenes/15-small-pepper-is-hot.png'),
+	require('@/assets/images/proverb-scenes/16-sightseeing-after-meal.png'),
+	require('@/assets/images/proverb-scenes/17-chicken-instead-of-pheasant.png'),
+	require('@/assets/images/proverb-scenes/18-school-dog-learns.png'),
+	require('@/assets/images/proverb-scenes/19-crying-child-gets-rice-cake.png'),
+	require('@/assets/images/proverb-scenes/20-needle-and-thread.png'),
+	require('@/assets/images/proverb-scenes/21-crow-flies-pear-falls.png'),
+	require('@/assets/images/proverb-scenes/22-kind-words-repay-debt.png'),
+	require('@/assets/images/proverb-scenes/23-small-bird-follows-stork.png'),
+	require('@/assets/images/proverb-scenes/24-empty-cart-rattles.png'),
+	require('@/assets/images/proverb-scenes/25-ten-cuts-fell-tree.png'),
+	require('@/assets/images/proverb-scenes/26-startled-by-pot-lid.png'),
+	require('@/assets/images/proverb-scenes/27-grasp-at-straw.png'),
+	require('@/assets/images/proverb-scenes/28-fan-burning-house.png'),
+	require('@/assets/images/proverb-scenes/29-ripe-rice-bows.png'),
+	require('@/assets/images/proverb-scenes/30-devoted-tower-stands.png'),
 ];
 
 // 태블릿 판정은 DementionUtils 의 공용 기준(짧은 변 600dp)을 쓴다 — 화면마다 기준이 갈리지 않게.
@@ -110,8 +127,8 @@ const QuizStudyScreen = () => {
 	};
 
 	// ✅ 첫 렌더부터 채워진 상태로 시작 (빈 배열이면 index % 0 = NaN → source undefined 가 됨)
-	const [mascotImagesQueue, setMascotImagesQueue] = useState<number[]>(() =>
-		Array.from({ length: 10 }, () => mascotImages[Math.floor(Math.random() * mascotImages.length)]),
+	const [proverbSceneQueue, setProverbSceneQueue] = useState<number[]>(() =>
+		Array.from({ length: 10 }, () => proverbSceneImages[Math.floor(Math.random() * proverbSceneImages.length)]),
 	);
 	const [isLoading, setIsLoading] = useState(true);
 	const [flippedCard, setFlippedCard] = useState<number | null>(null);
@@ -296,11 +313,11 @@ const QuizStudyScreen = () => {
 		};
 
 		// ✅ 이미지 갱신: 해당 index 위치의 이미지를 새 랜덤 이미지로 교체
-		setMascotImagesQueue((prevQueue) => {
+		setProverbSceneQueue((prevQueue) => {
 			const newQueue = [...prevQueue];
 			const currentIndex = getFilteredData().findIndex((p) => p.id === id);
 			if (currentIndex !== -1 && newQueue.length > 0) {
-				newQueue[currentIndex % newQueue.length] = mascotImages[Math.floor(Math.random() * mascotImages.length)];
+				newQueue[currentIndex % newQueue.length] = proverbSceneImages[Math.floor(Math.random() * proverbSceneImages.length)];
 			}
 			return newQueue;
 		});
@@ -561,7 +578,7 @@ const QuizStudyScreen = () => {
 	};
 
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
-		const mascot = mascotImagesQueue.length > 0 ? mascotImagesQueue[index % mascotImagesQueue.length] : mascotImages[0];
+		const proverbScene = proverbSceneQueue.length > 0 ? proverbSceneQueue[index % proverbSceneQueue.length] : proverbSceneImages[0];
 
 		const proverbId = item.id;
 		const isLearned = studyHistory.studyProverbes.includes(proverbId);
@@ -640,7 +657,7 @@ const QuizStudyScreen = () => {
 						]}>
 						<View style={styles.flagSection}>
 							<View style={styles.flagContainer}>
-								<FastImage source={mascot} style={styles.flagImageSquare} resizeMode="cover" />
+								<FastImage source={proverbScene} style={styles.flagImageSquare} resizeMode="cover" />
 							</View>
 						</View>
 						{flippedCard !== proverbId && (
@@ -760,7 +777,7 @@ const QuizStudyScreen = () => {
 										<Text style={styles.meaningQuoteText}>{item.longMeaning}</Text>
 									</View>
 									{/* 예문 */}
-									{item.example && (
+									{item.example?.some((ex) => ex.trim()) && (
 										<View style={styles.exampleBox}>
 											<Text style={styles.sectionTitle}>✍️ 예문</Text>
 											{item.example.map((ex, idx) => (

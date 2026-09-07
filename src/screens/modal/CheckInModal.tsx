@@ -46,8 +46,8 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 
 						<View style={styles.highlightBox}>
 							<Text style={styles.highlightText}>
-								연속 출석을 통해 5단계로 진화하는 귀여운 펫도 함께 얻을 수 있답니다 🐾{'\n'}
-								획득한 펫은 캐릭터 옆에 항상 따라다닙니다!
+								매일 출석해 해치알에 온기를 채워 주세요.{'\n'}
+								14일째 말빛 해치가 부화하고, 28일째 속담 수호자로 자랍니다!
 							</Text>
 						</View>
 
@@ -63,7 +63,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 												<FastImage
 													source={item.image}
 													style={[styles.petImage, isLocked && styles.petImageLocked]}
-													resizeMode="cover"
+													resizeMode="contain"
 												/>
 												{isEarned && (
 													<View style={styles.petEarnedCheck}>
@@ -135,7 +135,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 									{/* ✅ 획득한 펫이 캐릭터 옆에 함께 따라다님 */}
 									{petLevel >= 0 && (
 										<View style={styles.stampPetBadge}>
-											<FastImage source={PET_REWARDS[petLevel].image} style={styles.stampPetImage} resizeMode="cover" />
+											<FastImage source={PET_REWARDS[petLevel].image} style={styles.stampPetImage} resizeMode="contain" />
 										</View>
 									)}
 								</View>
@@ -241,7 +241,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		height: scaleWidth(48),
 		borderRadius: scaleWidth(48) / 2,
 		borderWidth: 2,
-		borderColor: COLORS.primary,
+		borderColor: COLORS.warning,
+		backgroundColor: COLORS.warningSoft,
 		marginBottom: SPACING_H.xs,
 	},
 	petItemBoxCurrent: {
@@ -301,7 +302,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: scaleWidth(56) / 2,
 		borderWidth: 2,
 		borderColor: COLORS.surface,
-		backgroundColor: COLORS.surface,
+		backgroundColor: COLORS.warningSoft,
 		overflow: 'hidden',
 	},
 	stampPetImage: {

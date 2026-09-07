@@ -53,8 +53,19 @@ const QUESTION_TIME_LIMIT = 40;
  * 정답 어절을 가리는 순간 문제가 통째로 '(____)' 가 되기 때문이다.
  * 랜덤 출제 / 오답 복습 / 진행률이 모두 이 한 곳을 쓴다.
  */
-export const isQuizzable = (proverb: MainDataType.Proverb, mode: QuizScreenParams['mode']) =>
-	mode !== 'blank' || new Set(proverb.proverb.split(' ').filter(Boolean)).size >= 2;
+/**
+ * 모드별로 출제 가능한 속담인지. 빈칸 모드는 가릴 어절이 두 개는 있어야 하고,
+ * 예문 모드는 예문이 있어야 한다 (사전에 용례가 없어 예문을 비워 둔 속담이 있다).
+ */
+export const isQuizzable = (proverb: MainDataType.Proverb, mode: QuizScreenParams['mode']) => {
+	if (mode === 'blank') {
+		return new Set(proverb.proverb.split(' ').filter(Boolean)).size >= 2;
+	}
+	if (mode === 'example' || mode === 'exampleBlank') {
+		return (proverb.example ?? []).some((e) => e.trim());
+	}
+	return true;
+};
 
 // 파라미터 정의는 RootStackParamList(단일 소스)에서 가져온다.
 type QuizRoute = RouteProp<{ QUIZ: QuizScreenParams }, 'QUIZ'>;
@@ -367,16 +378,35 @@ const QuizScreen = () => {
 	 */
 	const setupQuestion = (newQuestion: MainDataType.Proverb, pool: MainDataType.Proverb[] = filteredProverbs) => {
 		const shuffledPool = shuffle(pool.filter((p) => p.id !== newQuestion.id));
-		const shuffledDistractors = shuffledPool.slice(0, 3);
+		/**
+		 * 뜻이 똑같은 속담이 여럿 있어서(사전 정의가 같다) 그냥 3개를 집으면
+		 * 정답과 글자까지 같은 보기가 섞여 정답이 두 개가 된다. 보기 텍스트 기준으로 걸러 뽑는다.
+		 */
+		const pickDistractors = (text: (p: MainDataType.Proverb) => string) => {
+			const seen = new Set([text(newQuestion)]);
+			const picked: string[] = [];
+			for (const p of shuffledPool) {
+				const t = text(p);
+				if (seen.has(t)) {
+					continue;
+				}
+				seen.add(t);
+				picked.push(t);
+				if (picked.length === 3) {
+					break;
+				}
+			}
+			return picked;
+		};
 
 		let allOptions: string[] = [];
 		let displayText = '';
 
 		if (routeMode === 'meaning') {
-			allOptions = [...shuffledDistractors.map((p) => p.longMeaning!), newQuestion.longMeaning!];
+			allOptions = [...pickDistractors((p) => p.longMeaning!), newQuestion.longMeaning!];
 			displayText = newQuestion.proverb;
 		} else if (routeMode === 'proverb') {
-			allOptions = [...shuffledDistractors.map((p) => p.proverb), newQuestion.proverb];
+			allOptions = [...pickDistractors((p) => p.proverb), newQuestion.proverb];
 			displayText = newQuestion.longMeaning!;
 		} else if (routeMode === 'blank') {
 			const blank = pickBlankWord(newQuestion.proverb);
@@ -402,7 +432,7 @@ const QuizScreen = () => {
 				.join(' ');
 			setBlankWord(blank);
 		} else if (routeMode === 'example' || routeMode === 'exampleBlank') {
-			allOptions = [...shuffledDistractors.map((p) => p.proverb), newQuestion.proverb];
+			allOptions = [...pickDistractors((p) => p.proverb), newQuestion.proverb];
 			const ex = (newQuestion.example && newQuestion.example[0]) || '';
 			displayText = ex
 				? routeMode === 'exampleBlank' && ex.includes(newQuestion.proverb)

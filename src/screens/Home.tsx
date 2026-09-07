@@ -182,23 +182,10 @@ const Home = () => {
 	const [petSpeech, setPetSpeech] = useState<string | null>(null);
 	const hasShownInitialPetSpeech = useRef(false);
 
-	const PET_MESSAGES = [
-		'뀨! 안녕하세요!',
-		'오늘도 함께 공부하겠습니다!',
-		'속담 한 개 배워 보시겠습니까?',
-		'함께 놀아 주셔서 고맙습니다!',
-		'잘하고 계십니다, 최고입니다!',
-		'조금만 더 힘내 보세요!',
-		'쓰담쓰담 좋습니다~',
-		'퀴즈 풀러 가 보시겠습니까?',
-		'배고픕니다... 점수 주세요!',
-		'오늘도 출석 잊지 마세요!',
-	];
-
 	// 펫 말풍선 노출(공통)
 	const showPetSpeech = useCallback(
 		(msg?: string) => {
-			const message = msg ?? PET_MESSAGES[Math.floor(Math.random() * PET_MESSAGES.length)];
+			const message = msg ?? (petLevel >= 0 ? PET_REWARDS[petLevel].message : '매일 출석해 해치알을 만나 보세요!');
 			setPetSpeech(message);
 			petSpeechAnim.setValue(0);
 			Animated.spring(petSpeechAnim, { toValue: 1, friction: 6, tension: 120, useNativeDriver: true }).start();
@@ -210,7 +197,7 @@ const Home = () => {
 				Animated.timing(petSpeechAnim, { toValue: 0, duration: 240, useNativeDriver: true }).start(() => setPetSpeech(null));
 			}, 2200);
 		},
-		[petSpeechAnim],
+		[petLevel, petSpeechAnim],
 	);
 
 	// ✅ 화면 진입 애니메이션 (fade + slide-up)
@@ -265,22 +252,11 @@ const Home = () => {
 
 	const todayStr = DateUtils.getLocalDateString();
 
-	// ✅ 펫이 처음 등장하면 한 번 인사 말풍선 자동 노출
+	// 현재 부화 단계에 맞는 반응을 홈 진입 시 한 번 보여 준다.
 	useEffect(() => {
 		if (petLevel >= 0 && !hasShownInitialPetSpeech.current) {
 			hasShownInitialPetSpeech.current = true;
-			// 요일별로 좀 더 귀여운 인사말
-			const dayGreetings = [
-				'일요일입니다~ 푹 쉬면서 한 문제 어떠십니까? 😴',
-				'월요일 파이팅! 오늘도 같이 시작합니다 💪',
-				'화요일입니다! 가볍게 한 판 풀어 보시겠습니까? 🔥',
-				'수요일, 벌써 한 주의 절반! 잘하고 계십니다 🌱',
-				'목요일입니다~ 조금만 더 힘내세요! ✨',
-				'불금입니다! 오늘도 똑똑해지고 가세요 🎉',
-				'토요일입니다~ 여유롭게 한 문제 풀어 보세요 ☕',
-			];
-			const firstGreeting = dayGreetings[DateUtils.now().getDay()] ?? '안녕하세요! 오늘도 함께 공부하겠습니다 😊';
-			const t = setTimeout(() => showPetSpeech(firstGreeting), 900);
+			const t = setTimeout(() => showPetSpeech(PET_REWARDS[petLevel].message), 900);
 			return () => clearTimeout(t);
 		}
 	}, [petLevel, showPetSpeech]);
@@ -491,9 +467,17 @@ const Home = () => {
 								</TouchableOpacity>
 
 								{petLevel >= 0 && (
-									<TouchableOpacity style={styles.petContent} activeOpacity={0.8} onPress={bouncePet}>
+									<TouchableOpacity
+										style={styles.petContent}
+										activeOpacity={0.8}
+										accessibilityRole="button"
+										accessibilityLabel={`${PET_REWARDS[petLevel].name}, ${PET_REWARDS[petLevel].message}`}
+										onPress={() => {
+											bouncePet();
+											showPetSpeech(PET_REWARDS[petLevel].message);
+										}}>
 										<Animated.View style={{ width: '100%', height: '100%', transform: [{ scale: petScale }] }}>
-											<FastImage source={PET_REWARDS[petLevel].image} style={styles.petImage} resizeMode="cover" />
+											<FastImage source={PET_REWARDS[petLevel].image} style={styles.petImage} resizeMode="contain" />
 										</Animated.View>
 									</TouchableOpacity>
 								)}
@@ -930,7 +914,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		height: scaleWidth(60),
 		borderRadius: scaleWidth(60) / 2,
 		borderWidth: 2,
-		borderColor: COLORS.primaryDark,
+		borderColor: COLORS.warning,
+		backgroundColor: COLORS.warningSoft,
 		overflow: 'hidden',
 	},
 	petImage: { width: '100%', height: '100%' },

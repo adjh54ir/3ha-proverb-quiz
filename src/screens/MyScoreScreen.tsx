@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
 import {
 	View,
@@ -145,6 +145,19 @@ const ConquerHeader = ({
 	</View>
 );
 
+/**
+ * 정복 진행도 막대 (레벨/카테고리 공통).
+ * onColor = 카드가 이미 정복 색으로 칠해진 상태 — 막대도 흰색 계열로 뒤집는다.
+ */
+const ConquerProgress = ({ current, total, color, onColor }: { current: number; total: number; color: string; onColor?: boolean }) => {
+	const percent = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
+	return (
+		<View style={[styles.conquerTrack, onColor && { backgroundColor: 'rgba(255,255,255,0.28)' }]}>
+			<View style={[styles.conquerFill, { width: `${percent}%`, backgroundColor: onColor ? COLORS.textWhite : color }]} />
+		</View>
+	);
+};
+
 const MyScoreScreen = () => {
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('myScore');
@@ -179,6 +192,8 @@ const MyScoreScreen = () => {
 	const [showScrollTop, setShowScrollTop] = useState(false);
 
 	const [categoryMaster, setCategoryMaster] = useState<string[]>([]);
+	// 정복 진행도 계산용 — 지급 기준(QuizBadgeInterceptor)과 같이 정답+오답을 '푼 것'으로 센다
+	const [solvedIdSet, setSolvedIdSet] = useState<Set<number>>(new Set());
 	const [totalCountryCount, setTotalCountryCount] = useState<number>(0);
 
 	const [unlockedRewards, setUnlockedRewards] = useState<number[]>([]);
@@ -217,6 +232,25 @@ const MyScoreScreen = () => {
 	useBlockBackHandler(true); // 뒤로가기 모션 막기
 
 	const allCategories = ProverbServices.selectCategoryList(); // 전체 카테고리 (8개)
+
+	// 레벨/카테고리별 "푼 문제 수 / 전체" — 한 번 훑어서 두 맵을 같이 만든다
+	const { levelProgress, categoryProgress } = useMemo(() => {
+		const level: Record<string, { current: number; total: number }> = {};
+		const category: Record<string, { current: number; total: number }> = {};
+		const bump = (map: Record<string, { current: number; total: number }>, key: string, solved: boolean) => {
+			const entry = map[key] ?? (map[key] = { current: 0, total: 0 });
+			entry.total += 1;
+			if (solved) {
+				entry.current += 1;
+			}
+		};
+		ProverbServices.selectProverbList().forEach((p) => {
+			const solved = solvedIdSet.has(p.id);
+			bump(level, p.levelName, solved);
+			bump(category, p.category, solved);
+		});
+		return { levelProgress: level, categoryProgress: category };
+	}, [solvedIdSet]);
 	// TOOD: 해당 부분에서 데이터를 불러 와야 함
 	// const allCategories = []; // 전체 카테고리 (8개)
 
@@ -327,6 +361,7 @@ const MyScoreScreen = () => {
 			setCorrectCount(quizJson?.correctProverbId?.length ?? 0);
 			setWrongCount(quizJson?.wrongProverbId?.length ?? 0);
 			setLastAnsweredAt(quizJson?.lastAnsweredAt ?? '');
+			setSolvedIdSet(new Set([...(quizJson?.correctProverbId ?? []), ...(quizJson?.wrongProverbId ?? [])]));
 			setBestCombo(quizJson?.bestCombo ?? 0);
 
 			const timeResults = await read<MainDataType.TimeChallengeResult[]>(STORAGE_KEY_TIME, []);
@@ -399,7 +434,7 @@ const MyScoreScreen = () => {
 		}
 	};
 
-	// ✅ PET_REWARDS 인덱스 매핑: 1일→0(견습생), 7일→1(훈련생), 14일→2(수련생), 21일→3(졸업생), 28일→4(마스터)
+	// PET_REWARDS 인덱스 매핑: 1일→알, 7일→금 간 알, 14일→부화, 21일→성장, 28일→수호자
 	const getPetLevel = (count: number) => {
 		if (count >= 28) { return 4; }
 		if (count >= 21) { return 3; }
@@ -461,12 +496,11 @@ const MyScoreScreen = () => {
 	};
 
 	/**
-	 * 활동 탭 전환 — 탭을 바꾸면 이전 탭에서 보던 위치가 그대로 남아 엉뚱한 지점이 보인다.
-	 * 탭 값만 바꾸지 말고 스크롤도 최상단으로 되돌린다.
+	 * 활동 탭 전환 — 스크롤은 건드리지 않는다.
+	 * 탭만 바꾸려는데 매번 최상단으로 튀면 보던 위치를 잃는다(위로 갈 땐 ScrollTopButton 이 있다).
 	 */
 	const handleActivityTabPress = (tabKey: string) => {
 		setActiveTab(tabKey);
-		scrollRef.current?.scrollTo({ y: 0, animated: true });
 	};
 
 	const totalSolved = correctCount + wrongCount;
@@ -565,10 +599,11 @@ const MyScoreScreen = () => {
 									height: scaleWidth(60),
 									borderRadius: scaleWidth(30),
 									borderWidth: 2,
-									borderColor: COLORS.primary,
+									borderColor: COLORS.warning,
+									backgroundColor: COLORS.warningSoft,
 									overflow: 'hidden',
 								}}>
-								<FastImage source={PET_REWARDS[petLevel].image} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+								<FastImage source={PET_REWARDS[petLevel].image} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
 							</View>
 						)}
 					</Animated.View>
@@ -867,6 +902,7 @@ const MyScoreScreen = () => {
 									renderItem={({ item }) => {
 										const isEarned = levelMaster.includes(item.title);
 										const levelStyle = getLevelStyle(item.subtitle);
+										const progress = levelProgress[item.subtitle] ?? { current: 0, total: 0 };
 										return (
 											<View
 												style={[
@@ -885,6 +921,14 @@ const MyScoreScreen = () => {
 												/>
 												<Text style={[styles.levelText, isEarned && { color: COLORS.textWhite, fontWeight: '700' }]}> {item.title} </Text>
 												<Text style={[styles.levelSubText, isEarned && { color: COLORS.textWhite }]}> {item.subtitle} </Text>
+
+												{/* ✅ 진행도: 푼 문제 수 + 막대 */}
+												<View style={styles.levelProgressBox}>
+													<Text style={[styles.conquerProgressText, isEarned && { color: COLORS.textWhite }]}>
+														{progress.current} / {progress.total}
+													</Text>
+													<ConquerProgress current={progress.current} total={progress.total} color={levelStyle.bg} onColor={isEarned} />
+												</View>
 
 												{/* ✅ 정복 배지 */}
 												{isEarned && (
@@ -918,6 +962,7 @@ const MyScoreScreen = () => {
 								scrollEnabled={false}
 								renderItem={({ item: category }) => {
 									const isEarned = categoryMaster.includes(category);
+									const progress = categoryProgress[category] ?? { current: 0, total: 0 };
 									const categoryInfo = FIELD_DROPDOWN_ITEMS.find((item) => item.label === category || item.value === category);
 									const meta = {
 										color: categoryInfo?.iconColor ?? COLORS.borderDark,
@@ -953,22 +998,31 @@ const MyScoreScreen = () => {
 													color={isEarned ? COLORS.textWhite : meta.color}
 												/>
 											</View>
-											<Text
-												style={[
-													styles.categoryRowText,
-													isEarned && {
-														color: COLORS.textWhite,
-														fontWeight: '700',
-														textShadowColor: 'rgba(0, 0, 0, 0.15)',
-														textShadowOffset: { width: 1, height: 1 },
-														textShadowRadius: 2,
-													},
-												]}>
-												{category}
-											</Text>
+											<View style={styles.categoryRowBody}>
+												<View style={styles.categoryRowTop}>
+													<Text
+														style={[
+															styles.categoryRowText,
+															isEarned && {
+																color: COLORS.textWhite,
+																fontWeight: '700',
+																textShadowColor: 'rgba(0, 0, 0, 0.15)',
+																textShadowOffset: { width: 1, height: 1 },
+																textShadowRadius: 2,
+															},
+														]}>
+														{category}
+													</Text>
+													<Text style={[styles.conquerProgressText, isEarned && { color: COLORS.textWhite }]}>
+														{progress.current} / {progress.total}
+													</Text>
+												</View>
+												{/* ✅ 진행도 막대 */}
+												<ConquerProgress current={progress.current} total={progress.total} color={meta.color} onColor={isEarned} />
+											</View>
 											{/* ✅ 정복 배지 */}
 											{isEarned && (
-												<View style={[styles.conquerTag, { marginLeft: 'auto' }]}>
+												<View style={[styles.conquerTag, { marginLeft: SPACING_W.smPlus }]}>
 													<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color={COLORS.primaryDark} />
 													<Text style={styles.conquerTagText}>정복</Text>
 												</View>
@@ -1420,7 +1474,7 @@ const MyScoreScreen = () => {
 				onClose={guide.close}
 				lines={[
 					'나의 활동에서는 지금까지의 기록을 모아서 볼 수 있습니다.',
-					'퀴즈로 점수를 모으면 캐릭터 등급이 올라갑니다. 옆에 붙은 펫은 도전탑 보상으로 얻은 친구입니다.',
+					'퀴즈로 점수를 모으면 캐릭터 등급이 올라갑니다. 옆의 말빛 해치는 출석으로 알을 깨워 부화시킨 친구입니다.',
 					'전체 스코어로 학습 진척도와 정답률을 한눈에 확인하세요.',
 					'뱃지를 누르면 획득 조건과 상세 설명이 나옵니다!',
 				]}
@@ -1884,7 +1938,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	levelCard: {
 		width: '42%',
-		aspectRatio: 1,
+		paddingVertical: SPACING_H.lg,
+		paddingHorizontal: SPACING_W.md,
 		borderWidth: 1.5,
 		borderColor: COLORS.border,
 		borderRadius: RADIUS.lg,
@@ -2054,6 +2109,28 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.xs,
 		color: COLORS.primaryDark,
 		fontWeight: '700',
+	},
+	conquerTrack: {
+		height: scaleHeight(6),
+		width: '100%',
+		borderRadius: RADIUS.round,
+		backgroundColor: COLORS.surfaceAlt,
+		overflow: 'hidden',
+	},
+	conquerFill: {
+		height: '100%',
+		borderRadius: RADIUS.round,
+	},
+	conquerProgressText: {
+		fontSize: FONT_SIZES.xs,
+		color: COLORS.textSecondary,
+		fontWeight: '700',
+	},
+	levelProgressBox: {
+		width: '100%',
+		alignItems: 'center',
+		gap: SPACING_H.xxs,
+		marginTop: SPACING_H.smPlus,
 	},
 	sectionSubtitleInline: {
 		fontSize: FONT_SIZES.mdPlus,
@@ -2266,6 +2343,16 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.mdPlus,
 		color: COLORS.text,
 		fontWeight: '600',
+	},
+	categoryRowBody: {
+		flex: 1,
+		gap: SPACING_H.xs,
+	},
+	categoryRowTop: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		gap: SPACING_W.sm,
 	},
 	levelDetailDescription: {
 		fontSize: FONT_SIZES.sm,

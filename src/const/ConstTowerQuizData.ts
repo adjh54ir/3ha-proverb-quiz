@@ -35,7 +35,7 @@ export function generateTowerQuiz(level: MainDataType.Proverb['level'], question
 			question: `"${item.proverb}"의 뜻은 무엇입니까?`,
 			options: allOptions,
 			correctAnswer,
-			explanation: `${item.longMeaning || item.meaning}\n\n예시: ${item.example[0] ?? ''}`,
+			explanation: [item.longMeaning || item.meaning, item.example[0]].filter(Boolean).join('\n\n예시: '),
 			proverb: item.proverb,
 			level: item.level,
 			category: item.category,
@@ -59,7 +59,8 @@ export function generateCategoryQuiz(category: MainDataType.Proverb['category'],
 
 	return selectedWords.map((item) => {
 		const otherWords = CONST_MAIN_DATA.PROVERB.filter((w) => w.id !== item.id && w.meaning !== item.meaning);
-		const wrongAnswers = sampleSize(otherWords, 3).map((w) => w.meaning);
+		// 오답끼리 뜻이 겹치는 경우가 있어(사전 정의가 같은 속담들) 보기 텍스트 기준으로 중복을 뺀다.
+		const wrongAnswers = [...new Set(sampleSize(otherWords, 12).map((w) => w.meaning))].slice(0, 3);
 
 		const allOptions = shuffle([item.meaning, ...wrongAnswers]);
 		const correctAnswer = allOptions.indexOf(item.meaning);
@@ -68,7 +69,7 @@ export function generateCategoryQuiz(category: MainDataType.Proverb['category'],
 			question: `"${item.proverb}"의 뜻은 무엇입니까?`,
 			options: allOptions,
 			correctAnswer,
-			explanation: `${item.meaning}\n\n예시: ${item.example[0] ?? ''}`,
+			explanation: [item.meaning, item.example[0]].filter(Boolean).join('\n\n예시: '),
 			proverb: item.proverb,
 			level: item.level,
 			category: item.category,

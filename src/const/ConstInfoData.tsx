@@ -23,12 +23,41 @@ export {
 export type { CharacterLevel, ScoredCharacterLevel } from '@/const/common/CommonCharacterData';
 
 export const PET_REWARDS = [
-	{ day: 1, label: '1일 출석', name: '멍뭉 견습생', image: require('@/assets/images/pet_level0.jpg') },
-	{ day: 7, label: '7일 출석', name: '멍뭉 훈련생', image: require('@/assets/images/pet_level1.png') },
-	{ day: 14, label: '14일 출석', name: '멍뭉 수련생', image: require('@/assets/images/pet_level2.png') },
-	{ day: 21, label: '21일 출석', name: '멍뭉 졸업생', image: require('@/assets/images/pet_level3.png') },
-	{ day: 28, label: '28일 출석', name: '멍뭉 마스터', image: require('@/assets/images/pet_level4.png') },
+	{
+		day: 1,
+		label: '1일 출석',
+		name: '포근한 해치알',
+		message: '알이 포근해졌어요',
+		image: require('@/assets/images/pet_hatch_stage1_v3.png'),
+	},
+	{
+		day: 7,
+		label: '7일 출석',
+		name: '톡톡 해치알',
+		message: '톡톡… 안에서 소리가 나요!',
+		image: require('@/assets/images/pet_hatch_stage2_v3.png'),
+	},
+	{
+		day: 14,
+		label: '14일 출석',
+		name: '아기 말빛 해치',
+		message: '속담을 먹고 쑥쑥 자랄래요!',
+		image: require('@/assets/images/pet_hatch_stage3_v3.png'),
+	},
+	{
+		day: 21,
+		label: '21일 출석',
+		name: '배움 말빛 해치',
+		message: '오늘의 지혜도 모아 볼까요?',
+		image: require('@/assets/images/pet_hatch_stage4_v3.png'),
+	},
+	{
+		day: 28,
+		label: '28일 출석',
+		name: '속담 수호 해치',
+		message: '옛말의 지혜는 제가 지킬게요!',
+		image: require('@/assets/images/pet_hatch_stage5_v3.png'),
+	},
 ];
 
 // QUIZ_MODES 는 '@/const/common/CommonMainData' 단일 소스를 쓴다.
-

@@ -19,17 +19,15 @@ export declare namespace MainDataType {
 	export type Proverb = {
 		id: number; // 고유 식별자 (1부터 시작하는 번호)
 		proverb: string; // 속담 본문 (ex: "가는 말이 고와야 오는 말이 곱다")
-		meaning: string; // 속담의 의미 설명 (문장형, 존댓말 처리)
+		meaning: string; // 속담의 짧은 뜻 (한 문장, 평서형)
 		longMeaning: string; // 우리말샘의 긴 의미
 		sameProverb?: string[]; // 같은 의미
 		category: '운/우연' | '인간관계' | '세상 이치' | '근면/검소' | '노력/성공' | '경계/조심' | '욕심/탐욕' | '배신/불신'; // 속담이 속하는 카테고리 (ex: 인간관계, 세상 이치 등)
 		level: 1 | 2 | 3 | 4; // 난이도 숫자 (1: 초급, 2: 중급, 3: 고급, 4: 특급)
 		levelName: string; // 난이도 이름 (ex: "중급", "고급" 등 텍스트)
 		example: string[]; // 속담을 활용한 실제 예시 문장(2개)
-		origin: string; // 속담의 유래나 배경 설명
-		usageTip: string; // 속담을 사용할 수 있는 팁 또는 상황 설명
-		synonym: string | null; // 비슷한 의미의 다른 속담 (없으면 null)
-		antonym: string | null; // 반대 의미의 속담 (없으면 null)
+		origin: string; // 속담의 유래나 배경 설명 (확인된 것만, 없으면 '')
+		usageTip: string; // 속담을 쓰는 상황 설명 (속담마다 다른 내용만, 없으면 '')
 		difficultyScore: number; // 난이도를 세분화한 점수 (1~100 범위)
 	};
 

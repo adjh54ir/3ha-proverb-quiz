@@ -35,7 +35,7 @@ import { AppPermissionInfo, loadAppPermissions, requestAppPermission } from '@/u
 import DateUtils from '@/utils/DateUtils';
 import { useToast } from '@/hooks/useToast';
 import { changeTextSizeMode, changeThemeMode, useTextSizeMode, useThemeMode } from '@/hooks/useThemeMode';
-import CharacterGuide, { useCharacterGuideOnce, resetCharacterGuideSeen } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton, resetCharacterGuideSeen } from '@/screens/common/CharacterGuide';
 import { update, write } from '@/services/StorageService';
 
 // ─────────────────────────────────────────────
@@ -1086,6 +1086,10 @@ const SettingScreen = () => {
 											<IconComponent type="MaterialCommunityIcons" name="cellphone-check" size={scaledSize(16)} color={COLORS.secondary} />
 										</View>
 										<Text style={styles.recommendTitle}>앱이 마음에 드셨습니까?</Text>
+										{/* 화면 사용법 — 제목 뒤에 흘려 두어 한 덩어리로 가운데 정렬된다 */}
+										<View style={styles.settingHelpButton}>
+											<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
+										</View>
 									</View>
 									<Text style={styles.recommendSubtitle}>가족이나 친구, 지인에게 유용한 앱을 함께 나눠보세요!</Text>
 									<View style={styles.appIconWrapper}>
@@ -1392,6 +1396,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginRight: SPACING_W.sm,
 	},
 	recommendTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong },
+	settingHelpButton: { marginLeft: SPACING_W.sm },
 	recommendSubtitle: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', marginBottom: SPACING_H.md },
 	appIconWrapper: {
 		width: scaleWidth(80),

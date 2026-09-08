@@ -1076,6 +1076,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		borderWidth: 1,
 		borderColor: COLORS.primaryDark,
+		// iOS 는 테두리 있는 카드를 clip 할 때만 배경을 뷰 레이어에 직접 칠한다.
+		// 없으면 scale 로 등장하는 첫 프레임에서 배경만 작게 그려진다(모달 레이아웃 규칙 7).
+		overflow: 'hidden',
 	},
 	badgeChipTouch: {
 		// 터치 영역을 아이콘 칩 크기로 한정 (빈 공간 오터치 방지)

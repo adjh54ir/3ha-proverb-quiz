@@ -379,6 +379,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		maxHeight: '100%', // 카드가 시스템 바를 넘지 않도록(모달 레이아웃 규칙 2)
 		maxWidth: scaleWidth(340),
 		alignItems: 'center',
+		// iOS 는 테두리 있는 카드를 clip 할 때만 배경을 뷰 레이어에 직접 칠한다.
+		// 없으면 scale 로 등장하는 첫 프레임에서 배경만 작게 그려진다(모달 레이아웃 규칙 7).
+		overflow: 'hidden',
 	},
 	iconWrap: {
 		width: scaleWidth(76),

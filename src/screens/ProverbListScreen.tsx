@@ -19,7 +19,7 @@ import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName, getLev
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
-import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
 
@@ -427,7 +427,11 @@ const ProverbListScreen = () => {
 											즐겨찾기
 										</Text>
 									</TouchableOpacity>
-									<Text style={styles.listCountText}>총 {mainList.length}개가 검색되었습니다!</Text>
+									{/* 검색 개수와 한 줄로 흘려 둔다 — 절대 배치하면 카드 모서리로 쏠려 보인다 */}
+									<View style={styles.listCountRight}>
+										<Text style={styles.listCountText}>총 {mainList.length}개가 검색되었습니다!</Text>
+										<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
+									</View>
 								</View>
 							</View>
 						</Animated.View>
@@ -640,6 +644,11 @@ const styles = themedStyles(() => StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
+	},
+	listCountRight: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.sm,
 	},
 	listCountText: {
 		fontSize: FONT_SIZES.smPlus,

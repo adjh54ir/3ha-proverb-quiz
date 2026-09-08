@@ -65,3 +65,82 @@ test('훅 대신 insets 를 직접 쓰는 모달은 상단 여백을 실제로 �
 		.map(({ name }) => name);
 	expect(offenders).toEqual([]);
 });
+
+/**
+ * scale 로 등장·맥동하는 카드에 테두리가 있으면 `overflow: 'hidden'` 이 필수다. (규칙 7)
+ *
+ * iOS 는 테두리를 내용 **뒤에** 그려야 할 때(CSS 방식) 배경색을 뷰 레이어에 직접 칠하지 않고
+ * 별도 서브레이어로 그린다. 그 서브레이어는 첫 마운트 때 transform 이 반영된 크기로 만들어져서,
+ * scale 0.95 로 등장하는 첫 프레임에 배경만 95% 크기로 남는다 — 카드 안쪽이 덜 채워져 보이는
+ * 그 버그다(CheckInModal / LevelModal / NewBadgeModal / VersionCheckModal … 이 그랬다).
+ *
+ * clipsToBounds(= overflow: 'hidden') 면 iOS 가 CoreAnimation 테두리 경로를 타면서 배경을
+ * 뷰 레이어에 그대로 칠하므로 서브레이어가 아예 생기지 않는다.
+ *
+ * scale 이 1 에서 시작하면 첫 프레임은 멀쩡하지만, 규칙을 "테두리 + scale" 로 단순하게 두는 편이
+ * 새로 만드는 카드에서 매번 판단하지 않아도 되어 싸다. 그래서 예외를 두지 않는다.
+ *
+ * scale 은 세 갈래로 카드에 닿는다 — 세 갈래 모두 훑는다.
+ *  1. style 안에 직접 `scale:` 이 있다
+ *  2. `useModalEnter` / `useModalEnterExit` 가 돌려준 스타일을 얹는다 (변수명 자유)
+ *  3. `PopInView` 로 감싼다 (내부에서 useModalEnter 를 쓴다)
+ */
+const SRC = path.join(__dirname, '..', 'src');
+
+const walkTsx = (dir: string): string[] =>
+	fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+		const full = path.join(dir, entry.name);
+		return entry.isDirectory() ? walkTsx(full) : entry.name.endsWith('.tsx') ? [full] : [];
+	});
+
+/** 여는 괄호 위치에서 짝이 맞는 닫는 괄호 다음 인덱스를 돌려준다 (중첩 객체 때문에 정규식으로는 못 자른다) */
+const matchBlock = (source: string, open: number) => {
+	let depth = 0;
+	for (let i = open; i < source.length; i += 1) {
+		if ('{[('.includes(source[i])) depth += 1;
+		else if ('}])'.includes(source[i])) {
+			depth -= 1;
+			if (depth === 0) return i + 1;
+		}
+	}
+	return source.length;
+};
+
+/** StyleSheet 정의를 이름 → 본문 으로 모은다 */
+const collectStyles = (source: string) => {
+	const out = new Map<string, string>();
+	for (const m of source.matchAll(/^[ \t]*(\w+):\s*\{/gm)) {
+		const open = source.indexOf('{', m.index!);
+		if (!out.has(m[1])) out.set(m[1], source.slice(open, matchBlock(source, open)));
+	}
+	return out;
+};
+
+test('scale 이 걸리는 테두리 카드는 overflow: hidden 을 준다', () => {
+	const offenders = walkTsx(SRC).flatMap((file) => {
+		const source = fs.readFileSync(file, 'utf8');
+		const styles = collectStyles(source);
+		// useModalEnter(Exit) 결과를 담은 변수명 (enterStyle / cardStyle / …)
+		const enterVars = [
+			...source.matchAll(/const\s+(?:(\w+)|\{\s*style:\s*(\w+)[^}]*\})\s*=\s*useModalEnter(?:Exit)?\(/g),
+		].map((m) => m[1] ?? m[2]);
+
+		const scaled = new Set<string>();
+		for (const m of source.matchAll(/style=\{/g)) {
+			const open = source.indexOf('{', m.index!);
+			const attr = source.slice(open, matchBlock(source, open));
+			const hasScale = /scale\s*:/.test(attr) || enterVars.some((v) => new RegExp(`\\b${v}\\b`).test(attr));
+			if (hasScale) [...attr.matchAll(/styles\.(\w+)/g)].forEach((s) => scaled.add(s[1]));
+		}
+		// PopInView 는 감싼 카드에 useModalEnter 를 얹는다
+		for (const m of source.matchAll(/<PopInView[^>]*style=\{styles\.(\w+)\}/g)) scaled.add(m[1]);
+
+		return [...scaled]
+			.filter((name) => {
+				const block = styles.get(name);
+				return block && /borderWidth:/.test(block) && !/overflow:/.test(block);
+			})
+			.map((name) => `${path.relative(path.join(__dirname, '..'), file)} → ${name}`);
+	});
+	expect(offenders).toEqual([]);
+});

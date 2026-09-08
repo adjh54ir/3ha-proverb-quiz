@@ -541,10 +541,6 @@ const MyScoreScreen = () => {
 						progressBackgroundColor={COLORS.surface}
 					/>}>
 				<View style={styles.sectionBox}>
-					{/* 캐릭터 영역 안내 — 줄 가장 오른쪽 */}
-					<View style={styles.characterHelpButton}>
-						<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
-					</View>
 					<Animated.View style={{ alignItems: 'center', justifyContent: 'center', marginTop: SPACING_H.mdPlus, marginBottom: scaleHeight(-8), opacity: mascotFade, transform: [{ scale: mascotScale }], position: 'relative' }}>
 						{/* ✅ 홈화면과 동일한 캐릭터/펫 배치 구조 (래퍼 높이 축소로 타이틀과 밀착) */}
 						<View style={{ width: scaleWidth(180), height: scaleWidth(150), alignItems: 'center', justifyContent: 'center' }}>
@@ -594,6 +590,10 @@ const MyScoreScreen = () => {
 									style={{ marginLeft: SPACING_W.xs }}
 								/>
 							</TouchableOpacity>
+							{/* 화면 사용법 — 등급 라벨과 한 덩어리로 가운데 정렬한다 */}
+							<View style={styles.characterHelpButton}>
+								<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
+							</View>
 						</View>
 
 						<View style={styles.scoreBadge}>
@@ -1515,12 +1515,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.primary,
 	},
 	characterHelpButton: {
-		// absolute 자식은 부모의 padding 안쪽을 기준으로 잡힌다.
-		// 0 이면 카드 모서리에 딱 붙어 답답해 보여 위·오른쪽을 한 단계 더 띄운다.
-		position: 'absolute',
-		top: SPACING_H.md,
-		right: SPACING_W.md,
-		zIndex: 20,
+		// 카드 오른쪽 모서리에 절대 배치하면 등급 라벨과 떨어져 '우측으로 쏠린' 인상을 준다.
+		// 라벨 뒤에 그대로 흘려 두어 두 요소가 한 덩어리로 가운데 정렬되게 한다.
+		marginLeft: SPACING_W.sm,
 	},
 	sectionBox: {
 		backgroundColor: COLORS.background,

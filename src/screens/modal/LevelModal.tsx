@@ -129,6 +129,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
 		alignItems: 'center',
+		// iOS 는 테두리 있는 카드를 clip 할 때만 배경을 뷰 레이어에 직접 칠한다.
+		// 없으면 scale 로 등장하는 첫 프레임에서 배경만 95% 크기로 그려진다(모달 레이아웃 규칙 6).
+		overflow: 'hidden',
 	},
 	levelModalTitle: {
 		fontSize: FONT_SIZES.heading,

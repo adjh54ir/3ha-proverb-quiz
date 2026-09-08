@@ -36,7 +36,16 @@
 
 6. iOS(Fabric) 에서 테두리 있는 카드가 `scale` 로 등장할 때(`useModalEnter`) 첫 노출에만 흰 배경이
    테두리보다 작게(95%) 그려지는 건 RN 0.78 의 `RCTViewComponentView` 버그다.
-   `scripts/patch-rn-view-bg.js`(postinstall) 가 업스트림 수정을 백포트한다 — 모달 코드로 우회하지 말 것.
+   `scripts/patch-rn-view-bg.js`(postinstall) 가 업스트림 수정을 백포트한다.
+
+7. 그와 별개로 **`scale` 이 걸리는 테두리 뷰에는 `overflow: 'hidden'` 을 반드시 준다.**
+   iOS 는 테두리를 내용 뒤에 그려야 할 때(CSS 방식) 배경색을 뷰 레이어가 아니라 별도 서브레이어로
+   그리는데, 그 서브레이어가 규칙 6 의 버그를 타는 경로다. `clipsToBounds`(= `overflow: 'hidden'`) 면
+   CoreAnimation 테두리 경로로 넘어가 서브레이어가 아예 생기지 않는다.
+   모달 카드만의 문제가 아니다 — 플립 카드·토스트처럼 `scale` 로 등장하는 화면 안 카드도 같다.
+   `scale` 이 1 에서 시작해 첫 프레임이 멀쩡한 경우도 예외로 두지 않는다(판단 비용이 더 크다).
+   `__tests__/modalLayoutRules.test.ts` 가 `src` 전체에서 세 갈래를 훑는다 —
+   style 안의 `scale:`, `useModalEnter`/`useModalEnterExit` 결과를 얹은 뷰, `PopInView` 로 감싼 카드.
 
 ## 태블릿/아이패드 반응형 규칙
 

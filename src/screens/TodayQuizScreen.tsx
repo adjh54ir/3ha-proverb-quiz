@@ -29,7 +29,7 @@ import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { playCorrect, playWrong, playFinish } from '@/utils/SoundUtils';
 import { scheduleDailyQuizReminder, cancelDailyQuizReminder, parseAlarmHour, DEFAULT_ALARM_HOUR } from '@/utils/NotifactionHelper';
-import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
+import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import * as TodayQuizService from '@/services/TodayQuizService';
 
@@ -696,6 +696,8 @@ const TodayQuizScreen = () => {
 							</TouchableOpacity>
 						</View>
 					)}
+					{/* 화면 사용법 — 알림 설정 전에도 보이도록 줄 끝에 그대로 흘려 둔다 */}
+					<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
 				</View>
 
 				<View style={styles.rightAlignedRow} />

@@ -15,7 +15,7 @@ import {
 	NativeScrollEvent,
 	Animated,
 } from 'react-native';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { RootStackParamList } from '@/navigation/conf/Types';
@@ -162,7 +162,6 @@ const MyScoreScreen = () => {
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('myScore');
 	const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-	const isFocused = useIsFocused();
 	const scrollRef = useRef<ScrollView>(null);
 	const [refreshing, setRefreshing] = useState(false);
 
@@ -261,12 +260,6 @@ const MyScoreScreen = () => {
 		}
 		return { bg: entry.color, border: entry.color };
 	};
-
-	useEffect(() => {
-		if (isFocused) {
-			handleScrollToTop();
-		}
-	}, [isFocused]);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -489,10 +482,6 @@ const MyScoreScreen = () => {
 	const onRefresh = () => {
 		setRefreshing(true);
 		loadData().finally(() => setRefreshing(false)); // ✅ 이 방식 권장
-	};
-
-	const handleScrollToTop = () => {
-		scrollRef.current?.scrollTo({ y: 0, animated: true });
 	};
 
 	/**

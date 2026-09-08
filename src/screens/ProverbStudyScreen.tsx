@@ -7,6 +7,7 @@ import { SkeletonCardList } from '@/screens/common/atomic/Skeleton';
 import { Animated, Easing, Image, InteractionManager, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import Carousel from 'react-native-reanimated-carousel';
+import ConfettiCannon from 'react-native-confetti-cannon';
 import IconComponent from './common/atomic/IconComponent';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
@@ -28,6 +29,7 @@ import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import { read, write } from '@/services/StorageService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 // 난이도/카테고리 드롭다운은 CommonMainData 단일 소스를 쓴다.
 // (이 화면에 복사돼 있던 사본은 badgeId 가 category_world/category_success 로 잘못돼 있었다)
@@ -100,7 +102,8 @@ const QuizStudyScreen = () => {
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('study');
 	// 회전/폴더블 대응: 캐러셀 높이는 실시간 화면 높이를 따른다.
-	const { height: windowHeight } = useWindowDimensions();
+	const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+	const reducedMotion = useReducedMotion();
 	const STORAGE_KEY = MainStorageKeyType.USER_STUDY_HISTORY;
 	const completionImages = require('@/assets/images/cheer-up.png');
 
@@ -133,6 +136,9 @@ const QuizStudyScreen = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [flippedCard, setFlippedCard] = useState<number | null>(null);
 	const [completedCardId, setCompletedCardId] = useState<number | null>(null);
+	// 완료 팝업에 띄울 속담 그림 — 카드의 그림은 완료 직후 새 랜덤 값으로 교체되므로 그 전에 붙잡아 둔다.
+	const [completedSceneImage, setCompletedSceneImage] = useState<number | null>(null);
+	const [confettiKey, setConfettiKey] = useState(0);
 	const [proverbList, setProverbList] = useState<MainDataType.Proverb[]>([]);
 	const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<MainDataType.UserBadge[]>([]);
 	const [studyHistory, setStudyHistory] = useState<MainDataType.UserStudyHistory>({
@@ -312,6 +318,12 @@ const QuizStudyScreen = () => {
 			lastStudyAt: DateUtils.now(), // ✅ 마지막 학습일자 추가
 		};
 
+		// 완료 팝업이 쓸 그림은 교체 전 값(= 방금 학습한 카드에 떠 있던 속담 그림)으로 고정한다.
+		const shownIndex = prevIndex;
+		setCompletedSceneImage(
+			shownIndex !== -1 && proverbSceneQueue.length > 0 ? proverbSceneQueue[shownIndex % proverbSceneQueue.length] : proverbSceneImages[0],
+		);
+
 		// ✅ 이미지 갱신: 해당 index 위치의 이미지를 새 랜덤 이미지로 교체
 		setProverbSceneQueue((prevQueue) => {
 			const newQueue = [...prevQueue];
@@ -357,6 +369,7 @@ const QuizStudyScreen = () => {
 				? reviewPraiseMessages[Math.floor(Math.random() * reviewPraiseMessages.length)]
 				: praiseMessages[Math.floor(Math.random() * praiseMessages.length)],
 		);
+		setConfettiKey((prev) => prev + 1);
 		showEncourageToast();
 
 		// 👉 자동 넘김을 원하지 않을 경우 주석처리
@@ -1162,60 +1175,28 @@ const QuizStudyScreen = () => {
 				(() => {
 					const isComplete = typeof completedCardId === 'number' && (studyHistory.studyProverbes ?? []).includes(completedCardId);
 					const accent = isComplete ? COLORS.primary : COLORS.secondary;
-					const accentSoft = isComplete ? COLORS.primarySoft : COLORS.secondarySoft;
-					const learnedCount = (studyHistory.studyProverbes ?? []).length;
-					const totalCount = proverbList.length;
-					const pct = totalCount > 0 ? Math.min(Math.round((learnedCount / totalCount) * 100), 100) : 0;
 					return (
 						<View style={styles.toastWrapper} pointerEvents="none">
+							{!reducedMotion && (
+								<ConfettiCannon key={confettiKey} count={80} origin={{ x: windowWidth / 2, y: 0 }} fadeOut autoStart explosionSpeed={350} />
+							)}
 							<Animated.View
 								style={[
-									styles.toastCard,
+									styles.completeCard,
 									{
 										opacity: toastAnim,
 										transform: [
-											{
-												translateY: toastAnim.interpolate({
-													inputRange: [0, 1],
-													outputRange: [scaleHeight(28), 0],
-												}),
-											},
-											{
-												scale: toastAnim.interpolate({
-													inputRange: [0, 1],
-													outputRange: [0.9, 1],
-												}),
-											},
+											{ scale: toastAnim.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }) },
+											{ translateY: toastAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(20), 0] }) },
 										],
 									},
 								]}>
-								{/* 상단 상태 칩 */}
-								<View style={[styles.toastPill, { backgroundColor: accentSoft }]}>
-									<IconComponent type="materialIcons" name={isComplete ? 'check-circle' : 'menu-book'} size={scaledSize(13)} color={accent} />
-									<Text style={[styles.toastPillText, { color: accent }]}>{isComplete ? '학습 완료' : '복습 시작'}</Text>
+								<View style={[styles.completeBadge, { backgroundColor: accent }]}>
+									<IconComponent type="materialIcons" name={isComplete ? 'verified' : 'menu-book'} size={scaledSize(30)} color="#fff" />
 								</View>
-
-								{/* 마스코트 (은은한 헤일로) */}
-								<View style={[styles.toastHalo, { backgroundColor: accentSoft }]}>
-									<View style={[styles.toastHaloInner, { borderColor: accent }]}>
-										<Image source={completionImages} style={styles.toastMascot} />
-									</View>
-								</View>
-
-								{/* 칭찬 문구 */}
-								<Text style={styles.toastPraise}>{praiseText}</Text>
-
-								{/* 학습 진행도 */}
-								<View style={styles.toastProgressRow}>
-									<Text style={styles.toastProgressLabel}>학습 진행</Text>
-									<Text style={[styles.toastProgressValue, { color: accent }]}>
-										{learnedCount} / {totalCount}
-										<Text style={styles.toastProgressPct}> · {pct}%</Text>
-									</Text>
-								</View>
-								<View style={styles.toastProgressTrack}>
-									<View style={[styles.toastProgressFill, { backgroundColor: accent, width: `${pct}%` }]} />
-								</View>
+								<Image source={completedSceneImage ?? completionImages} style={styles.completeImage} resizeMode="cover" />
+								<Text style={[styles.completeTitle, { color: accent }]}>{isComplete ? '학습 완료!' : '복습 시작!'}</Text>
+								<Text style={styles.completeText}>{praiseText}</Text>
 							</Animated.View>
 						</View>
 					);
@@ -1446,95 +1427,48 @@ const styles = themedStyles(() => StyleSheet.create({
 		textAlign: 'center',
 		marginTop: SPACING_H.lg,
 	},
-	toastCard: {
-		width: scaleWidth(300),
+	completeCard: {
+		width: scaleWidth(280),
 		maxWidth: '88%',
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.xl,
-		paddingTop: SPACING_H.lg,
+		paddingTop: scaleHeight(34),
 		paddingBottom: SPACING_H.lg,
 		paddingHorizontal: SPACING_W.lg,
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		alignItems: 'center',
 	},
-	toastPill: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		columnGap: SPACING_W.xs,
-		paddingHorizontal: SPACING_W.md,
-		paddingVertical: SPACING_H.xs,
-		borderRadius: RADIUS.round,
-	},
-	toastPillText: {
-		fontSize: FONT_SIZES.xs,
-		fontWeight: '700',
-	},
-	toastHalo: {
-		width: scaleWidth(88),
-		height: scaleWidth(88),
-		borderRadius: scaleWidth(88) / 2,
+	completeBadge: {
+		position: 'absolute',
+		top: scaleHeight(-26),
+		width: scaleWidth(56),
+		height: scaleWidth(56),
+		borderRadius: scaleWidth(28),
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: SPACING_H.md,
-		marginBottom: SPACING_H.md,
+		borderWidth: 4,
+		borderColor: COLORS.surface,
 	},
-	toastHaloInner: {
-		width: scaleWidth(70),
-		height: scaleWidth(70),
-		borderRadius: scaleWidth(70) / 2,
-		backgroundColor: COLORS.surface,
-		borderWidth: 2,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	toastMascot: {
-		width: scaleWidth(52),
-		height: scaleWidth(52),
-		borderRadius: RADIUS.md,
-	},
-	toastPraise: {
-		alignSelf: 'stretch', // ✅ 카드 폭에 맞춰 줄바꿈 (긴 문구 오른쪽 잘림 방지)
-		width: '100%',
-		flexShrink: 1,
-		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.text,
-		lineHeight: scaledSize(20),
-		fontWeight: '700',
-		textAlign: 'center',
-		marginBottom: SPACING_H.md,
-	},
-	toastProgressRow: {
-		width: '100%',
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		marginBottom: SPACING_H.xs,
-	},
-	toastProgressLabel: {
-		fontSize: FONT_SIZES.xs,
-		fontWeight: '700',
-		color: COLORS.textLight,
-	},
-	toastProgressValue: {
-		fontSize: FONT_SIZES.sm,
-		fontWeight: '700',
-	},
-	toastProgressPct: {
-		fontSize: FONT_SIZES.xs,
-		fontWeight: '700',
-		color: COLORS.textLight,
-	},
-	toastProgressTrack: {
-		width: '100%',
-		height: scaleHeight(7),
-		borderRadius: RADIUS.round,
+	completeImage: {
+		width: scaleWidth(96),
+		height: scaleWidth(96),
+		borderRadius: scaleWidth(48),
+		marginBottom: SPACING_H.sm,
 		backgroundColor: COLORS.surfaceAlt,
-		overflow: 'hidden',
 	},
-	toastProgressFill: {
-		height: '100%',
-		borderRadius: RADIUS.round,
+	completeTitle: {
+		fontSize: FONT_SIZES.xl,
+		fontWeight: '900',
+		marginBottom: SPACING_H.xs,
+		textAlign: 'center',
+	},
+	completeText: {
+		alignSelf: 'stretch',
+		fontSize: FONT_SIZES.smPlus,
+		color: COLORS.textLight,
+		textAlign: 'center',
+		lineHeight: scaledSize(20),
 	},
 	toastWrapper: {
 		// 전체화면 중앙 오버레이 (퍼센트 top 제거 → 위치 어긋남/잘림 방지)

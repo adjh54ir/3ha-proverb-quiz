@@ -564,7 +564,7 @@ const MyScoreScreen = () => {
 									borderColor: COLORS.primary,
 									overflow: 'hidden',
 								}}>
-								<FastImage source={PET_REWARDS[petLevel].image} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+								<FastImage source={PET_REWARDS[petLevel].image} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
 							</View>
 						)}
 					</Animated.View>

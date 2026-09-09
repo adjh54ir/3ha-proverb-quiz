@@ -493,7 +493,7 @@ const Home = () => {
 								{petLevel >= 0 && (
 									<TouchableOpacity style={styles.petContent} activeOpacity={0.8} onPress={bouncePet}>
 										<Animated.View style={{ width: '100%', height: '100%', transform: [{ scale: petScale }] }}>
-											<FastImage source={PET_REWARDS[petLevel].image} style={styles.petImage} resizeMode="cover" />
+											<FastImage source={PET_REWARDS[petLevel].image} style={styles.petImage} resizeMode="contain" />
 										</Animated.View>
 									</TouchableOpacity>
 								)}

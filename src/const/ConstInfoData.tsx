@@ -23,12 +23,11 @@ export {
 export type { CharacterLevel, ScoredCharacterLevel } from '@/const/common/CommonCharacterData';
 
 export const PET_REWARDS = [
-	{ day: 1, label: '1일 출석', name: '멍뭉 견습생', image: require('@/assets/images/pet_level0.jpg') },
-	{ day: 7, label: '7일 출석', name: '멍뭉 훈련생', image: require('@/assets/images/pet_level1.png') },
-	{ day: 14, label: '14일 출석', name: '멍뭉 수련생', image: require('@/assets/images/pet_level2.png') },
-	{ day: 21, label: '21일 출석', name: '멍뭉 졸업생', image: require('@/assets/images/pet_level3.png') },
-	{ day: 28, label: '28일 출석', name: '멍뭉 마스터', image: require('@/assets/images/pet_level4.png') },
+	{ day: 1, label: '1일 출석', name: '지혜의 알', image: require('@/assets/images/pet_level0.png') },
+	{ day: 7, label: '7일 출석', name: '아기 까치', image: require('@/assets/images/pet_level1.png') },
+	{ day: 14, label: '14일 출석', name: '속담 탐험가', image: require('@/assets/images/pet_level2.png') },
+	{ day: 21, label: '21일 출석', name: '속담 선비', image: require('@/assets/images/pet_level3.png') },
+	{ day: 28, label: '28일 출석', name: '속담 도사', image: require('@/assets/images/pet_level4.png') },
 ];
 
 // QUIZ_MODES 는 '@/const/common/CommonMainData' 단일 소스를 쓴다.
-

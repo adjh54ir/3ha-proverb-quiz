@@ -63,7 +63,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 												<FastImage
 													source={item.image}
 													style={[styles.petImage, isLocked && styles.petImageLocked]}
-													resizeMode="cover"
+													resizeMode="contain"
 												/>
 												{isEarned && (
 													<View style={styles.petEarnedCheck}>
@@ -135,7 +135,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 									{/* ✅ 획득한 펫이 캐릭터 옆에 함께 따라다님 */}
 									{petLevel >= 0 && (
 										<View style={styles.stampPetBadge}>
-											<FastImage source={PET_REWARDS[petLevel].image} style={styles.stampPetImage} resizeMode="cover" />
+											<FastImage source={PET_REWARDS[petLevel].image} style={styles.stampPetImage} resizeMode="contain" />
 										</View>
 									)}
 								</View>

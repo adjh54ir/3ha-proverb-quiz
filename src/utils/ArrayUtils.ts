@@ -39,3 +39,20 @@ export const sampleSize = <T>(array: readonly T[], count: number): T[] => {
 	}
 	return picked;
 };
+
+/**
+ * 원본을 셔플한 묶음을 이어 붙여 최소 count 개짜리 배열을 만든다.
+ * 한 묶음 안에서는 모든 원소가 정확히 한 번씩 나오고, 묶음이 끝나면 다시 섞인 묶음이 붙는다.
+ * (예: 이미지 40장 → 40장을 랜덤 순서로 다 쓴 뒤 새로 섞은 40장이 이어진다)
+ * 길이는 묶음 단위로 올림된다 — 반환 길이 >= count.
+ */
+export const shuffledCycle = <T>(array: readonly T[], count: number): T[] => {
+	if (array.length === 0 || count <= 0) {
+		return [];
+	}
+	const result: T[] = [];
+	while (result.length < count) {
+		result.push(...shuffle(array));
+	}
+	return result;
+};

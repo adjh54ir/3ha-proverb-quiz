@@ -1,4 +1,4 @@
-import { sampleSize, shuffle } from '../src/utils/ArrayUtils';
+import { sampleSize, shuffle, shuffledCycle } from '../src/utils/ArrayUtils';
 
 describe('ArrayUtils', () => {
 	it('shuffle 은 원본을 바꾸지 않고 같은 원소를 그대로 유지한다', () => {
@@ -31,5 +31,27 @@ describe('ArrayUtils', () => {
 		}
 		const expected = RUNS / 4;
 		counts.forEach((c) => expect(Math.abs(c - expected)).toBeLessThan(expected * 0.25));
+	});
+});
+
+describe('shuffledCycle', () => {
+	const items = Array.from({ length: 40 }, (_, i) => i + 1);
+
+	it('한 묶음 안에서는 모든 원소가 정확히 한 번씩 나온다', () => {
+		const queue = shuffledCycle(items, 100);
+		expect(queue.length).toBe(120); // 40 단위 올림
+		for (let start = 0; start < queue.length; start += 40) {
+			expect([...queue.slice(start, start + 40)].sort((a, b) => a - b)).toEqual(items);
+		}
+	});
+
+	it('묶음마다 순서가 다시 섞인다', () => {
+		const queue = shuffledCycle(items, 80);
+		expect(queue.slice(0, 40)).not.toEqual(queue.slice(40, 80));
+	});
+
+	it('빈 배열이나 0개 요청이면 빈 배열', () => {
+		expect(shuffledCycle([], 10)).toEqual([]);
+		expect(shuffledCycle(items, 0)).toEqual([]);
 	});
 });

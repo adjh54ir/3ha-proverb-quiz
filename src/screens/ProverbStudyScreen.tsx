@@ -29,6 +29,7 @@ import { CONST_BADGES } from '@/const/ConstBadges';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import ProverbServices from '@/services/ProverbServices';
 import NewBadgeModal from '@/screens/modal/NewBadgeModal';
+import { shuffledCycle } from '@/utils/ArrayUtils';
 import { playComplete, playFlip } from '@/utils/SoundUtils';
 import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
@@ -143,9 +144,9 @@ const QuizStudyScreen = () => {
 	};
 
 	// ✅ 첫 렌더부터 채워진 상태로 시작 (빈 배열이면 index % 0 = NaN → source undefined 가 됨)
-	const [proverbSceneQueue, setProverbSceneQueue] = useState<number[]>(() =>
-		Array.from({ length: 10 }, () => proverbSceneImages[Math.floor(Math.random() * proverbSceneImages.length)]),
-	);
+	// 장면 이미지는 40장을 한 묶음으로 섞어서 쓴다 — 40장이 랜덤 순서로 한 번씩 나온 뒤,
+	// 다시 새로 섞은 40장이 이어진다(목록이 40개보다 길면 묶음이 계속 붙는다).
+	const [proverbSceneQueue, setProverbSceneQueue] = useState<number[]>(() => shuffledCycle(proverbSceneImages, proverbSceneImages.length));
 	const [isLoading, setIsLoading] = useState(true);
 	const [flippedCard, setFlippedCard] = useState<number | null>(null);
 	const [completedCardId, setCompletedCardId] = useState<number | null>(null);
@@ -334,13 +335,19 @@ const QuizStudyScreen = () => {
 			lastStudyAt: DateUtils.now(), // ✅ 마지막 학습일자 추가
 		};
 
-		// ✅ 이미지 갱신: 해당 index 위치의 이미지를 새 랜덤 이미지로 교체
+		// ✅ 이미지 갱신: 해당 index 의 이미지를 같은 묶음 안의 다른 자리와 맞바꾼다.
+		//    새로 랜덤 뽑기를 하면 "한 묶음에 40장이 한 번씩" 규칙이 깨지므로 교체가 아니라 swap.
 		setProverbSceneQueue((prevQueue) => {
-			const newQueue = [...prevQueue];
 			const currentIndex = getFilteredData().findIndex((p) => p.id === id);
-			if (currentIndex !== -1 && newQueue.length > 0) {
-				newQueue[currentIndex % newQueue.length] = proverbSceneImages[Math.floor(Math.random() * proverbSceneImages.length)];
+			if (currentIndex === -1 || prevQueue.length === 0) {
+				return prevQueue;
 			}
+			const newQueue = [...prevQueue];
+			const pos = currentIndex % newQueue.length;
+			const blockStart = Math.floor(pos / proverbSceneImages.length) * proverbSceneImages.length;
+			const blockLength = Math.min(proverbSceneImages.length, newQueue.length - blockStart);
+			const swapPos = blockStart + Math.floor(Math.random() * blockLength);
+			[newQueue[pos], newQueue[swapPos]] = [newQueue[swapPos], newQueue[pos]];
 			return newQueue;
 		});
 
@@ -561,6 +568,12 @@ const QuizStudyScreen = () => {
 		return [...filtered].sort((a, b) => compareKr(a.proverb, b.proverb));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [proverbList, studyHistory.studyProverbes, filter, levelFilter, regionFilter]);
+
+	// 목록이 이미지 묶음보다 길어지면 묶음을 더 이어 붙인다 (index % length 로 되돌지 않게).
+	// 이미 충분히 길면 그대로 둔다 — 필터를 바꿀 때마다 카드 그림이 통째로 바뀌지 않도록.
+	useEffect(() => {
+		setProverbSceneQueue((prev) => (prev.length >= filteredData.length ? prev : shuffledCycle(proverbSceneImages, filteredData.length)));
+	}, [filteredData.length]);
 
 	const getFilteredData = (): MainDataType.Proverb[] => filteredData;
 

@@ -48,6 +48,15 @@ class ProverbServices {
 			return undefined;
 		}
 	};
+	/**
+	 * 저장된 학습/풀이 기록 중 지금 데이터에 남아 있는 id 만 남긴다.
+	 * 조작·중복 속담을 걷어 내면서 id 가 사라지므로, 옛 기록을 그대로 세면 진행도가 100%를 넘는다.
+	 */
+	filterExistingIds = (ids: number[] = []): number[] => {
+		const alive = new Set(filterData.map((p) => p.id));
+		return ids.filter((id) => alive.has(id));
+	};
+
 	// ProverbServices.ts
 	selectProverbByIds(ids: number[]): MainDataType.Proverb[] {
 		const all = this.selectProverbList();

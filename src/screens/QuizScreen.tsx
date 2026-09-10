@@ -366,7 +366,9 @@ const QuizScreen = () => {
 	 * 문제 2: 문제 세팅 로직을 별도로 분리하여 재사용 가능하게
 	 */
 	const setupQuestion = (newQuestion: MainDataType.Proverb, pool: MainDataType.Proverb[] = filteredProverbs) => {
-		const shuffledPool = shuffle(pool.filter((p) => p.id !== newQuestion.id));
+		// 서로 다른 속담이 우리말샘 뜻풀이를 그대로 공유하는 경우가 있다.
+		// 그대로 두면 meaning 모드에서 같은 보기가 두 번 뜨고, proverb 모드에서는 정답이 둘이 된다.
+		const shuffledPool = shuffle(pool.filter((p) => p.id !== newQuestion.id && p.longMeaning !== newQuestion.longMeaning));
 		const shuffledDistractors = shuffledPool.slice(0, 3);
 
 		let allOptions: string[] = [];

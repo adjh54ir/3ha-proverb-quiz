@@ -15,6 +15,8 @@ jest.mock('../src/services/ProverbServices', () => ({
 			{ id: 2, levelName: '초급', category: '인간관계' },
 			{ id: 3, levelName: '중급', category: '운/우연' },
 		],
+		// 데이터에서 사라진 id 를 걸러 내는 실제 구현과 같은 기준
+		filterExistingIds: (ids: number[] = []) => ids.filter((id) => [1, 2, 3].includes(id)),
 	},
 }));
 

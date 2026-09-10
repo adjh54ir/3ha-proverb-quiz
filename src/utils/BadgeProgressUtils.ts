@@ -26,7 +26,8 @@ export const getBadgeProgress = async (badgeId: string): Promise<BadgeProgress |
 	const study: Partial<MainDataType.UserStudyHistory> = studyJson ? JSON.parse(studyJson) : {};
 	const todayList: MainDataType.TodayQuizList[] = todayJson ? JSON.parse(todayJson) : [];
 
-	const solvedSet = new Set([...(quiz.correctProverbId ?? []), ...(quiz.wrongProverbId ?? [])]);
+	const solvedSet = new Set(ProverbServices.filterExistingIds([...(quiz.correctProverbId ?? []), ...(quiz.wrongProverbId ?? [])]));
+	const studiedCount = ProverbServices.filterExistingIds(study.studyProverbes ?? []).length;
 	// 누적 풀이 수는 지급 로직(QuizBadgeInterceptor)과 같은 기준 — 중복 제거 없이 길이 합산
 	const totalSolved = (quiz.correctProverbId?.length ?? 0) + (quiz.wrongProverbId?.length ?? 0);
 	const proverbs = ProverbServices.selectProverbList();
@@ -46,7 +47,7 @@ export const getBadgeProgress = async (badgeId: string): Promise<BadgeProgress |
 		const goal = Number(goalText);
 		switch (kind) {
 			case 'study':
-				return { current: study.studyProverbes?.length ?? 0, goal, unit: '개 학습' };
+				return { current: studiedCount, goal, unit: '개 학습' };
 			case 'quiz':
 				return { current: totalSolved, goal, unit: '문제 풀이' };
 			case 'combo':
@@ -61,7 +62,7 @@ export const getBadgeProgress = async (badgeId: string): Promise<BadgeProgress |
 	}
 
 	if (badgeId === 'study_all') {
-		return { current: study.studyProverbes?.length ?? 0, goal: proverbs.length, unit: '개 학습' };
+		return { current: studiedCount, goal: proverbs.length, unit: '개 학습' };
 	}
 	if (badgeId === 'quiz_all') {
 		return { current: solvedSet.size, goal: proverbs.length, unit: '문제 풀이' };

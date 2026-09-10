@@ -4,16 +4,22 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { SkeletonCardList } from '@/screens/common/atomic/Skeleton';
-import { Animated, Easing, Image, InteractionManager, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Animated, Easing, Image, InteractionManager, Platform, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+// 카드 뒷면 스크롤은 gesture-handler의 ScrollView를 쓴다.
+// RN 기본 ScrollView는 Carousel의 PanGesture에 세로 제스처를 뺏겨 스크롤이 먹지 않는다.
+import { ScrollView as GHScrollView } from 'react-native-gesture-handler';
+// ref 로 잡히는 인스턴스는 RN ScrollView 다 (GHScrollView 는 forwardRef 래퍼).
+import type { ScrollView as ScrollViewInstance } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import Carousel from 'react-native-reanimated-carousel';
+import LinearGradient from 'react-native-linear-gradient';
 import IconComponent from './common/atomic/IconComponent';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme, getThemeMode } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber, LEVEL_NAME_BY_NUMBER } from '@/screens/common/CommonProverbModule';
 import { LEVEL_DROPDOWN_ITEMS, FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
@@ -31,20 +37,47 @@ import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
 // 난이도/카테고리 드롭다운은 CommonMainData 단일 소스를 쓴다.
 // (이 화면에 복사돼 있던 사본은 badgeId 가 category_world/category_success 로 잘못돼 있었다)
-const mascotImages = [
-	require('@/assets/images/random/random_mascote1.png'),
-	require('@/assets/images/random/random_mascote2.png'),
-	require('@/assets/images/random/random_mascote3.png'),
-	require('@/assets/images/random/random_mascote4.png'),
-	require('@/assets/images/random/random_mascote5.png'),
-	require('@/assets/images/random/random_mascote6.png'),
-	require('@/assets/images/random/random_mascote7.png'),
-	require('@/assets/images/random/random_mascote8.png'),
-	require('@/assets/images/random/random_mascote9.png'),
-	require('@/assets/images/random/random_mascote10.png'),
-	require('@/assets/images/random/random_mascote11.png'),
-	require('@/assets/images/random/random_mascote12.png'),
-	require('@/assets/images/random/random_mascote13.png'),
+const proverbSceneImages = [
+	require('@/assets/images/proverb-scenes/01-frog-in-well.png'),
+	require('@/assets/images/proverb-scenes/02-repair-after-losing-cow.png'),
+	require('@/assets/images/proverb-scenes/03-monkey-falls-from-tree.png'),
+	require('@/assets/images/proverb-scenes/04-tap-stone-bridge.png'),
+	require('@/assets/images/proverb-scenes/05-egg-against-rock.png'),
+	require('@/assets/images/proverb-scenes/06-dog-looks-at-roof.png'),
+	require('@/assets/images/proverb-scenes/07-whales-fight-shrimp-suffers.png'),
+	require('@/assets/images/proverb-scenes/08-speak-of-the-tiger.png'),
+	require('@/assets/images/proverb-scenes/09-puppy-fears-no-tiger.png'),
+	require('@/assets/images/proverb-scenes/10-crayfish-sides-with-crab.png'),
+	require('@/assets/images/proverb-scenes/11-dragon-from-stream.png'),
+	require('@/assets/images/proverb-scenes/12-too-many-boatmen.png'),
+	require('@/assets/images/proverb-scenes/13-rice-cake-in-picture.png'),
+	require('@/assets/images/proverb-scenes/14-others-rice-cake-looks-bigger.png'),
+	require('@/assets/images/proverb-scenes/15-small-pepper-is-hot.png'),
+	require('@/assets/images/proverb-scenes/16-sightseeing-after-meal.png'),
+	require('@/assets/images/proverb-scenes/17-chicken-instead-of-pheasant.png'),
+	require('@/assets/images/proverb-scenes/18-school-dog-learns.png'),
+	require('@/assets/images/proverb-scenes/19-crying-child-gets-rice-cake.png'),
+	require('@/assets/images/proverb-scenes/20-needle-and-thread.png'),
+	require('@/assets/images/proverb-scenes/21-crow-flies-pear-falls.png'),
+	require('@/assets/images/proverb-scenes/22-kind-words-repay-debt.png'),
+	require('@/assets/images/proverb-scenes/23-small-bird-follows-stork.png'),
+	require('@/assets/images/proverb-scenes/24-empty-cart-rattles.png'),
+	require('@/assets/images/proverb-scenes/25-ten-cuts-fell-tree.png'),
+	require('@/assets/images/proverb-scenes/26-startled-by-pot-lid.png'),
+	require('@/assets/images/proverb-scenes/27-grasp-at-straw.png'),
+	require('@/assets/images/proverb-scenes/28-fan-burning-house.png'),
+	require('@/assets/images/proverb-scenes/29-ripe-rice-bows.png'),
+	require('@/assets/images/proverb-scenes/30-devoted-tower-stands.png'),
+	require('@/assets/images/proverb-scenes/31-dust-gathers-into-mountain.jpg'),
+	require('@/assets/images/proverb-scenes/32-arrive-on-market-day.jpg'),
+	require('@/assets/images/proverb-scenes/33-bird-hears-day-mouse-hears-night.jpg'),
+	require('@/assets/images/proverb-scenes/34-lifelong-habit-starts-young.jpg'),
+	require('@/assets/images/proverb-scenes/35-dark-under-lamp.jpg'),
+	require('@/assets/images/proverb-scenes/36-small-problem-becomes-large.jpg'),
+	require('@/assets/images/proverb-scenes/37-seeing-once-is-best.jpg'),
+	require('@/assets/images/proverb-scenes/38-one-clue-reveals-ten.jpg'),
+	require('@/assets/images/proverb-scenes/39-ask-even-familiar-road.jpg'),
+	require('@/assets/images/proverb-scenes/40-promising-tree-from-first-leaf.jpg'),
 ];
 
 // 태블릿 판정은 DementionUtils 의 공용 기준(짧은 변 600dp)을 쓴다 — 화면마다 기준이 갈리지 않게.
@@ -90,7 +123,7 @@ const QuizStudyScreen = () => {
 	const navigation = useNavigation();
 	const isFocused = useIsFocused();
 	const carouselRef = useRef<any>(null);
-	const isBackCardScrollingRef = useRef(false);
+	const backScrollRefs = useRef<Record<string, ScrollViewInstance | null>>({});
 	const toastAnim = useRef(new Animated.Value(0)).current;
 	const toastHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const toastAnimRef = useRef<Animated.CompositeAnimation | null>(null);
@@ -110,8 +143,8 @@ const QuizStudyScreen = () => {
 	};
 
 	// ✅ 첫 렌더부터 채워진 상태로 시작 (빈 배열이면 index % 0 = NaN → source undefined 가 됨)
-	const [mascotImagesQueue, setMascotImagesQueue] = useState<number[]>(() =>
-		Array.from({ length: 10 }, () => mascotImages[Math.floor(Math.random() * mascotImages.length)]),
+	const [proverbSceneQueue, setProverbSceneQueue] = useState<number[]>(() =>
+		Array.from({ length: 10 }, () => proverbSceneImages[Math.floor(Math.random() * proverbSceneImages.length)]),
 	);
 	const [isLoading, setIsLoading] = useState(true);
 	const [flippedCard, setFlippedCard] = useState<number | null>(null);
@@ -241,6 +274,11 @@ const QuizStudyScreen = () => {
 		return matched ? <IconComponent type={matched.iconType} name={matched.iconName} size={scaledSize(14)} color={COLORS.textWhite} /> : null;
 	};
 
+	/** 뒷면은 다시 열릴 때 항상 맨 위부터 보이게 한다 */
+	const resetBackScrolls = () => {
+		Object.values(backScrollRefs.current).forEach((sv) => sv?.scrollTo({ y: 0, animated: false }));
+	};
+
 	const fetchData = async () => {
 		try {
 			const proverbList2 = ProverbServices.selectProverbList();
@@ -249,7 +287,7 @@ const QuizStudyScreen = () => {
 			const parsed = await read<MainDataType.UserStudyHistory | null>(STORAGE_KEY, null);
 			if (parsed) {
 				const fixed: MainDataType.UserStudyHistory = {
-					studyProverbes: parsed.studyProverbes ?? [],
+					studyProverbes: ProverbServices.filterExistingIds(parsed.studyProverbes ?? []),
 					studyCounts: parsed.studyCounts ?? {},
 					badges: parsed.badges ?? [],
 					lastStudyAt: parsed.lastStudyAt ? new Date(parsed.lastStudyAt) : DateUtils.now(),
@@ -259,6 +297,7 @@ const QuizStudyScreen = () => {
 				setStudyHistory({ studyProverbes: [], studyCounts: {}, badges: [], lastStudyAt: DateUtils.now() });
 			}
 
+			resetBackScrolls();
 		} catch (error) {
 			console.error(error);
 		} finally {
@@ -296,11 +335,11 @@ const QuizStudyScreen = () => {
 		};
 
 		// ✅ 이미지 갱신: 해당 index 위치의 이미지를 새 랜덤 이미지로 교체
-		setMascotImagesQueue((prevQueue) => {
+		setProverbSceneQueue((prevQueue) => {
 			const newQueue = [...prevQueue];
 			const currentIndex = getFilteredData().findIndex((p) => p.id === id);
 			if (currentIndex !== -1 && newQueue.length > 0) {
-				newQueue[currentIndex % newQueue.length] = mascotImages[Math.floor(Math.random() * mascotImages.length)];
+				newQueue[currentIndex % newQueue.length] = proverbSceneImages[Math.floor(Math.random() * proverbSceneImages.length)];
 			}
 			return newQueue;
 		});
@@ -452,6 +491,7 @@ const QuizStudyScreen = () => {
 				Object.values(store.current).forEach((value) => value.stopAnimation());
 				store.current = {};
 			});
+			backScrollRefs.current = {};
 			timersRef.current.forEach(clearTimeout);
 			timersRef.current = [];
 		},
@@ -478,6 +518,9 @@ const QuizStudyScreen = () => {
 			useNativeDriver: true,
 		}).start(() => {
 			setFlippedCard(isCurrentlyFlipped ? null : id);
+			if (isCurrentlyFlipped) {
+				resetBackScrolls();
+			}
 		});
 	};
 	// 상단 훅/레퍼런스들 근처에 추가
@@ -561,7 +604,7 @@ const QuizStudyScreen = () => {
 	};
 
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
-		const mascot = mascotImagesQueue.length > 0 ? mascotImagesQueue[index % mascotImagesQueue.length] : mascotImages[0];
+		const proverbScene = proverbSceneQueue.length > 0 ? proverbSceneQueue[index % proverbSceneQueue.length] : proverbSceneImages[0];
 
 		const proverbId = item.id;
 		const isLearned = studyHistory.studyProverbes.includes(proverbId);
@@ -586,9 +629,6 @@ const QuizStudyScreen = () => {
 		}
 
 		const handleCardPress = () => {
-			if (isBackCardScrollingRef.current) {
-				return;
-			}
 			Animated.parallel([
 				Animated.sequence([
 					Animated.timing(pressAnim, {
@@ -629,6 +669,7 @@ const QuizStudyScreen = () => {
 			<View style={styles.cardWrapper}>
 				<Pressable onPress={handleCardPress} style={styles.cardFront}>
 					<Animated.View
+						pointerEvents={flippedCard === proverbId ? 'none' : 'auto'}
 						style={[
 							styles.cardFace,
 							{
@@ -640,7 +681,7 @@ const QuizStudyScreen = () => {
 						]}>
 						<View style={styles.flagSection}>
 							<View style={styles.flagContainer}>
-								<FastImage source={mascot} style={styles.flagImageSquare} resizeMode="cover" />
+								<FastImage source={proverbScene} style={styles.flagImageSquare} resizeMode="cover" />
 							</View>
 						</View>
 						{flippedCard !== proverbId && (
@@ -711,6 +752,7 @@ const QuizStudyScreen = () => {
 					</Animated.View>
 
 					<Animated.View
+						pointerEvents={flippedCard === proverbId ? 'auto' : 'none'}
 						style={[
 							styles.cardFace2,
 							{
@@ -723,23 +765,19 @@ const QuizStudyScreen = () => {
 							},
 						]}>
 						<View style={styles.cardBackSurface}>
-							<ScrollView
+							<GHScrollView
+								ref={(sv) => {
+									backScrollRefs.current[proverbId] = sv;
+								}}
 								style={styles.cardBackScroll}
-								onScrollBeginDrag={() => {
-									isBackCardScrollingRef.current = true;
-								}}
-								onScrollEndDrag={() => {
-									runLater(() => {
-										isBackCardScrollingRef.current = false;
-									}, 120);
-								}}
-								onMomentumScrollEnd={() => {
-									isBackCardScrollingRef.current = false;
-								}}
 								contentContainerStyle={styles.cardBackScrollContent}
-								nestedScrollEnabled
+								scrollIndicatorInsets={{ right: scaleWidth(2) }}
+								// 검정 고정이면 다크 모드 카드 위에서 스크롤바가 보이지 않는다
+								indicatorStyle={getThemeMode() === 'dark' ? 'white' : 'black'}
+								persistentScrollbar
 								removeClippedSubviews={false}
-								showsVerticalScrollIndicator={true}>
+								nestedScrollEnabled
+								showsVerticalScrollIndicator>
 								{/* <View style={[styles.badge, { backgroundColor: getLevelColor(item.level) }]}>
 								<Text style={styles.badgeText}>{item.level}</Text>
 							</View> */}
@@ -807,7 +845,9 @@ const QuizStudyScreen = () => {
 										<Text style={styles.sectionTitle}>📝 예문</Text>
 										<Text style={styles.sectionContent}>{item.example}</Text>
 									</View> */}
-							</ScrollView>
+							</GHScrollView>
+							{/* 아래에 내용이 더 있다는 신호. 내용이 짧으면 표면색끼리 겹쳐 보이지 않는다 */}
+							<LinearGradient colors={[`${COLORS.surface}00`, COLORS.surface]} style={styles.cardBackFade} pointerEvents="none" />
 						</View>
 
 						{/* ✅ 하단 버튼 영역 고정 */}
@@ -1074,6 +1114,7 @@ const QuizStudyScreen = () => {
 												}).start();
 											});
 											setFlippedCard(null);
+											resetBackScrolls();
 										}}
 									/>
 								)}
@@ -1392,7 +1433,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: SPACING_H.sm,
-		justifyContent: 'space-between',
+		flexDirection: 'column',
 		alignSelf: 'center',
 		// iOS 는 테두리 있는 카드를 clip 할 때만 배경을 뷰 레이어에 직접 칠한다.
 		// 없으면 scale 로 등장하는 첫 프레임에서 배경만 작게 그려진다(모달 레이아웃 규칙 7).
@@ -1400,18 +1441,29 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	cardBackSurface: {
 		flex: 1,
+		minHeight: 0, // 버튼이 흐름 안에 있으므로 스크롤 영역이 남는 높이만 먹게 한다
+		width: '100%',
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.md,
 		overflow: 'hidden',
 	},
 	cardBackScroll: {
 		flex: 1,
+		width: '100%',
 		backgroundColor: COLORS.surface,
+	},
+	cardBackFade: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		bottom: 0,
+		height: scaleHeight(24),
 	},
 	cardBackScrollContent: {
 		paddingTop: SPACING_H.xs,
 		paddingHorizontal: 0,
-		paddingBottom: scaleHeight(80),
+		paddingRight: SPACING_W.sm, // 스크롤바가 본문 글자를 덮지 않게
+		paddingBottom: SPACING_H.md,
 		flexGrow: 1,
 	},
 	modalOverlay: {
@@ -1672,11 +1724,9 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 
 	fixedBottomButton: {
-		position: 'absolute',
-		bottom: SPACING_H.xl,
-		left: 0,
-		right: 0,
+		width: '100%',
 		alignItems: 'center',
+		paddingTop: SPACING_H.sm,
 		paddingHorizontal: SPACING_W.lg, // ➕ 앞면 카드와 동일한 좌우 여백
 	},
 	flagImageSquare: {

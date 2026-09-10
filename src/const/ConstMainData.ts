@@ -57,7 +57,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '조금씩 쌓여 큰 결과를 초래함.',
 			longMeaning:
 				'가늘게 내리는 비는 조금씩 젖어 들기 때문에 여간해서도 옷이 젖는 줄을 깨닫지 못한다는 뜻으로, 아무리 사소한 것이라도 그것이 거듭되면 무시하지 못할 정도로 크게 됨을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -134,7 +134,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '개 눈에는 똥만 보인다',
 			meaning: '자신이 보고 싶은 것만 보고 관심 있는 것만 본다.',
 			longMeaning: '평소에 자신이 좋아하거나 관심을 가지고 있는 것만이 눈에 띈다는 것을 놀림조로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -172,7 +172,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '개미는 작아도 탑을 쌓는다',
 			meaning: '작은 노력이라도 모이면 큰 일을 이룬다.',
 			longMeaning: '아무리 보잘것없고 힘이 없는 사람이라도 꾸준히 노력하고 정성을 들이면 훌륭한 일을 이룰 수 있음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 4,
 			levelName: '특급',
@@ -211,7 +211,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '거짓말은 새끼를 친다',
 			meaning: '거짓말을 하면 자꾸 새로운 거짓말을 하게 된다.',
 			longMeaning: '작은 거짓말을 덮기 위해 더 큰 거짓말이나 사기를 치게 되거나 작은 거짓말을 하는 사람은 더 큰 거짓말을 하게 됨을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 3,
 			levelName: '고급',
@@ -230,7 +230,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '거짓말은 십 리를 못 간다',
 			meaning: '거짓은 곧 들통나게 되어 있다.',
 			longMeaning: '남을 일시적으로 속일 수는 있지만 머지않아 사실이 밝혀져 오랫동안 속일 수는 없음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 3,
 			levelName: '고급',
@@ -249,7 +249,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '거짓말하고 뺨 맞는 것보다 낫다',
 			meaning: '거짓말을 하느니 솔직히 말하는 게 낫다.',
 			longMeaning: '좀 무안하더라도 사실을 사실대로 말해야지 거짓말을 하면 안 됨을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 3,
 			levelName: '고급',
@@ -268,7 +268,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '고래 싸움에 새우 등 터진다',
 			meaning: '강한 자들의 싸움에 약한 자가 피해를 본다.',
 			longMeaning: '강한 자들끼리 싸우는 통에 아무 상관도 없는 약한 자가 중간에 끼어 피해를 입게 됨을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -304,7 +304,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 17,
 			proverb: '고슴도치도 제 새끼가 제일 곱다고 한다',
-			meaning: '부모 눈에는 자기 자식이 가장 예뻐 보입니다.',
+			meaning: '부모 눈에는 자기 자식이 가장 예뻐 보임.',
 			longMeaning: '어버이 눈에는 제 자식이 다 잘나고 귀여워 보임을 이르는 말.',
 			sameProverb: ['고슴도치도 제 새끼는 함함하다고 한다', '고슴도치도 제 새끼만은 곱다고 쓰다듬는다'],
 			category: '세상 이치',
@@ -345,7 +345,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '공든 탑이 무너지랴',
 			meaning: '정성을 다해 한 일은 쉽게 실패하지 않는다.',
 			longMeaning: '공들여 쌓은 탑은 무너질 리 없다는 뜻으로, 힘을 다하고 정성을 다하여 한 일은 그 결과가 반드시 헛되지 아니함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 2,
 			levelName: '중급',
@@ -362,7 +362,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 20,
 			proverb: '구더기 무서워 장 못 담글까',
-			meaning: '싫은 일이 있어도 할 일은 해야 합니다.',
+			meaning: '싫은 일이 있어도 할 일은 해야 함.',
 			longMeaning: '다소 방해되는 것이 있다 하더라도 마땅히 할 일은 하여야 함을 이르는 말.',
 			sameProverb: ['가시 무서워 장 못 담그랴', '쉬파리 무서워 장 못 만들까[담글까]', '장마가 무서워 호박을 못 심겠다'],
 			category: '세상 이치',
@@ -383,7 +383,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '구르는 돌은 이끼가 안 낀다',
 			meaning: '부지런히 움직이는 사람은 해가 없다.',
 			longMeaning: '부지런하고 꾸준히 노력하는 사람은 침체되지 않고 계속 발전함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 3,
 			levelName: '고급',
@@ -440,7 +440,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '굼벵이(도) 구르는 재주(가) 있다',
 			meaning: '아무리 미련해도 한 가지 재주는 있다.',
 			longMeaning: '아무런 능력이 없는 사람이 남의 관심을 끌 만한 행동을 함을 놀림조로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -459,7 +459,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '기름 먹어 본 개(같이)',
 			meaning: '한 번 이익을 맛본 사람은 다시 탐내게 된다.',
 			longMeaning: '기름 맛을 본 개가 자꾸 기름을 먹고 싶어 한다는 뜻으로, 자주 어떤 일을 또 하고 싶어 하는 모양을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 4,
 			levelName: '특급',
@@ -491,7 +491,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '까마귀 날자 배 떨어진다',
 			meaning: '아무 관계 없는 일이 우연히 동시에 일어나 의심받음.',
 			longMeaning: '아무 관계 없이 한 일이 공교롭게도 때가 같아 어떤 관계가 있는 것처럼 의심을 받게 됨을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '운/우연',
 			level: 3,
 			levelName: '고급',
@@ -540,7 +540,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 31,
 			proverb: '남의 손의 떡은 커 보인다',
-			meaning: '남의 것이 더 좋아 보입니다.',
+			meaning: '남의 것이 더 좋아 보임.',
 			longMeaning: '물건은 남의 것이 제 것보다 더 좋아 보이고 일은 남의 일이 제 일보다 더 쉬워 보임을 이르는 말.',
 			sameProverb: ['남의 손의 떡이 더 커 보이고 남이 잡은 일감이 더 헐어 보인다', '남의 밥에 든 콩이 굵어 보인다'],
 			category: '인간관계',
@@ -561,7 +561,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '낫 놓고 기역 자도 모른다',
 			meaning: '아주 무식하거나 아는 것이 없다.',
 			longMeaning: '기역 자 모양으로 생긴 낫을 보면서도 기역 자를 모른다는 뜻으로, 아주 무식함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -575,7 +575,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 33,
 			proverb: '낮말은 새가 듣고 밤말은 쥐가 듣는다',
-			meaning: '어디서든 말조심해야 합니다.',
+			meaning: '어디서든 말조심해야 함.',
 			longMeaning: '아무리 비밀히 한 말이라도 반드시 남의 귀에 들어가게 됨을 이르는 말.',
 			sameProverb: ['밤말은 쥐가 듣고 낮말은 새가 듣는다'],
 			category: '인간관계',
@@ -713,7 +713,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 41,
 			proverb: '도둑이 제 발 저리다',
-			meaning: '나쁜 짓 한 사람은 스스로 불안해합니다.',
+			meaning: '나쁜 짓 한 사람은 스스로 불안해함.',
 			longMeaning: '지은 죄가 있으면 자연히 마음이 조마조마하여짐을 이르는 말.',
 			sameProverb: ['도적은 제 발이 저려서 뛴다'],
 			category: '인간관계',
@@ -766,7 +766,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '돌도 십 년을 보고 있으면 구멍이 뚫린다',
 			meaning: '끈기 있게 노력하면 어려운 일도 이룰 수 있다.',
 			longMeaning: '무슨 일에나 정성을 들여 애써 하면 안 되는 것이 없음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 4,
 			levelName: '특급',
@@ -808,7 +808,7 @@ export const CONST_MAIN_DATA: {
 			id: 46,
 			proverb: '두 손뼉이 맞아야 소리가 난다',
 			meaning: '일은 협력이 있어야 이루어진다.',
-			longMeaning: '무슨 일이든지 두 편에서 서로 뜻이 맞아야 이루어질 수 있음 이르는 말.',
+			longMeaning: '무슨 일이든지 두 편에서 서로 뜻이 맞아야 이루어질 수 있음을 이르는 말.',
 			sameProverb: ['도둑질을 해도 손발[눈]이 맞아야 한다'],
 			category: '인간관계',
 			level: 4,
@@ -828,7 +828,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '등잔 밑이 어둡다',
 			meaning: '가까운 곳이 오히려 잘 보이지 않는다.',
 			longMeaning: '대상에서 가까이 있는 사람이 도리어 대상에 대하여 잘 알기 어려움을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '운/우연',
 			level: 3,
 			levelName: '고급',
@@ -922,7 +922,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '매도 먼저 맞는 놈이 낫다',
 			meaning: '괴로운 일은 빨리 끝내는 것이 낫다.',
 			longMeaning: '이왕 겪어야 할 일이라면 아무리 어렵고 괴롭더라도 먼저 치르는 편이 나음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '운/우연',
 			level: 3,
 			levelName: '고급',
@@ -1012,7 +1012,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 58,
 			proverb: '못 먹는 감 찔러나 본다',
-			meaning: '자기 것으로 만들 수 없는 것을 방해합니다.',
+			meaning: '자기 것으로 만들 수 없는 것을 방해함.',
 			longMeaning: '제 것으로 만들지 못할 바에야 남도 갖지 못하게 못쓰게 만들자는 뒤틀린 마음을 이르는 말.',
 			sameProverb: ['나 못 먹을 밥에는 재나 넣지', '못 먹는 밥에 재 집어넣기', '못 먹는 호박 찔러 보는 심사'],
 			category: '세상 이치',
@@ -1050,9 +1050,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 60,
 			proverb: '무소식이 희소식',
-			meaning: '연락이 없으면 무사한 것입니다.',
+			meaning: '연락이 없으면 무사한 것임.',
 			longMeaning: '소식이 없는 것은 무사히 잘 있다는 말이니, 곧 기쁜 소식이나 다름없음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -1069,7 +1069,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 61,
 			proverb: '물에 빠지면 지푸라기라도 잡는다[움켜쥔다]',
-			meaning: '절박하면 아무것에라도 의지합니다.',
+			meaning: '절박하면 아무것에라도 의지함.',
 			longMeaning: '위급한 때를 당하면 무엇이나 닥치는 대로 잡고 늘어지게 됨을 이르는 말.',
 			category: '세상 이치',
 			level: 4,
@@ -1126,7 +1126,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 64,
 			proverb: '믿는 도끼에 발등 찍힌다',
-			meaning: '믿었던 사람에게 배신당합니다.',
+			meaning: '믿었던 사람에게 배신당함.',
 			longMeaning: '잘되리라고 믿고 있던 일이 어긋나거나 믿고 있던 사람이 배반하여 오히려 해를 입음을 이르는 말.',
 			sameProverb: ['낯익은 도끼에 발등 찍힌다', '믿던 발에 돌 찍힌다', '믿었던 돌에 발부리 채었다', '아는 도끼에 발등 찍힌다'],
 			category: '인간관계',
@@ -1183,7 +1183,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '발 없는 말이 천 리 간다',
 			meaning: '소문은 순식간에 퍼진다.',
 			longMeaning: '말은 비록 발이 없지만 천 리 밖까지도 순식간에 퍼진다는 뜻으로, 말을 삼가야 함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 3,
 			levelName: '고급',
@@ -1267,7 +1267,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 72,
 			proverb: '벼 이삭은 익을수록 고개를 숙인다',
-			meaning: '학식이나 덕이 높은 사람일수록 겸손합니다.',
+			meaning: '학식이나 덕이 높은 사람일수록 겸손함.',
 			longMeaning: '교양이 있고 수양을 쌓은 사람일수록 겸손하고 남 앞에서 자기를 내세우려 하지 않는다는 것을 이르는 말.',
 			sameProverb: ['곡식 이삭은 익을수록[잘될수록] 고개를 숙인다', '낟알은 익을수록 고개를 숙인다', '병에 찬 물은 저어도 소리가 나지 않는다'],
 			category: '인간관계',
@@ -1302,7 +1302,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 74,
 			proverb: '병 주고 약 준다',
-			meaning: '해를 끼치고 나서 도움을 주는 척합니다.',
+			meaning: '해를 끼치고 나서 도움을 주는 척함.',
 			longMeaning: '남을 해치고 나서 약을 주며 그를 구원하는 체한다는 뜻으로, 교활하고 음흉한 자의 행동을 비유적으로 이르는 말.',
 			sameProverb: ['등 치고 배 만진다', '술 먹여 놓고 해장 가자 부른다'],
 			category: '세상 이치',
@@ -1324,7 +1324,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '아무리 당연한 일도 실행해야 효과가 있다.',
 			longMeaning:
 				'가까운 부뚜막에 있는 소금도 넣지 아니하면 음식이 짠맛이 날 수 없다는 뜻으로, 아무리 좋은 조건이 마련되었거나 손쉬운 일이라도 힘을 들이어 이용하거나 하지 아니하면 안 됨을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -1366,7 +1366,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '비 온 뒤에 땅이 굳어진다',
 			meaning: '어려움을 겪은 뒤에 더 단단해진다.',
 			longMeaning: '비에 젖어 질척거리던 흙도 마르면서 단단하게 굳어진다는 뜻으로, 어떤 시련을 겪은 뒤에 더 강해짐을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -1385,7 +1385,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '빛 좋은 개살구',
 			meaning: '겉만 그럴듯하고 실속이 없음.',
 			longMeaning: '겉보기에는 먹음직스러운 빛깔을 띠고 있지만 맛은 없는 개살구라는 뜻으로, 겉만 그럴듯하고 실속이 없는 경우를 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -1402,7 +1402,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '일을 하는 사람이 너무 많으면 일이 제대로 되지 않는다.',
 			longMeaning:
 				'여러 사람이 저마다 제 주장대로 배를 몰려고 하면 결국에는 배가 물로 못 가고 산으로 올라간다는 뜻으로, 주관하는 사람 없이 여러 사람이 자기주장만 내세우면 일이 제대로 되기 어려움을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 4,
 			levelName: '특급',
@@ -1419,9 +1419,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 80,
 			proverb: '사촌이 땅을 사면 배가 아프다',
-			meaning: '남이 잘 되는 것을 시기하고 질투합니다.',
+			meaning: '남이 잘 되는 것을 시기하고 질투함.',
 			longMeaning: '남이 잘되는 것을 기뻐해 주지는 않고 오히려 질투하고 시기하는 경우를 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 3,
 			levelName: '고급',
@@ -1460,7 +1460,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '세 사람만 우겨 대면 없는 호랑이도 만들어 낼 수 있다',
 			meaning: '여러 사람이 한마디씩 하면 없는 일도 있는 것처럼 된다.',
 			longMeaning: '셋이 모여 우겨 대면 누구나 곧이듣게 된다는 뜻으로, 여럿이 힘을 합치면 안되는 일이 없음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 4,
 			levelName: '특급',
@@ -1479,7 +1479,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '소 뒷걸음질 치다 쥐 잡기',
 			meaning: '뜻하지 않은 것을 우연히 얻게 됨.',
 			longMeaning: '소가 뒷걸음질 치다가 우연히 쥐를 잡게 되었다는 뜻으로, 우연히 공을 세운 경우를 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '운/우연',
 			level: 3,
 			levelName: '고급',
@@ -1516,10 +1516,10 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 86,
 			proverb: '소같이 벌어서[일하고] 쥐같이 먹어라',
-			meaning: '많이 벌어도 검소하게 써야 합니다.',
+			meaning: '많이 벌어도 검소하게 써야 함.',
 			longMeaning:
 				'소같이 꾸준하고 힘써 일하여 많이 벌어서는 쥐같이 조금씩 먹으라는 뜻으로, 일은 열심히 하여서 돈은 많이 벌고 생활은 아껴서 검소하게 함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '근면/검소',
 			level: 4,
 			levelName: '특급',
@@ -1555,9 +1555,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 88,
 			proverb: '송충이는 솔잎을 먹어야 한다',
-			meaning: '각자 자기의 분수에 맞는 일을 해야 합니다.',
+			meaning: '각자 자기의 분수에 맞는 일을 해야 함.',
 			longMeaning: '자기 분수에 맞게 처신하여야 함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -1591,7 +1591,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 90,
 			proverb: '쇠뿔도 단김에 빼랬다[빼라]',
-			meaning: '일을 할 때는 기회를 놓치지 말고 곧바로 해야 합니다.',
+			meaning: '일을 할 때는 기회를 놓치지 말고 곧바로 해야 함.',
 			longMeaning:
 				'든든히 박힌 소의 뿔을 뽑으려면 불로 달구어 놓은 김에 해치워야 한다는 뜻으로, 어떤 일이든지 하려고 생각했으면 한창 열이 올랐을 때 망설이지 말고 곧 행동으로 옮겨야 함을 이르는 말.',
 			sameProverb: ['단김에 소뿔 빼듯'],
@@ -1675,7 +1675,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '시작이 반이다',
 			meaning: '무슨 일이든 시작만 하면 그 일은 반은 이룬 것이나 다름없다.',
 			longMeaning: '무슨 일이든지 시작하기가 어렵지 일단 시작하면 일을 끝마치기는 그리 어렵지 아니함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 1,
 			levelName: '초급',
@@ -1748,7 +1748,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '아홉 가진 놈(이) 하나 가진 놈 부러워한다',
 			meaning: '많이 가진 사람도 적게 가진 사람을 부러워한다는 뜻.',
 			longMeaning: '가지면 가질수록 더 욕심이 생김을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 4,
 			levelName: '특급',
@@ -1767,7 +1767,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '얌전한 고양이[강아지/개](가) 부뚜막에 먼저 올라간다',
 			meaning: '겉으로는 얌전한 척하는 사람이 먼저 자기 이익을 챙긴다는 말.',
 			longMeaning: '겉으로는 얌전해 보이는 사람이 딴짓을 하거나 자기 실속을 다 차리는 경우를 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 4,
 			levelName: '특급',
@@ -1806,11 +1806,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 101,
 			proverb: '엎어지면 코 닿을 데',
-			meaning: '매우 가까운 거리를 이르는 말.',
+			meaning: '매우 가까운 거리.',
 			longMeaning: '매우 가까운 거리를 이르는 말.',
 			sameProverb: ['넘어지면 코 닿을 데', '엎드러지면 코 닿을 데'],
 			category: '인간관계',
@@ -1866,7 +1865,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '우물 안 개구리[고기]',
 			meaning: '세상 물정을 모르는 사람을 비유하는 말.',
 			longMeaning: '넓은 세상의 형편을 알지 못하는 사람을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 2,
 			levelName: '중급',
@@ -1883,7 +1882,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '무슨 일이든 한 가지를 끝까지 파고들어야 성공할 수 있다는 뜻.',
 			longMeaning:
 				'일을 너무 벌여 놓거나 하던 일을 자주 바꾸어 하면 아무런 성과가 없으니 어떠한 일이든 한 가지 일을 끝까지 하여야 성공할 수 있음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 4,
 			levelName: '특급',
@@ -1959,7 +1958,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '윗물이 맑아야 아랫물이 맑다',
 			meaning: '윗사람이 바르고 깨끗해야 아랫사람도 그 영향을 받는다는 뜻.',
 			longMeaning: '윗사람이 잘하면 아랫사람도 따라서 잘하게 됨을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 3,
 			levelName: '고급',
@@ -1973,7 +1972,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 111,
 			proverb: '입에 쓴 약이 병을 고친다',
@@ -2111,7 +2109,7 @@ export const CONST_MAIN_DATA: {
 			id: 119,
 			proverb: '쥐구멍에도 볕 들 날 있다',
 			meaning: '힘들고 어려운 처지에서도 좋은 때가 올 수 있다는 뜻.',
-			longMeaning: '몹시 고생을 하는 삶도 좋은 운수가 터질 날이 있음 이르는 말.',
+			longMeaning: '몹시 고생을 하는 삶도 좋은 운수가 터질 날이 있음을 이르는 말.',
 			sameProverb: ['개똥밭에 이슬 내릴 때가 있다'],
 			category: '운/우연',
 			level: 3,
@@ -2139,14 +2137,13 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 121,
 			proverb: '지성이면 감천',
 			meaning: '정성을 다하면 하늘도 감동하여 소원을 들어준다는 뜻.',
 			longMeaning:
 				'정성이 지극하면 하늘도 감동하게 된다는 뜻으로, 무슨 일에든 정성을 다하면 아주 어려운 일도 순조롭게 풀리어 좋은 결과를 맺음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '운/우연',
 			level: 3,
 			levelName: '고급',
@@ -2162,7 +2159,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '짚신도 제짝이 있다',
 			meaning: '보잘것없는 사람도 어울리는 짝이 있다는 뜻.',
 			longMeaning: '보잘것없는 사람도 제짝이 있음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 3,
 			levelName: '고급',
@@ -2178,7 +2175,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '참새가 방앗간[올조밭]을 그저 지나랴',
 			meaning: '자기가 좋아하는 곳을 그냥 지나치지 못한다는 뜻.',
 			longMeaning: '자기가 좋아하는 곳은 그대로 지나치지 못함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -2255,7 +2252,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '토끼 둘을 잡으려다가 하나도 못 잡는다',
 			meaning: '욕심을 부리다가 결국 아무것도 얻지 못한다는 뜻.',
 			longMeaning: '욕심을 부려 한꺼번에 여러 가지 일을 하려 하면 그 가운데 하나도 이루지 못함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 4,
 			levelName: '특급',
@@ -2301,7 +2298,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 131,
 			proverb: '핑계 없는 무덤이 없다',
@@ -2377,7 +2373,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '한술 밥에 배부르랴',
 			meaning: '한 번의 노력으로는 원하는 결과를 얻기 어렵다는 뜻.',
 			longMeaning: '어떤 일이든지 단번에 만족할 수는 없다는 말 또는 힘을 조금 들이고 많은 효과를 기대할 수 없음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 3,
 			levelName: '고급',
@@ -2435,7 +2431,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '호미로 막을 것을 가래로 막는다',
 			meaning: '처음에 간단히 해결할 일을 방치해 일이 커졌음을 뜻함.',
 			longMeaning: '적은 힘으로 충분히 처리할 수 있는 일에 쓸데없이 많은 힘을 들이는 경우를 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -2486,7 +2482,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '가뭄에 콩 나듯 한다',
 			meaning: '어떤 일이 드물게 일어남.',
 			longMeaning: '어떤 일이나 물건이 드문드문 있음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -2502,7 +2498,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '간에 붙었다 쓸개[염통]에 붙었다 한다',
 			meaning: '형편에 따라 이쪽저쪽 편을 바꾸는 사람을 비유.',
 			longMeaning: '자기에게 조금이라도 이익이 되면 지조 없이 이편에 붙었다 저편에 붙었다 함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -2615,7 +2611,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '다 된 밥에 재 뿌리기',
 			meaning: '잘 되어 가는 일을 망침.',
 			longMeaning: '거의 다 된 일을 끝에 가서 망치게 되는 것을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '운/우연',
 			level: 1,
 			levelName: '초급',
@@ -2780,22 +2776,6 @@ export const CONST_MAIN_DATA: {
 			synonym: null,
 			antonym: null,
 			difficultyScore: 63,
-		},
-		{
-			id: 164,
-			proverb: '열 길 물 속은 알아도 한 길 사람의 속은 모른다',
-			meaning: '사람 마음을 알기 어렵다.',
-			longMeaning: '사람의 속마음을 알기란 매우 힘듦을 이르는 말.',
-			sameProverb: ['천 길 물속은 알아도 한 길 사람의 속은 모른다', '사람 속은 천 길 물속이라', '천 길 물속은 알아도 계집 마음속은 모른다'],
-			category: '세상 이치',
-			level: 4,
-			levelName: '특급',
-			example: ['열 길 물 속은 알아도 한 길 사람의 속은 모른다더니, 그는 늘 속을 알 수가 없다.', '사람 마음은 열 길 물 속보다 깊어 알기 어렵다.'],
-			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
-			usageTip: '타인의 내면을 함부로 단정하지 말라는 뜻으로 쓰입니다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 98,
 		},
 		{
 			id: 166,
@@ -3346,13 +3326,13 @@ export const CONST_MAIN_DATA: {
 			id: 208,
 			proverb: '혹 떼러 갔다 혹 붙여 온다',
 			meaning: '문제를 해결하려다가 오히려 더 큰 문제를 안게 되는 상황을 비유하는 말.',
-			longMeaning: '자기의 부담을 덜려고 하다가 다른 일까지 떠맡게 된 경우를 이르는 말. 혹부리 영감 이야기에서 유래함 이르는 말.',
+			longMeaning: '자기의 부담을 덜려고 하다가 다른 일까지 떠맡게 된 경우를 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
 			example: ['문제를 고치려다 더 복잡해졌으니 혹 떼러 갔다 혹 붙여 온 꼴이다.', '그의 결정은 혹 떼러 갔다 혹 붙여 온다는 속담을 떠올리게 했다.'],
-			origin: '말과 행동의 이치를 짧은 비유로 전하는 표현이다.',
+			origin: '혹부리 영감 이야기에서 나온 말이다.',
 			usageTip: '문제를 해결하려다 더 크게 만든 경우에 씁니다.',
 			synonym: null,
 			antonym: null,
@@ -3396,7 +3376,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 211,
 			proverb: '말 타면 경마 잡히고 싶다',
@@ -3474,7 +3453,7 @@ export const CONST_MAIN_DATA: {
 			id: 215,
 			proverb: '가게 기둥에 입춘[주련]',
 			meaning: '격에 맞지 않는 상황이나 어울리지 않는 처지를 비유하는 표현.',
-			longMeaning: '보잘것없는 가겟집 기둥에 \'입춘대길\'이라 써 붙이는 격으로, 제격에 맞지 않음을 이르는 말.',
+			longMeaning: "보잘것없는 가겟집 기둥에 '입춘대길'이라 써 붙이는 격으로, 제격에 맞지 않음을 이르는 말.",
 			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
@@ -3638,7 +3617,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 225,
 			proverb: '호랑이 없는 골에 토끼가 왕 노릇 한다',
-			meaning: '강자가 없으면 약자가 권력을 잡게 되는 상황을 말합니다.',
+			meaning: '강자가 없으면 약자가 권력을 잡게 되는 상황을 말함.',
 			longMeaning: '뛰어난 사람이 없는 곳에서 보잘것없는 사람이 득세함을 비유적으로 이르는 말.',
 			sameProverb: [
 				'범 없는 골에 토끼가 스승이라',
@@ -4604,7 +4583,7 @@ export const CONST_MAIN_DATA: {
 			id: 284,
 			proverb: '여자가 한을 품으면 오뉴월에도 서리가 내린다',
 			meaning: '여자의 원한은 매우 무섭고 강하다는 뜻.',
-			longMeaning: '여자가 한번 마음이 틀어져 원한을 품으면 오뉴월에도 서리가 칠 만큼 매섭고 독하다는 의미의 속담 이르는 말.',
+			longMeaning: '여자가 한번 마음이 틀어져 원한을 품으면 오뉴월에도 서리가 칠 만큼 매섭고 독함을 이르는 말.',
 			sameProverb: ['계집의 곡한[독한] 마음 오뉴월에 서리 친다'],
 			category: '인간관계',
 			level: 3,
@@ -4694,14 +4673,14 @@ export const CONST_MAIN_DATA: {
 		},
 		{
 			id: 294,
-			proverb: '콩떡같이 말해도 찰떡같이 알아듣다',
+			proverb: '콩떡같이 말해도 찰떡같이 알아듣는다',
 			meaning: '상대가 말을 서툴게 해도 정확히 이해한다는 뜻.',
 			longMeaning: '비록 표현이 서툴고 모호하더라도, 상대의 의도를 잘 파악하여 이해한다는 의미를 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
 			level: 2,
 			levelName: '중급',
-			example: ['그 친구는 내가 설명을 못해도 늘 콩떡같이 말해도 찰떡같이 알아들어요.', '서툴게 말해도 상대방이 찰떡같이 알아들으니 참 편해.'],
+			example: ['그 친구는 내가 설명을 못해도 늘 콩떡같이 말해도 찰떡같이 알아들어.', '서툴게 말해도 상대방이 찰떡같이 알아들으니 참 편해.'],
 			origin: '오랜 생활 경험을 짧은 비유로 압축한 표현이다.',
 			usageTip: '상대방의 말을 잘 이해하거나 호흡이 잘 맞는 관계를 표현할 때 쓴다.',
 			synonym: null,
@@ -4734,7 +4713,7 @@ export const CONST_MAIN_DATA: {
 			category: '세상 이치',
 			level: 2,
 			levelName: '중급',
-			example: ['그는 늘 번갯불에 콩 볶아 먹겠다는 식으로 급하게 굴어요.', '성격이 급해서 뭐든 번갯불에 콩 볶아 먹듯 처리하려 해.'],
+			example: ['그는 늘 번갯불에 콩 볶아 먹겠다는 식으로 급하게 굴어.', '성격이 급해서 뭐든 번갯불에 콩 볶아 먹듯 처리하려 해.'],
 			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
 			usageTip: '성격이 급하거나 성급하게 행동하는 사람을 지적할 때 쓴다.',
 			synonym: null,
@@ -4745,12 +4724,12 @@ export const CONST_MAIN_DATA: {
 			id: 298,
 			proverb: '가물에 콩(씨) 나듯',
 			meaning: '어떤 일이 매우 드물게 일어남을 뜻.',
-			longMeaning: '가뭄이 든 해에는 콩이 잘 자라지 못하고 드물게 나는 것처럼, 어떤 일이 거의 일어나지 않음을 비유적으로 표현한 이르는 말.',
+			longMeaning: '가뭄이 든 해에는 콩이 잘 자라지 못하고 드물게 나는 것처럼, 어떤 일이 거의 일어나지 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
 			levelName: '중급',
-			example: ['그 친구는 연락이 가물에 콩 나듯 해요.', '회의에 가물에 콩 나듯 참석하니 진도가 안 나가지.'],
+			example: ['그 친구는 연락이 가물에 콩 나듯 해.', '회의에 가물에 콩 나듯 참석하니 진도가 안 나가지.'],
 			origin: '말과 행동의 이치를 짧은 비유로 전하는 표현이다.',
 			usageTip: '빈도나 횟수가 매우 적을 때 강조하는 말로 쓴다.',
 			synonym: null,
@@ -4796,12 +4775,12 @@ export const CONST_MAIN_DATA: {
 			id: 301,
 			proverb: '눈 뜨고 코 베어 갈 세상',
 			meaning: '세상이 매우 각박하고 험하다는 뜻.',
-			longMeaning: '사람이 눈을 뜨고 있는데도 코를 베어 갈 만큼 교활하고 억센 세상임을 비유적으로 표현한 이르는 말.',
+			longMeaning: '사람이 눈을 뜨고 있는데도 코를 베어 갈 만큼 교활하고 억센 세상임을 비유적으로 이르는 말.',
 			sameProverb: ['눈 뜨고 코 베인다'],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
-			example: ['정말 눈 뜨고 코 베어 갈 세상이니 조심해야 해요.', '사기꾼이 판치는 세상, 눈 뜨고 코 베어 갈 세상이 따로 없네.'],
+			example: ['정말 눈 뜨고 코 베어 갈 세상이니 조심해야 해.', '사기꾼이 판치는 세상, 눈 뜨고 코 베어 갈 세상이 따로 없네.'],
 			origin: '일상에서 반복되는 상황을 빗대어 전해 온 말이다.',
 			usageTip: '세상이나 사람을 조심해야 한다는 경고로 쓴다.',
 			synonym: null,
@@ -4844,7 +4823,7 @@ export const CONST_MAIN_DATA: {
 			id: 306,
 			proverb: '귀신 씻나락 까먹는 소리',
 			meaning: '도무지 말도 안 되는 헛소리를 뜻.',
-			longMeaning: '귀신이 씻나락(쌀겨)을 까먹는다는 있을 수 없는 일을 비유하여, 도저히 이해할 수 없는 말을 의미합니다 이르는 말.',
+			longMeaning: '귀신이 씻나락을 까먹는다는 있을 수 없는 일에 빗대어, 도저히 이해할 수 없는 말을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
@@ -4860,7 +4839,7 @@ export const CONST_MAIN_DATA: {
 			id: 307,
 			proverb: '소귀에 경 읽기',
 			meaning: '아무리 가르치고 일러도 효과가 없음을 뜻.',
-			longMeaning: '소의 귀에 불경을 읽어도 알아듣지 못하는 것처럼, 아무리 좋은 말을 해도 알아듣지 못하는 경우를 이릅니다 이르는 말.',
+			longMeaning: '소의 귀에 불경을 읽어도 알아듣지 못하는 것처럼, 아무리 좋은 말을 해도 알아듣지 못하는 경우를 이르는 말.',
 			sameProverb: ['마이동풍'],
 			category: '인간관계',
 			level: 1,
@@ -4909,7 +4888,7 @@ export const CONST_MAIN_DATA: {
 			id: 310,
 			proverb: '고양이가 쥐를 마다한다',
 			meaning: '자신의 본분이나 이익을 스스로 포기하는 태도를 뜻.',
-			longMeaning: '쥐는 고양이의 먹이인데 고양이가 그것을 마다한다는 말로, 자기에게 이로운 것을 거절하거나 본분을 저버리는 모습을 표현한 이르는 말.',
+			longMeaning: '쥐는 고양이의 먹이인데 고양이가 그것을 마다한다는 뜻으로, 자기에게 이로운 것을 거절하거나 본분을 저버리는 모습을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
@@ -4925,12 +4904,12 @@ export const CONST_MAIN_DATA: {
 			id: 311,
 			proverb: '개 고양이 보듯',
 			meaning: '서로 몹시 싫어하고 미워함을 뜻.',
-			longMeaning: '개와 고양이는 본래 사이가 나쁘다고 여겨져, 서로 보기만 해도 싫어하는 관계를 표현할 때 쓰입니다 이르는 말.',
+			longMeaning: '개와 고양이는 본래 사이가 나쁘다는 데서, 서로 보기만 해도 싫어하는 관계를 이르는 말.',
 			sameProverb: ['견원지간'],
 			category: '인간관계',
 			level: 1,
 			levelName: '초급',
-			example: ['두 사람은 만나기만 하면 개 고양이 보듯 싸워요.', '그들은 예전부터 앙숙이라 개 고양이 보듯 으르렁대요.'],
+			example: ['두 사람은 만나기만 하면 개 고양이 보듯 싸운다.', '그들은 예전부터 앙숙이라 개 고양이 보듯 으르렁댄다.'],
 			origin: '일상의 경험을 바탕으로 교훈을 전하는 말이다.',
 			usageTip: '사이가 극도로 나쁜 관계를 비유할 때 쓴다.',
 			synonym: '견원지간',
@@ -4941,7 +4920,7 @@ export const CONST_MAIN_DATA: {
 			id: 312,
 			proverb: '쥐 잡아먹은 고양이',
 			meaning: '속으로는 기쁜 일이 있어도 겉으로는 모르는 척 태연한 체하는 사람을 뜻.',
-			longMeaning: '고양이가 쥐를 잡아먹고도 아무 일 없다는 듯 태연한 표정을 짓는 모습에서, 속마음과 겉모습이 다른 사람을 비유한 이르는 말.',
+			longMeaning: '고양이가 쥐를 잡아먹고도 아무 일 없다는 듯 태연한 표정을 짓는 모습에서, 속마음과 겉모습이 다른 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
 			level: 2,
@@ -4960,7 +4939,7 @@ export const CONST_MAIN_DATA: {
 			id: 313,
 			proverb: '생쥐 고양이한테 덤비는 격',
 			meaning: '약한 자가 강한 자에게 대드는 어리석음을 뜻.',
-			longMeaning: '고양이 앞에서 생쥐가 감히 덤비는 것처럼, 힘없는 사람이 강한 상대에게 무모하게 맞서는 모습을 비유적으로 표현한 이르는 말.',
+			longMeaning: '고양이 앞에서 생쥐가 감히 덤비는 것처럼, 힘없는 사람이 강한 상대에게 무모하게 맞서는 모습을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
@@ -4997,7 +4976,7 @@ export const CONST_MAIN_DATA: {
 			category: '인간관계',
 			level: 2,
 			levelName: '중급',
-			example: ['그는 상사 앞에만 서면 고양이 앞에 쥐처럼 말도 제대로 못 해요.', '면접장에서 고양이 앞에 쥐걸음처럼 기가 죽어 있더라.'],
+			example: ['그는 상사 앞에만 서면 고양이 앞에 쥐처럼 말도 제대로 못 해.', '면접장에서 고양이 앞에 쥐걸음처럼 기가 죽어 있더라.'],
 			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
 			usageTip: '위축되거나 기가 죽은 상태를 표현할 때 쓴다.',
 			synonym: null,
@@ -5125,7 +5104,7 @@ export const CONST_MAIN_DATA: {
 			category: '인간관계',
 			level: 1,
 			levelName: '초급',
-			example: ['아이들이 미운 일곱살이라더니 요즘 참 말 안 듣네요.', '다들 거치는 시기라지만 미운 일곱살은 부모를 힘들게 해.'],
+			example: ['아이들이 미운 일곱살이라더니 요즘 참 말 안 듣네.', '다들 거치는 시기라지만 미운 일곱살은 부모를 힘들게 해.'],
 			origin: '일상의 경험을 바탕으로 교훈을 전하는 말이다.',
 			usageTip: '아이들의 버릇없음이나 반항심이 강한 시기를 표현할 때 쓴다.',
 			synonym: null,
@@ -5923,7 +5902,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 398,
 			proverb: '닭 잡아먹고 오리발 내놓기',
-			meaning: '잘못을 하고도 발뺌하며 엉뚱한 증거를 내세워 속이려는 태도를 비유합니다.',
+			meaning: '잘못을 하고도 발뺌하며 엉뚱한 증거를 내세워 속이려는 태도를 비유하는 말.',
 			longMeaning: '옳지 못한 일을 저질러 놓고 엉뚱한 수작으로 속여 넘기려 하는 일을 비유적으로 이르는 말.',
 			sameProverb: ['잡아떼다'],
 			category: '배신/불신',
@@ -5966,7 +5945,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 400,
 			proverb: '흐르는 물은 썩지 않는다',
-			meaning: '움직임이 있는 것은 부패하지 않는다는 뜻으로, 항상 활동하고 노력하면 생기가 있다는 비유입니다.',
+			meaning: '움직임이 있는 것은 부패하지 않는다는 뜻으로, 항상 활동하고 노력하면 생기가 있다는 비유하는 말.',
 			longMeaning:
 				'고인 물이 썩지 흐르는 물은 썩지 아니한다는 뜻으로, 사람은 언제나 일하고 공부하며 단련하여야 시대에 뒤떨어지지 아니하고 또 변질되지 아니함을 비유적으로 이르는 말.',
 			sameProverb: ['물은 흘러야 썩지 않는다'],
@@ -6031,7 +6010,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 404,
 			proverb: '칼로 물베기',
-			meaning: '겉으로는 크게 다투어도 금세 화해하는 모습을 비유합니다.',
+			meaning: '겉으로는 크게 다투어도 금세 화해하는 모습을 비유하는 말.',
 			longMeaning: '다투었다가도 시간이 조금 지나 곧 사이가 다시 좋아지는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -6146,7 +6125,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 411,
 			proverb: '귀에다 말뚝을 박았나',
-			meaning: '아무리 말해도 전혀 듣지 않는 사람을 비유합니다.',
+			meaning: '아무리 말해도 전혀 듣지 않는 사람을 비유하는 말.',
 			longMeaning: '귀에 말뚝을 박은 것처럼 상대방의 말을 듣지 않고 무시하거나 무관심한 태도를 보이는 사람을 표현함을 비유적으로 이르는 말.',
 			sameProverb: ['귓구멍에 마늘쪽 박았나'],
 			category: '인간관계',
@@ -6315,7 +6294,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 422,
 			proverb: '전어 굽는 냄새에 나가던[나갔던] 며느리 다시 돌아온다',
-			meaning: '맛있는 냄새가 사람을 끌어들인다는 뜻으로, 욕심이나 유혹을 표현합니다.',
+			meaning: '맛있는 냄새가 사람을 끌어들인다는 뜻으로, 욕심이나 유혹을 표현하는 말.',
 			longMeaning: '전어 굽는 냄새가 하도 고소해서 시집을 버리고 나가던 며느리가 마음을 돌려 돌아온다는 뜻으로, 전어가 대단히 맛이 좋음을 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -6632,7 +6611,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 443,
 			proverb: '코 묻은 떡[돈]이라도 뺏어 먹겠다',
-			meaning: '아주 욕심이 많고 인색한 사람을 비유합니다.',
+			meaning: '아주 욕심이 많고 인색한 사람을 비유하는 말.',
 			longMeaning:
 				'아이들이 먹다 만 떡에 코 묻은 것조차 아까워 빼앗아 먹는다는 데서, 하는 행동이 너무나 치사하고 마음에 거슬리는 경우를 비꼬아 이르는 말.',
 			sameProverb: ['어린아이 가진 떡도 뺏어 먹겠다'],
@@ -6681,7 +6660,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 446,
 			proverb: '까마귀 고기를 먹었나[먹었느냐]',
-			meaning: '자꾸 잊어버리는 사람을 비유합니다.',
+			meaning: '자꾸 잊어버리는 사람을 비유하는 말.',
 			longMeaning: '까마귀 고기를 먹으면 기억력이 없어진다는 속설에서 비롯되어, 잊어버리기를 잘하는 사람을 놀리거나 나무라는 뜻을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -6885,7 +6864,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '아 해 다르고 어 해 다르다',
 			meaning: '같은 말이라도 표현에 따라 전혀 다르게 들린다는 뜻.',
 			longMeaning:
-				'\'아\' 하느냐 \'어\' 하느냐에 따라 말의 뉘앙스가 달라지듯, 말이란 같은 내용이라도 표현하는 데 따라서 아주 다르게 들린다는 뜻을 이르는 말.',
+				"'아' 하느냐 '어' 하느냐에 따라 말의 뉘앙스가 달라지듯, 말이란 같은 내용이라도 표현하는 데 따라서 아주 다르게 들린다는 뜻을 이르는 말.",
 			sameProverb: ['말이란 탁 해 다르고 툭 해 다르다', '같은 말도 툭 해서 다르고 탁 해서 다르다'],
 			category: '인간관계',
 			level: 3,
@@ -7156,7 +7135,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 475,
 			proverb: '바다는 메워도 사람의 욕심은 못 채운다',
@@ -7354,22 +7332,6 @@ export const CONST_MAIN_DATA: {
 			synonym: '부부싸움 하루 못 간다',
 			antonym: '갈등이 깊다',
 			difficultyScore: 35,
-		},
-		{
-			id: 489,
-			proverb: '걱정도 팔자다',
-			meaning: '걱정할 일이 없는데도 걱정을 하는 사람을 놀릴 때 하는 말.',
-			longMeaning: '하지 않아도 될 걱정을 하거나 관계도 없는 남의 일에 참견하는 사람에게 놀림조로 이르는 말.',
-			sameProverb: ['쓸데없는 걱정이다'],
-			category: '인간관계',
-			level: 1,
-			levelName: '초급',
-			example: ['그 정도 일로 왜 걱정해? 걱정도 팔자다.', '항상 걱정이 많네, 걱정도 팔자야.'],
-			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
-			usageTip: '지나치게 걱정하는 사람을 부드럽게 타이를 때 쓰입니다.',
-			synonym: '걱정이 많다',
-			antonym: '태평스럽다',
-			difficultyScore: 25,
 		},
 		{
 			id: 490,
@@ -7761,7 +7723,6 @@ export const CONST_MAIN_DATA: {
 			antonym: '세월을 이기다',
 			difficultyScore: 68,
 		},
-
 		{
 			id: 513,
 			proverb: '미운 벌레 모로 긴다',
@@ -7875,25 +7836,9 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 85,
 		},
 		{
-			id: 519,
-			proverb: '새발의 피',
-			meaning: '아주 보잘것없고 극히 적은 양을 비유한 표현.',
-			longMeaning: '새의 가느다란 발에서 나오는 피처럼 아주 적은 양이나 하찮은 일을 비유적으로 이르는 말을 이르는 말.',
-			sameProverb: [],
-			category: '세상 이치',
-			level: 1,
-			levelName: '초급',
-			example: ['이 정도 돈은 전체 예산에 비하면 새발의 피지.', '내가 도와준 건 새발의 피지만, 조금이라도 도움이 되었으면 좋겠다.'],
-			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
-			usageTip: '양이나 규모가 극히 작음을 강조할 때 사용합니다.',
-			synonym: '티끌만 하다',
-			antonym: '산더미 같다',
-			difficultyScore: 7,
-		},
-		{
 			id: 520,
 			proverb: '금도 모르면서 싸다 한다',
-			meaning: '가치나 수준을 알지도 못하면서 비싸다 싸다 평가함을 비유합니다.',
+			meaning: '가치나 수준을 알지도 못하면서 비싸다 싸다 평가함을 비유하는 말.',
 			longMeaning: '일의 속사정은 잘 알지도 못하면서 경솔하게 이러니저러니 말함을 이르는 말.',
 			sameProverb: ['값도 모르고 싸다 한다', '값도 모르고 쌀자루 내민다', '남의 처녀 나이도 모르고 숙성하다고 한다'],
 			category: '경계/조심',
@@ -8116,7 +8061,6 @@ export const CONST_MAIN_DATA: {
 			antonym: '행운만 바란다',
 			difficultyScore: 32,
 		},
-
 		{
 			id: 535,
 			proverb: '같은 값이면 다홍치마[검정 송아지/과부 집 머슴살이/처녀]',
@@ -8138,7 +8082,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '게으른 선비 책장 넘기기[넘기듯]',
 			meaning: '글의 내용은 모르고 건성으로 책장만 넘긴다.',
 			longMeaning: '실속 없이 겉으로만 어떤 일을 하는 체함을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -8157,7 +8101,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '구관이 명관이다',
 			meaning: '경험이 많은 예전 사람이 새 사람보다 낫다.',
 			longMeaning: '무슨 일이든 경험이 많거나 익숙한 이가 더 잘하는 법임을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -8176,7 +8120,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '굿이나 보고 떡이나 먹지',
 			meaning: '쓸데없이 간섭하지 말고 조용히 이익이나 챙겨라.',
 			longMeaning: '쓸데없이 남의 일에 간섭을 하지 말고 일이 되어 가는 형편을 보고 있다가 자기에게 돌아오는 몫이나 챙기라는 뜻으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -8224,7 +8168,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '누울 자리 봐 가며 발을 뻗어라',
 			meaning: '다가올 결과를 미리 생각하고 행동해라.',
 			longMeaning: '어떤 일을 하려고 할 때에는 먼저 결과가 어떻게 될 것인가를 생각해 보고 시작하라는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 3,
 			levelName: '고급',
@@ -8243,7 +8187,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '무자식이 상팔자',
 			meaning: '자식이 없으면 걱정할 일도 없어 마음 편하다.',
 			longMeaning: '자식이 있으면 걱정이 끊일 날이 없으나 자식이 없으면 도리어 걱정이 없어 편하다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
 			levelName: '중급',
@@ -8259,7 +8203,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '물 들어올 때 노(를) 젓다',
 			meaning: '기회가 왔을 때 놓치지 말고 힘써라.',
 			longMeaning: '좋은 기회가 왔을 때 그 기회를 놓치지 말고 힘껏 일하라는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 2,
 			levelName: '중급',
@@ -8274,8 +8218,8 @@ export const CONST_MAIN_DATA: {
 			id: 545,
 			proverb: '암탉이 울면 집안이 망한다',
 			meaning: '집안일이 순리대로 안 되고 위계가 없으면 망한다.',
-			longMeaning: '가정에서 아내가 남편을 제쳐 놓고 떠들고 간섭하면 집안일이 잘 안된다는 말로, 순리가 뒤바뀌면 일이 그르쳐짐을 경계 이르는 말.',
-			sameProverb: [''],
+			longMeaning: '가정에서 아내가 남편을 제쳐 놓고 떠들고 간섭하면 집안일이 잘 안된다는 말로, 순리가 뒤바뀌면 일이 그르쳐짐을 경계하여 이르는 말.',
+			sameProverb: [],
 			category: '경계/조심',
 			level: 3,
 			levelName: '고급',
@@ -8294,7 +8238,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '절이 싫으면 중이 떠나라',
 			meaning: '환경이 싫으면 불평 말고 스스로 떠나야 한다.',
 			longMeaning: '어떤 집단이나 환경이 마음에 들지 않으면, 그것을 탓하기보다 싫은 사람이 떠나는 것이 옳다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -8310,7 +8254,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '중이 제 머리 못 깎는다',
 			meaning: '자기 일은 자기가 해결하기 어렵다.',
 			longMeaning: '자기가 자신에 관한 일을 좋게 해결하기는 어려운 일이어서 남의 손을 빌려야만 이루기 쉬움을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -8346,7 +8290,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '털어서 먼지 안 나는 사람 없다',
 			meaning: '누구나 찾아보면 허물이 있기 마련이다.',
 			longMeaning: '아무리 깨끗한 사람이라도 흠이나 잘못이 없는 사람은 없다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -8378,7 +8322,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '평안 감사도 저 싫으면 그만이다',
 			meaning: '아무리 좋은 일도 본인이 싫다면 억지로 시킬 수 없다.',
 			longMeaning: '아무리 좋은 일이라도 당사자의 마음이 내키지 않으면 억지로 시킬 수 없음을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
 			levelName: '중급',
@@ -8414,7 +8358,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '홍시 먹다가 이 빠진다',
 			meaning: '쉬운 일이라도 방심하면 탈이 난다.',
 			longMeaning: '전혀 그렇게 될 리가 없음에도 일이 안되거나 꼬이는 경우를 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 3,
 			levelName: '고급',
@@ -8429,7 +8373,7 @@ export const CONST_MAIN_DATA: {
 			id: 569,
 			proverb: '화약 지고 불 속으로 들어간다',
 			meaning: '스스로 위험한 짓을 자초한다.',
-			longMeaning: '자기 스스로 위험한 곳으로 찾아 들어간다는 말. 재앙을 자초함을 비유 이르는 말.',
+			longMeaning: '자기 스스로 위험한 곳으로 찾아 들어간다는 뜻으로, 재앙을 자초함을 비유하여 이르는 말.',
 			sameProverb: ['섶을 지고 불로 들어가려 한다'],
 			category: '경계/조심',
 			level: 3,
@@ -8450,7 +8394,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '우연히 뜻밖의 공을 세우거나 알아맞혔다.',
 			longMeaning:
 				'미련해 보이는 황소가 의도치 않게 뒷걸음치다가 우연히 쥐를 밟아 잡게 된 상황에 빗대어, 어쩌다 우연히 어떤 일을 이루거나 알아맞힘을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '운/우연',
 			level: 3,
 			levelName: '고급',
@@ -8467,7 +8411,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '잠깐 만난 사이라도 깊은 인연을 맺는다.',
 			longMeaning:
 				'만난 지 얼마 되지 않았어도 깊은 인연을 맺을 수 있음을 나타내거나, 하룻밤의 인연으로도 큰일이 닥칠 수 있으니 타인과의 관계 맺음에 신중해야 한다는 교훈을 담아 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 3,
 			levelName: '고급',
@@ -8487,7 +8431,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '자식 많은 부모는 걱정이 끊일 날이 없다.',
 			longMeaning:
 				'가지가 많고 잎이 무성한 나무는 살랑거리는 바람에도 흔들려서 잠시도 조용한 날이 없다는 뜻으로, 자식을 많이 둔 어버이에게는 근심, 걱정이 끊일 날이 없음을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
 			levelName: '중급',
@@ -8557,7 +8501,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '말 안 하면 귀신도 모른다',
 			meaning: '말하지 않으면 속마음을 아무도 모른다.',
 			longMeaning: '자신의 속마음이나 생각을 말로 표현하지 않으면 귀신조차도 알 수 없다는 뜻으로, 의사 표현을 명확히 해야 함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 1,
 			levelName: '초급',
@@ -8573,7 +8517,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '벼는 익을수록 고개를 숙인다',
 			meaning: '훌륭한 사람일수록 겸손하다.',
 			longMeaning: '곡식이 익으면 이삭이 무거워 고개를 숙이듯이, 학식이나 덕망이 높은 사람일수록 교만하지 않고 더욱 겸손함을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 1,
 			levelName: '초급',
@@ -8605,7 +8549,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '감나무 밑에 누워 홍시 떨어지기를 기다린다',
 			meaning: '노력은 안 하고 요행만 바란다.',
 			longMeaning: '아무런 노력도 하지 않고 좋은 결과가 이루어지기만 바란다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 2,
 			levelName: '중급',
@@ -8640,7 +8584,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '개 꼬리 삼 년 묵어도 황모 못 된다',
 			meaning: '본바탕이 나쁜 것은 고치기 어렵다.',
 			longMeaning: '본래 타고난 천성이 나쁘거나 능력이 없는 사람은 아무리 오랜 시간이 지나도 훌륭하게 되기 어렵다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 2,
 			levelName: '중급',
@@ -8688,7 +8632,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '꿈보다 해몽이 좋다',
 			meaning: '사실보다 해석을 더 좋게 한다.',
 			longMeaning: '하찮거나 나쁜 일이라도 풀이하기에 따라 좋게 생각할 수 있다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -8704,7 +8648,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '나간 놈[사람]의 몫은 있어도 자는 놈[사람]의 몫은 없다',
 			meaning: '게으르면 먹을 것도 없다.',
 			longMeaning: '일하러 나간 사람의 밥은 남겨 두어도, 집에서 잠만 자는 게으른 사람에게 줄 밥은 없다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '근면/검소',
 			level: 4,
 			levelName: '특급',
@@ -8723,7 +8667,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '나귀는 샌님만 섬긴다[섬기겠단다]',
 			meaning: '한 사람만 고집스럽게 따른다.',
 			longMeaning: '보잘것없는 사람이라도 자기가 지닌 지조를 지키는 경우를 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 4,
 			levelName: '특급',
@@ -8771,8 +8715,8 @@ export const CONST_MAIN_DATA: {
 			id: 602,
 			proverb: '나루 건너 배 타기',
 			meaning: '순서가 바뀌어 일이 꼬이다.',
-			longMeaning: '나루를 건너야 배를 타는데, 건너고 나서 배를 타려니 순서가 맞지 않거나 일이 뒤바뀐 상황 이르는 말.',
-			sameProverb: [''],
+			longMeaning: '나루를 건너야 배를 타는데 건너고 나서 배를 타려 한다는 뜻으로, 순서가 맞지 않거나 일이 뒤바뀐 상황을 이르는 말.',
+			sameProverb: [],
 			category: '경계/조심',
 			level: 2,
 			levelName: '중급',
@@ -8788,7 +8732,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '나무는 옮기면 죽고 사람은 (자리를) 옮겨야 산다',
 			meaning: '사람은 넓은 세상으로 나가야 한다.',
 			longMeaning: '나무는 한곳에 뿌리박고 살아야 잘 자라지만, 사람은 여기저기 다니며 경험을 쌓아야 성공한다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 3,
 			levelName: '고급',
@@ -8804,7 +8748,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '나무에 오르라 하고 흔드는 격',
 			meaning: '남을 부추겨 놓고 곤경에 빠뜨린다.',
 			longMeaning: '남을 꾀어 위험한 일을 시키고, 뒤에서는 방해하거나 해를 입힌다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '배신/불신',
 			level: 1,
 			levelName: '초급',
@@ -8868,7 +8812,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '늦바람이 더 무섭다',
 			meaning: '늙어서 시작한 일에 더 열중한다.',
 			longMeaning: '나이 들어 뒤늦게 시작한 바람(외도나 도박 등)이 걷잡을 수 없이 무섭다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 1,
 			levelName: '초급',
@@ -8935,7 +8879,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '달걀도 굴러가다 서는 모가 있다',
 			meaning: '순탄한 일에도 어려움이 있다.',
 			longMeaning: '둥근 달걀도 구르다가 설 때가 있듯이, 좋은 일만 계속되는 것이 아니라 궂은일도 생길 수 있다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -8951,7 +8895,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '달보고 짖는 개',
 			meaning: '어리석은 행동을 한다.',
 			longMeaning: '대수롭지도 않은 일에 공연히 놀라거나 겁을 내서 떠들썩하는 싱거운 사람을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 1,
 			levelName: '초급',
@@ -8983,7 +8927,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '닭 쫓던 개 지붕 쳐다본다',
 			meaning: '애쓰던 일이 실패로 돌아가 허탈하다.',
 			longMeaning: '애써 하던 일이 실패로 돌아가거나 남보다 뒤떨어져 어찌할 수 없이 멍하니 됨을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 1,
 			levelName: '초급',
@@ -8999,7 +8943,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '당장 먹기는 곶감이 달다',
 			meaning: '눈앞의 이익이 좋으나 나중엔 해롭다.',
 			longMeaning: '당장 먹기 좋고 편한 것은 그때 잠시뿐이지 정작 좋고 이로운 것은 못 된다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 1,
 			levelName: '초급',
@@ -9055,7 +8999,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '모난 돌이 정 맞는다',
 			meaning: '성격이 원만하지 못하면 미움받는다.',
 			longMeaning: '성격이 너그럽지 못하면 대인 관계가 원만할 수 없음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 1,
 			levelName: '초급',
@@ -9189,7 +9133,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '귤이 회수를 건너면 탱자가 된다',
 			meaning: '환경에 따라 성질이 변함.',
 			longMeaning: '사람은 환경에 따라 기질이나 성품이 변한다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -9244,7 +9188,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '메뚜기도 유월이 한철이다',
 			meaning: '제때를 만난 듯 날뛰는 것도 한때뿐임.',
 			longMeaning: '무엇이나 다 한창인 때가 있어 영원히 계속되는 것은 아니라는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -9260,7 +9204,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '버스 지나간 뒤에 손 흔들기',
 			meaning: '시기를 놓치고 뒤늦게 애씀.',
 			longMeaning: '이미 기회를 놓친 뒤에 뒤늦게 행동을 취해 봐야 소용없음을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -9292,7 +9236,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '앓던 이가 빠진 것 같다',
 			meaning: '골칫거리가 없어져 시원함.',
 			longMeaning: '괴로움을 주던 일이 해결되어 마음이 매우 시원함을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -9344,7 +9288,7 @@ export const CONST_MAIN_DATA: {
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
-			example: ['동생이 먼저 먹으려고? 찬물도 위아래가 있는 법이야.', '급하더라도 줄을 서세요. 찬물도 위아래가 있다잖아요.'],
+			example: ['동생이 먼저 먹으려고? 찬물도 위아래가 있는 법이야.', '급하더라도 줄을 서. 찬물도 위아래가 있다잖아.'],
 			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
 			usageTip: '예의나 차례를 지키지 않는 아랫사람을 훈계할 때 씁니다.',
 			synonym: null,
@@ -9352,31 +9296,12 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 5,
 		},
 		{
-			id: 647,
-			proverb: '가자니 태산이요 돌아서자니 숭산이라',
-			meaning: '이러지도 저러지도 못하는 난처한 상황.',
-			longMeaning: '앞으로 나아가자니 태산이 가로막고, 뒤로 물러나자니 숭산이 가로막는다는 뜻으로, 꼼짝할 수 없는 진퇴양난의 처지를 이르는 말.',
-			sameProverb: [''],
-			category: '세상 이치',
-			level: 1,
-			levelName: '초급',
-			example: [
-				'이 일도 못 하고 저 일도 못 하고, 가자니 태산이요 돌아서자니 숭산이라.',
-				'빚 독촉에 시달리는데 직장까지 잃었으니, 가자니 태산이요 돌아서자니 숭산이네.',
-			],
-			origin: '일상의 경험을 바탕으로 교훈을 전하는 말이다.',
-			usageTip: '해결책이 보이지 않는 막막한 상황을 한탄할 때 씁니다.',
-			synonym: '진퇴양난',
-			antonym: null,
-			difficultyScore: 11,
-		},
-		{
 			id: 648,
 			proverb: '개밥에 도토리',
 			meaning: '따돌림을 당하는 사람.',
 			longMeaning:
 				'개는 도토리를 먹지 아니하기 때문에 밥 속에 있어도 먹지 아니하고 남긴다는 뜻에서, 따돌림을 받아서 여럿의 축에 끼지 못하는 사람을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 1,
 			levelName: '초급',
@@ -9392,7 +9317,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '고뿔도 남을 안 준다',
 			meaning: '매우 인색함.',
 			longMeaning: '감기조차 남에게 주지 않을 정도로 욕심이 많고 인색한 사람을 비꼬아 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 1,
 			levelName: '초급',
@@ -9408,7 +9333,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '고인 물은 썩는다',
 			meaning: '변화하지 않으면 도태됨.',
 			longMeaning: '물이 흐르지 않고 고여 있으면 썩듯이, 사람도 발전하려 노력하지 않고 안주하면 뒤처지게 마련이라는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 1,
 			levelName: '초급',
@@ -9441,7 +9366,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '얕은꾀로 남을 속이려 함.',
 			longMeaning:
 				'방울 소리가 제 귀에 들리지 않으면 남의 귀에도 들리지 않을 것이라고 생각하고 도둑질을 한다는 뜻으로, 어리석은 꾀로 남을 속이려 함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 2,
 			levelName: '중급',
@@ -9457,7 +9382,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '기둥을 치면 대들보가[들보가/봇장이] 운다[울린다]',
 			meaning: '간접적으로 말해도 알아들음.',
 			longMeaning: '(主)가 되는 대상을 탓하거나 또는 그 대상에 일격을 가하거나 하면 그와 관련된 대상들이 자연히 영향을 입게 됨을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -9473,7 +9398,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '나무를 보고 숲을 보지 못한다',
 			meaning: '전체적인 흐름을 파악하라.',
 			longMeaning: '작은 부분에 집착하지 말고 전체적인 상황이나 흐름을 파악해야 한다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -9489,7 +9414,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '버들가지가 바람에 꺾일까',
 			meaning: '부드러운 것이 강한 것을 이김.',
 			longMeaning: '부드럽고 유연한 것이 오히려 억세고 강한 것보다 더 잘 견뎌 냄을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -9505,7 +9430,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '산 입에 거미줄 치랴',
 			meaning: '굶어 죽지는 아니함.',
 			longMeaning: '사람이 아무리 가난하여도 목구멍에 거미줄을 칠 정도로 굶어 죽지는 아니한다는 말로, 어떻게든 먹고살 길은 생기기 마련임을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -9521,7 +9446,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '아는 도둑이 장독 깬다',
 			meaning: '가까운 사람이 해를 입힘.',
 			longMeaning: '잘 아는 사람이 도둑질을 하거나 해칠 수 있으므로 평소에 조심해야 한다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 1,
 			levelName: '초급',
@@ -9537,7 +9462,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '사돈(네) 남(의) 말한다',
 			meaning: '자신의 잘못은 모르고 남만 탓함.',
 			longMeaning: '자신도 같은 잘못을 저지르고 있으면서 제 일은 제쳐 놓고 남의 잘못만 나무란다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 2,
 			levelName: '중급',
@@ -9690,7 +9615,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '형만 한 아우 없다',
 			meaning: '형이 아우보다 나음.',
 			longMeaning: '아우의 재주가 아무리 뛰어나도 형만은 못하다는 뜻으로, 모든 면에서 형이 아우보다 나음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 1,
 			levelName: '초급',
@@ -9723,7 +9648,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '광에서 인심 난다',
 			meaning: '생활이 넉넉해야 남을 도울 수 있음.',
 			longMeaning: '자신이 넉넉해야 다른 사람도 도울 수 있음을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -9739,7 +9664,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '군불에 밥 짓기[익히기] ',
 			meaning: '겸사겸사 이익을 봄.',
 			longMeaning: '어떤 일에 곁따라 다른 일이 쉽게 이루어지거나 또는 다른 일을 해냄을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
 			levelName: '중급',
@@ -9755,7 +9680,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '깎아 놓은 밤알 같다',
 			meaning: '외모가 훤하고 말끔하게 잘생긴 사람을 비유하는 말.',
 			longMeaning: '껍질과 보늬를 벗긴 밤알이 희고 매끈한 모습에 빗대어, 얼굴이 훤하고 말끔하게 잘생긴 사람을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -9771,7 +9696,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '남의 말 하기는 식은 죽 먹기',
 			meaning: '남의 흉을 보기는 매우 쉬움.',
 			longMeaning: '남의 잘못을 드러내어 말하기는, 식은 죽을 먹듯이 아주 쉬운 일이라는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 1,
 			levelName: '초급',
@@ -9809,7 +9734,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '가는 손님은 뒤꼭지가 예쁘다',
 			meaning: '손님이 돌아갈 때는 반갑고 좋아 보인다.',
 			longMeaning: '손님이 오랫동안 머물러 주인이 대접하기 힘들게 하다가 돌아가면 그 뒷모습이 반갑고 예뻐 보인다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
 			levelName: '중급',
@@ -9848,7 +9773,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '간장이 시고 소금이 곰팡 난다[슨다]',
 			meaning: '도저히 있을 수 없는 일이다.',
 			longMeaning: '간장이 시어질 수 없고 소금에 곰팡이가 날 수 없다는 뜻으로, 절대로 있을 수 없는 일을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -9891,7 +9816,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 695,
 			proverb: '개도 닷새가 되면 주인을 안다',
@@ -9910,25 +9834,6 @@ export const CONST_MAIN_DATA: {
 			synonym: null,
 			antonym: '배은망덕',
 			difficultyScore: 62,
-		},
-		{
-			id: 696,
-			proverb: '거지도 부지런하면 더운 밥을 얻어 먹는다',
-			meaning: '사람은 부지런해야 잘 살 수 있다.',
-			longMeaning: '아무리 가난한 사람이라도 부지런하면 먹고사는 데 걱정이 없다는 뜻을 이르는 말.',
-			sameProverb: ['개도 부지런해야 더운 똥을 얻어먹는다'],
-			category: '근면/검소',
-			level: 2,
-			levelName: '중급',
-			example: [
-				'일찍 일어나서 일하면 뭐라도 생겨. 거지도 부지런하면 더운 밥을 얻어 먹는다잖아.',
-				'성실하게 살면 굶지는 않아. 거지도 부지런하면 더운 밥을 얻어 먹는 법이야.',
-			],
-			origin: '오랜 생활 경험을 짧은 비유로 압축한 표현이다.',
-			usageTip: '근면 성실한 태도가 생계 유지의 기본임을 강조할 때 씁니다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 50,
 		},
 		{
 			id: 697,
@@ -9951,7 +9856,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '고양이는 발톱을 감춘다',
 			meaning: '남을 해칠 마음을 속에 품고 겉으로는 드러내지 않는다.',
 			longMeaning: '고양이가 쥐를 잡을 때 발톱을 감추고 접근하듯이, 남을 해칠 마음을 속에 품고 겉으로는 부드럽게 대함을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 3,
 			levelName: '고급',
@@ -9984,7 +9889,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '공짜라면 양잿물이라도 먹는다',
 			meaning: '공짜를 너무 좋아하면 위험한 것도 마다하지 않는다.',
 			longMeaning: '거저 생기는 것이라면 무엇이든 가리지 않고 탐냄을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 2,
 			levelName: '중급',
@@ -10036,7 +9941,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '훌륭한 사람의 덕행이 널리 미친다.',
 			longMeaning:
 				'금강산의 아름다움이 관동 팔십 리 곧 강원도 지방에 널리 미친다는 뜻으로, 훌륭한 사람 밑에서 지내면 그의 덕이 미치고 도움을 받게 됨을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 4,
 			levelName: '특급',
@@ -10109,7 +10014,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '꿩 잡는 것이 매다',
 			meaning: '겉모양보다 실질적인 능력이 중요하다.',
 			longMeaning: '겉모양은 보잘것없더라도 제 구실을 다 하여야 훌륭한 사람이나 물건임을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 3,
 			levelName: '고급',
@@ -10142,7 +10047,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '지위가 높을수록 책임이나 근심도 크다.',
 			longMeaning:
 				'나무가 크면 그 그림자도 길게 드리운다는 뜻으로, 훌륭한 사람에게는 그만큼 명예나 영향력이 따르거나 지위가 높을수록 책임이나 근심도 큼을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -10235,7 +10140,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '눈 온 뒤에는 거지가 빨래를 한다',
 			meaning: '눈이 온 뒤에는 날씨가 포근하다.',
 			longMeaning: '거지가 빨래를 할 만큼 눈이 온 다음 날은 날씨가 따뜻하다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -10322,7 +10227,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '아무리 튼튼한 것도 망가질 때가 있다.',
 			longMeaning:
 				'아무리 튼튼한 돌절구도 닳아서 밑이 빠질 때가 있다는 뜻으로, 아무리 단단하고 튼튼한 것이라도 결단이 날 때가 있음을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -10505,7 +10410,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '바늘 구멍으로 황소바람 들어온다',
 			meaning: '작은 틈으로 들어오는 바람이 매우 차다.',
 			longMeaning: '작은 구멍으로 들어오는 바람이 몹시 세고 차다는 뜻으로, 추울 때는 작은 구멍 하나도 잘 막아서 추위를 막아야 함을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -10556,7 +10461,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '변덕이 죽 끓듯 하다',
 			meaning: '말이나 행동을 이랬다저랬다 자주 바꾼다.',
 			longMeaning: '끓는 죽이 부글부글 끓어오르듯 사람의 성질이나 행동이 종잡을 수 없이 툭하면 변함을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 2,
 			levelName: '중급',
@@ -10573,7 +10478,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '적은 자본으로 큰 이익을 얻는다.',
 			longMeaning:
 				'보리밥알같이 보잘것없는 미끼로 잉어같이 크고 귀한 고기를 낚는다는 뜻으로, 적은 자본이나 노력으로 큰 이득을 얻음을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '운/우연',
 			level: 3,
 			levelName: '고급',
@@ -10645,7 +10550,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '성격이 거친 사람은 늘 해를 입는다.',
 			longMeaning:
 				'사나운 개는 늘 다른 개와 싸워서 콧등의 상처가 아물 날이 없다는 뜻으로, 난폭한 행동을 일삼는 사람은 해를 입는 일이 잦음을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 4,
 			levelName: '특급',
@@ -10681,7 +10586,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '사위는 백년손님(백년지객)이다',
 			meaning: '사위는 언제나 손님처럼 대접해야 하는 어려운 존재다.',
 			longMeaning: '위는 영원한 손님이라는 뜻으로, 사위는 장인과 장모에게 있어서 언제나 소홀히 대할 수 없는 존재임을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 2,
 			levelName: '중급',
@@ -10698,7 +10603,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '자리를 가려서 사람을 사귀거나 처신해야 한다.',
 			longMeaning:
 				'새조차도 앉을 때 가지를 고르고 가려서 앉는다는 뜻으로, 친구를 사귀거나 직업을 택하는 데에도 신중하게 잘 가려서 택해야 한다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 3,
 			levelName: '고급',
@@ -10714,7 +10619,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '서리 맞은 구렁이(병아리)',
 			meaning: '힘이 없어 축 늘어진 사람이나 상태.',
 			longMeaning: '서리를 맞아 힘을 못 쓰고 움츠러든 구렁이 같다는 뜻으로, 힘을 쓰지 못하고 축 늘어져 있는 사람이나 그런 상태를 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -10731,7 +10636,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '요행을 바라다가 낭패를 본다.',
 			longMeaning:
 				'그럴 리야 없을 것이라 마음을 놓거나 요행을 바라는 데에서 탈이 난다는 뜻으로, 요행을 바라지 말고 있을 수 있는 모든 것을 미리 예방해 놓아야 한다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 3,
 			levelName: '고급',
@@ -10750,7 +10655,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '소리 없는 고양이 쥐 잡듯',
 			meaning: '말수 적은 사람이 오히려 실속이 있다.',
 			longMeaning: '떠벌리고 다니는 사람보다 말없이 실천하는 사람이 실속 있는 일을 한다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 3,
 			levelName: '고급',
@@ -10780,7 +10685,6 @@ export const CONST_MAIN_DATA: {
 			antonym: '명명백백(明明白白)',
 			difficultyScore: 35,
 		},
-
 		{
 			id: 763,
 			proverb: '손톱 밑에 가시 드는 줄은 알아도 염통 밑에 쉬 스는 줄은 모른다',
@@ -10807,7 +10711,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '재수 없는 일이 잇달아 일어난다.',
 			longMeaning:
 				'소의 똥에 미끄러진 것만도 재수 없는 일인데 개의 똥에다 코를 박게 되었다는 뜻으로, 대수롭지 않은 일에 연거푸 실수만 하고 일이 꼬여 들기만 하여 기가 막히고 어이가 없는 경우를 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '운/우연',
 			level: 3,
 			levelName: '고급',
@@ -10861,7 +10765,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '여름 비는 잠 비 가을 비는 떡 비',
 			meaning: '여름 비는 낮잠 자기 좋고 가을 비는 떡 해 먹기 좋다.',
 			longMeaning: '여름에는 비가 오면 일을 못 하니 낮잠을 자게 되고, 가을에는 비가 오면 농사일이 끝나 떡을 해 먹으며 쉰다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -10877,7 +10781,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '오뉴월 감기는 개도 아니 걸린다[앓는다]',
 			meaning: '여름 감기는 앓는 사람이 거의 없다.',
 			longMeaning: '여름에 감기 앓는 사람을 변변치 못한 사람이라고 놀림조로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
 			levelName: '중급',
@@ -10894,7 +10798,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '미래를 내다보고 미리 준비한다.',
 			longMeaning:
 				'장사하는 사람은 한 푼도 못 되는 적은 돈이라도 벌 수만 있다면 고생을 무릅쓴다는 뜻으로, 장사꾼의 돈에 대한 집착을 조롱조로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 3,
 			levelName: '고급',
@@ -10913,7 +10817,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '우박 맞은 호박잎',
 			meaning: '기운 없이 축 늘어진 모양.',
 			longMeaning: '우박을 맞아 구멍이 숭숭 뚫리고 찢어진 호박잎이나 마구 찌그려진 물건 또는 몹시 곤란한 처지에 빠진 사람을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -10929,7 +10833,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '원숭이 흉내[입내] 내듯',
 			meaning: '남의 행동을 생각 없이 그대로 따라 한다.',
 			longMeaning: '생각 없이 남 하는 대로 덩달아 따라 함을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
 			levelName: '중급',
@@ -10946,7 +10850,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '항상 좋은 기회만 있을 수는 없다.',
 			longMeaning:
 				'장 날 때마다 꼴뚜기가 나는 것은 아니라는 뜻으로, 어쩌다 한번 좋은 기회를 만났다고 해서 언제나 그런 기회가 있으리라고 믿어서는 안 됨을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '운/우연',
 			level: 3,
 			levelName: '고급',
@@ -11048,7 +10952,7 @@ export const CONST_MAIN_DATA: {
 			id: 784,
 			proverb: '큰 둑[방죽]도 개미구멍으로 무너진다',
 			meaning: '사소한 실수나 결함이 큰 재앙을 부를 수 있다.',
-			longMeaning: '큰 둑도 작은 개미구멍으로 인해 무너진다는 뜻으로, 아무리 큰 일이라도 사소한 결함이나 실수로 인해 실패할 수 있음을 경계 이르는 말.',
+			longMeaning: '큰 둑도 작은 개미구멍으로 인해 무너진다는 뜻으로, 아무리 큰 일이라도 사소한 결함이나 실수로 실패할 수 있음을 경계하여 이르는 말.',
 			sameProverb: ['공든 탑도 개미구멍으로 무너진다'],
 			category: '경계/조심',
 			level: 4,
@@ -11084,7 +10988,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '털도 안 뜯고 먹겠다 한다',
 			meaning: '성급하게 이익을 취하려 한다.',
 			longMeaning: '남의 물건을 통째로 집어삼키려 하거나, 성급하게 이익을 취하려 하는 욕심 많은 행동을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 2,
 			levelName: '중급',
@@ -11136,7 +11040,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '피는 물보다 진하다',
 			meaning: '혈육의 정은 무엇보다 깊다.',
 			longMeaning: '혈육의 정은 다른 어떤 인연보다 더 깊고 강함을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 1,
 			levelName: '초급',
@@ -11153,7 +11057,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '실수는 누구나 할 수 있는 흔한 일이다.',
 			longMeaning:
 				'전쟁에서 이기고 지는 것은 흔히 있는 일이라는 뜻으로, 한 번의 실수나 실패는 누구에게나 있을 수 있는 일이니 너무 낙심할 필요가 없음을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 2,
 			levelName: '중급',
@@ -11169,7 +11073,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '한 번 엎지른 물은 다시 주워 담지 못한다',
 			meaning: '일이 잘못된 뒤에는 돌이킬 수 없다.',
 			longMeaning: '일단 저지른 일은 다시 원상태로 되돌릴 수 없음을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 2,
 			levelName: '중급',
@@ -11212,13 +11116,12 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 60,
 		},
-
 		{
 			id: 806,
 			proverb: '호박씨 까서 한입에 털어 넣는다 ',
 			meaning: '애써 모은 것을 한꺼번에 다 털어 없앤다.',
 			longMeaning: '애써 힘들게 모아 둔 것을 한꺼번에 다 써 버리거나 없애 버림을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 3,
 			levelName: '고급',
@@ -11252,47 +11155,11 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 67,
 		},
 		{
-			id: 812,
-			proverb: '가을 물은 소 발자국에 고인 물도 먹는',
-			meaning: '가을 물은 매우 맑고 깨끗하다.',
-			longMeaning: '가을에는 흙탕물인 채로 괴어 있는 물까지도 마실 수 있을 만큼 물이 맑음을 비유적으로 이르는 말.',
-			sameProverb: [''],
-			category: '세상 이치',
-			level: 2,
-			levelName: '중급',
-			example: [
-				'계곡 물이 정말 맑네. 가을 물은 소 발자국에 괸 물도 먹는다더니.',
-				'가을이라 물맛이 좋아. 옛말 가을 물은 소 발자국에 괸 물도 먹는다잖아.',
-			],
-			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
-			usageTip: '가을철의 깨끗한 풍경이나 물의 맑음을 칭송할 때 씁니다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 58,
-		},
-		{
-			id: 814,
-			proverb: '개똥 밭에 이슬 내릴 때가 있다',
-			meaning: '천한 사람에게도 좋은 때가 온다.',
-			longMeaning:
-				'역하고 천한 개똥 밭에도 고운 이슬이 내릴 때가 있다는 뜻으로, 제아무리 천한 사람에게도 좋은 운수가 돌아올 때가 있음을 비유적으로 이르는 말.',
-			sameProverb: ['쥐구멍에도 볕 들 날 있다', '고랑도 이랑 될 날 있다'],
-			category: '운/우연',
-			level: 3,
-			levelName: '고급',
-			example: ['너무 낙심하지 마. 개똥 밭에 이슬 내릴 때가 있다잖아.', '그 친구 드디어 성공했네. 개똥 밭에 이슬 내릴 때가 있다더니.'],
-			origin: '말과 행동의 이치를 짧은 비유로 전하는 표현이다.',
-			usageTip: '현재 처지가 어렵더라도 언젠가 반드시 행운이 올 것임을 위로할 때 씁니다.',
-			synonym: '궁즉통(窮則通)',
-			antonym: null,
-			difficultyScore: 64,
-		},
-		{
 			id: 817,
 			proverb: '고양이가 알 낳을 노릇이다[일이다]',
 			meaning: '도무지 영문을 모를 일.',
 			longMeaning: '거짓말 같은 일이 생겨서 도무지 그 영문을 짐작하기 어려움을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
 			levelName: '특급',
@@ -11342,7 +11209,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '광대 끈 떨어졌다',
 			meaning: '인연이나 관계가 끊어졌다.',
 			longMeaning: '탈을 쓰고 노는 광대의 끈이 끊어졌다는 뜻으로, 인연이 끊어지거나 일이 중도에서 낭패를 보게 됨을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 3,
 			levelName: '고급',
@@ -11392,7 +11259,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '평소엔 안 찾다가 급할 때만 찾는다.',
 			longMeaning:
 				'중이건 속인이건 으레 급하면 관세음보살을 외는데, 그보다는 오히려 평소에 힘쓰고 닦아서 급한 일을 당하더라도 당황하지 않게 하라는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '인간관계',
 			level: 2,
 			levelName: '중급',
@@ -11487,7 +11354,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '자기를 위해 할 일을 엉뚱한 사람에게 하다.',
 			longMeaning:
 				'자신의 다리가 가려운데 남의 다리를 긁는다는 뜻으로, 자기를 위하여 할 일을 잘못 알고 남을 위하여 하거나, 엉뚱한 데 가서 애씀을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -11515,28 +11382,11 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 40,
 		},
 		{
-			id: 836,
-			proverb: '바늘 도둑이 소 도둑 된다',
-			meaning: '작은 잘못을 방치하면 큰 잘못으로 이어진다.',
-			longMeaning:
-				'바늘을 훔치는 작은 도둑질을 하던 사람이 나중에는 소를 훔치는 큰 도둑이 된다는 뜻으로, 작은 잘못을 그냥 두면 점점 커져서 큰 잘못을 저저르게 됨을 비유적으로 이르는 말.',
-			sameProverb: ['바늘 쌈지[상자]에서 도둑이 난다'],
-			category: '경계/조심',
-			level: 1,
-			levelName: '초급',
-			example: ['작은 거짓말도 하지 마. 바늘 도둑이 소 도둑 된다잖아.', '처음엔 작은 일탈이었는데 큰 범죄로 이어졌어. 바늘 도둑이 소 도둑 된다더니.'],
-			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
-			usageTip: '아이들의 나쁜 습관을 초기에 바로잡거나 작은 비리를 경계할 때 씁니다.',
-			synonym: '견미지저(見微知著)',
-			antonym: null,
-			difficultyScore: 30,
-		},
-		{
 			id: 837,
 			proverb: '세 살 버릇 여든까지 간다',
 			meaning: '어릴 때 버릇이 평생 간다.',
 			longMeaning: '어렸을 때 몸에 밴 버릇은 늙어서까지 고치기 어렵다는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 1,
 			levelName: '초급',
@@ -11552,7 +11402,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '열 번 찍어 안 넘어가는 나무 없다',
 			meaning: '끈기 있게 노력하면 성공한다.',
 			longMeaning: '도끼로 열 번 찍으면 어떤 나무라도 넘어진다는 뜻으로, 끈기 있게 계속 노력하면 안 되는 일이 없음을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 1,
 			levelName: '초급',
@@ -11568,7 +11418,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '아는 길도 물어가라',
 			meaning: '확실한 일도 확인하라.',
 			longMeaning: '아는 길이라도 물어보고 가라는 뜻으로, 아무리 잘 아는 일이라도 확인하고 신중하게 처리하라는 뜻을 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '경계/조심',
 			level: 1,
 			levelName: '초급',
@@ -11647,27 +11497,11 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 25,
 		},
 		{
-			id: 854,
-			proverb: '낫 놓고 기역자도 모른다',
-			meaning: '아주 무식하다.',
-			longMeaning: '낫의 모양이 한글 기역자와 비슷한데 그것도 모른다는 뜻으로, 아주 무식함을 비유적으로 이르는 말.',
-			sameProverb: [''],
-			category: '세상 이치',
-			level: 1,
-			levelName: '초급',
-			example: ['그 사람은 낫 놓고 기역자도 모르는 문맹이야.', '공부를 전혀 안 했나 봐. 낫 놓고 기역자도 모르네.'],
-			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
-			usageTip: '기본적인 상식이 부족한 사람을 힐난하거나 겸손하게 자신의 무지를 말할 때 씁니다.',
-			synonym: '목불식정(目不識丁)',
-			antonym: '박학다식',
-			difficultyScore: 35,
-		},
-		{
 			id: 857,
 			proverb: '서울 (가서) 김서방 찾기(찾는다)',
 			meaning: '막연한 일을 하려 한다.',
 			longMeaning: '넓은 서울에서 김 서방을 찾는다는 뜻으로, 아무리 단서도 없이 막연하게 일을 하려 함을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
 			levelName: '고급',
@@ -11700,7 +11534,7 @@ export const CONST_MAIN_DATA: {
 			meaning: '작은 어려움 때문에 큰일을 포기할 수 없다.',
 			longMeaning:
 				'구더기가 생길까 봐 장을 담그지 못하겠느냐는 뜻으로, 작은 어려움이나 위험 때문에 해야 할 일을 포기할 수는 없음을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 2,
 			levelName: '중급',
@@ -11716,7 +11550,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '꿀 먹은 벙어리',
 			meaning: '말하고 싶어도 말 못하는 답답한 처지.',
 			longMeaning: '꿀을 먹은 벙어리는 그 맛을 말로 표현할 수 없다는 뜻으로, 말하고 싶어도 사정상 말하지 못하는 답답한 처지를 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '세상 이치',
 			level: 1,
 			levelName: '초급',
@@ -11744,29 +11578,12 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 50,
 		},
 		{
-			id: 866,
-			proverb: '꿩 먹고 알 먹는다(먹기)',
-			meaning: '한 가지 일로 두 가지 이익을 본다.',
-			longMeaning: '꿩을 잡아먹고 그 알까지 먹는다는 뜻으로, 한 가지 일을 하여 두 가지 이익을 봄을 비유적으로 이르는 말.',
-			sameProverb: ['일석이조', '도랑 치고 가재 잡는다'],
-			category: '세상 이치',
-			level: 2,
-			levelName: '중급',
-			example: ['운동도 하고 친구도 만나니 꿩 먹고 알 먹기네.', '일도 배우고 돈도 버니 꿩 먹고 알 먹는 거지.'],
-			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
-			usageTip: '효율성이 극대화되어 일거양득의 결과를 얻었을 때 기쁨을 담아 씁니다.',
-			synonym: '일거양득(一擧兩得)',
-			antonym: null,
-			difficultyScore: 41,
-		},
-
-		{
 			id: 869,
 			proverb: '말은 나면 제주도로 보내고 사람은 나면 서울로 보내라',
 			meaning: '사람과 말은 좋은 환경에서 키워야 한다.',
 			longMeaning:
 				'사람은 서울로 보내 배우게 하고 말은 제주도로 보내 키우라는 뜻으로, 사람은 좋은 환경에서 교육받아야 하고 말은 좋은 목장에서 키워야 함을 비유적으로 이르는 말.',
-			sameProverb: [''],
+			sameProverb: [],
 			category: '노력/성공',
 			level: 3,
 			levelName: '고급',
@@ -11783,7 +11600,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 870,
 			proverb: '아는 놈이 도둑',
-			meaning: '가까이 지내는 사람이 오히려 더 큰 피해를 줄 수 있습니다.',
+			meaning: '가까이 지내는 사람이 오히려 더 큰 피해를 줄 수 있음.',
 			longMeaning: '잘 알고 지내는 사람이 모르는 사람보다 더 큰 해를 끼칠 수 있다는 뜻으로, 믿었던 사람에게 배신당하거나 피해를 입었을 때 이르는 말.',
 			sameProverb: ['믿는 도끼에 발등 찍힌다'],
 			category: '배신/불신',
@@ -11821,7 +11638,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 872,
 			proverb: '홀아비 사정은 과부가 알아준다',
-			meaning: '비슷한 처지에 있는 사람끼리 서로의 고충을 더 잘 이해하고 공감합니다.',
+			meaning: '비슷한 처지에 있는 사람끼리 서로의 고충을 더 잘 이해하고 공감함.',
 			longMeaning: '같은 처지에 놓여 있는 사람이 그 어려움과 고통을 더 잘 이해하고 공감할 수 있다는 뜻을 이르는 말.',
 			sameProverb: ['과부 설움은 홀아비가 안다'],
 			category: '인간관계',
@@ -11840,7 +11657,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 873,
 			proverb: '귀한 자식 매로 키워라',
-			meaning: '소중한 자녀일수록 엄하게 가르치고 훈육해야 바르게 성장합니다.',
+			meaning: '소중한 자녀일수록 엄하게 가르치고 훈육해야 바르게 성장함.',
 			longMeaning:
 				'자식이 아무리 귀하고 사랑스러워도 지나치게 응석만 받아줄 것이 아니라, 잘못을 엄하게 꾸짖고 바로잡아야 훌륭하게 자란다는 뜻을 이르는 말.',
 			sameProverb: ['미운 자식 떡 하나 더 주고 귀한 자식 매로 키워라'],
@@ -11860,7 +11677,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 874,
 			proverb: '도둑이 들려면 개도 안 짖는다',
-			meaning: '나쁜 일이 생길 운명이라면 어떤 방비도 소용이 없습니다.',
+			meaning: '나쁜 일이 생길 운명이라면 어떤 방비도 소용이 없음.',
 			longMeaning:
 				'어떤 불행이나 나쁜 일이 일어날 운수라면 아무리 막으려 해도 막을 수 없다는 뜻으로, 재수 없는 일은 어쩔 수 없이 당하게 됨을 이르는 말.',
 			sameProverb: [],
@@ -11880,9 +11697,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 875,
 			proverb: '천리마 꼬리에 쉬파리 따라가듯',
-			meaning: '자신의 능력은 없으면서 뛰어난 사람에게 붙어서 이득을 취하려 합니다.',
+			meaning: '자신의 능력은 없으면서 뛰어난 사람에게 붙어서 이득을 취하려 함.',
 			longMeaning:
-				'하루에 천 리를 달리는 준마의 꼬리에 붙어 쉬파리가 따라가듯, 능력도 없는 사람이 뛰어난 사람에게 달라붙어 함께 득세하려 함을 비유 이르는 말.',
+				'하루에 천 리를 달리는 준마의 꼬리에 붙어 쉬파리가 따라가듯, 능력도 없는 사람이 뛰어난 사람에게 달라붙어 함께 득세하려 함을 비유하여 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
@@ -11901,7 +11718,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 876,
 			proverb: '서투른 목수가 연장 탓한다',
-			meaning: '능력이 부족한 사람일수록 자신의 실력을 인정하지 않고 도구나 환경을 탓합니다.',
+			meaning: '능력이 부족한 사람일수록 자신의 실력을 인정하지 않고 도구나 환경을 탓함.',
 			longMeaning: '일을 잘 못하는 사람이 자신의 능력 부족을 인정하지 않고 도구나 주변 환경을 핑계로 삼는다는 뜻을 이르는 말.',
 			sameProverb: ['못 하는 기생이 거문고 탓한다', '서투른 무당이 장구 탓한다'],
 			category: '세상 이치',
@@ -11920,7 +11737,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 877,
 			proverb: '칠 년 간병에 삼 년 묵은 쑥을 찾는다',
-			meaning: '오랫동안 힘든 일을 겪고 나서야 뒤늦게 제대로 된 해결책을 찾으려 합니다.',
+			meaning: '오랫동안 힘든 일을 겪고 나서야 뒤늦게 제대로 된 해결책을 찾으려 함.',
 			longMeaning:
 				'7년이나 병을 간호하면서도 그 병에 효험이 있다는 3년 묵은 쑥을 진작 구하지 않다가 뒤늦게 찾는다는 뜻으로, 일이 다 된 뒤에야 뒤늦게 손을 쓰는 어리석음을 이르는 말.',
 			sameProverb: ['소 잃고 외양간 고친다'],
@@ -11940,7 +11757,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 878,
 			proverb: '상주 보고 제삿날 다툰다',
-			meaning: '가장 슬프고 힘든 당사자 앞에서 사소한 것으로 다투는 몰인정한 행동을 이릅니다.',
+			meaning: '가장 슬프고 힘든 당사자 앞에서 사소한 것으로 다투는 몰인정한 행동을 이르는 말.',
 			longMeaning:
 				'초상집에서 상주를 앞에 두고 제삿날 같은 사소한 문제로 다툰다는 뜻으로, 상대방의 처지나 감정은 아랑곳하지 않고 자기 이익만 챙기거나 엉뚱한 다툼을 벌이는 경우를 이르는 말.',
 			sameProverb: [],
@@ -11999,7 +11816,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 881,
 			proverb: '잡은 꿩 놓아주고 나는 꿩 잡자 한다',
-			meaning: '이미 확실한 것을 포기하고 불확실한 더 큰 것을 욕심내다 결국 아무것도 얻지 못합니다.',
+			meaning: '이미 확실한 것을 포기하고 불확실한 더 큰 것을 욕심내다 결국 아무것도 얻지 못함.',
 			longMeaning:
 				'손에 잡은 꿩을 놓아주고 하늘을 나는 꿩을 잡겠다고 한다는 뜻으로, 이미 확보한 이익을 포기하고 더 큰 이득을 탐하다가 결국 아무것도 얻지 못하게 되는 어리석음을 이르는 말.',
 			sameProverb: ['손 안의 새 두 마리보다 낫다'],
@@ -12019,7 +11836,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 883,
 			proverb: '토끼가 제 방귀에 놀란다',
-			meaning: '스스로 한 일에 자기 자신이 놀라거나 겁을 먹는 어리석은 모습을 이릅니다.',
+			meaning: '스스로 한 일에 자기 자신이 놀라거나 겁을 먹는 어리석은 모습을 이르는 말.',
 			longMeaning:
 				'토끼가 자기가 뀐 방귀 소리에 스스로 깜짝 놀란다는 뜻으로, 자기가 한 행동이나 말에 자기 스스로 놀라거나 겁먹는 어리석고 소심한 사람을 이르는 말.',
 			sameProverb: [],
@@ -12039,9 +11856,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 884,
 			proverb: '토끼 죽으니 여우 슬퍼한다',
-			meaning: '같은 처지에 있는 사람이 다른 이의 불행을 보며 자신의 앞날을 걱정하여 슬퍼합니다.',
+			meaning: '같은 처지에 있는 사람이 다른 이의 불행을 보며 자신의 앞날을 걱정하여 슬퍼함.',
 			longMeaning:
-				"토끼가 죽자 여우가 슬퍼한다는 뜻으로, 비슷한 처지에 있는 동류가 불행을 당하는 것을 보고 자신도 같은 신세가 될 것을 두려워하여 슬퍼하는 것을 이르는 말. '토사구팽(兔死狗烹)'과 연관된 의미로도 쓰인다.",
+				'토끼가 죽자 여우가 슬퍼한다는 뜻으로, 비슷한 처지에 있는 동류가 불행을 당하는 것을 보고 자신도 같은 신세가 될 것을 두려워하여 슬퍼함을 이르는 말.',
 			sameProverb: ['호사유피 인사유명'],
 			category: '인간관계',
 			level: 3,
@@ -12050,8 +11867,7 @@ export const CONST_MAIN_DATA: {
 				'동료가 갑작스럽게 해고되자 토끼 죽으니 여우 슬퍼한다고 남은 직원들도 불안에 떨었다.',
 				'같은 업종의 오랜 경쟁자가 폐업했다는 소식에 토끼 죽으니 여우 슬퍼한다는 심정으로 씁쓸함을 감출 수 없었다.',
 			],
-			origin:
-				'같은 처지의 동류가 화를 입으면 자신도 같은 처지가 될 수 있음을 두려워하는 심리에서 비롯된 속담으로, 동병상련(同病相憐)과 유사한 맥락에서 사용된다.',
+			origin: "'토사구팽(兔死狗烹)'과 연관된 의미로도 쓰인다.",
 			usageTip: '비슷한 처지의 사람이 불행을 당하는 것을 보고 자신의 앞날을 걱정하며 슬퍼하는 상황에서 사용합니다.',
 			synonym: '동병상련(同病相憐)',
 			antonym: null,
@@ -12060,9 +11876,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 885,
 			proverb: '토끼 입에 콩가루 먹은 것 같다',
-			meaning: '입이 가벼워 비밀을 전혀 지키지 못하는 사람을 이릅니다.',
+			meaning: '입이 가벼워 비밀을 전혀 지키지 못하는 사람을 이르는 말.',
 			longMeaning:
-				'토끼가 콩가루를 먹으면 입 주변에 가루가 묻어 금세 들통이 나듯, 무슨 일이든 숨기지 못하고 금방 드러나거나 비밀을 지키지 못하는 사람을 비유 이르는 말.',
+				'토끼가 콩가루를 먹으면 입 주변에 가루가 묻어 금세 들통이 나듯, 무슨 일이든 숨기지 못하고 금방 드러나거나 비밀을 지키지 못하는 사람을 비유하여 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
 			level: 3,
@@ -12080,7 +11896,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 886,
 			proverb: '있을 때 아껴야지 없으면 아낄 것도 없다',
-			meaning: '무언가가 풍족할 때 절약하는 습관을 길러야 하며, 없어진 후에는 아낄 기회조차 없습니다.',
+			meaning: '무언가가 풍족할 때 절약하는 습관을 길러야 하며, 없어진 후에는 아낄 기회조차 없음.',
 			longMeaning:
 				'돈이든 물건이든 건강이든, 여유가 있을 때 아끼고 소중히 다루어야지 이미 다 써버리거나 잃고 난 뒤에는 절약할 것 자체가 없다는 뜻을 이르는 말.',
 			sameProverb: [],
@@ -12100,7 +11916,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 887,
 			proverb: '있는 것은 모으고 없는 것은 헤프다',
-			meaning: '가진 것이 많은 사람은 더 아끼고 모으는 반면, 없는 사람은 오히려 씀씀이가 헤픈 아이러니한 현실을 이릅니다.',
+			meaning: '가진 것이 많은 사람은 더 아끼고 모으는 반면, 없는 사람은 오히려 씀씀이가 헤픈 아이러니한 현실을 이르는 말.',
 			longMeaning:
 				'부유한 사람은 재물을 더 모으려 하고, 가난한 사람은 얼마 없는 것마저 헤프게 쓴다는 뜻으로, 빈부의 격차가 점점 벌어지는 현실을 꼬집어 이르는 말.',
 			sameProverb: ['부익부 빈익빈(富益富 貧益貧)'],
@@ -12120,7 +11936,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 888,
 			proverb: '당겨 놓은 화살을 놓을 수 없다',
-			meaning: '이미 시작한 일은 중간에 멈출 수 없으니 끝까지 밀고 나가야 합니다.',
+			meaning: '이미 시작한 일은 중간에 멈출 수 없으니 끝까지 밀고 나가야 함.',
 			longMeaning: '활시위에 걸어 한껏 당긴 화살은 결국 쏘아야 하듯, 한번 시작한 일은 중도에 그만둘 수 없어 끝까지 해야 함을 이르는 말.',
 			sameProverb: ['엎질러진 물'],
 			category: '세상 이치',
@@ -12141,7 +11957,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '평택이 무너지나 아산이 깨어지나',
 			meaning: '사소한 일에 지나치게 호들갑을 떨거나 겁을 먹는 사람을 핀잔하는 말.',
 			longMeaning:
-				'평택이 무너지거나 아산이 깨어지는 것도 아닌데 왜 그리 호들갑이냐는 뜻으로, 별것 아닌 일에 지나치게 놀라거나 소란을 피우는 사람을 핀잔하는 말.',
+				'평택이 무너지거나 아산이 깨어지는 것도 아닌데 왜 그리 호들갑이냐는 뜻으로, 별것 아닌 일에 지나치게 놀라거나 소란을 피우는 사람을 핀잔하여 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
 			level: 4,
@@ -12159,7 +11975,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 890,
 			proverb: '행실을 배우라 하니까 포도청 문고리를 뺀다',
-			meaning: '바르게 되라고 가르쳤더니 오히려 더 나쁜 짓을 하는 어처구니없는 상황을 이릅니다.',
+			meaning: '바르게 되라고 가르쳤더니 오히려 더 나쁜 짓을 하는 어처구니없는 상황을 이르는 말.',
 			longMeaning:
 				'좋은 행실을 본받으라고 했더니 오히려 포도청(조선 시대 경찰 기관)의 문고리를 빼는 담대한 도둑질을 한다는 뜻으로, 가르침이 엉뚱하게 역효과를 내는 상황을 이르는 말.',
 			sameProverb: ['가르쳐 놓으니 선생 잡아먹는다'],
@@ -12179,7 +11995,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 891,
 			proverb: '같은 손가락에도 길고 짧은 것이 있다',
-			meaning: '같은 조건이나 환경에서도 사람마다 차이가 있는 것은 자연스러운 일입니다.',
+			meaning: '같은 조건이나 환경에서도 사람마다 차이가 있는 것은 자연스러운 일임.',
 			longMeaning:
 				'한 손에 달린 손가락도 길이가 제각각이듯, 같은 환경이나 조건 아래서도 사람마다 능력이나 처지에 차이가 나는 것은 당연하다는 뜻을 이르는 말.',
 			sameProverb: [],
@@ -12199,7 +12015,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 892,
 			proverb: '털 뽑아 제 구멍 메우기',
-			meaning: '자기 몸의 한 곳을 희생해 다른 곳의 급한 불을 끄는 임시방편을 이릅니다.',
+			meaning: '자기 몸의 한 곳을 희생해 다른 곳의 급한 불을 끄는 임시방편을 이르는 말.',
 			longMeaning:
 				'자기 털을 뽑아서 자기 몸의 구멍을 메운다는 뜻으로, 임시변통으로 자신의 것을 이용해 급한 사태를 모면하려 하나 근본적인 해결이 되지 않음을 이르는 말.',
 			sameProverb: ['빚으로 빚을 갚는다'],
@@ -12219,7 +12035,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 893,
 			proverb: '흉년에 윤달',
-			meaning: '어려운 상황에서 부담스러운 일까지 겹쳐 더욱 힘들어지는 상황을 이릅니다.',
+			meaning: '어려운 상황에서 부담스러운 일까지 겹쳐 더욱 힘들어지는 상황을 이르는 말.',
 			longMeaning:
 				'흉년이 든 해에 윤달까지 들어 먹여 살려야 할 날이 더 늘어난다는 뜻으로, 어려운 처지에 불리한 일까지 겹쳐 더욱 곤란해지는 경우를 이르는 말.',
 			sameProverb: ['엎친 데 덮친다'],
@@ -12259,7 +12075,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 895,
 			proverb: '갈 데까지 가다',
-			meaning: '어떤 상황이나 일이 더 이상 나빠질 수 없는 극한까지 치달았음을 이릅니다.',
+			meaning: '어떤 상황이나 일이 더 이상 나빠질 수 없는 극한까지 치달았음을 이르는 말.',
 			longMeaning: '더 이상 나아갈 곳이 없을 만큼 상황이 극단까지 치달았다는 뜻으로, 어떤 일이나 상태가 최악의 지경에 이르렀음을 이르는 말.',
 			sameProverb: ['막다른 골목에 몰리다'],
 			category: '세상 이치',
@@ -12314,7 +12130,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 898,
 			proverb: '고양이 발에 덕석',
-			meaning: '전혀 어울리지 않는 사람에게 과분하거나 쓸모없는 것을 주는 상황을 이릅니다.',
+			meaning: '전혀 어울리지 않는 사람에게 과분하거나 쓸모없는 것을 주는 상황을 이르는 말.',
 			longMeaning:
 				'고양이 발에 짚으로 엮은 큰 덕석(멍석)을 씌워 준다는 뜻으로, 전혀 맞지도 않고 쓸 수도 없는 것을 당치않은 대상에게 주거나 입히는 어울리지 않는 상황을 이르는 말.',
 			sameProverb: ['돼지 목에 진주 목걸이'],
@@ -12353,7 +12169,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 900,
 			proverb: '먹는 개도 아니 때린다',
-			meaning: '밥을 먹고 있는 중에는 아무리 잘못이 있어도 혼내거나 방해하지 않는 것이 도리입니다.',
+			meaning: '밥을 먹고 있는 중에는 아무리 잘못이 있어도 혼내거나 방해하지 않는 것이 도리임.',
 			longMeaning: '밥 먹는 개도 먹는 동안에는 때리지 않는다는 뜻으로, 먹는 행위는 그 어떤 경우에도 방해하지 않는 것이 기본 예의임을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -12372,7 +12188,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 901,
 			proverb: '알아야 면장을 하지',
-			meaning: '어떤 일이든 제대로 알고 있어야 그 일을 해낼 수 있습니다.',
+			meaning: '어떤 일이든 제대로 알고 있어야 그 일을 해낼 수 있음.',
 			longMeaning: '면장(面長) 자리도 알아야 할 수 있듯이, 무슨 일이든 그에 맞는 지식과 능력을 갖추어야만 제대로 해낼 수 있다는 뜻을 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -12391,7 +12207,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 902,
 			proverb: '미운 아이 떡 하나 더 준다',
-			meaning: '미운 사람일수록 더 잘 대해줌으로써 관계를 원만하게 유지하려는 처세술을 이릅니다.',
+			meaning: '미운 사람일수록 더 잘 대해줌으로써 관계를 원만하게 유지하려는 처세술을 이르는 말.',
 			longMeaning:
 				'미운 아이에게 오히려 떡을 하나 더 주어 달래듯, 사이가 안 좋은 사람에게 더 잘 대해주어 갈등을 사전에 막고 원만하게 지내는 것이 현명한 처세임을 이르는 말.',
 			sameProverb: ['귀한 자식 매로 키워라'],
@@ -12411,7 +12227,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 903,
 			proverb: '가랑잎이 솔잎더러 바스락거린다고 한다',
-			meaning: '자기 허물은 보지 못하고 남의 작은 흠만 탓함을 이릅니다.',
+			meaning: '자기 허물은 보지 못하고 남의 작은 흠만 탓함을 이르는 말.',
 			longMeaning:
 				'마른 가랑잎이 비슷한 처지의 솔잎을 보고 시끄럽다고 나무란다는 뜻으로, 자기도 같은 처지이거나 더한 흠이 있으면서 남의 허물만 탓하는 경우를 이르는 말.',
 			sameProverb: ['남의 눈의 티는 보고 제 눈의 들보는 못 본다'],
@@ -12431,7 +12247,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 904,
 			proverb: '간이 콩알만 해지다',
-			meaning: '몹시 겁이 나고 두려워지는 상태를 이릅니다.',
+			meaning: '몹시 겁이 나고 두려워지는 상태를 이르는 말.',
 			longMeaning: '겁을 먹어 간이 아주 작은 콩알만 해진 것 같다는 뜻으로, 매우 놀라거나 무서워서 기가 죽은 상태를 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -12447,7 +12263,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 905,
 			proverb: '개같이 벌어서 정승같이 쓴다',
-			meaning: '힘들게 번 돈이라도 값지고 품위 있게 써야 함을 이릅니다.',
+			meaning: '힘들게 번 돈이라도 값지고 품위 있게 써야 함을 이르는 말.',
 			longMeaning: '벌 때는 고생스럽고 천하게 벌더라도 쓸 때만큼은 정승처럼 떳떳하고 알차게 써야 한다는 뜻으로, 돈의 사용이 중요함을 이르는 말.',
 			sameProverb: [],
 			category: '근면/검소',
@@ -12485,7 +12301,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 907,
 			proverb: '굳은 나무가 먼저 부러진다',
-			meaning: '지나치게 강하고 융통성 없으면 오히려 먼저 해를 입을 수 있음을 이릅니다.',
+			meaning: '지나치게 강하고 융통성 없으면 오히려 먼저 해를 입을 수 있음을 이르는 말.',
 			longMeaning:
 				'너무 단단하고 굽힐 줄 모르는 나무가 강한 바람에 먼저 부러진다는 뜻으로, 사람도 지나치게 강직하거나 완고하면 손해를 볼 수 있음을 이르는 말.',
 			sameProverb: [],
@@ -12505,7 +12321,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 908,
 			proverb: '꿔다 놓은 보릿자루',
-			meaning: '가만히 앉아 아무 말도 못 하고 어색해하는 사람을 이릅니다.',
+			meaning: '가만히 앉아 아무 말도 못 하고 어색해하는 사람을 이르는 말.',
 			longMeaning:
 				'빌려다 놓은 보릿자루처럼 말도 없고 움직임도 없이 어색하게 있는 모습을 비유한 말로, 낯선 자리에서 어울리지 못하고 멀뚱히 있는 사람을 이르는 말.',
 			sameProverb: [],
@@ -12525,7 +12341,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 909,
 			proverb: '남의 떡으로 제사 지낸다',
-			meaning: '자기 것은 들이지 않고 남의 것으로 생색냄을 이릅니다.',
+			meaning: '자기 것은 들이지 않고 남의 것으로 생색냄을 이르는 말.',
 			longMeaning:
 				'제사를 지내면서 자기 떡이 아니라 남의 떡을 가져다 쓴다는 뜻으로, 자기 비용이나 노력은 들이지 않고 남의 힘이나 물건으로 일을 하며 생색내는 일을 이르는 말.',
 			sameProverb: [],
@@ -12545,7 +12361,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 910,
 			proverb: '닭 잡아 먹고 오리발 내민다',
-			meaning: '잘못을 저질러 놓고도 아닌 척 발뺌함을 이릅니다.',
+			meaning: '잘못을 저질러 놓고도 아닌 척 발뺌함을 이르는 말.',
 			longMeaning: '닭을 잡아먹어 놓고는 오리발이라며 모른 척한다는 뜻으로, 뻔한 잘못을 해 놓고도 태연하게 시치미를 떼는 행동을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -12564,7 +12380,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 911,
 			proverb: '도둑놈에게 열쇠 맡긴다',
-			meaning: '믿을 수 없는 사람에게 중요한 일을 맡기는 어리석음을 이릅니다.',
+			meaning: '믿을 수 없는 사람에게 중요한 일을 맡기는 어리석음을 이르는 말.',
 			longMeaning: '도둑에게 문을 여는 열쇠를 맡기면 당연히 위험하다는 뜻으로, 부정직하거나 위험한 사람에게 중요한 책임을 맡기는 일을 이르는 말.',
 			sameProverb: ['고양이한테 생선을 맡기다'],
 			category: '경계/조심',
@@ -12583,7 +12399,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 912,
 			proverb: '독 안에 든 쥐',
-			meaning: '달아날 길이 없어 꼼짝 못 하는 처지를 이릅니다.',
+			meaning: '달아날 길이 없어 꼼짝 못 하는 처지를 이르는 말.',
 			longMeaning: '항아리나 독 안에 빠진 쥐처럼 도망칠 곳도 숨을 곳도 없는 막막한 상황을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -12602,7 +12418,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 913,
 			proverb: '돌팔이 의사 사람 잡는다',
-			meaning: '실력 없는 사람이 함부로 나서면 큰 해를 끼칠 수 있음을 이릅니다.',
+			meaning: '실력 없는 사람이 함부로 나서면 큰 해를 끼칠 수 있음을 이르는 말.',
 			longMeaning:
 				'실력 없는 돌팔이 의사가 잘못 치료해 사람을 죽게 만들 수 있다는 뜻으로, 전문성 없는 사람이 중요한 일을 맡으면 큰 피해를 낳을 수 있음을 이르는 말.',
 			sameProverb: ['선무당이 사람 잡는다'],
@@ -12622,7 +12438,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 914,
 			proverb: '등 따시고 배부르다',
-			meaning: '생활이 편안하고 만족스러운 상태를 이릅니다.',
+			meaning: '생활이 편안하고 만족스러운 상태를 이르는 말.',
 			longMeaning: '등이 따뜻하고 배가 부르면 근심이 적고 평안하다는 뜻으로, 먹고사는 걱정 없이 편안한 형편을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -12641,7 +12457,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 915,
 			proverb: '마른 나무에 꽃이 핀다',
-			meaning: '전혀 기대하지 않던 좋은 일이 생김을 이릅니다.',
+			meaning: '전혀 기대하지 않던 좋은 일이 생김을 이르는 말.',
 			longMeaning: '죽은 듯 메마른 나무에 꽃이 필 리 없는데 꽃이 핀다는 뜻으로, 거의 불가능해 보이던 일이나 뜻밖의 좋은 일이 일어남을 이르는 말.',
 			sameProverb: [],
 			category: '운/우연',
@@ -12695,7 +12511,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 918,
 			proverb: '벙어리 냉가슴 앓듯',
-			meaning: '괴로움을 겉으로 말하지 못하고 속으로만 끙끙 앓는 모습을 이릅니다.',
+			meaning: '괴로움을 겉으로 말하지 못하고 속으로만 끙끙 앓는 모습을 이르는 말.',
 			longMeaning:
 				'말을 못 하는 사람이 답답한 속내를 표현하지 못하고 가슴앓이만 한다는 뜻으로, 괴롭거나 억울해도 드러내지 못한 채 혼자 속을 태우는 상황을 이르는 말.',
 			sameProverb: [],
@@ -12986,7 +12802,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 933,
 			proverb: '한 술 더 뜬다',
-			meaning: '남보다 한층 더 심하거나 더 지나치게 행동함을 이릅니다.',
+			meaning: '남보다 한층 더 심하거나 더 지나치게 행동함을 이르는 말.',
 			longMeaning:
 				'남이 한 술 뜬 데서 그치지 않고 한 술을 더 뜬다는 뜻으로, 어떤 말이나 행동을 한층 더 보태어 정도를 더 심하게 만드는 경우를 이르는 말.',
 			sameProverb: [],
@@ -13172,25 +12988,6 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 5,
 		},
 		{
-			id: 943,
-			proverb: '개 밥에 도토리',
-			meaning: '어울리지 못하고 혼자 겉도는 처지를 이릅니다.',
-			longMeaning: '개가 먹는 밥에 웬 도토리냐는 뜻으로, 주변과 어울리지 못하고 혼자 동떨어져 있는 사람이나 사물을 이르는 말.',
-			sameProverb: [],
-			category: '인간관계',
-			level: 1,
-			levelName: '초급',
-			example: [
-				'혼자 관심사가 달라서 모임 내내 개 밥에 도토리 같은 기분이었다.',
-				'전공자가 아닌 내가 그 학술 토론에 끼어 있으니 개 밥에 도토리처럼 어색했다.',
-			],
-			origin: '일상에서 반복되는 상황을 빗대어 전해 온 말이다.',
-			usageTip: '무리 속에서 혼자 어울리지 못하고 겉도는 상황을 말할 때 사용합니다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 12,
-		},
-		{
 			id: 944,
 			proverb: '공연히 긁어 부스럼 만든다',
 			meaning: '가만히 있으면 될 일을 괜히 건드려 문제를 만든다는 뜻.',
@@ -13233,7 +13030,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '아 다르고 어 다르다',
 			meaning: '말은 조금만 달라도 듣는 느낌과 뜻이 크게 달라진다는 뜻.',
 			longMeaning:
-				'비슷한 말이라도 \'아\'와 \'어\'의 차이만큼 표현 방식이 다르면 전달되는 느낌이 달라진다는 뜻으로, 말하는 태도와 표현의 중요성을 이르는 말.',
+				"비슷한 말이라도 '아'와 '어'의 차이만큼 표현 방식이 다르면 전달되는 느낌이 달라진다는 뜻으로, 말하는 태도와 표현의 중요성을 이르는 말.",
 			sameProverb: [],
 			category: '인간관계',
 			level: 1,
@@ -13310,7 +13107,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 950,
 			proverb: '남의 눈의 티는 보고 제 눈의 들보는 못 본다',
-			meaning: '남의 작은 허물은 쉽게 보면서 자기의 큰 잘못은 깨닫지 못함을 이릅니다.',
+			meaning: '남의 작은 허물은 쉽게 보면서 자기의 큰 잘못은 깨닫지 못함을 이르는 말.',
 			longMeaning:
 				'남의 눈 속 작은 티끌은 잘 보면서 자신의 눈에 들어 있는 큰 들보는 못 본다는 뜻으로, 자기 잘못은 모른 채 남의 허물만 탓하는 태도를 이르는 말.',
 			sameProverb: ['가랑잎이 솔잎더러 바스락거린다고 한다'],
@@ -13365,7 +13162,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 953,
 			proverb: '가는 세월에 오는 백발',
-			meaning: '세월이 흐르면 자연히 늙게 됨을 이릅니다.',
+			meaning: '세월이 흐르면 자연히 늙게 됨을 이르는 말.',
 			longMeaning: '흘러가는 세월을 따라 흰머리가 온다는 뜻으로, 시간의 흐름에 따라 누구나 늙어 간다는 자연의 이치를 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -13403,7 +13200,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 955,
 			proverb: '꽁무니를 빼다',
-			meaning: '겁이 나거나 불리해지자 슬그머니 피하거나 물러남을 이릅니다.',
+			meaning: '겁이 나거나 불리해지자 슬그머니 피하거나 물러남을 이르는 말.',
 			longMeaning: '뒤꽁무니를 감추듯이 슬쩍 자리를 피한다는 뜻으로, 책임지기 싫거나 불리한 상황이 되자 몰래 물러서는 태도를 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -13462,7 +13259,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 958,
 			proverb: '보리밥에 고등어',
-			meaning: '서로 잘 어울리는 짝이나 조합을 이릅니다.',
+			meaning: '서로 잘 어울리는 짝이나 조합을 이르는 말.',
 			longMeaning: '소박한 보리밥과 짭짤한 고등어가 잘 어울리듯이, 궁합이 잘 맞고 서로 조화를 이루는 관계나 조합을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -13497,7 +13294,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 960,
 			proverb: '비 온 뒤 죽순 돋듯 한다',
-			meaning: '어떤 일이나 사물이 갑자기 많이 생겨남을 이릅니다.',
+			meaning: '어떤 일이나 사물이 갑자기 많이 생겨남을 이르는 말.',
 			longMeaning: '비가 내린 뒤 대나무 죽순이 여기저기 빠르게 돋아나듯이, 어떤 현상이나 물건이 짧은 사이에 한꺼번에 많이 생겨나는 모습을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -13628,7 +13425,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 967,
 			proverb: '나무는 보고 숲은 못 본다',
-			meaning: '작은 부분만 보고 전체 흐름이나 본질은 보지 못함을 이릅니다.',
+			meaning: '작은 부분만 보고 전체 흐름이나 본질은 보지 못함을 이르는 말.',
 			longMeaning: '개별 나무는 보면서도 그것들이 모인 숲 전체는 보지 못한다는 뜻으로, 세부에만 집착하여 큰 그림이나 본질을 놓치는 경우를 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -13647,7 +13444,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 968,
 			proverb: '가을 바람에 낙엽 지듯',
-			meaning: '무엇이 우수수 쉽게 떨어지거나 몰락하는 모습을 이릅니다.',
+			meaning: '무엇이 우수수 쉽게 떨어지거나 몰락하는 모습을 이르는 말.',
 			longMeaning: '가을바람이 불면 낙엽이 한꺼번에 떨어지듯이, 사람이나 사물이 힘없이 많이 쓰러지거나 사라지는 모습을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -13757,7 +13554,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 974,
 			proverb: '달걀 꾸러미 지고 가듯 한다',
-			meaning: '몹시 조심스럽고 위태롭게 행동하는 모습을 이릅니다.',
+			meaning: '몹시 조심스럽고 위태롭게 행동하는 모습을 이르는 말.',
 			longMeaning: '깨지기 쉬운 달걀 꾸러미를 지고 가는 것처럼, 조금만 잘못해도 큰일이 날까 봐 몹시 조심조심 행동하는 모양을 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -13929,7 +13726,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 983,
 			proverb: '떡도 커야 사 먹는다',
-			meaning: '기왕이면 크고 좋은 것을 택하려는 마음을 이릅니다.',
+			meaning: '기왕이면 크고 좋은 것을 택하려는 마음을 이르는 말.',
 			longMeaning:
 				'돈을 주고 떡을 사 먹을 바에는 조금이라도 더 크고 나은 것을 고르려 한다는 뜻으로, 사람의 욕심이나 선택 기준이 더 나은 쪽으로 기울기 쉬움을 이르는 말.',
 			sameProverb: [],
@@ -16034,33 +15831,11 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 48,
 		},
 		{
-			id: 1094,
-			proverb: '강원도 삼척',
-			meaning:
-				'방이 몹시 추움을 비유적으로 이르는 말. 삼척은 삼청의 잘못된 발음으로, 삼청(三廳) 즉 옛날 금군 삼청(禁軍三廳)의 방에는 늘 불을 때지 않아 방이 매우 찼다는 데서 유래한 말이다.',
-			longMeaning:
-				'방이 몹시 추움을 비유적으로 이르는 말. 삼척은 삼청의 잘못된 발음으로, 삼청(三廳) 즉 옛날 금군 삼청(禁軍三廳)의 방에는 늘 불을 때지 않아 방이 매우 찼다는 데서 유래한 말이다 이르는 말.',
-			sameProverb: [],
-			category: '경계/조심',
-			level: 3,
-			levelName: '고급',
-			example: [
-				"남의 말을 쉽게 옮기던 사람이 결국 곤란해지자 주변에서 '강원도 삼척'라고 수군거렸다.",
-				"단체 대화방에 확인되지 않은 말을 올렸다가 일이 커지자 친구들이 '강원도 삼척'라고 했다.",
-			],
-			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
-			usageTip: '일상 대화에서 비슷한 일을 비유적으로 말할 때 알맞다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 63,
-		},
-		{
 			id: 1095,
 			proverb: '강원도 안 가도 삼척',
 			meaning:
 				'방이 몹시 추움을 비유적으로 이르는 말. 삼척은 삼청의 잘못된 발음으로, 삼청(三廳) 즉 옛날 금군 삼청(禁軍三廳)의 방에는 늘 불을 때지 않아 방이 매우 찼다는 데서 유래한 말이다.',
-			longMeaning:
-				'방이 몹시 추움을 비유적으로 이르는 말. 삼척은 삼청의 잘못된 발음으로, 삼청(三廳) 즉 옛날 금군 삼청(禁軍三廳)의 방에는 늘 불을 때지 않아 방이 매우 찼다는 데서 유래한 말이다 이르는 말.',
+			longMeaning: '방이 몹시 추움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
 			level: 4,
@@ -16069,7 +15844,7 @@ export const CONST_MAIN_DATA: {
 				"괜한 농담 한마디로 분위기가 틀어지자 선배가 '강원도 안 가도 삼척'라고 타일렀다.",
 				"회의에서 듣기 좋은 말만 늘어놓던 사람이 정작 책임은 피하자 팀원이 '강원도 안 가도 삼척'라고 말했다.",
 			],
-			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
+			origin: '삼척은 삼청(三廳)의 잘못된 발음으로, 옛날 금군 삼청의 방에는 늘 불을 때지 않아 방이 매우 찼다는 데서 유래한다.',
 			usageTip: '비슷한 상황을 짧게 빗대어 말할 때 쓸 수 있다.',
 			synonym: null,
 			antonym: null,
@@ -16732,8 +16507,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1130,
 			proverb: '가나다라도 모른다',
-			meaning: '\'낫 놓고 기역 자도 모른다\'의 북한 속담.',
-			longMeaning: '\'낫 놓고 기역 자도 모른다\'의 북한 속담 이르는 말.',
+			meaning: "'낫 놓고 기역 자도 모른다'의 북한 속담.",
+			longMeaning: "'낫 놓고 기역 자도 모른다'의 북한 속담. 기역 자 모양으로 생긴 낫을 보면서도 기역 자를 모른다는 뜻으로, 아주 무식함을 이르는 말.",
 			sameProverb: [],
 			category: '경계/조심',
 			level: 2,
@@ -16805,25 +16580,6 @@ export const CONST_MAIN_DATA: {
 			synonym: null,
 			antonym: null,
 			difficultyScore: 47,
-		},
-		{
-			id: 1134,
-			proverb: '가난은 나라님도 못 당한다',
-			meaning: '가난은 그만큼 견디기 어렵고 벗어나기도 힘듦.',
-			longMeaning: '가난은 임금이라도 어찌하지 못할 만큼 사람을 힘들게 한다는 뜻으로, 가난의 괴로움과 어려움이 매우 큼을 이르는 말.',
-			sameProverb: [],
-			category: '욕심/탐욕',
-			level: 3,
-			levelName: '고급',
-			example: [
-				"자기 몫을 챙기고도 남의 몫까지 넘보는 모습을 본 사람들이 '가난은 나라님도 못 당한다'라고 했다.",
-				"이미 충분히 받았는데도 추가 보상까지 요구하는 직원을 보며 회의실에서 '가난은 나라님도 못 당한다'라는 말이 나왔다.",
-			],
-			origin: '오랜 생활 경험을 짧은 비유로 압축한 표현이다.',
-			usageTip: '일상 대화에서 비슷한 일을 비유적으로 말할 때 알맞다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 60,
 		},
 		{
 			id: 1135,
@@ -17193,8 +16949,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1154,
 			proverb: '가락집에 가락을 세웠다만 가져와도 낫다',
-			meaning: '\'가락 바로잡는 집에 가져다가 세워 놨다 와도 좀 낫다\'의 북한 속담.',
-			longMeaning: '\'가락 바로잡는 집에 가져다가 세워 놨다 와도 좀 낫다\'의 북한 속담 이르는 말.',
+			meaning: "'가락 바로잡는 집에 가져다가 세워 놨다 와도 좀 낫다'의 북한 속담.",
+			longMeaning:
+				"'가락 바로잡는 집에 가져다가 세워 놨다 와도 좀 낫다'의 북한 속담. 휜 물렛가락을 가락 고치는 집에 가져다 놓았다가 다시 가져오기만 하여도 휜 것이 바로잡힌 것처럼 느껴진다는 뜻으로, 좋은 환경의 영향을 조금만 받아도 정신적으로 위안이 됨을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '경계/조심',
 			level: 3,
@@ -17523,8 +17280,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1171,
 			proverb: '가마목의 소금도 집어 넣어야 짜다',
-			meaning: '\'부뚜막의 소금도 집어넣어야 짜다\'의 북한 속담.',
-			longMeaning: '\'부뚜막의 소금도 집어넣어야 짜다\'의 북한 속담 이르는 말.',
+			meaning: "'부뚜막의 소금도 집어넣어야 짜다'의 북한 속담.",
+			longMeaning:
+				"'부뚜막의 소금도 집어넣어야 짜다'의 북한 속담. 가까운 부뚜막에 있는 소금도 넣지 아니하면 음식이 짠맛이 날 수 없다는 뜻으로, 아무리 좋은 조건이 마련되었거나 손쉬운 일이라도 힘을 들이어 이용하거나 하지 아니하면 안 됨을 이르는 말.",
 			sameProverb: [],
 			category: '노력/성공',
 			level: 4,
@@ -17582,8 +17340,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1174,
 			proverb: '가만바람이 대목을 꺾고 모기 소리에 소가 놀란다',
-			meaning: '\'가만한 바람이 대목을 꺾는다\'의 북한 속담.',
-			longMeaning: '\'가만한 바람이 대목을 꺾는다\'의 북한 속담 이르는 말.',
+			meaning: "'가만한 바람이 대목을 꺾는다'의 북한 속담.",
+			longMeaning:
+				"'가만한 바람이 대목을 꺾는다'의 북한 속담. 약하게 가만가만 부는 바람이 큰 나무를 꺾는다는 뜻으로, 작고 약한 것이라고 얕잡아 보아서는 안 된다는 뜻을 이르는 말.",
 			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 4,
@@ -17601,8 +17360,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1175,
 			proverb: '가만바람이 대목을 꺾는다',
-			meaning: '\'가만한 바람이 대목을 꺾는다\'의 북한 속담.',
-			longMeaning: '\'가만한 바람이 대목을 꺾는다\'의 북한 속담 이르는 말.',
+			meaning: "'가만한 바람이 대목을 꺾는다'의 북한 속담.",
+			longMeaning:
+				"'가만한 바람이 대목을 꺾는다'의 북한 속담. 약하게 가만가만 부는 바람이 큰 나무를 꺾는다는 뜻으로, 작고 약한 것이라고 얕잡아 보아서는 안 된다는 뜻을 이르는 말.",
 			sameProverb: [],
 			category: '배신/불신',
 			level: 3,
@@ -17775,8 +17535,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1184,
 			proverb: '가물치가 뛰면 옹달치도 뛴다',
-			meaning: '\'망둥이가 뛰면 꼴뚜기도 뛴다\'의 북한 속담.',
-			longMeaning: '\'망둥이가 뛰면 꼴뚜기도 뛴다\'의 북한 속담 이르는 말.',
+			meaning: "'망둥이가 뛰면 꼴뚜기도 뛴다'의 북한 속담.",
+			longMeaning: "'망둥이가 뛰면 꼴뚜기도 뛴다'의 북한 속담. 남이 한다고 하니까 분별없이 덩달아 나섬을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
@@ -17794,8 +17554,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1185,
 			proverb: '가물치가 첨벙하니 메사구도 첨벙한다',
-			meaning: '\'망둥이가 뛰면 꼴뚜기도 뛴다\'의 북한 속담.',
-			longMeaning: '\'망둥이가 뛰면 꼴뚜기도 뛴다\'의 북한 속담 이르는 말.',
+			meaning: "'망둥이가 뛰면 꼴뚜기도 뛴다'의 북한 속담.",
+			longMeaning: "'망둥이가 뛰면 꼴뚜기도 뛴다'의 북한 속담. 남이 한다고 하니까 분별없이 덩달아 나섬을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '인간관계',
 			level: 2,
@@ -17890,8 +17650,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1190,
 			proverb: '가시나무에 목을 맨다',
-			meaning: '\'가지 나무에 목을 맨다\'의 북한 속담.',
-			longMeaning: '\'가지 나무에 목을 맨다\'의 북한 속담 이르는 말.',
+			meaning: "'가지 나무에 목을 맨다'의 북한 속담.",
+			longMeaning:
+				"'가지 나무에 목을 맨다'의 북한 속담. 워낙 딱하고 서러워서 목맬 나무의 크고 작음을 가리지 않고 죽으려 한다는 뜻으로, 이것저것 가릴 처지가 아님을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 3,
@@ -17928,8 +17689,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1192,
 			proverb: '가시내가 오랍아 하면 머슴애도 오랍아 한다',
-			meaning: '\'계집애가 오랍아 하니 머슴애도[사내도] 오랍아 한다\'의 북한 속담.',
-			longMeaning: '\'계집애가 오랍아 하니 머슴애도[사내도] 오랍아 한다\'의 북한 속담 이르는 말.',
+			meaning: "'계집애가 오랍아 하니 머슴애도[사내도] 오랍아 한다'의 북한 속담.",
+			longMeaning:
+				"'계집애가 오랍아 하니 머슴애도[사내도] 오랍아 한다'의 북한 속담. 계집아이가 '오빠'라고 부른다고 하여 남자도 '형'이라고 해야 할 것을 덩달아 '오빠'라고 부른다는 뜻으로, 제 주견이 없이 덮어놓고 남이 하는 대로 따라 행동함을 비웃는 말을 이르는 말.",
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
@@ -17947,8 +17709,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1193,
 			proverb: '가시물그릇에서 숟가락 얻기',
-			meaning: '\'부엌에서 숟가락을 얻었다\'의 북한 속담.',
-			longMeaning: '\'부엌에서 숟가락을 얻었다\'의 북한 속담 이르는 말.',
+			meaning: "'부엌에서 숟가락을 얻었다'의 북한 속담.",
+			longMeaning: "'부엌에서 숟가락을 얻었다'의 북한 속담. 대단치 아니한 일을 하여 놓고 성공이나 한 듯이 자랑함을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '인간관계',
 			level: 2,
@@ -20001,8 +19763,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1300,
 			proverb: '개미가 절구통을 물고 가는 격',
-			meaning: '\'개미가 절구통 물고 나간다\'의 북한 속담.',
-			longMeaning: '\'개미가 절구통 물고 나간다\'의 북한 속담 이르는 말.',
+			meaning: "'개미가 절구통 물고 나간다'의 북한 속담.",
+			longMeaning:
+				"'개미가 절구통 물고 나간다'의 북한 속담. 약하고 작은 사람이 힘에 겨운 큰일을 맡아 하거나, 무거운 것을 가지고 감을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
@@ -20440,8 +20203,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1323,
 			proverb: '개천에서 선녀가 난다',
-			meaning: '\'개천에서 용 난다\'의 북한 속담.',
-			longMeaning: '\'개천에서 용 난다\'의 북한 속담 이르는 말.',
+			meaning: "'개천에서 용 난다'의 북한 속담.",
+			longMeaning: "'개천에서 용 난다'의 북한 속담. 미천한 집안이나 변변하지 못한 부모에게서 훌륭한 인물이 나는 경우를 이르는 말.",
 			sameProverb: [],
 			category: '배신/불신',
 			level: 4,
@@ -21379,8 +21142,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1372,
 			proverb: '건넌술막 꾸짖기',
-			meaning: '\'건넛산 보고 꾸짖기\'의 북한 속담.',
-			longMeaning: '\'건넛산 보고 꾸짖기\'의 북한 속담 이르는 말.',
+			meaning: "'건넛산 보고 꾸짖기'의 북한 속담.",
+			longMeaning:
+				"'건넛산 보고 꾸짖기'의 북한 속담. 본인에게 직접 욕하거나 꾸짖기가 거북할 때 다른 사람을 빗대어 간접적으로 꾸짖어서 당사자가 알게 한다는 뜻을 이르는 말.",
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
@@ -21852,25 +21616,6 @@ export const CONST_MAIN_DATA: {
 			synonym: null,
 			antonym: null,
 			difficultyScore: 44,
-		},
-		{
-			id: 1397,
-			proverb: '검은 머리 파 뿌리 되도록',
-			meaning: '오래 살아 아주 늙을 때까지.',
-			longMeaning: '검던 머리가 파 뿌리처럼 하얗게 셀 때까지라는 뜻으로, 오래 살아 아주 늙을 때까지를 이르는 말.',
-			sameProverb: [],
-			category: '인간관계',
-			level: 2,
-			levelName: '중급',
-			example: [
-				"회의에서 듣기 좋은 말만 늘어놓던 사람이 정작 책임은 피하자 팀원이 '검은 머리 파 뿌리 되도록'라고 말했다.",
-				"괜한 농담 한마디로 분위기가 틀어지자 선배가 '검은 머리 파 뿌리 되도록'라고 타일렀다.",
-			],
-			origin: '일상의 경험을 바탕으로 교훈을 전하는 말이다.',
-			usageTip: '상황을 직접 길게 설명하지 않고 비유로 전할 때 자연스럽다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 47,
 		},
 		{
 			id: 1398,
@@ -22681,9 +22426,9 @@ export const CONST_MAIN_DATA: {
 			id: 1440,
 			proverb: '경상도 입납',
 			meaning:
-				'\'경상도에 들이 넣고\'라고만 쓴 편지를 가지고 경상도 땅에서 주인을 찾아 전하는 것은 허황한 일이라는 데서, 주소를 막연하게 써 놓고 찾으려고 하는 경우를 비웃는 말.',
+				"'경상도에 들이 넣고'라고만 쓴 편지를 가지고 경상도 땅에서 주인을 찾아 전하는 것은 허황한 일이라는 데서, 주소를 막연하게 써 놓고 찾으려고 하는 경우를 비웃는 말.",
 			longMeaning:
-				'\'경상도에 들이 넣고\'라고만 쓴 편지를 가지고 경상도 땅에서 주인을 찾아 전하는 것은 허황한 일이라는 데서, 주소를 막연하게 써 놓고 찾으려고 하는 경우를 비웃어 이르는 말.',
+				"'경상도에 들이 넣고'라고만 쓴 편지를 가지고 경상도 땅에서 주인을 찾아 전하는 것은 허황한 일이라는 데서, 주소를 막연하게 써 놓고 찾으려고 하는 경우를 비웃어 이르는 말.",
 			sameProverb: [],
 			category: '근면/검소',
 			level: 2,
@@ -23051,8 +22796,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1459,
 			proverb: '계란 속에서 소 잡을 공론을 한다',
-			meaning: '\'섬 속에서 소 잡아먹겠다\'의 북한 속담.',
-			longMeaning: '\'섬 속에서 소 잡아먹겠다\'의 북한 속담 이르는 말.',
+			meaning: "'섬 속에서 소 잡아먹겠다'의 북한 속담.",
+			longMeaning: "'섬 속에서 소 잡아먹겠다'와 같은 뜻으로 쓰는 북한 속담을 이르는 말.",
 			sameProverb: [],
 			category: '배신/불신',
 			level: 4,
@@ -23797,8 +23542,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1498,
 			proverb: '고수머리하고는 말도 말랬다',
-			meaning: '\'고수머리 옥니박이하고는 말도 말랬다\'의 북한 속담.',
-			longMeaning: '\'고수머리 옥니박이하고는 말도 말랬다\'의 북한 속담 이르는 말.',
+			meaning: "'고수머리 옥니박이하고는 말도 말랬다'의 북한 속담.",
+			longMeaning: "'고수머리 옥니박이하고는 말도 말랬다'의 북한 속담. 곱슬머리인 사람과 옥니박이인 사람은 흔히 인색하고 각박하다는 뜻을 이르는 말.",
 			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 3,
@@ -23911,8 +23656,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1504,
 			proverb: '고슴도치한테 혼난 범이 밤송이 보고도 놀란다',
-			meaning: '\'자라 보고 놀란 가슴 소댕[솥뚜껑] 보고 놀란다\'의 북한 속담.',
-			longMeaning: '\'자라 보고 놀란 가슴 소댕[솥뚜껑] 보고 놀란다\'의 북한 속담 이르는 말.',
+			meaning: "'자라 보고 놀란 가슴 소댕[솥뚜껑] 보고 놀란다'의 북한 속담.",
+			longMeaning: "'자라 보고 놀란 가슴 소댕[솥뚜껑] 보고 놀란다'의 북한 속담. 어떤 사물에 몹시 놀란 사람은 비슷한 사물만 보아도 겁을 냄을 이르는 말.",
 			sameProverb: [],
 			category: '근면/검소',
 			level: 2,
@@ -24084,8 +23829,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1513,
 			proverb: '고양이 똥도 약에 쓰려면 없다',
-			meaning: '\'개똥도 약에 쓰려면 없다\'의 북한 속담.',
-			longMeaning: '\'개똥도 약에 쓰려면 없다\'의 북한 속담 이르는 말.',
+			meaning: "'개똥도 약에 쓰려면 없다'의 북한 속담.",
+			longMeaning: "'개똥도 약에 쓰려면 없다'의 북한 속담. 평소에 흔하던 것도 막상 긴하게 쓰려고 구하면 없음을 이르는 말.",
 			sameProverb: [],
 			category: '운/우연',
 			level: 2,
@@ -24160,8 +23905,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1517,
 			proverb: '고양이 벽장에 든 것 같다',
-			meaning: '\'고양이 도장에 든 것 같다\'의 북한 속담.',
-			longMeaning: '\'고양이 도장에 든 것 같다\'의 북한 속담 이르는 말.',
+			meaning: "'고양이 도장에 든 것 같다'의 북한 속담.",
+			longMeaning: "'고양이 도장에 든 것 같다'의 북한 속담. 덜거덕거리면서 부스럭댐을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '인간관계',
 			level: 2,
@@ -24218,8 +23963,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1520,
 			proverb: '고양이 앞에 고기반찬',
-			meaning: '\'고양이한테 생선을 맡기다\'의 북한 속담.',
-			longMeaning: '\'고양이한테 생선을 맡기다\'의 북한 속담 이르는 말.',
+			meaning: "'고양이한테 생선을 맡기다'의 북한 속담.",
+			longMeaning:
+				"'고양이한테 생선을 맡기다'의 북한 속담. 고양이한테 생선을 맡기면 고양이가 생선을 먹을 것이 뻔한 일이란 뜻으로, 어떤 일이나 사물을 믿지 못할 사람에게 맡겨 놓고 마음이 놓이지 않아 걱정함을 이르는 말.",
 			sameProverb: [],
 			category: '근면/검소',
 			level: 2,
@@ -24426,25 +24172,9 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 53,
 		},
 		{
-			id: 1531,
-			proverb: '갈수록 더하다',
-			meaning: '시간이 지날수록 정도가 점점 심해짐을 이르는 말.',
-			longMeaning: '처음보다 뒤로 갈수록 상태나 정도가 더 심해진다는 뜻으로, 좋지 않은 상황이나 행동이 점점 커지는 경우를 나타내는을 이르는 말.',
-			sameProverb: [],
-			category: '세상 이치',
-			level: 1,
-			levelName: '초급',
-			example: ['처음엔 작은 말다툼이었는데 갈수록 더해져 큰 싸움이 됐다.', '지각이 한두 번이 아니고 갈수록 더하니 따로 이야기해야겠다.'],
-			origin: '일상에서 반복되는 상황을 빗대어 전해 온 말이다.',
-			usageTip: '문제나 행동의 정도가 점점 심해질 때 쓸 수 있다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 7,
-		},
-		{
 			id: 1532,
 			proverb: '감은 익어야 먹고 말은 해야 한다',
-			meaning: '때가 되어야 할 일과 말해야 풀리는 일이 있음을 이릅니다.',
+			meaning: '때가 되어야 할 일과 말해야 풀리는 일이 있음을 이르는 말.',
 			longMeaning:
 				'감은 익어야 먹을 수 있고 말은 해야 뜻이 전달된다는 뜻으로, 어떤 일은 알맞은 때를 기다려야 하며 필요한 말은 분명히 해야 함을 이르는 말.',
 			sameProverb: [],
@@ -24513,26 +24243,6 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 67,
 		},
 		{
-			id: 1536,
-			proverb: '고기는 씹어야 맛이요 말은 해야 맛이라',
-			meaning: '하고 싶은 말이나 해야 할 말은 시원히 다 해 버려야 좋다는 말.',
-			longMeaning:
-				'고기의 참맛을 알려면 겉만 핥을 것이 아니라 자꾸 씹어야 하듯이, 하고 싶은 말이나 해야 할 말은 시원히 다 해 버려야 좋다는 뜻을 이르는 말.',
-			sameProverb: [],
-			category: '인간관계',
-			level: 2,
-			levelName: '중급',
-			example: [
-				'불만이 있으면 말해야지. 고기는 씹어야 맛이요 말은 해야 맛이다.',
-				'회의에서 의견을 내야 반영된다며 고기는 씹어야 맛이고 말은 해야 맛이라고 했다.',
-			],
-			origin: '오랜 생활 경험을 짧은 비유로 압축한 표현이다.',
-			usageTip: '속마음이나 의견을 분명히 표현하라고 할 때 쓸 수 있다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 41,
-		},
-		{
 			id: 1537,
 			proverb: '고양이 쥐 생각한다',
 			meaning: '해칠 사람이 도리어 걱정하는 척함을 이르는 말.',
@@ -24555,7 +24265,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1538,
 			proverb: '곤죽에 잣 집어넣기',
-			meaning: '어울리지 않는 곳에 귀한 것을 넣어도 빛이 나지 않음을 이릅니다.',
+			meaning: '어울리지 않는 곳에 귀한 것을 넣어도 빛이 나지 않음을 이르는 말.',
 			longMeaning: '곤죽 같은 형편없는 음식에 귀한 잣을 넣는다는 뜻으로, 바탕이 좋지 않으면 좋은 것을 더해도 제값을 하지 못한다는 의미를 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -24611,8 +24321,7 @@ export const CONST_MAIN_DATA: {
 			id: 1541,
 			proverb: '굶어 죽은 귀신은 있어도 먹어 죽은 귀신은 없다',
 			meaning: '먹는 일을 지나치게 아끼지 말라는 뜻.',
-			longMeaning:
-				'굶어서 죽었다는 말은 있어도 먹어서 죽었다는 말은 없다는 뜻으로, 먹을 것은 너무 아끼지 말고 충분히 먹어야 한다는 의미로 쓰이는 이르는 말.',
+			longMeaning: '굶어서 죽었다는 말은 있어도 먹어서 죽었다는 말은 없다는 뜻으로, 먹을 것은 너무 아끼지 말고 충분히 먹어야 함을 이르는 말.',
 			sameProverb: [],
 			category: '근면/검소',
 			level: 2,
@@ -24686,39 +24395,6 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 42,
 		},
 		{
-			id: 1545,
-			proverb: '낯이 두껍다',
-			meaning: '부끄러움을 모르고 염치가 없다.',
-			longMeaning: '부끄러움을 모르고 염치가 없다 이르는 말.',
-			sameProverb: [],
-			category: '인간관계',
-			level: 1,
-			levelName: '초급',
-			example: ['실수하고도 사과하지 않다니 참 낯이 두껍다.', '몇 번이나 부탁을 거절당하고 또 찾아가다니 낯이 두꺼운 사람이다.'],
-			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
-			usageTip: '부끄러움 없이 뻔뻔하게 행동하는 사람에게 쓸 수 있다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 5,
-		},
-		{
-			id: 1546,
-			proverb: '내일 모레 하다 삼 년 간다',
-			meaning: '미루기만 하면 시간이 훌쩍 지나감을 이르는 말.',
-			longMeaning:
-				'내일 하겠다, 모레 하겠다 하며 미루다 보면 삼 년도 간다는 뜻으로, 일을 자꾸 미루면 아무 성과 없이 긴 시간이 지나감을 경계하는 이르는 말.',
-			sameProverb: [],
-			category: '경계/조심',
-			level: 1,
-			levelName: '초급',
-			example: ['운동을 내일 하겠다고만 하다 보니 내일 모레 하다 삼 년 간 꼴이 됐다.', '공부를 미루지 말라며 내일 모레 하다 삼 년 간다고 하셨다.'],
-			origin: '말과 행동의 이치를 짧은 비유로 전하는 표현이다.',
-			usageTip: '일을 계속 미루는 사람에게 경고할 때 쓸 수 있다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 24,
-		},
-		{
 			id: 1547,
 			proverb: '노루 꼬리 삼 년',
 			meaning: '아무리 오래 두어도 별로 나아지지 않음을 이르는 말.',
@@ -24755,25 +24431,6 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 76,
 		},
 		{
-			id: 1549,
-			proverb: '되놈은 되로 주고 말로 받는다',
-			meaning: '조금 주고 훨씬 많이 받아 가려는 태도를 이르는 말.',
-			longMeaning: '되로 조금 주고 말로 많이 받는다는 뜻으로, 적게 베풀고 큰 대가를 바라거나 작은 일에 비해 과한 보상을 요구하는 경우을 이르는 말.',
-			sameProverb: [],
-			category: '욕심/탐욕',
-			level: 2,
-			levelName: '중급',
-			example: [
-				'작은 도움을 주고 큰 대가를 요구하니 되놈은 되로 주고 말로 받는 격이다.',
-				'그 조건은 되로 주고 말로 받겠다는 이야기라 받아들이기 어렵다.',
-			],
-			origin: '일상에서 반복되는 상황을 빗대어 전해 온 말이다.',
-			usageTip: '작은 베풂에 비해 과한 대가를 요구할 때 쓸 수 있다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 52,
-		},
-		{
 			id: 1550,
 			proverb: '등잔불에 콩 볶아 먹겠다',
 			meaning: '성미가 몹시 급함을 이르는 말.',
@@ -24788,25 +24445,6 @@ export const CONST_MAIN_DATA: {
 			synonym: null,
 			antonym: null,
 			difficultyScore: 43,
-		},
-		{
-			id: 1551,
-			proverb: '마음이 열두 번 변한다',
-			meaning: '마음이나 생각이 자주 바뀜을 이르는 말.',
-			longMeaning: '한 가지 마음이 오래가지 못하고 열두 번이나 바뀐다는 뜻으로, 결심이나 생각이 쉽게 흔들리고 자주 달라지는 상태을 이르는 말.',
-			sameProverb: [],
-			category: '세상 이치',
-			level: 1,
-			levelName: '초급',
-			example: [
-				'여행지를 정하면서 마음이 열두 번 변해 결국 다시 처음으로 돌아왔다.',
-				'그는 결정을 앞두고 마음이 열두 번 변하는 사람이라 시간이 오래 걸린다.',
-			],
-			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
-			usageTip: '생각이나 결정이 자주 바뀌는 상황에서 쓸 수 있다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 10,
 		},
 		{
 			id: 1552,
@@ -24918,25 +24556,6 @@ export const CONST_MAIN_DATA: {
 			difficultyScore: 42,
 		},
 		{
-			id: 1558,
-			proverb: '반찬 투정은 배부른 소리다',
-			meaning: '넉넉한 처지에서 작은 불만을 늘어놓음을 이르는 말.',
-			longMeaning: '먹을 것이 있는데 반찬을 트집 잡는다는 뜻으로, 기본적인 것은 충분히 갖추고 있으면서 사소한 불평을 하는 태도을 이르는 말.',
-			sameProverb: [],
-			category: '인간관계',
-			level: 1,
-			levelName: '초급',
-			example: [
-				'지원도 충분히 받으면서 작은 불편만 말하니 반찬 투정은 배부른 소리다.',
-				'선택지가 많은데 색깔이 마음에 안 든다는 건 반찬 투정 같은 소리다.',
-			],
-			origin: '말과 행동의 이치를 짧은 비유로 전하는 표현이다.',
-			usageTip: '충분한 조건을 가진 사람이 사소한 불만을 말할 때 쓸 수 있다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 22,
-		},
-		{
 			id: 1559,
 			proverb: '병은 자랑하랬다',
 			meaning: '병은 숨기지 말고 알려야 고칠 방법을 찾는다는 뜻.',
@@ -24956,7 +24575,7 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1560,
 			proverb: '비는 많이 와도 골마다 다 차지 않는다',
-			meaning: '혜택이나 이익이 많아도 모두에게 고르게 돌아가지는 않음을 이릅니다.',
+			meaning: '혜택이나 이익이 많아도 모두에게 고르게 돌아가지는 않음을 이르는 말.',
 			longMeaning:
 				'비가 많이 내려도 모든 골짜기가 다 차지는 않는다는 뜻으로, 좋은 조건이나 혜택이 있어도 사람마다 받는 정도가 다름을 나타냄을 이르는 말.',
 			sameProverb: [],
@@ -25003,25 +24622,6 @@ export const CONST_MAIN_DATA: {
 			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
 			usageTip: '어려운 상황에서도 살아갈 길이 있음을 격려할 때 쓸 수 있다.',
 			synonym: null,
-			antonym: null,
-			difficultyScore: 20,
-		},
-		{
-			id: 1563,
-			proverb: '서당개 삼 년이면 글 읽는다',
-			meaning: '오래 보고 들으면 자연히 익히게 된다는 뜻.',
-			longMeaning: '서당에 오래 머문 개도 글을 읽게 된다는 뜻으로, 배움의 자리에 오래 있거나 반복해 접하면 저절로 알게 되는 것이 있음을 이르는 말.',
-			sameProverb: ['서당 개 삼 년에 풍월(을) 한다[읊는다/짓는다]'],
-			category: '노력/성공',
-			level: 1,
-			levelName: '초급',
-			example: [
-				'개발팀 옆에서 일하다 보니 용어를 익혔다. 서당개 삼 년이면 글 읽는다.',
-				'계속 듣다 보니 회계 지식도 조금 생겨서 서당개 삼 년이면 글 읽는다는 말이 맞다.',
-			],
-			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
-			usageTip: '오래 접하면 자연스럽게 배운다는 뜻으로 쓸 수 있다.',
-			synonym: '서당 개 삼 년에 풍월을 한다',
 			antonym: null,
 			difficultyScore: 20,
 		},
@@ -25101,7 +24701,7 @@ export const CONST_MAIN_DATA: {
 			id: 1568,
 			proverb: '입찬말은 무덤 앞에 가서 하라',
 			meaning: '장담은 끝까지 일이 끝난 뒤에나 하라는 뜻.',
-			longMeaning: '자신만만한 말은 죽은 뒤 무덤 앞에서나 하라는 뜻으로, 살아 있는 동안에는 어떤 일이 생길지 모르니 함부로 장담하지 말라는 이르는 말.',
+			longMeaning: '자신만만한 말은 죽은 뒤 무덤 앞에서나 하라는 뜻으로, 살아 있는 동안에는 어떤 일이 생길지 모르니 함부로 장담하지 말라고 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
 			level: 2,
@@ -25170,81 +24770,6 @@ export const CONST_MAIN_DATA: {
 			synonym: null,
 			antonym: null,
 			difficultyScore: 73,
-		},
-		{
-			id: 1572,
-			proverb: '앉은 자리가 꽃자리다',
-			meaning: '자기 처한 자리와 형편을 좋게 여기라는 뜻.',
-			longMeaning:
-				'지금 앉아 있는 자리도 마음먹기에 따라 꽃자리라는 뜻으로, 현재의 처지나 자리를 소중히 여기고 긍정적으로 받아들이라는 의미를 이르는 말.',
-			sameProverb: [],
-			category: '세상 이치',
-			level: 1,
-			levelName: '초급',
-			example: [
-				'불평만 하지 말고 지금 자리에서 최선을 다하자. 앉은 자리가 꽃자리다.',
-				'환경이 완벽하지 않아도 마음가짐이 중요하다며 앉은 자리가 꽃자리라고 했다.',
-			],
-			origin: '오랜 생활 경험을 짧은 비유로 압축한 표현이다.',
-			usageTip: '현재 처지를 긍정적으로 받아들이라고 말할 때 쓸 수 있다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 21,
-		},
-		{
-			id: 1573,
-			proverb: '오래된 병에 효자 없다',
-			meaning: '오랜 병수발은 아무리 가까운 사람에게도 힘들다는 뜻.',
-			longMeaning: '병이 오래되면 효자도 지치게 된다는 뜻으로, 긴 병간호나 지속되는 어려움은 가족처럼 가까운 사람에게도 큰 부담이 됨을 이르는 말.',
-			sameProverb: [],
-			category: '인간관계',
-			level: 1,
-			levelName: '초급',
-			example: [
-				'간병이 길어질수록 가족도 지친다. 오래된 병에 효자 없다는 말이 현실적이다.',
-				'오래된 병에 효자 없다고 돌봄을 혼자 감당하지 말고 도움을 받아야 한다.',
-			],
-			origin: '일상에서 반복되는 상황을 빗대어 전해 온 말이다.',
-			usageTip: '오랜 간병이나 지속되는 부담이 관계를 지치게 할 때 쓸 수 있다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 39,
-		},
-		{
-			id: 1574,
-			proverb: '원님 재판은 팔자소관이다',
-			meaning: '권력자 판단에 따라 운명이 좌우됨을 이르는 말.',
-			longMeaning:
-				'원님의 재판 결과는 자기 팔자에 달렸다는 뜻으로, 힘 있는 사람의 판단이나 처분에 따라 결과가 크게 달라지는 처지를 비유적으로 이르는 말.',
-			sameProverb: [],
-			category: '세상 이치',
-			level: 3,
-			levelName: '고급',
-			example: [
-				"남의 말을 쉽게 옮기던 사람이 결국 곤란해지자 주변에서 '원님 재판은 팔자소관이다'라고 수군거렸다.",
-				'기준이 불분명하면 지원자는 원님 재판은 팔자소관처럼 느낄 수밖에 없다.',
-			],
-			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
-			usageTip: '결과가 권력자나 심사자의 판단에 크게 좌우될 때 쓸 수 있다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 76,
-		},
-		{
-			id: 1575,
-			proverb: '칼자루 쥔 놈이 임자다',
-			meaning: '실권을 가진 사람이 주도권을 가진다는 뜻.',
-			longMeaning: '칼자루를 쥔 사람이 실제 주인이라는 뜻으로, 명분보다 실제 권한이나 힘을 가진 사람이 상황을 좌우함을 이르는 말.',
-			sameProverb: [],
-			category: '세상 이치',
-			level: 1,
-			levelName: '초급',
-			example: ['결정권자가 따로 있으니 결국 칼자루 쥔 놈이 임자다.', '계약서상 권리보다 실제 운영 권한이 중요하다. 칼자루 쥔 사람이 임자다.'],
-			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
-			usageTip: '실질적 권한을 가진 사람이 상황을 좌우할 때 쓸 수 있다.',
-			synonym: null,
-			antonym: null,
-			difficultyScore: 25,
 		},
 		{
 			id: 1576,
@@ -25559,7 +25084,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '고지기 주는 것은 휘에 치면 되지',
 			meaning: '엄청나게 뜯길 수 있는 앞날의 손해를 막기 위하여 먼저 얼마간 손해를 보는 것은 손해라고 말할 수 없을 정도로 보잘것없는 것임.',
 			longMeaning:
-				'고지기의 뒷주머니에 밀어 넣는 것은 스무 말이나 열닷 말들이 \'휘\'에 비겨서 말한다면 열 홉들이 \'되\'에 불과하다는 뜻으로, 엄청나게 뜯길 수 있는 앞날의 손해를 막기 위하여 먼저 얼마간 손해를 보는 것은 손해라고 말할 수 없을 정도로 보잘것없는 것임을 비유적으로 이르는 말.',
+				"고지기의 뒷주머니에 밀어 넣는 것은 스무 말이나 열닷 말들이 '휘'에 비겨서 말한다면 열 홉들이 '되'에 불과하다는 뜻으로, 엄청나게 뜯길 수 있는 앞날의 손해를 막기 위하여 먼저 얼마간 손해를 보는 것은 손해라고 말할 수 없을 정도로 보잘것없는 것임을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '근면/검소',
 			level: 3,
@@ -26520,8 +26045,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1642,
 			proverb: '공것이라면 간장이라도 마신다',
-			meaning: '\'공것이라면 양잿물[비상]도 먹는다[삼킨다]\'의 북한 속담.',
-			longMeaning: '\'공것이라면 양잿물[비상]도 먹는다[삼킨다]\'의 북한 속담 이르는 말.',
+			meaning: "'공것이라면 양잿물[비상]도 먹는다[삼킨다]'의 북한 속담.",
+			longMeaning: "'공것이라면 양잿물[비상]도 먹는다[삼킨다]'와 같은 뜻으로 쓰는 북한 속담을 이르는 말.",
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
@@ -26693,7 +26218,7 @@ export const CONST_MAIN_DATA: {
 			id: 1651,
 			proverb: '공에도 사가 있다',
 			meaning: '어찌 사사로운 일에 남의 사정을 조금도 보아주지 않느냐는 말.',
-			longMeaning: '공적인 일에도 개인의 사정을 보아줄 때가 있다는 뜻으로, 어찌 사사로운 일에 남의 사정을 조금도 보아주지 않느냐고 타 이르는 말.',
+			longMeaning: '공적인 일에도 개인의 사정을 보아줄 때가 있다는 뜻으로, 어찌 사사로운 일에 남의 사정을 조금도 보아주지 않느냐고 타이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
 			level: 1,
@@ -26749,8 +26274,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1654,
 			proverb: '공연히 숲을 헤쳐서 뱀을 일군다',
-			meaning: '\'긁어 부스럼\'의 북한 속담.',
-			longMeaning: '\'긁어 부스럼\'의 북한 속담 이르는 말.',
+			meaning: "'긁어 부스럼'의 북한 속담.",
+			longMeaning: "'긁어 부스럼'의 북한 속담. 아무렇지도 않은 일을 공연히 건드려서 걱정을 일으킨 경우를 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '운/우연',
 			level: 2,
@@ -26866,7 +26391,7 @@ export const CONST_MAIN_DATA: {
 			proverb: '공작도 날거미만 먹고 살고 수달피도 발바닥만 핥고 산다',
 			meaning: '음식을 이리저리 가리는 사람을 핀잔.',
 			longMeaning:
-				'아름다운 공작도 날거미를 먹고 살고 비싼 털가죽을 가진 수달피도 발바닥을 핥고 산다는 뜻으로, 음식을 이리저리 가리는 사람을 핀잔하는 말.',
+				'아름다운 공작도 날거미를 먹고 살고 비싼 털가죽을 가진 수달피도 발바닥을 핥고 산다는 뜻으로, 음식을 이리저리 가리는 사람을 핀잔하여 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
 			level: 4,
@@ -27648,8 +27173,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1701,
 			proverb: '구두쟁이 셋이 모이면 재사보다 낫다',
-			meaning: '\'구두장이 셋이 모이면 제갈량보다 낫다\'의 북한 속담.',
-			longMeaning: '\'구두장이 셋이 모이면 제갈량보다 낫다\'의 북한 속담 이르는 말.',
+			meaning: "'구두장이 셋이 모이면 제갈량보다 낫다'의 북한 속담.",
+			longMeaning: "'구두장이 셋이 모이면 제갈량보다 낫다'의 북한 속담. 여러 사람의 지혜가 어떤 뛰어난 한 사람의 지혜보다 나음을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '배신/불신',
 			level: 4,
@@ -28224,7 +27749,7 @@ export const CONST_MAIN_DATA: {
 			id: 1731,
 			proverb: '국사에도 사정이 있다',
 			meaning: '어째서 남의 사정을 좀 봐주지 않느냐는 말.',
-			longMeaning: '나라의 일에도 사정을 봐주는 경우가 있다는 뜻으로, 어째서 남의 사정을 좀 봐주지 않느냐고 타 이르는 말.',
+			longMeaning: '나라의 일에도 사정을 봐주는 경우가 있다는 뜻으로, 어째서 남의 사정을 좀 봐주지 않느냐고 타이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 1,
@@ -28376,8 +27901,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1739,
 			proverb: '국에 덴 놈이 랭수를 떠 놓고 분다',
-			meaning: '\'국에 덴 놈 물[냉수] 보고도 분다[놀란다]\'의 북한 속담.',
-			longMeaning: '\'국에 덴 놈 물[냉수] 보고도 분다[놀란다]\'의 북한 속담 이르는 말.',
+			meaning: "'국에 덴 놈 물[냉수] 보고도 분다[놀란다]'의 북한 속담.",
+			longMeaning: "'국에 덴 놈 물[냉수] 보고도 분다[놀란다]'와 같은 뜻으로 쓰는 북한 속담을 이르는 말.",
 			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 2,
@@ -29882,8 +29407,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1818,
 			proverb: '귀머거리 솔뿌리 캐듯',
-			meaning: '\'귀먹은 중 마 캐듯\'의 북한 속담.',
-			longMeaning: '\'귀먹은 중 마 캐듯\'의 북한 속담 이르는 말.',
+			meaning: "'귀먹은 중 마 캐듯'의 북한 속담.",
+			longMeaning: "'귀먹은 중 마 캐듯'의 북한 속담. 남이 무슨 말을 하거나 말거나 알아듣지 못한 체하고 저 하던 일만 그대로 함을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '운/우연',
 			level: 2,
@@ -30800,8 +30325,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1866,
 			proverb: '그물을 벗어난 새요 함정에서 뛰여 난 범이라',
-			meaning: '\'그물을 벗어난 새\'의 북한 속담.',
-			longMeaning: '\'그물을 벗어난 새\'의 북한 속담 이르는 말.',
+			meaning: "'그물을 벗어난 새'의 북한 속담.",
+			longMeaning: "'그물을 벗어난 새'의 북한 속담. 몹시 위태롭거나 꼼짝없이 죽게 된 처지에서 벗어나 다시 살아나게 된 경우를 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '운/우연',
 			level: 2,
@@ -31447,8 +30972,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1900,
 			proverb: '금새도 모르고 싸다 한다',
-			meaning: '\'금도 모르면서 싸다 한다\'의 북한 속담.',
-			longMeaning: '\'금도 모르면서 싸다 한다\'의 북한 속담 이르는 말.',
+			meaning: "'금도 모르면서 싸다 한다'의 북한 속담.",
+			longMeaning: "'금도 모르면서 싸다 한다'의 북한 속담. 일의 속사정은 잘 알지도 못하면서 경솔하게 이러니저러니 말함을 이르는 말.",
 			sameProverb: [],
 			category: '근면/검소',
 			level: 3,
@@ -31620,8 +31145,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1909,
 			proverb: '급하다고 우물 쳐들고 마시랴',
-			meaning: '\'급하면 바늘허리에 실 매어 쓸까\'의 북한 속담.',
-			longMeaning: '\'급하면 바늘허리에 실 매어 쓸까\'의 북한 속담 이르는 말.',
+			meaning: "'급하면 바늘허리에 실 매어 쓸까'의 북한 속담.",
+			longMeaning:
+				"'급하면 바늘허리에 실 매어 쓸까'의 북한 속담. 일에는 일정한 순서가 있고 때가 있는 것이므로, 아무리 급해도 순서를 밟아서 일해야 함을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '배신/불신',
 			level: 4,
@@ -32098,8 +31624,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1934,
 			proverb: '기름을 치고 부채질한다',
-			meaning: '\'불난 데 풀무질한다\'의 북한 속담.',
-			longMeaning: '\'불난 데 풀무질한다\'의 북한 속담 이르는 말.',
+			meaning: "'불난 데 풀무질한다'의 북한 속담.",
+			longMeaning: "'불난 데 풀무질한다'와 같은 뜻으로 쓰는 북한 속담을 이르는 말.",
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
@@ -32444,8 +31970,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1952,
 			proverb: '길가에 집 세우며 남의 말 들으려다간 집 되여 볼 날 없다',
-			meaning: '\'길가에 집 짓기\'의 북한 속담.',
-			longMeaning: '\'길가에 집 짓기\'의 북한 속담 이르는 말.',
+			meaning: "'길가에 집 짓기'의 북한 속담.",
+			longMeaning: "'길가에 집 짓기'의 북한 속담. 주견이 없이 남의 간섭이나 의견만 좇다가는 아무 일도 제대로 끝을 맺을 수 없음을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '경계/조심',
 			level: 4,
@@ -33342,8 +32868,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 1999,
 			proverb: '까마귀 알 까먹었나',
-			meaning: '\'까마귀 고기를 먹었나[먹었느냐]\'의 북한 속담.',
-			longMeaning: '\'까마귀 고기를 먹었나[먹었느냐]\'의 북한 속담 이르는 말.',
+			meaning: "'까마귀 고기를 먹었나[먹었느냐]'의 북한 속담.",
+			longMeaning:
+				"'까마귀 고기를 먹었나[먹었느냐]'의 북한 속담. 까마귀 고기를 먹으면 기억력이 없어진다는 속설에서 비롯되어, 잊어버리기를 잘하는 사람을 놀리거나 나무라는 뜻을 이르는 말.",
 			sameProverb: [],
 			category: '욕심/탐욕',
 			level: 2,
@@ -33361,8 +32888,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 2000,
 			proverb: '까마귀 열두 가지 소리 다 잘해도 마지막에는 저 맞아 죽을 소리 한다',
-			meaning: '\'까마귀가 열두 번 울어도 까옥 소리뿐이다\'의 북한 속담.',
-			longMeaning: '\'까마귀가 열두 번 울어도 까옥 소리뿐이다\'의 북한 속담 이르는 말.',
+			meaning: "'까마귀가 열두 번 울어도 까옥 소리뿐이다'의 북한 속담.",
+			longMeaning: "'까마귀가 열두 번 울어도 까옥 소리뿐이다'의 북한 속담. 미운 사람이 하는 일은 하나부터 열까지 다 밉기만 함을 이르는 말.",
 			sameProverb: [],
 			category: '근면/검소',
 			level: 4,
@@ -33418,8 +32945,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 2003,
 			proverb: '까마귀 오디를 나무랄 때가 있다',
-			meaning: '\'까마귀가 메밀[고욤/보리/오디]을 마다한다[마다할까]\'의 북한 속담.',
-			longMeaning: '\'까마귀가 메밀[고욤/보리/오디]을 마다한다[마다할까]\'의 북한 속담 이르는 말.',
+			meaning: "'까마귀가 메밀[고욤/보리/오디]을 마다한다[마다할까]'의 북한 속담.",
+			longMeaning: "'까마귀가 메밀[고욤/보리/오디]을 마다한다[마다할까]'와 같은 뜻으로 쓰는 북한 속담을 이르는 말.",
 			sameProverb: [],
 			category: '인간관계',
 			level: 2,
@@ -33437,8 +32964,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 2004,
 			proverb: '까마귀 제아무리 흰 칠을 하여도 백조로 될 수 없다',
-			meaning: '\'까마귀 학이 되랴\'의 북한 속담.',
-			longMeaning: '\'까마귀 학이 되랴\'의 북한 속담 이르는 말.',
+			meaning: "'까마귀 학이 되랴'의 북한 속담.",
+			longMeaning:
+				"'까마귀 학이 되랴'의 북한 속담. 까마귀 같은 흔한 동물이 귀한 학이 될 리가 없다는 뜻으로, 본시 제가 타고난 대로밖에는 아무리 하여도 안 됨을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '경계/조심',
 			level: 4,
@@ -33705,9 +33233,9 @@ export const CONST_MAIN_DATA: {
 			id: 2018,
 			proverb: '까마귀가 오지 말라는 격',
 			meaning:
-				'까마귀가 \'까옥까옥\' 우는 것을 \'가오가오\' 하고 우는 것으로 듣는 것처럼 남은 아무렇지도 않은데 그의 말을 잘못 이해하고 공연히 언짢게 여김을 놀림조로.',
+				"까마귀가 '까옥까옥' 우는 것을 '가오가오' 하고 우는 것으로 듣는 것처럼 남은 아무렇지도 않은데 그의 말을 잘못 이해하고 공연히 언짢게 여김을 놀림조로.",
 			longMeaning:
-				'까마귀가 \'까옥까옥\' 우는 것을 \'가오가오\' 하고 우는 것으로 듣는 것처럼 남은 아무렇지도 않은데 그의 말을 잘못 이해하고 공연히 언짢게 여김을 놀림조로 이르는 말.',
+				"까마귀가 '까옥까옥' 우는 것을 '가오가오' 하고 우는 것으로 듣는 것처럼 남은 아무렇지도 않은데 그의 말을 잘못 이해하고 공연히 언짢게 여김을 놀림조로 이르는 말.",
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
@@ -33841,8 +33369,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 2025,
 			proverb: '까치 배 바닥같이 흰소리한다',
-			meaning: '\'까치 배 바닥[배때기] 같다\'의 북한 속담.',
-			longMeaning: '\'까치 배 바닥[배때기] 같다\'의 북한 속담 이르는 말.',
+			meaning: "'까치 배 바닥[배때기] 같다'의 북한 속담.",
+			longMeaning: "'까치 배 바닥[배때기] 같다'와 같은 뜻으로 쓰는 북한 속담을 이르는 말.",
 			sameProverb: [],
 			category: '배신/불신',
 			level: 4,
@@ -33879,8 +33407,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 2027,
 			proverb: '까치도 둥지가 있다',
-			meaning: '\'까막까치도 집이 있다\'의 북한 속담.',
-			longMeaning: '\'까막까치도 집이 있다\'의 북한 속담 이르는 말.',
+			meaning: "'까막까치도 집이 있다'의 북한 속담.",
+			longMeaning:
+				"'까막까치도 집이 있다'의 북한 속담. 하찮은 까마귀나 까치들도 다 제집이 있는 법이라는 뜻으로, 집 없는 사람의 서러운 처지를 한탄하여 이르는 말.",
 			sameProverb: [],
 			category: '인간관계',
 			level: 2,
@@ -34164,8 +33693,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 2042,
 			proverb: '껍질 없는 털가죽이 없다',
-			meaning: '\'껍질 없는 털이 있을까\'의 북한 속담.',
-			longMeaning: '\'껍질 없는 털이 있을까\'의 북한 속담 이르는 말.',
+			meaning: "'껍질 없는 털이 있을까'의 북한 속담.",
+			longMeaning: "'껍질 없는 털이 있을까'의 북한 속담. 무엇이나 그 바탕이 있어야 생길 수 있음을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
@@ -34278,8 +33807,9 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 2048,
 			proverb: '꼬챙이 건시 뽑아 먹듯',
-			meaning: '\'곶감 꼬치에서 곶감 빼[뽑아] 먹듯\'의 북한 속담.',
-			longMeaning: '\'곶감 꼬치에서 곶감 빼[뽑아] 먹듯\'의 북한 속담 이르는 말.',
+			meaning: "'곶감 꼬치에서 곶감 빼[뽑아] 먹듯'의 북한 속담.",
+			longMeaning:
+				"'곶감 꼬치에서 곶감 빼[뽑아] 먹듯'의 북한 속담. 맛있는 곶감을 하나씩 빼 먹듯이, 재산을 조금씩 헐어 써서 없애 버림을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '근면/검소',
 			level: 2,
@@ -35952,8 +35482,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 2136,
 			proverb: '나간 놈의 집',
-			meaning: '\'나간 놈의 집구석이라\'의 북한 속담.',
-			longMeaning: '\'나간 놈의 집구석이라\'의 북한 속담 이르는 말.',
+			meaning: "'나간 놈의 집구석이라'의 북한 속담.",
+			longMeaning: "'나간 놈의 집구석이라'의 북한 속담. 집 안이 어수선하고 정리가 안 되어 있음을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '근면/검소',
 			level: 2,
@@ -36317,9 +35847,9 @@ export const CONST_MAIN_DATA: {
 			id: 2155,
 			proverb: '나는 바담 풍 해도 너는 바람 풍 해라',
 			meaning:
-				'옛날 어느 서당에서 선생님이 \'바람풍\' 자를 가르치는데 혀가 짧아서 \'바담 풍\'으로 발음하니 학생들도 \'바담 풍\'으로 외운 데서 나온 말로, 자신은 잘못된 행동을 하면서 남보고는 잘하라고 요구.',
+				"옛날 어느 서당에서 선생님이 '바람풍' 자를 가르치는데 혀가 짧아서 '바담 풍'으로 발음하니 학생들도 '바담 풍'으로 외운 데서 나온 말로, 자신은 잘못된 행동을 하면서 남보고는 잘하라고 요구.",
 			longMeaning:
-				'옛날 어느 서당에서 선생님이 \'바람풍\' 자를 가르치는데 혀가 짧아서 \'바담 풍\'으로 발음하니 학생들도 \'바담 풍\'으로 외운 데서 나온 말로, 자신은 잘못된 행동을 하면서 남보고는 잘하라고 요구하여 이르는 말.',
+				"옛날 어느 서당에서 선생님이 '바람풍' 자를 가르치는데 혀가 짧아서 '바담 풍'으로 발음하니 학생들도 '바담 풍'으로 외운 데서 나온 말로, 자신은 잘못된 행동을 하면서 남보고는 잘하라고 요구하여 이르는 말.",
 			sameProverb: [],
 			category: '인간관계',
 			level: 2,
@@ -37045,8 +36575,8 @@ export const CONST_MAIN_DATA: {
 		{
 			id: 2193,
 			proverb: '나무에도 돌에도 붙일 데 없다',
-			meaning: '\'나무에도 못 대고 돌에도 못 댄다\'의 북한 속담.',
-			longMeaning: '\'나무에도 못 대고 돌에도 못 댄다\'의 북한 속담 이르는 말.',
+			meaning: "'나무에도 못 대고 돌에도 못 댄다'의 북한 속담.",
+			longMeaning: "'나무에도 못 대고 돌에도 못 댄다'의 북한 속담. 아무 데도 의지할 곳이 없음을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '배신/불신',
 			level: 4,
@@ -37194,14 +36724,12 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 79,
 		},
-
 		{
 			id: 2201,
 			proverb: '가갸 뒷다리[뒤 자]도 모른다',
-			meaning:
-				'반절본문의 첫 글자인 \'가\'와 \'갸\'의 세로획조차도 쓸 줄 모른다는 뜻으로, 글자를 전혀 깨치지 못하여 무식하거나, 사리에 몹시 어두운 사람을 놀림조로 이르는 말.',
+			meaning: '글자를 전혀 깨치지 못하여 무식하거나, 사리에 몹시 어두운 사람.',
 			longMeaning:
-				'반절본문의 첫 글자인 \'가\'와 \'갸\'의 세로획조차도 쓸 줄 모른다는 뜻으로, 글자를 전혀 깨치지 못하여 무식하거나, 사리에 몹시 어두운 사람을 놀림조로 이르는 말.',
+				"반절본문의 첫 글자인 '가'와 '갸'의 세로획조차도 쓸 줄 모른다는 뜻으로, 글자를 전혀 깨치지 못하여 무식하거나, 사리에 몹시 어두운 사람을 놀림조로 이르는 말.",
 			sameProverb: [],
 			category: '인간관계',
 			level: 3,
@@ -37216,7 +36744,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 70,
 		},
-
 		{
 			id: 2202,
 			proverb: '가까운 집 며느리일수록 흉이 많다',
@@ -37236,12 +36763,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2203,
 			proverb: '가난 구제는 지옥 늧이라',
-			meaning:
-				'가난한 사람을 구제하는 것은 지옥에 떨어질 징조라는 뜻으로, 그 일이 결국에 가서는 자신에게 해롭게 되고 고생거리가 되니 아예 가난한 사람을 구제할 생각도 하지 말라는 것을 비유적으로 이르는 말.',
+			meaning: '그 일이 결국에 가서는 자신에게 해롭게 되고 고생거리가 되니 아예 가난한 사람을 구제할 생각도 하지 말라는 것.',
 			longMeaning:
 				'가난한 사람을 구제하는 것은 지옥에 떨어질 징조라는 뜻으로, 그 일이 결국에 가서는 자신에게 해롭게 되고 고생거리가 되니 아예 가난한 사람을 구제할 생각도 하지 말라는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -37258,7 +36783,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2204,
 			proverb: '가난은 나라(님)도 못 당한다',
@@ -37278,11 +36802,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2205,
 			proverb: '가는 년이 물 길어다 놓고 갈까',
-			meaning: '이미 일이 다 틀어져 그만두는 터에 뒷일을 생각하고 돌아다볼 리 만무함을 비유적으로 이르는 말.',
+			meaning: '이미 일이 다 틀어져 그만두는 터에 뒷일을 생각하고 돌아다볼 리 만무함.',
 			longMeaning: '이미 일이 다 틀어져 그만두는 터에 뒷일을 생각하고 돌아다볼 리 만무함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -37298,11 +36821,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 60,
 		},
-
 		{
 			id: 2206,
 			proverb: '가는 며느리가 보리방아 찧어 놓고 가랴',
-			meaning: '이미 일이 다 틀어져 그만두는 터에 뒷일을 생각하고 돌아다볼 리 만무함을 비유적으로 이르는 말.',
+			meaning: '이미 일이 다 틀어져 그만두는 터에 뒷일을 생각하고 돌아다볼 리 만무함.',
 			longMeaning: '이미 일이 다 틀어져 그만두는 터에 뒷일을 생각하고 돌아다볼 리 만무함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -37318,12 +36840,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 2207,
 			proverb: '가락 바로잡는 집에 가져다가 세워 놨다 와도 좀 낫다',
-			meaning:
-				'휜 물렛가락을 가락 고치는 집에 가져다 놓았다가 다시 가져오기만 하여도 휜 것이 바로잡힌 것처럼 느껴진다는 뜻으로, 좋은 환경의 영향을 조금만 받아도 정신적으로 위안이 됨을 비유적으로 이르는 말.',
+			meaning: '좋은 환경의 영향을 조금만 받아도 정신적으로 위안이 됨.',
 			longMeaning:
 				'휜 물렛가락을 가락 고치는 집에 가져다 놓았다가 다시 가져오기만 하여도 휜 것이 바로잡힌 것처럼 느껴진다는 뜻으로, 좋은 환경의 영향을 조금만 받아도 정신적으로 위안이 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -37340,12 +36860,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2208,
 			proverb: '가래 터 종놈 같다',
-			meaning:
-				'힘든 가래질을 억지로 하는 종과 같다는 뜻으로, 성품이 거칠고 버릇없이 굴거나 매사에 못마땅해서 무뚝뚝하게 구는 사람을 비유적으로 이르는 말.',
+			meaning: '성품이 거칠고 버릇없이 굴거나 매사에 못마땅해서 무뚝뚝하게 구는 사람.',
 			longMeaning:
 				'힘든 가래질을 억지로 하는 종과 같다는 뜻으로, 성품이 거칠고 버릇없이 굴거나 매사에 못마땅해서 무뚝뚝하게 구는 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -37362,12 +36880,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 2209,
 			proverb: '가루 팔러 가니 바람이 불고 소금 팔러 가니 이슬비 온다',
-			meaning:
-				'가루 장사를 가면 바람이 불어 가루를 날리고 소금 장사를 가면 이슬비가 와서 소금을 다 녹여 버린다는 뜻으로, 일이 뜻대로 되지 않고 엇나감을 비유적으로 이르는 말.',
+			meaning: '일이 뜻대로 되지 않고 엇나감.',
 			longMeaning:
 				'가루 장사를 가면 바람이 불어 가루를 날리고 소금 장사를 가면 이슬비가 와서 소금을 다 녹여 버린다는 뜻으로, 일이 뜻대로 되지 않고 엇나감을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -37384,11 +36900,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2210,
 			proverb: '가뭄에 단비',
-			meaning: '가뭄이 들어 곡식이 다 마를 때에 기다리던 비가 온다는 뜻으로, 기다리고 바라던 일이 마침내 이루어짐을 이르는 말.',
+			meaning: '기다리고 바라던 일이 마침내 이루어짐.',
 			longMeaning: '가뭄이 들어 곡식이 다 마를 때에 기다리던 비가 온다는 뜻으로, 기다리고 바라던 일이 마침내 이루어짐을 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -37404,11 +36919,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 30,
 		},
-
 		{
 			id: 2211,
 			proverb: '가시아비 돈 떼어먹은 놈처럼',
-			meaning: '남에게 폐를 끼치고도 미안해하지 않는 태도를 비유적으로 이르는 말.',
+			meaning: '남에게 폐를 끼치고도 미안해하지 않는 태도.',
 			longMeaning: '남에게 폐를 끼치고도 미안해하지 않는 태도를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -37424,12 +36938,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2212,
 			proverb: '가시어머니 장 떨어지자 사위 국 싫다 한다',
-			meaning:
-				'처갓집에 장이 떨어져서 국을 끓일 수 없게 되었는데 마침 사위가 국은 싫어서 먹지 않겠다고 한다는 뜻으로, 어떤 일이 서로 공교롭게도 때맞추어 일어남을 비유적으로 이르는 말.',
+			meaning: '어떤 일이 서로 공교롭게도 때맞추어 일어남.',
 			longMeaning:
 				'처갓집에 장이 떨어져서 국을 끓일 수 없게 되었는데 마침 사위가 국은 싫어서 먹지 않겠다고 한다는 뜻으로, 어떤 일이 서로 공교롭게도 때맞추어 일어남을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -37446,12 +36958,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2213,
 			proverb: '가시어미 눈멀 사위',
-			meaning:
-				'사위가 왔을 때에 국을 끓여 주느라 생기는 연기와 김으로 장모의 눈을 멀게 할 사위라는 뜻으로, 국을 매우 좋아하는 사람을 비유적으로 이르는 말.',
+			meaning: '국을 매우 좋아하는 사람.',
 			longMeaning:
 				'사위가 왔을 때에 국을 끓여 주느라 생기는 연기와 김으로 장모의 눈을 멀게 할 사위라는 뜻으로, 국을 매우 좋아하는 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -37468,12 +36978,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2214,
 			proverb: '가시어미 장 떨어지자 사위가 국 싫다 한다',
-			meaning:
-				'처갓집에 장이 떨어져서 국을 끓일 수 없게 되었는데 마침 사위가 국은 싫어서 먹지 않겠다고 한다는 뜻으로, 어떤 일이 서로 공교롭게도 때맞추어 일어남을 비유적으로 이르는 말.',
+			meaning: '어떤 일이 서로 공교롭게도 때맞추어 일어남.',
 			longMeaning:
 				'처갓집에 장이 떨어져서 국을 끓일 수 없게 되었는데 마침 사위가 국은 싫어서 먹지 않겠다고 한다는 뜻으로, 어떤 일이 서로 공교롭게도 때맞추어 일어남을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -37490,12 +36998,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2215,
 			proverb: '가을마당에 빗자루 몽당이를 들고 춤을 추어도 농사 밑이 어둑하다',
-			meaning:
-				'가을에 타작을 하여 줄 것은 주고 갚을 것은 갚고 빈손에 빗자루만 남게 되더라도 그래도 남은 것이 있다는 뜻으로, 농사일은 든든한 것임을 이르는 말.',
+			meaning: '농사일은 든든한 것임.',
 			longMeaning:
 				'가을에 타작을 하여 줄 것은 주고 갚을 것은 갚고 빈손에 빗자루만 남게 되더라도 그래도 남은 것이 있다는 뜻으로, 농사일은 든든한 것임을 이르는 말.',
 			sameProverb: [],
@@ -37512,11 +37018,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2216,
 			proverb: '가을바람은 총각 바람 봄바람은 처녀 바람',
-			meaning: '가을에는 남자가 바람이 나기 쉽고, 봄에는 여자가 바람이 나기 쉬움을 비유적으로 이르는 말.',
+			meaning: '가을에는 남자가 바람이 나기 쉽고, 봄에는 여자가 바람이 나기 쉬움.',
 			longMeaning: '가을에는 남자가 바람이 나기 쉽고, 봄에는 여자가 바람이 나기 쉬움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -37532,12 +37037,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 2217,
 			proverb: '가을볕에는 딸을 쬐이고 봄볕에는 며느리를 쬐인다',
-			meaning:
-				'선선한 가을볕에는 딸을 쬐이고 살갗이 잘 타고 거칠어지는 봄볕에는 며느리를 쬐인다는 뜻으로, 시어머니는 며느리보다 제 딸을 더 아낌을 비유적으로 이르는 말.',
+			meaning: '시어머니는 며느리보다 제 딸을 더 아낌.',
 			longMeaning:
 				'선선한 가을볕에는 딸을 쬐이고 살갗이 잘 타고 거칠어지는 봄볕에는 며느리를 쬐인다는 뜻으로, 시어머니는 며느리보다 제 딸을 더 아낌을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -37554,11 +37057,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2218,
 			proverb: '가을 아욱국은 계집 내쫓고 먹는다',
-			meaning: '가을 아욱국이 특별히 맛이 좋음을 비유적으로 이르는 말.',
+			meaning: '가을 아욱국이 특별히 맛이 좋음.',
 			longMeaning: '가을 아욱국이 특별히 맛이 좋음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -37574,12 +37076,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2219,
 			proverb: '가을에 내 아비 제도 못 지내거든 봄에 의붓아비 제 지낼까',
-			meaning:
-				'양식이 풍족한 가을에 아버지 제사도 못 지냈는데 하물며 양식이 떨어진 봄에 의붓아버지의 제사를 지내겠냐는 뜻으로, 형편이 넉넉할 때 꼭 치러야 할 일도 못하는 처지인데 어려운 때에 체면을 차리기 위해서 억지로 힘든 일을 할 수는 없음을 비유적으로 이르는 말.',
+			meaning: '형편이 넉넉할 때 꼭 치러야 할 일도 못하는 처지인데 어려운 때에 체면을 차리기 위해서 억지로 힘든 일을 할 수는 없음.',
 			longMeaning:
 				'양식이 풍족한 가을에 아버지 제사도 못 지냈는데 하물며 양식이 떨어진 봄에 의붓아버지의 제사를 지내겠냐는 뜻으로, 형편이 넉넉할 때 꼭 치러야 할 일도 못하는 처지인데 어려운 때에 체면을 차리기 위해서 억지로 힘든 일을 할 수는 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -37596,11 +37096,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2220,
 			proverb: '가을에는 대부인 마누라도 나무 신짝 가지고 나온다',
-			meaning: '가을걷이 때에는 일이 많아서 누구나 바삐 나서서 거들게 됨을 비유적으로 이르는 말.',
+			meaning: '가을걷이 때에는 일이 많아서 누구나 바삐 나서서 거들게 됨.',
 			longMeaning: '가을걷이 때에는 일이 많아서 누구나 바삐 나서서 거들게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -37616,12 +37115,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2221,
 			proverb: '가을에 친아비 제사도 못 지냈는데 봄에 의붓아비 제사 지낼까',
-			meaning:
-				'양식이 풍족한 가을에 아버지 제사도 못 지냈는데 하물며 양식이 떨어진 봄에 의붓아버지의 제사를 지내겠냐는 뜻으로, 형편이 넉넉할 때 꼭 치러야 할 일도 못하는 처지인데 어려운 때에 체면을 차리기 위해서 억지로 힘든 일을 할 수는 없음을 비유적으로 이르는 말.',
+			meaning: '형편이 넉넉할 때 꼭 치러야 할 일도 못하는 처지인데 어려운 때에 체면을 차리기 위해서 억지로 힘든 일을 할 수는 없음.',
 			longMeaning:
 				'양식이 풍족한 가을에 아버지 제사도 못 지냈는데 하물며 양식이 떨어진 봄에 의붓아버지의 제사를 지내겠냐는 뜻으로, 형편이 넉넉할 때 꼭 치러야 할 일도 못하는 처지인데 어려운 때에 체면을 차리기 위해서 억지로 힘든 일을 할 수는 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -37638,11 +37135,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2222,
 			proverb: '가자니 태산이요, 돌아서자니 숭산이라',
-			meaning: '앞에도 높은 산이고 뒤에도 높은 산이라는 뜻으로, 이러지도 저러지도 못할 난처한 지경에 이름을 비유적으로 이르는 말.',
+			meaning: '이러지도 저러지도 못할 난처한 지경에 이름.',
 			longMeaning: '앞에도 높은 산이고 뒤에도 높은 산이라는 뜻으로, 이러지도 저러지도 못할 난처한 지경에 이름을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -37658,7 +37154,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 85,
 		},
-
 		{
 			id: 2223,
 			proverb: '가난한 사람 걱정은 결국 돈 한 가지 없다는 걱정이다',
@@ -37678,7 +37173,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2224,
 			proverb: '가난한 사람의 한 등불이 백만장자의 일만 등불보다 낫다',
@@ -37699,11 +37193,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2225,
 			proverb: '가시어머니 모셔다 놓은 듯',
-			meaning: '까딱하지 않고 하는 일 없이 지내는 모양을 비유적으로 이르는 말.',
+			meaning: '까딱하지 않고 하는 일 없이 지내는 모양.',
 			longMeaning: '까딱하지 않고 하는 일 없이 지내는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -37719,11 +37212,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2226,
 			proverb: '가을밭을 밟으면 떡이 세 개요 봄밭을 밟으면 뺨이 세 개다',
-			meaning: '가을걷이가 끝난 밭은 밟아 주는 것이 좋고, 봄에 녹아서 부푼 밭은 밟으면 안 된다는 것을 비유적으로 이르는 말.',
+			meaning: '가을걷이가 끝난 밭은 밟아 주는 것이 좋고, 봄에 녹아서 부푼 밭은 밟으면 안 된다는 것.',
 			longMeaning: '가을걷이가 끝난 밭은 밟아 주는 것이 좋고, 봄에 녹아서 부푼 밭은 밟으면 안 된다는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -37739,11 +37231,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2227,
 			proverb: '개가 벼룩 씹듯',
-			meaning: '음식 먹는 모습이 보기 흉함을 비유적으로 이르는 말.',
+			meaning: '음식 먹는 모습이 보기 흉함.',
 			longMeaning: '음식 먹는 모습이 보기 흉함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -37759,12 +37250,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2228,
 			proverb: '개 못된 것은 짖을 데 가 안 짖고 장에 가서 짖는다',
-			meaning:
-				'개는 집을 지키며 집에서 짖는 짐승인데 못된 개는 쓸데없이 장에 가서 짖는다는 뜻으로, 제가 마땅히 해야 할 일은 하지 아니하고 아무 소용도 없는 데 가서 잘난 체하고 떠드는 행동을 이르는 말.',
+			meaning: '제가 마땅히 해야 할 일은 하지 아니하고 아무 소용도 없는 데 가서 잘난 체하고 떠드는 행동.',
 			longMeaning:
 				'개는 집을 지키며 집에서 짖는 짐승인데 못된 개는 쓸데없이 장에 가서 짖는다는 뜻으로, 제가 마땅히 해야 할 일은 하지 아니하고 아무 소용도 없는 데 가서 잘난 체하고 떠드는 행동을 이르는 말.',
 			sameProverb: [],
@@ -37781,11 +37270,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2229,
 			proverb: '거지 조상 안 가진 부자 없고 부자 조상 안 가진 거지 없다',
-			meaning: '빈부귀천은 타고나는 것이 아님을 비유적으로 이르는 말.',
+			meaning: '빈부귀천은 타고나는 것이 아님.',
 			longMeaning: '빈부귀천은 타고나는 것이 아님을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -37801,11 +37289,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2230,
 			proverb: '겉보리 돈 사기가 수양딸로 며느리 삼기보다 쉽다',
-			meaning: '겉보리는 식량 사정이 어려운 초여름에 수확하기 때문에 팔아서 돈으로 만들기 쉽다는 뜻으로, 아주 하기 쉬운 일을 비유적으로 이르는 말.',
+			meaning: '아주 하기 쉬운 일.',
 			longMeaning: '겉보리는 식량 사정이 어려운 초여름에 수확하기 때문에 팔아서 돈으로 만들기 쉽다는 뜻으로, 아주 하기 쉬운 일을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -37821,7 +37308,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2231,
 			proverb: '겉보리 서 말만 있으면 처가살이하랴',
@@ -37841,12 +37327,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 2232,
 			proverb: '곁가마가 (더/먼저) 끓는다',
-			meaning:
-				'끓어야 할 원래의 가마솥은 끓지 않고 곁에 있는 가마솥이 끓는다는 뜻으로, 당사자는 가만히 있는데 옆 사람이 오히려 신이 나서 떠들거나 참견하는 경우를 비유적으로 이르는 말.',
+			meaning: '당사자는 가만히 있는데 옆 사람이 오히려 신이 나서 떠들거나 참견하는 경우.',
 			longMeaning:
 				'끓어야 할 원래의 가마솥은 끓지 않고 곁에 있는 가마솥이 끓는다는 뜻으로, 당사자는 가만히 있는데 옆 사람이 오히려 신이 나서 떠들거나 참견하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -37863,7 +37347,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2233,
 			proverb: '계집 둘 가진 놈의 창자는 호랑이도 안 먹는다',
@@ -37885,12 +37368,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2234,
 			proverb: '계집 바뀐 건 모르고 젓가락 짝 바뀐 건 안다',
 			meaning: '큰 변화는 모르고 지내면서, 소소하게 달라진 것에 대해서는 떠듦을 핀잔하는 말.',
-			longMeaning: '큰 변화는 모르고 지내면서, 소소하게 달라진 것에 대해서는 떠듦을 핀잔하는 말.',
+			longMeaning: '큰 변화는 모르고 지내면서, 소소하게 달라진 것에 대해서는 떠듦을 핀잔하여 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
 			level: 4,
@@ -37905,14 +37387,13 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2235,
 			proverb: '계집애가 오랍아 하니 머슴애도[사내도] 오랍아 한다',
 			meaning:
-				'계집아이가 \'오빠\'라고 부른다고 하여 남자도 \'형\'이라고 해야 할 것을 덩달아 \'오빠\'라고 부른다는 뜻으로, 제 주견이 없이 덮어놓고 남이 하는 대로 따라 행동함을 비웃는 말.',
+				"계집아이가 '오빠'라고 부른다고 하여 남자도 '형'이라고 해야 할 것을 덩달아 '오빠'라고 부른다는 뜻으로, 제 주견이 없이 덮어놓고 남이 하는 대로 따라 행동함을 비웃는 말.",
 			longMeaning:
-				'계집아이가 \'오빠\'라고 부른다고 하여 남자도 \'형\'이라고 해야 할 것을 덩달아 \'오빠\'라고 부른다는 뜻으로, 제 주견이 없이 덮어놓고 남이 하는 대로 따라 행동함을 비웃는 말을 이르는 말.',
+				"계집아이가 '오빠'라고 부른다고 하여 남자도 '형'이라고 해야 할 것을 덩달아 '오빠'라고 부른다는 뜻으로, 제 주견이 없이 덮어놓고 남이 하는 대로 따라 행동함을 비웃는 말을 이르는 말.",
 			sameProverb: [],
 			category: '인간관계',
 			level: 4,
@@ -37927,11 +37408,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2236,
 			proverb: '계집은 남의 것이 곱고 자식은 제 새끼가 곱다',
-			meaning: '남의 여자를 넘겨다보며 자기 아내에 대하여 불만을 가지는 실없는 남자의 마음을 이르는 말.',
+			meaning: '남의 여자를 넘겨다보며 자기 아내에 대하여 불만을 가지는 실없는 남자의 마음.',
 			longMeaning: '남의 여자를 넘겨다보며 자기 아내에 대하여 불만을 가지는 실없는 남자의 마음을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -37947,7 +37427,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2237,
 			proverb: '계집은 상을 들고 문지방을 넘으며 열두 가지 생각을 한다',
@@ -37967,7 +37446,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2238,
 			proverb: '계집의 말은 오뉴월 서리가 싸다',
@@ -37987,7 +37465,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2239,
 			proverb: '계집이 늙으면 여우가 된다',
@@ -38007,12 +37484,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2240,
 			proverb: '고양이보고 반찬 가게 지키라는 격(이다)',
-			meaning:
-				'고양이한테 반찬 가게를 맡기면 고양이가 반찬을 먹을 것이 뻔한 일이란 뜻으로, 어떤 일이나 사물을 믿지 못할 사람에게 맡겨 놓고 마음이 놓이지 않아 걱정함을 비유적으로 이르는 말.',
+			meaning: '어떤 일이나 사물을 믿지 못할 사람에게 맡겨 놓고 마음이 놓이지 않아 걱정함.',
 			longMeaning:
 				'고양이한테 반찬 가게를 맡기면 고양이가 반찬을 먹을 것이 뻔한 일이란 뜻으로, 어떤 일이나 사물을 믿지 못할 사람에게 맡겨 놓고 마음이 놓이지 않아 걱정함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -38029,12 +37504,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 92,
 		},
-
 		{
 			id: 2241,
 			proverb: '고양이 죽 쑤어 줄 것 없고 새앙쥐 볼가심할 것 없다',
-			meaning:
-				'고양이가 먹을 얼마 안 되는 죽을 쑤어 줄 만한 거리도 없고 조그만 생쥐가 볼가심할 만한 양식도 없다는 뜻으로, 너무 가난해서 아무것도 먹을 것이 없음을 비유적으로 이르는 말.',
+			meaning: '너무 가난해서 아무것도 먹을 것이 없음.',
 			longMeaning:
 				'고양이가 먹을 얼마 안 되는 죽을 쑤어 줄 만한 거리도 없고 조그만 생쥐가 볼가심할 만한 양식도 없다는 뜻으로, 너무 가난해서 아무것도 먹을 것이 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -38051,11 +37524,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2242,
 			proverb: '고자 처갓집 가듯[나들듯/다니듯]',
-			meaning: '자주 왔다 갔다 하면서도 아무런 실속이 없음을 이르는 말.',
+			meaning: '자주 왔다 갔다 하면서도 아무런 실속이 없음.',
 			longMeaning: '자주 왔다 갔다 하면서도 아무런 실속이 없음을 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -38071,11 +37543,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2243,
 			proverb: '고추보다 후추가 더 맵다',
-			meaning: '뛰어난 사람보다 더 뛰어난 사람이 있음을 비유적으로 이르는 말.',
+			meaning: '뛰어난 사람보다 더 뛰어난 사람이 있음.',
 			longMeaning: '뛰어난 사람보다 더 뛰어난 사람이 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38091,12 +37562,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 2244,
 			proverb: '곰 가재 뒤듯[잡듯]',
-			meaning:
-				'움직임이 둔한 곰이 개천 돌을 뒤쳐 가며 가재를 잡는다는 뜻으로, 급하다는데 느릿느릿 일을 하고 있거나 또는 침착하게 일하고 있음을 비유적으로 이르는 말.',
+			meaning: '급하다는데 느릿느릿 일을 하고 있거나 또는 침착하게 일하고 있음.',
 			longMeaning:
 				'움직임이 둔한 곰이 개천 돌을 뒤쳐 가며 가재를 잡는다는 뜻으로, 급하다는데 느릿느릿 일을 하고 있거나 또는 침착하게 일하고 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -38113,11 +37582,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2245,
 			proverb: '공것 바라면 이마[대머리]가 벗어진다',
-			meaning: '이마가 벗어진 사람을 놀림조로 이르는 말.',
+			meaning: '이마가 벗어진 사람.',
 			longMeaning: '이마가 벗어진 사람을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38133,11 +37601,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 71,
 		},
-
 		{
 			id: 2246,
 			proverb: '공것 바라서 이마[대머리]가 벗어졌다[벗어졌나]',
-			meaning: '공짜를 좋아하는 사람을 놀림조로 이르는 말.',
+			meaning: '공짜를 좋아하는 사람.',
 			longMeaning: '공짜를 좋아하는 사람을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38153,7 +37620,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 93,
 		},
-
 		{
 			id: 2247,
 			proverb: '과물전 망신은 모과가 시킨다',
@@ -38173,7 +37639,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 2248,
 			proverb: '과부가 찬밥에 곯는다',
@@ -38193,11 +37658,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2249,
 			proverb: '과부는 은이 서 말이고 홀아비는 이가 서 말이다',
-			meaning: '과부는 살림살이가 알뜰하여 규모 있게 생활하므로 경제적으로 걱정이 없지만, 홀아비는 생활이 곤궁함을 비유적으로 이르는 말.',
+			meaning: '과부는 살림살이가 알뜰하여 규모 있게 생활하므로 경제적으로 걱정이 없지만, 홀아비는 생활이 곤궁함.',
 			longMeaning: '과부는 살림살이가 알뜰하여 규모 있게 생활하므로 경제적으로 걱정이 없지만, 홀아비는 생활이 곤궁함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38213,11 +37677,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2250,
 			proverb: '과부 설움은[사정은] (동무) 과부가 안다',
-			meaning: '남의 곤란한 처지는 직접 그 일을 당해 보았거나 그와 비슷한 처지에 놓여 있는 사람이 잘 알 수 있음을 비유적으로 이르는 말.',
+			meaning: '남의 곤란한 처지는 직접 그 일을 당해 보았거나 그와 비슷한 처지에 놓여 있는 사람이 잘 알 수 있음.',
 			longMeaning: '남의 곤란한 처지는 직접 그 일을 당해 보았거나 그와 비슷한 처지에 놓여 있는 사람이 잘 알 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38233,11 +37696,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2251,
 			proverb: '과부 설움은 홀아비가 안다',
-			meaning: '남의 곤란한 처지는 직접 그 일을 당해 보았거나 그와 비슷한 처지에 놓여 있는 사람이 잘 알 수 있음을 비유적으로 이르는 말.',
+			meaning: '남의 곤란한 처지는 직접 그 일을 당해 보았거나 그와 비슷한 처지에 놓여 있는 사람이 잘 알 수 있음.',
 			longMeaning: '남의 곤란한 처지는 직접 그 일을 당해 보았거나 그와 비슷한 처지에 놓여 있는 사람이 잘 알 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38253,11 +37715,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2252,
 			proverb: '과부의 버선목에는 은이 가득하고 홀아비의 버선목에는 이가 가득하다',
-			meaning: '과부는 살림살이가 알뜰하여 규모 있게 생활하므로 경제적으로 걱정이 없지만, 홀아비는 생활이 곤궁함을 비유적으로 이르는 말.',
+			meaning: '과부는 살림살이가 알뜰하여 규모 있게 생활하므로 경제적으로 걱정이 없지만, 홀아비는 생활이 곤궁함.',
 			longMeaning: '과부는 살림살이가 알뜰하여 규모 있게 생활하므로 경제적으로 걱정이 없지만, 홀아비는 생활이 곤궁함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38273,11 +37734,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2253,
 			proverb: '과부의 심정은 홀아비가 알고 도적놈의 심보는 도적놈이 잘 안다',
-			meaning: '남의 곤란한 처지는 직접 그 일을 당해 보았거나 그와 비슷한 처지에 놓여 있는 사람이 잘 알 수 있음을 비유적으로 이르는 말.',
+			meaning: '남의 곤란한 처지는 직접 그 일을 당해 보았거나 그와 비슷한 처지에 놓여 있는 사람이 잘 알 수 있음.',
 			longMeaning: '남의 곤란한 처지는 직접 그 일을 당해 보았거나 그와 비슷한 처지에 놓여 있는 사람이 잘 알 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38293,11 +37753,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2254,
 			proverb: '과부 좋은 것과 소 좋은 것은 동네에서 나가지 않는다',
-			meaning: '질이 좋은 것은 누구나 귀히 여겨 가지려 하니 내침을 받음이 없음을 비유적으로 이르는 말.',
+			meaning: '질이 좋은 것은 누구나 귀히 여겨 가지려 하니 내침을 받음이 없음.',
 			longMeaning: '질이 좋은 것은 누구나 귀히 여겨 가지려 하니 내침을 받음이 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38313,11 +37772,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2255,
 			proverb: '과부 집 똥넉가래 내세우듯',
-			meaning: '일을 변통하는 주변도 없으면서 쓸데없는 호기를 부리며 고집함을 비유적으로 이르는 말.',
+			meaning: '일을 변통하는 주변도 없으면서 쓸데없는 호기를 부리며 고집함.',
 			longMeaning: '일을 변통하는 주변도 없으면서 쓸데없는 호기를 부리며 고집함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38333,11 +37791,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2256,
 			proverb: '과부 집에 가서 바깥양반 찾기',
-			meaning: '사람 또는 물건 따위가 있을 수 없는 데에 가서 엉뚱하게 그것을 찾는 경우를 비유적으로 이르는 말.',
+			meaning: '사람 또는 물건 따위가 있을 수 없는 데에 가서 엉뚱하게 그것을 찾는 경우.',
 			longMeaning: '사람 또는 물건 따위가 있을 수 없는 데에 가서 엉뚱하게 그것을 찾는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38353,11 +37810,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2257,
 			proverb: '구름 갈 제 비가 간다',
-			meaning: '구름이 가는 데 비가 뒤따른다는 뜻으로, 사람의 긴밀한 관계를 비유적으로 이르는 말.',
+			meaning: '사람의 긴밀한 관계.',
 			longMeaning: '구름이 가는 데 비가 뒤따른다는 뜻으로, 사람의 긴밀한 관계를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38373,11 +37829,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2258,
 			proverb: '군불 장댄가[장대처럼] 키만 크다',
-			meaning: '키가 큰 사람을 놀림조로 이르는 말.',
+			meaning: '키가 큰 사람.',
 			longMeaning: '키가 큰 사람을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38393,11 +37848,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2259,
 			proverb: '굼벵이(도) 꾸부리는[떨어지는] 재주(가) 있다',
-			meaning: '무능한 사람도 한 가지 재주는 있음을 비유적으로 이르는 말.',
+			meaning: '무능한 사람도 한 가지 재주는 있음.',
 			longMeaning: '무능한 사람도 한 가지 재주는 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38413,11 +37867,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 88,
 		},
-
 		{
 			id: 2260,
 			proverb: '궁서가 고양이를 문다',
-			meaning: '막다른 지경에 이르게 되면 약한 자도 마지막 힘을 다하여 반항함을 비유적으로 이르는 말.',
+			meaning: '막다른 지경에 이르게 되면 약한 자도 마지막 힘을 다하여 반항함.',
 			longMeaning: '막다른 지경에 이르게 되면 약한 자도 마지막 힘을 다하여 반항함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38433,11 +37886,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2261,
 			proverb: '궁한 새가 사람을 쫓는다',
-			meaning: '막다른 지경에 이르게 되면 약한 자도 마지막 힘을 다하여 반항함을 비유적으로 이르는 말.',
+			meaning: '막다른 지경에 이르게 되면 약한 자도 마지막 힘을 다하여 반항함.',
 			longMeaning: '막다른 지경에 이르게 되면 약한 자도 마지막 힘을 다하여 반항함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38453,11 +37905,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2262,
 			proverb: '궁한 쥐가 고양이한테 대든다',
-			meaning: '막다른 지경에 이르게 되면 약한 자도 마지막 힘을 다하여 반항함을 비유적으로 이르는 말.',
+			meaning: '막다른 지경에 이르게 되면 약한 자도 마지막 힘을 다하여 반항함.',
 			longMeaning: '막다른 지경에 이르게 되면 약한 자도 마지막 힘을 다하여 반항함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38473,7 +37924,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2263,
 			proverb: '그슬린 돼지가 달아맨 돼지 타령한다',
@@ -38493,11 +37943,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 71,
 		},
-
 		{
 			id: 2264,
 			proverb: '기와 한 장 아끼다가 대들보 썩힌다',
-			meaning: '조그마한 것을 아끼려다가 오히려 큰 손해를 봄을 비유적으로 이르는 말.',
+			meaning: '조그마한 것을 아끼려다가 오히려 큰 손해를 봄.',
 			longMeaning: '조그마한 것을 아끼려다가 오히려 큰 손해를 봄을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '근면/검소',
@@ -38513,11 +37962,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2265,
 			proverb: '나이가 예순 되도록 셈이 든다',
-			meaning: '늙어서도 아이들처럼 분수없이 행동함을 비유적으로 이르는 말.',
+			meaning: '늙어서도 아이들처럼 분수없이 행동함.',
 			longMeaning: '늙어서도 아이들처럼 분수없이 행동함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38533,11 +37981,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2266,
 			proverb: '나중 꿀 한 식기 먹기보다 당장의 엿 한 가락이 더 달다',
-			meaning: '눈앞에 보이지 않는 막연한 희망보다 작더라도 당장 가질 수 있는 이로움이 더 나음을 비유적으로 이르는 말.',
+			meaning: '눈앞에 보이지 않는 막연한 희망보다 작더라도 당장 가질 수 있는 이로움이 더 나음.',
 			longMeaning: '눈앞에 보이지 않는 막연한 희망보다 작더라도 당장 가질 수 있는 이로움이 더 나음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38553,11 +38000,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2267,
 			proverb: '나중에 꿀 한 식기 먹으려고 당장 엿 한 가락 안 먹을까',
-			meaning: '눈앞에 보이지 않는 막연한 희망보다 작더라도 당장 가질 수 있는 이로움이 더 나음을 비유적으로 이르는 말.',
+			meaning: '눈앞에 보이지 않는 막연한 희망보다 작더라도 당장 가질 수 있는 이로움이 더 나음.',
 			longMeaning: '눈앞에 보이지 않는 막연한 희망보다 작더라도 당장 가질 수 있는 이로움이 더 나음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38573,11 +38019,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2268,
 			proverb: '난리가 나도 얻어먹고 살겠다',
-			meaning: '영리하고 수단이 좋아 어떤 어려움이 있어도 살아갈 수 있는 사람을 비유적으로 이르는 말.',
+			meaning: '영리하고 수단이 좋아 어떤 어려움이 있어도 살아갈 수 있는 사람.',
 			longMeaning: '영리하고 수단이 좋아 어떤 어려움이 있어도 살아갈 수 있는 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38593,12 +38038,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2269,
 			proverb: '난리가 모 뿌리로 들어간다',
-			meaning:
-				'농촌에서 일이 없으면 난리 난다는 이야기만 하다가 모 심을 때가 되어 바빠지면 그런 이야기가 없어진다는 뜻으로, 정작 바빠지면 바쁘다는 말도 못 하게 됨을 비유적으로 이르는 말.',
+			meaning: '정작 바빠지면 바쁘다는 말도 못 하게 됨.',
 			longMeaning:
 				'농촌에서 일이 없으면 난리 난다는 이야기만 하다가 모 심을 때가 되어 바빠지면 그런 이야기가 없어진다는 뜻으로, 정작 바빠지면 바쁘다는 말도 못 하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -38615,11 +38058,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2270,
 			proverb: '낟가리에 불 질러 놓고 손발 쬐일 놈',
-			meaning: '매우 우둔하고 미련한 행동을 하는 사람을 비유적으로 이르는 말.',
+			meaning: '매우 우둔하고 미련한 행동을 하는 사람.',
 			longMeaning: '매우 우둔하고 미련한 행동을 하는 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38635,11 +38077,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2271,
 			proverb: '날 때 궂은 아이가 죽을 때도 궂게 죽는다',
-			meaning: '힘들게 태어난 아이는 죽을 때도 어렵게 죽는다는 뜻으로, 어려서 불행한 사람은 죽을 때까지 불행함을 비유적으로 이르는 말.',
+			meaning: '어려서 불행한 사람은 죽을 때까지 불행함.',
 			longMeaning: '힘들게 태어난 아이는 죽을 때도 어렵게 죽는다는 뜻으로, 어려서 불행한 사람은 죽을 때까지 불행함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38655,11 +38096,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 2272,
 			proverb: '날은 저물어 가고 갈 길은 멀다',
-			meaning: '아직도 해야 할 일은 많은데 자꾸만 늙어 가서 한스러움을 비유적으로 이르는 말.',
+			meaning: '아직도 해야 할 일은 많은데 자꾸만 늙어 가서 한스러움.',
 			longMeaning: '아직도 해야 할 일은 많은데 자꾸만 늙어 가서 한스러움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38675,11 +38115,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2273,
 			proverb: '남을 물에 넣으려면 제가 먼저 물에 들어간다',
-			meaning: '남을 해하려 하면 자기가 먼저 그러한 일을 당함을 비유적으로 이르는 말.',
+			meaning: '남을 해하려 하면 자기가 먼저 그러한 일을 당함.',
 			longMeaning: '남을 해하려 하면 자기가 먼저 그러한 일을 당함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38695,11 +38134,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 90,
 		},
-
 		{
 			id: 2274,
 			proverb: '남의 떡 가지고 낯을 낸다',
-			meaning: '남의 것으로 생색을 냄을 비유적으로 이르는 말.',
+			meaning: '남의 것으로 생색을 냄.',
 			longMeaning: '남의 것으로 생색을 냄을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38715,11 +38153,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2275,
 			proverb: '남의 뱃속의 글을 옮겨 넣는 재주만 없고 못하는 재주가 없다',
-			meaning: '아무리 재간이 좋아도 남의 머릿속에 든 지식은 빼앗을 수 없음을 비유적으로 이르는 말.',
+			meaning: '아무리 재간이 좋아도 남의 머릿속에 든 지식은 빼앗을 수 없음.',
 			longMeaning: '아무리 재간이 좋아도 남의 머릿속에 든 지식은 빼앗을 수 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38735,11 +38172,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2276,
 			proverb: '남의 사돈이야 가거나 말거나',
-			meaning: '자기와는 아무런 상관이 없음을 비유적으로 이르는 말.',
+			meaning: '자기와는 아무런 상관이 없음.',
 			longMeaning: '자기와는 아무런 상관이 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38755,7 +38191,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 2277,
 			proverb: '남의 사정 보다가 갈보 난다',
@@ -38775,7 +38210,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2278,
 			proverb: '남의 사정 보다가 망한다',
@@ -38795,7 +38229,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2279,
 			proverb: '남의 아이 이름 내가 어이 짓나',
@@ -38815,11 +38248,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2280,
 			proverb: '남의 아이 한 번 때리나 열 번 때리나 때렸단 소리 듣기는 마찬가지다',
-			meaning: '이러나저러나 매한가지인 경우를 비유적으로 이르는 말.',
+			meaning: '이러나저러나 매한가지인 경우.',
 			longMeaning: '이러나저러나 매한가지인 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -38835,7 +38267,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2281,
 			proverb: '남의 옷 얻어 입으면 걸렛감만 남고 남의 서방 얻어 가면 송장치레만 한다',
@@ -38857,7 +38288,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2282,
 			proverb: '남의 자식 흉보지 말고 내 자식 가르쳐라',
@@ -38877,11 +38307,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 2283,
 			proverb: '남의 짐이 가벼워 보인다',
-			meaning: '남이 하는 일은 힘든 일이라도 자기가 하는 일보다 쉬워 보임을 비유적으로 이르는 말.',
+			meaning: '남이 하는 일은 힘든 일이라도 자기가 하는 일보다 쉬워 보임.',
 			longMeaning: '남이 하는 일은 힘든 일이라도 자기가 하는 일보다 쉬워 보임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38897,7 +38326,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2284,
 			proverb: '남의 흉이 한 가지면 내 흉은 몇 가지냐',
@@ -38917,7 +38345,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 2285,
 			proverb: '남의 흉이 한 가지면 제 흉은 열 가지',
@@ -38937,11 +38364,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 2286,
 			proverb: '남이 장에 가니 저도 덩달아 장에 간다',
-			meaning: '자기 주견이 없이 남이 한다고 덩달아 따라 함을 비유적으로 이르는 말.',
+			meaning: '자기 주견이 없이 남이 한다고 덩달아 따라 함.',
 			longMeaning: '자기 주견이 없이 남이 한다고 덩달아 따라 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38957,11 +38383,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2287,
 			proverb: '남자가 상처하는 것은 과거할 신수라야 한다',
-			meaning: '남자가 상처해서 다시 장가드는 것도 하나의 복임을 비유적으로 이르는 말.',
+			meaning: '남자가 상처해서 다시 장가드는 것도 하나의 복임.',
 			longMeaning: '남자가 상처해서 다시 장가드는 것도 하나의 복임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -38977,7 +38402,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 89,
 		},
-
 		{
 			id: 2288,
 			proverb: '남자가 죽어도 전장에 가서 죽어라',
@@ -38997,11 +38421,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2289,
 			proverb: '남 잡으려다가 제가 잡힌다',
-			meaning: '남을 해하려다가 오히려 자기가 당하게 되는 경우를 이르는 말.',
+			meaning: '남을 해하려다가 오히려 자기가 당하게 되는 경우.',
 			longMeaning: '남을 해하려다가 오히려 자기가 당하게 되는 경우를 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -39017,11 +38440,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2290,
 			proverb: '남 잡이가 제 잡이',
-			meaning: '남을 해하려다가 오히려 자기가 당하게 되는 경우를 이르는 말.',
+			meaning: '남을 해하려다가 오히려 자기가 당하게 되는 경우.',
 			longMeaning: '남을 해하려다가 오히려 자기가 당하게 되는 경우를 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -39037,11 +38459,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 28,
 		},
-
 		{
 			id: 2291,
 			proverb: '낫으로 눈 가려운 데 긁기',
-			meaning: '눈이 가렵다고 위험하게 낫으로 눈을 긁는다는 뜻으로, 우둔하게 위험한 짓을 함을 비유적으로 이르는 말.',
+			meaning: '우둔하게 위험한 짓을 함.',
 			longMeaning: '눈이 가렵다고 위험하게 낫으로 눈을 긁는다는 뜻으로, 우둔하게 위험한 짓을 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -39057,11 +38478,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2292,
 			proverb: '낫으로 눈을 가린다',
-			meaning: '낫으로 눈을 가리고 몸 전체를 가린 줄 안다는 뜻으로, 어리석고 미련한 짓을 함을 비유적으로 이르는 말.',
+			meaning: '어리석고 미련한 짓을 함.',
 			longMeaning: '낫으로 눈을 가리고 몸 전체를 가린 줄 안다는 뜻으로, 어리석고 미련한 짓을 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39077,11 +38497,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2293,
 			proverb: '내가 중이 되니 고기가 천하다',
-			meaning: '자기가 구할 때는 없던 것이 필요하지 아니하게 되자 갑자기 많아짐을 비유적으로 이르는 말.',
+			meaning: '자기가 구할 때는 없던 것이 필요하지 아니하게 되자 갑자기 많아짐.',
 			longMeaning: '자기가 구할 때는 없던 것이 필요하지 아니하게 되자 갑자기 많아짐을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39097,11 +38516,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2294,
 			proverb: '내관 처가 출입하듯',
-			meaning: '자주 왔다 갔다 하면서도 아무런 실속이 없음을 이르는 말.',
+			meaning: '자주 왔다 갔다 하면서도 아무런 실속이 없음.',
 			longMeaning: '자주 왔다 갔다 하면서도 아무런 실속이 없음을 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -39117,11 +38535,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 32,
 		},
-
 		{
 			id: 2295,
 			proverb: '내 딸이 고와야 나비가 모인다',
-			meaning: '자기는 부족하고 불완전하면서 남의 완전한 것만을 구하는 것은 부당함을 비유적으로 이르는 말.',
+			meaning: '자기는 부족하고 불완전하면서 남의 완전한 것만을 구하는 것은 부당함.',
 			longMeaning: '자기는 부족하고 불완전하면서 남의 완전한 것만을 구하는 것은 부당함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -39137,7 +38554,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2296,
 			proverb: '내 말은 남이 하고 남 말은 내가 한다',
@@ -39157,11 +38573,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 2297,
 			proverb: '내 밥 먹은 개가 발뒤축을 문다',
-			meaning: '자기에게 은혜를 입은 사람으로부터 도리어 화를 입음을 비유적으로 이르는 말.',
+			meaning: '자기에게 은혜를 입은 사람으로부터 도리어 화를 입음.',
 			longMeaning: '자기에게 은혜를 입은 사람으로부터 도리어 화를 입음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -39177,11 +38592,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2298,
 			proverb: '내 배가 부르니 종의 배고픔을 모른다',
-			meaning: '자기만 만족하면 남의 곤란함을 모르고 돌보아 주지 아니함을 비유적으로 이르는 말.',
+			meaning: '자기만 만족하면 남의 곤란함을 모르고 돌보아 주지 아니함.',
 			longMeaning: '자기만 만족하면 남의 곤란함을 모르고 돌보아 주지 아니함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -39197,11 +38611,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2299,
 			proverb: '내 배 부르니 평안 감사가 조카 같다',
-			meaning: '자기 배가 불러 세상에 부러울 것이 없음을 비유적으로 이르는 말.',
+			meaning: '자기 배가 불러 세상에 부러울 것이 없음.',
 			longMeaning: '자기 배가 불러 세상에 부러울 것이 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39217,11 +38630,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2300,
 			proverb: '내일은 삼수갑산을 가더라도',
-			meaning: '나중에 일이 잘 안되어 최악의 경우에 이를지라도 우선은 자기가 하고 싶은 대로 어떤 일을 함을 이르는 말.',
+			meaning: '나중에 일이 잘 안되어 최악의 경우에 이를지라도 우선은 자기가 하고 싶은 대로 어떤 일을 함.',
 			longMeaning: '나중에 일이 잘 안되어 최악의 경우에 이를지라도 우선은 자기가 하고 싶은 대로 어떤 일을 함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39237,11 +38649,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2301,
 			proverb: '내 절 부처는 내가 위해야 한다',
-			meaning: '자기가 모시는 주인은 자기가 잘 섬겨야 남도 그를 알아봄을 비유적으로 이르는 말.',
+			meaning: '자기가 모시는 주인은 자기가 잘 섬겨야 남도 그를 알아봄.',
 			longMeaning: '자기가 모시는 주인은 자기가 잘 섬겨야 남도 그를 알아봄을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -39257,11 +38668,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2302,
 			proverb: '냇가 돌 닳듯',
-			meaning: '세상에 시달려 성격이 약아지고 모질어짐을 비유적으로 이르는 말.',
+			meaning: '세상에 시달려 성격이 약아지고 모질어짐.',
 			longMeaning: '세상에 시달려 성격이 약아지고 모질어짐을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39277,12 +38687,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2303,
 			proverb: '너는 용빼는 재주가 있느냐',
 			meaning: '뾰족한 재주도 없이 남을 흉보는 사람을 핀잔하는 말.',
-			longMeaning: '뾰족한 재주도 없이 남을 흉보는 사람을 핀잔하는 말.',
+			longMeaning: '뾰족한 재주도 없이 남을 흉보는 사람을 핀잔하여 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
 			level: 2,
@@ -39297,11 +38706,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2304,
 			proverb: '너무 고르다가 눈먼 사위 얻는다',
-			meaning: '너무 고르다 보면 오히려 나쁜 것을 고르게 됨을 비유적으로 이르는 말.',
+			meaning: '너무 고르다 보면 오히려 나쁜 것을 고르게 됨.',
 			longMeaning: '너무 고르다 보면 오히려 나쁜 것을 고르게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39317,11 +38725,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 2305,
 			proverb: '넉가래 내세우듯',
-			meaning: '일을 변통하는 주변도 없으면서 쓸데없는 호기를 부리며 고집함을 비유적으로 이르는 말.',
+			meaning: '일을 변통하는 주변도 없으면서 쓸데없는 호기를 부리며 고집함.',
 			longMeaning: '일을 변통하는 주변도 없으면서 쓸데없는 호기를 부리며 고집함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39337,7 +38744,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2306,
 			proverb: '넉 달 가뭄에도 하루만 더 개었으면 한다',
@@ -39357,7 +38763,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 82,
 		},
-
 		{
 			id: 2307,
 			proverb: '네 것 내 것 가리다',
@@ -39377,7 +38782,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 33,
 		},
-
 		{
 			id: 2308,
 			proverb: '네 것 내 것을 가리지 않다',
@@ -39397,12 +38801,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2309,
 			proverb: '네 아들 형제가 내 아들 하나만 못하다',
-			meaning:
-				'남의 아들이 아무리 많아도 자기에게는 소용이 없다는 뜻으로, 필요한 물건이나 조건이 제게 꼭 갖추어져야 제 일이 수월하게 풀려나갈 수 있다는 것을 비유적으로 이르는 말.',
+			meaning: '필요한 물건이나 조건이 제게 꼭 갖추어져야 제 일이 수월하게 풀려나갈 수 있다는 것.',
 			longMeaning:
 				'남의 아들이 아무리 많아도 자기에게는 소용이 없다는 뜻으로, 필요한 물건이나 조건이 제게 꼭 갖추어져야 제 일이 수월하게 풀려나갈 수 있다는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -39419,7 +38821,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 88,
 		},
-
 		{
 			id: 2310,
 			proverb: '네 일 내 일을 가리다',
@@ -39439,7 +38840,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 37,
 		},
-
 		{
 			id: 2311,
 			proverb: '네 일 내 일을 가리지 않다',
@@ -39459,12 +38859,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2312,
 			proverb: '노래기 푸념한 데 가 시룻번이나 얻어먹어라',
 			meaning: '고약한 노린내가 나는 노래기의 회를 먹는다는 뜻으로, 염치도 체면도 없이 행동함을 핀잔하는 말.',
-			longMeaning: '고약한 노린내가 나는 노래기의 회를 먹는다는 뜻으로, 염치도 체면도 없이 행동함을 핀잔하는 말.',
+			longMeaning: '고약한 노린내가 나는 노래기의 회를 먹는다는 뜻으로, 염치도 체면도 없이 행동함을 핀잔하여 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
 			level: 4,
@@ -39479,11 +38878,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 97,
 		},
-
 		{
 			id: 2313,
 			proverb: '노루가 제 방귀에 놀라듯',
-			meaning: '남몰래 저지른 일이 염려되어 스스로 겁을 먹고 대수롭지 아니한 것에도 놀람을 비유적으로 이르는 말.',
+			meaning: '남몰래 저지른 일이 염려되어 스스로 겁을 먹고 대수롭지 아니한 것에도 놀람.',
 			longMeaning: '남몰래 저지른 일이 염려되어 스스로 겁을 먹고 대수롭지 아니한 것에도 놀람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -39499,7 +38897,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2314,
 			proverb: '노루 꼬리가 길면 얼마나 길까',
@@ -39519,11 +38916,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 2315,
 			proverb: '노루 잡는 사람에 토끼가 보이나',
-			meaning: '큰일을 꾀하는 사람에게 하찮고 사소한 일은 보이지 않음을 비유적으로 이르는 말.',
+			meaning: '큰일을 꾀하는 사람에게 하찮고 사소한 일은 보이지 않음.',
 			longMeaning: '큰일을 꾀하는 사람에게 하찮고 사소한 일은 보이지 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -39539,11 +38935,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2316,
 			proverb: '노염은 호구별성(戶口別星)인가',
-			meaning: '늘 성을 잘 내는 사람을 놀림조로 이르는 말.',
+			meaning: '늘 성을 잘 내는 사람.',
 			longMeaning: '늘 성을 잘 내는 사람을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -39559,7 +38954,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2317,
 			proverb: '노장은 병담(兵談)을 아니 하고 양고(良賈)는 심장(深藏)한다',
@@ -39581,11 +38975,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2318,
 			proverb: '노적가리에 불 지르고 싸라기 주워 먹는다',
-			meaning: '큰 것을 잃고 작은 것을 얻음을 비유적으로 이르는 말.',
+			meaning: '큰 것을 잃고 작은 것을 얻음.',
 			longMeaning: '큰 것을 잃고 작은 것을 얻음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39601,11 +38994,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 82,
 		},
-
 		{
 			id: 2319,
 			proverb: '노처녀가 시집을 가려니 등창이 난다',
-			meaning: '오랫동안 벼르고 벼르던 일을 하려 할 때 장애물이 생겨서 하지 못하고 맒을 비유적으로 이르는 말.',
+			meaning: '오랫동안 벼르고 벼르던 일을 하려 할 때 장애물이 생겨서 하지 못하고 맒.',
 			longMeaning: '오랫동안 벼르고 벼르던 일을 하려 할 때 장애물이 생겨서 하지 못하고 맒을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39621,7 +39013,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2320,
 			proverb: '노처녀더러 시집가라 한다',
@@ -39641,12 +39032,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2321,
 			proverb: '녹비에 가로왈',
-			meaning:
-				'사슴 가죽에 쓴 가로왈(曰) 자는 가죽을 잡아당기는 대로 일(日) 자도 되고 왈(曰) 자도 된다는 뜻으로, 사람이 일정한 주견이 없이 남의 말을 좇아 이랬다저랬다 함을 비유적으로 이르는 말.',
+			meaning: '사람이 일정한 주견이 없이 남의 말을 좇아 이랬다저랬다 함.',
 			longMeaning:
 				'사슴 가죽에 쓴 가로왈(曰) 자는 가죽을 잡아당기는 대로 일(日) 자도 되고 왈(曰) 자도 된다는 뜻으로, 사람이 일정한 주견이 없이 남의 말을 좇아 이랬다저랬다 함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -39663,11 +39052,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2322,
 			proverb: '녹수 갈 제 원앙 가듯',
-			meaning: '둘의 관계가 밀접하여 서로 떨어지지 않음을 비유적으로 이르는 말.',
+			meaning: '둘의 관계가 밀접하여 서로 떨어지지 않음.',
 			longMeaning: '둘의 관계가 밀접하여 서로 떨어지지 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39683,11 +39071,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2323,
 			proverb: '녹용 대가리 베어 가는 셈',
-			meaning: '어떤 것 중에서 가장 중요한 핵심 부분을 가로채어 가는 염치없는 행동을 비유적으로 이르는 말.',
+			meaning: '어떤 것 중에서 가장 중요한 핵심 부분을 가로채어 가는 염치없는 행동.',
 			longMeaning: '어떤 것 중에서 가장 중요한 핵심 부분을 가로채어 가는 염치없는 행동을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39703,7 +39090,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2324,
 			proverb: '농사군은 지게가 둘이다',
@@ -39723,11 +39109,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 2325,
 			proverb: '높은 가지가 부러지기 쉽다',
-			meaning: '높은 지위일수록 그 자리를 오래 지키기가 어려움을 비유적으로 이르는 말.',
+			meaning: '높은 지위일수록 그 자리를 오래 지키기가 어려움.',
 			longMeaning: '높은 지위일수록 그 자리를 오래 지키기가 어려움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39743,14 +39128,12 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2326,
 			proverb: '누가 흥(興)이야 항(恒)이야 하랴',
 			meaning:
 				'제가 힘써 잡은 권세를 남이 뭐라고 말할 필요는 없다는 뜻으로, 관계없는 남의 일에 이래라저래라 할 수 없다는 말. 숙종 때에 김수흥 김수항 형제가 대신의 자리에 있음에 그 권세를 미워한 데서 나온 말이다.',
-			longMeaning:
-				'제가 힘써 잡은 권세를 남이 뭐라고 말할 필요는 없다는 뜻으로, 관계없는 남의 일에 이래라저래라 할 수 없다는 말. 숙종 때에 김수흥 김수항 형제가 대신의 자리에 있음에 그 권세를 미워한 데서 나온 말이다 이르는 말.',
+			longMeaning: '제가 힘써 잡은 권세를 남이 뭐라고 말할 필요는 없다는 뜻으로, 관계없는 남의 일에 이래라저래라 할 수 없음을 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
 			level: 4,
@@ -39759,18 +39142,16 @@ export const CONST_MAIN_DATA: {
 				"남의 말을 쉽게 옮기던 사람이 결국 곤란해지자 주변에서 '누가 흥(興)이야 항(恒)이야 하랴'라고 수군거렸다.",
 				"단체 대화방에 확인되지 않은 말을 올렸다가 일이 커지자 친구들이 '누가 흥(興)이야 항(恒)이야 하랴'라고 했다.",
 			],
-			origin: '말과 행동의 이치를 짧은 비유로 전하는 표현이다.',
+			origin: '숙종 때에 김수흥·김수항 형제가 대신의 자리에 있음에 그 권세를 미워한 데서 나온 말이다.',
 			usageTip: '일의 형편이나 태도를 간단히 설명할 때 알맞다.',
 			synonym: null,
 			antonym: null,
 			difficultyScore: 95,
 		},
-
 		{
 			id: 2327,
 			proverb: '누이 믿고 장가 안 간다',
-			meaning:
-				'누이와 결혼할 목적으로 다른 혼처에는 눈을 뜨지 않는다는 뜻으로, 도저히 가능하지 않은 일만을 하려고 하고 다른 방책을 세우지 않는 어리석은 모양을 비유적으로 이르는 말.',
+			meaning: '도저히 가능하지 않은 일만을 하려고 하고 다른 방책을 세우지 않는 어리석은 모양.',
 			longMeaning:
 				'누이와 결혼할 목적으로 다른 혼처에는 눈을 뜨지 않는다는 뜻으로, 도저히 가능하지 않은 일만을 하려고 하고 다른 방책을 세우지 않는 어리석은 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -39787,7 +39168,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2328,
 			proverb: '눅은 데 패가한다',
@@ -39807,7 +39187,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 38,
 		},
-
 		{
 			id: 2329,
 			proverb: '눈구석에 쌍가래톳이 선다',
@@ -39827,12 +39206,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2330,
 			proverb: '눈 먹던 토끼 얼음 먹던 토끼가 제각각',
-			meaning:
-				'눈을 먹고 살던 토끼와 얼음을 먹고 살던 토끼가 다르다는 뜻으로, 사람은 자기가 겪어 온 환경에 따라서 그 능력이 다르고 생각이 다름을 비유적으로 이르는 말.',
+			meaning: '사람은 자기가 겪어 온 환경에 따라서 그 능력이 다르고 생각이 다름.',
 			longMeaning:
 				'눈을 먹고 살던 토끼와 얼음을 먹고 살던 토끼가 다르다는 뜻으로, 사람은 자기가 겪어 온 환경에 따라서 그 능력이 다르고 생각이 다름을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -39849,11 +39226,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 2331,
 			proverb: '눈먼 장님은 서울을 가도 말 못 하는 벙어리는 서울 못 간다',
-			meaning: '벙어리보다는 장님이 낫다는 것을 비유적으로 이르는 말.',
+			meaning: '벙어리보다는 장님이 낫다는 것.',
 			longMeaning: '벙어리보다는 장님이 낫다는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39869,11 +39245,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2332,
 			proverb: '눈물은 내려가고 숟가락[밥술]은 올라간다',
-			meaning: '죽은 사람에 대한 슬픔이 아무리 커도 결국 그것을 참고 견디면서 살아 나갈 길을 찾기 마련임을 비유적으로 이르는 말.',
+			meaning: '죽은 사람에 대한 슬픔이 아무리 커도 결국 그것을 참고 견디면서 살아 나갈 길을 찾기 마련임.',
 			longMeaning: '죽은 사람에 대한 슬픔이 아무리 커도 결국 그것을 참고 견디면서 살아 나갈 길을 찾기 마련임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -39889,11 +39264,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 87,
 		},
-
 		{
 			id: 2333,
 			proverb: '눈보다 동자가 크다',
-			meaning: '눈보다 그 안에 있는 눈동자가 더 크다는 뜻으로, 기본이 되는 것보다 덧붙이는 것이 더 많거나 큰 경우를 비유적으로 이르는 말.',
+			meaning: '기본이 되는 것보다 덧붙이는 것이 더 많거나 큰 경우.',
 			longMeaning: '눈보다 그 안에 있는 눈동자가 더 크다는 뜻으로, 기본이 되는 것보다 덧붙이는 것이 더 많거나 큰 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39909,11 +39283,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 2334,
 			proverb: '눈 앓는 놈 고춧가루 넣기',
-			meaning: '성한 눈도 견디기 힘든 고춧가루를 앓는 눈에 뿌린다는 뜻으로, 엎친 데 덮친 격으로 아주 나쁜 결과를 가져올 대책을 이르는 말.',
+			meaning: '엎친 데 덮친 격으로 아주 나쁜 결과를 가져올 대책.',
 			longMeaning: '성한 눈도 견디기 힘든 고춧가루를 앓는 눈에 뿌린다는 뜻으로, 엎친 데 덮친 격으로 아주 나쁜 결과를 가져올 대책을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -39929,12 +39302,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2335,
 			proverb: '눈에 눈이 들어가니 눈물인가 눈물인가',
-			meaning:
-				'얼굴의 눈에 하늘에서 내리는 눈이 들어갔을 때 흐르는 물이 눈에서 나오는 눈물인지 눈이 녹은 눈물인지 분간할 수 없다는 뜻으로, 도무지 분간하기 어렵게 된 경우를 말장난으로 이르는 말.',
+			meaning: '도무지 분간하기 어렵게 된 경우를 말장난으로.',
 			longMeaning:
 				'얼굴의 눈에 하늘에서 내리는 눈이 들어갔을 때 흐르는 물이 눈에서 나오는 눈물인지 눈이 녹은 눈물인지 분간할 수 없다는 뜻으로, 도무지 분간하기 어렵게 된 경우를 말장난으로 이르는 말.',
 			sameProverb: [],
@@ -39951,12 +39322,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 94,
 		},
-
 		{
 			id: 2336,
 			proverb: '눈을 져다가 우물을 판다',
-			meaning:
-				'눈을 가져다가 가만히 두어도 물이 될 것을 거기에 또 우묵히 파서 물이 나게 한다는 뜻으로, 일 처리가 둔하고 답답한 것을 비유적으로 이르는 말.',
+			meaning: '일 처리가 둔하고 답답한 것.',
 			longMeaning:
 				'눈을 가져다가 가만히 두어도 물이 될 것을 거기에 또 우묵히 파서 물이 나게 한다는 뜻으로, 일 처리가 둔하고 답답한 것을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -39973,12 +39342,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2337,
 			proverb: '눈자리가 나게 쏘아보다',
-			meaning: '\'눈자리가 나도록 보다\'의 북한 속담.',
-			longMeaning: '\'눈자리가 나도록 보다\'의 북한 속담 이르는 말.',
+			meaning: "'눈자리가 나도록 보다'의 북한 속담.",
+			longMeaning: "'눈자리가 나도록 보다'의 북한 속담. 실컷 보는 것을 비유적으로 이르는 말.",
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
@@ -39993,11 +39361,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2338,
 			proverb: '눈자리가 나도록 보다',
-			meaning: '실컷 보는 것을 비유적으로 이르는 말.',
+			meaning: '실컷 보는 것.',
 			longMeaning: '실컷 보는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40013,11 +39380,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2339,
 			proverb: '눈치가 발바닥이라',
-			meaning: '눈치가 몹시 무디거나 없는 경우를 비유적으로 이르는 말.',
+			meaning: '눈치가 몹시 무디거나 없는 경우.',
 			longMeaning: '눈치가 몹시 무디거나 없는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40033,11 +39399,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2340,
 			proverb: '눈치가 빠르기는 도갓집 강아지',
-			meaning: '사람들이 많이 모여들어 나드는 도갓집 강아지처럼 사람의 동정을 잘 살피며 눈치가 빠른 사람을 비유적으로 이르는 말.',
+			meaning: '사람들이 많이 모여들어 나드는 도갓집 강아지처럼 사람의 동정을 잘 살피며 눈치가 빠른 사람.',
 			longMeaning: '사람들이 많이 모여들어 나드는 도갓집 강아지처럼 사람의 동정을 잘 살피며 눈치가 빠른 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -40053,7 +39418,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2341,
 			proverb: '눈치가 빠르면 절에 가도 젓갈[새우젓/조개젓]을 얻어먹는다',
@@ -40073,11 +39437,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2342,
 			proverb: '눈치가 안는 암탉 잡아먹겠다',
-			meaning: '병아리를 까려고 알을 안고 있는 암탉도 잡아먹을 눈치라는 뜻으로, 무슨 엉뚱한 짓이라도 할 것 같은 사람을 비유적으로 이르는 말.',
+			meaning: '무슨 엉뚱한 짓이라도 할 것 같은 사람.',
 			longMeaning: '병아리를 까려고 알을 안고 있는 암탉도 잡아먹을 눈치라는 뜻으로, 무슨 엉뚱한 짓이라도 할 것 같은 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -40093,11 +39456,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2343,
 			proverb: '눈치가 있으면 떡이나 얻어먹지',
-			meaning: '둔하고 미련한 사람을 놀림조로 이르는 말.',
+			meaning: '둔하고 미련한 사람.',
 			longMeaning: '둔하고 미련한 사람을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -40113,11 +39475,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2344,
 			proverb: '눈치가 참새 방앗간 찾기',
-			meaning: '눈치가 매우 빠름을 비유적으로 이르는 말.',
+			meaning: '눈치가 매우 빠름.',
 			longMeaning: '눈치가 매우 빠름을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40133,11 +39494,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 2345,
 			proverb: '뉘 덕으로 잔뼈가 굵었기에',
-			meaning: '남의 은덕을 입고 자라났음에도 그 은덕을 모름을 이르는 말.',
+			meaning: '남의 은덕을 입고 자라났음에도 그 은덕을 모름.',
 			longMeaning: '남의 은덕을 입고 자라났음에도 그 은덕을 모름을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -40153,7 +39513,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2346,
 			proverb: '뉘 집 개가 짖어 대는 소리냐',
@@ -40173,11 +39532,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2347,
 			proverb: '뉘 집 숟가락이 몇 갠지 아냐',
-			meaning: '어느 집에 숟가락이 몇 개나 되는지 어찌 알겠느냐는 뜻으로, 남의 집 일을 다 알 수 없고 또 알 필요도 없음을 비유적으로 이르는 말.',
+			meaning: '남의 집 일을 다 알 수 없고 또 알 필요도 없음.',
 			longMeaning: '어느 집에 숟가락이 몇 개나 되는지 어찌 알겠느냐는 뜻으로, 남의 집 일을 다 알 수 없고 또 알 필요도 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -40193,11 +39551,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2348,
 			proverb: '늙은 개가 문 지키기 괴롭다',
-			meaning: '나이 많고 늙은 사람이 쉬지 않고 꼬박 일하는 것이 쉽지 않음을 비유적으로 이르는 말.',
+			meaning: '나이 많고 늙은 사람이 쉬지 않고 꼬박 일하는 것이 쉽지 않음.',
 			longMeaning: '나이 많고 늙은 사람이 쉬지 않고 꼬박 일하는 것이 쉽지 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -40213,11 +39570,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 2349,
 			proverb: '늙은 아이어미 석 자 가시 목구멍에 안 걸린다',
-			meaning: '늙도록 아이를 많이 낳은 어머니들은 석 자나 되는 가시를 먹어도 목에 안 걸리고 넘어갈 만큼 속이 비고 궁하게 지냄을 비유적으로 이르는 말.',
+			meaning: '늙도록 아이를 많이 낳은 어머니들은 석 자나 되는 가시를 먹어도 목에 안 걸리고 넘어갈 만큼 속이 비고 궁하게 지냄.',
 			longMeaning:
 				'늙도록 아이를 많이 낳은 어머니들은 석 자나 되는 가시를 먹어도 목에 안 걸리고 넘어갈 만큼 속이 비고 궁하게 지냄을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -40234,11 +39590,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2350,
 			proverb: '늙은이 가죽 두껍다',
-			meaning: '늙은이는 염치없는 짓을 잘함을 비유적으로 이르는 말.',
+			meaning: '늙은이는 염치없는 짓을 잘함.',
 			longMeaning: '늙은이는 염치없는 짓을 잘함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40254,11 +39609,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2351,
 			proverb: '늙은이 기운 좋은 것과 가을 날씨 좋은 것은 믿을 수 없다',
-			meaning: '상황이 언제 변할지 모름을 비유적으로 이르는 말.',
+			meaning: '상황이 언제 변할지 모름.',
 			longMeaning: '상황이 언제 변할지 모름을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40274,11 +39628,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2352,
 			proverb: '늙은 쥐가 독 뚫는다',
-			meaning: '늙으면 꾀가 많이 생기고 엉큼해짐을 비유적으로 이르는 말.',
+			meaning: '늙으면 꾀가 많이 생기고 엉큼해짐.',
 			longMeaning: '늙으면 꾀가 많이 생기고 엉큼해짐을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40294,11 +39647,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2353,
 			proverb: '늦게 시작한 도둑이 새벽 다 가는 줄 모른다',
-			meaning: '어떤 일에 남보다 늦게 재미를 붙인 사람이 그 일에 더 열중하게 됨을 비유적으로 이르는 말.',
+			meaning: '어떤 일에 남보다 늦게 재미를 붙인 사람이 그 일에 더 열중하게 됨.',
 			longMeaning: '어떤 일에 남보다 늦게 재미를 붙인 사람이 그 일에 더 열중하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -40314,11 +39666,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 88,
 		},
-
 		{
 			id: 2354,
 			proverb: '다 가도 문턱 못 넘기',
-			meaning: '애써 일을 하였으나 끝맺음을 못하여 보람이 없게 됨을 비유적으로 이르는 말.',
+			meaning: '애써 일을 하였으나 끝맺음을 못하여 보람이 없게 됨.',
 			longMeaning: '애써 일을 하였으나 끝맺음을 못하여 보람이 없게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40334,12 +39685,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2355,
 			proverb: '다라운 부자가 활수(滑手)한 빈자보다 낫다',
 			meaning:
-				'가난한 사람은 마음씨가 곱고 동정심이 많아도 남을 도와주기란 쉽지 않음에 비하여, 부자는 인색하여도 남는 것이 있어 없는 사람이 물질적 도움을 입을 수 있음을 이르는 말.',
+				'가난한 사람은 마음씨가 곱고 동정심이 많아도 남을 도와주기란 쉽지 않음에 비하여, 부자는 인색하여도 남는 것이 있어 없는 사람이 물질적 도움을 입을 수 있음.',
 			longMeaning:
 				'가난한 사람은 마음씨가 곱고 동정심이 많아도 남을 도와주기란 쉽지 않음에 비하여, 부자는 인색하여도 남는 것이 있어 없는 사람이 물질적 도움을 입을 수 있음을 이르는 말.',
 			sameProverb: [],
@@ -40356,7 +39706,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2356,
 			proverb: '다리가 의붓자식보다 낫다',
@@ -40376,7 +39725,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 2357,
 			proverb: '다리뼈가 맏아들이라',
@@ -40396,11 +39744,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2358,
 			proverb: '다섯 손가락 깨물어서 아프지 않은 손가락이 없다',
-			meaning: '혈육은 다 귀하고 소중함을 비유적으로 이르는 말.',
+			meaning: '혈육은 다 귀하고 소중함.',
 			longMeaning: '혈육은 다 귀하고 소중함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40416,11 +39763,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2359,
 			proverb: '단 가마에 눈',
-			meaning: '뜨겁게 단 가마에 떨어져 금방 녹아 버리는 눈이라는 뜻으로, 순식간에 곧 사라짐을 비유적으로 이르는 말.',
+			meaning: '순식간에 곧 사라짐.',
 			longMeaning: '뜨겁게 단 가마에 떨어져 금방 녹아 버리는 눈이라는 뜻으로, 순식간에 곧 사라짐을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40436,11 +39782,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2360,
 			proverb: '단삼 적삼 벗고 은가락지 낀다',
-			meaning: '격에 맞지 않는 짓을 함을 비유적으로 이르는 말.',
+			meaning: '격에 맞지 않는 짓을 함.',
 			longMeaning: '격에 맞지 않는 짓을 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40456,7 +39801,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 2361,
 			proverb: '닫는 말에 채질한다고 경상도까지 하루에 갈 것인가',
@@ -40476,11 +39820,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2362,
 			proverb: '달걀에도 뼈가 있다',
-			meaning: '늘 일이 잘 안되던 사람이 모처럼 좋은 기회를 만났건만, 그 일마저 역시 잘 안됨을 이르는 말.',
+			meaning: '늘 일이 잘 안되던 사람이 모처럼 좋은 기회를 만났건만, 그 일마저 역시 잘 안됨.',
 			longMeaning: '늘 일이 잘 안되던 사람이 모처럼 좋은 기회를 만났건만, 그 일마저 역시 잘 안됨을 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -40496,12 +39839,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 40,
 		},
-
 		{
 			id: 2363,
 			proverb: '달걀 지고 성 밑으로 못 가겠다',
-			meaning:
-				'이미 다 썩은 달걀을 지고 성 밑으로 가면서도 성벽이 무너져 달걀이 깨질까 두려워 못 간다는 뜻으로, 무슨 일을 지나치게 두려워하며 걱정함을 비유적으로 이르는 말.',
+			meaning: '무슨 일을 지나치게 두려워하며 걱정함.',
 			longMeaning:
 				'이미 다 썩은 달걀을 지고 성 밑으로 가면서도 성벽이 무너져 달걀이 깨질까 두려워 못 간다는 뜻으로, 무슨 일을 지나치게 두려워하며 걱정함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -40518,12 +39859,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 70,
 		},
-
 		{
 			id: 2364,
 			proverb: '달고 치는데 안 맞는 장사가 있나',
-			meaning:
-				'아무리 장사라도 달아매어 놓고 치는 데는 안 맞을 재간이 없다는 뜻으로, 아무리 강한 사람도 여럿이 함께 몰아 대면 당할 수 없음을 비유적으로 이르는 말.',
+			meaning: '아무리 강한 사람도 여럿이 함께 몰아 대면 당할 수 없음.',
 			longMeaning:
 				'아무리 장사라도 달아매어 놓고 치는 데는 안 맞을 재간이 없다는 뜻으로, 아무리 강한 사람도 여럿이 함께 몰아 대면 당할 수 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -40540,7 +39879,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2365,
 			proverb: '달기는 엿집 할머니 손가락이라',
@@ -40560,7 +39898,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2366,
 			proverb: '달팽이가 바다를 건너다니',
@@ -40580,7 +39917,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2367,
 			proverb: '닭의 대가리가 소꼬리보다 낫다',
@@ -40600,7 +39936,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2368,
 			proverb: '닭의 부리가 될지라도 소의 꼬리는 되지 마라',
@@ -40620,12 +39955,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 98,
 		},
-
 		{
 			id: 2369,
 			proverb: '닭의 새끼가 발을 벗으니 오뉴월만 여긴다',
-			meaning:
-				'닭의 새끼가 맨발로 다니는 것을 보고 오뉴월 더운 때인 줄 안다는 뜻으로, 한창 추운 때에 추위를 막을 대책을 전혀 세우지 않음을 비유적으로 이르는 말.',
+			meaning: '한창 추운 때에 추위를 막을 대책을 전혀 세우지 않음.',
 			longMeaning:
 				'닭의 새끼가 맨발로 다니는 것을 보고 오뉴월 더운 때인 줄 안다는 뜻으로, 한창 추운 때에 추위를 막을 대책을 전혀 세우지 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -40642,11 +39975,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 94,
 		},
-
 		{
 			id: 2370,
 			proverb: '담뱃대로 가슴을 찌를 노릇',
-			meaning: '몹시 답답하고 원통함을 비유적으로 이르는 말.',
+			meaning: '몹시 답답하고 원통함.',
 			longMeaning: '몹시 답답하고 원통함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40662,11 +39994,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2371,
 			proverb: '담에도 귀가 달렸다',
-			meaning: '비밀은 없기 때문에 경솔히 말하지 말 것을 비유적으로 이르는 말.',
+			meaning: '비밀은 없기 때문에 경솔히 말하지 말 것.',
 			longMeaning: '비밀은 없기 때문에 경솔히 말하지 말 것을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40682,11 +40013,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2372,
 			proverb: '닷 돈 보고 보리밭에 갔다가 명주 속옷 찢었다',
-			meaning: '작은 이익을 얻으려다 도리어 큰 손해를 봄을 비유적으로 이르는 말.',
+			meaning: '작은 이익을 얻으려다 도리어 큰 손해를 봄.',
 			longMeaning: '작은 이익을 얻으려다 도리어 큰 손해를 봄을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -40702,11 +40032,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 99,
 		},
-
 		{
 			id: 2373,
 			proverb: '당나귀 새낀가 보다 술 때 아는 걸 보니',
-			meaning: '술 잘 먹는 사람이 술 먹을 때를 용하게 알아서 오는 경우를 비유적으로 이르는 말.',
+			meaning: '술 잘 먹는 사람이 술 먹을 때를 용하게 알아서 오는 경우.',
 			longMeaning: '술 잘 먹는 사람이 술 먹을 때를 용하게 알아서 오는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -40722,11 +40051,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 2374,
 			proverb: '당나귀 찬물 건너가듯',
-			meaning: '글을 막힘없이 줄줄 잘 읽음을 비유적으로 이르는 말.',
+			meaning: '글을 막힘없이 줄줄 잘 읽음.',
 			longMeaning: '글을 막힘없이 줄줄 잘 읽음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40742,11 +40070,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2375,
 			proverb: '대가리를 삶으면 귀까지 익는다',
-			meaning: '가장 중요한 것만 처리하고 나면 나머지 일은 따라서 해결됨을 비유적으로 이르는 말.',
+			meaning: '가장 중요한 것만 처리하고 나면 나머지 일은 따라서 해결됨.',
 			longMeaning: '가장 중요한 것만 처리하고 나면 나머지 일은 따라서 해결됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40762,11 +40089,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2376,
 			proverb: '대가리를 잡다가 꽁지를 잡았다',
-			meaning: '큰 것을 바라다가 겨우 조그마한 것밖에 얻지 못하였음을 비유적으로 이르는 말.',
+			meaning: '큰 것을 바라다가 겨우 조그마한 것밖에 얻지 못하였음.',
 			longMeaning: '큰 것을 바라다가 겨우 조그마한 것밖에 얻지 못하였음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40782,7 +40108,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2377,
 			proverb: '대가리보다 꼬리가 크다',
@@ -40802,11 +40127,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2378,
 			proverb: '대가리에 쉬슨 놈',
-			meaning: '어리석고 둔한 사람을 비유적으로 이르는 말.',
+			meaning: '어리석고 둔한 사람.',
 			longMeaning: '어리석고 둔한 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -40822,12 +40146,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2379,
 			proverb: '대감 말이 죽었다면 먹던 밥을 밀쳐 놓고 가고, 대감이 죽었다면 먹던 밥 다 먹고 간다',
-			meaning:
-				'대감이 죽은 후에는 그에게 잘 보일 필요가 없으나 대감이 살고 말이 죽으면 대감의 환심을 사기 위하여 조문을 간다는 뜻으로, 권력이 있을 때는 아첨을 하지만 권력이 없어지면 돌아다보지 않는 세상인심을 비유적으로 이르는 말.',
+			meaning: '권력이 있을 때는 아첨을 하지만 권력이 없어지면 돌아다보지 않는 세상인심.',
 			longMeaning:
 				'대감이 죽은 후에는 그에게 잘 보일 필요가 없으나 대감이 살고 말이 죽으면 대감의 환심을 사기 위하여 조문을 간다는 뜻으로, 권력이 있을 때는 아첨을 하지만 권력이 없어지면 돌아다보지 않는 세상인심을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -40844,11 +40166,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2380,
 			proverb: '대 끝에서 대가 나고 싸리 끝에서 싸리가 난다',
-			meaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임을 비유적으로 이르는 말.',
+			meaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임.',
 			longMeaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40864,11 +40185,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2381,
 			proverb: '대나무 그루에선 대나무가 난다',
-			meaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임을 비유적으로 이르는 말.',
+			meaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임.',
 			longMeaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40884,7 +40204,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2382,
 			proverb: '대문이 가문',
@@ -40904,11 +40223,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 22,
 		},
-
 		{
 			id: 2383,
 			proverb: '대 뿌리에서 대가 난다',
-			meaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임을 비유적으로 이르는 말.',
+			meaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임.',
 			longMeaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40924,11 +40242,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 2384,
 			proverb: '대천가의 논은 살 것이 아니다',
-			meaning: '큰 강가의 논은 수해를 입기가 쉬움을 비유적으로 이르는 말.',
+			meaning: '큰 강가의 논은 수해를 입기가 쉬움.',
 			longMeaning: '큰 강가의 논은 수해를 입기가 쉬움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40944,14 +40261,12 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2385,
 			proverb: '대학을 가르칠라',
 			meaning:
 				'미련한 자가 어리석은 말을 함을 비유적으로 이르는 말. 옛날에 한 농부가 촌 선생에게서 《대학》을 배우다가 답답하여 공부를 단념하고 돌아가서 밭을 갈다가 소가 말을 듣지 않자 소에게 "《대학》을 가르칠까 보다."라고 하였다는 말에서 유래한다.',
-			longMeaning:
-				'미련한 자가 어리석은 말을 함을 비유적으로 이르는 말. 옛날에 한 농부가 촌 선생에게서 《대학》을 배우다가 답답하여 공부를 단념하고 돌아가서 밭을 갈다가 소가 말을 듣지 않자 소에게 "《대학》을 가르칠까 보다."라고 하였다는 말에서 유래한다 이르는 말.',
+			longMeaning: '미련한 자가 어리석은 말을 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
@@ -40960,17 +40275,17 @@ export const CONST_MAIN_DATA: {
 				"회의에서 듣기 좋은 말만 늘어놓던 사람이 정작 책임은 피하자 팀원이 '대학을 가르칠라'라고 말했다.",
 				"괜한 농담 한마디로 분위기가 틀어지자 선배가 '대학을 가르칠라'라고 타일렀다.",
 			],
-			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
+			origin:
+				'옛날에 한 농부가 촌 선생에게서 《대학》을 배우다가 답답하여 공부를 단념하고 돌아가 밭을 갈다가, 소가 말을 듣지 않자 소에게 "《대학》을 가르칠까 보다."라고 하였다는 데서 유래한다.',
 			usageTip: '비슷한 상황을 짧게 빗대어 말할 때 쓸 수 있다.',
 			synonym: null,
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 2386,
 			proverb: '대한이 소한의 집에 가서 얼어 죽는다',
-			meaning: '글자 뜻으로만 보면 대한이 소한보다 추워야 할 것이나 사실은 소한 무렵이 더 추운 것을 비유적으로 이르는 말.',
+			meaning: '글자 뜻으로만 보면 대한이 소한보다 추워야 할 것이나 사실은 소한 무렵이 더 추운 것.',
 			longMeaning: '글자 뜻으로만 보면 대한이 소한보다 추워야 할 것이나 사실은 소한 무렵이 더 추운 것을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -40986,7 +40301,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 2387,
 			proverb: '더도 말고 덜도 말고 늘 가윗날만 같아라',
@@ -41007,12 +40321,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 85,
 		},
-
 		{
 			id: 2388,
 			proverb: '더부살이가 주인마누라 속곳 베 걱정한다',
-			meaning:
-				'남의 집에 더부살이하면서 제 옷도 변변히 못 입는 형편에 주인집 마누라의 속곳 마련할 걱정을 한다는 뜻으로, 주제넘게 남의 일에 대하여 걱정함을 비유적으로 이르는 말.',
+			meaning: '주제넘게 남의 일에 대하여 걱정함.',
 			longMeaning:
 				'남의 집에 더부살이하면서 제 옷도 변변히 못 입는 형편에 주인집 마누라의 속곳 마련할 걱정을 한다는 뜻으로, 주제넘게 남의 일에 대하여 걱정함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -41029,11 +40341,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 96,
 		},
-
 		{
 			id: 2389,
 			proverb: '덤불이 커야 도깨비가 난다',
-			meaning: '일정한 바탕이나 조건이 갖추어져야 그것에 합당한 내용이 따르게 됨을 비유적으로 이르는 말.',
+			meaning: '일정한 바탕이나 조건이 갖추어져야 그것에 합당한 내용이 따르게 됨.',
 			longMeaning: '일정한 바탕이나 조건이 갖추어져야 그것에 합당한 내용이 따르게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41049,11 +40360,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 2390,
 			proverb: '도끼가 제 자루 깎지 못한다',
-			meaning: '자기의 허물을 자기가 알아서 고치기 어려움을 비유적으로 이르는 말.',
+			meaning: '자기의 허물을 자기가 알아서 고치기 어려움.',
 			longMeaning: '자기의 허물을 자기가 알아서 고치기 어려움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41069,11 +40379,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2391,
 			proverb: '도끼가 제 자루 못 찍는다',
-			meaning: '자기의 허물을 자기가 알아서 고치기 어려움을 비유적으로 이르는 말.',
+			meaning: '자기의 허물을 자기가 알아서 고치기 어려움.',
 			longMeaning: '자기의 허물을 자기가 알아서 고치기 어려움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41089,7 +40398,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2392,
 			proverb: '도끼 가진 놈이 바늘 가진 놈을 못 당한다',
@@ -41109,11 +40417,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 85,
 		},
-
 		{
 			id: 2393,
 			proverb: '도둑개가 겻섬에 오른다',
-			meaning: '자기가 하고 싶은 것을 할 때에는 그 동작이 매우 재빠름을 비유적으로 이르는 말.',
+			meaning: '자기가 하고 싶은 것을 할 때에는 그 동작이 매우 재빠름.',
 			longMeaning: '자기가 하고 싶은 것을 할 때에는 그 동작이 매우 재빠름을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41129,11 +40436,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2394,
 			proverb: '도둑고양이가 살찌랴',
-			meaning: '늘 남의 것을 탐하는 자는 재물을 모으지 못함을 비유적으로 이르는 말.',
+			meaning: '늘 남의 것을 탐하는 자는 재물을 모으지 못함.',
 			longMeaning: '늘 남의 것을 탐하는 자는 재물을 모으지 못함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -41149,7 +40455,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2395,
 			proverb: '도둑고양이가 제상에 오른다',
@@ -41169,11 +40474,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2396,
 			proverb: '도둑에도 의리가 있고 딴꾼에도 꼭지가 있다',
-			meaning: '못된 짓을 하는 자들에게도 저희끼리 지켜야 하는 의리나 질서가 있음을 비유적으로 이르는 말.',
+			meaning: '못된 짓을 하는 자들에게도 저희끼리 지켜야 하는 의리나 질서가 있음.',
 			longMeaning: '못된 짓을 하는 자들에게도 저희끼리 지켜야 하는 의리나 질서가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41189,11 +40493,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 91,
 		},
-
 		{
 			id: 2397,
 			proverb: '도둑의 씨가 따로 없다',
-			meaning: '특별히 타고난 도둑은 없다는 뜻으로, 사람이란 주위의 환경과 조건에 따라 누구나 도둑이 될 수 있음을 비유적으로 이르는 말.',
+			meaning: '사람이란 주위의 환경과 조건에 따라 누구나 도둑이 될 수 있음.',
 			longMeaning: '특별히 타고난 도둑은 없다는 뜻으로, 사람이란 주위의 환경과 조건에 따라 누구나 도둑이 될 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -41209,11 +40512,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2398,
 			proverb: '도둑질은 내가 하고 오라는 네가 져라',
-			meaning: '나쁜 짓을 해서 이익은 자기가 차지하고 그것에 대한 벌은 남보고 받으라는 경우를 비유적으로 이르는 말.',
+			meaning: '나쁜 짓을 해서 이익은 자기가 차지하고 그것에 대한 벌은 남보고 받으라는 경우.',
 			longMeaning: '나쁜 짓을 해서 이익은 자기가 차지하고 그것에 대한 벌은 남보고 받으라는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -41229,11 +40531,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 2399,
 			proverb: '도련님은 당나귀가 제격이라',
-			meaning: '제격에 맞게 물건을 쓰거나 행동해야 어울림을 비유적으로 이르는 말.',
+			meaning: '제격에 맞게 물건을 쓰거나 행동해야 어울림.',
 			longMeaning: '제격에 맞게 물건을 쓰거나 행동해야 어울림을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41249,7 +40550,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 2400,
 			proverb: '도마 위의 고기가 칼을 무서워하랴',
@@ -41269,11 +40569,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 2401,
 			proverb: '도투마리 잘라 넉가래 만들기',
-			meaning: '도투마리를 두 토막 내면 넉가래가 되는 데서, 아주 하기가 쉬운 일을 비유적으로 이르는 말.',
+			meaning: '아주 하기가 쉬운 일.',
 			longMeaning: '도투마리를 두 토막 내면 넉가래가 되는 데서, 아주 하기가 쉬운 일을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41289,7 +40588,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2402,
 			proverb: '도회 소식 들으려면 시골로 가거라',
@@ -41309,11 +40607,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 2403,
 			proverb: '독사 아가리에 손가락을 넣는다',
-			meaning: '매우 위험한 짓을 함을 비유적으로 이르는 말.',
+			meaning: '매우 위험한 짓을 함.',
 			longMeaning: '매우 위험한 짓을 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -41329,12 +40626,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2404,
 			proverb: '독서당 개가 맹자 왈 한다',
-			meaning:
-				'어떤 분야에 대하여 지식과 경험이 전혀 없는 사람이라도 그 부문에 오래 있으면 얼마간의 지식과 경험을 갖게 된다는 것을 비유적으로 이르는 말.',
+			meaning: '어떤 분야에 대하여 지식과 경험이 전혀 없는 사람이라도 그 부문에 오래 있으면 얼마간의 지식과 경험을 갖게 된다는 것.',
 			longMeaning:
 				'어떤 분야에 대하여 지식과 경험이 전혀 없는 사람이라도 그 부문에 오래 있으면 얼마간의 지식과 경험을 갖게 된다는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -41351,7 +40646,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2405,
 			proverb: '독 틈에도 용소가 있다',
@@ -41371,12 +40665,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 2406,
 			proverb: '돈 모아 줄 생각 말고 자식 글 가르쳐라',
 			meaning: '자식을 위하는 가장 좋은 유산은 교육을 잘 시키는 일임을 강조하는 말.',
-			longMeaning: '자식을 위하는 가장 좋은 유산은 교육을 잘 시키는 일임을 강조하는 말.',
+			longMeaning: '자식을 위하는 가장 좋은 유산은 교육을 잘 시키는 일임을 강조하여 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
 			level: 3,
@@ -41391,11 +40684,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 2407,
 			proverb: '돈 없는 놈이 선가 먼저 물어본다',
-			meaning: '자격을 갖추지 못한 자가 도리어 먼저 나댈 때 이르는 말.',
+			meaning: '자격을 갖추지 못한 자가 도리어 먼저 나댈 때.',
 			longMeaning: '자격을 갖추지 못한 자가 도리어 먼저 나댈 때 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -41411,7 +40703,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 2408,
 			proverb: '돈은 있다가도 없어지고 없다가도 생기는 법이라',
@@ -41431,11 +40722,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2409,
 			proverb: '돈이 많으면 장사를 잘하고 소매가 길면 춤을 잘 춘다',
-			meaning: '모든 일이 잘되려면 그 소재가 좋고 풍족하여야 함을 비유적으로 이르는 말.',
+			meaning: '모든 일이 잘되려면 그 소재가 좋고 풍족하여야 함.',
 			longMeaning: '모든 일이 잘되려면 그 소재가 좋고 풍족하여야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41451,11 +40741,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2410,
 			proverb: '돈이 자가사리 끓듯 한다',
-			meaning: '돈이 많음을 빙자하여 함부로 외람된 짓을 하며 못되게 구는 사람을 욕으로 이르는 말.',
+			meaning: '돈이 많음을 빙자하여 함부로 외람된 짓을 하며 못되게 구는 사람.',
 			longMeaning: '돈이 많음을 빙자하여 함부로 외람된 짓을 하며 못되게 구는 사람을 욕으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -41471,11 +40760,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2411,
 			proverb: '돌다(가) 보아도 마름[물방아]',
-			meaning: '물 위에 떠돌아다니는 마름은 아무리 떠돌아도 마름이라는 뜻으로, 별다른 진보가 없이 같은 일만 되풀이함을 비유적으로 이르는 말.',
+			meaning: '별다른 진보가 없이 같은 일만 되풀이함.',
 			longMeaning: '물 위에 떠돌아다니는 마름은 아무리 떠돌아도 마름이라는 뜻으로, 별다른 진보가 없이 같은 일만 되풀이함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41491,11 +40779,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2412,
 			proverb: '돌담의 부른 배는 쓸모가 없다',
-			meaning: '도무지 유용한 데는 없고 해만 끼치는 존재를 비유적으로 이르는 말.',
+			meaning: '도무지 유용한 데는 없고 해만 끼치는 존재.',
 			longMeaning: '도무지 유용한 데는 없고 해만 끼치는 존재를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41511,11 +40798,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2413,
 			proverb: '돌부처가 웃다가 배꼽이 떨어지겠다',
-			meaning: '너무나 어처구니없는 일이 생긴 경우를 비유적으로 이르는 말.',
+			meaning: '너무나 어처구니없는 일이 생긴 경우.',
 			longMeaning: '너무나 어처구니없는 일이 생긴 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41531,11 +40817,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 70,
 		},
-
 		{
 			id: 2414,
 			proverb: '돌부처가 웃을 노릇',
-			meaning: '너무나 어처구니없는 일이 생긴 경우를 비유적으로 이르는 말.',
+			meaning: '너무나 어처구니없는 일이 생긴 경우.',
 			longMeaning: '너무나 어처구니없는 일이 생긴 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41551,7 +40836,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2415,
 			proverb: '돌절구도 밑 빠질 때가 있다',
@@ -41571,7 +40855,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2416,
 			proverb: '동냥치가 동냥치 꺼린다',
@@ -41591,11 +40874,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2417,
 			proverb: '동냥하려다가 추수 못 본다',
-			meaning: '작은 것을 탐내어 다니다가 큰 것을 놓치게 됨을 비유적으로 이르는 말.',
+			meaning: '작은 것을 탐내어 다니다가 큰 것을 놓치게 됨.',
 			longMeaning: '작은 것을 탐내어 다니다가 큰 것을 놓치게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -41611,11 +40893,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2418,
 			proverb: '동네 색시 믿고 장가 못 든다',
-			meaning: '남은 생각지도 않는데 자기 혼자 지레짐작으로 믿고만 있다가 낭패를 보게 됨을 비유적으로 이르는 말.',
+			meaning: '남은 생각지도 않는데 자기 혼자 지레짐작으로 믿고만 있다가 낭패를 보게 됨.',
 			longMeaning: '남은 생각지도 않는데 자기 혼자 지레짐작으로 믿고만 있다가 낭패를 보게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -41631,11 +40912,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2419,
 			proverb: '돼지가 깃을 물어 들이면 비가 온다',
-			meaning: '둔하고 미련한 사람의 직감이 들어맞음을 비유적으로 이르는 말.',
+			meaning: '둔하고 미련한 사람의 직감이 들어맞음.',
 			longMeaning: '둔하고 미련한 사람의 직감이 들어맞음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -41651,7 +40931,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 2420,
 			proverb: '되 글을 가지고 말 글로 써먹는다',
@@ -41671,7 +40950,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2421,
 			proverb: '되놈과 겸상을 하면 재수가 없다',
@@ -41691,11 +40969,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2422,
 			proverb: '되는 집에는 가지 나무에 수박이 열린다',
-			meaning: '잘되어 가는 집은 하는 일마다 좋은 결과를 맺음을 비유적으로 이르는 말.',
+			meaning: '잘되어 가는 집은 하는 일마다 좋은 결과를 맺음.',
 			longMeaning: '잘되어 가는 집은 하는 일마다 좋은 결과를 맺음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41711,7 +40988,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 78,
 		},
-
 		{
 			id: 2423,
 			proverb: '되는 집에는 암소가 세 마리 안되는 집에는 계집이 셋',
@@ -41731,7 +41007,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2424,
 			proverb: '두꺼비씨름 누가 질지 누가 이길지',
@@ -41751,7 +41026,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2425,
 			proverb: '두 눈의 부처가 발등걸이 했다',
@@ -41771,11 +41045,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2426,
 			proverb: '두더지는 나비가 못 되라는 법 있나',
-			meaning: '다른 사람이 상상하지 못하는 전혀 뜻밖의 상황도 일어날 수 있음을 비유적으로 이르는 말.',
+			meaning: '다른 사람이 상상하지 못하는 전혀 뜻밖의 상황도 일어날 수 있음.',
 			longMeaning: '다른 사람이 상상하지 못하는 전혀 뜻밖의 상황도 일어날 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '운/우연',
@@ -41791,11 +41064,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 70,
 		},
-
 		{
 			id: 2427,
 			proverb: '두었다가 국 끓여 먹겠느냐',
-			meaning: '써야 할 것을 쓰지 아니하고 너무 아껴 두기만 함을 놀림조로 이르는 말.',
+			meaning: '써야 할 것을 쓰지 아니하고 너무 아껴 두기만 함.',
 			longMeaning: '써야 할 것을 쓰지 아니하고 너무 아껴 두기만 함을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41811,7 +41083,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 60,
 		},
-
 		{
 			id: 2428,
 			proverb: '드나드는 개가 꿩을 문다',
@@ -41831,7 +41102,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2429,
 			proverb: '드물어도 아이가 든다',
@@ -41851,7 +41121,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 39,
 		},
-
 		{
 			id: 2430,
 			proverb: '들어서 죽 쑨 놈은 나가서도 죽 쑨다',
@@ -41871,7 +41140,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 2431,
 			proverb: '등걸이 없는 휘추리가 있나',
@@ -41891,11 +41159,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2432,
 			proverb: '등겨가 서 말만 있으면 처가살이 안 한다',
-			meaning: '처가살이는 할 것이 못 됨을 이르는 말.',
+			meaning: '처가살이는 할 것이 못 됨.',
 			longMeaning: '처가살이는 할 것이 못 됨을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41911,7 +41178,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 2433,
 			proverb: '등겨 먹던 개가 말경(末境)에는 쌀을 먹는다',
@@ -41933,11 +41199,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2434,
 			proverb: '등이 더우랴 배가 부르랴',
-			meaning: '등을 덥게 할 의복이나 배를 부르게 할 밥이 생기지 아니한다는 뜻으로, 어떤 일이 자기에게 아무 이익이 되지 아니함을 비유적으로 이르는 말.',
+			meaning: '어떤 일이 자기에게 아무 이익이 되지 아니함.',
 			longMeaning:
 				'등을 덥게 할 의복이나 배를 부르게 할 밥이 생기지 아니한다는 뜻으로, 어떤 일이 자기에게 아무 이익이 되지 아니함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -41954,7 +41219,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 2435,
 			proverb: '등잔 뒤가 밝다',
@@ -41974,11 +41238,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 25,
 		},
-
 		{
 			id: 2436,
 			proverb: '등줄기에서 노린내가 나게 두들긴다',
-			meaning: '몹시 두들겨 맞는 모습을 비유적으로 이르는 말.',
+			meaning: '몹시 두들겨 맞는 모습.',
 			longMeaning: '몹시 두들겨 맞는 모습을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -41994,7 +41257,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 2437,
 			proverb: '딸 셋을 여의면 기둥뿌리가 팬다',
@@ -42016,7 +41278,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 2438,
 			proverb: '딸 손자는 가을볕에 놀리고 아들 손자는 봄볕에 놀린다',
@@ -42036,7 +41297,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2439,
 			proverb: '딸의 굿에 가도 전대가 셋(이다)',
@@ -42056,7 +41316,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2440,
 			proverb: '딸의 굿에를 가도 자루 아홉을 가지고 간다',
@@ -42076,7 +41335,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 85,
 		},
-
 		{
 			id: 2441,
 			proverb: '딸의 집에서 가져온 고추장',
@@ -42096,7 +41354,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2442,
 			proverb: '딸의 차반 재 넘어가고 며느리 차반 농 위에 둔다',
@@ -42117,7 +41374,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2443,
 			proverb: '땅내가 고소하다[구수하다]',
@@ -42137,11 +41393,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2444,
 			proverb: '땅 파다가 은 얻었다',
-			meaning: '대수롭지 않은 일을 하다가 뜻밖의 이익을 얻게 됨을 비유적으로 이르는 말.',
+			meaning: '대수롭지 않은 일을 하다가 뜻밖의 이익을 얻게 됨.',
 			longMeaning: '대수롭지 않은 일을 하다가 뜻밖의 이익을 얻게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -42157,7 +41412,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2445,
 			proverb: '때린 놈은 가로 가고 맞은 놈은 가운데로 간다',
@@ -42177,12 +41431,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2446,
 			proverb: '떡가루 두고 떡 못할까',
 			meaning: '으레 되기로 정해진 일을 하면서 자랑할 것이 무어냐고 핀잔하는 말.',
-			longMeaning: '으레 되기로 정해진 일을 하면서 자랑할 것이 무어냐고 핀잔하는 말.',
+			longMeaning: '으레 되기로 정해진 일을 하면서 자랑할 것이 무어냐고 핀잔하여 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
 			level: 2,
@@ -42197,7 +41450,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2447,
 			proverb: '떼가 사촌보다 낫다',
@@ -42217,11 +41469,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 31,
 		},
-
 		{
 			id: 2448,
 			proverb: '또아리 샅[눈] 가린다',
-			meaning: '가린다고 가렸으나 가장 요긴한 데를 가리지 못했음을 이르는 말.',
+			meaning: '가린다고 가렸으나 가장 요긴한 데를 가리지 못했음.',
 			longMeaning: '가린다고 가렸으나 가장 요긴한 데를 가리지 못했음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42237,11 +41488,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2449,
 			proverb: '똥 누러 가서 밥 달라고 하느냐',
-			meaning: '처음에 목적하던 일을 하러 가서 전혀 딴짓을 함을 이르는 말.',
+			meaning: '처음에 목적하던 일을 하러 가서 전혀 딴짓을 함.',
 			longMeaning: '처음에 목적하던 일을 하러 가서 전혀 딴짓을 함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42257,7 +41507,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2450,
 			proverb: '똥 묻은 접시가 재 묻은 접시를 흉본다',
@@ -42277,7 +41526,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 2451,
 			proverb: '똥 벌레가 제 몸 더러운 줄 모른다',
@@ -42297,7 +41545,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 2452,
 			proverb: '뜨겁기는 박태보(朴泰輔)가 살았을라고',
@@ -42318,11 +41565,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 87,
 		},
-
 		{
 			id: 2453,
 			proverb: '뜨물에도 아이가 든다',
-			meaning: '일이 여러 날 지연되기는 해도 반드시 이루어짐을 비유적으로 이르는 말.',
+			meaning: '일이 여러 날 지연되기는 해도 반드시 이루어짐.',
 			longMeaning: '일이 여러 날 지연되기는 해도 반드시 이루어짐을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -42338,11 +41584,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 42,
 		},
-
 		{
 			id: 2454,
 			proverb: '마당이 환하면 비가 오고 계집 뒤가 반지르르하면 애가 든다',
-			meaning: '아이 어머니의 쇠약하였던 몸이 다시 회복되고 몸매가 반지르르하게 되면 또 아이를 가지게 됨을 이르는 말.',
+			meaning: '아이 어머니의 쇠약하였던 몸이 다시 회복되고 몸매가 반지르르하게 되면 또 아이를 가지게 됨.',
 			longMeaning: '아이 어머니의 쇠약하였던 몸이 다시 회복되고 몸매가 반지르르하게 되면 또 아이를 가지게 됨을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42358,11 +41603,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2455,
 			proverb: '마루 넘은 수레 내려가기',
-			meaning: '사물의 진행 속도나 형세가 걷잡을 수 없이 매우 빠름을 이르는 말.',
+			meaning: '사물의 진행 속도나 형세가 걷잡을 수 없이 매우 빠름.',
 			longMeaning: '사물의 진행 속도나 형세가 걷잡을 수 없이 매우 빠름을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42378,11 +41622,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2456,
 			proverb: '마루 밑에 볕 들 때가 있다',
-			meaning: '마루 밑과 같은 음침한 곳에도 볕이 들 때가 있는 것처럼, 어떤 일이나 고정불변한 것은 없음을 비유적으로 이르는 말.',
+			meaning: '어떤 일이나 고정불변한 것은 없음.',
 			longMeaning: '마루 밑과 같은 음침한 곳에도 볕이 들 때가 있는 것처럼, 어떤 일이나 고정불변한 것은 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42398,11 +41641,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2457,
 			proverb: '마루 아래 강아지가 웃을 노릇',
-			meaning: '어떤 일이 경우에 몹시 어긋남을 이르는 말.',
+			meaning: '어떤 일이 경우에 몹시 어긋남.',
 			longMeaning: '어떤 일이 경우에 몹시 어긋남을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -42418,11 +41660,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 2458,
 			proverb: '마른 말은 꼬리가 길다',
-			meaning: '마르고 여위면 같은 것이라도 더 길어 보임을 이르는 말.',
+			meaning: '마르고 여위면 같은 것이라도 더 길어 보임.',
 			longMeaning: '마르고 여위면 같은 것이라도 더 길어 보임을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42438,7 +41679,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2459,
 			proverb: '마음씨가 고우면 옷 앞섶이 아문다',
@@ -42458,11 +41698,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2460,
 			proverb: '마음을 잘 가지면 죽어도 옳은 귀신이 된다',
-			meaning: '착한 마음씨를 지니고 살면 죽어도 유감됨이 없음을 이르는 말.',
+			meaning: '착한 마음씨를 지니고 살면 죽어도 유감됨이 없음.',
 			longMeaning: '착한 마음씨를 지니고 살면 죽어도 유감됨이 없음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42478,7 +41717,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 84,
 		},
-
 		{
 			id: 2461,
 			proverb: '마음이 맞으면 삶은 도토리 한 알 가지고도 시장 멈춤을 한다',
@@ -42500,11 +41738,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2462,
 			proverb: '마음이 풀어지면 하는 일이 가볍다',
-			meaning: '마음에 맺혔던 근심과 걱정이 없어지고 부아가 풀리면 하는 일도 힘들지 않고 쉽게 됨을 이르는 말.',
+			meaning: '마음에 맺혔던 근심과 걱정이 없어지고 부아가 풀리면 하는 일도 힘들지 않고 쉽게 됨.',
 			longMeaning: '마음에 맺혔던 근심과 걱정이 없어지고 부아가 풀리면 하는 일도 힘들지 않고 쉽게 됨을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42520,11 +41757,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 2463,
 			proverb: '마지막 고개를 넘기기가 가장 힘들다',
-			meaning: '어떤 일이든지 끝을 잘 마무리하기가 가장 힘듦을 비유적으로 이르는 말.',
+			meaning: '어떤 일이든지 끝을 잘 마무리하기가 가장 힘듦.',
 			longMeaning: '어떤 일이든지 끝을 잘 마무리하기가 가장 힘듦을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42540,11 +41776,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2464,
 			proverb: '마치가 가벼우면 못이 솟는다',
-			meaning: '윗사람이 위엄이 없으면 아랫사람이 순종하지 아니하고 반항하게 됨을 비유적으로 이르는 말.',
+			meaning: '윗사람이 위엄이 없으면 아랫사람이 순종하지 아니하고 반항하게 됨.',
 			longMeaning: '윗사람이 위엄이 없으면 아랫사람이 순종하지 아니하고 반항하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -42560,7 +41795,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2465,
 			proverb: '말 꼬리에 파리가 천 리 간다',
@@ -42580,7 +41814,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2466,
 			proverb: '말만 잘하면 천 냥 빚도 가린다',
@@ -42600,7 +41833,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2467,
 			proverb: '말 머리에 태기가 있다',
@@ -42620,7 +41852,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 39,
 		},
-
 		{
 			id: 2468,
 			proverb: '말 속에 뜻이 있고 뼈가 있다',
@@ -42640,11 +41871,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2469,
 			proverb: '말 잘하고 징역 가랴',
-			meaning: '말을 잘하면 징역 갈 것도 면한다는 뜻으로, 말의 중요성을 이르는 말.',
+			meaning: '말의 중요성.',
 			longMeaning: '말을 잘하면 징역 갈 것도 면한다는 뜻으로, 말의 중요성을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42660,11 +41890,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 38,
 		},
-
 		{
 			id: 2470,
 			proverb: '말 한마디가 대포알 만 개도 당한다',
-			meaning: '말 잘하는 것이 큰 위력을 가질 수 있음을 비유적으로 이르는 말.',
+			meaning: '말 잘하는 것이 큰 위력을 가질 수 있음.',
 			longMeaning: '말 잘하는 것이 큰 위력을 가질 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42680,11 +41909,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 2471,
 			proverb: '망둥이가 뛰니까 전라도 빗자루도 뛴다',
-			meaning: '남이 한다고 하니까 분별없이 덩달아 나섬을 비유적으로 이르는 말.',
+			meaning: '남이 한다고 하니까 분별없이 덩달아 나섬.',
 			longMeaning: '남이 한다고 하니까 분별없이 덩달아 나섬을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -42700,11 +41928,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 2472,
 			proverb: '망치가 가벼우면 못이 솟는다',
-			meaning: '윗사람이 위엄이 없으면 아랫사람이 순종하지 아니하고 반항하게 됨을 비유적으로 이르는 말.',
+			meaning: '윗사람이 위엄이 없으면 아랫사람이 순종하지 아니하고 반항하게 됨.',
 			longMeaning: '윗사람이 위엄이 없으면 아랫사람이 순종하지 아니하고 반항하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -42720,11 +41947,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2473,
 			proverb: '매가 꿩을 잡아 주고 싶어 잡아 주나',
-			meaning: '마지못하여 남의 부림을 당하는 처지를 비유적으로 이르는 말.',
+			meaning: '마지못하여 남의 부림을 당하는 처지.',
 			longMeaning: '마지못하여 남의 부림을 당하는 처지를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -42740,7 +41966,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2474,
 			proverb: '맹자 집 개가 맹자 왈 한다',
@@ -42760,7 +41985,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2475,
 			proverb: '머리가 모시 바구니가 되었다',
@@ -42780,7 +42004,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 2476,
 			proverb: '머리는 끝부터 가르고 말은 밑부터 한다',
@@ -42800,11 +42023,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 2477,
 			proverb: '머리 위에 무쇠 두멍이 내릴 때가 멀지 않았다',
-			meaning: '무쇠 두멍이 머리에 떨어지면 살아날 리가 없는 것이니, 죽을 날이 멀지 않았다고 저주하여 이르는 말.',
+			meaning: '무쇠 두멍이 머리에 떨어지면 살아날 리가 없는 것이니, 죽을 날이 멀지 않았다고 저주하여.',
 			longMeaning: '무쇠 두멍이 머리에 떨어지면 살아날 리가 없는 것이니, 죽을 날이 멀지 않았다고 저주하여 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42820,7 +42042,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2478,
 			proverb: '먹기는 파발[발장]이 먹고 뛰기는 역마[파발마]가 뛴다',
@@ -42840,11 +42061,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2479,
 			proverb: '먹는 데는 남이요 궂은일에는 일가라',
-			meaning: '제 욕심을 채울 때는 남을 돌보지 아니하다가, 제가 어려운 일을 당하면 남의 도움을 바라는 얄미운 심리를 이르는 말.',
+			meaning: '제 욕심을 채울 때는 남을 돌보지 아니하다가, 제가 어려운 일을 당하면 남의 도움을 바라는 얄미운 심리.',
 			longMeaning: '제 욕심을 채울 때는 남을 돌보지 아니하다가, 제가 어려운 일을 당하면 남의 도움을 바라는 얄미운 심리를 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -42860,11 +42080,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 2480,
 			proverb: '먹는 소가 똥을 누지',
-			meaning: '무슨 일이든 거기에는 반드시 그렇게 된 까닭이 있음을 비유적으로 이르는 말.',
+			meaning: '무슨 일이든 거기에는 반드시 그렇게 된 까닭이 있음.',
 			longMeaning: '무슨 일이든 거기에는 반드시 그렇게 된 까닭이 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42880,7 +42099,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2481,
 			proverb: '먹다가 굶어 죽겠다',
@@ -42900,11 +42118,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 29,
 		},
-
 		{
 			id: 2482,
 			proverb: '먹다가 보니 개떡[수제비]',
-			meaning: '멋도 모르고 그저 좋아하다가, 알고 보니 의외로 하찮은 것이어서 실망함을 이르는 말.',
+			meaning: '멋도 모르고 그저 좋아하다가, 알고 보니 의외로 하찮은 것이어서 실망함.',
 			longMeaning: '멋도 모르고 그저 좋아하다가, 알고 보니 의외로 하찮은 것이어서 실망함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -42920,7 +42137,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 42,
 		},
-
 		{
 			id: 2483,
 			proverb: '먼 데 것을 얻으려고 가까운 것을 버린다',
@@ -42940,7 +42156,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 2484,
 			proverb: '먼 데 단 냉이보다 가까운 데 쓴 냉이',
@@ -42960,11 +42175,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 70,
 		},
-
 		{
 			id: 2485,
 			proverb: '먼 데 일가가 가까운 이웃만 못하다',
-			meaning: '가까이 지내는 이웃이 먼 데 사는 일가보다 낫다는 뜻으로, 이웃끼리 서로 도우며 사는 것이 중요함을 이르는 말.',
+			meaning: '이웃끼리 서로 도우며 사는 것이 중요함.',
 			longMeaning: '가까이 지내는 이웃이 먼 데 사는 일가보다 낫다는 뜻으로, 이웃끼리 서로 도우며 사는 것이 중요함을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -42980,11 +42194,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2486,
 			proverb: '먼 일가와 가까운 이웃',
-			meaning: '이웃끼리 서로 친하게 지내다 보면 먼 곳에 있는 일가보다 더 친하게 되어 서로 도우며 살게 된다는 것을 이르는 말.',
+			meaning: '이웃끼리 서로 친하게 지내다 보면 먼 곳에 있는 일가보다 더 친하게 되어 서로 도우며 살게 된다는 것.',
 			longMeaning: '이웃끼리 서로 친하게 지내다 보면 먼 곳에 있는 일가보다 더 친하게 되어 서로 도우며 살게 된다는 것을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -43000,11 +42213,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2487,
 			proverb: '먼 조카는 따져도 가까운 삼촌은 따지지 않는다',
-			meaning: '먼 친척은 어려워서 이것저것 까다롭게 재지만 삼촌은 항렬이 위이나 편한 사이이므로 대하기가 매우 스스럼없음을 이르는 말.',
+			meaning: '먼 친척은 어려워서 이것저것 까다롭게 재지만 삼촌은 항렬이 위이나 편한 사이이므로 대하기가 매우 스스럼없음.',
 			longMeaning: '먼 친척은 어려워서 이것저것 까다롭게 재지만 삼촌은 항렬이 위이나 편한 사이이므로 대하기가 매우 스스럼없음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43020,11 +42232,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2488,
 			proverb: '메기가 눈은 작아도 저 먹을 것은 알아본다',
-			meaning: '아무리 식견이 좁은 자라도 제 살길은 다 마련하고 있음을 비유적으로 이르는 말.',
+			meaning: '아무리 식견이 좁은 자라도 제 살길은 다 마련하고 있음.',
 			longMeaning: '아무리 식견이 좁은 자라도 제 살길은 다 마련하고 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43040,11 +42251,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 2489,
 			proverb: '메기 등에 뱀장어 넘어가듯',
-			meaning: '일을 분명하고 깔끔하게 처리하지 않고 슬그머니 얼버무려 버림을 비유적으로 이르는 말.',
+			meaning: '일을 분명하고 깔끔하게 처리하지 않고 슬그머니 얼버무려 버림.',
 			longMeaning: '일을 분명하고 깔끔하게 처리하지 않고 슬그머니 얼버무려 버림을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43060,11 +42270,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2490,
 			proverb: '메기 아가리 큰 대로 다 못 먹는다',
-			meaning: '욕심대로 모두 이루어지지는 않음을 비유적으로 이르는 말.',
+			meaning: '욕심대로 모두 이루어지지는 않음.',
 			longMeaning: '욕심대로 모두 이루어지지는 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -43080,7 +42289,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2491,
 			proverb: '메밀도 굴러가다가 서는 모가 있다',
@@ -43100,7 +42308,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2492,
 			proverb: '며느리가 미우면 발뒤축이 달걀 같다고 나무란다',
@@ -43120,7 +42327,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2493,
 			proverb: '며느리가 미우면 손자까지 밉다',
@@ -43140,11 +42346,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2494,
 			proverb: '명태 대가리 하나는 놀랍지 않아도 괭이 소위가 괘씸하다',
-			meaning: '없어진 명태가 아깝기보다 훔쳐 간 고양이의 소행이 더 밉다는 뜻으로, 입은 손해보다도 그 저지른 짓이 미움을 비유적으로 이르는 말.',
+			meaning: '입은 손해보다도 그 저지른 짓이 미움.',
 			longMeaning: '없어진 명태가 아깝기보다 훔쳐 간 고양이의 소행이 더 밉다는 뜻으로, 입은 손해보다도 그 저지른 짓이 미움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43160,7 +42365,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2495,
 			proverb: '모기 대가리에 골을 내랴',
@@ -43180,11 +42384,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 2496,
 			proverb: '모래가 싹 난다',
-			meaning: '절대로 있을 수 없는 일을 고집을 부리는 경우를 이르는 말.',
+			meaning: '절대로 있을 수 없는 일을 고집을 부리는 경우.',
 			longMeaning: '절대로 있을 수 없는 일을 고집을 부리는 경우를 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43200,7 +42403,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 24,
 		},
-
 		{
 			id: 2497,
 			proverb: '모로 가나 기어가나 서울 남대문만 가면 그만이다',
@@ -43220,11 +42422,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2498,
 			proverb: '모주 장사 열 바가지 두르듯',
-			meaning: '보잘것없는 내용을 겉만 꾸며 내는 모양을 비유적으로 이르는 말.',
+			meaning: '보잘것없는 내용을 겉만 꾸며 내는 모양.',
 			longMeaning: '보잘것없는 내용을 겉만 꾸며 내는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43240,11 +42441,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2499,
 			proverb: '모진 놈 옆에 있다가 벼락 맞는다',
-			meaning: '악한 사람을 가까이하면 반드시 그 화를 입게 됨을 비유적으로 이르는 말.',
+			meaning: '악한 사람을 가까이하면 반드시 그 화를 입게 됨.',
 			longMeaning: '악한 사람을 가까이하면 반드시 그 화를 입게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -43260,11 +42460,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2500,
 			proverb: '목 벤 놈 허리 베고 허리 벤 놈 목밖에 더 베겠는가',
-			meaning: '해내고야 말 것임을 굳게 결심함을 속되게 이르는 말.',
+			meaning: '해내고야 말 것임을 굳게 결심함.',
 			longMeaning: '해내고야 말 것임을 굳게 결심함을 속되게 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43280,7 +42479,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2501,
 			proverb: '목수가 많으면 기둥이 기울어진다',
@@ -43300,7 +42498,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2502,
 			proverb: '목수가 많으면 집을 무너뜨린다',
@@ -43320,7 +42517,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2503,
 			proverb: '목수가 해금통을 부순다',
@@ -43340,7 +42536,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2504,
 			proverb: '목탁귀가 밝아야 한다',
@@ -43360,11 +42555,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 40,
 		},
-
 		{
 			id: 2505,
 			proverb: '몸은 개천에 가 있어도 입은 관청에 가 있다',
-			meaning: '가난한 주제에 잘 먹고 잘 지내려는 경우를 이르는 말.',
+			meaning: '가난한 주제에 잘 먹고 잘 지내려는 경우.',
 			longMeaning: '가난한 주제에 잘 먹고 잘 지내려는 경우를 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43380,11 +42574,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 84,
 		},
-
 		{
 			id: 2506,
 			proverb: '못된 일가 항렬만 높다',
-			meaning: '쓸데없는 일가가 친족 관계의 등급만 높다는 뜻으로, 쓸데없는 것일수록 성(盛)함을 이르는 말.',
+			meaning: '쓸데없는 것일수록 성(盛)함.',
 			longMeaning: '쓸데없는 일가가 친족 관계의 등급만 높다는 뜻으로, 쓸데없는 것일수록 성(盛)함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43400,11 +42593,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2507,
 			proverb: '못 먹는 씨아가 소리만 난다',
-			meaning: '못난 사람일수록 잘난 체하고 큰소리를 침을 비유적으로 이르는 말.',
+			meaning: '못난 사람일수록 잘난 체하고 큰소리를 침.',
 			longMeaning: '못난 사람일수록 잘난 체하고 큰소리를 침을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -43420,7 +42612,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2508,
 			proverb: '몽글게 먹고 가늘게 싼다',
@@ -43440,7 +42631,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 2509,
 			proverb: '무게가 천 근이나 된다',
@@ -43460,12 +42650,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 39,
 		},
-
 		{
 			id: 2510,
 			proverb: '무는 말 아가리와 깨진 독 서슬 같다',
-			meaning:
-				'무는 말의 벌린 아가리와 같고 깨진 독의 예리한 날과 같이 모질다는 뜻으로, 사람됨이 모질고 독살스러워 가까이할 수 없음을 비유적으로 이르는 말.',
+			meaning: '사람됨이 모질고 독살스러워 가까이할 수 없음.',
 			longMeaning:
 				'무는 말의 벌린 아가리와 같고 깨진 독의 예리한 날과 같이 모질다는 뜻으로, 사람됨이 모질고 독살스러워 가까이할 수 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -43482,11 +42670,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 78,
 		},
-
 		{
 			id: 2511,
 			proverb: '무당의 영신(迎神)인가',
-			meaning: '맥없이 있다가도 어떤 일을 맡기면 기쁘게 받아들여 날뛰는 사람을 이르는 말.',
+			meaning: '맥없이 있다가도 어떤 일을 맡기면 기쁘게 받아들여 날뛰는 사람.',
 			longMeaning: '맥없이 있다가도 어떤 일을 맡기면 기쁘게 받아들여 날뛰는 사람을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -43502,11 +42689,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2512,
 			proverb: '무른 감도 쉬어 가면서 먹어라',
-			meaning: '아무리 쉬운 일이라도 한 번 더 확인한 다음에 하는 것이 안전함을 비유적으로 이르는 말.',
+			meaning: '아무리 쉬운 일이라도 한 번 더 확인한 다음에 하는 것이 안전함.',
 			longMeaning: '아무리 쉬운 일이라도 한 번 더 확인한 다음에 하는 것이 안전함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43522,7 +42708,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2513,
 			proverb: '무쇠 두멍을 쓰고 소(沼)에 가 빠졌다',
@@ -43542,7 +42727,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2514,
 			proverb: '무식한 도깨비가 부작을 모른다',
@@ -43562,7 +42746,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2515,
 			proverb: '묵은 거지보다 햇거지가 더 어렵다',
@@ -43582,7 +42765,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2516,
 			proverb: '문경이 충청도 되었다가 경상도가 되었다',
@@ -43602,11 +42784,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 79,
 		},
-
 		{
 			id: 2517,
 			proverb: '문채가 좋은 차복성(車福成)이라',
-			meaning: '용모가 빼어나고 옷차림이 화려한 사람을 비유적으로 이르는 말.',
+			meaning: '용모가 빼어나고 옷차림이 화려한 사람.',
 			longMeaning: '용모가 빼어나고 옷차림이 화려한 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -43622,11 +42803,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2518,
 			proverb: '문풍지 떨어진 데는 풀비가 제격',
-			meaning: '문풍지가 떨어지면 풀비로 풀칠을 하는 것이 좋다는 뜻으로, 격에 맞음을 비유적으로 이르는 말.',
+			meaning: '격에 맞음.',
 			longMeaning: '문풍지가 떨어지면 풀비로 풀칠을 하는 것이 좋다는 뜻으로, 격에 맞음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43642,11 +42822,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2519,
 			proverb: '물고기가 물속에 놓여 나다',
-			meaning: '본래의 영역으로 되돌아와 크게 활약할 수 있게 됨을 비유적으로 이르는 말.',
+			meaning: '본래의 영역으로 되돌아와 크게 활약할 수 있게 됨.',
 			longMeaning: '본래의 영역으로 되돌아와 크게 활약할 수 있게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43662,7 +42841,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2520,
 			proverb: '물도 가다 구비를 친다',
@@ -43682,12 +42860,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 40,
 		},
-
 		{
 			id: 2521,
 			proverb: '물 묻은 바가지에 깨 엉겨 붙듯',
-			meaning:
-				'깨가 있는 곳에 물 묻은 바가지를 놓았을 때 빈자리가 없이 새까맣게 깨가 엉겨 붙는다는 뜻으로, 무엇이 다닥다닥 엉겨 붙는 모양을 비유적으로 이르는 말.',
+			meaning: '무엇이 다닥다닥 엉겨 붙는 모양.',
 			longMeaning:
 				'깨가 있는 곳에 물 묻은 바가지를 놓았을 때 빈자리가 없이 새까맣게 깨가 엉겨 붙는다는 뜻으로, 무엇이 다닥다닥 엉겨 붙는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -43704,11 +42880,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2522,
 			proverb: '물 본 기러기 산 넘어가랴',
-			meaning: '그리운 사람을 본 이가 그대로 지나쳐 가 버릴 리가 없음을 비유적으로 이르는 말.',
+			meaning: '그리운 사람을 본 이가 그대로 지나쳐 가 버릴 리가 없음.',
 			longMeaning: '그리운 사람을 본 이가 그대로 지나쳐 가 버릴 리가 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -43724,11 +42899,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2523,
 			proverb: '물은 근원이 없어지면 끊어지고 나무는 뿌리가 없어지면 죽는다',
-			meaning: '어떤 사물이나 그 근본이 없어지면 존재할 수 없음을 이르는 말.',
+			meaning: '어떤 사물이나 그 근본이 없어지면 존재할 수 없음.',
 			longMeaning: '어떤 사물이나 그 근본이 없어지면 존재할 수 없음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43744,11 +42918,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2524,
 			proverb: '물을 떠난 고기가 물을 그리워한다',
-			meaning: '자기 고향이나 조국을 떠나 있게 되면 고향이나 조국에 대한 그리움이 간절하여짐을 비유적으로 이르는 말.',
+			meaning: '자기 고향이나 조국을 떠나 있게 되면 고향이나 조국에 대한 그리움이 간절하여짐.',
 			longMeaning: '자기 고향이나 조국을 떠나 있게 되면 고향이나 조국에 대한 그리움이 간절하여짐을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -43764,11 +42937,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 70,
 		},
-
 		{
 			id: 2525,
 			proverb: '물이 가야[와야] 배가 오지',
-			meaning: '물에서 가는 돛배인 만큼 물이 있어야 갈 수 있다는 뜻으로, 기회나 경우가 맞아야 일을 제대로 이룰 수 있음을 비유적으로 이르는 말.',
+			meaning: '기회나 경우가 맞아야 일을 제대로 이룰 수 있음.',
 			longMeaning: '물에서 가는 돛배인 만큼 물이 있어야 갈 수 있다는 뜻으로, 기회나 경우가 맞아야 일을 제대로 이룰 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -43784,11 +42956,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 2526,
 			proverb: '물이 너무 맑으면 고기가 아니 모인다[산다]',
-			meaning: '사람이 지나치게 결백하면 남이 따르지 않음을 비유적으로 이르는 말.',
+			meaning: '사람이 지나치게 결백하면 남이 따르지 않음.',
 			longMeaning: '사람이 지나치게 결백하면 남이 따르지 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -43804,7 +42975,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 85,
 		},
-
 		{
 			id: 2527,
 			proverb: '물 좋고 정자 좋은 데가 있으랴',
@@ -43824,11 +42994,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2528,
 			proverb: '물 탄 꾀가 전(全) 꾀를 속이려 한다',
-			meaning: '얕은꾀가 전체의 꾀를 망치게 한다는 뜻으로, 우둔한 사람이 도리어 영리한 사람을 속이려 함을 비유적으로 이르는 말.',
+			meaning: '우둔한 사람이 도리어 영리한 사람을 속이려 함.',
 			longMeaning: '얕은꾀가 전체의 꾀를 망치게 한다는 뜻으로, 우둔한 사람이 도리어 영리한 사람을 속이려 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -43844,12 +43013,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 2529,
 			proverb: '물 퍼런 것도 잘 보면 여러 가지라',
-			meaning:
-				'그저 그렇게 보이는 물도 자세히 보면 여러 가지로 다를 수 있다는 뜻으로, 무엇이나 얼른 보아서는 비슷하게 보여도 자세히 따져 보면 꼭 같은 것이 없음을 비유적으로 이르는 말.',
+			meaning: '무엇이나 얼른 보아서는 비슷하게 보여도 자세히 따져 보면 꼭 같은 것이 없음.',
 			longMeaning:
 				'그저 그렇게 보이는 물도 자세히 보면 여러 가지로 다를 수 있다는 뜻으로, 무엇이나 얼른 보아서는 비슷하게 보여도 자세히 따져 보면 꼭 같은 것이 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -43866,12 +43033,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 79,
 		},
-
 		{
 			id: 2530,
 			proverb: '미꾸라지 한 마리가 온 웅덩이를 흐려 놓는다',
-			meaning:
-				'미꾸라지 한 마리가 흙탕물을 일으켜서 웅덩이의 물을 온통 다 흐리게 한다는 뜻으로, 한 사람의 좋지 않은 행동이 그 집단 전체나 여러 사람에게 나쁜 영향을 미침을 비유적으로 이르는 말.',
+			meaning: '한 사람의 좋지 않은 행동이 그 집단 전체나 여러 사람에게 나쁜 영향을 미침.',
 			longMeaning:
 				'미꾸라지 한 마리가 흙탕물을 일으켜서 웅덩이의 물을 온통 다 흐리게 한다는 뜻으로, 한 사람의 좋지 않은 행동이 그 집단 전체나 여러 사람에게 나쁜 영향을 미침을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -43888,12 +43053,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2531,
 			proverb: '미꾸라지 한 마리가 한강 물을 다 흐리게 한다',
-			meaning:
-				'미꾸라지 한 마리가 흙탕물을 일으켜서 물을 온통 다 흐리게 한다는 뜻으로, 한 사람의 좋지 않은 행동이 그 집단 전체나 여러 사람에게 나쁜 영향을 미침을 비유적으로 이르는 말.',
+			meaning: '한 사람의 좋지 않은 행동이 그 집단 전체나 여러 사람에게 나쁜 영향을 미침.',
 			longMeaning:
 				'미꾸라지 한 마리가 흙탕물을 일으켜서 물을 온통 다 흐리게 한다는 뜻으로, 한 사람의 좋지 않은 행동이 그 집단 전체나 여러 사람에게 나쁜 영향을 미침을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -43910,11 +43073,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2532,
 			proverb: '미련한 놈 가슴의 고드름은 안 녹는다',
-			meaning: '둔하고 못난 사람이 한번 앙심을 품으면 좀처럼 누그러지지 않음을 비유적으로 이르는 말.',
+			meaning: '둔하고 못난 사람이 한번 앙심을 품으면 좀처럼 누그러지지 않음.',
 			longMeaning: '둔하고 못난 사람이 한번 앙심을 품으면 좀처럼 누그러지지 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -43930,7 +43092,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2533,
 			proverb: '미련한 놈 잡아들이라 하면 가난한 놈 잡아들인다',
@@ -43950,7 +43111,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2534,
 			proverb: '미역국 먹고 생선 가시 내랴',
@@ -43970,12 +43130,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 60,
 		},
-
 		{
 			id: 2535,
 			proverb: '미운 개가 주걱 들고 조왕에 오른다',
-			meaning:
-				'미운 개가 못되게도 밥주걱을 물고서 부엌 귀신을 위해 두는 조왕에 오른다는 뜻으로, 미운 것이 더욱더 미운 짓을 하는 경우를 비유적으로 이르는 말.',
+			meaning: '미운 것이 더욱더 미운 짓을 하는 경우.',
 			longMeaning:
 				'미운 개가 못되게도 밥주걱을 물고서 부엌 귀신을 위해 두는 조왕에 오른다는 뜻으로, 미운 것이 더욱더 미운 짓을 하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -43992,11 +43150,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 2536,
 			proverb: '미운 마누라가 죽젓광이에 이 죽인다',
-			meaning: '미운 것이 더욱더 미운 짓만 골라 함을 비유적으로 이르는 말.',
+			meaning: '미운 것이 더욱더 미운 짓만 골라 함.',
 			longMeaning: '미운 것이 더욱더 미운 짓만 골라 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44012,7 +43169,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 71,
 		},
-
 		{
 			id: 2537,
 			proverb: '미운 사람에게는 쫓아가 인사한다',
@@ -44032,7 +43188,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2538,
 			proverb: '미운 파리 잡으려다가 성한 팔이 상한다',
@@ -44054,12 +43209,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 98,
 		},
-
 		{
 			id: 2539,
 			proverb: '미친개가 천연한 체한다',
-			meaning:
-				'미친개가 아무런 병도 없는 듯이 보이려고 천연스럽게 행동한다는 뜻으로, 못되고 악독한 자가 짐짓 점잖은 체한다거나 온전하지 못한 자가 온전한 체하는 경우를 비유적으로 이르는 말.',
+			meaning: '못되고 악독한 자가 짐짓 점잖은 체한다거나 온전하지 못한 자가 온전한 체하는 경우.',
 			longMeaning:
 				'미친개가 아무런 병도 없는 듯이 보이려고 천연스럽게 행동한다는 뜻으로, 못되고 악독한 자가 짐짓 점잖은 체한다거나 온전하지 못한 자가 온전한 체하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44076,7 +43229,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2540,
 			proverb: '미친개가 호랑이 잡는다',
@@ -44097,12 +43249,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2541,
 			proverb: '미친년의 속곳 가랑이 빠지듯',
-			meaning:
-				'미친 여자가 옷을 입을 때 매고 여미고 하는 것을 단정하게 못하여 속곳이 겉으로 비어져 나온다는 뜻으로, 옷매무시가 단정하지 못함을 비유적으로 이르는 말.',
+			meaning: '옷매무시가 단정하지 못함.',
 			longMeaning:
 				'미친 여자가 옷을 입을 때 매고 여미고 하는 것을 단정하게 못하여 속곳이 겉으로 비어져 나온다는 뜻으로, 옷매무시가 단정하지 못함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44119,12 +43269,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2542,
 			proverb: '밀밭만 지나가도 주정한다',
-			meaning:
-				'밀은 베어서 털고 찧어야 술누룩을 만들 수 있는 것인데 밀밭만 지나가도 술을 마신 것처럼 주정한다는 뜻으로, 전혀 술을 못 먹음을 비유적으로 이르는 말.',
+			meaning: '전혀 술을 못 먹음.',
 			longMeaning:
 				'밀은 베어서 털고 찧어야 술누룩을 만들 수 있는 것인데 밀밭만 지나가도 술을 마신 것처럼 주정한다는 뜻으로, 전혀 술을 못 먹음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44141,12 +43289,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2543,
 			proverb: '밀밭만 지나가도 취한다',
-			meaning:
-				'밀은 베어서 털고 찧어야 술누룩을 만들 수 있는 것인데 밀밭만 지나가도 술을 마신 것처럼 취한다는 뜻으로, 전혀 술을 못 먹음을 비유적으로 이르는 말.',
+			meaning: '전혀 술을 못 먹음.',
 			longMeaning:
 				'밀은 베어서 털고 찧어야 술누룩을 만들 수 있는 것인데 밀밭만 지나가도 술을 마신 것처럼 취한다는 뜻으로, 전혀 술을 못 먹음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44163,11 +43309,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2544,
 			proverb: '밑구멍이 찢어지게[째지게] 가난하다',
-			meaning: '몹시 가난함을 이르는 말.',
+			meaning: '몹시 가난함.',
 			longMeaning: '몹시 가난함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44183,12 +43328,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2545,
 			proverb: '밑 빠진 독[가마/항아리]에 물 붓기',
-			meaning:
-				'밑 빠진 독에 아무리 물을 부어도 독이 채워질 수 없다는 뜻으로, 아무리 힘이나 밑천을 들여도 보람 없이 헛된 일이 되는 상태를 비유적으로 이르는 말.',
+			meaning: '아무리 힘이나 밑천을 들여도 보람 없이 헛된 일이 되는 상태.',
 			longMeaning:
 				'밑 빠진 독에 아무리 물을 부어도 독이 채워질 수 없다는 뜻으로, 아무리 힘이나 밑천을 들여도 보람 없이 헛된 일이 되는 상태를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44205,11 +43348,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2546,
 			proverb: '바늘 가는 데 실 가고 바람 가는 데 구름 간다',
-			meaning: '바늘이 가는 데 실이 항상 뒤따르고 바람이 가는 데 구름이 뒤따른다는 뜻으로, 사람의 긴밀한 관계를 비유적으로 이르는 말.',
+			meaning: '사람의 긴밀한 관계.',
 			longMeaning: '바늘이 가는 데 실이 항상 뒤따르고 바람이 가는 데 구름이 뒤따른다는 뜻으로, 사람의 긴밀한 관계를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -44225,7 +43367,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2547,
 			proverb: '바늘 가진 사람이 도끼 가진 사람 이긴다',
@@ -44245,11 +43386,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 84,
 		},
-
 		{
 			id: 2548,
 			proverb: '바다에 가서 토끼 찾기',
-			meaning: '땅에서 사는 토끼를 바다에서 구한다는 뜻으로 도저히 불가능한 일을 하려고 애쓰는 어리석음을 비유적으로 이르는 말.',
+			meaning: '땅에서 사는 토끼를 바다에서 구한다는 뜻으로 도저히 불가능한 일을 하려고 애쓰는 어리석음.',
 			longMeaning: '땅에서 사는 토끼를 바다에서 구한다는 뜻으로 도저히 불가능한 일을 하려고 애쓰는 어리석음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44265,11 +43405,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2549,
 			proverb: '바닷가 개는 호랑이 무서운 줄 모른다',
-			meaning: '겪어 보지 않았거나 어리석어서 사리에 어두움을 비유적으로 이르는 말.',
+			meaning: '겪어 보지 않았거나 어리석어서 사리에 어두움.',
 			longMeaning: '겪어 보지 않았거나 어리석어서 사리에 어두움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44285,12 +43424,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 2550,
 			proverb: '바람 부는 날 가루 팔러 가듯',
-			meaning:
-				'가루를 펼쳐 놓지도 못할 정도로 바람이 부는 험상한 날에 가루를 팔러 나간다는 뜻으로, 모든 일에서 그 알맞은 기회를 알지 못함을 비유적으로 이르는 말.',
+			meaning: '모든 일에서 그 알맞은 기회를 알지 못함.',
 			longMeaning:
 				'가루를 펼쳐 놓지도 못할 정도로 바람이 부는 험상한 날에 가루를 팔러 나간다는 뜻으로, 모든 일에서 그 알맞은 기회를 알지 못함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44307,12 +43444,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2551,
 			proverb: '바위 속에도 용수가 있다',
-			meaning:
-				'굳은 바위 속에서도 비집고 돌아설 수 있는 틈이 있다는 뜻으로, 아무런 방도가 없는 것같이 보이는 경우라도 거기에는 반드시 어떤 해결책이 있기 마련임을 비유적으로 이르는 말.',
+			meaning: '아무런 방도가 없는 것같이 보이는 경우라도 거기에는 반드시 어떤 해결책이 있기 마련임.',
 			longMeaning:
 				'굳은 바위 속에서도 비집고 돌아설 수 있는 틈이 있다는 뜻으로, 아무런 방도가 없는 것같이 보이는 경우라도 거기에는 반드시 어떤 해결책이 있기 마련임을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44329,11 +43464,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2552,
 			proverb: '바지가랭이에서 비파 소리가 난다',
-			meaning: '매우 바삐 진행되거나 움직이는 모양을 비유적으로 이르는 말.',
+			meaning: '매우 바삐 진행되거나 움직이는 모양.',
 			longMeaning: '매우 바삐 진행되거나 움직이는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44349,11 +43483,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2553,
 			proverb: '바지가랭이에서 자개바람이 인다',
-			meaning: '매우 바삐 진행되거나 움직이는 모양을 비유적으로 이르는 말.',
+			meaning: '매우 바삐 진행되거나 움직이는 모양.',
 			longMeaning: '매우 바삐 진행되거나 움직이는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44369,7 +43502,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2554,
 			proverb: '반자가 얕다 하고 펄펄 뛰다',
@@ -44389,11 +43521,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2555,
 			proverb: '반찬 항아리가 열둘이라도 서방님 비위를 못 맞추겠다',
-			meaning: '성미가 몹시 까다로워 비위 맞추기가 어려움을 비유적으로 이르는 말.',
+			meaning: '성미가 몹시 까다로워 비위 맞추기가 어려움.',
 			longMeaning: '성미가 몹시 까다로워 비위 맞추기가 어려움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44409,11 +43540,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2556,
 			proverb: '발가락의 티눈만큼도 안 여긴다',
-			meaning: '발가락에 난 귀찮은 티눈만큼도 여기지 아니한다는 뜻으로, 남을 몹시 업신여김을 비유적으로 이르는 말.',
+			meaning: '남을 몹시 업신여김.',
 			longMeaning: '발가락에 난 귀찮은 티눈만큼도 여기지 아니한다는 뜻으로, 남을 몹시 업신여김을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -44429,11 +43559,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2557,
 			proverb: '발가벗고 달밤에 체조하다',
-			meaning: '분별없고 체통 없는 짓을 함을 비유적으로 이르는 말.',
+			meaning: '분별없고 체통 없는 짓을 함.',
 			longMeaning: '분별없고 체통 없는 짓을 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44449,12 +43578,12 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2558,
 			proverb: '발길도 이불깃을 봐 가면서 펴야 한다',
-			meaning: '\'누울 자리 봐 가며 발을 뻗어라\'의 북한 속담.',
-			longMeaning: '\'누울 자리 봐 가며 발을 뻗어라\'의 북한 속담 이르는 말.',
+			meaning: "'누울 자리 봐 가며 발을 뻗어라'의 북한 속담.",
+			longMeaning:
+				"'누울 자리 봐 가며 발을 뻗어라'의 북한 속담. 어떤 일을 하려고 할 때에는 먼저 결과가 어떻게 될 것인가를 생각해 보고 시작하라는 뜻을 이르는 말.",
 			sameProverb: [],
 			category: '세상 이치',
 			level: 4,
@@ -44469,11 +43598,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 2559,
 			proverb: '발바닥이 두터우면 배가죽도 두텁다',
-			meaning: '발바닥이 두꺼워지도록 부지런히 일을 하게 되면 그만큼 풍족한 생활을 누리게 됨을 비유적으로 이르는 말.',
+			meaning: '발바닥이 두꺼워지도록 부지런히 일을 하게 되면 그만큼 풍족한 생활을 누리게 됨.',
 			longMeaning: '발바닥이 두꺼워지도록 부지런히 일을 하게 되면 그만큼 풍족한 생활을 누리게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '근면/검소',
@@ -44489,11 +43617,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2560,
 			proverb: '발보다 발가락이 더 크다',
-			meaning: '일이 도리와 반대가 되는 경우를 비유적으로 이르는 말.',
+			meaning: '일이 도리와 반대가 되는 경우.',
 			longMeaning: '일이 도리와 반대가 되는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44509,12 +43636,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2561,
 			proverb: '발(을) 벗고 따라가도 못 따르겠다',
-			meaning:
-				'신발까지 벗고 쫓아가도 따라가지 못하겠다는 뜻으로, 능력이나 수준의 차이가 너무 심해서 경쟁 상대가 되지 못하는 경우를 비유적으로 이르는 말.',
+			meaning: '능력이나 수준의 차이가 너무 심해서 경쟁 상대가 되지 못하는 경우.',
 			longMeaning:
 				'신발까지 벗고 쫓아가도 따라가지 못하겠다는 뜻으로, 능력이나 수준의 차이가 너무 심해서 경쟁 상대가 되지 못하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44531,7 +43656,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2562,
 			proverb: '밤말은 쥐가 듣고 낮말은 새가 듣는다',
@@ -44551,12 +43675,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2563,
 			proverb: '밤새도록 가도 문 못 들기',
-			meaning:
-				'밤새도록 갔으나 끝내 성문 안에는 들어가지 못했다는 뜻으로, 몹시 애를 썼으나 제 기한에 미치지 못하여 애쓴 보람이 없게 된 경우를 비유적으로 이르는 말.',
+			meaning: '몹시 애를 썼으나 제 기한에 미치지 못하여 애쓴 보람이 없게 된 경우.',
 			longMeaning:
 				'밤새도록 갔으나 끝내 성문 안에는 들어가지 못했다는 뜻으로, 몹시 애를 썼으나 제 기한에 미치지 못하여 애쓴 보람이 없게 된 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44573,7 +43695,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2564,
 			proverb: '밤새도록 울다가 누가 죽었느냐고 한다',
@@ -44595,11 +43716,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2565,
 			proverb: '밥은 열 곳에 가 먹어도 잠은 한 곳에서 자랬다',
-			meaning: '아무리 여러 곳을 다니며 밥을 먹는 한이 있어도 잠자리만은 바로 가져야 한다는 뜻으로, 사람은 거처가 일정해야 함을 비유적으로 이르는 말.',
+			meaning: '사람은 거처가 일정해야 함.',
 			longMeaning:
 				'아무리 여러 곳을 다니며 밥을 먹는 한이 있어도 잠자리만은 바로 가져야 한다는 뜻으로, 사람은 거처가 일정해야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44616,12 +43736,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2566,
 			proverb: '방귀가 잦으면 똥 싸기 쉽다',
-			meaning:
-				'어떤 현상과 연관이 있는 징조가 자주 나타나게 되면 필경 그 현상이 생기기 마련이라는 뜻으로, 무슨 일이나 소문이 잦으면 실현되기 쉬움을 비유적으로 이르는 말.',
+			meaning: '무슨 일이나 소문이 잦으면 실현되기 쉬움.',
 			longMeaning:
 				'어떤 현상과 연관이 있는 징조가 자주 나타나게 되면 필경 그 현상이 생기기 마련이라는 뜻으로, 무슨 일이나 소문이 잦으면 실현되기 쉬움을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44638,12 +43756,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2567,
 			proverb: '방망이가 가벼우면 주름이 잡힌다',
-			meaning:
-				'다듬이질을 할 때에 다듬잇방망이가 가벼우면 주름이 펴지지 않는다는 뜻으로, 통솔과 감독이 엄중하지 않으면 부실한 곳이 생김을 비유적으로 이르는 말.',
+			meaning: '통솔과 감독이 엄중하지 않으면 부실한 곳이 생김.',
 			longMeaning:
 				'다듬이질을 할 때에 다듬잇방망이가 가벼우면 주름이 펴지지 않는다는 뜻으로, 통솔과 감독이 엄중하지 않으면 부실한 곳이 생김을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44660,12 +43776,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 2568,
 			proverb: '방에 가면 더 먹을까 부엌에 가면 더 먹을까',
-			meaning:
-				'남보다 더 먹기 위하여 방에 들어갈까 부엌에 들어갈까 타산한다는 뜻으로, 어느 쪽이 더 이익이 많을까 하고 잇속을 따지느라 망설임을 비유적으로 이르는 말.',
+			meaning: '어느 쪽이 더 이익이 많을까 하고 잇속을 따지느라 망설임.',
 			longMeaning:
 				'남보다 더 먹기 위하여 방에 들어갈까 부엌에 들어갈까 타산한다는 뜻으로, 어느 쪽이 더 이익이 많을까 하고 잇속을 따지느라 망설임을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44682,11 +43796,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 97,
 		},
-
 		{
 			id: 2569,
 			proverb: '방에서는 매부 말이 옳고 부엌에 가면 누이 말이 옳다',
-			meaning: '양편의 말이 모두 일리가 있어서 시비를 가리기가 어려운 경우를 비유적으로 이르는 말.',
+			meaning: '양편의 말이 모두 일리가 있어서 시비를 가리기가 어려운 경우.',
 			longMeaning: '양편의 말이 모두 일리가 있어서 시비를 가리기가 어려운 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44702,7 +43815,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2570,
 			proverb: '방죽을 파야 개구리가 뛰어들지',
@@ -44724,11 +43836,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 2571,
 			proverb: '배가 남산만[앞 남산만] 하다',
-			meaning: '배가 불러 앞으로 나왔다는 뜻으로, 임신부의 배가 부름을 비유적으로 이르는 말.',
+			meaning: '임신부의 배가 부름.',
 			longMeaning: '배가 불러 앞으로 나왔다는 뜻으로, 임신부의 배가 부름을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44744,12 +43855,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2572,
 			proverb: '배고픈 호랑이가 원님을 알아보나',
-			meaning:
-				'배고픈 호랑이가 원님이라고 사정을 보아주지 아니한다는 뜻으로, 사람이 극히 가난하고 굶주리는 지경에 이르면 아무것도 가리지 않고 분별없는 짓까지 마구 하게 됨을 비유적으로 이르는 말.',
+			meaning: '사람이 극히 가난하고 굶주리는 지경에 이르면 아무것도 가리지 않고 분별없는 짓까지 마구 하게 됨.',
 			longMeaning:
 				'배고픈 호랑이가 원님이라고 사정을 보아주지 아니한다는 뜻으로, 사람이 극히 가난하고 굶주리는 지경에 이르면 아무것도 가리지 않고 분별없는 짓까지 마구 하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -44766,11 +43875,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 81,
 		},
-
 		{
 			id: 2573,
 			proverb: '백두산이 무너지나 동해수가 메어지나',
-			meaning: '서로 싸울 때 끝까지 겨루어 보자고 벼르며 이르는 말.',
+			meaning: '서로 싸울 때 끝까지 겨루어 보자고 벼르며.',
 			longMeaning: '서로 싸울 때 끝까지 겨루어 보자고 벼르며 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44786,7 +43894,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2574,
 			proverb: '백 일 장마에도 하루만 더 비가 왔으면 한다',
@@ -44806,12 +43913,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 83,
 		},
-
 		{
 			id: 2575,
 			proverb: '백장이 양반 행세를 하면 개가 짖는다',
-			meaning:
-				'백정이 잘 입고 점잔을 부려 양반 행세를 하려 하나 고기 냄새가 나 개가 짖는다는 뜻으로, 겉모양을 잘 꾸미어도 본색은 감추기 어려움을 이르는 말.',
+			meaning: '겉모양을 잘 꾸미어도 본색은 감추기 어려움.',
 			longMeaning:
 				'백정이 잘 입고 점잔을 부려 양반 행세를 하려 하나 고기 냄새가 나 개가 짖는다는 뜻으로, 겉모양을 잘 꾸미어도 본색은 감추기 어려움을 이르는 말.',
 			sameProverb: [],
@@ -44828,11 +43933,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 82,
 		},
-
 		{
 			id: 2576,
 			proverb: '백정 년 가마 타고 모퉁이 도는 격',
-			meaning: '실상은 흉악하면서 그것을 잘 모르는 사람 앞에서는 훌륭한 체하고 꾸미는 경우를 비유적으로 이르는 말.',
+			meaning: '실상은 흉악하면서 그것을 잘 모르는 사람 앞에서는 훌륭한 체하고 꾸미는 경우.',
 			longMeaning: '실상은 흉악하면서 그것을 잘 모르는 사람 앞에서는 훌륭한 체하고 꾸미는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -44848,11 +43952,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 2577,
 			proverb: '백정도 올가미가 있어야 한다',
-			meaning: '장사에는 밑천이 있어야 한다는 뜻으로, 준비 없이는 어떤 일을 이룰 수 없음을 이르는 말.',
+			meaning: '준비 없이는 어떤 일을 이룰 수 없음.',
 			longMeaning: '장사에는 밑천이 있어야 한다는 뜻으로, 준비 없이는 어떤 일을 이룰 수 없음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44868,12 +43971,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2578,
 			proverb: '백정이 가마를 타면 동네 개가 짖는다',
-			meaning:
-				'백정이 잘 입고 점잔을 부려 양반 행세를 하려 하나 고기 냄새가 나 개가 짖는다는 뜻으로, 겉모양을 잘 꾸미어도 본색은 감추기 어려움을 이르는 말.',
+			meaning: '겉모양을 잘 꾸미어도 본색은 감추기 어려움.',
 			longMeaning:
 				'백정이 잘 입고 점잔을 부려 양반 행세를 하려 하나 고기 냄새가 나 개가 짖는다는 뜻으로, 겉모양을 잘 꾸미어도 본색은 감추기 어려움을 이르는 말.',
 			sameProverb: [],
@@ -44890,12 +43991,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 82,
 		},
-
 		{
 			id: 2579,
 			proverb: '백쥐가 나와 춤을 추고 초상상제가 나와 웃을 노릇이다',
-			meaning:
-				'밝은 데를 싫어하는 흰쥐조차 기뻐서 뛰어나와 춤을 추고 슬픔에 잠겨 있는 초상집의 상제들이 나와서 웃지 않을 수 없는 노릇이라는 뜻으로, 하는 짓이 너무 우습고 망측스러워 웃음을 참으려야 참을 수 없음을 이르는 말.',
+			meaning: '하는 짓이 너무 우습고 망측스러워 웃음을 참으려야 참을 수 없음.',
 			longMeaning:
 				'밝은 데를 싫어하는 흰쥐조차 기뻐서 뛰어나와 춤을 추고 슬픔에 잠겨 있는 초상집의 상제들이 나와서 웃지 않을 수 없는 노릇이라는 뜻으로, 하는 짓이 너무 우습고 망측스러워 웃음을 참으려야 참을 수 없음을 이르는 말.',
 			sameProverb: [],
@@ -44912,11 +44011,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2580,
 			proverb: '뱁새가 수리를 낳는다',
-			meaning: '못난 어버이한테서 훌륭한 아들이 난 경우를 비유적으로 이르는 말.',
+			meaning: '못난 어버이한테서 훌륭한 아들이 난 경우.',
 			longMeaning: '못난 어버이한테서 훌륭한 아들이 난 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44932,11 +44030,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2581,
 			proverb: '뱃가죽이 땅 두께 같다',
-			meaning: '뱃가죽이 땅 두께처럼 두껍다는 뜻으로, 염치가 없거나 배짱이 셈을 비유적으로 이르는 말.',
+			meaning: '염치가 없거나 배짱이 셈.',
 			longMeaning: '뱃가죽이 땅 두께처럼 두껍다는 뜻으로, 염치가 없거나 배짱이 셈을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44952,11 +44049,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2582,
 			proverb: '번개가 잦으면 벼락 늧이라',
-			meaning: '나쁜 일이 잦으면 결국에는 큰 봉변을 보게 됨을 비유적으로 이르는 말.',
+			meaning: '나쁜 일이 잦으면 결국에는 큰 봉변을 보게 됨.',
 			longMeaning: '나쁜 일이 잦으면 결국에는 큰 봉변을 보게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -44972,11 +44068,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2583,
 			proverb: '번개가 잦으면 천둥을 한다',
-			meaning: '어떤 일의 징조가 잦으면 반드시 그 일이 생기기 마련임을 비유적으로 이르는 말.',
+			meaning: '어떤 일의 징조가 잦으면 반드시 그 일이 생기기 마련임.',
 			longMeaning: '어떤 일의 징조가 잦으면 반드시 그 일이 생기기 마련임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -44992,11 +44087,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2584,
 			proverb: '벋어 가는 칡도 한(限)이 있다',
-			meaning: '칡이 기세 좋게 벋어 나가지만 그것도 한계가 있다는 뜻으로, 무엇이나 성하는 것도 한도가 있음을 이르는 말.',
+			meaning: '무엇이나 성하는 것도 한도가 있음.',
 			longMeaning: '칡이 기세 좋게 벋어 나가지만 그것도 한계가 있다는 뜻으로, 무엇이나 성하는 것도 한도가 있음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45012,11 +44106,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 2585,
 			proverb: '범 가는 데 바람 간다',
-			meaning: '반드시 같이 다녀서 둘이 서로 떠나지 아니할 경우를 비유적으로 이르는 말.',
+			meaning: '반드시 같이 다녀서 둘이 서로 떠나지 아니할 경우.',
 			longMeaning: '반드시 같이 다녀서 둘이 서로 떠나지 아니할 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45032,7 +44125,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2586,
 			proverb: '범 대가리에 개고기',
@@ -45052,11 +44144,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2587,
 			proverb: '범도 죽을 때 제 굴에 가서 죽는다',
-			meaning: '누구나 죽을 때는 자기가 난 고장을 그리워함을 비유적으로 이르는 말.',
+			meaning: '누구나 죽을 때는 자기가 난 고장을 그리워함.',
 			longMeaning: '누구나 죽을 때는 자기가 난 고장을 그리워함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45072,11 +44163,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2588,
 			proverb: '범 아가리에 날고기 넣은 셈',
-			meaning: '염치와 예의도 모르는 사람에게 그 사람이 좋아하는 물건을 맡겨 놓으면 영락없이 그 물건을 잃게 됨을 비유적으로 이르는 말.',
+			meaning: '염치와 예의도 모르는 사람에게 그 사람이 좋아하는 물건을 맡겨 놓으면 영락없이 그 물건을 잃게 됨.',
 			longMeaning: '염치와 예의도 모르는 사람에게 그 사람이 좋아하는 물건을 맡겨 놓으면 영락없이 그 물건을 잃게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -45092,7 +44182,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2589,
 			proverb: '범에게 물려 가도 정신만 차리면 산다',
@@ -45112,7 +44201,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2590,
 			proverb: '범에게 열두 번 물려 가도 정신을 놓지 말라',
@@ -45132,7 +44220,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 87,
 		},
-
 		{
 			id: 2591,
 			proverb: '범을 보니 무섭고 범 가죽을 보니 탐난다',
@@ -45152,11 +44239,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 78,
 		},
-
 		{
 			id: 2592,
 			proverb: '범(의) 굴에 들어가야 범을 잡는다',
-			meaning: '뜻하는 성과를 얻으려면 그에 마땅한 일을 하여야 함을 비유적으로 이르는 말.',
+			meaning: '뜻하는 성과를 얻으려면 그에 마땅한 일을 하여야 함.',
 			longMeaning: '뜻하는 성과를 얻으려면 그에 마땅한 일을 하여야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45172,11 +44258,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2593,
 			proverb: '범이 사람 셋을 잡아먹으면 귀가 째진다',
-			meaning: '악한 짓을 하면 겉으로도 반드시 나타나기 마련임을 비유적으로 이르는 말.',
+			meaning: '악한 짓을 하면 겉으로도 반드시 나타나기 마련임.',
 			longMeaning: '악한 짓을 하면 겉으로도 반드시 나타나기 마련임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45192,7 +44277,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 78,
 		},
-
 		{
 			id: 2594,
 			proverb: '범 잡아먹는 담비가 있다',
@@ -45212,12 +44296,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 42,
 		},
-
 		{
 			id: 2595,
 			proverb: '법 모르는 관리가 볼기로 위세 부린다',
-			meaning:
-				'법 규정이 어떻게 되어 있는지 알지 못하는 벼슬아치가 덮어놓고 볼기를 치며 위세를 부린다는 뜻으로, 실력이 없는 자가 덮어놓고 우격다짐으로 일을 처리하는 경우를 비유적으로 이르는 말.',
+			meaning: '실력이 없는 자가 덮어놓고 우격다짐으로 일을 처리하는 경우.',
 			longMeaning:
 				'법 규정이 어떻게 되어 있는지 알지 못하는 벼슬아치가 덮어놓고 볼기를 치며 위세를 부린다는 뜻으로, 실력이 없는 자가 덮어놓고 우격다짐으로 일을 처리하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -45234,12 +44316,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 89,
 		},
-
 		{
 			id: 2596,
 			proverb: '벙거지 조각에 콩가루 묻혀 먹을 놈',
-			meaning:
-				'털로 만든 벙거지 조각에 아무리 콩가루를 묻혀도 먹을 것이 없는데 그것을 먹는다는 뜻으로, 못 할 짓을 하여 재물을 남몰래 빼앗아 가는 자를 비유적으로 이르는 말.',
+			meaning: '못 할 짓을 하여 재물을 남몰래 빼앗아 가는 자.',
 			longMeaning:
 				'털로 만든 벙거지 조각에 아무리 콩가루를 묻혀도 먹을 것이 없는데 그것을 먹는다는 뜻으로, 못 할 짓을 하여 재물을 남몰래 빼앗아 가는 자를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -45256,11 +44336,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 81,
 		},
-
 		{
 			id: 2597,
 			proverb: '벙어리가 서방질을 해도 제 속이 있다',
-			meaning: '말은 하지 않더라도 제 딴에는 정당한 이유도 있고 뜻도 있음을 비유적으로 이르는 말.',
+			meaning: '말은 하지 않더라도 제 딴에는 정당한 이유도 있고 뜻도 있음.',
 			longMeaning: '말은 하지 않더라도 제 딴에는 정당한 이유도 있고 뜻도 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45276,12 +44355,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2598,
 			proverb: '벙어리가 증문 가지고 있는 격',
-			meaning:
-				'말 못 하는 벙어리가 어떤 사실을 증명하는 문서를 가지고 있으면서도 똑바로 증언할 수 없다는 뜻으로, 정당한 이유나 근거를 가지고도 내세워 증명할 수 없는 경우를 비유적으로 이르는 말.',
+			meaning: '정당한 이유나 근거를 가지고도 내세워 증명할 수 없는 경우.',
 			longMeaning:
 				'말 못 하는 벙어리가 어떤 사실을 증명하는 문서를 가지고 있으면서도 똑바로 증언할 수 없다는 뜻으로, 정당한 이유나 근거를 가지고도 내세워 증명할 수 없는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -45298,11 +44375,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 2599,
 			proverb: '벙어리 소를 몰고 가듯',
-			meaning: '말 못 하는 벙어리가 아무 말도 없이 소를 몰면서 간다는 뜻으로, 아무 말 없이 앞서거니 뒤서거니 걷기만 하는 모양을 비유적으로 이르는 말.',
+			meaning: '아무 말 없이 앞서거니 뒤서거니 걷기만 하는 모양.',
 			longMeaning:
 				'말 못 하는 벙어리가 아무 말도 없이 소를 몰면서 간다는 뜻으로, 아무 말 없이 앞서거니 뒤서거니 걷기만 하는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -45319,11 +44395,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2600,
 			proverb: '벙어리 속은 벙어리가 안다',
-			meaning: '같은 처지에 있는 사람이라야 그 마음을 알 수 있음을 비유적으로 이르는 말.',
+			meaning: '같은 처지에 있는 사람이라야 그 마음을 알 수 있음.',
 			longMeaning: '같은 처지에 있는 사람이라야 그 마음을 알 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -45339,11 +44414,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2601,
 			proverb: '베 고의에 방귀 나가듯',
-			meaning: '무엇이 사방으로 쉽게 잘 퍼져 나가는 모양을 비유적으로 이르는 말.',
+			meaning: '무엇이 사방으로 쉽게 잘 퍼져 나가는 모양.',
 			longMeaning: '무엇이 사방으로 쉽게 잘 퍼져 나가는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45359,12 +44433,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 42,
 		},
-
 		{
 			id: 2602,
 			proverb: '베돌던 닭도 때가 되면 홰 안에 찾아든다',
-			meaning:
-				'홰에 오르지 않고 베돌기만 하던 닭도 때가 되어 자야겠다고 생각하면 절로 홰 안에 찾아오기 마련이라는 뜻으로, 서로 어울리지 않고 따로 놀던 사람도 때가 되면 언젠가는 다시 돌아올 때가 있음을 비유적으로 이르는 말.',
+			meaning: '서로 어울리지 않고 따로 놀던 사람도 때가 되면 언젠가는 다시 돌아올 때가 있음.',
 			longMeaning:
 				'홰에 오르지 않고 베돌기만 하던 닭도 때가 되어 자야겠다고 생각하면 절로 홰 안에 찾아오기 마련이라는 뜻으로, 서로 어울리지 않고 따로 놀던 사람도 때가 되면 언젠가는 다시 돌아올 때가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -45381,11 +44453,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2603,
 			proverb: '벼락에는 바가지라도 쓴다[뒤집어쓴다]',
-			meaning: '액운이나 재화(災禍)는 무슨 짓을 하더라도 면하기 어려움을 비유적으로 이르는 말.',
+			meaning: '액운이나 재화(災禍)는 무슨 짓을 하더라도 면하기 어려움.',
 			longMeaning: '액운이나 재화(災禍)는 무슨 짓을 하더라도 면하기 어려움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45401,11 +44472,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2604,
 			proverb: '벼락에는 오히려 바가지를 쓴다',
-			meaning: '액운이나 재화(災禍)는 무슨 짓을 하더라도 면하기 어려움을 비유적으로 이르는 말.',
+			meaning: '액운이나 재화(災禍)는 무슨 짓을 하더라도 면하기 어려움.',
 			longMeaning: '액운이나 재화(災禍)는 무슨 짓을 하더라도 면하기 어려움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45421,12 +44491,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2605,
 			proverb: '벼린 도끼가 이 빠진다',
-			meaning:
-				'애써서 벼린 도끼의 날이 그만 이가 빠져서 꼴사납게 되었다는 뜻으로, 공을 들여 잘 장만한 것이 오히려 빨리 못쓰게 되는 경우를 비유적으로 이르는 말.',
+			meaning: '공을 들여 잘 장만한 것이 오히려 빨리 못쓰게 되는 경우.',
 			longMeaning:
 				'애써서 벼린 도끼의 날이 그만 이가 빠져서 꼴사납게 되었다는 뜻으로, 공을 들여 잘 장만한 것이 오히려 빨리 못쓰게 되는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -45443,11 +44511,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 2606,
 			proverb: '벽에도 귀가 있다',
-			meaning: '비밀은 없기 때문에 경솔히 말하지 말 것을 비유적으로 이르는 말.',
+			meaning: '비밀은 없기 때문에 경솔히 말하지 말 것.',
 			longMeaning: '비밀은 없기 때문에 경솔히 말하지 말 것을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45463,11 +44530,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2607,
 			proverb: '벽을 치면 대들보가 울린다',
-			meaning: '암시만 주어도 곧 눈치를 채고 의사소통이 이루어짐을 비유적으로 이르는 말.',
+			meaning: '암시만 주어도 곧 눈치를 채고 의사소통이 이루어짐.',
 			longMeaning: '암시만 주어도 곧 눈치를 채고 의사소통이 이루어짐을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -45483,12 +44549,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2608,
 			proverb: '병든 놈 두고 약 지으러 가니 약국도 두건을 썼더란다[썼더라 한다]',
-			meaning:
-				'환자가 생겨 약 지으러 약국에 뛰어가니 약국은 자기보다 더 하게 이미 상사(喪事)를 만나 두건을 쓰고 있었다는 뜻으로, 가도 소용이 없으니 갈 필요가 없음을 비유적으로 이르는 말.',
+			meaning: '가도 소용이 없으니 갈 필요가 없음.',
 			longMeaning:
 				'환자가 생겨 약 지으러 약국에 뛰어가니 약국은 자기보다 더 하게 이미 상사(喪事)를 만나 두건을 쓰고 있었다는 뜻으로, 가도 소용이 없으니 갈 필요가 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -45505,11 +44569,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2609,
 			proverb: '병에 찬 물은 저어도 소리가 나지 않는다',
-			meaning: '교양이 있고 수양을 쌓은 사람일수록 겸손하고 남 앞에서 자기를 내세우려 하지 않는다는 것을 비유적으로 이르는 말.',
+			meaning: '교양이 있고 수양을 쌓은 사람일수록 겸손하고 남 앞에서 자기를 내세우려 하지 않는다는 것.',
 			longMeaning: '교양이 있고 수양을 쌓은 사람일수록 겸손하고 남 앞에서 자기를 내세우려 하지 않는다는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -45525,11 +44588,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 84,
 		},
-
 		{
 			id: 2610,
 			proverb: '병은 한 가지 약은 천 가지',
-			meaning: '한 가지 병에 대하여 그 치료법이 매우 많음을 이르는 말.',
+			meaning: '한 가지 병에 대하여 그 치료법이 매우 많음.',
 			longMeaning: '한 가지 병에 대하여 그 치료법이 매우 많음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45545,12 +44607,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2611,
 			proverb: '보름달 밝아 구황 타러 가기 좋다',
-			meaning:
-				'구황으로 나눠 주는 곡식을 타러 가는데 달이 밝으니 어두운 것보다는 좋다는 뜻으로, 별로 내키지 않는 일을 하는 데 약간의 좋은 조건이 갖추어졌음을 비유적으로 이르는 말.',
+			meaning: '별로 내키지 않는 일을 하는 데 약간의 좋은 조건이 갖추어졌음.',
 			longMeaning:
 				'구황으로 나눠 주는 곡식을 타러 가는데 달이 밝으니 어두운 것보다는 좋다는 뜻으로, 별로 내키지 않는 일을 하는 데 약간의 좋은 조건이 갖추어졌음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -45567,11 +44627,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 2612,
 			proverb: '보리 가시랭이가 까다로우냐 괭이 가시랭이가 까다로우냐',
-			meaning: '매우 성미가 까다로움을 비유적으로 이르는 말.',
+			meaning: '매우 성미가 까다로움.',
 			longMeaning: '매우 성미가 까다로움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45587,11 +44646,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2613,
 			proverb: '보리로 담근 술 보리 냄새가 안 빠진다',
-			meaning: '제 본성은 그대로 지님을 비유적으로 이르는 말.',
+			meaning: '제 본성은 그대로 지님.',
 			longMeaning: '제 본성은 그대로 지님을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45607,11 +44665,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2614,
 			proverb: '보리를 베면서 가라면 하루에 갈 길을 평지에서 걸어가라면 닷새도 더 걸린다',
-			meaning: '숙련된 일은 시간 가는 줄도 모르고 힘든 줄도 모르게 빠르지만 그렇지 못한 일은 매우 더딤을 비유적으로 이르는 말.',
+			meaning: '숙련된 일은 시간 가는 줄도 모르고 힘든 줄도 모르게 빠르지만 그렇지 못한 일은 매우 더딤.',
 			longMeaning: '숙련된 일은 시간 가는 줄도 모르고 힘든 줄도 모르게 빠르지만 그렇지 못한 일은 매우 더딤을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45627,11 +44684,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2615,
 			proverb: '보리밭만 지나가도 주정한다',
-			meaning: '술을 먹지 않고 술을 만드는 재료인 보리를 심은 밭만 지나가도 주정한다는 뜻으로, 성미가 급하여 일을 서두름을 비유적으로 이르는 말.',
+			meaning: '성미가 급하여 일을 서두름.',
 			longMeaning: '술을 먹지 않고 술을 만드는 재료인 보리를 심은 밭만 지나가도 주정한다는 뜻으로, 성미가 급하여 일을 서두름을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45647,11 +44703,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2616,
 			proverb: '보리밭에 가 숭늉 찾는다',
-			meaning: '모든 일에는 질서와 차례가 있는 법인데 일의 순서도 모르고 성급하게 덤빔을 비유적으로 이르는 말.',
+			meaning: '모든 일에는 질서와 차례가 있는 법인데 일의 순서도 모르고 성급하게 덤빔.',
 			longMeaning: '모든 일에는 질서와 차례가 있는 법인데 일의 순서도 모르고 성급하게 덤빔을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45667,11 +44722,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2617,
 			proverb: '보릿고개가 태산보다 높다',
-			meaning: '한 해 동안 농사지은 식량을 가지고 다음 해 보리가 날 때까지 견디어 나가기가 매우 힘듦을 비유적으로 이르는 말.',
+			meaning: '한 해 동안 농사지은 식량을 가지고 다음 해 보리가 날 때까지 견디어 나가기가 매우 힘듦.',
 			longMeaning: '한 해 동안 농사지은 식량을 가지고 다음 해 보리가 날 때까지 견디어 나가기가 매우 힘듦을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45687,11 +44741,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 2618,
 			proverb: '보지 못하는 소 멍에가 아홉',
-			meaning: '눈먼 소에게 멍에를 아홉 개나 메웠다는 뜻으로, 능력도 없는 사람에게 무거운 책임만 잔뜩 지워졌음을 비유적으로 이르는 말.',
+			meaning: '능력도 없는 사람에게 무거운 책임만 잔뜩 지워졌음.',
 			longMeaning: '눈먼 소에게 멍에를 아홉 개나 메웠다는 뜻으로, 능력도 없는 사람에게 무거운 책임만 잔뜩 지워졌음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -45707,11 +44760,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2619,
 			proverb: '복 없는 가시내(가) 봉놋방에 가 누워도 고자 곁에 가 눕는다',
-			meaning: '운수가 나쁘면 하는 일마다 잘 안됨을 비유적으로 이르는 말.',
+			meaning: '운수가 나쁘면 하는 일마다 잘 안됨.',
 			longMeaning: '운수가 나쁘면 하는 일마다 잘 안됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45727,11 +44779,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2620,
 			proverb: '복 없는 정승은 계란에도 뼈가 있다',
-			meaning: '운수가 나쁘면 하는 일마다 잘 안됨을 비유적으로 이르는 말.',
+			meaning: '운수가 나쁘면 하는 일마다 잘 안됨.',
 			longMeaning: '운수가 나쁘면 하는 일마다 잘 안됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45747,12 +44798,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 2621,
 			proverb: '복장이 따뜻하니까 생시가 꿈인 줄 안다',
-			meaning:
-				'마음이 편안하고 걱정이 없으니 마치 꿈속에서 사는 것같이 여긴다는 뜻으로, 무사태평하여 눈앞에 닥치는 걱정을 모르고 지냄을 비난조로 이르는 말.',
+			meaning: '무사태평하여 눈앞에 닥치는 걱정을 모르고 지냄.',
 			longMeaning:
 				'마음이 편안하고 걱정이 없으니 마치 꿈속에서 사는 것같이 여긴다는 뜻으로, 무사태평하여 눈앞에 닥치는 걱정을 모르고 지냄을 비난조로 이르는 말.',
 			sameProverb: [],
@@ -45769,7 +44818,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 93,
 		},
-
 		{
 			id: 2622,
 			proverb: '봄 백양 가을 내장',
@@ -45789,12 +44837,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 30,
 		},
-
 		{
 			id: 2623,
 			proverb: '봄볕은 며느리를 쬐이고 가을볕은 딸을 쬐인다',
-			meaning:
-				'선선한 가을볕에는 딸을 쬐이고 살갗이 잘 타고 거칠어지는 봄볕에는 며느리를 쬐인다는 뜻으로, 시어머니는 며느리보다 제 딸을 더 아낌을 비유적으로 이르는 말.',
+			meaning: '시어머니는 며느리보다 제 딸을 더 아낌.',
 			longMeaning:
 				'선선한 가을볕에는 딸을 쬐이고 살갗이 잘 타고 거칠어지는 봄볕에는 며느리를 쬐인다는 뜻으로, 시어머니는 며느리보다 제 딸을 더 아낌을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -45811,11 +44857,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2624,
 			proverb: '봄 보지가 쇠 저를 녹이고 가을 좆이 쇠판을 뚫는다',
-			meaning: '봄에는 여자가, 가을에는 남자가 춘정(春情)이 높아짐을 비유적으로 이르는 말.',
+			meaning: '봄에는 여자가, 가을에는 남자가 춘정(春情)이 높아짐.',
 			longMeaning: '봄에는 여자가, 가을에는 남자가 춘정(春情)이 높아짐을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -45831,12 +44876,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2625,
 			proverb: '봄비가 잦으면 마을 집 지어미 손이 크다',
-			meaning:
-				'봄비가 자주 오면 풍년이 들 것으로 생각하기 때문에 부인들의 인심이 후해진다는 뜻으로, 아무 소용 없고 도리어 해롭기만 함을 비유적으로 이르는 말.',
+			meaning: '아무 소용 없고 도리어 해롭기만 함.',
 			longMeaning:
 				'봄비가 자주 오면 풍년이 들 것으로 생각하기 때문에 부인들의 인심이 후해진다는 뜻으로, 아무 소용 없고 도리어 해롭기만 함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -45853,11 +44896,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 89,
 		},
-
 		{
 			id: 2626,
 			proverb: '봄에 깐 병아리 가을에 와서 세어 본다',
-			meaning: '봄에 깬 병아리를 중병아리가 되는 가을에 가서야 그 수를 세어 본다는 뜻으로, 이해타산이 어수룩함을 비유적으로 이르는 말.',
+			meaning: '이해타산이 어수룩함.',
 			longMeaning: '봄에 깬 병아리를 중병아리가 되는 가을에 가서야 그 수를 세어 본다는 뜻으로, 이해타산이 어수룩함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45873,11 +44915,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 79,
 		},
-
 		{
 			id: 2627,
 			proverb: '봄 조개 가을 낙지',
-			meaning: '봄에는 조개, 가을에는 낙지가 제철이라는 뜻으로, 제때를 만나야 제구실을 하게 됨을 비유적으로 이르는 말.',
+			meaning: '제때를 만나야 제구실을 하게 됨.',
 			longMeaning: '봄에는 조개, 가을에는 낙지가 제철이라는 뜻으로, 제때를 만나야 제구실을 하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45893,11 +44934,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2628,
 			proverb: '봉 가는 데 황 간다',
-			meaning: '사람의 긴밀한 관계를 비유적으로 이르는 말.',
+			meaning: '사람의 긴밀한 관계.',
 			longMeaning: '사람의 긴밀한 관계를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -45913,11 +44953,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2629,
 			proverb: '부등가리 안 옆 죄듯[조이듯]',
-			meaning: '무슨 일을 저질러 놓고 마음이 놓이지 아니하여 안절부절못하는 모양을 비유적으로 이르는 말.',
+			meaning: '무슨 일을 저질러 놓고 마음이 놓이지 아니하여 안절부절못하는 모양.',
 			longMeaning: '무슨 일을 저질러 놓고 마음이 놓이지 아니하여 안절부절못하는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -45933,11 +44972,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2630,
 			proverb: '부모가 반팔자',
-			meaning: '어떤 부모에게서 태어나느냐 하는 것이 사람의 운명을 결정하는 중요한 요소임을 비유적으로 이르는 말.',
+			meaning: '어떤 부모에게서 태어나느냐 하는 것이 사람의 운명을 결정하는 중요한 요소임.',
 			longMeaning: '어떤 부모에게서 태어나느냐 하는 것이 사람의 운명을 결정하는 중요한 요소임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -45953,7 +44991,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2631,
 			proverb: '부모가 온효자 되어야 자식이 반효자',
@@ -45973,11 +45010,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 70,
 		},
-
 		{
 			id: 2632,
 			proverb: '부모가 착해야 효자(가) 난다',
-			meaning: '부모가 착하여야 자식도 부모를 따라 착한 사람이 된다는 뜻으로, 윗사람이 잘하여야 아랫사람도 잘함을 비유적으로 이르는 말.',
+			meaning: '윗사람이 잘하여야 아랫사람도 잘함.',
 			longMeaning: '부모가 착하여야 자식도 부모를 따라 착한 사람이 된다는 뜻으로, 윗사람이 잘하여야 아랫사람도 잘함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -45993,11 +45029,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2633,
 			proverb: '부모 속에는 부처가 들어 있고 자식 속에는 앙칼이 들어 있다',
-			meaning: '부모는 누구나 다 제 자식을 한없이 사랑하지만 자식들 가운데는 부모의 은덕을 저버리는 경우가 없지 아니함을 비유적으로 이르는 말.',
+			meaning: '부모는 누구나 다 제 자식을 한없이 사랑하지만 자식들 가운데는 부모의 은덕을 저버리는 경우가 없지 아니함.',
 			longMeaning: '부모는 누구나 다 제 자식을 한없이 사랑하지만 자식들 가운데는 부모의 은덕을 저버리는 경우가 없지 아니함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46013,11 +45048,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2634,
 			proverb: '부서진 갓모자가 되었다',
-			meaning: '사람이 남에게 꾸지람을 듣고 무안을 당하였음을 비유적으로 이르는 말.',
+			meaning: '사람이 남에게 꾸지람을 듣고 무안을 당하였음.',
 			longMeaning: '사람이 남에게 꾸지람을 듣고 무안을 당하였음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46033,12 +45067,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2635,
 			proverb: '부엉이 소리도 제가 듣기에는 좋다고',
-			meaning:
-				'세상에 듣기 싫은 부엉이 소리조차도 부엉이가 들으면 듣기에 좋다는 뜻으로, 자기의 약점을 모르고 제가 하는 일은 다 좋은 것으로만 생각하는 경우를 비유적으로 이르는 말.',
+			meaning: '자기의 약점을 모르고 제가 하는 일은 다 좋은 것으로만 생각하는 경우.',
 			longMeaning:
 				'세상에 듣기 싫은 부엉이 소리조차도 부엉이가 들으면 듣기에 좋다는 뜻으로, 자기의 약점을 모르고 제가 하는 일은 다 좋은 것으로만 생각하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -46055,12 +45087,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 85,
 		},
-
 		{
 			id: 2636,
 			proverb: '부엌에 가면 더 먹을까 방에 가면 더 먹을까',
-			meaning:
-				'남보다 더 먹기 위하여 방에 들어갈까 부엌에 들어갈까 타산한다는 뜻으로, 어느 쪽이 더 이익이 많을까 하고 잇속을 따지느라 망설임을 비유적으로 이르는 말.',
+			meaning: '어느 쪽이 더 이익이 많을까 하고 잇속을 따지느라 망설임.',
 			longMeaning:
 				'남보다 더 먹기 위하여 방에 들어갈까 부엌에 들어갈까 타산한다는 뜻으로, 어느 쪽이 더 이익이 많을까 하고 잇속을 따지느라 망설임을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -46077,11 +45107,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 97,
 		},
-
 		{
 			id: 2637,
 			proverb: '부엌에서 숟가락을 얻었다',
-			meaning: '대단치 아니한 일을 하여 놓고 성공이나 한 듯이 자랑함을 비유적으로 이르는 말.',
+			meaning: '대단치 아니한 일을 하여 놓고 성공이나 한 듯이 자랑함.',
 			longMeaning: '대단치 아니한 일을 하여 놓고 성공이나 한 듯이 자랑함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -46097,11 +45126,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2638,
 			proverb: '부자가 더 무섭다',
-			meaning: '부자가 더 인색하게 굶을 비유적으로 이르는 말.',
+			meaning: '부자가 더 인색하게 굶.',
 			longMeaning: '부자가 더 인색하게 굶을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46117,11 +45145,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2639,
 			proverb: '부자 하나면 세 동네가 망한다',
-			meaning: '세 동네가 망하여야 그 돈이 모여 부자 하나가 난다는 뜻으로, 무슨 큰일을 하나 이루려면 많은 희생이 있게 됨을 비유적으로 이르는 말.',
+			meaning: '무슨 큰일을 하나 이루려면 많은 희생이 있게 됨.',
 			longMeaning: '세 동네가 망하여야 그 돈이 모여 부자 하나가 난다는 뜻으로, 무슨 큰일을 하나 이루려면 많은 희생이 있게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -46137,11 +45164,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2640,
 			proverb: '부잣집 가운데 자식 (같다)',
-			meaning: '부잣집 둘째 아들이 흔히 무위도식하며 방탕하다는 데서, 일은 하지 아니하고 놀고먹는 사람을 비유적으로 이르는 말.',
+			meaning: '일은 하지 아니하고 놀고먹는 사람.',
 			longMeaning: '부잣집 둘째 아들이 흔히 무위도식하며 방탕하다는 데서, 일은 하지 아니하고 놀고먹는 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46157,11 +45183,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2641,
 			proverb: '부잣집 업 나가듯 한다',
-			meaning: '부잣집을 지키는 업이 나간다는 뜻으로, 까닭 없이 갑자기 집안이 망해 감을 비유적으로 이르는 말.',
+			meaning: '까닭 없이 갑자기 집안이 망해 감.',
 			longMeaning: '부잣집을 지키는 업이 나간다는 뜻으로, 까닭 없이 갑자기 집안이 망해 감을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46177,11 +45202,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2642,
 			proverb: '부지깽이가 곤두선다',
-			meaning: '부지깽이도 누워 있을 틈이 없이 곤두서서 돌아다닌다는 뜻으로, 어떤 일이 몹시 바쁜 경우를 비유적으로 이르는 말.',
+			meaning: '어떤 일이 몹시 바쁜 경우.',
 			longMeaning: '부지깽이도 누워 있을 틈이 없이 곤두서서 돌아다닌다는 뜻으로, 어떤 일이 몹시 바쁜 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46197,11 +45221,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2643,
 			proverb: '부처님 가운데[허리] 토막',
-			meaning: '자비로운 부처의 가운데 부분과 같이 음흉하거나 요사스러운 마음이 전혀 없다는 뜻으로, 마음이 지나치게 어질고 순한 사람을 이르는 말.',
+			meaning: '마음이 지나치게 어질고 순한 사람.',
 			longMeaning: '자비로운 부처의 가운데 부분과 같이 음흉하거나 요사스러운 마음이 전혀 없다는 뜻으로, 마음이 지나치게 어질고 순한 사람을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46217,11 +45240,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 2644,
 			proverb: '북과 아이는 칠수록 소리가 커진다',
-			meaning: '우는 아이를 때리면 더 크게 운다는 뜻으로, 잘 달래야 함을 비유적으로 이르는 말.',
+			meaning: '잘 달래야 함.',
 			longMeaning: '우는 아이를 때리면 더 크게 운다는 뜻으로, 잘 달래야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46237,12 +45259,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2645,
 			proverb: '북어 뜯고 손가락 빤다',
-			meaning:
-				'말린 명태나 뜯고 그래도 물고기 만진 손이라고 하며 손가락을 빤다는 뜻으로, 크게 이득도 없는 일을 하고서 아쉬워하는 경우를 비유적으로 이르는 말.',
+			meaning: '크게 이득도 없는 일을 하고서 아쉬워하는 경우.',
 			longMeaning:
 				'말린 명태나 뜯고 그래도 물고기 만진 손이라고 하며 손가락을 빤다는 뜻으로, 크게 이득도 없는 일을 하고서 아쉬워하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -46259,11 +45279,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2646,
 			proverb: '북은 칠수록 소리가 난다',
-			meaning: '북은 힘을 주어 세게 치면 칠수록 요란한 소리가 난다는 뜻으로, 다투면 다툴수록 그만큼 손해만 커짐을 비유적으로 이르는 말.',
+			meaning: '다투면 다툴수록 그만큼 손해만 커짐.',
 			longMeaning: '북은 힘을 주어 세게 치면 칠수록 요란한 소리가 난다는 뜻으로, 다투면 다툴수록 그만큼 손해만 커짐을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46279,11 +45298,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2647,
 			proverb: '불 가져오라는데 물 가져온다',
-			meaning: '시키는 일과 전혀 딴 일을 함을 비유적으로 이르는 말.',
+			meaning: '시키는 일과 전혀 딴 일을 함.',
 			longMeaning: '시키는 일과 전혀 딴 일을 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46299,11 +45317,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 2648,
 			proverb: '불에 놀란 놈이 부지깽이[화젓가락]만 보아도 놀란다',
-			meaning: '어떤 사물에 몹시 놀란 사람은 비슷한 사물만 보아도 겁을 냄을 이르는 말.',
+			meaning: '어떤 사물에 몹시 놀란 사람은 비슷한 사물만 보아도 겁을 냄.',
 			longMeaning: '어떤 사물에 몹시 놀란 사람은 비슷한 사물만 보아도 겁을 냄을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46319,11 +45336,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2649,
 			proverb: '불탄 개가죽 같다',
-			meaning: '일마다 이루어지지 아니하거나 발전이 없고 점점 오그라들기만 하는 경우를 비유적으로 이르는 말.',
+			meaning: '일마다 이루어지지 아니하거나 발전이 없고 점점 오그라들기만 하는 경우.',
 			longMeaning: '일마다 이루어지지 아니하거나 발전이 없고 점점 오그라들기만 하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -46339,11 +45355,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2650,
 			proverb: '불탄 쇠가죽 오그라들듯',
-			meaning: '일마다 이루어지지 아니하거나 발전이 없고 점점 오그라들기만 하는 경우를 비유적으로 이르는 말.',
+			meaning: '일마다 이루어지지 아니하거나 발전이 없고 점점 오그라들기만 하는 경우.',
 			longMeaning: '일마다 이루어지지 아니하거나 발전이 없고 점점 오그라들기만 하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -46359,14 +45374,13 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2651,
 			proverb: '비가 오면 모종하듯 조상의 무덤을 이장해라',
 			meaning:
 				'못난 짓을 많이 하는 사람에게, 부모의 산소를 비 오는 날 모종하듯 다른 곳으로 옮겨 앞으로는 조상의 산소를 잘못 써서 못난 자식이 나는 일이 없도록 하라고 핀잔하는 말.',
 			longMeaning:
-				'못난 짓을 많이 하는 사람에게, 부모의 산소를 비 오는 날 모종하듯 다른 곳으로 옮겨 앞으로는 조상의 산소를 잘못 써서 못난 자식이 나는 일이 없도록 하라고 핀잔하는 말.',
+				'못난 짓을 많이 하는 사람에게, 부모의 산소를 비 오는 날 모종하듯 다른 곳으로 옮겨 앞으로는 조상의 산소를 잘못 써서 못난 자식이 나는 일이 없도록 하라고 핀잔하여 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
 			level: 4,
@@ -46381,11 +45395,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2652,
 			proverb: '비렁뱅이가 하늘을 불쌍히 여긴다',
-			meaning: '빌어먹는 형편에 하늘을 보고 처지가 가련하다고 한다는 뜻으로, 주제넘게 동정을 하거나 엉뚱한 일을 걱정하는 경우를 비유적으로 이르는 말.',
+			meaning: '주제넘게 동정을 하거나 엉뚱한 일을 걱정하는 경우.',
 			longMeaning:
 				'빌어먹는 형편에 하늘을 보고 처지가 가련하다고 한다는 뜻으로, 주제넘게 동정을 하거나 엉뚱한 일을 걱정하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -46402,11 +45415,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 2653,
 			proverb: '비 맞은 중 담 모퉁이 돌아가는 소리',
-			meaning: '남이 알아듣지 못할 정도로 낮은 소리로 불평 섞인 말을 중얼거림을 비유적으로 이르는 말.',
+			meaning: '남이 알아듣지 못할 정도로 낮은 소리로 불평 섞인 말을 중얼거림.',
 			longMeaning: '남이 알아듣지 못할 정도로 낮은 소리로 불평 섞인 말을 중얼거림을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46422,11 +45434,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 71,
 		},
-
 		{
 			id: 2654,
 			proverb: '비위가 노래기 회 쳐 먹겠다',
-			meaning: '고약한 노린내가 나는 노래기의 회를 쳐 먹는다는 뜻으로, 아주 비위가 좋음을 비유적으로 이르는 말.',
+			meaning: '아주 비위가 좋음.',
 			longMeaning: '고약한 노린내가 나는 노래기의 회를 쳐 먹는다는 뜻으로, 아주 비위가 좋음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46442,11 +45453,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 2655,
 			proverb: '비위가 떡판[떡함지]에 가 넘어지겠다',
-			meaning: '떡판에 넘어진 것같이 꾸며서 떡을 먹으려 한다는 뜻으로, 몹시 비위가 좋고 뻔뻔스러움을 비유적으로 이르는 말.',
+			meaning: '몹시 비위가 좋고 뻔뻔스러움.',
 			longMeaning: '떡판에 넘어진 것같이 꾸며서 떡을 먹으려 한다는 뜻으로, 몹시 비위가 좋고 뻔뻔스러움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46462,11 +45472,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2656,
 			proverb: '비 틈으로 빠져나가겠다',
-			meaning: '행동이나 동작이 매우 민첩함을 비유적으로 이르는 말.',
+			meaning: '행동이나 동작이 매우 민첩함.',
 			longMeaning: '행동이나 동작이 매우 민첩함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46482,12 +45491,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2657,
 			proverb: '비파 소리가 나도록 갈팡질팡한다',
-			meaning:
-				'바짓가랑이에서 비파 소리가 나도록 급하게 오고 가고 한다는 뜻으로, 어떤 일을 당하여 어찌할 바를 모르고 쩔쩔매는 모양을 비유적으로 이르는 말.',
+			meaning: '어떤 일을 당하여 어찌할 바를 모르고 쩔쩔매는 모양.',
 			longMeaning:
 				'바짓가랑이에서 비파 소리가 나도록 급하게 오고 가고 한다는 뜻으로, 어떤 일을 당하여 어찌할 바를 모르고 쩔쩔매는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -46504,11 +45511,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2658,
 			proverb: '빈낚시에 고기가 물릴 수 없다',
-			meaning: '힘을 안 들인 일에는 성과가 있을 수 없음을 비유적으로 이르는 말.',
+			meaning: '힘을 안 들인 일에는 성과가 있을 수 없음.',
 			longMeaning: '힘을 안 들인 일에는 성과가 있을 수 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46524,11 +45530,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2659,
 			proverb: '빈대 잡으려고 초가삼간 태운다',
-			meaning: '손해를 크게 볼 것을 생각지 아니하고 자기에게 마땅치 아니한 것을 없애려고 그저 덤비기만 하는 경우를 비유적으로 이르는 말.',
+			meaning: '손해를 크게 볼 것을 생각지 아니하고 자기에게 마땅치 아니한 것을 없애려고 그저 덤비기만 하는 경우.',
 			longMeaning: '손해를 크게 볼 것을 생각지 아니하고 자기에게 마땅치 아니한 것을 없애려고 그저 덤비기만 하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46544,12 +45549,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2660,
 			proverb: '빌어먹는 놈이 이밥 조밥 가리랴',
-			meaning:
-				'한창 궁하여 빌어먹는 판에 이밥 조밥 가릴 수 없다는 뜻으로, 자기가 아쉽거나 급히 필요한 일에는 좋고 나쁨을 가릴 겨를이 없음을 비유적으로 이르는 말.',
+			meaning: '자기가 아쉽거나 급히 필요한 일에는 좋고 나쁨을 가릴 겨를이 없음.',
 			longMeaning:
 				'한창 궁하여 빌어먹는 판에 이밥 조밥 가릴 수 없다는 뜻으로, 자기가 아쉽거나 급히 필요한 일에는 좋고 나쁨을 가릴 겨를이 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -46566,11 +45569,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2661,
 			proverb: '뺨을 맞아도 은가락지 낀 손에 맞는 것이 좋다',
-			meaning: '이왕 꾸지람을 듣거나 벌을 받을 바에는 권위 있고 덕망 있는 사람에게 당하는 것이 나음을 비유적으로 이르는 말.',
+			meaning: '이왕 꾸지람을 듣거나 벌을 받을 바에는 권위 있고 덕망 있는 사람에게 당하는 것이 나음.',
 			longMeaning: '이왕 꾸지람을 듣거나 벌을 받을 바에는 권위 있고 덕망 있는 사람에게 당하는 것이 나음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46586,11 +45588,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2662,
 			proverb: '뻔뻔하기가 양푼 밑구멍 같다',
-			meaning: '양푼의 밑이 편편하다는 데서, 뻔뻔스럽기 짝이 없고 아주 철면피함을 비유적으로 이르는 말.',
+			meaning: '뻔뻔스럽기 짝이 없고 아주 철면피함.',
 			longMeaning: '양푼의 밑이 편편하다는 데서, 뻔뻔스럽기 짝이 없고 아주 철면피함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46606,11 +45607,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2663,
 			proverb: '뻗어 가는 칡도 한[끝]이 있다',
-			meaning: '무슨 일이든지 일정한 한도가 있음을 비유적으로 이르는 말.',
+			meaning: '무슨 일이든지 일정한 한도가 있음.',
 			longMeaning: '무슨 일이든지 일정한 한도가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46626,12 +45626,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2664,
 			proverb: '뿌리 깊은 나무 가뭄 안 탄다',
-			meaning:
-				'땅속 깊이 뿌리 내린 나무는 가뭄에 타지 않아 말라 죽는 일이 없다는 뜻으로, 무엇이나 근원이 깊고 튼튼하면 어떤 시련도 견뎌 냄을 비유적으로 이르는 말.',
+			meaning: '무엇이나 근원이 깊고 튼튼하면 어떤 시련도 견뎌 냄.',
 			longMeaning:
 				'땅속 깊이 뿌리 내린 나무는 가뭄에 타지 않아 말라 죽는 일이 없다는 뜻으로, 무엇이나 근원이 깊고 튼튼하면 어떤 시련도 견뎌 냄을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -46648,11 +45646,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2665,
 			proverb: '뿌리 없는 나무가 없다',
-			meaning: '원인이 없이 결과만 있을 수 없음을 이르는 말.',
+			meaning: '원인이 없이 결과만 있을 수 없음.',
 			longMeaning: '원인이 없이 결과만 있을 수 없음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46668,7 +45665,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 40,
 		},
-
 		{
 			id: 2666,
 			proverb: '사내가 바가지로 물을 마시면 수염이 안 난다',
@@ -46688,11 +45684,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 89,
 		},
-
 		{
 			id: 2667,
 			proverb: '사내가 어디 가나 옹솥하고 계집은 있다',
-			meaning: '어떤 남자라도 밥할 만한 작은 밥솥과 같이 살 여자는 다 가지고 있다는 뜻으로, 못난 남자라도 밥벌이와 아내는 얻게 됨을 이르는 말.',
+			meaning: '못난 남자라도 밥벌이와 아내는 얻게 됨.',
 			longMeaning: '어떤 남자라도 밥할 만한 작은 밥솥과 같이 살 여자는 다 가지고 있다는 뜻으로, 못난 남자라도 밥벌이와 아내는 얻게 됨을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46708,11 +45703,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 85,
 		},
-
 		{
 			id: 2668,
 			proverb: '사내가 우비하고 거짓말은 가지고 다녀야 한다',
-			meaning: '남자가 비 올 때 쓸 우비와 급할 때 둘러댈 거짓말을 갖추고 다녀야 한다는 뜻으로, 남자가 처세하려면 거짓말도 필요함을 이르는 말.',
+			meaning: '남자가 처세하려면 거짓말도 필요함.',
 			longMeaning: '남자가 비 올 때 쓸 우비와 급할 때 둘러댈 거짓말을 갖추고 다녀야 한다는 뜻으로, 남자가 처세하려면 거짓말도 필요함을 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -46728,7 +45722,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2669,
 			proverb: '사내 못난 것은 대가리만 크고, 계집 못난 것은 젖통만 크다',
@@ -46748,11 +45741,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2670,
 			proverb: '사내 못난 것은 북문에 가 호강받는다',
-			meaning: '조선 후기에, 아무리 못난 사내라도 서울의 북쪽에 있는 숙정문(肅靖門)에만 가면 많은 부녀자로부터 추파를 받고 환대를 받았음을 이르는 말.',
+			meaning: '조선 후기에, 아무리 못난 사내라도 서울의 북쪽에 있는 숙정문(肅靖門)에만 가면 많은 부녀자로부터 추파를 받고 환대를 받았음.',
 			longMeaning:
 				'조선 후기에, 아무리 못난 사내라도 서울의 북쪽에 있는 숙정문(肅靖門)에만 가면 많은 부녀자로부터 추파를 받고 환대를 받았음을 이르는 말.',
 			sameProverb: [],
@@ -46769,7 +45761,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 2671,
 			proverb: '사내 못난 것은 사랑에 가서 먹이나 갈아 주고 계집 못난 것은 젖통만 크다',
@@ -46791,11 +45782,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2672,
 			proverb: '사내아이가 열다섯이면 호패를 찬다',
-			meaning: '남자의 나이 열다섯이 되면 어른으로 취급하는데, 이미 열다섯이니 제 한몫을 할 때가 되었음을 강조하여 이르는 말.',
+			meaning: '남자의 나이 열다섯이 되면 어른으로 취급하는데, 이미 열다섯이니 제 한몫을 할 때가 되었음.',
 			longMeaning: '남자의 나이 열다섯이 되면 어른으로 취급하는데, 이미 열다섯이니 제 한몫을 할 때가 되었음을 강조하여 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46811,11 +45801,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 2673,
 			proverb: '사내자식 길 나설 때 갈모 하나 거짓말 하나는 가지고 나서야 한다',
-			meaning: '남자가 비 올 때 쓸 갈모와 급할 때 둘러댈 거짓말을 갖추고 다녀야 한다는 뜻으로, 남자가 처세하려면 거짓말도 필요함을 이르는 말.',
+			meaning: '남자가 처세하려면 거짓말도 필요함.',
 			longMeaning: '남자가 비 올 때 쓸 갈모와 급할 때 둘러댈 거짓말을 갖추고 다녀야 한다는 뜻으로, 남자가 처세하려면 거짓말도 필요함을 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -46831,11 +45820,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2674,
 			proverb: '사냥 가는 데 총 놓고 간다',
-			meaning: '무슨 일을 하러 가면서 거기에 가장 긴요한 물건을 빠뜨리고 감을 비유적으로 이르는 말.',
+			meaning: '무슨 일을 하러 가면서 거기에 가장 긴요한 물건을 빠뜨리고 감.',
 			longMeaning: '무슨 일을 하러 가면서 거기에 가장 긴요한 물건을 빠뜨리고 감을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46851,11 +45839,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2675,
 			proverb: '사냥 가는 데 총을 안 가지고 가는 것 같다',
-			meaning: '무슨 일을 하러 가면서 거기에 가장 긴요한 물건을 빠뜨리고 감을 비유적으로 이르는 말.',
+			meaning: '무슨 일을 하러 가면서 거기에 가장 긴요한 물건을 빠뜨리고 감.',
 			longMeaning: '무슨 일을 하러 가면서 거기에 가장 긴요한 물건을 빠뜨리고 감을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -46871,12 +45858,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 83,
 		},
-
 		{
 			id: 2676,
 			proverb: '사당치레하다가 신주 개 물려 보낸다',
-			meaning:
-				'사당 겉치레만 하며 돌아다니다가 사당에 두는 신주를 개한테 물려 보냈다는 뜻으로, 겉치레만 지나치게 하다가 그만 중요한 것을 잃어버림을 이르는 말.',
+			meaning: '겉치레만 지나치게 하다가 그만 중요한 것을 잃어버림.',
 			longMeaning:
 				'사당 겉치레만 하며 돌아다니다가 사당에 두는 신주를 개한테 물려 보냈다는 뜻으로, 겉치레만 지나치게 하다가 그만 중요한 것을 잃어버림을 이르는 말.',
 			sameProverb: [],
@@ -46893,11 +45878,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 81,
 		},
-
 		{
 			id: 2677,
 			proverb: '사돈네 제사에 가서 감 놓아라 배 놓아라 한다',
-			meaning: '남의 일에 공연히 간섭하고 나섬을 비유적으로 이르는 말.',
+			meaning: '남의 일에 공연히 간섭하고 나섬.',
 			longMeaning: '남의 일에 공연히 간섭하고 나섬을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46913,7 +45897,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 98,
 		},
-
 		{
 			id: 2678,
 			proverb: '사람과 곡식은 가꾸기에 달렸다',
@@ -46933,11 +45916,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2679,
 			proverb: '사람마다 한 가지 버릇은 있다',
-			meaning: '사람은 누구나 한두 가지의 좋지 못한 버릇이 있음을 이르는 말.',
+			meaning: '사람은 누구나 한두 가지의 좋지 못한 버릇이 있음.',
 			longMeaning: '사람은 누구나 한두 가지의 좋지 못한 버릇이 있음을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46953,11 +45935,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2680,
 			proverb: '사람 밥 빌어먹는 구멍은 삼천몇 가지',
-			meaning: '사람이 먹고살아 나가기 위한 생활 수단이 매우 다양함을 비유적으로 이르는 말.',
+			meaning: '사람이 먹고살아 나가기 위한 생활 수단이 매우 다양함.',
 			longMeaning: '사람이 먹고살아 나가기 위한 생활 수단이 매우 다양함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -46973,12 +45954,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2681,
 			proverb: '사람은 죽으면 이름을 남기고 범은 죽으면 가죽을 남긴다',
-			meaning:
-				'호랑이가 죽은 다음에 귀한 가죽을 남기듯이 사람은 죽은 다음에 생전에 쌓은 공적으로 명예를 남기게 된다는 뜻으로, 인생에서 가장 중요한 것은 생전에 보람 있는 일을 해놓아 후세에 명예를 떨치는 것임을 비유적으로 이르는 말.',
+			meaning: '인생에서 가장 중요한 것은 생전에 보람 있는 일을 해놓아 후세에 명예를 떨치는 것임.',
 			longMeaning:
 				'호랑이가 죽은 다음에 귀한 가죽을 남기듯이 사람은 죽은 다음에 생전에 쌓은 공적으로 명예를 남기게 된다는 뜻으로, 인생에서 가장 중요한 것은 생전에 보람 있는 일을 해놓아 후세에 명예를 떨치는 것임을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -46995,11 +45974,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2682,
 			proverb: '사람을 알자면 하루 길을 같이 가 보라',
-			meaning: '사람의 마음이란 겉으로 언뜻 보아서는 알 수 없으며 함께 오랫동안 지내보아야 알 수 있음을 이르는 말.',
+			meaning: '사람의 마음이란 겉으로 언뜻 보아서는 알 수 없으며 함께 오랫동안 지내보아야 알 수 있음.',
 			longMeaning: '사람의 마음이란 겉으로 언뜻 보아서는 알 수 없으며 함께 오랫동안 지내보아야 알 수 있음을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -47015,11 +45993,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 2683,
 			proverb: '사람의 혀는 뼈가 없어도 사람의 뼈를 부순다',
-			meaning: '뼈가 없는 혀를 놀려서 하는 말이 굳은 뼈도 부술 수 있다는 뜻으로, 말이란 무서운 힘을 가지고 있음을 비유적으로 이르는 말.',
+			meaning: '말이란 무서운 힘을 가지고 있음.',
 			longMeaning: '뼈가 없는 혀를 놀려서 하는 말이 굳은 뼈도 부술 수 있다는 뜻으로, 말이란 무서운 힘을 가지고 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47035,12 +46012,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 95,
 		},
-
 		{
 			id: 2684,
 			proverb: '사람이면 다 사람인가 사람이라야 사람이지',
-			meaning:
-				'사람이라고 해서 다 사람인 것이 아니라 사람답게 행동하여야 진짜 사람이라고 할 수 있다는 뜻으로, 사람답지 않은 짓을 하는 사람은 짐승과 다를 바 없음을 이르는 말.',
+			meaning: '사람답지 않은 짓을 하는 사람은 짐승과 다를 바 없음.',
 			longMeaning:
 				'사람이라고 해서 다 사람인 것이 아니라 사람답게 행동하여야 진짜 사람이라고 할 수 있다는 뜻으로, 사람답지 않은 짓을 하는 사람은 짐승과 다를 바 없음을 이르는 말.',
 			sameProverb: [],
@@ -47057,11 +46032,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2685,
 			proverb: '사람이 세상에 나면 저 먹을 것은 가지고 나온다',
-			meaning: '사람은 잘났든 못났든 누구나 다 살아 나갈 수 있는 방도를 가지고 있음을 비유적으로 이르는 말.',
+			meaning: '사람은 잘났든 못났든 누구나 다 살아 나갈 수 있는 방도를 가지고 있음.',
 			longMeaning: '사람은 잘났든 못났든 누구나 다 살아 나갈 수 있는 방도를 가지고 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -47077,11 +46051,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2686,
 			proverb: '사랑은 내려가고 걱정은 올라간다',
-			meaning: '사랑은 언제나 윗사람이 아랫사람에게 베풀어 주게 되고 걱정은 아랫사람이 윗사람에게 끼치는 법임을 이르는 말.',
+			meaning: '사랑은 언제나 윗사람이 아랫사람에게 베풀어 주게 되고 걱정은 아랫사람이 윗사람에게 끼치는 법임.',
 			longMeaning: '사랑은 언제나 윗사람이 아랫사람에게 베풀어 주게 되고 걱정은 아랫사람이 윗사람에게 끼치는 법임을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -47097,11 +46070,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 2687,
 			proverb: '사서삼경을 다 읽어도 누울 와(臥) 자가 제일',
-			meaning: '게으른 자가 누워서 뒹굴 때 핑계로 이르는 말.',
+			meaning: '게으른 자가 누워서 뒹굴 때 핑계로.',
 			longMeaning: '게으른 자가 누워서 뒹굴 때 핑계로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47117,7 +46089,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 98,
 		},
-
 		{
 			id: 2688,
 			proverb: '사월 없는 곳에 가서 살면 좋겠다',
@@ -47137,11 +46108,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 60,
 		},
-
 		{
 			id: 2689,
 			proverb: '사월 파일 등 올라가듯',
-			meaning: '여럿이 조롱조롱 올라가는 모양을 비유적으로 이르는 말.',
+			meaning: '여럿이 조롱조롱 올라가는 모양.',
 			longMeaning: '여럿이 조롱조롱 올라가는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47157,11 +46127,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2690,
 			proverb: '사위가 고우면 요강 분지를 쓴다',
-			meaning: '사위는 처가에서 극진한 대접을 받음을 비유적으로 이르는 말.',
+			meaning: '사위는 처가에서 극진한 대접을 받음.',
 			longMeaning: '사위는 처가에서 극진한 대접을 받음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -47177,12 +46146,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2691,
 			proverb: '사위가 무던하면 개 구유를 씻는다',
 			meaning:
-				'처가에서 사위는 극진히 대접받기 마련이기 때문에 가만히 앉아 있어도 아무도 탓할 사람이 없는데도, 개 밥통을 씻는 궂은일까지도 마다하지 않을 만큼 그 사람됨이 무던한 경우를 비유적으로 이르는 말.',
+				'처가에서 사위는 극진히 대접받기 마련이기 때문에 가만히 앉아 있어도 아무도 탓할 사람이 없는데도, 개 밥통을 씻는 궂은일까지도 마다하지 않을 만큼 그 사람됨이 무던한 경우.',
 			longMeaning:
 				'처가에서 사위는 극진히 대접받기 마련이기 때문에 가만히 앉아 있어도 아무도 탓할 사람이 없는데도, 개 밥통을 씻는 궂은일까지도 마다하지 않을 만큼 그 사람됨이 무던한 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -47199,12 +46167,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 2692,
 			proverb: '사자가 눈깔이 멀었다',
 			meaning: '죽은 사람을 데려간다는 저승사자가 눈이 멀어서 잡아가지 않는다는 뜻으로, 못되게 구는 사람을 욕 이르는 말.',
-			longMeaning: '죽은 사람을 데려간다는 저승사자가 눈이 멀어서 잡아가지 않는다는 뜻으로, 못되게 구는 사람을 욕 이르는 말.',
+			longMeaning: '죽은 사람을 데려간다는 저승사자가 눈이 멀어서 잡아가지 않는다는 뜻으로, 못되게 구는 사람을 욕하여 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
 			level: 2,
@@ -47219,11 +46186,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 2693,
 			proverb: '사자는 불가부생(不可復生)이라',
-			meaning: '죽은 사람은 다시 살아날 수 없다는 뜻으로, 단념할 수밖에 없음을 이르는 말.',
+			meaning: '단념할 수밖에 없음.',
 			longMeaning: '죽은 사람은 다시 살아날 수 없다는 뜻으로, 단념할 수밖에 없음을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -47239,11 +46205,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 2694,
 			proverb: '사자 없는 산에 토끼가 왕[대장] 노릇 한다',
-			meaning: '뛰어난 사람이 없는 곳에서 보잘것없는 사람이 득세함을 비유적으로 이르는 말.',
+			meaning: '뛰어난 사람이 없는 곳에서 보잘것없는 사람이 득세함.',
 			longMeaning: '뛰어난 사람이 없는 곳에서 보잘것없는 사람이 득세함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -47259,11 +46224,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 81,
 		},
-
 		{
 			id: 2695,
 			proverb: '사잣밥(을) 싸 가지고 다닌다',
-			meaning: '언제 어디서 죽을지 모를 위험한 처지에 놓여 있음을 비유적으로 이르는 말.',
+			meaning: '언제 어디서 죽을지 모를 위험한 처지에 놓여 있음.',
 			longMeaning: '언제 어디서 죽을지 모를 위험한 처지에 놓여 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -47279,11 +46243,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 2696,
 			proverb: '사정이 많으면 한 동리에 시아비가 아홉',
-			meaning: '일정한 주관 없이 남을 덩달아 좇는 사람을 비유적으로 이르는 말.',
+			meaning: '일정한 주관 없이 남을 덩달아 좇는 사람.',
 			longMeaning: '일정한 주관 없이 남을 덩달아 좇는 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -47299,11 +46262,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 2697,
 			proverb: '사주에 없는 관을 쓰면 이마가 벗어진다',
-			meaning: '제 분수에 넘치는 일을 억지로 이루어 놓으면 나중에 도리어 해가 될 수 있음을 비유적으로 이르는 말.',
+			meaning: '제 분수에 넘치는 일을 억지로 이루어 놓으면 나중에 도리어 해가 될 수 있음.',
 			longMeaning: '제 분수에 넘치는 일을 억지로 이루어 놓으면 나중에 도리어 해가 될 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -47319,11 +46281,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 81,
 		},
-
 		{
 			id: 2698,
 			proverb: '사침에도 용수가 있다',
-			meaning: '아무리 분주한 때라도 틈을 낼 수 있음을 비유적으로 이르는 말.',
+			meaning: '아무리 분주한 때라도 틈을 낼 수 있음.',
 			longMeaning: '아무리 분주한 때라도 틈을 낼 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47339,11 +46300,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2699,
 			proverb: '사타구니에 방울 소리가 나도록',
-			meaning: '아주 급하게 뛰어가는 모습을 비유적으로 이르는 말.',
+			meaning: '아주 급하게 뛰어가는 모습.',
 			longMeaning: '아주 급하게 뛰어가는 모습을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47359,11 +46319,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2700,
 			proverb: '사흘 길에 하루쯤 가서 열흘씩 눕는다',
-			meaning: '성미가 게을러서 일을 도저히 이루지 못함을 비유적으로 이르는 말.',
+			meaning: '성미가 게을러서 일을 도저히 이루지 못함.',
 			longMeaning: '성미가 게을러서 일을 도저히 이루지 못함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -47379,11 +46338,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2701,
 			proverb: '사흘 길 하루도 아니 가서',
-			meaning: '오래 두고 할 일에 처음부터 싫증을 내거나 배반하는 경우를 비유적으로 이르는 말.',
+			meaning: '오래 두고 할 일에 처음부터 싫증을 내거나 배반하는 경우.',
 			longMeaning: '오래 두고 할 일에 처음부터 싫증을 내거나 배반하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47399,11 +46357,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2702,
 			proverb: '사흘 책을 안 읽으면 머리에 곰팡이가 슨다',
-			meaning: '짧은 기간이라도 책을 안 읽고 지내면 머리가 둔하게 됨을 비유적으로 이르는 말.',
+			meaning: '짧은 기간이라도 책을 안 읽고 지내면 머리가 둔하게 됨.',
 			longMeaning: '짧은 기간이라도 책을 안 읽고 지내면 머리가 둔하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47419,7 +46376,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 2703,
 			proverb: '산 개 새끼가 죽은 정승보다 낫다',
@@ -47439,11 +46395,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2704,
 			proverb: '산골 부자는 해변가 개보다 못하다',
-			meaning: '물고기 반찬을 먹는 데는 산골의 부자가 바닷가의 개보다 못하다는 뜻으로, 보잘것없는 산골 부자의 처지를 비유적으로 이르는 말.',
+			meaning: '보잘것없는 산골 부자의 처지.',
 			longMeaning: '물고기 반찬을 먹는 데는 산골의 부자가 바닷가의 개보다 못하다는 뜻으로, 보잘것없는 산골 부자의 처지를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47459,12 +46414,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2705,
 			proverb: '산돼지를 잡으려다가 집돼지까지 잃는다',
-			meaning:
-				'산돼지를 잡겠다고 욕심을 부리던 나머지 집돼지를 잘못 간수한 탓으로 잃어버리게 되었다는 뜻으로, 지나치게 욕심을 부리다가 이미 차지한 것까지 잃어버리게 됨을 비유적으로 이르는 말.',
+			meaning: '지나치게 욕심을 부리다가 이미 차지한 것까지 잃어버리게 됨.',
 			longMeaning:
 				'산돼지를 잡겠다고 욕심을 부리던 나머지 집돼지를 잘못 간수한 탓으로 잃어버리게 되었다는 뜻으로, 지나치게 욕심을 부리다가 이미 차지한 것까지 잃어버리게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -47481,7 +46434,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 97,
 		},
-
 		{
 			id: 2706,
 			proverb: '산림도 청으로 하는 수가 있다',
@@ -47501,11 +46453,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2707,
 			proverb: '산 밑 집에 방앗공이(가) 논다[귀하다]',
-			meaning: '산과 같이 나무가 많은 고장에서 방앗공이가 없다는 뜻으로, 그 고장의 산물이 도리어 그 산지에서는 더 귀함을 비유적으로 이르는 말.',
+			meaning: '그 고장의 산물이 도리어 그 산지에서는 더 귀함.',
 			longMeaning: '산과 같이 나무가 많은 고장에서 방앗공이가 없다는 뜻으로, 그 고장의 산물이 도리어 그 산지에서는 더 귀함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -47521,11 +46472,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2708,
 			proverb: '산보다 호랑이가 더 크다',
-			meaning: '주가 되는 산보다 부차적인 골이 더 크다는 뜻으로, 사리에 맞지 않음을 비유적으로 이르는 말.',
+			meaning: '사리에 맞지 않음.',
 			longMeaning: '주가 되는 산보다 부차적인 골이 더 크다는 뜻으로, 사리에 맞지 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47541,12 +46491,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2709,
 			proverb: '산에 가야 범을 잡지',
-			meaning:
-				'꿩은 산에 가야 잡을 수 있고, 고기는 바다에 가야 잡을 수 있다는 뜻으로, 목적하는 방향을 제대로 잡아 노력하여야만 그 목적을 제대로 이룰 수 있음을 비유적으로 이르는 말.',
+			meaning: '목적하는 방향을 제대로 잡아 노력하여야만 그 목적을 제대로 이룰 수 있음.',
 			longMeaning:
 				'꿩은 산에 가야 잡을 수 있고, 고기는 바다에 가야 잡을 수 있다는 뜻으로, 목적하는 방향을 제대로 잡아 노력하여야만 그 목적을 제대로 이룰 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -47563,11 +46511,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 2710,
 			proverb: '산에 들어가 호랑이를 피하랴',
-			meaning: '이미 피할 수 없는 일이나 피하여서는 안 되는 일을 피하려고 무모하게 행동함을 이르는 말.',
+			meaning: '이미 피할 수 없는 일이나 피하여서는 안 되는 일을 피하려고 무모하게 행동함.',
 			longMeaning: '이미 피할 수 없는 일이나 피하여서는 안 되는 일을 피하려고 무모하게 행동함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47583,11 +46530,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2711,
 			proverb: '산이 우니 돌이[산돼지가] 운다',
-			meaning: '산이 우니 그 속에 있는 돌[산돼지]도 덩달아 운다는 뜻으로, 주관 없이 남이 하는 대로만 따라 행동함을 비유적으로 이르는 말.',
+			meaning: '주관 없이 남이 하는 대로만 따라 행동함.',
 			longMeaning: '산이 우니 그 속에 있는 돌[산돼지]도 덩달아 운다는 뜻으로, 주관 없이 남이 하는 대로만 따라 행동함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -47603,12 +46549,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 2712,
 			proverb: '산지기가 놀고 중이 추렴을 낸다',
-			meaning:
-				'산지기가 산을 안 지키고 민간에 내려가서 행음을 하고 중이 불공은 안 드리고 술추렴을 한다는 뜻으로, 부당하거나 엉뚱한 짓을 함을 비유적으로 이르는 말.',
+			meaning: '부당하거나 엉뚱한 짓을 함.',
 			longMeaning:
 				'산지기가 산을 안 지키고 민간에 내려가서 행음을 하고 중이 불공은 안 드리고 술추렴을 한다는 뜻으로, 부당하거나 엉뚱한 짓을 함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -47625,12 +46569,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2713,
 			proverb: '산 진 거북이요 돌 진 가재[자라]라',
-			meaning:
-				'등이 납작하여 넘어질 위험이 없는 거북이와 가재, 또는 자라가 산과 돌을 각각 지었다는 뜻으로, 의지하고 있는 세력이 든든함을 비유적으로 이르는 말.',
+			meaning: '의지하고 있는 세력이 든든함.',
 			longMeaning:
 				'등이 납작하여 넘어질 위험이 없는 거북이와 가재, 또는 자라가 산과 돌을 각각 지었다는 뜻으로, 의지하고 있는 세력이 든든함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -47647,11 +46589,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 2714,
 			proverb: '살강 밑에서 숟가락 얻었다[주웠다]',
-			meaning: '남이 빠뜨린 물건을 얻어서 횡재했다고 좋아하다 임자가 나타나 헛되이 좋아한 것이 됨을 비유적으로 이르는 말.',
+			meaning: '남이 빠뜨린 물건을 얻어서 횡재했다고 좋아하다 임자가 나타나 헛되이 좋아한 것이 됨.',
 			longMeaning: '남이 빠뜨린 물건을 얻어서 횡재했다고 좋아하다 임자가 나타나 헛되이 좋아한 것이 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -47667,7 +46608,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2715,
 			proverb: '살결이 희면 열 허물 가린다',
@@ -47687,11 +46627,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2716,
 			proverb: '살아가면 고손자한테도 배운다',
-			meaning: '배움에는 위아래가 없음을 비유적으로 이르는 말.',
+			meaning: '배움에는 위아래가 없음.',
 			longMeaning: '배움에는 위아래가 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47707,7 +46646,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2717,
 			proverb: '살아가면 고향',
@@ -47727,11 +46665,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 35,
 		},
-
 		{
 			id: 2718,
 			proverb: '살이 살을 먹고 쇠가 쇠를 먹는다',
-			meaning: '동포 형제나 가까운 이웃, 친척끼리 서로 해치려 함을 비유적으로 이르는 말.',
+			meaning: '동포 형제나 가까운 이웃, 친척끼리 서로 해치려 함.',
 			longMeaning: '동포 형제나 가까운 이웃, 친척끼리 서로 해치려 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -47747,12 +46684,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2719,
 			proverb: '삶은 소가 웃다가 꾸러미 째지겠다[터지겠다]',
-			meaning:
-				'웃을 수 없는 삶은 소조차 너무도 어이없고 우스워서 한껏 입 벌리고 웃다가 꾸러미까지 터지고 말겠다는 뜻으로, 하는 품이 하도 어이없고 가소로움을 놀림조로 이르는 말.',
+			meaning: '하는 품이 하도 어이없고 가소로움.',
 			longMeaning:
 				'웃을 수 없는 삶은 소조차 너무도 어이없고 우스워서 한껏 입 벌리고 웃다가 꾸러미까지 터지고 말겠다는 뜻으로, 하는 품이 하도 어이없고 가소로움을 놀림조로 이르는 말.',
 			sameProverb: [],
@@ -47769,7 +46704,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2720,
 			proverb: '삼간초가가 다 타도 빈대 죽어[타 죽는 것만] 좋다',
@@ -47789,11 +46723,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 96,
 		},
-
 		{
 			id: 2721,
 			proverb: '삼 년 가뭄에는 살아도 석 달 장마에는 못 산다',
-			meaning: '가뭄 피해보다 장마 피해가 더 무서움을 이르는 말.',
+			meaning: '가뭄 피해보다 장마 피해가 더 무서움.',
 			longMeaning: '가뭄 피해보다 장마 피해가 더 무서움을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47809,11 +46742,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 98,
 		},
-
 		{
 			id: 2722,
 			proverb: '삼 년 가뭄에 하루 쓸 날 없다',
-			meaning: '계속 날이 개어 있다가 무슨 일을 하려고 하는 날 공교롭게도 날씨가 궂어 일을 그르치는 경우를 비유적으로 이르는 말.',
+			meaning: '계속 날이 개어 있다가 무슨 일을 하려고 하는 날 공교롭게도 날씨가 궂어 일을 그르치는 경우.',
 			longMeaning: '계속 날이 개어 있다가 무슨 일을 하려고 하는 날 공교롭게도 날씨가 궂어 일을 그르치는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '운/우연',
@@ -47829,11 +46761,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2723,
 			proverb: '삼 년 먹여 기른 개가 주인 발등을 문다',
-			meaning: '은혜를 베푼 사람으로부터 큰 화를 입음을 비유적으로 이르는 말.',
+			meaning: '은혜를 베푼 사람으로부터 큰 화를 입음.',
 			longMeaning: '은혜를 베푼 사람으로부터 큰 화를 입음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -47849,11 +46780,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 2724,
 			proverb: '삼 년 묵은 말가죽도 오롱조롱 소리 난다',
-			meaning: '봄이 되어 만물이 다시 활동하기 시작하는 모양을 비유적으로 이르는 말.',
+			meaning: '봄이 되어 만물이 다시 활동하기 시작하는 모양.',
 			longMeaning: '봄이 되어 만물이 다시 활동하기 시작하는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47869,12 +46799,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 2725,
 			proverb: '삼대 정승이 없고 삼대 거지가 없다',
-			meaning:
-				'삼대에 걸쳐서 계속 거지 노릇만 하는 집안도 없고 계속 부자인 집안도 없다는 뜻으로, 많은 재산이 오랫동안 유지될 수 없으며 가난한 형편 또한 오래가지 않는다는 것을 비유적으로 이르는 말.',
+			meaning: '많은 재산이 오랫동안 유지될 수 없으며 가난한 형편 또한 오래가지 않는다는 것.',
 			longMeaning:
 				'삼대에 걸쳐서 계속 거지 노릇만 하는 집안도 없고 계속 부자인 집안도 없다는 뜻으로, 많은 재산이 오랫동안 유지될 수 없으며 가난한 형편 또한 오래가지 않는다는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -47891,7 +46819,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 85,
 		},
-
 		{
 			id: 2726,
 			proverb: '삼대 천치가 들면 사 대째 영웅이 난다',
@@ -47911,11 +46838,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2727,
 			proverb: '삼 동서가 모이면 황소도 잡는다',
-			meaning: '동서가 많으면 큰일도 거뜬히 치러 낼 수 있음을 이르는 말.',
+			meaning: '동서가 많으면 큰일도 거뜬히 치러 낼 수 있음.',
 			longMeaning: '동서가 많으면 큰일도 거뜬히 치러 낼 수 있음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -47931,12 +46857,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2728,
 			proverb: '삼복에 비가 오면 보은 처자(가) 울겠다',
-			meaning:
-				'대추의 명산지인 보은 지방에서 대추 수확으로 혼수를 마련한 데서 나온 말로, 삼복에 비가 오면 대추가 열리지 않는다는 것을 비유적으로 이르는 말.',
+			meaning: '삼복에 비가 오면 대추가 열리지 않는다는 것.',
 			longMeaning:
 				'대추의 명산지인 보은 지방에서 대추 수확으로 혼수를 마련한 데서 나온 말로, 삼복에 비가 오면 대추가 열리지 않는다는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -47953,11 +46877,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 2729,
 			proverb: '삼수갑산에 가는 한이 있어도',
-			meaning: '자신에게 닥쳐올 어떤 위험도 무릅쓰고라도 어떤 일을 단행할 때 이르는 말.',
+			meaning: '자신에게 닥쳐올 어떤 위험도 무릅쓰고라도 어떤 일을 단행할 때.',
 			longMeaning: '자신에게 닥쳐올 어떤 위험도 무릅쓰고라도 어떤 일을 단행할 때 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -47973,11 +46896,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2730,
 			proverb: '삼수갑산을 가서 산전을 일궈 먹더라도',
-			meaning: '자신에게 닥쳐올 어떤 위험도 무릅쓰고라도 어떤 일을 단행할 때 이르는 말.',
+			meaning: '자신에게 닥쳐올 어떤 위험도 무릅쓰고라도 어떤 일을 단행할 때.',
 			longMeaning: '자신에게 닥쳐올 어떤 위험도 무릅쓰고라도 어떤 일을 단행할 때 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -47993,7 +46915,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 81,
 		},
-
 		{
 			id: 2731,
 			proverb: '삼정승 부러워 말고 내 한 몸 튼튼히 가지라',
@@ -48013,12 +46934,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 89,
 		},
-
 		{
 			id: 2732,
 			proverb: '삼춘고한 가문 날에 감우(甘雨) 오니 즐거운 일',
-			meaning:
-				'봄철 석 달의 지독한 가뭄 가운데 단비가 오니 반갑기 이를 데 없는 일이라는 뜻으로, 몹시 바라고 기다리던 일이 이루어져 매우 반갑고 즐거움을 비유적으로 이르는 말.',
+			meaning: '몹시 바라고 기다리던 일이 이루어져 매우 반갑고 즐거움.',
 			longMeaning:
 				'봄철 석 달의 지독한 가뭄 가운데 단비가 오니 반갑기 이를 데 없는 일이라는 뜻으로, 몹시 바라고 기다리던 일이 이루어져 매우 반갑고 즐거움을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48035,11 +46954,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2733,
 			proverb: '삼태기로 앞 가리기',
-			meaning: '속이 빤히 들여다보이는 일을 속여 보려고 하는 어리석은 짓을 비유적으로 이르는 말.',
+			meaning: '속이 빤히 들여다보이는 일을 속여 보려고 하는 어리석은 짓.',
 			longMeaning: '속이 빤히 들여다보이는 일을 속여 보려고 하는 어리석은 짓을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -48055,12 +46973,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2734,
 			proverb: '상감님 망건 사러 가는 돈도 써야만 하겠다',
-			meaning:
-				'감히 손댈 수 없는 임금의 망건 살 돈조차도 우선 쓰고 봐야 하겠다는 뜻으로, 나중에 어떤 벌을 받을지라도 우선 급한 것부터 해결하여야 하겠다고 단정하여 이르는 말.',
+			meaning: '나중에 어떤 벌을 받을지라도 우선 급한 것부터 해결하여야 하겠다고 단정하여.',
 			longMeaning:
 				'감히 손댈 수 없는 임금의 망건 살 돈조차도 우선 쓰고 봐야 하겠다는 뜻으로, 나중에 어떤 벌을 받을지라도 우선 급한 것부터 해결하여야 하겠다고 단정하여 이르는 말.',
 			sameProverb: [],
@@ -48077,11 +46993,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 98,
 		},
-
 		{
 			id: 2735,
 			proverb: '상두꾼에도 순번이 있고 초라니탈에도 차례가 있다',
-			meaning: '모든 일에는 차례와 순서가 있음을 비유적으로 이르는 말.',
+			meaning: '모든 일에는 차례와 순서가 있음.',
 			longMeaning: '모든 일에는 차례와 순서가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48097,12 +47012,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2736,
 			proverb: '상여 메고 가다가 귀청 후빈다',
 			meaning: '일을 끝까지 성실하게 하지 않고 도중에 엉뚱한 데 정신을 팖을 핀잔하는 말.',
-			longMeaning: '일을 끝까지 성실하게 하지 않고 도중에 엉뚱한 데 정신을 팖을 핀잔하는 말.',
+			longMeaning: '일을 끝까지 성실하게 하지 않고 도중에 엉뚱한 데 정신을 팖을 핀잔하여 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
 			level: 3,
@@ -48117,12 +47031,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 2737,
 			proverb: '상여 메는 사람이나 가마 메는 사람이나',
-			meaning:
-				'상여를 메나 가마를 메나 메는 사람이라는 점에서는 매한가지라는 뜻으로, 조금씩 차이는 있더라도 결국은 비슷비슷한 사람임을 비유적으로 이르는 말.',
+			meaning: '조금씩 차이는 있더라도 결국은 비슷비슷한 사람임.',
 			longMeaning:
 				'상여를 메나 가마를 메나 메는 사람이라는 점에서는 매한가지라는 뜻으로, 조금씩 차이는 있더라도 결국은 비슷비슷한 사람임을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48139,11 +47051,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 87,
 		},
-
 		{
 			id: 2738,
 			proverb: '상제가 울어도 제상에 가자미 물어 가는 것은 안다',
-			meaning: '자기의 손해에 대하여서는 언제 어디서나 민감함을 비유적으로 이르는 말.',
+			meaning: '자기의 손해에 대하여서는 언제 어디서나 민감함.',
 			longMeaning: '자기의 손해에 대하여서는 언제 어디서나 민감함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48159,11 +47070,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2739,
 			proverb: '상제보다 복재기가 더 설워한다',
-			meaning: '직접 일을 당한 사람보다도 오히려 다른 사람이 더 걱정하고 있음을 비유적으로 이르는 말.',
+			meaning: '직접 일을 당한 사람보다도 오히려 다른 사람이 더 걱정하고 있음.',
 			longMeaning: '직접 일을 당한 사람보다도 오히려 다른 사람이 더 걱정하고 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -48179,12 +47089,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 2740,
 			proverb: '상좌가 많으면 가마솥을 깨뜨린다',
-			meaning:
-				'상좌가 많아서 저마다 명령을 하면 무쇠 가마조차도 깨뜨리고 만다는 뜻으로, 뚜렷한 책임자 없이 여러 사람이 저마다 간섭을 하면 도리어 일을 그르침을 이르는 말.',
+			meaning: '뚜렷한 책임자 없이 여러 사람이 저마다 간섭을 하면 도리어 일을 그르침.',
 			longMeaning:
 				'상좌가 많아서 저마다 명령을 하면 무쇠 가마조차도 깨뜨리고 만다는 뜻으로, 뚜렷한 책임자 없이 여러 사람이 저마다 간섭을 하면 도리어 일을 그르침을 이르는 말.',
 			sameProverb: [],
@@ -48201,11 +47109,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 2741,
 			proverb: '상투가 국수버섯 솟듯',
-			meaning: '상투가 더부룩하게 솟아오르는 국수버섯처럼 우뚝하다는 뜻으로, 의기양양하여 지나치게 우쭐거리는 모양을 비유적으로 이르는 말.',
+			meaning: '의기양양하여 지나치게 우쭐거리는 모양.',
 			longMeaning: '상투가 더부룩하게 솟아오르는 국수버섯처럼 우뚝하다는 뜻으로, 의기양양하여 지나치게 우쭐거리는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48221,11 +47128,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2742,
 			proverb: '상판대기가 꽹과리 같다',
-			meaning: '얼굴이 놋쇠로 만든 꽹과리 같다는 뜻으로, 몹시 파렴치한 사람을 비유적으로 이르는 말.',
+			meaning: '몹시 파렴치한 사람.',
 			longMeaning: '얼굴이 놋쇠로 만든 꽹과리 같다는 뜻으로, 몹시 파렴치한 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -48241,11 +47147,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2743,
 			proverb: '상하사불급이요 이름만 석숭이가 되었다',
-			meaning: '이 일 저 일 벌여 놓기만 하고 실속은 없어 알뜰하게 모은 제 재물은 없음을 비유적으로 이르는 말.',
+			meaning: '이 일 저 일 벌여 놓기만 하고 실속은 없어 알뜰하게 모은 제 재물은 없음.',
 			longMeaning: '이 일 저 일 벌여 놓기만 하고 실속은 없어 알뜰하게 모은 제 재물은 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48261,12 +47166,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 84,
 		},
-
 		{
 			id: 2744,
 			proverb: '새남터를 나가도 먹어야 한다',
-			meaning:
-				'곧 죽으러 새남터로 끌려 나가더라도 우선 먹고 봐야 한다는 뜻으로, 아무리 큰일을 당하더라도 우선 든든히 먹고 기운을 차리는 것이 중요함을 비유적으로 이르는 말.',
+			meaning: '아무리 큰일을 당하더라도 우선 든든히 먹고 기운을 차리는 것이 중요함.',
 			longMeaning:
 				'곧 죽으러 새남터로 끌려 나가더라도 우선 먹고 봐야 한다는 뜻으로, 아무리 큰일을 당하더라도 우선 든든히 먹고 기운을 차리는 것이 중요함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48283,11 +47186,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 2745,
 			proverb: '새도 날개가 생겨야 날아간다',
-			meaning: '새도 날개가 생겨나야 날 수 있다는 뜻으로, 무슨 일이든 필요한 조건이 갖추어져야 이루어질 수 있음을 비유적으로 이르는 말.',
+			meaning: '무슨 일이든 필요한 조건이 갖추어져야 이루어질 수 있음.',
 			longMeaning: '새도 날개가 생겨나야 날 수 있다는 뜻으로, 무슨 일이든 필요한 조건이 갖추어져야 이루어질 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -48303,11 +47205,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 60,
 		},
-
 		{
 			id: 2746,
 			proverb: '새벽 호랑이(가) 중이나 개를 헤아리지 않는다[아니한다]',
-			meaning: '다급해지면 무엇이든지 가릴 여지가 없어짐을 비유적으로 이르는 말.',
+			meaning: '다급해지면 무엇이든지 가릴 여지가 없어짐.',
 			longMeaning: '다급해지면 무엇이든지 가릴 여지가 없어짐을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48323,12 +47224,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2747,
 			proverb: '새 오리 장가가면 헌 오리 나도 한다',
-			meaning:
-				'새 오리가 장가가면 헌 오리가 나도 하겠다고 나선다는 뜻으로, 남이 하는 대로 무턱대고 자기도 하겠다고 따라나서는 주책없는 행동을 비유적으로 이르는 말.',
+			meaning: '남이 하는 대로 무턱대고 자기도 하겠다고 따라나서는 주책없는 행동.',
 			longMeaning:
 				'새 오리가 장가가면 헌 오리가 나도 하겠다고 나선다는 뜻으로, 남이 하는 대로 무턱대고 자기도 하겠다고 따라나서는 주책없는 행동을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48345,11 +47244,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 2748,
 			proverb: '색시가 고우면 가시집 말장 끝까지 곱게 보인다',
-			meaning: '마음에 드는 사람과 관계된 것이면 무엇이나 다 좋게만 보임을 비유적으로 이르는 말.',
+			meaning: '마음에 드는 사람과 관계된 것이면 무엇이나 다 좋게만 보임.',
 			longMeaning: '마음에 드는 사람과 관계된 것이면 무엇이나 다 좋게만 보임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -48365,11 +47263,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2749,
 			proverb: '색시가 고우면 처갓집 외양간 말뚝에도 절한다',
-			meaning: '어떤 사람을 너무 좋아하여 사리 판단이 어두워지면 실수를 하게 됨을 비유적으로 이르는 말.',
+			meaning: '어떤 사람을 너무 좋아하여 사리 판단이 어두워지면 실수를 하게 됨.',
 			longMeaning: '어떤 사람을 너무 좋아하여 사리 판단이 어두워지면 실수를 하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -48385,12 +47282,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 96,
 		},
-
 		{
 			id: 2750,
 			proverb: '색시가 시집살이하려면 벙어리 삼 년 귀머거리 삼 년 해야 한다',
-			meaning:
-				'여자는 시집가서 남의 말을 듣고도 못 들은 체하고 하고 싶은 말이 있어도 하지 말아야 한다는 뜻으로, 시집살이의 어려움을 비유적으로 이르는 말.',
+			meaning: '시집살이의 어려움.',
 			longMeaning:
 				'여자는 시집가서 남의 말을 듣고도 못 들은 체하고 하고 싶은 말이 있어도 하지 말아야 한다는 뜻으로, 시집살이의 어려움을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48407,7 +47302,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2751,
 			proverb: '색시 짚신에 구슬 감기가 웬일인고',
@@ -48427,12 +47321,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 71,
 		},
-
 		{
 			id: 2752,
 			proverb: '생가시아비 묶듯',
-			meaning:
-				'살아 있는 장인을 죽은 사람 다루듯 묶는다는 뜻으로, 엄하여야 할 자리에 있는 사람은 너그럽게 대하는데 그 상대편이 도리어 버릇없이 굴어 도리에 어긋나게 됨을 비유적으로 이르는 말.',
+			meaning: '엄하여야 할 자리에 있는 사람은 너그럽게 대하는데 그 상대편이 도리어 버릇없이 굴어 도리에 어긋나게 됨.',
 			longMeaning:
 				'살아 있는 장인을 죽은 사람 다루듯 묶는다는 뜻으로, 엄하여야 할 자리에 있는 사람은 너그럽게 대하는데 그 상대편이 도리어 버릇없이 굴어 도리에 어긋나게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48449,7 +47341,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2753,
 			proverb: '생선 망신은 꼴뚜기가 시킨다',
@@ -48469,11 +47360,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 2754,
 			proverb: '생쥐 볼가심할 것도 없다',
-			meaning: '조그마한 생쥐가 입가심할 정도의 먹을 것도 없다는 뜻으로, 먹을 것이라고는 아무것도 없고 몹시 가난함을 비유적으로 이르는 말.',
+			meaning: '먹을 것이라고는 아무것도 없고 몹시 가난함.',
 			longMeaning: '조그마한 생쥐가 입가심할 정도의 먹을 것도 없다는 뜻으로, 먹을 것이라고는 아무것도 없고 몹시 가난함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48489,11 +47379,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2755,
 			proverb: '서낭에 가 절만 한다',
-			meaning: '서낭신 앞에 가서 아무 목적도 없이 절만 한다는 뜻으로, 영문도 모르고 남이 하는 대로만 따라 함을 비유적으로 이르는 말.',
+			meaning: '영문도 모르고 남이 하는 대로만 따라 함.',
 			longMeaning: '서낭신 앞에 가서 아무 목적도 없이 절만 한다는 뜻으로, 영문도 모르고 남이 하는 대로만 따라 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -48509,11 +47398,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 2756,
 			proverb: '서리를 기다리는 마가을 초목',
-			meaning: '죽기를 기다리는 가냘픈 존재를 비유적으로 이르는 말.',
+			meaning: '죽기를 기다리는 가냘픈 존재.',
 			longMeaning: '죽기를 기다리는 가냘픈 존재를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48529,11 +47417,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 2757,
 			proverb: '서울 가는 놈 감투 부탁 받은 격',
-			meaning: '남의 귀찮은 부탁을 달갑지 않게 여기면서 마지못해 받는 경우를 비유적으로 이르는 말.',
+			meaning: '남의 귀찮은 부탁을 달갑지 않게 여기면서 마지못해 받는 경우.',
 			longMeaning: '남의 귀찮은 부탁을 달갑지 않게 여기면서 마지못해 받는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -48549,7 +47436,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 60,
 		},
-
 		{
 			id: 2758,
 			proverb: '서울 가는 놈이 눈썹을 빼고 간다',
@@ -48569,12 +47455,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 2759,
 			proverb: '서울 가 본 놈하고 안 가 본 놈하고 싸우면 서울 가 본 놈이 못 이긴다',
 			meaning:
-				'실지로 해 보거나 직접 눈으로 본 사람은 사실대로만 말하지만, 실지로 해 보거나 직접 눈으로 보지 아니한 사람은 오히려 더 그럴듯한 이론이나 과장된 이야기를 말해서 더 그럴듯하고 더 엄청나게 이야기함을 비유적으로 이르는 말.',
+				'실지로 해 보거나 직접 눈으로 본 사람은 사실대로만 말하지만, 실지로 해 보거나 직접 눈으로 보지 아니한 사람은 오히려 더 그럴듯한 이론이나 과장된 이야기를 말해서 더 그럴듯하고 더 엄청나게 이야기함.',
 			longMeaning:
 				'실지로 해 보거나 직접 눈으로 본 사람은 사실대로만 말하지만, 실지로 해 보거나 직접 눈으로 보지 아니한 사람은 오히려 더 그럴듯한 이론이나 과장된 이야기를 말해서 더 그럴듯하고 더 엄청나게 이야기함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48591,12 +47476,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2760,
 			proverb: '서울 소식은 시골 가서 들어라',
-			meaning:
-				'서울에서 벌어진 사건에 대한 소식 중의 어떤 것은 시골에 먼저 퍼진다는 뜻으로, 자기 주위의 일은 먼 데 사람이 더 잘 아는 경우가 많음을 비유적으로 이르는 말.',
+			meaning: '자기 주위의 일은 먼 데 사람이 더 잘 아는 경우가 많음.',
 			longMeaning:
 				'서울에서 벌어진 사건에 대한 소식 중의 어떤 것은 시골에 먼저 퍼진다는 뜻으로, 자기 주위의 일은 먼 데 사람이 더 잘 아는 경우가 많음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48613,11 +47496,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2761,
 			proverb: '서울에 가야 과거도 본다',
-			meaning: '서울에 가야 과거를 보든지 말든지 한다는 뜻으로, 우선 목적지에 가 봐야 어떤 일이 이루어지든지 말든지 한다는 것을 비유적으로 이르는 말.',
+			meaning: '우선 목적지에 가 봐야 어떤 일이 이루어지든지 말든지 한다는 것.',
 			longMeaning:
 				'서울에 가야 과거를 보든지 말든지 한다는 뜻으로, 우선 목적지에 가 봐야 어떤 일이 이루어지든지 말든지 한다는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48634,7 +47516,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 2762,
 			proverb: '서울을 가야 과거에 급제하지',
@@ -48654,11 +47535,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2763,
 			proverb: '서천에 경 가지러 가는 사람은 가고 장가들 사람은 장가든다',
-			meaning: '서로 같은 목적으로 동행하다가 갑자기 변하여 각자 자기 좋은 대로 행동하는 경우를 비유적으로 이르는 말.',
+			meaning: '서로 같은 목적으로 동행하다가 갑자기 변하여 각자 자기 좋은 대로 행동하는 경우.',
 			longMeaning: '서로 같은 목적으로 동행하다가 갑자기 변하여 각자 자기 좋은 대로 행동하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48674,11 +47554,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2764,
 			proverb: '서천에서 해가 뜨겠다',
-			meaning: '해가 뜰 리 없는 서쪽 하늘에서 해가 뜨겠다는 뜻으로, 너무나도 뜻밖의 일임을 비유적으로 이르는 말.',
+			meaning: '너무나도 뜻밖의 일임.',
 			longMeaning: '해가 뜰 리 없는 서쪽 하늘에서 해가 뜨겠다는 뜻으로, 너무나도 뜻밖의 일임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '운/우연',
@@ -48694,7 +47573,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 2765,
 			proverb: '서투른 숙수가 (피나무) 안반만 나무란다',
@@ -48714,12 +47592,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 82,
 		},
-
 		{
 			id: 2766,
 			proverb: '서투른 시객이 평측을 가리랴',
-			meaning:
-				'한시를 잘 못 짓는 사람이 한자음의 높낮이를 맞추어서 시를 지을 수 있겠는가라는 뜻으로, 일을 잘 못하는 주제에 까다로운 법칙까지 다 알아서 할 수 있을 리 없음을 비유적으로 이르는 말.',
+			meaning: '일을 잘 못하는 주제에 까다로운 법칙까지 다 알아서 할 수 있을 리 없음.',
 			longMeaning:
 				'한시를 잘 못 짓는 사람이 한자음의 높낮이를 맞추어서 시를 지을 수 있겠는가라는 뜻으로, 일을 잘 못하는 주제에 까다로운 법칙까지 다 알아서 할 수 있을 리 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48736,12 +47612,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2767,
 			proverb: '선가 없는 놈이 배에 먼저 오른다',
-			meaning:
-				'뱃삯으로 낼 돈도 없는 주제에 배에는 염치없이 먼저 오른다는 뜻으로, 실력 없는 사람이 오히려 실력 있는 사람보다 앞서서 덤벙대거나 서두름을 놀림조로 이르는 말.',
+			meaning: '실력 없는 사람이 오히려 실력 있는 사람보다 앞서서 덤벙대거나 서두름.',
 			longMeaning:
 				'뱃삯으로 낼 돈도 없는 주제에 배에는 염치없이 먼저 오른다는 뜻으로, 실력 없는 사람이 오히려 실력 있는 사람보다 앞서서 덤벙대거나 서두름을 놀림조로 이르는 말.',
 			sameProverb: [],
@@ -48758,11 +47632,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 2768,
 			proverb: '선떡 가지고 친정에 간다',
-			meaning: '제대로 익지 아니한 선떡을 하여 가지고 친정집에 찾아간다는 뜻으로, 변변찮고 성의 없는 선물을 함을 비유적으로 이르는 말.',
+			meaning: '변변찮고 성의 없는 선물을 함.',
 			longMeaning: '제대로 익지 아니한 선떡을 하여 가지고 친정집에 찾아간다는 뜻으로, 변변찮고 성의 없는 선물을 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48778,12 +47651,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2769,
 			proverb: '섣달그믐날 시루 얻으러 가다니[다니기]',
-			meaning:
-				'어느 집이나 다 시루를 쓰는 섣달그믐날에 남의 집에 시루를 얻으러 다닌다는 뜻으로, 되지도 않을 일에 애를 쓰는 미련한 짓을 비유적으로 이르는 말.',
+			meaning: '되지도 않을 일에 애를 쓰는 미련한 짓.',
 			longMeaning:
 				'어느 집이나 다 시루를 쓰는 섣달그믐날에 남의 집에 시루를 얻으러 다닌다는 뜻으로, 되지도 않을 일에 애를 쓰는 미련한 짓을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48800,11 +47671,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 83,
 		},
-
 		{
 			id: 2770,
 			proverb: '설 때 궂긴 아이가 날 때도 궂긴다',
-			meaning: '뱃속에 처음 생길 때부터 힘든 아이는 태어날 때도 고생한다는 뜻으로, 처음 시작이 순조롭지 못하면 내내 순조롭지 못함을 이르는 말.',
+			meaning: '처음 시작이 순조롭지 못하면 내내 순조롭지 못함.',
 			longMeaning: '뱃속에 처음 생길 때부터 힘든 아이는 태어날 때도 고생한다는 뜻으로, 처음 시작이 순조롭지 못하면 내내 순조롭지 못함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48820,11 +47690,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 71,
 		},
-
 		{
 			id: 2771,
 			proverb: '설삶은 말[소] 대가리',
-			meaning: '격에 어울리지 아니하게 멋대가리 없는 모습을 비유적으로 이르는 말.',
+			meaning: '격에 어울리지 아니하게 멋대가리 없는 모습.',
 			longMeaning: '격에 어울리지 아니하게 멋대가리 없는 모습을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48840,11 +47709,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2772,
 			proverb: '설 제 궂긴 아이가 날 제도 궂긴다',
-			meaning: '뱃속에 처음 생길 때부터 힘든 아이는 태어날 때도 고생한다는 뜻으로, 처음 시작이 순조롭지 못하면 내내 순조롭지 못함을 이르는 말.',
+			meaning: '처음 시작이 순조롭지 못하면 내내 순조롭지 못함.',
 			longMeaning: '뱃속에 처음 생길 때부터 힘든 아이는 태어날 때도 고생한다는 뜻으로, 처음 시작이 순조롭지 못하면 내내 순조롭지 못함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48860,7 +47728,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 71,
 		},
-
 		{
 			id: 2773,
 			proverb: '성은 피가(皮哥)라도 옥관자[동지] 맛에 다닌다',
@@ -48882,12 +47749,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2774,
 			proverb: '성인은 미치광이 말도 가려 쓴다',
-			meaning:
-				'성인은 미치광이가 하는 말도 듣고 나서 받아들일 것은 받아들인다는 뜻으로, 누구의 말이든 귀담아듣고 옳은 말은 받아들여야 함을 비유적으로 이르는 말.',
+			meaning: '누구의 말이든 귀담아듣고 옳은 말은 받아들여야 함.',
 			longMeaning:
 				'성인은 미치광이가 하는 말도 듣고 나서 받아들일 것은 받아들인다는 뜻으로, 누구의 말이든 귀담아듣고 옳은 말은 받아들여야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48904,11 +47769,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 71,
 		},
-
 		{
 			id: 2775,
 			proverb: '성현이 나면 기린이 나고 군자가 나면 봉이 난다',
-			meaning: '어진 이나 임금이 나와 나라를 잘 다스리면 기린이나 봉황이 나타나는 것과 같은 상서로운 일도 있게 됨을 이르는 말.',
+			meaning: '어진 이나 임금이 나와 나라를 잘 다스리면 기린이나 봉황이 나타나는 것과 같은 상서로운 일도 있게 됨.',
 			longMeaning: '어진 이나 임금이 나와 나라를 잘 다스리면 기린이나 봉황이 나타나는 것과 같은 상서로운 일도 있게 됨을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48924,11 +47788,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2776,
 			proverb: '섶을 지고 불로 들어가려 한다',
-			meaning: '당장에 불이 붙을 섶을 지고 이글거리는 불 속으로 뛰어든다는 뜻으로, 앞뒤 가리지 못하고 미련하게 행동함을 놀림조로 이르는 말.',
+			meaning: '앞뒤 가리지 못하고 미련하게 행동함.',
 			longMeaning: '당장에 불이 붙을 섶을 지고 이글거리는 불 속으로 뛰어든다는 뜻으로, 앞뒤 가리지 못하고 미련하게 행동함을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -48944,11 +47807,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2777,
 			proverb: '세끼 굶으면 군자가 없다',
-			meaning: '아무리 착한 사람이라도 몹시 궁하게 되면 못하는 짓이 없게 됨을 비유적으로 이르는 말.',
+			meaning: '아무리 착한 사람이라도 몹시 궁하게 되면 못하는 짓이 없게 됨.',
 			longMeaning: '아무리 착한 사람이라도 몹시 궁하게 되면 못하는 짓이 없게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -48964,12 +47826,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2778,
 			proverb: '세끼(를) 굶으면 쌀 가지고 오는 놈[사람] 있다',
-			meaning:
-				'사람이 양식이 떨어져 굶어 죽게 되면 도와주는 사람이 생기게 마련이라는 뜻으로, 사람이 아무리 어렵게 지내더라도 여간하여서는 굶어 죽지는 않음을 비유적으로 이르는 말.',
+			meaning: '사람이 아무리 어렵게 지내더라도 여간하여서는 굶어 죽지는 않음.',
 			longMeaning:
 				'사람이 양식이 떨어져 굶어 죽게 되면 도와주는 사람이 생기게 마련이라는 뜻으로, 사람이 아무리 어렵게 지내더라도 여간하여서는 굶어 죽지는 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -48986,11 +47846,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2779,
 			proverb: '세상에 뜸부기가 한 마리뿐인가',
-			meaning: '이번에는 놓쳤으나 앞으로 또 기회가 있음을 비유적으로 이르는 말.',
+			meaning: '이번에는 놓쳤으나 앞으로 또 기회가 있음.',
 			longMeaning: '이번에는 놓쳤으나 앞으로 또 기회가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -49006,7 +47865,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2780,
 			proverb: '셈 센 아버지가 참는다',
@@ -49028,11 +47886,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2781,
 			proverb: '셋이 먹다가 둘이 죽어도 모른다',
-			meaning: '음식이 아주 맛있음을 이르는 말.',
+			meaning: '음식이 아주 맛있음.',
 			longMeaning: '음식이 아주 맛있음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49048,7 +47905,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2782,
 			proverb: '소 가는 데 말도 간다',
@@ -49068,11 +47924,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 36,
 		},
-
 		{
 			id: 2783,
 			proverb: '소가 짖겠다',
-			meaning: '너무나 어처구니없는 일을 본 경우를 이르는 말.',
+			meaning: '너무나 어처구니없는 일을 본 경우.',
 			longMeaning: '너무나 어처구니없는 일을 본 경우를 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49088,12 +47943,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 19,
 		},
-
 		{
 			id: 2784,
 			proverb: '소가 크면[세면] 왕 노릇 하나',
-			meaning:
-				'소가 아무리 크고 힘이 세다 할지라도 왕 노릇은 할 수 없다는 뜻으로, 힘만 가지고는 결코 큰일을 못하며 반드시 훌륭한 품성과 지략을 갖추어야 됨을 비유적으로 이르는 말.',
+			meaning: '힘만 가지고는 결코 큰일을 못하며 반드시 훌륭한 품성과 지략을 갖추어야 됨.',
 			longMeaning:
 				'소가 아무리 크고 힘이 세다 할지라도 왕 노릇은 할 수 없다는 뜻으로, 힘만 가지고는 결코 큰일을 못하며 반드시 훌륭한 품성과 지략을 갖추어야 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -49110,11 +47963,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2785,
 			proverb: '소 갈 데 말 갈 데 (가리지 않는다)',
-			meaning: '어떤 목적을 위하여서는 그 어떤 궂은 데나 험한 데라도 가리지 아니하고 어디나 다 돌아다님을 비유적으로 이르는 말.',
+			meaning: '어떤 목적을 위하여서는 그 어떤 궂은 데나 험한 데라도 가리지 아니하고 어디나 다 돌아다님.',
 			longMeaning: '어떤 목적을 위하여서는 그 어떤 궂은 데나 험한 데라도 가리지 아니하고 어디나 다 돌아다님을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49130,11 +47982,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2786,
 			proverb: '소경 관등(觀燈) 가듯',
-			meaning: '눈먼 봉사가 단청을 구경한다는 뜻으로, 사물의 참된 모습을 깨닫지 못함을 비유적으로 이르는 말.',
+			meaning: '사물의 참된 모습을 깨닫지 못함.',
 			longMeaning: '눈먼 봉사가 단청을 구경한다는 뜻으로, 사물의 참된 모습을 깨닫지 못함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49150,11 +48001,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 2787,
 			proverb: '소금 먹은 소가 물을 켜지',
-			meaning: '무슨 일이든 거기에는 반드시 그렇게 된 까닭이 있음을 비유적으로 이르는 말.',
+			meaning: '무슨 일이든 거기에는 반드시 그렇게 된 까닭이 있음.',
 			longMeaning: '무슨 일이든 거기에는 반드시 그렇게 된 까닭이 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49170,7 +48020,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2788,
 			proverb: '소나무가 무성하면 잣나무도 기뻐한다',
@@ -49190,7 +48039,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 2789,
 			proverb: '소는 농가의 조상',
@@ -49210,11 +48058,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 27,
 		},
-
 		{
 			id: 2790,
 			proverb: '소 대가리에 말 궁둥이 갖다 붙인다',
-			meaning: '실정과는 전혀 맞지 아니하게 일의 차례나 체계를 뒤바꾸어 하는 경우를 비유적으로 이르는 말.',
+			meaning: '실정과는 전혀 맞지 아니하게 일의 차례나 체계를 뒤바꾸어 하는 경우.',
 			longMeaning: '실정과는 전혀 맞지 아니하게 일의 차례나 체계를 뒤바꾸어 하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49230,11 +48077,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 70,
 		},
-
 		{
 			id: 2791,
 			proverb: '소 대가리에 말 꼬리를 달아 놓은 격',
-			meaning: '실정과는 전혀 맞지 아니하게 일의 차례나 체계를 뒤바꾸어 하는 경우를 비유적으로 이르는 말.',
+			meaning: '실정과는 전혀 맞지 아니하게 일의 차례나 체계를 뒤바꾸어 하는 경우.',
 			longMeaning: '실정과는 전혀 맞지 아니하게 일의 차례나 체계를 뒤바꾸어 하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49250,11 +48096,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 71,
 		},
-
 		{
 			id: 2792,
 			proverb: '소똥도 약에 쓸 때가 있다',
-			meaning: '아무리 하찮은 물건이라도 요긴하게 쓰일 때가 있음을 비유적으로 이르는 말.',
+			meaning: '아무리 하찮은 물건이라도 요긴하게 쓰일 때가 있음.',
 			longMeaning: '아무리 하찮은 물건이라도 요긴하게 쓰일 때가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49270,11 +48115,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2793,
 			proverb: '소라가 똥 누러 가니 소라게 기어들었다',
-			meaning: '잠시 빈틈을 타서 남의 자리를 빼앗아 차지하는 짓을 비유적으로 이르는 말.',
+			meaning: '잠시 빈틈을 타서 남의 자리를 빼앗아 차지하는 짓.',
 			longMeaning: '잠시 빈틈을 타서 남의 자리를 빼앗아 차지하는 짓을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -49290,7 +48134,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 78,
 		},
-
 		{
 			id: 2794,
 			proverb: '소매가 길면 춤을 잘 추고 돈이 많으면 장사를 잘한다',
@@ -49310,7 +48153,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2795,
 			proverb: '소여 대여(大輿)에 죽어 가는 것이 헌 옷 입고 볕에 앉았는 것만 못하다',
@@ -49332,11 +48174,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2796,
 			proverb: '소진이도 말 잘 못할 때가 있다',
-			meaning: '소진과 같이 말을 잘하는 사람도 말실수할 때가 있다는 뜻으로, 말실수를 하는 경우에 위로로 이르는 말.',
+			meaning: '말실수를 하는 경우에 위로로.',
 			longMeaning: '소진과 같이 말을 잘하는 사람도 말실수할 때가 있다는 뜻으로, 말실수를 하는 경우에 위로로 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -49352,11 +48193,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2797,
 			proverb: '소한 추위는 꾸어다가라도 한다',
-			meaning: '소한 때는 반드시 추운 법임을 강조하여 이르는 말.',
+			meaning: '소한 때는 반드시 추운 법임.',
 			longMeaning: '소한 때는 반드시 추운 법임을 강조하여 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49372,11 +48212,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2798,
 			proverb: '속곳 벗고 은가락지 낀다',
-			meaning: '격에 맞지 아니한 짓을 하는 경우를 비유적으로 이르는 말.',
+			meaning: '격에 맞지 아니한 짓을 하는 경우.',
 			longMeaning: '격에 맞지 아니한 짓을 하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49392,11 +48231,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 2799,
 			proverb: '속에 구렝이가 들어앉다',
-			meaning: '사람이 음흉스러워서 순진하고 소탈한 맛이 없음을 비유적으로 이르는 말.',
+			meaning: '사람이 음흉스러워서 순진하고 소탈한 맛이 없음.',
 			longMeaning: '사람이 음흉스러워서 순진하고 소탈한 맛이 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -49412,7 +48250,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2800,
 			proverb: '속에서 쪼르륵 소리가 난다',
@@ -49432,11 +48269,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2801,
 			proverb: '손가락도 길고 짧다',
-			meaning: '아무리 같은 조건에 있다고 하더라도 조금씩은 서로 차이가 있게 마련이라는 것을 비유적으로 이르는 말.',
+			meaning: '아무리 같은 조건에 있다고 하더라도 조금씩은 서로 차이가 있게 마련이라는 것.',
 			longMeaning: '아무리 같은 조건에 있다고 하더라도 조금씩은 서로 차이가 있게 마련이라는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49452,12 +48288,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2802,
 			proverb: '손가락에 불을 지르고 하늘에 오른다',
 			meaning: '자기가 주장하는 것이 틀림없다고 장담 이르는 말.',
-			longMeaning: '자기가 주장하는 것이 틀림없다고 장담 이르는 말.',
+			longMeaning: '자기가 주장하는 것이 틀림없다고 장담하여 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
 			level: 3,
@@ -49472,11 +48307,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 70,
 		},
-
 		{
 			id: 2803,
 			proverb: '손가락으로 하늘 찌르기',
-			meaning: '끝없이 높은 하늘을 손가락으로 찌르려 한다는 뜻으로, 가능성이 전혀 없는 짓을 함을 이르는 말.',
+			meaning: '가능성이 전혀 없는 짓을 함.',
 			longMeaning: '끝없이 높은 하늘을 손가락으로 찌르려 한다는 뜻으로, 가능성이 전혀 없는 짓을 함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49492,11 +48326,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2804,
 			proverb: '손샅으로 밑 가리기',
-			meaning: '애써 숨기려 하나 제대로 숨기지 못하는 경우를 비유적으로 이르는 말.',
+			meaning: '애써 숨기려 하나 제대로 숨기지 못하는 경우.',
 			longMeaning: '애써 숨기려 하나 제대로 숨기지 못하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49512,11 +48345,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2805,
 			proverb: '손이 차가운 사람은 심장이 뜨겁다',
-			meaning: '감정이 풍부하고 열정을 지닌 사람이 겉으로 냉정한 태도를 취함을 비유적으로 이르는 말.',
+			meaning: '감정이 풍부하고 열정을 지닌 사람이 겉으로 냉정한 태도를 취함.',
 			longMeaning: '감정이 풍부하고 열정을 지닌 사람이 겉으로 냉정한 태도를 취함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -49532,11 +48364,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2806,
 			proverb: '손 큰 며느리가 시집살이했을까',
-			meaning: '물건을 파는 장수가 더 많이 주지 못하겠다는 뜻으로 이르는 말.',
+			meaning: '물건을 파는 장수가 더 많이 주지 못하겠다는 뜻으로.',
 			longMeaning: '물건을 파는 장수가 더 많이 주지 못하겠다는 뜻으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49552,11 +48383,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2807,
 			proverb: '손톱 밑의 가시가 생손으로 곪는다',
-			meaning: '손톱 밑에 박혔던 가시가 덧나서 생인손으로 악화되어 크게 고생한다는 뜻으로, 사소한 것 때문에 큰 해를 입게 됨을 이르는 말.',
+			meaning: '사소한 것 때문에 큰 해를 입게 됨.',
 			longMeaning: '손톱 밑에 박혔던 가시가 덧나서 생인손으로 악화되어 크게 고생한다는 뜻으로, 사소한 것 때문에 큰 해를 입게 됨을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49572,11 +48402,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2808,
 			proverb: '솔밭에 가서 고기 낚기',
-			meaning: '물에서 사는 물고기를 솔밭에서 구한다는 뜻으로 도저히 불가능한 일을 하려고 애쓰는 어리석음을 비유적으로 이르는 말.',
+			meaning: '물에서 사는 물고기를 솔밭에서 구한다는 뜻으로 도저히 불가능한 일을 하려고 애쓰는 어리석음.',
 			longMeaning: '물에서 사는 물고기를 솔밭에서 구한다는 뜻으로 도저히 불가능한 일을 하려고 애쓰는 어리석음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49592,12 +48421,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2809,
 			proverb: '솔잎이 버썩하니 가랑잎이 할 말이 없다',
-			meaning:
-				'버썩 소리를 낼 리 없는 솔잎이 버썩하니 버썩 소리를 잘 내는 가랑잎이 어이가 없어 아무 소리도 내지 못한다는 뜻으로, 자기보다 정도가 덜한 사람이 먼저 야단스럽게 떠들어 대니 정작 큰 걱정거리가 있는 사람은 너무나 어이가 없어 할 말이 없게 됨을 이르는 말.',
+			meaning: '자기보다 정도가 덜한 사람이 먼저 야단스럽게 떠들어 대니 정작 큰 걱정거리가 있는 사람은 너무나 어이가 없어 할 말이 없게 됨.',
 			longMeaning:
 				'버썩 소리를 낼 리 없는 솔잎이 버썩하니 버썩 소리를 잘 내는 가랑잎이 어이가 없어 아무 소리도 내지 못한다는 뜻으로, 자기보다 정도가 덜한 사람이 먼저 야단스럽게 떠들어 대니 정작 큰 걱정거리가 있는 사람은 너무나 어이가 없어 할 말이 없게 됨을 이르는 말.',
 			sameProverb: [],
@@ -49614,11 +48441,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2810,
 			proverb: '솜뭉치로 가슴(을) 칠 일(이다)',
-			meaning: '아무리 쳐도 가슴이 시원해지지 않을 솜뭉치로 가슴을 칠 일이라는 뜻으로, 몹시 답답하고 원통함을 비유적으로 이르는 말.',
+			meaning: '몹시 답답하고 원통함.',
 			longMeaning: '아무리 쳐도 가슴이 시원해지지 않을 솜뭉치로 가슴을 칠 일이라는 뜻으로, 몹시 답답하고 원통함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49634,7 +48460,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2811,
 			proverb: '솜에 채어도 발가락이 깨진다',
@@ -49654,11 +48479,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2812,
 			proverb: '송곳니가 방석니가 된다',
-			meaning: '뾰족한 송곳니가 납작하게 닳도록 이를 몹시 간다는 뜻으로, 몹시 원통함을 비유적으로 이르는 말.',
+			meaning: '몹시 원통함.',
 			longMeaning: '뾰족한 송곳니가 납작하게 닳도록 이를 몹시 간다는 뜻으로, 몹시 원통함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49674,11 +48498,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2813,
 			proverb: '송곳니를 가진 호랑이는 뿔이 없다',
-			meaning: '모든 것을 다 갖출 수는 없음을 비유적으로 이르는 말.',
+			meaning: '모든 것을 다 갖출 수는 없음.',
 			longMeaning: '모든 것을 다 갖출 수는 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49694,11 +48517,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2814,
 			proverb: '송곳 항렬인가',
-			meaning: '꼬치꼬치 캐어묻거나 파고 묻는 사람을 놀림조로 이르는 말.',
+			meaning: '꼬치꼬치 캐어묻거나 파고 묻는 사람.',
 			longMeaning: '꼬치꼬치 캐어묻거나 파고 묻는 사람을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -49714,14 +48536,12 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2815,
 			proverb: '송도가 망하려니까 불가사리가 나왔다',
 			meaning:
 				'어떤 좋지 못한 일이 생기기 전에 불길한 징조가 나타남을 비유적으로 이르는 말. 고려가 망하게 되었을 때 송도에 불가사리가 나타나서 못된 장난질을 하였다는 전설에서 유래한다.',
-			longMeaning:
-				'어떤 좋지 못한 일이 생기기 전에 불길한 징조가 나타남을 비유적으로 이르는 말. 고려가 망하게 되었을 때 송도에 불가사리가 나타나서 못된 장난질을 하였다는 전설에서 유래한다 이르는 말.',
+			longMeaning: '어떤 좋지 못한 일이 생기기 전에 불길한 징조가 나타남을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
 			level: 4,
@@ -49730,18 +48550,16 @@ export const CONST_MAIN_DATA: {
 				"괜한 농담 한마디로 분위기가 틀어지자 선배가 '송도가 망하려니까 불가사리가 나왔다'라고 타일렀다.",
 				"회의에서 듣기 좋은 말만 늘어놓던 사람이 정작 책임은 피하자 팀원이 '송도가 망하려니까 불가사리가 나왔다'라고 말했다.",
 			],
-			origin: '일상에서 반복되는 상황을 빗대어 전해 온 말이다.',
+			origin: '고려가 망하게 되었을 때 송도에 불가사리가 나타나 못된 장난질을 하였다는 전설에서 유래한다.',
 			usageTip: '비슷한 상황을 짧게 빗대어 말할 때 쓸 수 있다.',
 			synonym: null,
 			antonym: null,
 			difficultyScore: 91,
 		},
-
 		{
 			id: 2816,
 			proverb: '송도 말년의 불가사리라',
-			meaning:
-				'고려 말에 불가사리라는 괴물이 나타나 못된 짓을 많이 하였으나 죽이지 못하였다는 이야기에서 나온 말로, 몹시 무지하고 못된 짓을 하는 자를 비유적으로 이르는 말.',
+			meaning: '몹시 무지하고 못된 짓을 하는 자.',
 			longMeaning:
 				'고려 말에 불가사리라는 괴물이 나타나 못된 짓을 많이 하였으나 죽이지 못하였다는 이야기에서 나온 말로, 몹시 무지하고 못된 짓을 하는 자를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -49758,12 +48576,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 2817,
 			proverb: '송사리 한 마리가 온 강물을 흐린다',
-			meaning:
-				'조그마한 송사리 한 마리가 까불며 바닥의 흙을 휘저어 강물을 흐리게 만든다는 뜻으로, 대수롭지 않은 존재의 부정적인 행위가 온 집단에 나쁜 영향을 끼침을 비유적으로 이르는 말.',
+			meaning: '대수롭지 않은 존재의 부정적인 행위가 온 집단에 나쁜 영향을 끼침.',
 			longMeaning:
 				'조그마한 송사리 한 마리가 까불며 바닥의 흙을 휘저어 강물을 흐리게 만든다는 뜻으로, 대수롭지 않은 존재의 부정적인 행위가 온 집단에 나쁜 영향을 끼침을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -49780,11 +48596,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 83,
 		},
-
 		{
 			id: 2818,
 			proverb: '송아지 천자(千字) 가르치듯',
-			meaning: '미련하고 아둔하여 알아듣지도 못하고 들으려 하지도 않는 사람을 억지로 애써 가르치는 모양을 비유적으로 이르는 말.',
+			meaning: '미련하고 아둔하여 알아듣지도 못하고 들으려 하지도 않는 사람을 억지로 애써 가르치는 모양.',
 			longMeaning: '미련하고 아둔하여 알아듣지도 못하고 들으려 하지도 않는 사람을 억지로 애써 가르치는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -49800,7 +48615,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 60,
 		},
-
 		{
 			id: 2819,
 			proverb: '송충이가 갈밭에 내려왔다',
@@ -49821,11 +48635,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2820,
 			proverb: '송충이가 갈잎을 먹으면 죽는다[떨어진다]',
-			meaning: '제 할 일은 안 하고 딴마음을 먹었다가는 낭패를 봄을 비유적으로 이르는 말.',
+			meaning: '제 할 일은 안 하고 딴마음을 먹었다가는 낭패를 봄.',
 			longMeaning: '제 할 일은 안 하고 딴마음을 먹었다가는 낭패를 봄을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -49841,11 +48654,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 2821,
 			proverb: '쇠가 쇠를 먹고 살이 살을 먹는다',
-			meaning: '동포 형제나 가까운 이웃, 친척끼리 서로 해치려 함을 비유적으로 이르는 말.',
+			meaning: '동포 형제나 가까운 이웃, 친척끼리 서로 해치려 함.',
 			longMeaning: '동포 형제나 가까운 이웃, 친척끼리 서로 해치려 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -49861,12 +48673,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2822,
 			proverb: '쇠꼬리보다 닭 대가리가 낫다',
-			meaning:
-				'큰 짐승에게 붙어 꼬리 노릇 하는 것보다는 비록 작은 짐승일지라도 머리 노릇을 하는 것이 낫다는 뜻으로, 크거나 훌륭한 것 중의 말단에 있는 것보다는 대수롭지 않은 데서라도 상석에 있는 것이 훨씬 더 나음을 이르는 말.',
+			meaning: '크거나 훌륭한 것 중의 말단에 있는 것보다는 대수롭지 않은 데서라도 상석에 있는 것이 훨씬 더 나음.',
 			longMeaning:
 				'큰 짐승에게 붙어 꼬리 노릇 하는 것보다는 비록 작은 짐승일지라도 머리 노릇을 하는 것이 낫다는 뜻으로, 크거나 훌륭한 것 중의 말단에 있는 것보다는 대수롭지 않은 데서라도 상석에 있는 것이 훨씬 더 나음을 이르는 말.',
 			sameProverb: [],
@@ -49883,12 +48693,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 79,
 		},
-
 		{
 			id: 2823,
 			proverb: '쇠라도 맞부딪쳐야 소리가 난다',
-			meaning:
-				'서로 맞부딪쳐야 소리가 나지 한쪽이라도 가만히 있으면 소리가 나지 않는다는 뜻으로, 한쪽이라도 맞서지 않고 가만히 있으면 싸움은 절대로 일어나지 않음을 이르는 말.',
+			meaning: '한쪽이라도 맞서지 않고 가만히 있으면 싸움은 절대로 일어나지 않음.',
 			longMeaning:
 				'서로 맞부딪쳐야 소리가 나지 한쪽이라도 가만히 있으면 소리가 나지 않는다는 뜻으로, 한쪽이라도 맞서지 않고 가만히 있으면 싸움은 절대로 일어나지 않음을 이르는 말.',
 			sameProverb: [],
@@ -49905,11 +48713,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 2824,
 			proverb: '쇠뿔 잡다가 소 죽인다',
-			meaning: '어떤 것 또는 어떤 사람의 결점이나 흠을 고치려다 그 정도가 지나쳐서 도리어 그 사물이나 사람을 망치는 경우를 비유적으로 이르는 말.',
+			meaning: '어떤 것 또는 어떤 사람의 결점이나 흠을 고치려다 그 정도가 지나쳐서 도리어 그 사물이나 사람을 망치는 경우.',
 			longMeaning: '어떤 것 또는 어떤 사람의 결점이나 흠을 고치려다 그 정도가 지나쳐서 도리어 그 사물이나 사람을 망치는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -49925,12 +48732,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2825,
 			proverb: '쇠죽가마에 달걀 삶아 먹을라',
-			meaning:
-				'쇠죽가마에 달걀을 삶아 먹지 말라고 타일러 준 것이 도리어 그것을 일깨워 준 꼴이 되었다는 뜻으로, 훈계한다는 것이 도리어 나쁜 방법을 가르쳐 주는 꼴이 된 경우를 비유적으로 이르는 말.',
+			meaning: '훈계한다는 것이 도리어 나쁜 방법을 가르쳐 주는 꼴이 된 경우.',
 			longMeaning:
 				'쇠죽가마에 달걀을 삶아 먹지 말라고 타일러 준 것이 도리어 그것을 일깨워 준 꼴이 되었다는 뜻으로, 훈계한다는 것이 도리어 나쁜 방법을 가르쳐 주는 꼴이 된 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -49947,12 +48752,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2826,
 			proverb: '수수깡도 아래위 마디가 있다',
-			meaning:
-				'아래위 분간이 어려운 수수깡조차도 아랫마디와 윗마디가 나뉘어 있다는 뜻으로, 어떤 일에나 위아래가 있고 질서가 있음을 비유적으로 이르는 말.',
+			meaning: '어떤 일에나 위아래가 있고 질서가 있음.',
 			longMeaning:
 				'아래위 분간이 어려운 수수깡조차도 아랫마디와 윗마디가 나뉘어 있다는 뜻으로, 어떤 일에나 위아래가 있고 질서가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -49969,12 +48772,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2827,
 			proverb: '수숫대도 아래위 마디가 있다',
-			meaning:
-				'아래위 분간이 어려운 수숫대조차도 아랫마디와 윗마디가 나뉘어 있다는 뜻으로, 어떤 일에나 위아래가 있고 질서가 있음을 비유적으로 이르는 말.',
+			meaning: '어떤 일에나 위아래가 있고 질서가 있음.',
 			longMeaning:
 				'아래위 분간이 어려운 수숫대조차도 아랫마디와 윗마디가 나뉘어 있다는 뜻으로, 어떤 일에나 위아래가 있고 질서가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -49991,7 +48792,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2828,
 			proverb: '수풀엣 꿩은 개가 내몰고 오장엣 말은 술이 내몬다',
@@ -50013,7 +48813,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2829,
 			proverb: '술 담배 참아 소 샀더니 호랑이가 물어 갔다',
@@ -50033,11 +48832,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 84,
 		},
-
 		{
 			id: 2830,
 			proverb: '술 먹여 놓고 해장 가자 부른다',
-			meaning: '술 먹여 놓고 해장 가자 부르며 그를 위한다는 뜻으로, 교활하고 음흉한 자의 행동을 비유적으로 이르는 말.',
+			meaning: '교활하고 음흉한 자의 행동.',
 			longMeaning: '술 먹여 놓고 해장 가자 부르며 그를 위한다는 뜻으로, 교활하고 음흉한 자의 행동을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50053,7 +48851,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2831,
 			proverb: '술친구는 친구가 아니다',
@@ -50073,11 +48870,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 2832,
 			proverb: '쉽게 단 쇠가 쉽게 식는다',
-			meaning: '힘이나 노력을 적게 들이고 빨리 해 버린 일은 그만큼 결과가 오래가지 못함을 비유적으로 이르는 말.',
+			meaning: '힘이나 노력을 적게 들이고 빨리 해 버린 일은 그만큼 결과가 오래가지 못함.',
 			longMeaning: '힘이나 노력을 적게 들이고 빨리 해 버린 일은 그만큼 결과가 오래가지 못함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -50093,11 +48889,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2833,
 			proverb: '쉽기가 손바닥 뒤집기다',
-			meaning: '매우 손쉽게 할 수 있음을 비유적으로 이르는 말.',
+			meaning: '매우 손쉽게 할 수 있음.',
 			longMeaning: '매우 손쉽게 할 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50113,11 +48908,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2834,
 			proverb: '시냇가 돌 닳듯',
-			meaning: '시련을 당하는 모양을 비유적으로 이르는 말.',
+			meaning: '시련을 당하는 모양.',
 			longMeaning: '시련을 당하는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50133,7 +48927,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2835,
 			proverb: '시누이올케 춤추는 가운데 올케 못 출까',
@@ -50153,7 +48946,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 2836,
 			proverb: '시앗을 보면 길가의 돌부처도 돌아앉는다',
@@ -50173,11 +48965,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 81,
 		},
-
 		{
 			id: 2837,
 			proverb: '시앗 죽은 눈물이 눈 가장자리 젖으랴',
-			meaning: '시앗이 죽었을 때에 본처가 흘리는 눈물만큼이라는 뜻으로, 양이 몹시 적음을 비유적으로 이르는 말.',
+			meaning: '양이 몹시 적음.',
 			longMeaning: '시앗이 죽었을 때에 본처가 흘리는 눈물만큼이라는 뜻으로, 양이 몹시 적음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50193,12 +48984,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 2838,
 			proverb: '시어는 뼈가 많고 자미(子美)는 문(文)에 능하지 못하고 자고(子固)는 시(詩)가 변변하지 못하였다',
-			meaning:
-				'준치는 아름답지만 뼈가 많은 것이 흠이고, 두보는 대시인이었지만 산문에는 능하지 못하였고, 증공과 같은 문장가는 운문에 변변치 못한 것이 유감이라는 뜻으로, 좋은 면의 한편에는 좋지 못한 일이 있음을 비유적으로 이르는 말.',
+			meaning: '좋은 면의 한편에는 좋지 못한 일이 있음.',
 			longMeaning:
 				'준치는 아름답지만 뼈가 많은 것이 흠이고, 두보는 대시인이었지만 산문에는 능하지 못하였고, 증공과 같은 문장가는 운문에 변변치 못한 것이 유감이라는 뜻으로, 좋은 면의 한편에는 좋지 못한 일이 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -50215,11 +49004,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2839,
 			proverb: '시어머니가 오래 살자니까 며느리가 방아 동티에 죽는 걸 본다',
-			meaning: '사람이 오래 살게 되면 망측한 꼴도 보게 됨을 비유적으로 이르는 말.',
+			meaning: '사람이 오래 살게 되면 망측한 꼴도 보게 됨.',
 			longMeaning: '사람이 오래 살게 되면 망측한 꼴도 보게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -50235,11 +49023,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2840,
 			proverb: '시어미가 오래 살다가 며느리 환갑날 국수 양푼에 빠져 죽는다',
-			meaning: '사람이 모질어서 남에게 못 할 짓 하는 것을 비난조로 이르는 말.',
+			meaning: '사람이 모질어서 남에게 못 할 짓 하는 것.',
 			longMeaning: '사람이 모질어서 남에게 못 할 짓 하는 것을 비난조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -50255,12 +49042,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2841,
 			proverb: '시어미가 죽으면 안방은 내 차지',
-			meaning:
-				'시어머니가 죽으면 며느리가 그 자리를 차지하게 된다는 뜻으로, 권력을 잡았던 사람이 없어지면 그다음 자리에 있던 사람이 권력을 잡게 됨을 비유적으로 이르는 말.',
+			meaning: '권력을 잡았던 사람이 없어지면 그다음 자리에 있던 사람이 권력을 잡게 됨.',
 			longMeaning:
 				'시어머니가 죽으면 며느리가 그 자리를 차지하게 된다는 뜻으로, 권력을 잡았던 사람이 없어지면 그다음 자리에 있던 사람이 권력을 잡게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -50277,11 +49062,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 2842,
 			proverb: '시어미 부를 노래를 며느리가 먼저 부른다',
-			meaning: '꾸짖음이나 나무람을 들어야 할 사람이 도리어 큰소리를 침을 비유적으로 이르는 말.',
+			meaning: '꾸짖음이나 나무람을 들어야 할 사람이 도리어 큰소리를 침.',
 			longMeaning: '꾸짖음이나 나무람을 들어야 할 사람이 도리어 큰소리를 침을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -50297,11 +49081,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 85,
 		},
-
 		{
 			id: 2843,
 			proverb: '시원찮은 국에 입(가) 덴다',
-			meaning: '대단하지 아니한 일에 해를 당함을 비유적으로 이르는 말.',
+			meaning: '대단하지 아니한 일에 해를 당함.',
 			longMeaning: '대단하지 아니한 일에 해를 당함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50317,7 +49100,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2844,
 			proverb: '시집가는 데 강아지 따르는 것이 제격이라',
@@ -50337,11 +49119,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 83,
 		},
-
 		{
 			id: 2845,
 			proverb: '시집가(서) 석 달 장가가(서) 석 달 같으면 살림 못할 사람 없다',
-			meaning: '결혼 생활 처음처럼 애정이 지속되면 살림 못하고 이혼할 사람은 하나도 없음을 비유적으로 이르는 말.',
+			meaning: '결혼 생활 처음처럼 애정이 지속되면 살림 못하고 이혼할 사람은 하나도 없음.',
 			longMeaning: '결혼 생활 처음처럼 애정이 지속되면 살림 못하고 이혼할 사람은 하나도 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -50357,11 +49138,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2846,
 			proverb: '시집도 가기 전에 기저귀[강아지/포대기] 마련한다',
-			meaning: '일을 너무 일찍 서두름을 비유적으로 이르는 말.',
+			meaning: '일을 너무 일찍 서두름.',
 			longMeaning: '일을 너무 일찍 서두름을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50377,11 +49157,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 95,
 		},
-
 		{
 			id: 2847,
 			proverb: '시집도 아니 가서 포대기 장만한다',
-			meaning: '일을 너무 일찍 서두름을 비유적으로 이르는 말.',
+			meaning: '일을 너무 일찍 서두름.',
 			longMeaning: '일을 너무 일찍 서두름을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50397,7 +49176,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2848,
 			proverb: '시집살이 못하면 동리 개가 업신여긴다',
@@ -50417,11 +49195,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 2849,
 			proverb: '시청하는 도승지가 여름 북창 밑에서 자는 사람만 못하다',
-			meaning: '벼슬살이를 하느라고 대궐을 드나드는 것보다 제집에서 편히 지내는 것이 더 나음을 비유적으로 이르는 말.',
+			meaning: '벼슬살이를 하느라고 대궐을 드나드는 것보다 제집에서 편히 지내는 것이 더 나음.',
 			longMeaning: '벼슬살이를 하느라고 대궐을 드나드는 것보다 제집에서 편히 지내는 것이 더 나음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50437,11 +49214,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2850,
 			proverb: '식은 밥이 밥일런가 명태 반찬이 반찬일런가',
-			meaning: '음식 대접이 좋지 않음을 비난조로 이르는 말.',
+			meaning: '음식 대접이 좋지 않음.',
 			longMeaning: '음식 대접이 좋지 않음을 비난조로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50457,11 +49233,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 93,
 		},
-
 		{
 			id: 2851,
 			proverb: '식은 죽도 불어[쉬어] 가며 먹어라',
-			meaning: '아무리 쉬운 일이라도 한 번 더 확인한 다음에 하는 것이 안전함을 비유적으로 이르는 말.',
+			meaning: '아무리 쉬운 일이라도 한 번 더 확인한 다음에 하는 것이 안전함.',
 			longMeaning: '아무리 쉬운 일이라도 한 번 더 확인한 다음에 하는 것이 안전함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50477,11 +49252,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2852,
 			proverb: '식전 개가 똥을 참지',
-			meaning: '늘 하던 일을 다시는 하지 않겠다고 하는 사람에게 놀림조로 이르는 말.',
+			meaning: '늘 하던 일을 다시는 하지 않겠다고 하는 사람에게.',
 			longMeaning: '늘 하던 일을 다시는 하지 않겠다고 하는 사람에게 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -50497,11 +49271,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2853,
 			proverb: '식초병보다 병마개가 더 시다',
-			meaning: '본래의 것보다 그것에 딸린 것이 오히려 그 속성을 더 잘 드러내는 경우를 비유적으로 이르는 말.',
+			meaning: '본래의 것보다 그것에 딸린 것이 오히려 그 속성을 더 잘 드러내는 경우.',
 			longMeaning: '본래의 것보다 그것에 딸린 것이 오히려 그 속성을 더 잘 드러내는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50517,11 +49290,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 2854,
 			proverb: '신발에 귀가 달렸다',
-			meaning: '쓸데없는 것이 덧붙어서 격에 맞지 아니함을 비유적으로 이르는 말.',
+			meaning: '쓸데없는 것이 덧붙어서 격에 맞지 아니함.',
 			longMeaning: '쓸데없는 것이 덧붙어서 격에 맞지 아니함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50537,11 +49309,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2855,
 			proverb: '신작로 닦아 놓으니까 문둥이가 먼저 지나간다',
-			meaning: '애써 한 일을 가당찮은 사람이 망쳐 놓아 보람이 없게 된 경우를 비유적으로 이르는 말.',
+			meaning: '애써 한 일을 가당찮은 사람이 망쳐 놓아 보람이 없게 된 경우.',
 			longMeaning: '애써 한 일을 가당찮은 사람이 망쳐 놓아 보람이 없게 된 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -50557,11 +49328,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 95,
 		},
-
 		{
 			id: 2856,
 			proverb: '신주치레하다가 제 못 지낸다',
-			meaning: '모양만 부리다가 정작 하여야 할 일을 하지 못하는 경우를 비유적으로 이르는 말.',
+			meaning: '모양만 부리다가 정작 하여야 할 일을 하지 못하는 경우.',
 			longMeaning: '모양만 부리다가 정작 하여야 할 일을 하지 못하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50577,11 +49347,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2857,
 			proverb: '실 가는 데 바늘도 간다',
-			meaning: '실이 가는 데 바늘이 항상 뒤따른다는 뜻으로, 사람의 긴밀한 관계를 비유적으로 이르는 말.',
+			meaning: '사람의 긴밀한 관계.',
 			longMeaning: '실이 가는 데 바늘이 항상 뒤따른다는 뜻으로, 사람의 긴밀한 관계를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -50597,7 +49366,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2858,
 			proverb: '실과 망신은 모과가 시킨다',
@@ -50617,7 +49385,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2859,
 			proverb: '실뱀 한 마리가 온 바다를 흐리게 한다',
@@ -50637,11 +49404,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 2860,
 			proverb: '실이 와야 바늘이 가지',
-			meaning: '조건이 성숙되어야 일이 성사됨을 비유적으로 이르는 말.',
+			meaning: '조건이 성숙되어야 일이 성사됨.',
 			longMeaning: '조건이 성숙되어야 일이 성사됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50657,7 +49423,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2861,
 			proverb: '실컷 울고 나서 뉘 초상인가 물어본다',
@@ -50679,11 +49444,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 93,
 		},
-
 		{
 			id: 2862,
 			proverb: '심사가 꽁지벌레라',
-			meaning: '심사가 좋지 못한 사람을 놀림조로 이르는 말.',
+			meaning: '심사가 좋지 못한 사람.',
 			longMeaning: '심사가 좋지 못한 사람을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -50699,11 +49463,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2863,
 			proverb: '심사가 놀부라',
-			meaning: '인색하고 심술궂은 사람을 놀림조로 이르는 말.',
+			meaning: '인색하고 심술궂은 사람.',
 			longMeaning: '인색하고 심술궂은 사람을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -50719,11 +49482,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2864,
 			proverb: '십 년 과수로 앉았다가 고자 대감을 만났다',
-			meaning: '오랫동안 공들인 일도 복이 없고 운수가 나쁘면 아무 보람도 없이 쓸모없는 것이 될 수 있음을 비유적으로 이르는 말.',
+			meaning: '오랫동안 공들인 일도 복이 없고 운수가 나쁘면 아무 보람도 없이 쓸모없는 것이 될 수 있음.',
 			longMeaning: '오랫동안 공들인 일도 복이 없고 운수가 나쁘면 아무 보람도 없이 쓸모없는 것이 될 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50739,11 +49501,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 89,
 		},
-
 		{
 			id: 2865,
 			proverb: '십 리가 모랫바닥이라도 눈 찌를 가시나무가 있다',
-			meaning: '아주 친한 벗 사이에도 원수가 섞여 있을 수 있음을 비유적으로 이르는 말.',
+			meaning: '아주 친한 벗 사이에도 원수가 섞여 있을 수 있음.',
 			longMeaning: '아주 친한 벗 사이에도 원수가 섞여 있을 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50759,11 +49520,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2866,
 			proverb: '싸전에 가서 밥 달라고 한다',
-			meaning: '모든 일에는 질서와 차례가 있는 법인데 일의 순서도 모르고 성급하게 덤빔을 비유적으로 이르는 말.',
+			meaning: '모든 일에는 질서와 차례가 있는 법인데 일의 순서도 모르고 성급하게 덤빔.',
 			longMeaning: '모든 일에는 질서와 차례가 있는 법인데 일의 순서도 모르고 성급하게 덤빔을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50779,12 +49539,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 2867,
 			proverb: '쌍가마 속에도 설움은 있다',
-			meaning:
-				'쌍가마를 타고 다니는 높은 벼슬아치에게도 설움은 있다는 뜻으로, 겉으로는 좋아 보여도 누구나 저마다의 걱정과 설움이 있음을 비유적으로 이르는 말.',
+			meaning: '겉으로는 좋아 보여도 누구나 저마다의 걱정과 설움이 있음.',
 			longMeaning:
 				'쌍가마를 타고 다니는 높은 벼슬아치에게도 설움은 있다는 뜻으로, 겉으로는 좋아 보여도 누구나 저마다의 걱정과 설움이 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -50801,12 +49559,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2868,
 			proverb: '쌍언청이가 외언청이 타령한다[타령이다]',
-			meaning:
-				'입술이 두 군데나 갈라진 언청이가 한 군데 갈라진 언청이를 보고 흉본다는 뜻으로, 자기의 큰 허물은 모르고 남의 작은 허물을 잡아서 탓함을 비유적으로 이르는 말.',
+			meaning: '자기의 큰 허물은 모르고 남의 작은 허물을 잡아서 탓함.',
 			longMeaning:
 				'입술이 두 군데나 갈라진 언청이가 한 군데 갈라진 언청이를 보고 흉본다는 뜻으로, 자기의 큰 허물은 모르고 남의 작은 허물을 잡아서 탓함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -50823,11 +49579,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 85,
 		},
-
 		{
 			id: 2869,
 			proverb: '썩은 새끼도 쓸데가 있다',
-			meaning: '아무 데도 소용없을 듯한 폐물도 다 쓸데가 있음을 비유적으로 이르는 말.',
+			meaning: '아무 데도 소용없을 듯한 폐물도 다 쓸데가 있음.',
 			longMeaning: '아무 데도 소용없을 듯한 폐물도 다 쓸데가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50843,7 +49598,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2870,
 			proverb: '쓰러져 가는 나무는 아주 쓰러뜨려라',
@@ -50863,11 +49617,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 71,
 		},
-
 		{
 			id: 2871,
 			proverb: '쓰러져 가는 나무를 아주 쓰러뜨린다',
-			meaning: '곤란한 입장에 처한 사람을 더 곤란하게 만듦을 비유적으로 이르는 말.',
+			meaning: '곤란한 입장에 처한 사람을 더 곤란하게 만듦.',
 			longMeaning: '곤란한 입장에 처한 사람을 더 곤란하게 만듦을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -50883,11 +49636,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2872,
 			proverb: '쓸개에 가 붙고 간에 가 붙는다',
-			meaning: '자기에게 조금이라도 이익이 되면 지조 없이 이편에 붙었다 저편에 붙었다 함을 비유적으로 이르는 말.',
+			meaning: '자기에게 조금이라도 이익이 되면 지조 없이 이편에 붙었다 저편에 붙었다 함.',
 			longMeaning: '자기에게 조금이라도 이익이 되면 지조 없이 이편에 붙었다 저편에 붙었다 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -50903,11 +49655,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2873,
 			proverb: '씨가 따로 있나',
-			meaning: '높은 자리에 오르는 것은 가문이나 혈통 따위에 따른 것이 아니라 자신의 능력에 따른 것임을 이르는 말.',
+			meaning: '높은 자리에 오르는 것은 가문이나 혈통 따위에 따른 것이 아니라 자신의 능력에 따른 것임.',
 			longMeaning: '높은 자리에 오르는 것은 가문이나 혈통 따위에 따른 것이 아니라 자신의 능력에 따른 것임을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50923,11 +49674,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 33,
 		},
-
 		{
 			id: 2874,
 			proverb: '아가리가 광주리만 해도 막말은 못 한다',
-			meaning: '입이 아무리 커도 함부로 말할 수 없다는 뜻으로, 상대편이 어처구니없는 말을 함을 비난조로 이르는 말.',
+			meaning: '상대편이 어처구니없는 말을 함.',
 			longMeaning: '입이 아무리 커도 함부로 말할 수 없다는 뜻으로, 상대편이 어처구니없는 말을 함을 비난조로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50943,11 +49693,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 87,
 		},
-
 		{
 			id: 2875,
 			proverb: '아가리에 자시오 할 땐 마다하다가 아가리에 처먹으라 해야 먹는다',
-			meaning: '처음에 좋은 말로 할 때는 듣지 아니하다가 나중에 말이 거칠어져야 말을 듣는 경우를 비유적으로 이르는 말.',
+			meaning: '처음에 좋은 말로 할 때는 듣지 아니하다가 나중에 말이 거칠어져야 말을 듣는 경우.',
 			longMeaning: '처음에 좋은 말로 할 때는 듣지 아니하다가 나중에 말이 거칠어져야 말을 듣는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -50963,7 +49712,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2876,
 			proverb: '아내가 귀여우면 처갓집 문설주도 귀엽다',
@@ -50983,14 +49731,12 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 81,
 		},
-
 		{
 			id: 2877,
 			proverb: '아내가 예쁘면 처갓집 울타리까지 예쁘다',
 			meaning:
-				'어떤 사람을 너무 좋아하여 사리 판단이 어두워지면 실수를 하게 됨을 비유적으로 이르는 말. \'색시가 고우면 처갓집 외양간 말뚝에도 절한다\' \'아내가 귀여우면 처갓집 문설주도 귀엽다\',.',
-			longMeaning:
-				'어떤 사람을 너무 좋아하여 사리 판단이 어두워지면 실수를 하게 됨을 비유적으로 이르는 말. \'색시가 고우면 처갓집 외양간 말뚝에도 절한다\' \'아내가 귀여우면 처갓집 문설주도 귀엽다\', 이르는 말.',
+				"어떤 사람을 너무 좋아하여 사리 판단이 어두워지면 실수를 하게 됨을 비유적으로 이르는 말. '색시가 고우면 처갓집 외양간 말뚝에도 절한다' '아내가 귀여우면 처갓집 문설주도 귀엽다',.",
+			longMeaning: '어떤 사람을 너무 좋아하여 사리 판단이 어두워지면 실수를 하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
 			level: 4,
@@ -51005,11 +49751,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 99,
 		},
-
 		{
 			id: 2878,
 			proverb: '아내 없는 처갓집 가나 마나',
-			meaning: '목적하는 것이 없는 데는 갈 필요가 없음을 비유적으로 이르는 말.',
+			meaning: '목적하는 것이 없는 데는 갈 필요가 없음.',
 			longMeaning: '목적하는 것이 없는 데는 갈 필요가 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51025,11 +49770,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2879,
 			proverb: '아니 먹는 씨아가 소리만 난다',
-			meaning: '쓸모없는 사람일수록 공연히 떠벌리며 돌아다니기만 함을 비유적으로 이르는 말.',
+			meaning: '쓸모없는 사람일수록 공연히 떠벌리며 돌아다니기만 함.',
 			longMeaning: '쓸모없는 사람일수록 공연히 떠벌리며 돌아다니기만 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -51045,11 +49789,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2880,
 			proverb: '아들네 집 가 밥 먹고 딸네 집 가 물 마신다',
-			meaning: '흔히 딸 살림살이를 더 아끼고 위하여 주는 부모의 심정을 비유적으로 이르는 말.',
+			meaning: '흔히 딸 살림살이를 더 아끼고 위하여 주는 부모의 심정.',
 			longMeaning: '흔히 딸 살림살이를 더 아끼고 위하여 주는 부모의 심정을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '근면/검소',
@@ -51065,7 +49808,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 92,
 		},
-
 		{
 			id: 2881,
 			proverb: '아래턱이 위턱에 올라가 붙다[붙나]',
@@ -51085,11 +49827,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2882,
 			proverb: '아랫길도 못 가고 윗길도 못 가겠다',
-			meaning: '이것도 저것도 다 믿을 수 없고 어찌하여야 할지 모름을 비유적으로 이르는 말.',
+			meaning: '이것도 저것도 다 믿을 수 없고 어찌하여야 할지 모름.',
 			longMeaning: '이것도 저것도 다 믿을 수 없고 어찌하여야 할지 모름을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51105,11 +49846,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 2883,
 			proverb: '아무 때 먹어도 김가가 먹을 것이다',
-			meaning: '자기가 취할 이익은 내버려두어도 자신에게 돌아옴을 비유적으로 이르는 말.',
+			meaning: '자기가 취할 이익은 내버려두어도 자신에게 돌아옴.',
 			longMeaning: '자기가 취할 이익은 내버려두어도 자신에게 돌아옴을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -51125,11 +49865,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 2884,
 			proverb: '아무리 쫓겨도 신발 벗고 가랴',
-			meaning: '아무리 급한 경우라도 체면을 차릴 것은 차려야 함을 비유적으로 이르는 말.',
+			meaning: '아무리 급한 경우라도 체면을 차릴 것은 차려야 함.',
 			longMeaning: '아무리 급한 경우라도 체면을 차릴 것은 차려야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51145,11 +49884,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2885,
 			proverb: '아버지는 아들이 잘났다고 하면 기뻐하고 형은 아우가 더 낫다고 하면 노한다',
-			meaning: '형제간의 우애가 부모의 사랑을 따를 수 없음을 이르는 말.',
+			meaning: '형제간의 우애가 부모의 사랑을 따를 수 없음.',
 			longMeaning: '형제간의 우애가 부모의 사랑을 따를 수 없음을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -51165,11 +49903,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2886,
 			proverb: '아이가 때리는 매도 많이 맞으면 아프다',
-			meaning: '조그만 손해도 여러 번 당하면 큰 손해가 됨을 비유적으로 이르는 말.',
+			meaning: '조그만 손해도 여러 번 당하면 큰 손해가 됨.',
 			longMeaning: '조그만 손해도 여러 번 당하면 큰 손해가 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51185,11 +49922,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 78,
 		},
-
 		{
 			id: 2887,
 			proverb: '아이 가진 떡',
-			meaning: '상대편이 힘이 없어서 가지고 있는 것을 쉽게 빼앗을 수 있는 경우를 비유적으로 이르는 말.',
+			meaning: '상대편이 힘이 없어서 가지고 있는 것을 쉽게 빼앗을 수 있는 경우.',
 			longMeaning: '상대편이 힘이 없어서 가지고 있는 것을 쉽게 빼앗을 수 있는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51205,11 +49941,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2888,
 			proverb: '아전의 술 한 잔이 환자(還子)가 석 섬이라고',
-			meaning: '관리에게 조금이라도 신세를 지게 되면 그 몇 곱으로 갚아야 함을 이르는 말.',
+			meaning: '관리에게 조금이라도 신세를 지게 되면 그 몇 곱으로 갚아야 함.',
 			longMeaning: '관리에게 조금이라도 신세를 지게 되면 그 몇 곱으로 갚아야 함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51225,7 +49960,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2889,
 			proverb: '아침 안개가 중 대가리 깬다',
@@ -51245,7 +49979,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 2890,
 			proverb: '아침에 까치가 울면 좋은 일이 있고 밤에 까마귀가 울면 대변(大變)이 있다',
@@ -51265,11 +49998,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2891,
 			proverb: '아픈 아이 눈 들어가듯 한다',
-			meaning: '독의 쌀 따위가 푹푹 줄어드는 모양을 비유적으로 이르는 말.',
+			meaning: '독의 쌀 따위가 푹푹 줄어드는 모양.',
 			longMeaning: '독의 쌀 따위가 푹푹 줄어드는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51285,11 +50017,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2892,
 			proverb: '아홉 섬 추수한 자가 한 섬 추수한 자더러 그 한 섬을 채워 열 섬으로 달라 한다',
-			meaning: '남의 사정은 돌보지 않고 자신의 욕심만 채우려 함을 비유적으로 이르는 말.',
+			meaning: '남의 사정은 돌보지 않고 자신의 욕심만 채우려 함.',
 			longMeaning: '남의 사정은 돌보지 않고 자신의 욕심만 채우려 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -51305,11 +50036,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2893,
 			proverb: '아흔아홉 섬 가진 사람이 한 섬 가진 사람의 것을 마저 빼앗으려 한다',
-			meaning: '재산을 많이 가지면 가질수록 재산에 대한 욕심이 더욱더 크게 생김을 비유적으로 이르는 말.',
+			meaning: '재산을 많이 가지면 가질수록 재산에 대한 욕심이 더욱더 크게 생김.',
 			longMeaning: '재산을 많이 가지면 가질수록 재산에 대한 욕심이 더욱더 크게 생김을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -51325,11 +50055,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2894,
 			proverb: '안뒷간에 똥 누고 안 아가씨더러 밑 씻겨 달라겠다',
-			meaning: '지나치게 염치가 없는 경우를 비유적으로 이르는 말.',
+			meaning: '지나치게 염치가 없는 경우.',
 			longMeaning: '지나치게 염치가 없는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51345,11 +50074,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2895,
 			proverb: '안 먹고 사는 장사가 없다',
-			meaning: '누구나 먹어야 힘을 쓰고 일을 할 수 있음을 비유적으로 이르는 말.',
+			meaning: '누구나 먹어야 힘을 쓰고 일을 할 수 있음.',
 			longMeaning: '누구나 먹어야 힘을 쓰고 일을 할 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51365,11 +50093,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2896,
 			proverb: '안반 이고 보 마르러 가겠다',
-			meaning: '네모난 안반을 이고 보자기를 마르러 가겠다는 뜻으로, 바느질 솜씨나 일솜씨가 어지간히도 없는 경우를 놀림조로 이르는 말.',
+			meaning: '바느질 솜씨나 일솜씨가 어지간히도 없는 경우.',
 			longMeaning: '네모난 안반을 이고 보자기를 마르러 가겠다는 뜻으로, 바느질 솜씨나 일솜씨가 어지간히도 없는 경우를 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51385,11 +50112,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 2897,
 			proverb: '안 살이 내 살이면 천 리라도 찾아가고 밭 살이 내 살이면 십 리라도 가지 마라',
-			meaning: '출가하여 사는 부인들이 친정 식구는 매우 반겨서 극진히 대접하나, 시댁 식구는 달갑지 않게 여기고 대접도 소홀히 함을 비유적으로 이르는 말.',
+			meaning: '출가하여 사는 부인들이 친정 식구는 매우 반겨서 극진히 대접하나, 시댁 식구는 달갑지 않게 여기고 대접도 소홀히 함.',
 			longMeaning:
 				'출가하여 사는 부인들이 친정 식구는 매우 반겨서 극진히 대접하나, 시댁 식구는 달갑지 않게 여기고 대접도 소홀히 함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -51406,11 +50132,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2898,
 			proverb: '안질에 고춧가루',
-			meaning: '성한 눈도 견디기 힘든 고춧가루를 앓는 눈에 뿌린다는 뜻으로, 엎친 데 덮친 격으로 아주 나쁜 결과를 가져올 대책을 이르는 말.',
+			meaning: '엎친 데 덮친 격으로 아주 나쁜 결과를 가져올 대책.',
 			longMeaning: '성한 눈도 견디기 힘든 고춧가루를 앓는 눈에 뿌린다는 뜻으로, 엎친 데 덮친 격으로 아주 나쁜 결과를 가져올 대책을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51426,11 +50151,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 39,
 		},
-
 		{
 			id: 2899,
 			proverb: '앉은 개 입에 똥 들어가나',
-			meaning: '일하지 아니하고 가만히 있으면 먹을 것이 생길 수 없음을 비유적으로 이르는 말.',
+			meaning: '일하지 아니하고 가만히 있으면 먹을 것이 생길 수 없음.',
 			longMeaning: '일하지 아니하고 가만히 있으면 먹을 것이 생길 수 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51446,11 +50170,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2900,
 			proverb: '앉은 데가 본이라',
-			meaning: '한번 한곳에 머무르게 되면 그곳에 정이 붙어 이주하기가 쉽지 아니함을 비유적으로 이르는 말.',
+			meaning: '한번 한곳에 머무르게 되면 그곳에 정이 붙어 이주하기가 쉽지 아니함.',
 			longMeaning: '한번 한곳에 머무르게 되면 그곳에 정이 붙어 이주하기가 쉽지 아니함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51466,11 +50189,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2901,
 			proverb: '앉은뱅이가 서면 천 리를 가나',
-			meaning: '능력도 없고 수단도 없는 사람이 장차 큰일을 할 것처럼 떠들고 다닐 때 놀림조로 이르는 말.',
+			meaning: '능력도 없고 수단도 없는 사람이 장차 큰일을 할 것처럼 떠들고 다닐 때.',
 			longMeaning: '능력도 없고 수단도 없는 사람이 장차 큰일을 할 것처럼 떠들고 다닐 때 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -51486,7 +50208,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2902,
 			proverb: '앉을 자리 봐 가면서 앉으라',
@@ -51506,11 +50227,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2903,
 			proverb: '앉을 자리 설 자리를 가리다[안다]',
-			meaning: '사리에 맞고 눈치가 빠르게 자기가 해야 할 일을 잘 분간하는 경우를 비유적으로 이르는 말.',
+			meaning: '사리에 맞고 눈치가 빠르게 자기가 해야 할 일을 잘 분간하는 경우.',
 			longMeaning: '사리에 맞고 눈치가 빠르게 자기가 해야 할 일을 잘 분간하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51526,11 +50246,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2904,
 			proverb: '알고 있는 일일수록 더욱 명치에 가둬야 한다',
-			meaning: '말과 행동에 신중을 기해야 함을 비유적으로 이르는 말.',
+			meaning: '말과 행동에 신중을 기해야 함.',
 			longMeaning: '말과 행동에 신중을 기해야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -51546,7 +50265,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 88,
 		},
-
 		{
 			id: 2905,
 			proverb: '알뜰하고 덕 있는 며느리가 들어와야 집안이 흥한다',
@@ -51568,7 +50286,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2906,
 			proverb: '앞 남산 호랑이가 뭘 먹고 사나',
@@ -51588,11 +50305,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2907,
 			proverb: '앞에서 꼬리 치는 개가 후에 발뒤꿈치 문다',
-			meaning: '앞에 와서 좋은 말만 하고 살살 비위를 맞추기에 급급한 사람일수록 보이지 않는 데서는 험담을 하고 모해함을 비유적으로 이르는 말.',
+			meaning: '앞에 와서 좋은 말만 하고 살살 비위를 맞추기에 급급한 사람일수록 보이지 않는 데서는 험담을 하고 모해함.',
 			longMeaning: '앞에 와서 좋은 말만 하고 살살 비위를 맞추기에 급급한 사람일수록 보이지 않는 데서는 험담을 하고 모해함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -51608,11 +50324,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 90,
 		},
-
 		{
 			id: 2908,
 			proverb: '앞집 처녀 믿다가 장가 못 간다',
-			meaning: '남은 생각지도 않는데 자기 혼자 지레짐작으로 믿고만 있다가 낭패를 보게 됨을 비유적으로 이르는 말.',
+			meaning: '남은 생각지도 않는데 자기 혼자 지레짐작으로 믿고만 있다가 낭패를 보게 됨.',
 			longMeaning: '남은 생각지도 않는데 자기 혼자 지레짐작으로 믿고만 있다가 낭패를 보게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -51628,12 +50343,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2909,
 			proverb: '애어미 삼사 월에 돌이라도 이 안 들어가 못 먹는다',
-			meaning:
-				'젖을 먹이는 아이어머니는 식성이 좋아 닥치는 대로 잘 먹는데 더군다나 해가 긴 음력 삼사 월에는 이만 들어가면 돌이라도 먹을 형편이라는 뜻으로, 젖을 먹이는 어머니들이 무엇이나 가리지 아니하고 다 잘 먹음을 비유적으로 이르는 말.',
+			meaning: '젖을 먹이는 어머니들이 무엇이나 가리지 아니하고 다 잘 먹음.',
 			longMeaning:
 				'젖을 먹이는 아이어머니는 식성이 좋아 닥치는 대로 잘 먹는데 더군다나 해가 긴 음력 삼사 월에는 이만 들어가면 돌이라도 먹을 형편이라는 뜻으로, 젖을 먹이는 어머니들이 무엇이나 가리지 아니하고 다 잘 먹음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -51650,7 +50363,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2910,
 			proverb: '약과는 누가 먼저 먹을는지',
@@ -51670,11 +50382,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 2911,
 			proverb: '약국집 맷돌인가',
-			meaning: '어디에나 두루 쓰는 것을 비유적으로 이르는 말.',
+			meaning: '어디에나 두루 쓰는 것.',
 			longMeaning: '어디에나 두루 쓰는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51690,11 +50401,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2912,
 			proverb: '약은 쥐가 밤눈 어둡다',
-			meaning: '약빨라 실수가 없을 듯한 사람도 부족한 점은 있음을 비유적으로 이르는 말.',
+			meaning: '약빨라 실수가 없을 듯한 사람도 부족한 점은 있음.',
 			longMeaning: '약빨라 실수가 없을 듯한 사람도 부족한 점은 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -51710,7 +50420,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 42,
 		},
-
 		{
 			id: 2913,
 			proverb: '양 가문 한 집에는 까마귀도 앉지 않는다',
@@ -51730,12 +50439,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 88,
 		},
-
 		{
 			id: 2914,
 			proverb: '양반 못된 것이 장에 가 호령한다',
-			meaning:
-				'양반이라 호령은 하고 싶으나 할 데가 없어서 시장에 가서 호령을 한다는 뜻으로, 무능한 자가 자기 손아랫사람에게나 큰소리치며 윗사람 행세를 하려고 함을 비난조로 이르는 말.',
+			meaning: '무능한 자가 자기 손아랫사람에게나 큰소리치며 윗사람 행세를 하려고 함.',
 			longMeaning:
 				'양반이라 호령은 하고 싶으나 할 데가 없어서 시장에 가서 호령을 한다는 뜻으로, 무능한 자가 자기 손아랫사람에게나 큰소리치며 윗사람 행세를 하려고 함을 비난조로 이르는 말.',
 			sameProverb: [],
@@ -51752,7 +50459,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 82,
 		},
-
 		{
 			id: 2915,
 			proverb: '양반은 가는 데마다 상이요 상놈은 가는 데마다 일이라',
@@ -51772,12 +50478,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2916,
 			proverb: '양반이 대추 한 개가 해장국이라고',
-			meaning:
-				'먹을 것이 많은 양반도 대추 한 개만 가지고 해장을 한다는 뜻으로, 음식을 많이 먹을 필요가 없고 조금씩만 먹어도 넉넉함을 비유적으로 이르는 말.',
+			meaning: '음식을 많이 먹을 필요가 없고 조금씩만 먹어도 넉넉함.',
 			longMeaning:
 				'먹을 것이 많은 양반도 대추 한 개만 가지고 해장을 한다는 뜻으로, 음식을 많이 먹을 필요가 없고 조금씩만 먹어도 넉넉함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -51794,11 +50498,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 2917,
 			proverb: '양반인가 두 냥 반인가',
-			meaning: '양반(兩班)은 한 냥 반으로 개 한 마리 값만도 못하다는 뜻으로, 못난 양반을 놀림조로 이르는 말.',
+			meaning: '못난 양반.',
 			longMeaning: '양반(兩班)은 한 냥 반으로 개 한 마리 값만도 못하다는 뜻으로, 못난 양반을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51814,11 +50517,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2918,
 			proverb: '어깨가 귀를 넘어까지 산다',
-			meaning: '허리가 구부러져서 어깨가 귀보다 올라갈 때까지 오래오래 산다는 뜻으로, 한 일도 별로 없이 오래 삶을 비유적으로 이르는 말.',
+			meaning: '한 일도 별로 없이 오래 삶.',
 			longMeaning: '허리가 구부러져서 어깨가 귀보다 올라갈 때까지 오래오래 산다는 뜻으로, 한 일도 별로 없이 오래 삶을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -51834,7 +50536,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2919,
 			proverb: '어느 구름에 눈이 들며 어느 구름에 비가 들었나',
@@ -51854,7 +50555,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2920,
 			proverb: '어느 구름에(서) 비가 올지',
@@ -51874,11 +50574,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 2921,
 			proverb: '어느 집 개가 짖느냐 한다',
-			meaning: '남이 하는 말을 무시하여 들은 체도 아니함을 비유적으로 이르는 말.',
+			meaning: '남이 하는 말을 무시하여 들은 체도 아니함.',
 			longMeaning: '남이 하는 말을 무시하여 들은 체도 아니함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -51894,11 +50593,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 2922,
 			proverb: '어디 개가 짖느냐 한다',
-			meaning: '남이 하는 말을 무시하여 들은 체도 아니함을 비유적으로 이르는 말.',
+			meaning: '남이 하는 말을 무시하여 들은 체도 아니함.',
 			longMeaning: '남이 하는 말을 무시하여 들은 체도 아니함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -51914,11 +50612,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 2923,
 			proverb: '어른 말을 들으면 자다가도 떡이 생긴다',
-			meaning: '어른이 시키는 대로 하면 실수가 없을 뿐만 아니라, 여러 가지로 이익이 됨을 비유적으로 이르는 말.',
+			meaning: '어른이 시키는 대로 하면 실수가 없을 뿐만 아니라, 여러 가지로 이익이 됨.',
 			longMeaning: '어른이 시키는 대로 하면 실수가 없을 뿐만 아니라, 여러 가지로 이익이 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -51934,7 +50631,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 81,
 		},
-
 		{
 			id: 2924,
 			proverb: '어리석은 자가 농사일을 한다',
@@ -51954,7 +50650,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2925,
 			proverb: '어린 때 굽은 이 쇠 길맛가지 된다',
@@ -51974,7 +50669,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2926,
 			proverb: '어린아이 가진 떡도 뺏어 먹겠다',
@@ -51994,7 +50688,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 2927,
 			proverb: '어린아이 자지가 크면 얼마나 클까',
@@ -52014,11 +50707,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2928,
 			proverb: '어릴 때 굽은 길맛가지',
-			meaning: '좋지 않은 버릇이 아주 어렸을 때부터 굳어 버려서 고치지 못하게 됨을 비유적으로 이르는 말.',
+			meaning: '좋지 않은 버릇이 아주 어렸을 때부터 굳어 버려서 고치지 못하게 됨.',
 			longMeaning: '좋지 않은 버릇이 아주 어렸을 때부터 굳어 버려서 고치지 못하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52034,7 +50726,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2929,
 			proverb: '어머니가 반중매쟁이가 되어야 딸을 살린다',
@@ -52056,7 +50747,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2930,
 			proverb: '어머니가 의붓어머니면 친아버지도 의붓아버지가 된다',
@@ -52076,7 +50766,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2931,
 			proverb: '어머니 뱃속에서 배워 가지고 나오다',
@@ -52096,7 +50785,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 2932,
 			proverb: '어미 모르는 병 열수(數) 가지를 앓는다',
@@ -52116,7 +50804,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 2933,
 			proverb: '어사는 가어사(假御使)가 더 무섭다',
@@ -52136,11 +50823,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 2934,
 			proverb: '억새에 손가락[자지] 베었다',
-			meaning: '대수롭지 아니하게 생각하였던 상대에게 뜻밖의 손해를 보는 경우를 비유적으로 이르는 말.',
+			meaning: '대수롭지 아니하게 생각하였던 상대에게 뜻밖의 손해를 보는 경우.',
 			longMeaning: '대수롭지 아니하게 생각하였던 상대에게 뜻밖의 손해를 보는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '운/우연',
@@ -52156,7 +50842,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 2935,
 			proverb: '억지가 반벌충이다',
@@ -52176,7 +50861,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 32,
 		},
-
 		{
 			id: 2936,
 			proverb: '억지가 사촌보다 낫다',
@@ -52196,11 +50880,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 42,
 		},
-
 		{
 			id: 2937,
 			proverb: '언덕에 자빠진 돼지가 평지에 자빠진 돼지를 나무란다',
-			meaning: '같은 처지임에도 불구하고 부질없이 남을 나무라고 있다는 뜻으로, 제 흉은 모르고 남의 흉만 탓함을 비유적으로 이르는 말.',
+			meaning: '제 흉은 모르고 남의 흉만 탓함.',
 			longMeaning: '같은 처지임에도 불구하고 부질없이 남을 나무라고 있다는 뜻으로, 제 흉은 모르고 남의 흉만 탓함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -52216,7 +50899,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2938,
 			proverb: '언청이 아가리에 콩가루',
@@ -52236,11 +50918,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2939,
 			proverb: '언청이 아가리에 토란 비어지듯',
-			meaning: '남이 이야기하는 데에 불쑥불쑥 끼어듦을 비난조로 이르는 말.',
+			meaning: '남이 이야기하는 데에 불쑥불쑥 끼어듦.',
 			longMeaning: '남이 이야기하는 데에 불쑥불쑥 끼어듦을 비난조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -52256,11 +50937,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 2940,
 			proverb: '언청이 콩가루 쥐어 먹기',
-			meaning: '아주 쉬운 일을 비유적으로 이르는 말.',
+			meaning: '아주 쉬운 일.',
 			longMeaning: '아주 쉬운 일을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52276,12 +50956,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 2941,
 			proverb: '얻어먹는 놈이 이밥 조밥 가리랴',
-			meaning:
-				'한창 궁하여 얻어먹는 판에 이밥 조밥 가릴 수 없다는 뜻으로, 자기가 아쉽거나 급히 필요한 일에는 좋고 나쁨을 가릴 겨를이 없음을 비유적으로 이르는 말.',
+			meaning: '자기가 아쉽거나 급히 필요한 일에는 좋고 나쁨을 가릴 겨를이 없음.',
 			longMeaning:
 				'한창 궁하여 얻어먹는 판에 이밥 조밥 가릴 수 없다는 뜻으로, 자기가 아쉽거나 급히 필요한 일에는 좋고 나쁨을 가릴 겨를이 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -52298,11 +50976,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2942,
 			proverb: '얻은 가래로 식전 보 막기',
-			meaning: '숨 가쁘게 급히 하여야 하는 일임을 비유적으로 이르는 말.',
+			meaning: '숨 가쁘게 급히 하여야 하는 일임.',
 			longMeaning: '숨 가쁘게 급히 하여야 하는 일임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52318,11 +50995,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 2943,
 			proverb: '얻은 죽에 머리가 아프다',
-			meaning: '변변치 못한 것이나마 남의 것을 얻어 가지게 되면 마음에 짐이 됨을 비유적으로 이르는 말.',
+			meaning: '변변치 못한 것이나마 남의 것을 얻어 가지게 되면 마음에 짐이 됨.',
 			longMeaning: '변변치 못한 것이나마 남의 것을 얻어 가지게 되면 마음에 짐이 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -52338,11 +51014,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 2944,
 			proverb: '얼굴보다 코가 더 크다',
-			meaning: '얼굴보다 거기에 붙은 코가 더 크다는 뜻으로, 기본이 되는 것보다 덧붙이는 것이 더 많거나 큰 경우를 비유적으로 이르는 말.',
+			meaning: '기본이 되는 것보다 덧붙이는 것이 더 많거나 큰 경우.',
 			longMeaning: '얼굴보다 거기에 붙은 코가 더 크다는 뜻으로, 기본이 되는 것보다 덧붙이는 것이 더 많거나 큰 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52358,12 +51033,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 2945,
 			proverb: '얼굴 보아 가며 이름 짓는다',
-			meaning:
-				'이름이란 사물의 생김새를 보아 가며 대상의 특성에 맞게 짓는 법이라는 뜻으로, 무슨 일이나 구체적인 조건과 특성에 알맞게 처리하여야 함을 비유적으로 이르는 말.',
+			meaning: '무슨 일이나 구체적인 조건과 특성에 알맞게 처리하여야 함.',
 			longMeaning:
 				'이름이란 사물의 생김새를 보아 가며 대상의 특성에 맞게 짓는 법이라는 뜻으로, 무슨 일이나 구체적인 조건과 특성에 알맞게 처리하여야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -52380,7 +51053,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 2946,
 			proverb: '얼레빗 참빗 품고 가도 제 복이 있으면 잘산다',
@@ -52402,11 +51074,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2947,
 			proverb: '엄벙덤벙하다가 물에 빠졌다',
-			meaning: '무슨 영문인지도 모르고 함부로 덤비다가 낭패를 보고 화를 입게 된 경우를 비유적으로 이르는 말.',
+			meaning: '무슨 영문인지도 모르고 함부로 덤비다가 낭패를 보고 화를 입게 된 경우.',
 			longMeaning: '무슨 영문인지도 모르고 함부로 덤비다가 낭패를 보고 화를 입게 된 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52422,11 +51093,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2948,
 			proverb: '엄천득이 가게 벌이듯',
-			meaning: '되지도 아니하는 말을 구구하게 늘어놓음을 비유적으로 이르는 말.',
+			meaning: '되지도 아니하는 말을 구구하게 늘어놓음.',
 			longMeaning: '되지도 아니하는 말을 구구하게 늘어놓음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52442,12 +51112,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2949,
 			proverb: '업족제비가 비행기를 탔다',
-			meaning:
-				'집의 재산을 늘려 준다고 하는 업족제비가 비행기를 타고 멀리 가 버렸다는 뜻으로, 집안이 망하여 모든 일이 잘 안된 경우를 비유적으로 이르는 말.',
+			meaning: '집안이 망하여 모든 일이 잘 안된 경우.',
 			longMeaning:
 				'집의 재산을 늘려 준다고 하는 업족제비가 비행기를 타고 멀리 가 버렸다는 뜻으로, 집안이 망하여 모든 일이 잘 안된 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -52464,7 +51132,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2950,
 			proverb: '업혀 가는 돼지 눈',
@@ -52484,7 +51151,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2951,
 			proverb: '엎더져 가는 놈 꼭뒤 찬다',
@@ -52504,7 +51170,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 2952,
 			proverb: '엎어져도 코가 깨지고 자빠져도 코가 깨진다',
@@ -52524,11 +51189,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 89,
 		},
-
 		{
 			id: 2953,
 			proverb: '여덟 가랭이 대문어같이 멀끔하다',
-			meaning: '생김생김이 환하고 멀끔함을 비유적으로 이르는 말.',
+			meaning: '생김생김이 환하고 멀끔함.',
 			longMeaning: '생김생김이 환하고 멀끔함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52544,11 +51208,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2954,
 			proverb: '여든 살 난 큰아기가 시집가랬더니 차일이 없다 한다',
-			meaning: '오랫동안 벼르고 벼르던 일을 하려 할 때 장애물이 생겨서 하지 못하고 맒을 비유적으로 이르는 말.',
+			meaning: '오랫동안 벼르고 벼르던 일을 하려 할 때 장애물이 생겨서 하지 못하고 맒.',
 			longMeaning: '오랫동안 벼르고 벼르던 일을 하려 할 때 장애물이 생겨서 하지 못하고 맒을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52564,7 +51227,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2955,
 			proverb: '여든에 낳은 아들인가',
@@ -52584,11 +51246,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 2956,
 			proverb: '여든에 이가 나나',
-			meaning: '도저히 있을 수 없는 일임을 비유적으로 이르는 말.',
+			meaning: '도저히 있을 수 없는 일임.',
 			longMeaning: '도저히 있을 수 없는 일임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52604,11 +51265,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2957,
 			proverb: '여럿이 가는 데 섞이면 병든 다리도 끌려 간다',
-			meaning: '여러 사람이 권하면 어쩔 수 없이 따라 행하게 됨을 비유적으로 이르는 말.',
+			meaning: '여러 사람이 권하면 어쩔 수 없이 따라 행하게 됨.',
 			longMeaning: '여러 사람이 권하면 어쩔 수 없이 따라 행하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -52624,7 +51284,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 99,
 		},
-
 		{
 			id: 2958,
 			proverb: '여름비는 더워야 오고 가을비는 추워야 온다',
@@ -52644,7 +51303,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 89,
 		},
-
 		{
 			id: 2959,
 			proverb: '여수가 밑천이다',
@@ -52664,11 +51322,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 36,
 		},
-
 		{
 			id: 2960,
 			proverb: '여우가 죽으니까 토끼가 슬퍼한다',
-			meaning: '같은 부류의 슬픔이나 괴로움 따위를 동정함을 비유적으로 이르는 말.',
+			meaning: '같은 부류의 슬픔이나 괴로움 따위를 동정함.',
 			longMeaning: '같은 부류의 슬픔이나 괴로움 따위를 동정함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52684,11 +51341,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2961,
 			proverb: '여자가 셋이면 나무 접시가 들논다',
-			meaning: '여자가 많이 모이면 말이 많고 떠들썩함을 비유적으로 이르는 말.',
+			meaning: '여자가 많이 모이면 말이 많고 떠들썩함.',
 			longMeaning: '여자가 많이 모이면 말이 많고 떠들썩함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52704,7 +51360,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2962,
 			proverb: '여자는 사흘을 안 때리면 여우가 된다',
@@ -52724,11 +51379,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 70,
 		},
-
 		{
 			id: 2963,
 			proverb: '여자는 제 고을 장날을 몰라야 팔자가 좋다',
-			meaning: '여자는 집 안에서 살림이나 하고 사는 것이 가장 행복한 것임을 비유적으로 이르는 말.',
+			meaning: '여자는 집 안에서 살림이나 하고 사는 것이 가장 행복한 것임.',
 			longMeaning: '여자는 집 안에서 살림이나 하고 사는 것이 가장 행복한 것임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52744,11 +51398,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 2964,
 			proverb: '여자의 말은 잘 들어도 패가하고 안 들어도 망신한다',
-			meaning: '여자의 말은 적당하게 들어야 함을 비유적으로 이르는 말.',
+			meaning: '여자의 말은 적당하게 들어야 함.',
 			longMeaning: '여자의 말은 적당하게 들어야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52764,7 +51417,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2965,
 			proverb: '여자의 악담에는 오뉴월에도 서리가 온다',
@@ -52784,11 +51436,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 2966,
 			proverb: '역적 대가리 같다',
-			meaning: '모양이 텁수룩하여서 보기 싫은 경우를 비유적으로 이르는 말.',
+			meaning: '모양이 텁수룩하여서 보기 싫은 경우.',
 			longMeaning: '모양이 텁수룩하여서 보기 싫은 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52804,11 +51455,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2967,
 			proverb: '연자매를 가는 당나귀',
-			meaning: '일에 몰려 눈코 뜰 새 없이 바쁜 처지를 비유적으로 이르는 말.',
+			meaning: '일에 몰려 눈코 뜰 새 없이 바쁜 처지.',
 			longMeaning: '일에 몰려 눈코 뜰 새 없이 바쁜 처지를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52824,7 +51474,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 2968,
 			proverb: '열 달 만에 아이 날 줄 몰랐던가',
@@ -52844,11 +51493,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 2969,
 			proverb: '열 번 갈아서 안 드는 도끼가 없다',
-			meaning: '무슨 일이나 꾸준히 공을 들이면 소기의 성과를 거두게 됨을 이르는 말.',
+			meaning: '무슨 일이나 꾸준히 공을 들이면 소기의 성과를 거두게 됨.',
 			longMeaning: '무슨 일이나 꾸준히 공을 들이면 소기의 성과를 거두게 됨을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52864,7 +51512,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2970,
 			proverb: '열 벙어리가 말을 해도 가만있어라',
@@ -52884,7 +51531,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2971,
 			proverb: '열 사람 형리(刑吏) 사귀지 말고 한 가지 죄를 범하지 마라',
@@ -52904,7 +51550,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2972,
 			proverb: '열 사위는 밉지 아니하여도 한 며느리가 밉다',
@@ -52924,11 +51569,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 88,
 		},
-
 		{
 			id: 2973,
 			proverb: '열 손가락으로 물을 튀긴다',
-			meaning: '아무 일도 안 하고 뻔뻔하게 놀고만 있는 것을 놀림조로 이르는 말.',
+			meaning: '아무 일도 안 하고 뻔뻔하게 놀고만 있는 것.',
 			longMeaning: '아무 일도 안 하고 뻔뻔하게 놀고만 있는 것을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52944,11 +51588,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 2974,
 			proverb: '열 시앗이 밉지 않고 한 시누이가 밉다',
-			meaning: '대개 올케와 시누이의 의가 좋지 못함을 비유적으로 이르는 말.',
+			meaning: '대개 올케와 시누이의 의가 좋지 못함.',
 			longMeaning: '대개 올케와 시누이의 의가 좋지 못함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52964,11 +51607,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 2975,
 			proverb: '열흘 길 하루도 아니 가서 (돌아선다)',
-			meaning: '오래 두고 할 일에 처음부터 싫증을 내거나 배반하는 경우를 비유적으로 이르는 말.',
+			meaning: '오래 두고 할 일에 처음부터 싫증을 내거나 배반하는 경우.',
 			longMeaning: '오래 두고 할 일에 처음부터 싫증을 내거나 배반하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -52984,11 +51626,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 60,
 		},
-
 		{
 			id: 2976,
 			proverb: '염병 치른 놈의 대가리 같다',
-			meaning: '염병을 앓고 난 뒤에 머리카락이 없어지는 것처럼 아무것도 없게 되었음을 비유적으로 이르는 말.',
+			meaning: '염병을 앓고 난 뒤에 머리카락이 없어지는 것처럼 아무것도 없게 되었음.',
 			longMeaning: '염병을 앓고 난 뒤에 머리카락이 없어지는 것처럼 아무것도 없게 되었음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53004,7 +51645,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 2977,
 			proverb: '염통에 고름 든 줄은 몰라도 손톱눈에 가시 든 줄은 안다',
@@ -53024,7 +51664,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2978,
 			proverb: '영감의 상투가 커야 맛이냐',
@@ -53044,11 +51683,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 2979,
 			proverb: '영리한 고양이가 밤눈 어둡다[못 본다]',
-			meaning: '약빨라 실수가 없을 듯한 사람도 부족한 점은 있음을 비유적으로 이르는 말.',
+			meaning: '약빨라 실수가 없을 듯한 사람도 부족한 점은 있음.',
 			longMeaning: '약빨라 실수가 없을 듯한 사람도 부족한 점은 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -53064,11 +51702,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 2980,
 			proverb: '옆집 개가 짖어서 도적 면했다',
-			meaning: '우연히 남의 덕을 입게 됨을 비유적으로 이르는 말.',
+			meaning: '우연히 남의 덕을 입게 됨.',
 			longMeaning: '우연히 남의 덕을 입게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '운/우연',
@@ -53084,12 +51721,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 2981,
 			proverb: '옆집 처녀 믿고 장가 안 간다',
-			meaning:
-				'옆집 처녀는 생각지도 아니하는데 그와의 결혼을 혼잣속으로 생각하여 장가를 안 간다는 뜻으로, 상대편의 의사는 알지도 못하면서 제 나름대로 생각하여 행동함을 이르는 말.',
+			meaning: '상대편의 의사는 알지도 못하면서 제 나름대로 생각하여 행동함.',
 			longMeaning:
 				'옆집 처녀는 생각지도 아니하는데 그와의 결혼을 혼잣속으로 생각하여 장가를 안 간다는 뜻으로, 상대편의 의사는 알지도 못하면서 제 나름대로 생각하여 행동함을 이르는 말.',
 			sameProverb: [],
@@ -53106,11 +51741,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 2982,
 			proverb: '옆집 처녀 믿다가 장가 못 간다',
-			meaning: '상대편의 의사는 알지도 못하면서 제 나름대로 생각하여 행동하다가 일을 망치는 경우를 비유적으로 이르는 말.',
+			meaning: '상대편의 의사는 알지도 못하면서 제 나름대로 생각하여 행동하다가 일을 망치는 경우.',
 			longMeaning: '상대편의 의사는 알지도 못하면서 제 나름대로 생각하여 행동하다가 일을 망치는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53126,11 +51760,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2983,
 			proverb: '예쁘지 않은 며느리가 삿갓 쓰고 으스름 달밤에 나선다',
-			meaning: '가뜩이나 미운 사람이 더 미운 짓만 함을 비유적으로 이르는 말.',
+			meaning: '가뜩이나 미운 사람이 더 미운 짓만 함.',
 			longMeaning: '가뜩이나 미운 사람이 더 미운 짓만 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -53146,11 +51779,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2984,
 			proverb: '오뉴월 개가죽 문인가',
-			meaning: '한여름 개가죽으로 만든 문이 있는 방처럼 더운 줄 아느냐는 뜻으로, 추운 날 드나들면서 문을 열어 놓고 다니는 사람을 비난조로 이르는 말.',
+			meaning: '추운 날 드나들면서 문을 열어 놓고 다니는 사람.',
 			longMeaning:
 				'한여름 개가죽으로 만든 문이 있는 방처럼 더운 줄 아느냐는 뜻으로, 추운 날 드나들면서 문을 열어 놓고 다니는 사람을 비난조로 이르는 말.',
 			sameProverb: [],
@@ -53167,11 +51799,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 2985,
 			proverb: '오뉴월 맹꽁이도 울다가 그친다',
-			meaning: '끝없이 계속될 것 같은 일도 결국은 끝날 때가 있음을 비유적으로 이르는 말.',
+			meaning: '끝없이 계속될 것 같은 일도 결국은 끝날 때가 있음.',
 			longMeaning: '끝없이 계속될 것 같은 일도 결국은 끝날 때가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53187,11 +51818,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 60,
 		},
-
 		{
 			id: 2986,
 			proverb: '오뉴월 병아리 하룻볕 쬐기가 무섭다',
-			meaning: '음력 오뉴월에는 하룻볕이라도 쬐면 동식물이 부쩍부쩍 자라게 된다는 뜻으로, 짧은 동안에 자라는 정도가 아주 뚜렷함을 비유적으로 이르는 말.',
+			meaning: '짧은 동안에 자라는 정도가 아주 뚜렷함.',
 			longMeaning:
 				'음력 오뉴월에는 하룻볕이라도 쬐면 동식물이 부쩍부쩍 자라게 된다는 뜻으로, 짧은 동안에 자라는 정도가 아주 뚜렷함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -53208,7 +51838,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 79,
 		},
-
 		{
 			id: 2987,
 			proverb: '오는 떡이 두터워야[커야] 가는 떡이 두텁다[크다]',
@@ -53228,7 +51857,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2988,
 			proverb: '오는 말이 고와야 가는 말이 곱다',
@@ -53248,7 +51876,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 2989,
 			proverb: '오는 정이 있어야 가는 정이 있다',
@@ -53268,11 +51895,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2990,
 			proverb: '오달지기는 사돈네 가을 닭이다',
-			meaning: '사돈네 가을 닭이 아무리 살지고 좋아도 제게는 소용이 없으니 보기만 좋지 도무지 실속이 없음을 비유적으로 이르는 말.',
+			meaning: '사돈네 가을 닭이 아무리 살지고 좋아도 제게는 소용이 없으니 보기만 좋지 도무지 실속이 없음.',
 			longMeaning: '사돈네 가을 닭이 아무리 살지고 좋아도 제게는 소용이 없으니 보기만 좋지 도무지 실속이 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -53288,11 +51914,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 2991,
 			proverb: '오동 숟가락에 가물칫국을 먹었나',
-			meaning: '피부가 검은 사람을 놀림조로 이르는 말.',
+			meaning: '피부가 검은 사람.',
 			longMeaning: '피부가 검은 사람을 놀림조로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -53308,7 +51933,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 2992,
 			proverb: '오랜 원수를 갚으려다가 새 원수가 생겼다',
@@ -53328,7 +51952,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 85,
 		},
-
 		{
 			id: 2993,
 			proverb: '오리 새끼는 길러 놓으면 물로 가고 꿩 새끼는 산으로 간다',
@@ -53348,11 +51971,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2994,
 			proverb: '오소리감투가 둘이다',
-			meaning: '어떤 일에 주관하는 자가 둘이 있어 서로 다툼이 생긴 경우를 비유적으로 이르는 말.',
+			meaning: '어떤 일에 주관하는 자가 둘이 있어 서로 다툼이 생긴 경우.',
 			longMeaning: '어떤 일에 주관하는 자가 둘이 있어 서로 다툼이 생긴 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53368,7 +51990,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 2995,
 			proverb: '오이는 씨가 있어도 도둑은 씨가 없다',
@@ -53388,11 +52009,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 2996,
 			proverb: '오이 덩굴에서 가지 열리는 법은 없다',
-			meaning: '그 아버지에 그 아들밖에 날 수 없음을 비유적으로 이르는 말.',
+			meaning: '그 아버지에 그 아들밖에 날 수 없음.',
 			longMeaning: '그 아버지에 그 아들밖에 날 수 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53408,11 +52028,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 72,
 		},
-
 		{
 			id: 2997,
 			proverb: '오이 덩굴에 오이 열리고 가지 나무에 가지 열린다',
-			meaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임을 비유적으로 이르는 말.',
+			meaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임.',
 			longMeaning: '모든 일은 근본에 따라 거기에 걸맞은 결과가 나타나는 것임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53428,7 +52047,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 2998,
 			proverb: '옥에도 티가 있다',
@@ -53448,7 +52066,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 36,
 		},
-
 		{
 			id: 2999,
 			proverb: '온전한 기와가 부서진 옥보다 낫다',
@@ -53468,11 +52085,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 3000,
 			proverb: '올가미 없는 개장사',
-			meaning: '밑천 없이 하는 장사를 낮잡아 이르는 말.',
+			meaning: '밑천 없이 하는 장사.',
 			longMeaning: '밑천 없이 하는 장사를 낮잡아 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53488,7 +52104,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 30,
 		},
-
 		{
 			id: 3001,
 			proverb: '옷은 시집올 때처럼 음식은 한가위처럼',
@@ -53508,11 +52123,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 82,
 		},
-
 		{
 			id: 3002,
 			proverb: '옷을 격해 가려운 데를 긁는다',
-			meaning: '옷을 입고 가려운 데를 긁으면 긁으나 마나라는 뜻으로, 요긴한 곳에 직접 미치지 못하여 안타까운 경우를 비유적으로 이르는 말.',
+			meaning: '요긴한 곳에 직접 미치지 못하여 안타까운 경우.',
 			longMeaning: '옷을 입고 가려운 데를 긁으면 긁으나 마나라는 뜻으로, 요긴한 곳에 직접 미치지 못하여 안타까운 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53528,11 +52142,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 3003,
 			proverb: '옷 입고 가려운 데 긁기',
-			meaning: '옷을 입고 가려운 데를 긁으면 긁으나 마나라는 뜻으로, 요긴한 곳에 직접 미치지 못하여 안타까운 경우를 비유적으로 이르는 말.',
+			meaning: '요긴한 곳에 직접 미치지 못하여 안타까운 경우.',
 			longMeaning: '옷을 입고 가려운 데를 긁으면 긁으나 마나라는 뜻으로, 요긴한 곳에 직접 미치지 못하여 안타까운 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53548,11 +52161,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 3004,
 			proverb: '왕방울로 솥[가마] 가시듯',
-			meaning: '쇠로 만든 솥을 왕방울로 가실 때처럼 왁자지껄하게 떠드는 소리를 비유적으로 이르는 말.',
+			meaning: '쇠로 만든 솥을 왕방울로 가실 때처럼 왁자지껄하게 떠드는 소리.',
 			longMeaning: '쇠로 만든 솥을 왕방울로 가실 때처럼 왁자지껄하게 떠드는 소리를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53568,11 +52180,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 3005,
 			proverb: '왕방울로 퉁노구 가시는 소리',
-			meaning: '쇠로 만든 솥을 왕방울로 가실 때처럼 왁자지껄하게 떠드는 소리를 비유적으로 이르는 말.',
+			meaning: '쇠로 만든 솥을 왕방울로 가실 때처럼 왁자지껄하게 떠드는 소리.',
 			longMeaning: '쇠로 만든 솥을 왕방울로 가실 때처럼 왁자지껄하게 떠드는 소리를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53588,11 +52199,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 3006,
 			proverb: '왕후장상이 씨가 있나',
-			meaning: '높은 자리에 오르는 것은 가문이나 혈통 따위에 따른 것이 아니라 자신의 능력에 따른 것임을 이르는 말.',
+			meaning: '높은 자리에 오르는 것은 가문이나 혈통 따위에 따른 것이 아니라 자신의 능력에 따른 것임.',
 			longMeaning: '높은 자리에 오르는 것은 가문이나 혈통 따위에 따른 것이 아니라 자신의 능력에 따른 것임을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53608,11 +52218,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 3007,
 			proverb: '왜가리 새 여울목 넘어다보듯',
-			meaning: '남의 눈을 피하여 가며 제 이익만을 취함을 비유적으로 이르는 말.',
+			meaning: '남의 눈을 피하여 가며 제 이익만을 취함.',
 			longMeaning: '남의 눈을 피하여 가며 제 이익만을 취함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -53628,11 +52237,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 3008,
 			proverb: '외갓집 들어가듯',
-			meaning: '예의도 차릴 필요 없이 자기 집에 들어가는 것처럼 남의 집에 거리낌없이 쉽게 들어감을 비유적으로 이르는 말.',
+			meaning: '예의도 차릴 필요 없이 자기 집에 들어가는 것처럼 남의 집에 거리낌없이 쉽게 들어감.',
 			longMeaning: '예의도 차릴 필요 없이 자기 집에 들어가는 것처럼 남의 집에 거리낌없이 쉽게 들어감을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -53648,11 +52256,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3009,
 			proverb: '외갓집 콩죽에 잔뼈가 굵었겠나',
-			meaning: '남에게 신세를 지고 남의 호의로 살아온 것이 아니라는 뜻으로, 새삼스레 남의 도움을 받기 싫어 거절할 때 이르는 말.',
+			meaning: '새삼스레 남의 도움을 받기 싫어 거절할 때.',
 			longMeaning: '남에게 신세를 지고 남의 호의로 살아온 것이 아니라는 뜻으로, 새삼스레 남의 도움을 받기 싫어 거절할 때 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -53668,11 +52275,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 3010,
 			proverb: '외 덩굴에 가지 열릴까',
-			meaning: '어버이와 아주 딴판인 자식은 있을 수 없음을 이르는 말.',
+			meaning: '어버이와 아주 딴판인 자식은 있을 수 없음.',
 			longMeaning: '어버이와 아주 딴판인 자식은 있을 수 없음을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -53688,11 +52294,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3011,
 			proverb: '외삼촌 물에 빠졌는가 (웃기는 왜 웃나)',
-			meaning: '남이 크게 웃을 때 이르는 말.',
+			meaning: '남이 크게 웃을 때.',
 			longMeaning: '남이 크게 웃을 때 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -53708,11 +52313,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 3012,
 			proverb: '외삼촌 사는 골에 가지도 말랬다',
-			meaning: '외삼촌과 조카 사이란 매우 소원한 관계임을 비유적으로 이르는 말.',
+			meaning: '외삼촌과 조카 사이란 매우 소원한 관계임.',
 			longMeaning: '외삼촌과 조카 사이란 매우 소원한 관계임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53728,11 +52332,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 3013,
 			proverb: '외손뼉이 못 울고 한 다리로 가지 못한다',
-			meaning: '상대 없는 분쟁이 없음을 비유적으로 이르는 말.',
+			meaning: '상대 없는 분쟁이 없음.',
 			longMeaning: '상대 없는 분쟁이 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53748,11 +52351,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 78,
 		},
-
 		{
 			id: 3014,
 			proverb: '외손자는 업고 친손자는 걸리면서 업은 아이 발 시리다 빨리 가자 한다',
-			meaning: '사랑에 있어 경중이 바뀌었다는 뜻으로, 행동에서 주객이 뒤바뀌었음을 이르는 말.',
+			meaning: '행동에서 주객이 뒤바뀌었음.',
 			longMeaning: '사랑에 있어 경중이 바뀌었다는 뜻으로, 행동에서 주객이 뒤바뀌었음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53768,12 +52370,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3015,
 			proverb: '외톨밤이 벌레가 먹었다',
 			meaning: '똑똑하고 분명하여야 할 것이 그렇지 못하고 부실함을 비유적으로 이르는 말. 특히 외아들이 쓸데없이 되어 버린 경우를 이른다.',
-			longMeaning: '똑똑하고 분명하여야 할 것이 그렇지 못하고 부실함을 비유적으로 이르는 말. 특히 외아들이 쓸데없이 되어 버린 경우를 이른다 이르는 말.',
+			longMeaning: '똑똑하고 분명하여야 할 것이 그렇지 못하고 부실함, 특히 외아들이 쓸데없이 되어 버린 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
 			level: 2,
@@ -53782,17 +52383,16 @@ export const CONST_MAIN_DATA: {
 				"괜한 농담 한마디로 분위기가 틀어지자 선배가 '외톨밤이 벌레가 먹었다'라고 타일렀다.",
 				"회의에서 듣기 좋은 말만 늘어놓던 사람이 정작 책임은 피하자 팀원이 '외톨밤이 벌레가 먹었다'라고 말했다.",
 			],
-			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
+			origin: '외아들이 쓸데없이 되어 버린 경우를 이르던 말이다.',
 			usageTip: '비슷한 상황을 짧게 빗대어 말할 때 쓸 수 있다.',
 			synonym: null,
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 3016,
 			proverb: '왼팔도 쓸 데가 있다',
-			meaning: '평상시에 잘 쓰지 아니하는 것도 쓸모 있을 때가 있음을 비유적으로 이르는 말.',
+			meaning: '평상시에 잘 쓰지 아니하는 것도 쓸모 있을 때가 있음.',
 			longMeaning: '평상시에 잘 쓰지 아니하는 것도 쓸모 있을 때가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53808,11 +52408,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3017,
 			proverb: '용 가는 데 구름 가고 범 가는 데 바람 간다',
-			meaning: '반드시 같이 다녀서 둘이 서로 떠나지 아니할 경우를 비유적으로 이르는 말.',
+			meaning: '반드시 같이 다녀서 둘이 서로 떠나지 아니할 경우.',
 			longMeaning: '반드시 같이 다녀서 둘이 서로 떠나지 아니할 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53828,11 +52427,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 91,
 		},
-
 		{
 			id: 3018,
 			proverb: '용 가는 데 구름 간다',
-			meaning: '반드시 같이 다녀서 둘이 서로 떠나지 아니할 경우를 비유적으로 이르는 말.',
+			meaning: '반드시 같이 다녀서 둘이 서로 떠나지 아니할 경우.',
 			longMeaning: '반드시 같이 다녀서 둘이 서로 떠나지 아니할 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53848,11 +52446,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3019,
 			proverb: '용수가 채반이 되도록 우긴다',
-			meaning: '사리에 맞지 아니하는 의견을 끝까지 주장하는 경우를 비꼬아 이르는 말.',
+			meaning: '사리에 맞지 아니하는 의견을 끝까지 주장하는 경우.',
 			longMeaning: '사리에 맞지 아니하는 의견을 끝까지 주장하는 경우를 비꼬아 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53868,7 +52465,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 3020,
 			proverb: '용이 개천에 빠지면 모기붙이 새끼가 엉겨 붙는다',
@@ -53889,7 +52485,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3021,
 			proverb: '용이 물 밖에 나면 개미가 침노를 한다',
@@ -53910,11 +52505,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 3022,
 			proverb: '용이 여의주를 얻으면 하늘로 올라가고야 만다',
-			meaning: '무엇이나 어떤 단계에 이르면 최종적인 결과가 나타나게 됨을 비유적으로 이르는 말.',
+			meaning: '무엇이나 어떤 단계에 이르면 최종적인 결과가 나타나게 됨.',
 			longMeaning: '무엇이나 어떤 단계에 이르면 최종적인 결과가 나타나게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53930,11 +52524,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 95,
 		},
-
 		{
 			id: 3023,
 			proverb: '우는 가슴에 말뚝 박듯',
-			meaning: '그렇지 않아도 가슴이 아픈데 더욱 큰 상처를 줌을 비유적으로 이르는 말.',
+			meaning: '그렇지 않아도 가슴이 아픈데 더욱 큰 상처를 줌.',
 			longMeaning: '그렇지 않아도 가슴이 아픈데 더욱 큰 상처를 줌을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -53950,7 +52543,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 42,
 		},
-
 		{
 			id: 3024,
 			proverb: '우렁이도 두렁 넘을 꾀가 있다',
@@ -53970,12 +52562,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 3025,
 			proverb: '우마가 기린 되랴',
-			meaning:
-				'소나 말 같은 흔하고 천한 동물이 귀하고 상서로운 기린이 될 리가 없다는 뜻으로, 본시 제가 타고난 대로밖에는 아무리 하여도 안 됨을 비유적으로 이르는 말.',
+			meaning: '본시 제가 타고난 대로밖에는 아무리 하여도 안 됨.',
 			longMeaning:
 				'소나 말 같은 흔하고 천한 동물이 귀하고 상서로운 기린이 될 리가 없다는 뜻으로, 본시 제가 타고난 대로밖에는 아무리 하여도 안 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -53992,12 +52582,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 3026,
 			proverb: '우물가에 애 보낸 것 같다',
-			meaning:
-				'어린아이를 우물가에 내놓으면 언제 우물에 빠질지 몰라 마음이 불안하다는 뜻으로, 몹시 걱정이 되어 마음이 놓이지 아니하는 상태를 비유적으로 이르는 말.',
+			meaning: '몹시 걱정이 되어 마음이 놓이지 아니하는 상태.',
 			longMeaning:
 				'어린아이를 우물가에 내놓으면 언제 우물에 빠질지 몰라 마음이 불안하다는 뜻으로, 몹시 걱정이 되어 마음이 놓이지 아니하는 상태를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -54014,11 +52602,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 3027,
 			proverb: '운수가 사나우면 짖던 개도 안 짖는다',
-			meaning: '운수가 나쁘면 모든 것이 제대로 되지 않음을 비유적으로 이르는 말.',
+			meaning: '운수가 나쁘면 모든 것이 제대로 되지 않음.',
 			longMeaning: '운수가 나쁘면 모든 것이 제대로 되지 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54034,11 +52621,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 73,
 		},
-
 		{
 			id: 3028,
 			proverb: '울바자가 헐어지니 이웃집 개가 드나든다',
-			meaning: '자신에게 약점이 있으니까 남이 그것을 알고 업신여김을 비유적으로 이르는 말.',
+			meaning: '자신에게 약점이 있으니까 남이 그것을 알고 업신여김.',
 			longMeaning: '자신에게 약점이 있으니까 남이 그것을 알고 업신여김을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54054,11 +52640,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 82,
 		},
-
 		{
 			id: 3029,
 			proverb: '울타리가 허니까 이웃집 개가 드나든다',
-			meaning: '자신에게 약점이 있으니까 남이 그것을 알고 업신여김을 비유적으로 이르는 말.',
+			meaning: '자신에게 약점이 있으니까 남이 그것을 알고 업신여김.',
 			longMeaning: '자신에게 약점이 있으니까 남이 그것을 알고 업신여김을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54074,11 +52659,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 3030,
 			proverb: '원님과 급창이 흥정을 하여도 에누리가 있다',
-			meaning: '대하기 어려운 사람과도 흥정을 하게 되면 에누리가 있다는 뜻으로, 흥정에는 반드시 에누리가 있게 됨을 비유적으로 이르는 말.',
+			meaning: '흥정에는 반드시 에누리가 있게 됨.',
 			longMeaning: '대하기 어려운 사람과도 흥정을 하게 되면 에누리가 있다는 뜻으로, 흥정에는 반드시 에누리가 있게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54094,11 +52678,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 94,
 		},
-
 		{
 			id: 3031,
 			proverb: '원님과 급창이 흥정을 해도 에누리가 없다',
-			meaning: '대하기 어려운 사람과 흥정을 할 때도 에누리가 없다는 뜻으로, 흥정은 상하의 구별이나 친분과 관계없음을 비유적으로 이르는 말.',
+			meaning: '흥정은 상하의 구별이나 친분과 관계없음.',
 			longMeaning: '대하기 어려운 사람과 흥정을 할 때도 에누리가 없다는 뜻으로, 흥정은 상하의 구별이나 친분과 관계없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54114,11 +52697,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 89,
 		},
-
 		{
 			id: 3032,
 			proverb: '원님에게 물건을 팔아도 에누리가 있다',
-			meaning: '대하기 어려운 사람과도 흥정을 하게 되면 에누리가 있다는 뜻으로, 흥정에는 반드시 에누리가 있게 됨을 비유적으로 이르는 말.',
+			meaning: '흥정에는 반드시 에누리가 있게 됨.',
 			longMeaning: '대하기 어려운 사람과도 흥정을 하게 되면 에누리가 있다는 뜻으로, 흥정에는 반드시 에누리가 있게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54134,11 +52716,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 82,
 		},
-
 		{
 			id: 3033,
 			proverb: '원숭이 볼기짝인가',
-			meaning: '술을 먹고 얼굴이 불그레해진 사람을 비유적으로 이르는 말.',
+			meaning: '술을 먹고 얼굴이 불그레해진 사람.',
 			longMeaning: '술을 먹고 얼굴이 불그레해진 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54154,11 +52735,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3034,
 			proverb: '위에는 위가 있다',
-			meaning: '최상은 쉽게 말할 수 없음을 이르는 말.',
+			meaning: '최상은 쉽게 말할 수 없음.',
 			longMeaning: '최상은 쉽게 말할 수 없음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54174,11 +52754,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 26,
 		},
-
 		{
 			id: 3035,
 			proverb: '유비가 한중(漢中) 믿듯',
-			meaning: '모든 일을 굳게 믿어 의심하지 아니함을 비유적으로 이르는 말.',
+			meaning: '모든 일을 굳게 믿어 의심하지 아니함.',
 			longMeaning: '모든 일을 굳게 믿어 의심하지 아니함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54194,7 +52773,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 3036,
 			proverb: '음지가 양지 되고 양지가 음지 된다',
@@ -54216,11 +52794,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 3037,
 			proverb: '음지도 양지 될 때가 있다',
-			meaning: '운이 나쁜 사람도 좋은 일을 만날 수 있음을 이르는 말.',
+			meaning: '운이 나쁜 사람도 좋은 일을 만날 수 있음.',
 			longMeaning: '운이 나쁜 사람도 좋은 일을 만날 수 있음을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54236,7 +52813,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 3038,
 			proverb: '의가 좋으면 세 어이딸이 도토리 한 알을 먹어도 시장 멈춤은 한다',
@@ -54258,7 +52834,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3039,
 			proverb: '의가 좋으면 처갓집 말뚝에도 절한다',
@@ -54278,7 +52853,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 71,
 		},
-
 		{
 			id: 3040,
 			proverb: '의가 좋으면 천하도 반분한다',
@@ -54298,7 +52872,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 3041,
 			proverb: '의붓아비 돼지고기 써는 데는 가도 친아비 나무 패는 데는 가지 마라',
@@ -54320,7 +52893,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3042,
 			proverb: '의붓아비 떡 치는 데는 가도 친아비 도끼질하는 데는 안 간다',
@@ -54342,7 +52914,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3043,
 			proverb: '의붓어미가 티를 내는 것이 아니라 의붓자식이 티를 낸다',
@@ -54362,11 +52933,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3044,
 			proverb: '의사가 제 병 못 고친다',
-			meaning: '자기가 자신에 관한 일을 좋게 해결하기는 어려운 일이어서 남의 손을 빌려야만 이루기 쉬움을 비유적으로 이르는 말.',
+			meaning: '자기가 자신에 관한 일을 좋게 해결하기는 어려운 일이어서 남의 손을 빌려야만 이루기 쉬움.',
 			longMeaning: '자기가 자신에 관한 일을 좋게 해결하기는 어려운 일이어서 남의 손을 빌려야만 이루기 쉬움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -54382,11 +52952,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 3045,
 			proverb: '의젓잖은 며느리가 사흘 만에 고추장 세 바탱이 먹는다',
-			meaning: '못난 자가 미운 짓만 하느라고 사람을 놀라게 하는 경우를 비유적으로 이르는 말.',
+			meaning: '못난 자가 미운 짓만 하느라고 사람을 놀라게 하는 경우.',
 			longMeaning: '못난 자가 미운 짓만 하느라고 사람을 놀라게 하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54402,11 +52971,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3046,
 			proverb: '의주를 가려면서 신날도 안 꼬았다',
-			meaning: '큰일을 하려고 하면서도 조금도 준비가 되어 있지 않음을 비유적으로 이르는 말.',
+			meaning: '큰일을 하려고 하면서도 조금도 준비가 되어 있지 않음.',
 			longMeaning: '큰일을 하려고 하면서도 조금도 준비가 되어 있지 않음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54422,11 +52990,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 3047,
 			proverb: '의주 파발도 똥 눌 때[새]가 있다',
-			meaning: '아무리 급한 일이 있어도 잠시 틈을 낼 수 있음을 비유적으로 이르는 말.',
+			meaning: '아무리 급한 일이 있어도 잠시 틈을 낼 수 있음.',
 			longMeaning: '아무리 급한 일이 있어도 잠시 틈을 낼 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54442,11 +53009,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 3048,
 			proverb: '이가 자식보다 낫다',
-			meaning: '이가 있으면 먹고 살아갈 수 있으며 때로는 맛있는 음식도 먹게 된다는 뜻으로, 이의 중요성을 이르는 말.',
+			meaning: '이의 중요성.',
 			longMeaning: '이가 있으면 먹고 살아갈 수 있으며 때로는 맛있는 음식도 먹게 된다는 뜻으로, 이의 중요성을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54462,7 +53028,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3049,
 			proverb: '이가 칼을 쓰겠다',
@@ -54482,7 +53047,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 37,
 		},
-
 		{
 			id: 3050,
 			proverb: '이고 지고 가도 제 복 없으면 못산다',
@@ -54503,11 +53067,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 3051,
 			proverb: '이 골 원을 하다가 저 골에 [가서] 좌수 노릇도 한다',
-			meaning: '낯선 고장에 가면 낮은 지위도 감수해야 할 경우가 있음을 비유적으로 이르는 말.',
+			meaning: '낯선 고장에 가면 낮은 지위도 감수해야 할 경우가 있음.',
 			longMeaning: '낯선 고장에 가면 낮은 지위도 감수해야 할 경우가 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54523,12 +53086,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3052,
 			proverb: '이른 새끼가 살 안 찐다',
-			meaning:
-				'알에서 일찍 깬 새끼가 살이 안 찌고 크게 자라지 못한다는 뜻으로, 사람이 어려서 나이 든 체하며 너무 일되면 도리어 훌륭하게 되지 못함을 이르는 말.',
+			meaning: '사람이 어려서 나이 든 체하며 너무 일되면 도리어 훌륭하게 되지 못함.',
 			longMeaning:
 				'알에서 일찍 깬 새끼가 살이 안 찌고 크게 자라지 못한다는 뜻으로, 사람이 어려서 나이 든 체하며 너무 일되면 도리어 훌륭하게 되지 못함을 이르는 말.',
 			sameProverb: [],
@@ -54545,11 +53106,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 3053,
 			proverb: '이리가 짖으니 개가 꼬리(를) 흔든다',
-			meaning: '모양이나 형편이 서로 비슷하고 인연이 있는 것끼리 서로 잘 어울리고, 사정을 보아주며 감싸 주기 쉬움을 비유적으로 이르는 말.',
+			meaning: '모양이나 형편이 서로 비슷하고 인연이 있는 것끼리 서로 잘 어울리고, 사정을 보아주며 감싸 주기 쉬움.',
 			longMeaning: '모양이나 형편이 서로 비슷하고 인연이 있는 것끼리 서로 잘 어울리고, 사정을 보아주며 감싸 주기 쉬움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54565,11 +53125,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 3054,
 			proverb: '이밥이면 다 젯밥인가',
-			meaning: '같은 물건이라도 경우에 따라 각각 다르게 쓰이며 또 효과도 각각 다름을 이르는 말.',
+			meaning: '같은 물건이라도 경우에 따라 각각 다르게 쓰이며 또 효과도 각각 다름.',
 			longMeaning: '같은 물건이라도 경우에 따라 각각 다르게 쓰이며 또 효과도 각각 다름을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54585,11 +53144,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 3055,
 			proverb: '이불깃 봐 가며 발 편다',
-			meaning: '무슨 일이고 간에 조건과 사정을 보아 가며 거기에 알맞게 일을 하여야 함을 비유적으로 이르는 말.',
+			meaning: '무슨 일이고 간에 조건과 사정을 보아 가며 거기에 알맞게 일을 하여야 함.',
 			longMeaning: '무슨 일이고 간에 조건과 사정을 보아 가며 거기에 알맞게 일을 하여야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54605,12 +53163,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 44,
 		},
-
 		{
 			id: 3056,
 			proverb: '이삭 밥에도 가난이 든다',
 			meaning:
-				'양식이 궁하여 가을에 추수가 끝날 때까지 기다리지 못하고 벼 이삭, 수수 이삭 따위를 베어다 먹을 때부터 이미 오는 해에도 가난하게 살 징조가 보임을 이르는 말.',
+				'양식이 궁하여 가을에 추수가 끝날 때까지 기다리지 못하고 벼 이삭, 수수 이삭 따위를 베어다 먹을 때부터 이미 오는 해에도 가난하게 살 징조가 보임.',
 			longMeaning:
 				'양식이 궁하여 가을에 추수가 끝날 때까지 기다리지 못하고 벼 이삭, 수수 이삭 따위를 베어다 먹을 때부터 이미 오는 해에도 가난하게 살 징조가 보임을 이르는 말.',
 			sameProverb: [],
@@ -54627,11 +53184,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 3057,
 			proverb: '이 샘물 안 먹는다고 똥 누고 가더니 그 물이 맑기도 전에 다시 와서 먹는다',
-			meaning: '두 번 다시 안 볼 것같이 하여도 나중에 다시 만나 사정하게 됨을 비유적으로 이르는 말.',
+			meaning: '두 번 다시 안 볼 것같이 하여도 나중에 다시 만나 사정하게 됨.',
 			longMeaning: '두 번 다시 안 볼 것같이 하여도 나중에 다시 만나 사정하게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54647,11 +53203,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3058,
 			proverb: '이웃집 개가 짖어서 도적을 면했다',
-			meaning: '우연히 남의 덕을 입게 됨을 비유적으로 이르는 말.',
+			meaning: '우연히 남의 덕을 입게 됨.',
 			longMeaning: '우연히 남의 덕을 입게 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '운/우연',
@@ -54667,11 +53222,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 3059,
 			proverb: '이웃집 색시 믿고 장가 못 든다',
-			meaning: '상대편의 의사는 알지도 못하면서 제 나름대로 생각하여 행동하다가 일을 망치는 경우를 비유적으로 이르는 말.',
+			meaning: '상대편의 의사는 알지도 못하면서 제 나름대로 생각하여 행동하다가 일을 망치는 경우.',
 			longMeaning: '상대편의 의사는 알지도 못하면서 제 나름대로 생각하여 행동하다가 일을 망치는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54687,12 +53241,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 3060,
 			proverb: '이 장떡이 큰가 저 장떡이 큰가',
-			meaning:
-				'남보다 더 먹기 위하여 이 장떡이 큰가 저 장떡이 큰가 타산한다는 뜻으로, 어느 쪽이 더 이익이 많을까 하고 잇속을 따지느라 망설임을 비유적으로 이르는 말.',
+			meaning: '어느 쪽이 더 이익이 많을까 하고 잇속을 따지느라 망설임.',
 			longMeaning:
 				'남보다 더 먹기 위하여 이 장떡이 큰가 저 장떡이 큰가 타산한다는 뜻으로, 어느 쪽이 더 이익이 많을까 하고 잇속을 따지느라 망설임을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -54709,7 +53261,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 3061,
 			proverb: '이 팽이가 돌면 저 팽이도 돈다',
@@ -54729,11 +53280,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 3062,
 			proverb: '인경 꼭지가 말랑말랑하거든',
-			meaning: '인경 꼭지가 말랑말랑해지는지 만져 보라는 뜻으로, 영영 될 수 없거나 도저히 가능하지 않은 상황을 비유적으로 이르는 말.',
+			meaning: '영영 될 수 없거나 도저히 가능하지 않은 상황.',
 			longMeaning: '인경 꼭지가 말랑말랑해지는지 만져 보라는 뜻으로, 영영 될 수 없거나 도저히 가능하지 않은 상황을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54749,12 +53299,11 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 3063,
 			proverb: '인색한 부자가 손쓰는 가난뱅이보다 낫다',
 			meaning:
-				'가난한 사람은 마음씨가 곱고 동정심이 많아도 남을 도와주기란 쉽지 않음에 비하여, 부자는 인색하여도 남는 것이 있어 없는 사람이 물질적 도움을 입을 수 있음을 이르는 말.',
+				'가난한 사람은 마음씨가 곱고 동정심이 많아도 남을 도와주기란 쉽지 않음에 비하여, 부자는 인색하여도 남는 것이 있어 없는 사람이 물질적 도움을 입을 수 있음.',
 			longMeaning:
 				'가난한 사람은 마음씨가 곱고 동정심이 많아도 남을 도와주기란 쉽지 않음에 비하여, 부자는 인색하여도 남는 것이 있어 없는 사람이 물질적 도움을 입을 수 있음을 이르는 말.',
 			sameProverb: [],
@@ -54771,7 +53320,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 96,
 		},
-
 		{
 			id: 3064,
 			proverb: '인왕산 모르는 호랑이가 있나',
@@ -54791,12 +53339,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 3065,
 			proverb: '인정에 겨워 동네 시아비가 아홉이라',
-			meaning:
-				'인정을 헤프게 쓰다가 여러 서방을 맞아서 한 동네에 시아비가 아홉이나 되는 망측스러운 신세가 되었다는 뜻으로, 인정에 이끌려 정당치 못한 일까지 한 경우를 비유적으로 이르는 말.',
+			meaning: '인정에 이끌려 정당치 못한 일까지 한 경우.',
 			longMeaning:
 				'인정을 헤프게 쓰다가 여러 서방을 맞아서 한 동네에 시아비가 아홉이나 되는 망측스러운 신세가 되었다는 뜻으로, 인정에 이끌려 정당치 못한 일까지 한 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -54813,12 +53359,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 87,
 		},
-
 		{
 			id: 3066,
 			proverb: '인품이 좋으면 한 마당귀에 시아비가 아홉',
-			meaning:
-				'여자가 품성이 좋으면 욕심내는 사람이 많아서 시아비 될 사람이 마당에 가득하다는 뜻으로, 사람이 잘나서 따르는 사람이 많음을 비유적으로 이르는 말.',
+			meaning: '사람이 잘나서 따르는 사람이 많음.',
 			longMeaning:
 				'여자가 품성이 좋으면 욕심내는 사람이 많아서 시아비 될 사람이 마당에 가득하다는 뜻으로, 사람이 잘나서 따르는 사람이 많음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -54835,11 +53379,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 93,
 		},
-
 		{
 			id: 3067,
 			proverb: '일가 못 된 건 계수',
-			meaning: '시아주버니와 제수 사이는 친척 가운데 가장 거리가 멀고 서먹한 사이임을 비유적으로 이르는 말.',
+			meaning: '시아주버니와 제수 사이는 친척 가운데 가장 거리가 멀고 서먹한 사이임.',
 			longMeaning: '시아주버니와 제수 사이는 친척 가운데 가장 거리가 멀고 서먹한 사이임을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54855,11 +53398,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3068,
 			proverb: '일가 못된 것이 항렬만 높다',
-			meaning: '못된 일가가 친족 관계의 항렬만 높다는 뜻으로, 변변치 아니한 사람이나 일이 잘되는 경우를 비유적으로 이르는 말.',
+			meaning: '변변치 아니한 사람이나 일이 잘되는 경우.',
 			longMeaning: '못된 일가가 친족 관계의 항렬만 높다는 뜻으로, 변변치 아니한 사람이나 일이 잘되는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54875,11 +53417,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 3069,
 			proverb: '일가 싸움은 개싸움',
-			meaning: '일가끼리의 싸움은 싸우는 그때뿐이고 원한을 품지 아니함을 이르는 말.',
+			meaning: '일가끼리의 싸움은 싸우는 그때뿐이고 원한을 품지 아니함.',
 			longMeaning: '일가끼리의 싸움은 싸우는 그때뿐이고 원한을 품지 아니함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -54895,12 +53436,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 33,
 		},
-
 		{
 			id: 3070,
 			proverb: '일가에서[일가끼리] 방자한다',
-			meaning:
-				'일가친척끼리 서로 허물을 잡고 탓하며 남에게까지 들추어내어 화근을 만든다는 뜻으로, 서로 돕고 화목하게 지내야 할 사람들이 화목하지 못함을 이르는 말.',
+			meaning: '서로 돕고 화목하게 지내야 할 사람들이 화목하지 못함.',
 			longMeaning:
 				'일가친척끼리 서로 허물을 잡고 탓하며 남에게까지 들추어내어 화근을 만든다는 뜻으로, 서로 돕고 화목하게 지내야 할 사람들이 화목하지 못함을 이르는 말.',
 			sameProverb: [],
@@ -54917,7 +53456,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 3071,
 			proverb: '일기가 좋아 대사는 잘 지냈소',
@@ -54937,11 +53475,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 3072,
 			proverb: '일 안 하는 가장',
-			meaning: '있어도 제구실을 하지 못하고 소용없게 된 사물이나 사람을 이르는 말.',
+			meaning: '있어도 제구실을 하지 못하고 소용없게 된 사물이나 사람.',
 			longMeaning: '있어도 제구실을 하지 못하고 소용없게 된 사물이나 사람을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54957,11 +53494,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 25,
 		},
-
 		{
 			id: 3073,
 			proverb: '잃은 도끼는 쇠가 좋거니',
-			meaning: '지금의 새로운 물건이나 사람이 먼저의 물건이나 사람보다 못하여 아쉬움을 비유적으로 이르는 말.',
+			meaning: '지금의 새로운 물건이나 사람이 먼저의 물건이나 사람보다 못하여 아쉬움.',
 			longMeaning: '지금의 새로운 물건이나 사람이 먼저의 물건이나 사람보다 못하여 아쉬움을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54977,11 +53513,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 3074,
 			proverb: '잃은 사람이 죄가 많다',
-			meaning: '무언가를 잃은 사람이 애매한 여러 사람을 의심하게 됨을 이르는 말.',
+			meaning: '무언가를 잃은 사람이 애매한 여러 사람을 의심하게 됨.',
 			longMeaning: '무언가를 잃은 사람이 애매한 여러 사람을 의심하게 됨을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -54997,11 +53532,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 42,
 		},
-
 		{
 			id: 3075,
 			proverb: '입 가리고 고양이 흉내',
-			meaning: '얕은꾀로 남을 속이려는 어리석음을 비유적으로 이르는 말.',
+			meaning: '얕은꾀로 남을 속이려는 어리석음.',
 			longMeaning: '얕은꾀로 남을 속이려는 어리석음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -55017,11 +53551,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3076,
 			proverb: '입만 가지면[있으면] 서울 이 서방 집도 찾아간다',
-			meaning: '말만 잘하면 아무리 힘든 일이라도 할 수 있음을 이르는 말.',
+			meaning: '말만 잘하면 아무리 힘든 일이라도 할 수 있음.',
 			longMeaning: '말만 잘하면 아무리 힘든 일이라도 할 수 있음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55037,11 +53570,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3077,
 			proverb: '입술이 없으면 이가 시리다',
-			meaning: '서로 밀접한 관계에 있어서 하나가 망하면 다른 하나도 망하게 되는 경우를 비유적으로 이르는 말.',
+			meaning: '서로 밀접한 관계에 있어서 하나가 망하면 다른 하나도 망하게 되는 경우.',
 			longMeaning: '서로 밀접한 관계에 있어서 하나가 망하면 다른 하나도 망하게 되는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55057,11 +53589,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 3078,
 			proverb: '입에 들어가는 밥술도 제가 떠 넣어야 한다',
-			meaning: '쉬운 일이라도 자기의 노력을 들이지 아니하면 이룰 수 없음을 비유적으로 이르는 말.',
+			meaning: '쉬운 일이라도 자기의 노력을 들이지 아니하면 이룰 수 없음.',
 			longMeaning: '쉬운 일이라도 자기의 노력을 들이지 아니하면 이룰 수 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -55077,11 +53608,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 3079,
 			proverb: '입에서 젖내가 난다',
-			meaning: '나이가 어려 하는 말이나 행동이 유치함을 비유적으로 이르는 말.',
+			meaning: '나이가 어려 하는 말이나 행동이 유치함.',
 			longMeaning: '나이가 어려 하는 말이나 행동이 유치함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55097,12 +53627,12 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3080,
 			proverb: '입은 가죽이 모자라서 냈나',
 			meaning: '말하기 위해서 입을 냈지 살가죽이 모자라서 입을 내놓은 것이 아니라는 뜻으로, 말을 해야 할 때 말을 하지 않는 사람을 핀잔하는 말.',
-			longMeaning: '말하기 위해서 입을 냈지 살가죽이 모자라서 입을 내놓은 것이 아니라는 뜻으로, 말을 해야 할 때 말을 하지 않는 사람을 핀잔하는 말.',
+			longMeaning:
+				'말하기 위해서 입을 냈지 살가죽이 모자라서 입을 내놓은 것이 아니라는 뜻으로, 말을 해야 할 때 말을 하지 않는 사람을 핀잔하여 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
 			level: 3,
@@ -55117,11 +53647,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 3081,
 			proverb: '입이 걸기가 사복개천 같다',
-			meaning: '말을 조금도 삼가지 아니하고 상스럽게 함부로 지껄이는 경우를 비유적으로 이르는 말.',
+			meaning: '말을 조금도 삼가지 아니하고 상스럽게 함부로 지껄이는 경우.',
 			longMeaning: '말을 조금도 삼가지 아니하고 상스럽게 함부로 지껄이는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55137,7 +53666,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 3082,
 			proverb: '입찬말은 묘 앞에 가서 하여라',
@@ -55157,7 +53685,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 3083,
 			proverb: '입찬소리는 무덤 앞에 가서 하라',
@@ -55177,11 +53704,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 3084,
 			proverb: '입추의 여지가 없다',
-			meaning: '발 들여놓을 데가 없을 정도로 많은 사람들이 꽉 들어찬 경우를 비유적으로 이르는 말.',
+			meaning: '발 들여놓을 데가 없을 정도로 많은 사람들이 꽉 들어찬 경우.',
 			longMeaning: '발 들여놓을 데가 없을 정도로 많은 사람들이 꽉 들어찬 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -55197,11 +53723,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3085,
 			proverb: '잉어가 뛰니까 망둥이도 뛴다',
-			meaning: '남이 한다고 하니까 분별없이 덩달아 나섬을 비유적으로 이르는 말.',
+			meaning: '남이 한다고 하니까 분별없이 덩달아 나섬.',
 			longMeaning: '남이 한다고 하니까 분별없이 덩달아 나섬을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -55217,11 +53742,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 3086,
 			proverb: '잉어 숭어가 오니 물고기라고 송사리도 온다',
-			meaning: '남이 한다고 하니까 분별없이 덩달아 나섬을 비유적으로 이르는 말.',
+			meaning: '남이 한다고 하니까 분별없이 덩달아 나섬.',
 			longMeaning: '남이 한다고 하니까 분별없이 덩달아 나섬을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -55237,11 +53761,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 88,
 		},
-
 		{
 			id: 3087,
 			proverb: '자가사리 끓듯',
-			meaning: '크지도 않은 것들이 많이 모여 복작거림을 비유적으로 이르는 말.',
+			meaning: '크지도 않은 것들이 많이 모여 복작거림.',
 			longMeaning: '크지도 않은 것들이 많이 모여 복작거림을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55257,11 +53780,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3088,
 			proverb: '자가사리 용을 건드린다',
-			meaning: '힘이 약한 것이 자기 힘으로 상대할 수 없는 강한 것을 함부로 건드림을 비유적으로 이르는 말.',
+			meaning: '힘이 약한 것이 자기 힘으로 상대할 수 없는 강한 것을 함부로 건드림.',
 			longMeaning: '힘이 약한 것이 자기 힘으로 상대할 수 없는 강한 것을 함부로 건드림을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55277,11 +53799,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 3089,
 			proverb: '자는 입에 콩가루 떨어 넣기',
-			meaning: '옳지 못한 처사를 비유적으로 이르는 말.',
+			meaning: '옳지 못한 처사.',
 			longMeaning: '옳지 못한 처사를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55297,11 +53818,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 48,
 		},
-
 		{
 			id: 3090,
 			proverb: '자다가 벼락을 맞는다',
-			meaning: '급작스럽게 뜻하지 아니한 큰 봉변을 당함을 비유적으로 이르는 말.',
+			meaning: '급작스럽게 뜻하지 아니한 큰 봉변을 당함.',
 			longMeaning: '급작스럽게 뜻하지 아니한 큰 봉변을 당함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -55317,11 +53837,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3091,
 			proverb: '자다가 생병 얻는[앓는] 것 같다',
-			meaning: '급작스럽게 뜻하지 아니한 큰 봉변을 당함을 비유적으로 이르는 말.',
+			meaning: '급작스럽게 뜻하지 아니한 큰 봉변을 당함.',
 			longMeaning: '급작스럽게 뜻하지 아니한 큰 봉변을 당함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -55337,11 +53856,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 57,
 		},
-
 		{
 			id: 3092,
 			proverb: '자다가 얻은 병',
-			meaning: '급작스럽게 뜻하지 아니한 큰 봉변을 당함을 비유적으로 이르는 말.',
+			meaning: '급작스럽게 뜻하지 아니한 큰 봉변을 당함.',
 			longMeaning: '급작스럽게 뜻하지 아니한 큰 봉변을 당함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -55357,11 +53875,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3093,
 			proverb: '자다가 얻은 병이 이각(離却)을 못 한다',
-			meaning: '갑자기 얻은 병이나 화가 쉽게 떨어지지 아니함을 이르는 말.',
+			meaning: '갑자기 얻은 병이나 화가 쉽게 떨어지지 아니함.',
 			longMeaning: '갑자기 얻은 병이나 화가 쉽게 떨어지지 아니함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55377,12 +53894,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 3094,
 			proverb: '자던 아이 가지 따러 갔다',
-			meaning:
-				'아이를 재우려고 아이와 같이 누운 어머니가 잠든 사이에 아이는 잠들지 아니하고 밭에 나가 가지를 땄다는 뜻으로, 아이를 재우려다 어머니가 먼저 잠든 경우를 이르는 말.',
+			meaning: '아이를 재우려다 어머니가 먼저 잠든 경우.',
 			longMeaning:
 				'아이를 재우려고 아이와 같이 누운 어머니가 잠든 사이에 아이는 잠들지 아니하고 밭에 나가 가지를 땄다는 뜻으로, 아이를 재우려다 어머니가 먼저 잠든 경우를 이르는 말.',
 			sameProverb: [],
@@ -55399,11 +53914,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 59,
 		},
-
 		{
 			id: 3095,
 			proverb: '자비가 짚 벙거지',
-			meaning: '겉으로 자비로운 체하나 사실은 그렇지 못함을 이르는 말.',
+			meaning: '겉으로 자비로운 체하나 사실은 그렇지 못함.',
 			longMeaning: '겉으로 자비로운 체하나 사실은 그렇지 못함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55419,7 +53933,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 28,
 		},
-
 		{
 			id: 3096,
 			proverb: '자빠져도 코가 깨진다',
@@ -55439,11 +53952,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 42,
 		},
-
 		{
 			id: 3097,
 			proverb: '자시오 할 땐 마다더니 아가리에 박으라 해야 먹는다',
-			meaning: '좋은 말로 할 때는 듣지 아니하고 거칠고 심한 말을 해야만 비로소 듣는 경우를 비유적으로 이르는 말.',
+			meaning: '좋은 말로 할 때는 듣지 아니하고 거칠고 심한 말을 해야만 비로소 듣는 경우.',
 			longMeaning: '좋은 말로 할 때는 듣지 아니하고 거칠고 심한 말을 해야만 비로소 듣는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55459,7 +53971,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3098,
 			proverb: '자식 과년하면 부모가 반중매쟁이 된다',
@@ -55479,11 +53990,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 81,
 		},
-
 		{
 			id: 3099,
 			proverb: '자식 기르는 것 배우고 시집가는 계집 없다',
-			meaning: '무슨 일이나 일을 해 나가면서 배워 가는 것임을 이르는 말.',
+			meaning: '무슨 일이나 일을 해 나가면서 배워 가는 것임.',
 			longMeaning: '무슨 일이나 일을 해 나가면서 배워 가는 것임을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55499,12 +54009,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 84,
 		},
-
 		{
 			id: 3100,
 			proverb: '자식 떼고 돌아서는 어미는 발자국마다 피가 고인다',
-			meaning:
-				'자식을 떼어 버리고 돌아선 어머니는 걸음마다 피를 쏟으며 걷는다는 뜻으로, 어머니가 자식을 떼어 놓는 일이 매우 괴롭고 고통스러운 일임을 비유적으로 이르는 말.',
+			meaning: '어머니가 자식을 떼어 놓는 일이 매우 괴롭고 고통스러운 일임.',
 			longMeaning:
 				'자식을 떼어 버리고 돌아선 어머니는 걸음마다 피를 쏟으며 걷는다는 뜻으로, 어머니가 자식을 떼어 놓는 일이 매우 괴롭고 고통스러운 일임을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -55521,7 +54029,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3101,
 			proverb: '자식은 낳기보다 키우기가 더 어렵다',
@@ -55541,11 +54048,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 3102,
 			proverb: '자식은 내 자식이 커 보이고 벼는 남의 벼가 커 보인다',
-			meaning: '자식은 자기 자식이 잘나 보이고 재물은 남의 것이 더 좋아 보여 탐이 남을 이르는 말.',
+			meaning: '자식은 자기 자식이 잘나 보이고 재물은 남의 것이 더 좋아 보여 탐이 남.',
 			longMeaning: '자식은 자기 자식이 잘나 보이고 재물은 남의 것이 더 좋아 보여 탐이 남을 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -55561,7 +54067,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3103,
 			proverb: '작게 먹고 가는 똥 누어라[싸지]',
@@ -55581,11 +54086,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 3104,
 			proverb: '작은 절에 고양이[괴]가 두 마리',
-			meaning: '격에 맞지 아니하게 쓸모없는 것이 많은 경우를 비유적으로 이르는 말.',
+			meaning: '격에 맞지 아니하게 쓸모없는 것이 많은 경우.',
 			longMeaning: '격에 맞지 아니하게 쓸모없는 것이 많은 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55601,7 +54105,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 3105,
 			proverb: '작작 먹고 가는 똥 누어라',
@@ -55621,7 +54124,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 3106,
 			proverb: '작작 먹고 가늘게 싸라',
@@ -55641,11 +54143,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 39,
 		},
-
 		{
 			id: 3107,
 			proverb: '잔고기 가시 세다',
-			meaning: '고기는 작은데 가시는 세서 먹기가 여간 성가시지 아니하다는 뜻으로, 몸집은 작으나 속은 야무지고 단단함을 이르는 말.',
+			meaning: '몸집은 작으나 속은 야무지고 단단함.',
 			longMeaning: '고기는 작은데 가시는 세서 먹기가 여간 성가시지 아니하다는 뜻으로, 몸집은 작으나 속은 야무지고 단단함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55661,11 +54162,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 38,
 		},
-
 		{
 			id: 3108,
 			proverb: '잔치엔 먹으러 가고 장사엔 보러 간다',
-			meaning: '축하하여야 할 혼인 잔칫집에는 먹는 데만 신경을 쓰고, 위로하며 일을 도와주어야 할 초상집에서는 구경만 하는 야박한 인심을 이르는 말.',
+			meaning: '축하하여야 할 혼인 잔칫집에는 먹는 데만 신경을 쓰고, 위로하며 일을 도와주어야 할 초상집에서는 구경만 하는 야박한 인심.',
 			longMeaning: '축하하여야 할 혼인 잔칫집에는 먹는 데만 신경을 쓰고, 위로하며 일을 도와주어야 할 초상집에서는 구경만 하는 야박한 인심을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55681,11 +54181,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 3109,
 			proverb: '잔칫집에는 같이 가지 못하겠다',
-			meaning: '언제나 경사스러운 자리에서 남의 결점을 들추어내어 남의 좋은 일을 그르치게 하는 사람을 두고 이르는 말.',
+			meaning: '언제나 경사스러운 자리에서 남의 결점을 들추어내어 남의 좋은 일을 그르치게 하는 사람을 두고.',
 			longMeaning: '언제나 경사스러운 자리에서 남의 결점을 들추어내어 남의 좋은 일을 그르치게 하는 사람을 두고 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -55701,12 +54200,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 3110,
 			proverb: '잘 나가다[가다가] 삼천포(三千浦)로 빠지다',
-			meaning:
-				'진주로 가야 하는데 길을 잘못 들어 삼천포로 가게 되었다는 데서, 어떤 일이나 이야기 따위가 도중에 엉뚱한 방향으로 진행됨을 비유적으로 이르는 말.',
+			meaning: '어떤 일이나 이야기 따위가 도중에 엉뚱한 방향으로 진행됨.',
 			longMeaning:
 				'진주로 가야 하는데 길을 잘못 들어 삼천포로 가게 되었다는 데서, 어떤 일이나 이야기 따위가 도중에 엉뚱한 방향으로 진행됨을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -55723,11 +54220,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 95,
 		},
-
 		{
 			id: 3111,
 			proverb: '잘되는 밥 가마에 재를 넣는다',
-			meaning: '남의 다 된 일을 악랄한 방법으로 방해하는 것을 비유적으로 이르는 말.',
+			meaning: '남의 다 된 일을 악랄한 방법으로 방해하는 것.',
 			longMeaning: '남의 다 된 일을 악랄한 방법으로 방해하는 것을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -55743,7 +54239,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 3112,
 			proverb: '잘 싸우는 장수에게는 내버릴 병사가 없고 글 잘 쓰는 사람에게는 내버릴 글자가 없다',
@@ -55763,7 +54258,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3113,
 			proverb: '장가는 얕이 들고 시집은 높이 가렷다',
@@ -55784,11 +54278,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 79,
 		},
-
 		{
 			id: 3114,
 			proverb: '장가들러 가는 놈이 불알 떼어 놓고 간다',
-			meaning: '가장 중요하고 긴요한 것을 잊어버리는 경우를 비유적으로 이르는 말.',
+			meaning: '가장 중요하고 긴요한 것을 잊어버리는 경우.',
 			longMeaning: '가장 중요하고 긴요한 것을 잊어버리는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55804,7 +54297,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 3115,
 			proverb: '장가를 들어야 아이를 낳는다',
@@ -55824,7 +54316,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 3116,
 			proverb: '장가를 세 번 가면 불 끄는 걸 잊어버린다',
@@ -55844,11 +54335,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 81,
 		},
-
 		{
 			id: 3117,
 			proverb: '장 가운데 중 찾기',
-			meaning: '아주 찾기 쉬운 경우를 이르는 말.',
+			meaning: '아주 찾기 쉬운 경우.',
 			longMeaning: '아주 찾기 쉬운 경우를 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55864,11 +54354,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 26,
 		},
-
 		{
 			id: 3118,
 			proverb: '장꾼보다 풍각쟁이[엿장수]가 많다',
-			meaning: '돈을 내고 구경할 구경꾼보다 풍각쟁이만 많다는 뜻으로, 비례가 거꾸로 뒤바뀜을 비유적으로 이르는 말.',
+			meaning: '비례가 거꾸로 뒤바뀜.',
 			longMeaning: '돈을 내고 구경할 구경꾼보다 풍각쟁이만 많다는 뜻으로, 비례가 거꾸로 뒤바뀜을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55884,11 +54373,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 3119,
 			proverb: '장님에게 눈으로 가리키고 벙어리에게 속삭인다',
-			meaning: '각각의 일에 합당한 방도를 찾지 못하고 어리석게 행동하여 번번이 실패함을 이르는 말.',
+			meaning: '각각의 일에 합당한 방도를 찾지 못하고 어리석게 행동하여 번번이 실패함.',
 			longMeaning: '각각의 일에 합당한 방도를 찾지 못하고 어리석게 행동하여 번번이 실패함을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55904,11 +54392,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 99,
 		},
-
 		{
 			id: 3120,
 			proverb: '장님 파밭 들어가듯[매듯]',
-			meaning: '어림으로 대강 짐작하는 것도 없이 마구 찾아 헤매는 경우를 비유적으로 이르는 말.',
+			meaning: '어림으로 대강 짐작하는 것도 없이 마구 찾아 헤매는 경우.',
 			longMeaning: '어림으로 대강 짐작하는 것도 없이 마구 찾아 헤매는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55924,11 +54411,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 3121,
 			proverb: '장 단 집에는 가도 말 단 집에는 가지 마라',
-			meaning: '듣기 좋은 말만 하며 아첨하는 사람을 조심해야 함을 비유적으로 이르는 말.',
+			meaning: '듣기 좋은 말만 하며 아첨하는 사람을 조심해야 함.',
 			longMeaning: '듣기 좋은 말만 하며 아첨하는 사람을 조심해야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -55944,11 +54430,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 3122,
 			proverb: '장마가 무서워 호박을 못 심겠다',
-			meaning: '다소 방해되는 것이 있다 하더라도 마땅히 할 일은 하여야 함을 비유적으로 이르는 말.',
+			meaning: '다소 방해되는 것이 있다 하더라도 마땅히 할 일은 하여야 함.',
 			longMeaning: '다소 방해되는 것이 있다 하더라도 마땅히 할 일은 하여야 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -55964,7 +54449,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 63,
 		},
-
 		{
 			id: 3123,
 			proverb: '장마 도깨비 여울 건너가는 소리',
@@ -55984,7 +54468,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 3124,
 			proverb: '장모는 사위가 곰보라도 예뻐하고 시아버지는 며느리가 뻐드렁니에 애꾸라도 예뻐한다',
@@ -56004,11 +54487,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3125,
 			proverb: '장미꽃에는 가시가 있다',
-			meaning: '사람이 겉으로 좋고 훌륭하여 보여도 남을 해롭게 할 수 있는 요소를 가지고 있어 상대편이 해를 입을 수 있음을 비유적으로 이르는 말.',
+			meaning: '사람이 겉으로 좋고 훌륭하여 보여도 남을 해롭게 할 수 있는 요소를 가지고 있어 상대편이 해를 입을 수 있음.',
 			longMeaning: '사람이 겉으로 좋고 훌륭하여 보여도 남을 해롭게 할 수 있는 요소를 가지고 있어 상대편이 해를 입을 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -56024,11 +54506,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 53,
 		},
-
 		{
 			id: 3126,
 			proverb: '장부가 칼을 빼었다가 도로 꽂나',
-			meaning: '크게 결심하고 무슨 일을 하려다가 어려움이 있다 하여서 중도에 그만둘 수는 없음을 이르는 말.',
+			meaning: '크게 결심하고 무슨 일을 하려다가 어려움이 있다 하여서 중도에 그만둘 수는 없음.',
 			longMeaning: '크게 결심하고 무슨 일을 하려다가 어려움이 있다 하여서 중도에 그만둘 수는 없음을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -56044,11 +54525,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 64,
 		},
-
 		{
 			id: 3127,
 			proverb: '장비가 싸움을 마대',
-			meaning: '자기가 즐기는 것을 남이 권하였을 때 흔쾌히 받아들이며 이르는 말.',
+			meaning: '자기가 즐기는 것을 남이 권하였을 때 흔쾌히 받아들이며.',
 			longMeaning: '자기가 즐기는 것을 남이 권하였을 때 흔쾌히 받아들이며 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -56064,11 +54544,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 32,
 		},
-
 		{
 			id: 3128,
 			proverb: '장사가 나면 용마가 난다',
-			meaning: '무슨 일이거나 잘 되려면 좋은 기회가 저절로 생김을 이르는 말.',
+			meaning: '무슨 일이거나 잘 되려면 좋은 기회가 저절로 생김.',
 			longMeaning: '무슨 일이거나 잘 되려면 좋은 기회가 저절로 생김을 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -56084,11 +54563,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 3129,
 			proverb: '장사 지내러 가는 놈이 시체 두고 간다',
-			meaning: '사람이 어리석어 가장 중요한 것을 잊거나 잃어버리고 일에 임하는 경우를 비유적으로 이르는 말.',
+			meaning: '사람이 어리석어 가장 중요한 것을 잊거나 잃어버리고 일에 임하는 경우.',
 			longMeaning: '사람이 어리석어 가장 중요한 것을 잊거나 잃어버리고 일에 임하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -56104,11 +54582,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 76,
 		},
-
 		{
 			id: 3130,
 			proverb: '장수가 나면 용마가 난다',
-			meaning: '무슨 일이거나 잘 되려면 좋은 기회가 저절로 생김을 이르는 말.',
+			meaning: '무슨 일이거나 잘 되려면 좋은 기회가 저절로 생김.',
 			longMeaning: '무슨 일이거나 잘 되려면 좋은 기회가 저절로 생김을 이르는 말.',
 			sameProverb: [],
 			category: '노력/성공',
@@ -56124,11 +54601,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 3131,
 			proverb: '장수가 엄하면 군사가 강하다',
-			meaning: '지휘관이 군사들을 엄한 규율과 훈련으로 단련시키면 그만큼 강해짐을 이르는 말.',
+			meaning: '지휘관이 군사들을 엄한 규율과 훈련으로 단련시키면 그만큼 강해짐.',
 			longMeaning: '지휘관이 군사들을 엄한 규율과 훈련으로 단련시키면 그만큼 강해짐을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -56144,11 +54620,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 56,
 		},
-
 		{
 			id: 3132,
 			proverb: '장승박이로 끌고 가겠다',
-			meaning: '사람이 미련하여 아무 데도 쓸데가 없고 도리어 해만 끼치게 될 경우에 이르는 말.',
+			meaning: '사람이 미련하여 아무 데도 쓸데가 없고 도리어 해만 끼치게 될 경우에.',
 			longMeaning: '사람이 미련하여 아무 데도 쓸데가 없고 도리어 해만 끼치게 될 경우에 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -56164,7 +54639,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 3133,
 			proverb: '재미는 누가 보고 성은 누구한테 내느냐',
@@ -56184,11 +54658,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 82,
 		},
-
 		{
 			id: 3134,
 			proverb: '재수가 물밀 듯하다',
-			meaning: '재수가 좋아서 일이 썩 잘되어 가는 상태를 비유적으로 이르는 말.',
+			meaning: '재수가 좋아서 일이 썩 잘되어 가는 상태.',
 			longMeaning: '재수가 좋아서 일이 썩 잘되어 가는 상태를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '운/우연',
@@ -56204,11 +54677,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3135,
 			proverb: '재수가 불붙었다',
-			meaning: '재수가 좋아서 일이 썩 잘되어 가는 상태를 비유적으로 이르는 말.',
+			meaning: '재수가 좋아서 일이 썩 잘되어 가는 상태.',
 			longMeaning: '재수가 좋아서 일이 썩 잘되어 가는 상태를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '운/우연',
@@ -56224,11 +54696,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3136,
 			proverb: '재수가 불 일 듯하다',
-			meaning: '재수가 좋아서 일이 썩 잘되어 가는 상태를 비유적으로 이르는 말.',
+			meaning: '재수가 좋아서 일이 썩 잘되어 가는 상태.',
 			longMeaning: '재수가 좋아서 일이 썩 잘되어 가는 상태를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '운/우연',
@@ -56244,7 +54715,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3137,
 			proverb: '재수가 없는 포수는 곰을 잡아도 웅담이 없고 복 없는 봉사는 괘문을 배워 놓으면 개좆부리 하는 놈도 없다',
@@ -56264,11 +54734,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3138,
 			proverb: '재수가 옴 붙었다[붙다]',
-			meaning: '재수가 아주 없음을 이르는 말.',
+			meaning: '재수가 아주 없음.',
 			longMeaning: '재수가 아주 없음을 이르는 말.',
 			sameProverb: [],
 			category: '운/우연',
@@ -56284,7 +54753,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3139,
 			proverb: '잿불 화로의 불씨가 끊어져서는 집안이 망한다',
@@ -56305,7 +54773,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3140,
 			proverb: '저 걷던 놈도 나만 보면 타고 가려네',
@@ -56325,11 +54792,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 3141,
 			proverb: '적도 모르고 가지 딴다',
-			meaning: '적도 딸 줄 모르면서 가지를 따려 든다는 뜻으로, 기초적인 것도 모르면서 어려운 것을 하려 드는 것을 이르는 말.',
+			meaning: '기초적인 것도 모르면서 어려운 것을 하려 드는 것.',
 			longMeaning: '적도 딸 줄 모르면서 가지를 따려 든다는 뜻으로, 기초적인 것도 모르면서 어려운 것을 하려 드는 것을 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -56345,11 +54811,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 46,
 		},
-
 		{
 			id: 3142,
 			proverb: '적삼 벗고 은가락지 낀다',
-			meaning: '격에 맞지 아니한 짓을 하는 경우를 비유적으로 이르는 말.',
+			meaning: '격에 맞지 아니한 짓을 하는 경우.',
 			longMeaning: '격에 맞지 아니한 짓을 하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -56365,11 +54830,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 3143,
 			proverb: '적은 것은 똥 아닌가',
-			meaning: '나쁜 짓을 조금 했다고 하여 안 했다고 발뺌을 할 수는 없음을 비유적으로 이르는 말.',
+			meaning: '나쁜 짓을 조금 했다고 하여 안 했다고 발뺌을 할 수는 없음.',
 			longMeaning: '나쁜 짓을 조금 했다고 하여 안 했다고 발뺌을 할 수는 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -56385,11 +54849,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3144,
 			proverb: '적은 물이 새어 큰 배 가라앉는다',
-			meaning: '작은 구멍으로 새어 들기 시작한 물로 큰 배가 가라앉는다는 뜻으로, 자그마한 실수나 잘못으로 큰일을 그르칠 수도 있음을 이르는 말.',
+			meaning: '자그마한 실수나 잘못으로 큰일을 그르칠 수도 있음.',
 			longMeaning: '작은 구멍으로 새어 들기 시작한 물로 큰 배가 가라앉는다는 뜻으로, 자그마한 실수나 잘못으로 큰일을 그르칠 수도 있음을 이르는 말.',
 			sameProverb: [],
 			category: '경계/조심',
@@ -56405,11 +54868,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 69,
 		},
-
 		{
 			id: 3145,
 			proverb: '절간에 가서 참빗 찾기',
-			meaning: '사람 또는 물건 따위가 있을 수 없는 데에 가서 엉뚱하게 그것을 찾는 경우를 비유적으로 이르는 말.',
+			meaning: '사람 또는 물건 따위가 있을 수 없는 데에 가서 엉뚱하게 그것을 찾는 경우.',
 			longMeaning: '사람 또는 물건 따위가 있을 수 없는 데에 가서 엉뚱하게 그것을 찾는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -56425,7 +54887,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 3146,
 			proverb: '절굿공이가 순경(巡更) 돌면 집안이 망한다',
@@ -56445,11 +54906,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 91,
 		},
-
 		{
 			id: 3147,
 			proverb: '절에 가면 중노릇하고 싶다',
-			meaning: '일정한 주견이 없이 남이 하는 일을 보면 덮어놓고 따르려고 하는 경우를 비유적으로 이르는 말.',
+			meaning: '일정한 주견이 없이 남이 하는 일을 보면 덮어놓고 따르려고 하는 경우.',
 			longMeaning: '일정한 주견이 없이 남이 하는 일을 보면 덮어놓고 따르려고 하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -56465,11 +54925,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 3148,
 			proverb: '절에 가면 중 되고 싶고 마을에 가면 속인 되고 싶다',
-			meaning: '일정한 주견이 없이 남이 하는 일을 보면 덮어놓고 따르려고 하는 경우를 비유적으로 이르는 말.',
+			meaning: '일정한 주견이 없이 남이 하는 일을 보면 덮어놓고 따르려고 하는 경우.',
 			longMeaning: '일정한 주견이 없이 남이 하는 일을 보면 덮어놓고 따르려고 하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -56485,7 +54944,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3149,
 			proverb: '절에 가면 중이 되라',
@@ -56505,12 +54963,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 33,
 		},
-
 		{
 			id: 3150,
 			proverb: '절에 가면 중 이야기 촌에 가면 속인 이야기',
-			meaning:
-				'절에 가면 자연히 중에 대한 이야기를 하게 되고 마을에 가면 중이 아닌 여느 사람에 대한 이야기를 하게 된다는 뜻으로, 일정한 주견이 없이 환경과 장소에 따라 생각과 태도가 잘 변하는 경우를 비유적으로 이르는 말.',
+			meaning: '일정한 주견이 없이 환경과 장소에 따라 생각과 태도가 잘 변하는 경우.',
 			longMeaning:
 				'절에 가면 자연히 중에 대한 이야기를 하게 되고 마을에 가면 중이 아닌 여느 사람에 대한 이야기를 하게 된다는 뜻으로, 일정한 주견이 없이 환경과 장소에 따라 생각과 태도가 잘 변하는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -56527,7 +54983,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3151,
 			proverb: '절이 망하려니까 새우젓 장수가 들어온다',
@@ -56547,7 +55002,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 3152,
 			proverb: '점잖은 개가 똥을 먹는다',
@@ -56567,11 +55021,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 43,
 		},
-
 		{
 			id: 3153,
 			proverb: '젓가락으로 김칫국을 집어 먹을 놈',
-			meaning: '어리석고 용렬하여 어처구니없는 짓을 하는 사람에게 이르는 말.',
+			meaning: '어리석고 용렬하여 어처구니없는 짓을 하는 사람에게.',
 			longMeaning: '어리석고 용렬하여 어처구니없는 짓을 하는 사람에게 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -56587,11 +55040,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 66,
 		},
-
 		{
 			id: 3154,
 			proverb: '젓갈 가게에 중',
-			meaning: '당찮은 일에 눈뜨는 경우를 비유적으로 이르는 말.',
+			meaning: '당찮은 일에 눈뜨는 경우.',
 			longMeaning: '당찮은 일에 눈뜨는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -56607,7 +55059,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3155,
 			proverb: '정강이가 맏아들보다 낫다',
@@ -56627,7 +55078,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 52,
 		},
-
 		{
 			id: 3156,
 			proverb: '정배도 가려다 못 가면 섭섭하다',
@@ -56649,12 +55099,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 3157,
 			proverb: '정승 말[개/당나귀] 죽은 데는 (문상을) 가도 정승 죽은 데는 (문상을) 안 간다',
-			meaning:
-				'정승이 죽은 후에는 그에게 잘 보일 필요가 없으나 정승이 살고 말이 죽으면 정승의 환심을 사기 위하여 조문을 간다는 뜻으로, 권력이 있을 때는 아첨을 하지만 권력이 없어지면 돌아다보지 않는 세상인심을 비유적으로 이르는 말.',
+			meaning: '권력이 있을 때는 아첨을 하지만 권력이 없어지면 돌아다보지 않는 세상인심.',
 			longMeaning:
 				'정승이 죽은 후에는 그에게 잘 보일 필요가 없으나 정승이 살고 말이 죽으면 정승의 환심을 사기 위하여 조문을 간다는 뜻으로, 권력이 있을 때는 아첨을 하지만 권력이 없어지면 돌아다보지 않는 세상인심을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -56671,11 +55119,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3158,
 			proverb: '정신은 처가에 간다 하고 외가에를 가겠다',
-			meaning: '처가에 간다고 하고서는 처가에 가는 것을 잊고 외가로 간다는 뜻으로, 정신이 좋지 못하여 잘 잊어버리는 경우를 비유적으로 이르는 말.',
+			meaning: '정신이 좋지 못하여 잘 잊어버리는 경우.',
 			longMeaning: '처가에 간다고 하고서는 처가에 가는 것을 잊고 외가로 간다는 뜻으로, 정신이 좋지 못하여 잘 잊어버리는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -56691,11 +55138,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 90,
 		},
-
 		{
 			id: 3159,
 			proverb: '정월 대보름날 귀머리장군 연 떠나가듯',
-			meaning: '멀리 가서 떨어지는 모양을 비유적으로 이르는 말.',
+			meaning: '멀리 가서 떨어지는 모양.',
 			longMeaning: '멀리 가서 떨어지는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -56711,7 +55157,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 75,
 		},
-
 		{
 			id: 3160,
 			proverb: '젖먹이 두고 가는 년은 자국마다 피가 맺힌다',
@@ -56731,11 +55176,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 92,
 		},
-
 		{
 			id: 3161,
 			proverb: '제가 기른 개에게 발꿈치 물린다',
-			meaning: '자기에게 은혜를 입은 사람으로부터 도리어 화를 입음을 비유적으로 이르는 말.',
+			meaning: '자기에게 은혜를 입은 사람으로부터 도리어 화를 입음.',
 			longMeaning: '자기에게 은혜를 입은 사람으로부터 도리어 화를 입음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -56751,11 +55195,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 62,
 		},
-
 		{
 			id: 3162,
 			proverb: '제가 제 무덤을 판다',
-			meaning: '스스로 자신을 망치는 어리석은 짓을 함을 비유적으로 이르는 말.',
+			meaning: '스스로 자신을 망치는 어리석은 짓을 함.',
 			longMeaning: '스스로 자신을 망치는 어리석은 짓을 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -56771,11 +55214,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3163,
 			proverb: '제가 제 뺨을 친다',
-			meaning: '자기가 잘못하여 자신에게 해가 돌아오게 함을 비유적으로 이르는 말.',
+			meaning: '자기가 잘못하여 자신에게 해가 돌아오게 함.',
 			longMeaning: '자기가 잘못하여 자신에게 해가 돌아오게 함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -56791,11 +55233,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3164,
 			proverb: '제가 춤추고 싶어서 동서를 권한다',
-			meaning: '제가 춤을 추고 싶다는 말은 못하고 그 동서에게 권한다는 뜻으로, 무슨 일을 자기가 하고 싶어서 남에게 권함을 비유적으로 이르는 말.',
+			meaning: '무슨 일을 자기가 하고 싶어서 남에게 권함.',
 			longMeaning: '제가 춤을 추고 싶다는 말은 못하고 그 동서에게 권한다는 뜻으로, 무슨 일을 자기가 하고 싶어서 남에게 권함을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -56811,7 +55252,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 74,
 		},
-
 		{
 			id: 3165,
 			proverb: '제가 하고 싶어 하는 일은 흥이 난다',
@@ -56831,12 +55271,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 3166,
 			proverb: '제갈량이 왔다가 울고 가겠다',
-			meaning:
-				'지략으로 유명한 제갈량이 상대의 지략에 놀라 자신의 무능을 한탄하여 울고 돌아가겠다는 뜻으로, 지혜와 지략이 매우 뛰어난 사람을 비유적으로 이르는 말.',
+			meaning: '지혜와 지략이 매우 뛰어난 사람.',
 			longMeaning:
 				'지략으로 유명한 제갈량이 상대의 지략에 놀라 자신의 무능을 한탄하여 울고 돌아가겠다는 뜻으로, 지혜와 지략이 매우 뛰어난 사람을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -56853,11 +55291,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 3167,
 			proverb: '제 논에 모가 큰 것은 모른다',
-			meaning: '언제나 남의 논에 있는 모가 더 커 보인다는 뜻으로, 무엇이든 남의 물건이나 재물은 좋아 보이고 탐이 남을 비유적으로 이르는 말.',
+			meaning: '무엇이든 남의 물건이나 재물은 좋아 보이고 탐이 남.',
 			longMeaning: '언제나 남의 논에 있는 모가 더 커 보인다는 뜻으로, 무엇이든 남의 물건이나 재물은 좋아 보이고 탐이 남을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -56873,11 +55310,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 58,
 		},
-
 		{
 			id: 3168,
 			proverb: '제 딴죽에 제가 넘어졌다',
-			meaning: '꾀를 내어 남을 속이려다 도리어 자기가 그 꾀에 속아 넘어감을 비유적으로 이르는 말.',
+			meaning: '꾀를 내어 남을 속이려다 도리어 자기가 그 꾀에 속아 넘어감.',
 			longMeaning: '꾀를 내어 남을 속이려다 도리어 자기가 그 꾀에 속아 넘어감을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -56893,11 +55329,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 47,
 		},
-
 		{
 			id: 3169,
 			proverb: '제 발등을 제가 찍는다',
-			meaning: '자기가 한 일이 도리어 자기에게 해가 됨을 비유적으로 이르는 말.',
+			meaning: '자기가 한 일이 도리어 자기에게 해가 됨.',
 			longMeaning: '자기가 한 일이 도리어 자기에게 해가 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -56913,11 +55348,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3170,
 			proverb: '제 밥 먹은 개가 제 발등 문다',
-			meaning: '자기에게 은혜를 입은 사람으로부터 도리어 화를 입음을 비유적으로 이르는 말.',
+			meaning: '자기에게 은혜를 입은 사람으로부터 도리어 화를 입음.',
 			longMeaning: '자기에게 은혜를 입은 사람으로부터 도리어 화를 입음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -56933,7 +55367,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 54,
 		},
-
 		{
 			id: 3171,
 			proverb: '제 사랑 제가 진다',
@@ -56953,7 +55386,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 29,
 		},
-
 		{
 			id: 3172,
 			proverb: '제삿술 가지고 친구 사귄다',
@@ -56973,7 +55405,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 49,
 		},
-
 		{
 			id: 3173,
 			proverb: '제상 앞에 개가 꼬리를 쳐야 그 집안이 잘된다',
@@ -56993,11 +55424,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 98,
 		},
-
 		{
 			id: 3174,
 			proverb: '제 얼굴 가죽을 제가 벗긴다',
-			meaning: '자기에게 불명예스러운 일을 스스로 저지름을 비유적으로 이르는 말.',
+			meaning: '자기에게 불명예스러운 일을 스스로 저지름.',
 			longMeaning: '자기에게 불명예스러운 일을 스스로 저지름을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -57013,11 +55443,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 3175,
 			proverb: '제 얼굴은 제가 못 본다',
-			meaning: '자기의 허물을 자기가 잘 모름을 비유적으로 이르는 말.',
+			meaning: '자기의 허물을 자기가 잘 모름.',
 			longMeaning: '자기의 허물을 자기가 잘 모름을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -57033,11 +55462,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3176,
 			proverb: '제 오라를 제가 졌다',
-			meaning: '자기가 한 일이 도리어 자기에게 해가 됨을 비유적으로 이르는 말.',
+			meaning: '자기가 한 일이 도리어 자기에게 해가 됨.',
 			longMeaning: '자기가 한 일이 도리어 자기에게 해가 됨을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '배신/불신',
@@ -57053,11 +55481,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3177,
 			proverb: '제 옷감을 제가 찢는다',
-			meaning: '자기 일을 스스로 그르치는 어리석음을 비유적으로 이르는 말.',
+			meaning: '자기 일을 스스로 그르치는 어리석음.',
 			longMeaning: '자기 일을 스스로 그르치는 어리석음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -57073,12 +55500,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3178,
 			proverb: '제 인심 좋으면 초나라 가달도 사귄다',
-			meaning:
-				'저만 착하고 인심 좋으면 몹시 험상궂고 심보가 사납기로 이름난 초나라의 가달조차도 잘 사귈 수 있다는 뜻으로, 마음씨만 고우면 누구라도 잘 사귈 수 있음을 비유적으로 이르는 말.',
+			meaning: '마음씨만 고우면 누구라도 잘 사귈 수 있음.',
 			longMeaning:
 				'저만 착하고 인심 좋으면 몹시 험상궂고 심보가 사납기로 이름난 초나라의 가달조차도 잘 사귈 수 있다는 뜻으로, 마음씨만 고우면 누구라도 잘 사귈 수 있음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -57095,11 +55520,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 88,
 		},
-
 		{
 			id: 3179,
 			proverb: '제 절 부처는 제가 위하랬다(고)',
-			meaning: '자기가 모시는 주인은 자기가 잘 섬겨야 남도 그를 알아봄을 비유적으로 이르는 말.',
+			meaning: '자기가 모시는 주인은 자기가 잘 섬겨야 남도 그를 알아봄.',
 			longMeaning: '자기가 모시는 주인은 자기가 잘 섬겨야 남도 그를 알아봄을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -57115,12 +55539,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 61,
 		},
-
 		{
 			id: 3180,
 			proverb: '제 침 발라 꼰 새끼가 제일이다',
-			meaning:
-				'손바닥에 침을 발라 가며 자기가 직접 꼰 새끼가 제 마음에 제일 든다는 뜻으로, 자기가 직접 힘을 들여 한 일이 제일 믿음직함을 비유적으로 이르는 말.',
+			meaning: '자기가 직접 힘을 들여 한 일이 제일 믿음직함.',
 			longMeaning:
 				'손바닥에 침을 발라 가며 자기가 직접 꼰 새끼가 제 마음에 제일 든다는 뜻으로, 자기가 직접 힘을 들여 한 일이 제일 믿음직함을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -57137,11 +55559,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 67,
 		},
-
 		{
 			id: 3181,
 			proverb: '제 코가 석 자',
-			meaning: '내 사정이 급하고 어려워서 남을 돌볼 여유가 없음을 비유적으로 이르는 말.',
+			meaning: '내 사정이 급하고 어려워서 남을 돌볼 여유가 없음.',
 			longMeaning: '내 사정이 급하고 어려워서 남을 돌볼 여유가 없음을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '인간관계',
@@ -57154,7 +55575,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 41,
 		},
-
 		{
 			id: 3182,
 			proverb: '제 흉 열 가지 가진 놈이 남의 흉 한 가지를 본다',
@@ -57174,7 +55594,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3183,
 			proverb: '제힘 모르고 강가 씨름 갈까',
@@ -57194,7 +55613,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 50,
 		},
-
 		{
 			id: 3184,
 			proverb: '조깃배에는 못 가리라',
@@ -57216,7 +55634,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 51,
 		},
-
 		{
 			id: 3185,
 			proverb: '조록싸리 피거든 남의 집도 가지 마라',
@@ -57236,7 +55653,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 77,
 		},
-
 		{
 			id: 3186,
 			proverb: '조밥에도 큰 덩이 작은 덩이가 있다',
@@ -57256,11 +55672,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 65,
 		},
-
 		{
 			id: 3187,
 			proverb: '조석 싸 가지고 말리러 다닌다',
-			meaning: '기를 쓰고 하지 못하게 말리는 경우를 비유적으로 이르는 말.',
+			meaning: '기를 쓰고 하지 못하게 말리는 경우.',
 			longMeaning: '기를 쓰고 하지 못하게 말리는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -57276,12 +55691,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 55,
 		},
-
 		{
 			id: 3188,
 			proverb: '조 한 섬 가진 놈이 시겟금 올린다',
-			meaning:
-				'좁쌀을 불과 한 섬밖에 가지지 못한 자가 쌀의 시세를 올려놓고 말았다는 뜻으로, 대단치도 않은 인물이 부정적인 영향을 미치게 됨을 비난조로 이르는 말.',
+			meaning: '대단치도 않은 인물이 부정적인 영향을 미치게 됨.',
 			longMeaning:
 				'좁쌀을 불과 한 섬밖에 가지지 못한 자가 쌀의 시세를 올려놓고 말았다는 뜻으로, 대단치도 않은 인물이 부정적인 영향을 미치게 됨을 비난조로 이르는 말.',
 			sameProverb: [],
@@ -57298,11 +55711,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 3189,
 			proverb: '족제비 난장 맞고 홍문재 넘어가듯',
-			meaning: '엉겁결에 정신을 잃고 죽을지 살지 몰라 허겁지겁 달아나는 모양을 비유적으로 이르는 말.',
+			meaning: '엉겁결에 정신을 잃고 죽을지 살지 몰라 허겁지겁 달아나는 모양.',
 			longMeaning: '엉겁결에 정신을 잃고 죽을지 살지 몰라 허겁지겁 달아나는 모양을 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '세상 이치',
@@ -57318,12 +55730,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 68,
 		},
-
 		{
 			id: 3190,
 			proverb: '종가는 망해도 신주보와 향로 향합은 남는다',
-			meaning:
-				'종가는 망하여도 제사 지낼 때 쓰는 신주보와 향로, 향합은 남는다는 뜻으로, 문벌 있는 집안은 아무리 망하더라도 집안의 규율과 품격과 지조는 남음을 비유적으로 이르는 말.',
+			meaning: '문벌 있는 집안은 아무리 망하더라도 집안의 규율과 품격과 지조는 남음.',
 			longMeaning:
 				'종가는 망하여도 제사 지낼 때 쓰는 신주보와 향로, 향합은 남는다는 뜻으로, 문벌 있는 집안은 아무리 망하더라도 집안의 규율과 품격과 지조는 남음을 비유적으로 이르는 말.',
 			sameProverb: [],
@@ -57340,7 +55750,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 100,
 		},
-
 		{
 			id: 3191,
 			proverb: '종기가 커야 고름이 많다',
@@ -57360,7 +55769,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 45,
 		},
-
 		{
 			id: 3192,
 			proverb: '종일 가는 길에 중도 보고 속(俗)도 본다',
@@ -57380,7 +55788,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 86,
 		},
-
 		{
 			id: 3193,
 			proverb: '좋은 노래도 세 번 들으면 귀가 싫어한다',
@@ -57400,7 +55807,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 78,
 		},
-
 		{
 			id: 3194,
 			proverb: '좋은 일에는 남이요 궂은일에는 일가다',
@@ -57420,11 +55826,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 80,
 		},
-
 		{
 			id: 3195,
 			proverb: '죄는 막둥이가 짓고 벼락은 샌님이 맞는다',
-			meaning: '나쁜 짓을 해서 이익을 차지하는 사람과 그것에 대한 벌을 받는 사람이 따로 있는 경우를 비유적으로 이르는 말.',
+			meaning: '나쁜 짓을 해서 이익을 차지하는 사람과 그것에 대한 벌을 받는 사람이 따로 있는 경우.',
 			longMeaning: '나쁜 짓을 해서 이익을 차지하는 사람과 그것에 대한 벌을 받는 사람이 따로 있는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -57440,11 +55845,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 88,
 		},
-
 		{
 			id: 3196,
 			proverb: '죄는 샌님이 짓고 벼락은 막둥이가 맞는다',
-			meaning: '나쁜 짓을 해서 이익을 차지하는 사람과 그것에 대한 벌을 받는 사람이 따로 있는 경우를 비유적으로 이르는 말.',
+			meaning: '나쁜 짓을 해서 이익을 차지하는 사람과 그것에 대한 벌을 받는 사람이 따로 있는 경우.',
 			longMeaning: '나쁜 짓을 해서 이익을 차지하는 사람과 그것에 대한 벌을 받는 사람이 따로 있는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -57460,7 +55864,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 88,
 		},
-
 		{
 			id: 3197,
 			proverb: '죄는 지은 데로 가고 덕은 닦은 데로 간다',
@@ -57480,7 +55883,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 79,
 		},
-
 		{
 			id: 3198,
 			proverb: '죄는 지은 데로 가고 물은 곬으로 흐른다',
@@ -57500,7 +55902,6 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 78,
 		},
-
 		{
 			id: 3199,
 			proverb: '죄는 지은 데로 가고 물은 트는 데로 간다',
@@ -57520,11 +55921,10 @@ export const CONST_MAIN_DATA: {
 			antonym: null,
 			difficultyScore: 79,
 		},
-
 		{
 			id: 3200,
 			proverb: '죄는 천 도깨비가 짓고 벼락은 고목이 맞는다',
-			meaning: '나쁜 짓을 해서 이익을 차지하는 사람과 그것에 대한 벌을 받는 사람이 따로 있는 경우를 비유적으로 이르는 말.',
+			meaning: '나쁜 짓을 해서 이익을 차지하는 사람과 그것에 대한 벌을 받는 사람이 따로 있는 경우.',
 			longMeaning: '나쁜 짓을 해서 이익을 차지하는 사람과 그것에 대한 벌을 받는 사람이 따로 있는 경우를 비유적으로 이르는 말.',
 			sameProverb: [],
 			category: '욕심/탐욕',
@@ -57539,6 +55939,434 @@ export const CONST_MAIN_DATA: {
 			synonym: null,
 			antonym: null,
 			difficultyScore: 94,
+		},
+		{
+			id: 3201,
+			proverb: '콩이야 팥이야 한다',
+			meaning: '비슷비슷한 것을 두고 이러니저러니 시비를 다툼.',
+			longMeaning: '서로 비슷한 것을 가지고 이렇다 저렇다 시비를 다툼을 이르는 말.',
+			sameProverb: [],
+			category: '인간관계',
+			level: 3,
+			levelName: '고급',
+			example: ['둘 다 별 차이도 없는데 콩이야 팥이야 하며 한 시간을 싸웠다.', '고만고만한 안건을 두고 콩이야 팥이야 하니 회의가 길어진다.'],
+			origin: '오랜 생활 경험을 짧은 비유로 압축한 표현이다.',
+			usageTip: '비슷한 상황을 짧게 빗대어 말할 때 쓸 수 있다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 66,
+		},
+		{
+			id: 3202,
+			proverb: '크고 작은 것은 대봐야 안다',
+			meaning: '참된 가치는 직접 견주어 봐야 알 수 있음.',
+			longMeaning: '어떤 것의 참된 가치는 직접 비교해 보아야 알 수 있음을 이르는 말.',
+			sameProverb: [],
+			category: '세상 이치',
+			level: 2,
+			levelName: '중급',
+			example: ['말로만 낫다고 하지 말고 붙여 보자. 크고 작은 것은 대봐야 안다.', '스펙만 보고 정하지 마. 크고 작은 것은 대봐야 아는 거야.'],
+			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
+			usageTip: '일상 대화에서 비슷한 일을 비유적으로 말할 때 알맞다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 44,
+		},
+		{
+			id: 3203,
+			proverb: '큰 북에서 큰 소리 난다',
+			meaning: '크고 훌륭한 데서라야 좋은 일이 나옴.',
+			longMeaning: '크고 훌륭한 데서라야 좋은 일이 생길 수 있음을 비유적으로 이르는 말.',
+			sameProverb: [],
+			category: '세상 이치',
+			level: 3,
+			levelName: '고급',
+			example: [
+				'기초가 튼튼한 팀에서 결과가 나오더라. 큰 북에서 큰 소리 난다잖아.',
+				'판을 크게 벌여 놓으니 성과도 크네. 큰 북에서 큰 소리 나는 법이지.',
+			],
+			origin: '일상의 경험을 바탕으로 교훈을 전하는 말이다.',
+			usageTip: '상대에게 교훈이나 경계를 전할 때 쓸 수 있다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 62,
+		},
+		{
+			id: 3204,
+			proverb: '키 크고 싱겁지 않은 사람 없다',
+			meaning: '키가 큰 사람은 대체로 싱겁다는 뜻.',
+			longMeaning: '보통 키가 큰 사람은 싱겁다는 뜻으로 이르는 말.',
+			sameProverb: [],
+			category: '세상 이치',
+			level: 2,
+			levelName: '중급',
+			example: ['농담이 하나같이 허술하네. 키 크고 싱겁지 않은 사람 없다더니.', '덩치는 큰데 하는 말이 영 맹탕이야. 키 크고 싱겁지 않은 사람 없지.'],
+			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
+			usageTip: '일의 형편이나 태도를 간단히 설명할 때 알맞다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 48,
+		},
+		{
+			id: 3205,
+			proverb: '탕약에 감초 빠질까',
+			meaning: '무슨 일에나 빠짐없이 끼어드는 사람.',
+			longMeaning: '무슨 일에나 빠짐없이 끼어드는 사람을 놀림조로 이르는 말.',
+			sameProverb: [],
+			category: '인간관계',
+			level: 3,
+			levelName: '고급',
+			example: ['이번 모임에도 그 친구가 왔더라. 탕약에 감초 빠질까.', '어느 자리든 꼭 끼어 있네. 탕약에 감초 빠지겠어?'],
+			origin: '말과 행동의 이치를 짧은 비유로 전하는 표현이다.',
+			usageTip: '상황을 직접 길게 설명하지 않고 비유로 전할 때 자연스럽다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 68,
+		},
+		{
+			id: 3206,
+			proverb: '터를 닦아야 집을 짓는다',
+			meaning: '기초를 다져야 그 위에 일을 벌일 수 있음.',
+			longMeaning: '기초 작업을 해야 그 위에 일을 벌일 수 있음을 비유적으로 이르는 말.',
+			sameProverb: [],
+			category: '노력/성공',
+			level: 2,
+			levelName: '중급',
+			example: ['기본기부터 잡고 응용으로 가자. 터를 닦아야 집을 짓지.', '설계도 없이 개발부터 하겠다니, 터를 닦아야 집을 짓는 법이야.'],
+			origin: '일상에서 반복되는 상황을 빗대어 전해 온 말이다.',
+			usageTip: '비슷한 상황을 짧게 빗대어 말할 때 쓸 수 있다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 42,
+		},
+		{
+			id: 3207,
+			proverb: '터진 꽈리 보듯 한다',
+			meaning: '사람이나 물건을 대수롭지 않게 여김.',
+			longMeaning: '터져서 쓸데없어진 꽈리를 보듯 한다는 뜻으로, 사람이나 물건을 대수롭지 않게 여김을 이르는 말.',
+			sameProverb: [],
+			category: '인간관계',
+			level: 4,
+			levelName: '특급',
+			example: ['한번 실수했다고 터진 꽈리 보듯 하니 서운하다.', '쓸모없어지자 바로 터진 꽈리 보듯 하더라.'],
+			origin: '오랜 생활 경험을 짧은 비유로 압축한 표현이다.',
+			usageTip: '일상 대화에서 비슷한 일을 비유적으로 말할 때 알맞다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 84,
+		},
+		{
+			id: 3208,
+			proverb: '털도 아니 난 것이 날기부터 하려 한다',
+			meaning: '작은 일도 못 하면서 큰일부터 하려 듦.',
+			longMeaning: '깃털도 나지 않은 새끼가 날려고 한다는 뜻으로, 쉽고 작은 일도 해낼 수 없으면서 어렵고 큰일을 하려고 나섬을 이르는 말.',
+			sameProverb: [],
+			category: '경계/조심',
+			level: 3,
+			levelName: '고급',
+			example: [
+				'기본 문법도 모르면서 프레임워크부터 만들겠다니, 털도 아니 난 것이 날기부터 하려 한다.',
+				'연습도 안 하고 대회부터 나간대. 털도 아니 난 것이 날기부터 하려 하네.',
+			],
+			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
+			usageTip: '상대에게 교훈이나 경계를 전할 때 쓸 수 있다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 64,
+		},
+		{
+			id: 3209,
+			proverb: '파리떼 덤비듯',
+			meaning: '이익을 좇아 사람들이 자꾸 모여드는 모양.',
+			longMeaning: '사람들이 이익을 취하고자 자꾸 모여드는 모습을 비유적으로 이르는 말.',
+			sameProverb: [],
+			category: '욕심/탐욕',
+			level: 3,
+			levelName: '고급',
+			example: ['보상금 소식이 돌자 파리떼 덤비듯 사람이 몰렸다.', '지원금 공고가 뜨자마자 파리떼 덤비듯 신청이 쏟아졌다.'],
+			origin: '일상의 경험을 바탕으로 교훈을 전하는 말이다.',
+			usageTip: '일의 형편이나 태도를 간단히 설명할 때 알맞다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 63,
+		},
+		{
+			id: 3210,
+			proverb: '파리똥은 똥이 아니랴',
+			meaning: '차이가 있어도 본질은 다르지 않음.',
+			longMeaning: '다소의 차이가 있을지라도 본질은 다르지 않음을 이르는 말.',
+			sameProverb: [],
+			category: '세상 이치',
+			level: 4,
+			levelName: '특급',
+			example: ['액수가 적어도 횡령은 횡령이야. 파리똥은 똥이 아니랴.', '조금 베낀 것도 표절이지. 파리똥은 똥이 아니냐고.'],
+			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
+			usageTip: '상황을 직접 길게 설명하지 않고 비유로 전할 때 자연스럽다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 78,
+		},
+		{
+			id: 3211,
+			proverb: '평양감사도 저 싫으면 그만이다',
+			meaning: '아무리 좋은 일도 본인이 싫으면 억지로 시킬 수 없음.',
+			longMeaning: '아무리 좋은 일이라도 저 하기 싫다면 억지로 시킬 수 없음을 이르는 말.',
+			sameProverb: [],
+			category: '세상 이치',
+			level: 1,
+			levelName: '초급',
+			example: ['조건이 그렇게 좋은데도 안 간대. 평양감사도 저 싫으면 그만이지.', '억지로 밀어붙이지 마. 평양감사도 저 싫으면 그만이야.'],
+			origin: '말과 행동의 이치를 짧은 비유로 전하는 표현이다.',
+			usageTip: '비슷한 상황을 짧게 빗대어 말할 때 쓸 수 있다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 30,
+		},
+		{
+			id: 3212,
+			proverb: '포도청의 문고리 빼겠다',
+			meaning: '겁 없이 대담하게 구는 사람.',
+			longMeaning: '도둑을 잡는 관청인 포도청의 문고리도 훔치겠다는 뜻으로, 대담하고 겁이 없는 사람을 이르는 말.',
+			sameProverb: [],
+			category: '경계/조심',
+			level: 4,
+			levelName: '특급',
+			example: ['감사 기간에 그런 짓을 하다니, 포도청의 문고리 빼겠다.', '사장 앞에서 저렇게 말하네. 포도청의 문고리 빼겠어.'],
+			origin: '일상에서 반복되는 상황을 빗대어 전해 온 말이다.',
+			usageTip: '일상 대화에서 비슷한 일을 비유적으로 말할 때 알맞다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 80,
+		},
+		{
+			id: 3213,
+			proverb: '풀방구리에 쥐 드나들듯',
+			meaning: '어느 곳을 매우 자주 드나드는 모양.',
+			longMeaning: '풀을 담은 그릇에 풀을 먹으려고 쥐가 드나드는 것과 같다는 뜻으로, 어느 곳을 자주 드나드는 모양을 비유적으로 이르는 말.',
+			sameProverb: [],
+			category: '세상 이치',
+			level: 3,
+			levelName: '고급',
+			example: ['요즘 그 카페를 풀방구리에 쥐 드나들듯 한다.', '점심마다 편의점을 풀방구리에 쥐 드나들듯 오간다.'],
+			origin: '오랜 생활 경험을 짧은 비유로 압축한 표현이다.',
+			usageTip: '상대에게 교훈이나 경계를 전할 때 쓸 수 있다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 70,
+		},
+		{
+			id: 3214,
+			proverb: '피장파장',
+			meaning: '두 편이 낫고 못함 없이 같은 처지임.',
+			longMeaning: '두 편이 서로 낫고 못함이 없이 같은 처지임을 이르는 말.',
+			sameProverb: [],
+			category: '인간관계',
+			level: 2,
+			levelName: '중급',
+			example: ['너도 늦고 나도 늦었으니 피장파장이다.', '서로 실수했으니 따질 것 없어. 피장파장이야.'],
+			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
+			usageTip: '일의 형편이나 태도를 간단히 설명할 때 알맞다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 40,
+		},
+		{
+			id: 3215,
+			proverb: '한 어미 자식도 아롱이다롱이',
+			meaning: '같은 데서 나온 것도 저마다 다름.',
+			longMeaning: '한 어미에게서 난 자식도 그 모양이나 성격이 각각 다르다는 뜻으로, 세상일은 무엇이나 똑같은 것이 없음을 이르는 말.',
+			sameProverb: [],
+			category: '세상 이치',
+			level: 3,
+			levelName: '고급',
+			example: ['형제인데 성격이 정반대야. 한 어미 자식도 아롱이다롱이지.', '같은 교육을 받아도 결과가 다 달라. 한 어미 자식도 아롱이다롱이니까.'],
+			origin: '일상의 경험을 바탕으로 교훈을 전하는 말이다.',
+			usageTip: '상황을 직접 길게 설명하지 않고 비유로 전할 때 자연스럽다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 60,
+		},
+		{
+			id: 3216,
+			proverb: '한 잔 술에 눈물난다',
+			meaning: '사소한 일에도 차별을 두면 섭섭해짐.',
+			longMeaning: '사람의 감정이란 사소한 일이라도 차별을 두는 데서 섭섭한 생각이 남을 이르는 말.',
+			sameProverb: [],
+			category: '인간관계',
+			level: 3,
+			levelName: '고급',
+			example: ['한 명만 빼놓고 챙겼으니 서운하지. 한 잔 술에 눈물난다잖아.', '작은 것부터 공평하게 하자. 한 잔 술에 눈물나는 법이야.'],
+			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
+			usageTip: '비슷한 상황을 짧게 빗대어 말할 때 쓸 수 있다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 58,
+		},
+		{
+			id: 3217,
+			proverb: '한편 말만 듣고 송사 못한다',
+			meaning: '한쪽 말만 듣고는 옳게 판단할 수 없음.',
+			longMeaning: '시비나 싸움은 양쪽 모두 그럴 만한 까닭이 있어 일어나므로 어느 한편의 말만 듣고는 올바르게 판단할 수 없음을 이르는 말.',
+			sameProverb: [],
+			category: '경계/조심',
+			level: 3,
+			levelName: '고급',
+			example: ['상대 얘기도 들어 보고 정하자. 한편 말만 듣고 송사 못한다.', '민원 하나만 보고 결론 내면 안 돼. 한편 말만 듣고 송사 못하지.'],
+			origin: '말과 행동의 이치를 짧은 비유로 전하는 표현이다.',
+			usageTip: '일상 대화에서 비슷한 일을 비유적으로 말할 때 알맞다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 66,
+		},
+		{
+			id: 3218,
+			proverb: '항우도 댕댕이덩굴에 넘어진다',
+			meaning: '보잘것없다고 얕보다가 낭패를 봄.',
+			longMeaning: '작고 보잘것없다고 하여 얕보다가는 낭패를 보게 됨을 이르는 말.',
+			sameProverb: [],
+			category: '경계/조심',
+			level: 4,
+			levelName: '특급',
+			example: ['사소한 설정 하나에 서비스가 멈췄다. 항우도 댕댕이덩굴에 넘어진다더니.', '쉬운 상대라고 방심하지 마. 항우도 댕댕이덩굴에 넘어져.'],
+			origin: '일상에서 반복되는 상황을 빗대어 전해 온 말이다.',
+			usageTip: '상대에게 교훈이나 경계를 전할 때 쓸 수 있다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 76,
+		},
+		{
+			id: 3219,
+			proverb: '행랑 빌리면 안방까지 든다',
+			meaning: '조심하던 일도 재미를 붙이면 지나치게 됨.',
+			longMeaning: '처음에는 조심스럽게 하던 일도 점점 재미를 붙이면 정도에 지나친 짓까지 하게 됨을 이르는 말.',
+			sameProverb: [],
+			category: '경계/조심',
+			level: 3,
+			levelName: '고급',
+			example: [
+				'처음엔 한 번만 빌린다더니 이젠 아예 눌러앉았네. 행랑 빌리면 안방까지 든다.',
+				'예외를 한 번 허용하니 계속 요구한다. 행랑 빌리면 안방까지 드는 법이야.',
+			],
+			origin: '오랜 생활 경험을 짧은 비유로 압축한 표현이다.',
+			usageTip: '일의 형편이나 태도를 간단히 설명할 때 알맞다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 68,
+		},
+		{
+			id: 3220,
+			proverb: '헌신짝 버리듯 한다',
+			meaning: '요긴하게 쓰고 나서 거리낌 없이 내버림.',
+			longMeaning: '요긴하게 쓰고 난 뒤에 아무 거리낌 없이 내버림을 이르는 말.',
+			sameProverb: [],
+			category: '배신/불신',
+			level: 2,
+			levelName: '중급',
+			example: ['필요할 땐 붙잡더니 끝나니까 헌신짝 버리듯 한다.', '공을 다 쓰고 나서 헌신짝 버리듯 내치더라.'],
+			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
+			usageTip: '상황을 직접 길게 설명하지 않고 비유로 전할 때 자연스럽다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 46,
+		},
+		{
+			id: 3221,
+			proverb: '호떡집에 불난 것 같다',
+			meaning: '왁자지껄하게 떠드는 모양.',
+			longMeaning: '왁자지껄하게 떠드는 모양을 비유적으로 이르는 말.',
+			sameProverb: [],
+			category: '세상 이치',
+			level: 2,
+			levelName: '중급',
+			example: ['공지가 뜨자마자 단톡방이 호떡집에 불난 것 같다.', '쉬는 시간만 되면 교실이 호떡집에 불난 것 같아.'],
+			origin: '일상의 경험을 바탕으로 교훈을 전하는 말이다.',
+			usageTip: '비슷한 상황을 짧게 빗대어 말할 때 쓸 수 있다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 50,
+		},
+		{
+			id: 3222,
+			proverb: '호랑이에게 개 꾸어 준 셈',
+			meaning: '믿을 수 없는 사람에게 주어 되받지 못하게 됨.',
+			longMeaning: '믿을 수 없는 사람에게 주어 아무런 보답도 바랄 수 없게 된 경우를 이르는 말.',
+			sameProverb: [],
+			category: '배신/불신',
+			level: 3,
+			levelName: '고급',
+			example: ['그 사람한테 장비를 빌려준 건 호랑이에게 개 꾸어 준 셈이었다.', '보증까지 서 줬는데 연락도 없네. 호랑이에게 개 꾸어 준 셈이지.'],
+			origin: '생활 속 판단과 교훈을 비유적으로 담은 말이다.',
+			usageTip: '일상 대화에서 비슷한 일을 비유적으로 말할 때 알맞다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 72,
+		},
+		{
+			id: 3223,
+			proverb: '호박이 굴렀다',
+			meaning: '뜻밖에 좋은 물건을 얻거나 좋은 일이 생김.',
+			longMeaning: '뜻밖에 좋은 물건을 얻거나 좋은 일이 생김을 이르는 말.',
+			sameProverb: [],
+			category: '운/우연',
+			level: 2,
+			levelName: '중급',
+			example: ['안 될 줄 알았던 지원에 붙었어. 호박이 굴렀네.', '중고로 산 물건이 새것이었다니 호박이 굴렀다.'],
+			origin: '말과 행동의 이치를 짧은 비유로 전하는 표현이다.',
+			usageTip: '상대에게 교훈이나 경계를 전할 때 쓸 수 있다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 38,
+		},
+		{
+			id: 3224,
+			proverb: '흘러가는 물도 떠 주면 공이 된다',
+			meaning: '주기는 쉬워도 받는 쪽에는 큰 고마움이 됨.',
+			longMeaning: '주는 사람에게는 쉬워서 대수롭지 않은 일도 받는 사람에게는 크게 고마운 일이 됨을 이르는 말.',
+			sameProverb: [],
+			category: '인간관계',
+			level: 2,
+			levelName: '중급',
+			example: [
+				'자리 하나 알려 준 게 그렇게 고마웠대. 흘러가는 물도 떠 주면 공이 된다잖아.',
+				'지나가며 한 조언이 큰 도움이 됐다더라. 흘러가는 물도 떠 주면 공이 되는 거지.',
+			],
+			origin: '일상에서 반복되는 상황을 빗대어 전해 온 말이다.',
+			usageTip: '일의 형편이나 태도를 간단히 설명할 때 알맞다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 45,
+		},
+		{
+			id: 3225,
+			proverb: '흥정은 붙이고 싸움은 말리랬다',
+			meaning: '좋은 일은 권하고 나쁜 일은 말려야 함.',
+			longMeaning: '좋은 일은 서로 권장하고 나쁜 일은 서로 말리라고 이르는 말.',
+			sameProverb: [],
+			category: '인간관계',
+			level: 1,
+			levelName: '초급',
+			example: ['둘이 싸우는데 왜 부추기니. 흥정은 붙이고 싸움은 말리랬다.', '거래는 이어 주고 다툼은 뜯어말려야지. 흥정은 붙이고 싸움은 말리랬어.'],
+			origin: '오랜 생활 경험을 짧은 비유로 압축한 표현이다.',
+			usageTip: '상황을 직접 길게 설명하지 않고 비유로 전할 때 자연스럽다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 32,
+		},
+		{
+			id: 3226,
+			proverb: '흰죽에 코',
+			meaning: '옳고 그름이나 좋고 나쁨을 가릴 수 없음.',
+			longMeaning: '흰죽에 콧물이 들어간 것 같다는 뜻으로, 옳고 그름이나 좋고 나쁨을 가릴 수 없음을 비유적으로 이르는 말.',
+			sameProverb: [],
+			category: '세상 이치',
+			level: 4,
+			levelName: '특급',
+			example: ['원본과 수정본이 섞여 버려서 흰죽에 코가 됐다.', '두 자료가 뒤엉켜 무엇이 맞는지 흰죽에 코다.'],
+			origin: '사람들이 겪은 일을 간결한 말로 정리한 표현이다.',
+			usageTip: '비슷한 상황을 짧게 빗대어 말할 때 쓸 수 있다.',
+			synonym: null,
+			antonym: null,
+			difficultyScore: 82,
 		},
 	],
 };

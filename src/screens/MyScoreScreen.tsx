@@ -308,7 +308,7 @@ const MyScoreScreen = () => {
 
 			const studyBadges = studyJson?.badges ?? [];
 			const quizBadges = quizJson?.badges ?? [];
-			const studiedIds: number[] = studyJson?.studyProverbes ?? [];
+			const studiedIds: number[] = ProverbServices.filterExistingIds(studyJson?.studyProverbes ?? []);
 			const studyCounts = studyJson?.studyCounts ?? {};
 			const lastDate = studyJson?.lastStudyAt ?? '';
 

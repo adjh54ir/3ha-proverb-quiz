@@ -49,6 +49,12 @@
 
 ## 태블릿/아이패드 반응형 규칙
 
+**iPad 배포는 보류 중이다** — `TARGETED_DEVICE_FAMILY = 1` (iPhone 전용). 다시 켤 때는
+`"1,2"` 로 되돌리고 `__tests__/tabletLayout.test.ts` 의 타깃 테스트만 뒤집으면 된다.
+반응형 코드는 그대로 살아 있다. 지우지 않는 이유는 두 가지다 —
+안드로이드 태블릿은 Play 에서 배제할 수 없어 계속 설치되고(배율 상한이 없으면 1024dp 에서
+2.5배로 깨진다), 폰에서는 전부 no-op 이라 유지 비용이 0 이다.
+
 전제는 하나다 — **폰 레이아웃은 바뀌지 않는다.** 태블릿 전용 레이아웃을 따로 짜지 않고
 배율 상한 + 본문 기둥 폭 두 가지로 처리한다. 값은 모두 `src/utils/DementionUtils.ts` 에 있다.
 
@@ -69,7 +75,7 @@
    `width: '100%'` 만 두면 아이패드에서 카드가 화면 폭을 다 먹어 대화상자로 읽히지 않는다.
 
 5. 네이티브 스위치 네 개가 세트다 (`__tests__/tabletLayout.test.ts` 가 확인한다).
-   - `TARGETED_DEVICE_FAMILY = "1,2"` (Debug/Release 둘 다)
+   - `TARGETED_DEVICE_FAMILY` — 지금은 `1` (iPad 배포 보류). iPad 를 켤 때 `"1,2"`, Debug/Release 둘 다.
    - `UIRequiresFullScreen` = true (멀티태스킹을 지원하면 애플이 4방향 회전을 요구한다)
    - `UISupportedInterfaceOrientations~ipad` = Portrait 만
    - Android `PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY` = true

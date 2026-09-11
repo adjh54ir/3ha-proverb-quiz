@@ -3,7 +3,8 @@
 /* eslint-disable react-native/no-inline-styles */
 
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 import AppAlert from '@/screens/common/modal/AppAlert';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, AppState, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
@@ -325,14 +326,13 @@ const SettingScreen = () => {
 	const guide = useCharacterGuideOnce('setting');
 	const themeMode = useThemeMode(); // 화이트/다크 선택 상태
 	const textSizeMode = useTextSizeMode(); // 기본/글자 크게 선택 상태
-	const sectionRef = useRef<SectionList>(null);
+	const { scrollRef: sectionRef, showScrollTop, setShowScrollTop, onScroll: onListScroll, scrollToTop } = useScrollTop<SectionList>();
 
 	const [showDevModal, setShowDevModal] = useState(false);
 	const [showAppsModal, setShowAppsModal] = useState(false);
 	const [showTermsModal, setShowTermsModal] = useState(false);
 	const [showOpenSourceModal, setShowOpenSourceModal] = useState(false);
 	const [showVersionModal, setShowVersionModal] = useState(false);
-	const [showScrollTop, setShowScrollTop] = useState(false);
 
 	const [openAccordion, setOpenAccordion] = useState<'study' | 'challenge' | null>(null);
 	const [modalVisible, setModalVisible] = useState(false);
@@ -478,8 +478,6 @@ const SettingScreen = () => {
 			};
 		}, [refreshPermissions, endPreview]),
 	);
-
-	const scrollToTop = () => sectionRef.current?.getScrollResponder()?.scrollTo({ x: 0, y: 0, animated: true });
 
 	// ── 리셋 실행 ─────────────────────────────────
 	const openResetModal = (type: ResetType) => {
@@ -1061,7 +1059,7 @@ const SettingScreen = () => {
 						renderItem={renderItem}
 						sections={BASE_SECTIONS.map((section, i) => ({ ...section, key: `section-${i}` }))}
 						stickySectionHeadersEnabled={false}
-						onScroll={(e) => setShowScrollTop(e.nativeEvent.contentOffset.y > SCROLL_TOP_THRESHOLD)}
+						onScroll={onListScroll}
 						scrollEventThrottle={16}
 						contentContainerStyle={styles.listContent}
 						ItemSeparatorComponent={() => <View style={styles.itemSpacing} />}

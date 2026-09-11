@@ -15,6 +15,8 @@ import BottomHomeButton from './common/BottomHomeButton';
 import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 
 /** 모드별 설명 (카드 서브텍스트) */
 const MODE_DESC: Record<string, string> = {
@@ -37,7 +39,7 @@ const InitQuizModeScreen = () => {
 	const [accordionOpen, setAccordionOpen] = useState(false);
 	const [totalScore, setTotalScore] = useState<number>(0);
 
-	const scrollRef = useRef<ScrollView>(null);
+	const { scrollRef, showScrollTop, onScroll: onListScroll, scrollToTop } = useScrollTop<ScrollView>();
 	const enterAnim = useRef(new Animated.Value(0)).current;
 	// 모드 카드 stagger 진입 (최대 6개까지만 지연)
 	const cardAnims = useRef(QUIZ_MODES.map(() => new Animated.Value(0))).current;
@@ -87,7 +89,7 @@ const InitQuizModeScreen = () => {
 		<SafeAreaView style={styles.main} edges={['bottom']}>
 			<View style={styles.container}>
 				<Animated.View style={[styles.animatedWrap, { opacity: enterAnim }]}>
-					<ScrollView ref={scrollRef} style={styles.scrollArea} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+					<ScrollView ref={scrollRef} style={styles.scrollArea} contentContainerStyle={styles.scrollContent} onScroll={onListScroll} scrollEventThrottle={16} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 						<View style={styles.mascotSection}>
 							<FastImage
 								source={require('@/assets/images/screen-heroes/quiz-mode.png')}
@@ -181,6 +183,7 @@ const InitQuizModeScreen = () => {
 						)}
 					</ScrollView>
 				</Animated.View>
+				<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 			</View>
 			<BottomHomeButton backgroundColor={COLORS.background} />
 			<CharacterGuide

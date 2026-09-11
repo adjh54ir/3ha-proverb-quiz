@@ -43,11 +43,15 @@ const DonutChart: React.FC<DonutChartProps> = ({
 	const clamped = Math.min(Math.max(percent, 0), 100);
 
 	useEffect(() => {
-		Animated.timing(progress, {
+		const animation = Animated.timing(progress, {
 			toValue: clamped,
 			duration: 900,
 			useNativeDriver: false, // SVG strokeDashoffset 애니메이션은 네이티브 드라이버 미지원
-		}).start();
+		});
+		animation.start();
+		// useNativeDriver:false 라 매 프레임 JS 에서 값을 밀어 넣는다. 차트가 사라진 뒤에도
+		// 900ms 동안 계속 돌지 않도록 언마운트/값 변경 시 반드시 멈춘다.
+		return () => animation.stop();
 	}, [clamped, progress]);
 
 	const strokeDashoffset = progress.interpolate({

@@ -26,6 +26,8 @@ import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 
 type QuizModeScreenRouteParams = {
 	QuizModeScreen: { mode: 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank' };
@@ -84,7 +86,7 @@ const QuizModeScreen = () => {
 
 	// 🎞 화면 진입 / 탭 전환 시 페이드 + 슬라이드 업
 	const enterAnim = useRef(new Animated.Value(0)).current;
-	const scrollRef = useRef<ScrollView>(null);
+	const { scrollRef, showScrollTop, onScroll: onListScroll, scrollToTop } = useScrollTop<ScrollView>();
 
 	// 퀴즈를 풀고 돌아오면 진행도가 달라져 있으므로 포커스마다 다시 읽고,
 	// 탭은 '난이도'로 되돌리고 맨 위에서 시작한다.
@@ -208,6 +210,8 @@ const QuizModeScreen = () => {
 							transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
 						}}
 						showsVerticalScrollIndicator={false}
+						onScroll={onListScroll}
+						scrollEventThrottle={16}
 						contentContainerStyle={styles.scrollContent}>
 						{selectedMode && (
 							<View style={[styles.selectedModeBoxEnhanced, { backgroundColor: withAlpha(selectedMode.color, ALPHA.soft) }]}>
@@ -345,6 +349,7 @@ const QuizModeScreen = () => {
 							)}
 						</View>
 					</Animated.ScrollView>
+					<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 				</View>
 			</View>
 			<BottomHomeButton backgroundColor={COLORS.surface} />

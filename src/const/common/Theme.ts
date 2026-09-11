@@ -414,6 +414,11 @@ export const themedStyles = themedValue;
  *               (예: QuizStartModal, CheckInModal, DailyMissionModal …)
  * - `xxl`     : 화면(Screen) 타이틀. 모달에는 쓰지 않는다.
  * 새 모달을 만들 때 이 규칙을 벗어나면 화면 간 위계가 흔들리므로 반드시 둘 중 하나를 고른다.
+ *
+ * 예외 — 타이틀이 길어 `heading` 으로는 좁은 카드 안에서 두 줄로 접히는 다이얼로그는 `xl` 을 쓴다.
+ * (`SettingModal` 의 "개인정보처리방침 및 이용약관", `SettingScreen` 의 초기화 확인 타이틀)
+ * 타이틀 옆에 아이콘·닫기 버튼이 함께 들어가 실제 가용 폭이 카드 폭보다 한참 좁은 경우들이다.
+ * 이 두 곳을 `heading` 으로 '통일'하면 줄바꿈이 생겨 오히려 위계가 흔들린다.
  */
 const BASE_FONT_SIZES = {
 	xxs: 10, // 캡션/뱃지

@@ -15,6 +15,8 @@ import DateUtils from '@/utils/DateUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import { read } from '@/services/StorageService';
 import useCountdownTimers from '@/hooks/useCountdownTimers';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 
 // 규칙 한 줄 행 (아이콘 + 한 줄 텍스트)
 const RuleRow = ({ iconType, iconName, iconColor, chipColor, text }: { iconType: string; iconName: string; iconColor: string; chipColor: string; text: string }) => (
@@ -34,7 +36,7 @@ const InitTimeChallengeScreen = () => {
 	const scaleAnim = useRef(new Animated.Value(1)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
 	const slideAnim = useRef(new Animated.Value(scaleHeight(12))).current;
-	const scrollRef = useRef<ScrollView>(null);
+	const { scrollRef, showScrollTop, onScroll: onListScroll, scrollToTop } = useScrollTop<ScrollView>();
 	const { countdownTimerRef, countdownTimeoutRef, clearCountdownTimers } = useCountdownTimers();
 
 	const [count, setCount] = useState(3);
@@ -174,7 +176,7 @@ const InitTimeChallengeScreen = () => {
 	return (
 		<SafeAreaView style={styles.container} edges={['bottom']}>
 			<Animated.View style={[styles.contentWrapper, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-				<ScrollView ref={scrollRef} contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+				<ScrollView ref={scrollRef} contentContainerStyle={styles.scrollContainer} onScroll={onListScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
 					{/* 🎯 대표 이미지 영역 */}
 					<View style={styles.heroImageContainer}>
 						<Image source={require('@/assets/images/feature-states/time-challenge-hero.png')} style={styles.heroImage} resizeMode="contain" />
@@ -308,19 +310,25 @@ const InitTimeChallengeScreen = () => {
 						)}
 					</View>
 
-					<TouchableOpacity style={styles.startButton} onPress={handleStartChallenge} activeOpacity={0.85}>
-						<Text style={styles.startButtonText}>챌린지 시작하기</Text>
-						<IconComponent
-							name="play-circle"
-							type="Feather"
-							size={scaledSize(22)}
-							color={COLORS.textWhite}
-							style={{ marginLeft: SPACING_W.sm }}
-						/>
-					</TouchableOpacity>
 				</ScrollView>
+				<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 			</Animated.View>
-			<BottomHomeButton />
+
+			{/* 주 동작(시작)은 스크롤 밖에 고정한다 — 규칙·랭킹을 끝까지 내려야 누를 수 있으면 안 된다. */}
+			<View style={styles.startButtonBar}>
+				<TouchableOpacity style={styles.startButton} onPress={handleStartChallenge} activeOpacity={0.85}>
+					<Text style={styles.startButtonText}>챌린지 시작하기</Text>
+					<IconComponent
+						name="play-circle"
+						type="Feather"
+						size={scaledSize(22)}
+						color={COLORS.textWhite}
+						style={{ marginLeft: SPACING_W.sm }}
+					/>
+				</TouchableOpacity>
+			</View>
+			{/* 화면 배경이 background 라 기본값(surface)을 쓰면 하단에 다른 색 띠가 생긴다. */}
+			<BottomHomeButton backgroundColor={COLORS.background} />
 
 			<Modal visible={isCountingDown} transparent animationType="fade" onRequestClose={cancelCountdown}>
 				<View style={styles.countdownOverlay}>
@@ -687,6 +695,16 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 
 	// 시작 버튼
+	// 스크롤 내용이 버튼 밑으로 지나가므로 앱의 다른 고정 바와 같은 상단 구분선을 둔다
+	// (즐겨찾기 삭제 바 / 속담집 빼기 바 / 시트 footer 와 동일한 구성).
+	startButtonBar: {
+		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.md,
+		paddingBottom: SPACING_H.xs,
+		backgroundColor: COLORS.background,
+		borderTopWidth: 1,
+		borderTopColor: COLORS.border,
+	},
 	startButton: {
 		flexDirection: 'row',
 		backgroundColor: COLORS.secondary,

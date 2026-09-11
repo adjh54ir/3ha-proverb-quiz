@@ -6,6 +6,8 @@ import { Animated, View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking
 import Modal from '@/screens/common/atomic/AppModal';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight } from '@/utils/DementionUtils';
 import Markdown from 'react-native-markdown-display';
 import IconComponent from '../atomic/IconComponent';
@@ -216,6 +218,8 @@ Wi-Fi 외 환경에서 사용 시 발생하는 데이터 요금 및 로밍 요�
 export const TermsOfServiceModal = ({ visible, onClose }) => {
   const enterStyle = useModalEnter(visible);
   const safePadding = useModalSafePadding();
+  // 약관 전문이라 스크롤이 아주 길다 → 화면 목록과 같은 '맨 위로' 버튼을 둔다.
+  const { scrollRef, showScrollTop, onScroll, scrollToTop } = useScrollTop<ScrollView>();
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -227,7 +231,12 @@ export const TermsOfServiceModal = ({ visible, onClose }) => {
             <ModalCloseButton onPress={onClose} style={modalStyles.closeIcon} />
           </View>
 
-          <ScrollView contentContainerStyle={modalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            ref={scrollRef}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
+            contentContainerStyle={modalStyles.scrollContainer}
+            showsVerticalScrollIndicator={false}>
             <View style={modalStyles.markdownBox}>
               {/* React.memo 컴포넌트라 style 프롭 동등성으로 렌더를 건너뛴다 → 모드를 key 로 걸어 갱신 */}
               <Markdown key={getThemeMode()} style={markdownStyles}>
@@ -235,6 +244,8 @@ export const TermsOfServiceModal = ({ visible, onClose }) => {
               </Markdown>
             </View>
           </ScrollView>
+
+          <ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
         </Animated.View>
       </View>
     </Modal>
@@ -245,6 +256,8 @@ export const TermsOfServiceModal = ({ visible, onClose }) => {
 export const OpenSourceModal = ({ visible, onClose }) => {
   const enterStyle = useModalEnter(visible);
   const safePadding = useModalSafePadding();
+  // 라이선스 카드가 40개를 넘어 스크롤이 길다 → 같은 '맨 위로' 버튼을 둔다.
+  const { scrollRef, showScrollTop, onScroll, scrollToTop } = useScrollTop<ScrollView>();
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -256,7 +269,12 @@ export const OpenSourceModal = ({ visible, onClose }) => {
             <ModalCloseButton onPress={onClose} style={modalStyles.closeIcon} />
           </View>
 
-          <ScrollView contentContainerStyle={modalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            ref={scrollRef}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
+            contentContainerStyle={modalStyles.scrollContainer}
+            showsVerticalScrollIndicator={false}>
             <View style={styles.wrapperBox}>
               {OPEN_SOURCE_LIBS.map((lib, index) => (
                 <View key={index} style={styles.card}>
@@ -294,6 +312,8 @@ export const OpenSourceModal = ({ visible, onClose }) => {
               </Text>
             </View>
           </ScrollView>
+
+          <ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
         </Animated.View>
       </View>
     </Modal>

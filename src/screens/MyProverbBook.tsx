@@ -24,6 +24,12 @@ import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/Characte
 import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 import ScreenHeader from '@/screens/common/ScreenHeader';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
+
+/** 속담집 추가 FAB — '맨 위로' 버튼을 그 위에 쌓아야 해서 크기/위치를 상수로 뺀다. */
+const FAB_SIZE = scaleWidth(56);
+const FAB_BOTTOM = scaleHeight(90);
 
 // 액션시트가 아래에서 올라오는 거리. 시트 높이보다 크기만 하면 되므로 화면 높이를 쓴다(세로 고정 앱).
 const SHEET_SLIDE_FROM = Dimensions.get('screen').height;
@@ -92,7 +98,7 @@ const MyProverbBook = () => {
 	const { showToast, hideToast, ToastView } = useToast(scaleHeight(60));
 
 	const fadeAnim = useRef(new Animated.Value(1)).current;
-	const scrollRef = useRef<ScrollView>(null);
+	const { scrollRef, showScrollTop, onScroll: onListScroll, scrollToTop } = useScrollTop<ScrollView>();
 
 	useFocusEffect(
 		useCallback(() => {
@@ -221,7 +227,7 @@ const MyProverbBook = () => {
 					</View>
 				)}
 
-				<Animated.ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ opacity: fadeAnim }} contentContainerStyle={[styles.booksContainer, filteredBooks.length === 0 && styles.booksContainerEmpty]} showsVerticalScrollIndicator={false}>
+				<Animated.ScrollView ref={scrollRef} onScroll={onListScroll} scrollEventThrottle={16} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ opacity: fadeAnim }} contentContainerStyle={[styles.booksContainer, filteredBooks.length === 0 && styles.booksContainerEmpty]} showsVerticalScrollIndicator={false}>
 					{books.length === 0 ? (
 						<View style={styles.emptyView}>
 							<Image source={require('@/assets/images/screen-heroes/library-shelf.png')} style={styles.emptyShelfImage} resizeMode="contain" />
@@ -292,6 +298,9 @@ const MyProverbBook = () => {
 						})
 					)}
 				</Animated.ScrollView>
+
+				{/* FAB 위에 쌓는다 — 둘 다 오른쪽 하단이라 겹치면 추가 버튼을 가린다. */}
+				<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} bottom={FAB_BOTTOM + FAB_SIZE + SPACING_H.md} />
 
 				<TouchableOpacity style={styles.fab} onPress={() => setFormTarget(null)}>
 					<IconComponent type="materialIcons" name="add" size={scaledSize(28)} color={COLORS.textWhite} />
@@ -507,10 +516,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	fab: {
 		position: 'absolute',
 		right: SPACING_W.xl,
-		bottom: scaleHeight(90),
-		width: scaleWidth(56),
-		height: scaleWidth(56),
-		borderRadius: scaleWidth(56) / 2,
+		bottom: FAB_BOTTOM,
+		width: FAB_SIZE,
+		height: FAB_SIZE,
+		borderRadius: FAB_SIZE / 2,
 		backgroundColor: COLORS.secondary,
 		alignItems: 'center',
 		justifyContent: 'center',

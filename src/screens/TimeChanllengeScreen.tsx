@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
-import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
-import { Text, TouchableOpacity, View, StyleSheet, Platform, ScrollView, Animated, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
+import { Text, TouchableOpacity, View, StyleSheet, Platform, ScrollView, Animated } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
@@ -80,7 +81,7 @@ const InfinityQuizScreen = () => {
 	const navigation = useAppNavigation();
 	const isFocused = useIsFocused();
 
-	const scrollViewRef = useRef<ScrollView>(null);
+	const { scrollRef: scrollViewRef, showScrollTop, onScroll: onMainScroll, scrollToTop } = useScrollTop<ScrollView>();
 	const scoreAnim = useRef(new Animated.Value(1)).current;
 	const comboAnim = useRef(new Animated.Value(1)).current;
 	const comboShake = useRef(new Animated.Value(0)).current;
@@ -133,7 +134,6 @@ const InfinityQuizScreen = () => {
 	const [gameResult, setGameResult] = useState<MainDataType.TimeChallengeResult | null>(null);
 	const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
-	const [showScrollTop, setShowScrollTop] = useState(false);
 	const labelColors = [COLORS.secondary, COLORS.primary, COLORS.accentFlame, COLORS.accentPink]; // A, B, C, D 색상 (각각 다르게)
 	const solvedProverbs = questionList.slice(0, currentIndex + 1).filter((q) => resultMap[q.id]);
 	// 해설 헤더에 접힌 상태에서도 성적을 보여주기 위한 요약
@@ -337,39 +337,6 @@ const InfinityQuizScreen = () => {
 		heartAnim.start();
 		return () => heartAnim.stop();
 	}, [lives]);
-
-	/**
-	 * 스크롤을 관리하는 Handler
-	 */
-	const scrollHandler = (() => {
-		return {
-			/**
-			 * 스크롤을 일정 높이 만큼 움직였을때 아이콘 등장 처리
-			 * @param event
-			 */
-			onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-				const offsetY = event.nativeEvent.contentOffset.y;
-				setShowScrollTop(offsetY > SCROLL_TOP_THRESHOLD);
-			},
-			/**
-			 * 스크롤 최상단으로 이동
-			 * @return {void}
-			 */
-			toTop: (): void => {
-				scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-			},
-
-			/**
-			 * 스크롤 뷰 최하단으로 이동
-			 * @return {void}
-			 */
-			toBottom: (): void => {
-				runLater(() => {
-					scrollViewRef.current?.scrollToEnd({ animated: true });
-				}, 100);
-			},
-		};
-	})();
 
 	const saveChallengeResultToStorage = async (result: MainDataType.TimeChallengeResult) => {
 		// 최근 기록을 맨 앞에 — update 라 다른 저장과 겹쳐도 기록이 사라지지 않는다
@@ -669,7 +636,7 @@ const InfinityQuizScreen = () => {
 				ref={scrollViewRef}
 				style={{ flex: 1 }}
 				contentContainerStyle={isGameOver ? styles.resultScrollContent : styles.quizScrollContent}
-				onScroll={scrollHandler.onScroll}
+				onScroll={onMainScroll}
 				scrollEventThrottle={16}
 				keyboardShouldPersistTaps="handled">
 				{!isGameOver && (
@@ -1239,7 +1206,7 @@ const InfinityQuizScreen = () => {
 			</Modal>
 
 			{/* 최하단에 위치할것!! */}
-			<ScrollTopButton visible={showScrollTop} onPress={scrollHandler.toTop} />
+			<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 
 			{comboEffectText !== '' && (
 				<Animated.View

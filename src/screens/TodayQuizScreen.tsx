@@ -31,6 +31,8 @@ import { playCorrect, playWrong, playFinish } from '@/utils/SoundUtils';
 import { scheduleDailyQuizReminder, cancelDailyQuizReminder, parseAlarmHour, DEFAULT_ALARM_HOUR } from '@/utils/NotifactionHelper';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import QuizHistoryService from '@/services/QuizHistoryService';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 import * as TodayQuizService from '@/services/TodayQuizService';
 
 /** 저장 포맷('HH:mm') 으로 변환 */
@@ -58,7 +60,8 @@ const TodayQuizScreen = () => {
 	const STORAGE_KEY = MainStorageKeyType.TODAY_QUIZ_LIST;
 	const SETTING_KEY = MainStorageKeyType.SETTING_INFO;
 
-	const scrollRef = useRef<ScrollView>(null); // 전체 스크롤
+	// 전체 스크롤 + '맨 위로' 버튼 (문제를 다 풀면 한 화면을 훌쩍 넘는다)
+	const { scrollRef, showScrollTop, onScroll: onMainScroll, scrollToTop } = useScrollTop<ScrollView>();
 	const hourScrollRef = useRef<ScrollView>(null); // 알람 시간 선택 스크롤
 	const modalScrollRef = useRef<ScrollView>(null); // 모달 내부 스크롤
 	const [isTodayUnsolved, setIsTodayUnsolved] = useState(false);
@@ -682,6 +685,8 @@ const TodayQuizScreen = () => {
 			<ScrollView
 				ref={scrollRef}
 				showsVerticalScrollIndicator={false}
+				onScroll={onMainScroll}
+				scrollEventThrottle={16}
 				contentContainerStyle={{
 					paddingBottom: SPACING_H.xxxxl,
 				}}>
@@ -905,6 +910,8 @@ const TodayQuizScreen = () => {
 				</View>
 			</ScrollView>
 			</FadeInView>
+
+			<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 
 			<Modal visible={showAlarmModal} transparent animationType="fade" onRequestClose={() => setShowAlarmModal(false)}>
 				<View style={[styles.modalOverlay, safePadding]}>

@@ -11,6 +11,8 @@ import { CommonType } from '@/types/CommonType';
 import PopInView from '@/components/animation/PopInView';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 
 type CategoryFilter = 'all' | CommonType.AppCategory;
 
@@ -44,6 +46,8 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 	const safePadding = useModalSafePadding();
 	// 모달 → 알림창 전환 시 이전 모달 깜빡임 방지
 	const handoff = useModalHandoff();
+	// 앱 카드가 20개를 넘어 목록이 길다 → 화면 목록과 같은 '맨 위로' 버튼을 둔다.
+	const { scrollRef, showScrollTop, onScroll: onListScroll, scrollToTop } = useScrollTop<ScrollView>();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
 	const [searchQuery, setSearchQuery] = useState('');
 	const [searchFocused, setSearchFocused] = useState(false);
@@ -158,7 +162,14 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 					<Text style={styles.countLabel}>{filteredApps.length}개 앱</Text>
 
 					{/* 리스트 */}
-					<ScrollView contentContainerStyle={[styles.scroll, filteredApps.length === 0 && styles.scrollEmpty]} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
+					<ScrollView
+						ref={scrollRef}
+						onScroll={onListScroll}
+						scrollEventThrottle={16}
+						contentContainerStyle={[styles.scroll, filteredApps.length === 0 && styles.scrollEmpty]}
+						showsVerticalScrollIndicator={false}
+						keyboardShouldPersistTaps="handled"
+						keyboardDismissMode="on-drag">
 						{filteredApps.length === 0 ? (
 							<View style={styles.emptyState}>
 								<Text style={styles.emptyText}>검색 결과가 없습니다</Text>
@@ -199,6 +210,8 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 							})
 						)}
 					</ScrollView>
+
+					<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 				</PopInView>
 			</KeyboardAvoidingView>
 		</Modal>

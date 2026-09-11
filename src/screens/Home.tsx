@@ -31,6 +31,8 @@ import TowerRewardSection from '@/components/TowerRewardSection';
 import { playFinish } from '@/utils/SoundUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 
 const greetingMessages = [
 	'🎯 반갑습니다! 오늘도 똑똑해질 준비되셨습니까?',
@@ -132,7 +134,8 @@ const Home = () => {
 	const handoff = useModalHandoff();
 	const navigation = useAppNavigation();
 	const confettiTimer = useRef<NodeJS.Timeout | null>(null); // 축포 자동 종료 타이머
-	const scrollViewRef = useRef<ScrollView>(null);
+	// 홈은 한 화면을 넘는 세로 스크롤이라 '맨 위로' 버튼을 둔다(목록 화면과 같은 공용 훅/버튼).
+	const { scrollRef: scrollViewRef, showScrollTop, onScroll: onHomeScroll, scrollToTop } = useScrollTop<ScrollView>();
 
 	const [greeting, setGreeting] = useState('🖐️ 안녕하세요! 오늘도 속담 퀴즈 풀 준비 되셨습니까?');
 	const [showConfetti, setShowConfetti] = useState(false);
@@ -456,7 +459,12 @@ const Home = () => {
 				  · 도전  : 앰버 → 플레임 → 오렌지 (난이도가 올라가는 램프)
 				  · 수집  : 틸 / 스카이
 				*/}
-				<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false} ref={scrollViewRef}>
+				<ScrollView
+					contentContainerStyle={styles.container}
+					showsVerticalScrollIndicator={false}
+					ref={scrollViewRef}
+					onScroll={onHomeScroll}
+					scrollEventThrottle={16}>
 					<View style={styles.heroSection}>
 						<View style={styles.imageContainer}>
 							<View style={styles.streakChipWrapper}>
@@ -768,6 +776,8 @@ const Home = () => {
 					</View>
 				</ScrollView>
 			</Animated.View>
+
+			<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 
 			{/* 뱃지 상세 팝업 (나의 활동과 동일 컴포넌트 재사용) */}
 			{/* RN Modal 두 개가 동시에 present 되면 iOS 에서 상세가 안 뜨므로, 목록이 닫힌 뒤에만 띄운다. */}

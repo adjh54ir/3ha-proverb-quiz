@@ -8,6 +8,11 @@ import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
+
+/** 닫기 버튼 높이 — '맨 위로' 버튼을 그 위에 띄우는 데 쓴다(두 곳이 같은 값을 봐야 한다). */
+const DONE_BTN_HEIGHT = scaleHeight(48);
 
 const BadgeListModal = ({
 	visible,
@@ -26,6 +31,8 @@ const BadgeListModal = ({
 	const safePadding = useModalSafePadding();
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(visible);
+	// 뱃지가 70개를 넘어 목록이 길다 → 화면 목록과 같은 '맨 위로' 버튼을 둔다.
+	const { scrollRef, showScrollTop, onScroll: onListScroll, scrollToTop } = useScrollTop<ScrollView>();
 
 
 	const total = badges.length;
@@ -94,6 +101,9 @@ const BadgeListModal = ({
 
 					{/* 목록 */}
 					<ScrollView
+						ref={scrollRef}
+						onScroll={onListScroll}
+						scrollEventThrottle={16}
 						contentContainerStyle={styles.badgeListContent}
 						style={styles.badgeList}
 						showsVerticalScrollIndicator={false}>
@@ -151,6 +161,13 @@ const BadgeListModal = ({
 							);
 						})}
 					</ScrollView>
+
+					{/* 카드 하단의 닫기 버튼을 가리지 않도록 그 위로 띄운다. */}
+					<ScrollTopButton
+						visible={showScrollTop}
+						onPress={scrollToTop}
+						bottom={SPACING_H.xl + DONE_BTN_HEIGHT + SPACING_H.md + SPACING_H.sm}
+					/>
 
 					<TouchableOpacity style={styles.badgeModalDoneBtn} onPress={onClose} activeOpacity={0.85}>
 						<Text style={styles.badgeModalDoneText}>닫기</Text>
@@ -350,7 +367,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignSelf: 'stretch',
 		marginHorizontal: SPACING_W.lg,
 		marginTop: SPACING_H.md,
-		height: scaleHeight(48),
+		height: DONE_BTN_HEIGHT,
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.primary,
 		justifyContent: 'center',

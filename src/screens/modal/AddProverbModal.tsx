@@ -17,6 +17,8 @@ import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName } from 
 import { getLevelIconName } from '@/screens/common/CommonProverbModule';
 import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
 import useReducedMotion from '@/hooks/useReducedMotion';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 
 // 시트가 아래에서 올라오는 거리. 시트 높이보다 크기만 하면 되므로 화면 높이를 쓴다(세로 고정 앱).
 const SHEET_SLIDE_FROM = Dimensions.get('screen').height;
@@ -59,6 +61,9 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 	const [categoryItems, setCategoryItems] = useState<any[]>([]);
 
 	const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	// 속담 전체가 올라오는 목록이라 화면 안 목록과 같은 '맨 위로' 버튼을 둔다.
+	const { scrollRef: listRef, showScrollTop, onScroll: onListScroll, scrollToTop } = useScrollTop<FlatList>();
 
 	// 시트 등장 모션. animationType="slide" 는 딤까지 함께 밀어 올려 전환 내내 화면 위쪽이
 	// 딤 없이 비친다. 그래서 모달은 animationType="fade" 로 딤을 화면 전체에 고르게 깔고
@@ -296,10 +301,13 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 							</View>
 
 							<FlatList
+								ref={listRef}
 								data={filteredList}
 								keyExtractor={(item) => item.id.toString()}
 								renderItem={renderItem}
 								scrollEnabled={!levelOpen && !categoryOpen}
+								onScroll={onListScroll}
+								scrollEventThrottle={16}
 								keyboardShouldPersistTaps="handled"
 								keyboardDismissMode="on-drag"
 								contentContainerStyle={[styles.listContent, filteredList.length === 0 && styles.listContentEmpty]}
@@ -312,6 +320,8 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 									</View>
 								)}
 							/>
+
+							<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 						</View>
 					</TouchableWithoutFeedback>
 

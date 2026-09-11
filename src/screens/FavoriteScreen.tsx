@@ -17,7 +17,8 @@ import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import ProverbDetailModal from './modal/ProverbDetailModal';
-import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 import { useToast } from '@/hooks/useToast';
 import BottomHomeButton from './common/BottomHomeButton';
 import FavoriteAddModal from './modal/FavoriteAddModal';
@@ -46,7 +47,7 @@ const FavoriteScreen = () => {
 	const guide = useCharacterGuideOnce('favorite');
 	const emptyFavoritesImage = require('@/assets/images/feature-states/empty-favorites.png');
 	const emptySearchImage = require('@/assets/images/feature-states/empty-search.png');
-	const flatListRef = useRef<FlatList>(null);
+	const { scrollRef: flatListRef, showScrollTop, onScroll: onListScroll, scrollToTop } = useScrollTop<FlatList>();
 	const headerAnim = useRef(new Animated.Value(0)).current;
 	// 필터 초기화 지연 타이머 — 언마운트 시 정리해서 unmounted setState 를 막는다
 	const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -68,7 +69,6 @@ const FavoriteScreen = () => {
 	const [isSelectionMode, setIsSelectionMode] = useState(false);
 	const [selectedIds, setSelectedIds] = useState<number[]>([]);
 	const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
-	const [showScrollTop, setShowScrollTop] = useState(false);
 
 	// ─── 드롭다운 상태 ─────────────────────────────────────────
 	const [fieldOpen, setFieldOpen] = useState(false);
@@ -152,7 +152,7 @@ const FavoriteScreen = () => {
 			setLevelOpen(false);
 			setShowDeleteConfirmModal(false);
 			Keyboard.dismiss();
-			flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+			scrollToTop(false);
 			loadFavorites();
 		}, []),
 	);
@@ -177,7 +177,7 @@ const FavoriteScreen = () => {
 
 	useEffect(() => {
 		if (filteredList.length > 0) {
-			flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+			scrollToTop(false);
 		}
 	}, [keyword, categoryValue, levelValue]);
 
@@ -467,7 +467,7 @@ const FavoriteScreen = () => {
 						<FlatList
 							ref={flatListRef}
 							data={filteredList}
-							onScroll={(event) => setShowScrollTop(event.nativeEvent.contentOffset.y > SCROLL_TOP_THRESHOLD)}
+							onScroll={onListScroll}
 							scrollEventThrottle={16}
 							scrollEnabled={!fieldOpen && !levelOpen}
 							keyExtractor={(item) => item.id.toString()}
@@ -505,9 +505,11 @@ const FavoriteScreen = () => {
 							)}
 						/>
 
+						{/* 선택 모드에서는 하단 삭제 바가 버튼을 덮으므로 그 위로 올린다. */}
 						<ScrollTopButton
 							visible={showScrollTop}
-							onPress={() => flatListRef.current?.scrollToOffset({ offset: 0, animated: true })}
+							onPress={scrollToTop}
+							bottom={isSelectionMode ? BOTTOM_BAR_HEIGHT + SPACING_H.sm : undefined}
 						/>
 
 						{isSelectionMode && (
@@ -571,6 +573,9 @@ const FavoriteScreen = () => {
 };
 
 export default FavoriteScreen;
+
+/** 하단 삭제 바의 실제 높이 — '맨 위로' 버튼을 그 위로 띄우는 데 같은 값을 쓴다. */
+const BOTTOM_BAR_HEIGHT = SPACING_H.md + scaleHeight(52) + SPACING_H.xl;
 
 const styles = themedStyles(() => StyleSheet.create({
 	main: { flex: 1, backgroundColor: COLORS.background },

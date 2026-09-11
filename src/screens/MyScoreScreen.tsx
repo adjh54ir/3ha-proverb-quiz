@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 import {
 	View,
 	Text,
@@ -11,8 +12,6 @@ import {
 	Alert,
 	Modal,
 	FlatList,
-	NativeSyntheticEvent,
-	NativeScrollEvent,
 	Animated,
 } from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
@@ -150,7 +149,7 @@ const MyScoreScreen = () => {
 	const guide = useCharacterGuideOnce('myScore');
 	const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 	const isFocused = useIsFocused();
-	const scrollRef = useRef<ScrollView>(null);
+	const { scrollRef, showScrollTop, setShowScrollTop, onScroll: onMainScroll, scrollToTop } = useScrollTop<ScrollView>();
 	const [refreshing, setRefreshing] = useState(false);
 
 	// 마스코트 진입 애니메이션
@@ -176,7 +175,6 @@ const MyScoreScreen = () => {
 	const [studyCountries, setStudyCountries] = useState<string[]>([]);
 	const [lastStudyAt, setLastStudyAt] = useState<string | Date>('');
 	const [totalStudyCount, setTotalStudyCount] = useState<number>(0);
-	const [showScrollTop, setShowScrollTop] = useState(false);
 
 	const [categoryMaster, setCategoryMaster] = useState<string[]>([]);
 	const [totalCountryCount, setTotalCountryCount] = useState<number>(0);
@@ -457,7 +455,7 @@ const MyScoreScreen = () => {
 	};
 
 	const handleScrollToTop = () => {
-		scrollRef.current?.scrollTo({ y: 0, animated: true });
+		scrollToTop();
 	};
 
 	/**
@@ -466,34 +464,11 @@ const MyScoreScreen = () => {
 	 */
 	const handleActivityTabPress = (tabKey: string) => {
 		setActiveTab(tabKey);
-		scrollRef.current?.scrollTo({ y: 0, animated: true });
+		scrollToTop();
 	};
 
 	const totalSolved = correctCount + wrongCount;
 	const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
-
-	/**
-	 * 스크롤을 관리하는 Handler
-	 */
-	const scrollHandler = (() => {
-		return {
-			/**
-			 * 스크롤을 일정 높이 만큼 움직였을때 아이콘 등장 처리
-			 * @param event
-			 */
-			onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-				const offsetY = event.nativeEvent.contentOffset.y;
-				setShowScrollTop(offsetY > SCROLL_TOP_THRESHOLD);
-			},
-			/**
-			 * 스크롤 최상단으로 이동
-			 * @return {void}
-			 */
-			toTop: (): void => {
-				scrollRef.current?.scrollTo({ y: 0, animated: true });
-			},
-		};
-	})();
 
 	const updateMarkedQuizDatesOnSelect = (
 		date: string,
@@ -531,7 +506,7 @@ const MyScoreScreen = () => {
 				ref={scrollRef}
 				style={styles.container}
 				contentContainerStyle={{ paddingBottom: SPACING_H.xxxxl, flexGrow: 1 }}
-				onScroll={scrollHandler.onScroll}
+				onScroll={onMainScroll}
 				scrollEventThrottle={16}
 				refreshControl={<RefreshControl
 						refreshing={refreshing}
@@ -1414,7 +1389,7 @@ const MyScoreScreen = () => {
 			<ProverbDetailModal visible={detailVisible && !!detailProverb} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
 
 			{/* 최하단에 위치할것!! */}
-			<ScrollTopButton visible={showScrollTop} onPress={scrollHandler.toTop} />
+			<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 			<CharacterGuide
 				visible={guide.visible}
 				onClose={guide.close}

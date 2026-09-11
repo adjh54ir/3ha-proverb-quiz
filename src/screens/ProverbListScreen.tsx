@@ -1,7 +1,8 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 import { matchesKeyword } from '@/utils/SearchUtils';
 import { View, Text, StyleSheet, TextInput, RefreshControl, TouchableOpacity, Keyboard, TouchableWithoutFeedback, FlatList, KeyboardAvoidingView, Animated } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -65,7 +66,7 @@ const buildFieldItems = (fields: string[]) => [
 const ProverbListScreen = () => {
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('proverbList');
-	const scrollRef = useRef<FlatList>(null);
+	const { scrollRef, showScrollTop, setShowScrollTop, onScroll: onListScroll, scrollToTop } = useScrollTop<FlatList>();
 	const searchInputRef = useRef<TextInput>(null);
 	const headerAnim = useRef(new Animated.Value(0)).current;
 	// 필터 초기화 지연 타이머 — 언마운트 시 정리해서 unmounted setState 를 막는다
@@ -77,7 +78,6 @@ const ProverbListScreen = () => {
 	const [mainList, setMainList] = useState<MainDataType.Proverb[]>([]);
 	const [visibleList, setVisibleList] = useState<MainDataType.Proverb[]>([]);
 	const [page, setPage] = useState(1);
-	const [showScrollTop, setShowScrollTop] = useState(false);
 
 	const [fieldOpen, setFieldOpen] = useState(false);
 	const [levelOpen, setLevelOpen] = useState(false);
@@ -164,7 +164,7 @@ const ProverbListScreen = () => {
 			setLevelOpen(false);
 			setShowScrollTop(false);
 			Keyboard.dismiss();
-			scrollRef.current?.scrollToOffset({ offset: 0, animated: false });
+			scrollToTop(false);
 
 			// ✅ 리스트 상태 초기화
 			setPage(1);
@@ -214,10 +214,6 @@ const ProverbListScreen = () => {
 			setVisibleList(newData);
 			setPage(nextPage);
 		}
-	};
-
-	const scrollToTop = () => {
-		scrollRef.current?.scrollToOffset({ animated: true, offset: 0 });
 	};
 
 	const handleReset = () => {
@@ -452,10 +448,7 @@ const ProverbListScreen = () => {
 									/>}
 								onEndReached={loadMoreData}
 								onEndReachedThreshold={0.5}
-								onScroll={(event) => {
-									const offsetY = event.nativeEvent.contentOffset.y;
-									setShowScrollTop(offsetY > SCROLL_TOP_THRESHOLD);
-								}}
+								onScroll={onListScroll}
 								scrollEventThrottle={16}
 								keyboardShouldPersistTaps="handled"
 								keyboardDismissMode="on-drag"

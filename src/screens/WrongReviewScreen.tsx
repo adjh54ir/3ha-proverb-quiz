@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 import Skeleton from '@/screens/common/atomic/Skeleton';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import { Paths } from '@/navigation/conf/Paths';
@@ -77,9 +78,8 @@ const WrongReviewScreen = () => {
 	const navigation = useAppNavigation();
 	const isFocused = useIsFocused();
 	const [loading, setLoading] = useState(true);
-	const scrollViewRef = useRef<ScrollView>(null);
+	const { scrollRef: scrollViewRef, showScrollTop, setShowScrollTop, onScroll: handleScroll, scrollToTop } = useScrollTop<ScrollView>();
 	const [wrongProverbIds, setWrongProverbIds] = useState<MainDataType.Proverb[]>([]);
-	const [showScrollTop, setShowScrollTop] = useState(false);
 	const [totalSolvedCount, setTotalSolvedCount] = useState(0);
 	const [correctCount, setCorrectCount] = useState(0);
 	const [showWrongList, setShowWrongList] = useState(false);
@@ -108,7 +108,7 @@ const WrongReviewScreen = () => {
 		setCategoryFilter(ALL);
 		setDetailVisible(false);
 		setShowScrollTop(false);
-		scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+		scrollToTop(false);
 	}, [isFocused]);
 
 	useEffect(() => {
@@ -203,15 +203,6 @@ const WrongReviewScreen = () => {
 	const resetFilters = () => {
 		setLevelFilter(ALL);
 		setCategoryFilter(ALL);
-	};
-
-	/**
-	 * 스크롤을 움직일때 동작을 합니다. 하단으로 스크롤을 내릴때 아이콘 생성
-	 * @param event
-	 */
-	const handleScroll = (event: any) => {
-		const offsetY = event.nativeEvent.contentOffset.y;
-		setShowScrollTop(offsetY > SCROLL_TOP_THRESHOLD);
 	};
 
 	const startWrongReview = () => {
@@ -401,7 +392,7 @@ const WrongReviewScreen = () => {
 			</ScrollView>
 
 			{/* 최하단에 위치할것!! */}
-			<ScrollTopButton visible={showScrollTop} onPress={() => scrollViewRef.current?.scrollTo({ y: 0, animated: true })} />
+			<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
 
 			<ProverbDetailModal visible={detailVisible && !!detailProverb} proverb={detailProverb} onClose={() => setDetailVisible(false)} />
 			<CharacterGuide

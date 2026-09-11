@@ -12,7 +12,8 @@ import BottomHomeButton from './common/BottomHomeButton';
 import AddProverbModal from './modal/AddProverbModal';
 import QuizModeModal from './modal/QuizModeModal';
 import ProverbDetailModal from './modal/ProverbDetailModal';
-import ScrollTopButton, { SCROLL_TOP_THRESHOLD } from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import { useScrollTop } from '@/hooks/useScrollTop';
 import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
@@ -38,7 +39,7 @@ const PRACTICE_RECORD_KEY = MainStorageKeyType.USER_PROVERB_PRACTICE_RECORDS;
 const MyProverbBookDetail = () => {
 	const modalSafePadding = useModalSafePadding();
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
-	const listRef = useRef<FlatList<MainDataType.Proverb>>(null);
+	const { scrollRef: listRef, showScrollTop, onScroll: onListScroll, scrollToTop } = useScrollTop<FlatList<MainDataType.Proverb>>();
 	const guide = useCharacterGuideOnce('myProverbBookDetail');
 	const navigation = useNavigation<any>();
 	const route = useRoute<any>();
@@ -59,7 +60,6 @@ const MyProverbBookDetail = () => {
 	const [removeMode, setRemoveMode] = useState(false);
 	const [selectedForRemove, setSelectedForRemove] = useState<Set<number>>(new Set());
 	const [removeConfirmVisible, setRemoveConfirmVisible] = useState(false);
-	const [showScrollTop, setShowScrollTop] = useState(false);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -72,7 +72,7 @@ const MyProverbBookDetail = () => {
 			setAddModalVisible(false);
 			setQuizModeModal(null);
 			setShowDetailModal(false);
-			listRef.current?.scrollToOffset({ offset: 0, animated: false });
+			scrollToTop(false);
 		}, [bookId]),
 	);
 
@@ -229,7 +229,7 @@ const MyProverbBookDetail = () => {
 				<FlatList
 					ref={listRef}
 					data={proverbs}
-					onScroll={(event) => setShowScrollTop(event.nativeEvent.contentOffset.y > SCROLL_TOP_THRESHOLD)}
+					onScroll={onListScroll}
 					scrollEventThrottle={16}
 					keyExtractor={(item) => item.id.toString()}
 					renderItem={renderItem}
@@ -243,9 +243,11 @@ const MyProverbBookDetail = () => {
 					)}
 				/>
 
+				{/* 빼기 모드에서는 하단 바가 버튼을 덮으므로 그 위로 올린다. */}
 				<ScrollTopButton
 					visible={showScrollTop}
-					onPress={() => listRef.current?.scrollToOffset({ offset: 0, animated: true })}
+					onPress={scrollToTop}
+					bottom={removeMode ? BOTTOM_BAR_HEIGHT + SPACING_H.sm : undefined}
 				/>
 
 				{removeMode && (
@@ -300,6 +302,9 @@ const MyProverbBookDetail = () => {
 };
 
 export default MyProverbBookDetail;
+
+/** 하단 빼기 바의 실제 높이 — '맨 위로' 버튼을 그 위로 띄우는 데 같은 값을 쓴다. */
+const BOTTOM_BAR_HEIGHT = SPACING_H.md + scaleHeight(52) + SPACING_H.xl;
 
 const styles = themedStyles(() => StyleSheet.create({
 	main: { flex: 1, backgroundColor: COLORS.background },

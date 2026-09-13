@@ -137,6 +137,29 @@ describe('네이티브 기기 설정', () => {
 		expect(project).not.toMatch(/TARGETED_DEVICE_FAMILY = 1;/);
 	});
 
+	/**
+	 * 기기 타깃에 iPad 를 켜면 앱 아이콘도 iPad 크기를 다 갖춰야 한다.
+	 * 빠지면 빌드는 통과하고 App Store Connect **업로드에서** 거절된다
+	 * ("Missing required icon file … '152x152' … '167x167'", code 90023).
+	 */
+	test('아이패드 앱 아이콘이 다 있다', () => {
+		const dir = 'ios/ProverbQuiz/Images.xcassets/AppIcon.appiconset';
+		const catalog = JSON.parse(read(`${dir}/Contents.json`)) as {
+			images: Array<{ filename?: string; idiom: string; scale: string; size: string }>;
+		};
+		const ipad = catalog.images.filter((image) => image.idiom === 'ipad');
+		// 애플이 요구하는 아이패드 아이콘 한 벌
+		expect(ipad.map((image) => `${image.size}@${image.scale}`).sort()).toEqual(
+			['20x20@1x', '20x20@2x', '29x29@1x', '29x29@2x', '40x40@1x', '40x40@2x', '76x76@1x', '76x76@2x', '83.5x83.5@2x'].sort(),
+		);
+		// 카탈로그에 이름만 적혀 있고 파일이 없으면 같은 오류가 난다
+		const missing = catalog.images
+			.map((image) => image.filename)
+			.filter((filename): filename is string => !!filename)
+			.filter((filename) => !fs.existsSync(path.join(__dirname, '..', dir, filename)));
+		expect(missing).toEqual([]);
+	});
+
 	test('아이패드도 세로 고정이다', () => {
 		const plist = read('ios/ProverbQuiz/Info.plist');
 		// 멀티태스킹을 지원하면 애플이 네 방향 회전을 모두 요구한다 → 전체화면 전용으로 선언한다.

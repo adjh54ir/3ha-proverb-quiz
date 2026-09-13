@@ -44,7 +44,7 @@ const AppLayout = () => {
 	const { height: screenHeight } = Dimensions.get('window');
 
 	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute as Paths), [currentRoute]);
-	// const shouldShowAd = false
+	// 스토어 스크린샷을 찍을 때만 `const shouldShowAd = false` 로 바꾼다 (appstore/capture.sh 참고)
 
 	// ✅ 라우트별 배경색 지정
 	const backgroundColor = useMemo(() => {
@@ -62,6 +62,38 @@ const AppLayout = () => {
 		}
 		// themeMode 가 바뀌면 COLORS 가 다른 팔레트를 가리키므로 다시 계산해야 한다.
 	}, [currentRoute, themeMode]);
+
+	/**
+	 * 태블릿에서 본문 기둥(navigatorWrapper) 양옆에 남는 여백의 색.
+	 *
+	 * 기둥 폭이 화면보다 좁아 남는 자리는 이 색으로 칠해진다. 위 `backgroundColor` 는 화면 몇
+	 * 개만 구분해 두고 나머지는 흰색(surface)이라, 배경이 다른 화면에서는 여백만 흰 띠로 떠 보였다
+	 * (특히 타워 챌린지 — 어두운 화면 좌우가 흰색).
+	 *
+	 * `backgroundColor` 자체를 고치지 않는 이유 — 그 값은 폰에서도 상단 안전영역(광고가 뜨는
+	 * 화면)에 그대로 칠해져서, 건드리면 폰 화면이 같이 바뀐다. 그래서 태블릿에서만 갈아 끼운다.
+	 */
+	const gutterColor = useMemo(() => {
+		if (!isTablet) {
+			return backgroundColor;
+		}
+		switch (currentRoute) {
+			case Paths.TOWER_CHANLLENGE:
+			case Paths.TOWER_QUIZ:
+				// 화면은 세로 그라데이션이라 완전히 같게는 못 맞춘다 — 가운데 톤으로 이어 붙인다.
+				return COLORS.darkGradient[1];
+			case Paths.PROVERB_QUIZ_MODE_SELECT:
+			case Paths.QUIZ_WRONG_REVIEW:
+			case Paths.INIT_TIME_CHANLLENGE:
+			case Paths.FAVORITE:
+			case Paths.MY_PROVERB_BOOK:
+			case Paths.MY_PROVERB_BOOK_DETAIL:
+				return COLORS.background;
+			default:
+				return backgroundColor;
+		}
+		// themeMode 가 바뀌면 COLORS 가 다른 팔레트를 가리키므로 다시 계산해야 한다.
+	}, [currentRoute, backgroundColor, themeMode]);
 
 	const getAdPaddingTop = () => {
 		if (!shouldShowAd) {
@@ -188,8 +220,9 @@ const AppLayout = () => {
 					setCurrentRoute(routeName);
 				}
 			}}>
-			<SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={shouldShowAd ? ['top'] : []}>
-				<View style={[styles.container, { backgroundColor }]}>
+			{/* 기둥 바깥(태블릿 좌우 여백)까지 덮는 두 겹은 여백 색을 쓴다 — 폰에서는 backgroundColor 와 같은 값이다. */}
+			<SafeAreaView style={[styles.safeArea, { backgroundColor: gutterColor }]} edges={shouldShowAd ? ['top'] : []}>
+				<View style={[styles.container, { backgroundColor: gutterColor }]}>
 					{/*
 						배너는 본문 기둥(CONTENT_MAX_WIDTH)에 맞추지 않는다.
 						앵커드 어댑티브 배너의 네이티브 뷰는 컨테이너가 아니라 '기기 폭'으로 크기를 정해

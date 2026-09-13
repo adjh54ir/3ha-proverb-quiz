@@ -13,7 +13,7 @@ import BadgeListModal from './modal/BadgeListModal';
 import { HIT_SLOP, COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { CONTENT_MAX_WIDTH, isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateUtils from '@/utils/DateUtils';
 import '@/utils/KoreanLocale'; // 달력/moment 한국어 설정 (단일 소스)
@@ -442,7 +442,14 @@ const Home = () => {
 			{/* 컨페티는 화면 전체를 덮는 큰 모션이라 '애니메이션 줄이기'에서는 생략한다. */}
 			{showConfetti && !reducedMotion && (
 				<View style={styles.globalConfettiWrapper}>
-					<ConfettiCannon count={60} origin={{ x: scaleWidth(180), y: 0 }} fadeOut explosionSpeed={500} fallSpeed={2500} />
+					{/* 컨페티는 본문 기둥 안에서 터진다 — 태블릿은 기둥 가운데를 써야 한가운데서 퍼진다. */}
+					<ConfettiCannon
+						count={60}
+						origin={{ x: isTablet ? CONTENT_MAX_WIDTH / 2 : scaleWidth(180), y: 0 }}
+						fadeOut
+						explosionSpeed={500}
+						fallSpeed={2500}
+					/>
 				</View>
 			)}
 			<Animated.View

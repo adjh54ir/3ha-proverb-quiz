@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
-import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
@@ -142,8 +142,9 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 					style={[
 						styles.modalContainer,
 						{
-							// 태블릿에서 화면의 90% 는 지나치게 넓다 — 본문 기둥 폭을 넘지 않게 묶는다(폰은 상한에 닿지 않음).
-							width: Math.min(width * 0.9, CONTENT_MAX_WIDTH),
+							// 태블릿에서 화면의 90% 는 지나치게 넓다 — 다른 대화상자와 같은 모달 상한으로 묶는다
+							// (기둥 폭 700 은 대화상자로 읽히지 않는다). 폰은 상한에 닿지 않아 그대로다.
+							width: Math.min(width * 0.9, MODAL_MAX_WIDTH),
 							// 쓸 수 있는 높이의 80% → 버튼이 항상 화면 안에 들어옴
 							height: cardHeight,
 							backgroundColor: bgColor,

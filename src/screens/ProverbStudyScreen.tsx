@@ -4,7 +4,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { SkeletonCardList } from '@/screens/common/atomic/Skeleton';
-import { Animated, Easing, Image, InteractionManager, Platform, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Animated, Dimensions, Easing, Image, InteractionManager, Platform, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 // 카드 뒷면 스크롤은 gesture-handler의 ScrollView를 쓴다.
 // RN 기본 ScrollView는 Carousel의 PanGesture에 세로 제스처를 뺏겨 스크롤이 먹지 않는다.
 import { ScrollView as GHScrollView } from 'react-native-gesture-handler';
@@ -18,7 +18,7 @@ import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { CONTENT_MAX_WIDTH, isTablet, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme, getThemeMode } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber, LEVEL_NAME_BY_NUMBER } from '@/screens/common/CommonProverbModule';
 import { LEVEL_DROPDOWN_ITEMS, FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
@@ -82,13 +82,22 @@ const proverbSceneImages = [
 ];
 
 // 태블릿 판정은 DementionUtils 의 공용 기준(짧은 변 600dp)을 쓴다 — 화면마다 기준이 갈리지 않게.
-// 예시: 카드 높이 다르게 적용
 const isAndroid = Platform.OS === 'android';
+
+/**
+ * 학습 카드 크기.
+ *
+ * 태블릿은 `scaleHeight(고정값)` 을 쓰지 않는다 — 배율 상한(1.35)에 걸려 어떤 기기든 756pt 로
+ * 굳어 버려서, 13인치에서는 카드 아래로 화면 높이의 4분의 1이 비고 폭도 기둥(700) 안에서
+ * 500 밖에 안 써 좌우가 휑했다. 기기 크기에 비례시켜 기둥과 화면을 채운다.
+ * 폰은 두 값 모두 기존 그대로다.
+ */
 const CARD_HEIGHT = isTablet
-	? scaleHeight(560)
+	? Math.round(Dimensions.get('screen').height * 0.62)
 	: isAndroid
 		? scaleHeight(550) // 📌 iOS 대비 20 높게
 		: scaleHeight(540);
+const CARD_WIDTH = isTablet ? Math.round(CONTENT_MAX_WIDTH * 0.88) : scaleWidth(370);
 
 const praiseMessages = [
 	'속담 하나를 더 마스터했습니다! 🎉',
@@ -1103,8 +1112,10 @@ const QuizStudyScreen = () => {
 								{!(Platform.OS === 'android' && (badgeModalVisible || showExitModal)) && (
 									<Carousel
 										ref={carouselRef}
-										width={scaleWidth(370)}
-										height={windowHeight * 0.65}
+										width={CARD_WIDTH}
+										// 태블릿은 화면의 65% 가 카드(CARD_HEIGHT)보다 한참 크거나(13") 작아서(mini)
+										// 빈 칸이 남거나 카드가 잘린다. 카드 높이에 맞춘다. 폰은 기존 값 그대로.
+										height={isTablet ? CARD_HEIGHT + scaleHeight(40) : windowHeight * 0.65}
 										// @ts-ignore
 										data={getFilteredData()}
 										renderItem={renderItem}
@@ -1288,7 +1299,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'flex-start',
 	},
 	cardFront: {
-		width: scaleWidth(370), // ✅ 내부 카드(cardFace)와 같은 크기로
+		width: CARD_WIDTH, // ✅ 내부 카드(cardFace)와 같은 크기로
 		height: CARD_HEIGHT, // ✅ 앞/뒷면(cardFace)과 동일 높이로 맞춰 크로스페이드 중 빈 영역 방지
 		borderRadius: RADIUS.lg,
 		backgroundColor: COLORS.surface, // ✅ 플립 전환 중에도 카드 영역이 항상 흰색으로 가득 채워지도록
@@ -1422,7 +1433,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	cardFace: {
-		width: scaleWidth(370),
+		width: CARD_WIDTH,
 		height: CARD_HEIGHT, // ✅ 여기 반영
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.lg,
@@ -1438,7 +1449,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 
 	cardFace2: {
-		width: scaleWidth(370),
+		width: CARD_WIDTH,
 		height: CARD_HEIGHT, // ✅ 여기 반영
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
@@ -1681,6 +1692,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	exitModalBox: {
 		width: '80%',
+		// 전체화면 모달이라 본문 기둥 밖이다 — 태블릿에서 80% 는 819pt 로 벌어진다.
+		maxWidth: MODAL_MAX_WIDTH,
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,

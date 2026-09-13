@@ -8,7 +8,7 @@ import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { CONTENT_MAX_WIDTH, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
@@ -533,6 +533,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	confirmModal: {
 		width: '100%',
+		// 전체화면 모달이라 본문 기둥 밖이다 — 태블릿에서 대화상자가 화면 폭을 다 먹지 않게 묶는다.
+		maxWidth: MODAL_MAX_WIDTH,
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.xl,
 		paddingHorizontal: SPACING_W.xl,
@@ -554,6 +556,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	confirmBtnText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
 	actionSheetOverlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'flex-end' },
 	actionSheet: {
+		// 바텀시트는 본문 기둥 폭까지만 (다른 시트와 같은 규칙)
+		width: '100%',
+		maxWidth: CONTENT_MAX_WIDTH,
+		alignSelf: 'center',
 		backgroundColor: COLORS.surface,
 		borderTopLeftRadius: RADIUS.xl,
 		borderTopRightRadius: RADIUS.xl,

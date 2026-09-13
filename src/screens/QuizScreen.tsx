@@ -19,7 +19,7 @@ import { QuizBadgeInterceptor } from '@/services/interceptor/QuizBadgeIntercepto
 import { CONST_BADGES } from '@/const/ConstBadges';
 import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber } from '@/screens/common/CommonProverbModule';
@@ -1196,7 +1196,10 @@ const QuizScreen = () => {
 							</Animated.View>
 						)}
 
-						{confettiKey > 0 && !reducedMotion && <ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart />}
+						{/* 컨페티는 본문 기둥 안에서 터진다 — 태블릿은 화면 반이 아니라 기둥 반이 한가운데다. */}
+						{confettiKey > 0 && !reducedMotion && (
+							<ConfettiCannon key={confettiKey} count={100} origin={{ x: Math.min(screenWidth, CONTENT_MAX_WIDTH) / 2, y: 0 }} fadeOut autoStart />
+						)}
 					</View>
 			{/* 뱃지 모달 */}
 			<NewBadgeModal

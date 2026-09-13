@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, View } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
-import { scaleWidth } from '@/utils';
+import { isTablet, scaleWidth } from '@/utils';
 import { COLORS } from '@/const/common/Theme';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -34,8 +34,11 @@ const DonutChart: React.FC<DonutChartProps> = ({
 	trackColor = COLORS.border,
 	children,
 }) => {
-	const dimension = scaleWidth(size);
-	const stroke = scaleWidth(strokeWidth);
+	// 호출부가 이미 scaledSize() 로 넘긴 값이라 여기서 또 곱하면 배율이 두 번 걸린다.
+	// 폰은 배율이 1 근처(1.05² ≈ 1.1)라 티가 안 났지만 태블릿은 1.35² = 1.8배로 벌어져
+	// 도넛이 카드를 넘친다. 폰 화면을 건드리지 않으려고 태블릿에서만 이중 적용을 끊는다.
+	const dimension = isTablet ? size : scaleWidth(size);
+	const stroke = isTablet ? strokeWidth : scaleWidth(strokeWidth);
 	const radius = (dimension - stroke) / 2;
 	const circumference = 2 * Math.PI * radius;
 

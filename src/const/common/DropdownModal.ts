@@ -1,5 +1,6 @@
 import { Dimensions, ModalProps, ViewStyle } from 'react-native';
 import { COLORS, RADIUS, SPACING_H, themedValue } from '@/const/common/Theme';
+import { MODAL_MAX_WIDTH } from '@/utils/DementionUtils';
 
 /**
  * DropDownPicker(listMode="MODAL") 카테고리 팝업 공통 설정.
@@ -26,8 +27,12 @@ import { COLORS, RADIUS, SPACING_H, themedValue } from '@/const/common/Theme';
  */
 const screen = Dimensions.get('screen');
 
-/** 카드 폭 — 기존 `width: '85%'` 와 같은 비율. */
-const CARD_WIDTH = Math.round(screen.width * 0.85);
+/**
+ * 카드 폭 — 기존 `width: '85%'` 와 같은 비율에 모달 상한을 씌운다.
+ * 폰은 화면이 MODAL_MAX_WIDTH(460)보다 좁아 상한에 닿지 않는다(= 기존 값 그대로).
+ * 태블릿은 85% 가 870px 까지 벌어져 대화상자가 아니라 한 페이지로 읽힌다.
+ */
+const CARD_WIDTH = Math.min(Math.round(screen.width * 0.85), MODAL_MAX_WIDTH);
 /** 카드 최대 높이 — 기존 `maxHeight: '60%'` 와 같은 비율. */
 const CARD_MAX_HEIGHT = Math.round(screen.height * 0.6);
 /** 카드 상단 여백 — 기존 `marginTop: '25%'`. */

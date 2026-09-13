@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
-import { moderateScale, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { CONTENT_MAX_WIDTH, isTablet, moderateScale, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize } from '@/const/common/Theme';
 import {useIsFocused} from '@react-navigation/native';
@@ -778,7 +778,8 @@ const InfinityQuizScreen = () => {
 							<View style={styles.globalConfettiWrapper}>
 								<ConfettiCannon
 									count={200}
-									origin={{ x: scaleWidth(180), y: 0 }}
+									// 컨페티는 본문 기둥 안에서 터진다 — 태블릿은 기둥 가운데를 써야 한가운데서 퍼진다.
+									origin={{ x: isTablet ? CONTENT_MAX_WIDTH / 2 : scaleWidth(180), y: 0 }}
 									fadeOut
 									explosionSpeed={500}
 									fallSpeed={2500}
@@ -1392,6 +1393,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	exitModal: {
 		width: '85%',
+		// 전체화면 모달이라 본문 기둥 밖이다 — 같은 파일의 chanceModalCard 와 같은 규칙으로 묶는다.
+		maxWidth: MODAL_MAX_WIDTH,
 		maxHeight: '80%',
 		backgroundColor: COLORS.surface,
 		// backgroundColor: 'red',

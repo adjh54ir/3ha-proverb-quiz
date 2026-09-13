@@ -10,7 +10,7 @@ import Icon from 'react-native-vector-icons/FontAwesome6';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import IconComponent from './common/atomic/IconComponent';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
@@ -773,6 +773,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	confirmBox: {
 		width: '100%',
+		// 전체화면 모달이라 본문 기둥 밖이다 — 태블릿에서 대화상자가 화면 폭을 다 먹지 않게 묶는다.
+		maxWidth: MODAL_MAX_WIDTH,
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.xl,
 		paddingTop: SPACING_H.xxl,

@@ -8,8 +8,8 @@ import SettingScreen from '@/screens/SettingScreen';
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import ProverbListScreen from '@/screens/ProverbListScreen';
 import MyScoreScreen from '@/screens/MyScoreScreen';
-import { isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, SPACING_H } from '@/const/common/Theme';
+import { isTablet, scaledSize, scaleHeight } from '@/utils/DementionUtils';
+import { COLORS, FONT_SIZES } from '@/const/common/Theme';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import TodayQuizScreen from '@/screens/TodayQuizScreen';
 import { withThemedScreen } from './withThemedScreen';
@@ -102,7 +102,7 @@ const BottomTabNavigator = () => {
 		},
 		tabBarLabelStyle: {
 			fontSize: isTablet ? FONT_SIZES.sm : FONT_SIZES.xs,
-			marginTop: isTablet ? scaleHeight(10) : 0,
+			marginTop: 0,
 			fontWeight: '600' as const,
 		},
 	});
@@ -110,20 +110,16 @@ const BottomTabNavigator = () => {
 	// materialicons
 
 	/**
-	 * 반응형 태블릿 처리에 대한 Helper
-	 * @param iconName
-	 * @returns
+	 * 탭 아이콘.
+	 *
+	 * 태블릿 전용 크기를 따로 씌우지 않는다 — `scaledSize(24)` 가 이미 배율 상한까지 반영한
+	 * 값이라, 그 위에 `width: scaleWidth(16)` 을 얹으면 글리프(33pt)보다 좁은 상자에 갇혀
+	 * 좌우가 잘리고 `marginTop` 까지 겹쳐 탭바 높이를 넘겼다.
 	 */
 	const getTabBarIcon = (iconType: Parameters<typeof IconComponent>[0]['type'], iconName: string) => {
 		return ({ color, focused }: { color: string; size: number; focused: boolean }) => (
 			<TabIconPop focused={focused}>
-				<IconComponent
-					type={iconType}
-					name={iconName}
-					size={scaledSize(24)}
-					color={color}
-					style={isTablet ? { marginTop: SPACING_H.xxl, height: scaleHeight(45), width: scaleWidth(16) } : undefined}
-				/>
+				<IconComponent type={iconType} name={iconName} size={scaledSize(24)} color={color} />
 			</TabIconPop>
 		);
 	};

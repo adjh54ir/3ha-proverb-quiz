@@ -5,7 +5,7 @@ import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
@@ -421,6 +421,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	confirmModal: {
 		width: '100%',
+		// 전체화면 모달이라 본문 기둥 밖이다 — 태블릿에서 대화상자가 화면 폭을 다 먹지 않게 묶는다.
+		maxWidth: MODAL_MAX_WIDTH,
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.xl,
 		paddingHorizontal: SPACING_W.xl,

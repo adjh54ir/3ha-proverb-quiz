@@ -121,8 +121,8 @@ describe('모달 카드 폭', () => {
 /**
  * 네이티브 설정은 JS 에서 못 잡는다 — 소스로 직접 확인한다.
  *
- * iPad 배포는 지금 보류 상태다(TARGETED_DEVICE_FAMILY = 1). 세로 고정 스위치 세 개는
- * 그대로 두고 타깃만 내렸으니, 다시 켤 때는 "1,2" 로 되돌리고 이 테스트만 뒤집으면 된다.
+ * iPad 배포를 켠 상태다(TARGETED_DEVICE_FAMILY = "1,2"). 세로 고정 스위치 세 개와 세트로 간다.
+ * 다시 보류로 돌릴 때는 타깃만 1 로 내리고 이 테스트를 뒤집으면 된다.
  * 안드로이드 태블릿은 Play 에서 배제할 수 없어 계속 설치되므로 세로 고정이 필요하다.
  */
 describe('네이티브 기기 설정', () => {
@@ -130,14 +130,13 @@ describe('네이티브 기기 설정', () => {
 	const path = require('path') as typeof import('path');
 	const read = (relative: string) => fs.readFileSync(path.join(__dirname, '..', relative), 'utf8');
 
-	test('iOS 타깃이 iPhone 전용이다 (iPad 배포 보류)', () => {
+	test('iOS 타깃이 iPhone + iPad 다 (iPad 배포)', () => {
 		const project = read('ios/ProverbQuiz.xcodeproj/project.pbxproj');
-		expect(project).toMatch(/TARGETED_DEVICE_FAMILY = 1;/);
-		// "1,2" 가 하나라도 남으면 App Store 에 iPad 앱으로 올라간다(Debug/Release 둘 다 봐야 한다).
-		expect(project).not.toMatch(/TARGETED_DEVICE_FAMILY = "1,2";/);
+		// Debug/Release 둘 다 "1,2" 여야 App Store 에 iPad 앱으로 올라간다. 하나만 바꾸면 빌드가 어긋난다.
+		expect(project.match(/TARGETED_DEVICE_FAMILY = "1,2";/g)).toHaveLength(2);
+		expect(project).not.toMatch(/TARGETED_DEVICE_FAMILY = 1;/);
 	});
 
-	// iPad 배포를 다시 켤 때 바로 쓰이도록 plist 키는 남겨둔다.
 	test('아이패드도 세로 고정이다', () => {
 		const plist = read('ios/ProverbQuiz/Info.plist');
 		// 멀티태스킹을 지원하면 애플이 네 방향 회전을 모두 요구한다 → 전체화면 전용으로 선언한다.

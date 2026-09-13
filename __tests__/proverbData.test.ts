@@ -11,6 +11,51 @@ const PROVERBS = CONST_MAIN_DATA.PROVERB;
 /** 괄호·대괄호 이형태와 띄어쓰기를 지운 비교용 표제 */
 const normalize = (text: string) => text.replace(/[[\](){}]/g, '').replace(/\s+/g, '').replace(/[.,!?~]/g, '');
 
+/**
+ * 같은 속담을 다른 표기로 두 번 실은 것까지 잡는 비교용 표제.
+ *
+ * `normalize` 는 대괄호 기호만 지워서 "달걀로 바위[백운대/성] 치기" 가
+ * "달걀로바위백운대/성치기" 가 된다. 그래서 "계란으로 바위 치기" 와 같은 속담인 걸 못 잡았다.
+ * 여기서는 대괄호 안 대체어를 실제로 펼치고, 뜻이 달라지지 않는 표기 차이만 한 형태로 모은다.
+ */
+const expandVariants = (text: string) => {
+	let forms = [text];
+	for (let depth = 0; depth < 5; depth += 1) {
+		const next: string[] = [];
+		let changed = false;
+		forms.forEach((form) => {
+			const match = /(\S*?)\[([^\]]+)\]/.exec(form);
+			if (!match) {
+				next.push(form);
+				return;
+			}
+			changed = true;
+			// 대괄호를 통째로 빼는 형태 + 대체어를 하나씩 끼운 형태
+			next.push(form.replace(match[0], match[1]));
+			match[2].split('/').forEach((alt) => next.push(form.replace(match[0], alt)));
+		});
+		forms = [...new Set(next)];
+		if (!changed) {
+			break;
+		}
+	}
+	const withParens = forms.flatMap((form) => [form.replace(/\([^)]*\)/g, ''), form.replace(/\(([^)]*)\)/g, '$1')]);
+	return [
+		...new Set(
+			withParens
+				.map((form) =>
+					form
+						.replace(/\s+/g, '')
+						.replace(/[.,!?~·'"]/g, '')
+						.replace(/계란|닭알/g, '달걀')
+						.replace(/으로/g, '로')
+						.replace(/(이라|이다)$/, ''),
+				)
+				.filter(Boolean),
+		),
+	];
+};
+
 /** 마지막 음절에 받침이 있는지 (없으면 '를', 있으면 '을') */
 const hasFinalConsonant = (syllable: string) => {
 	const code = syllable.charCodeAt(0);
@@ -39,6 +84,22 @@ test('id 와 표제가 중복되지 않는다', () => {
 	expect(duplicatesOf((p) => p.id)).toEqual([]);
 	// 괄호·띄어쓰기만 다른 표제도 같은 속담이다
 	expect(duplicatesOf((p) => normalize(p.proverb))).toEqual([]);
+});
+
+test('표기만 다른 같은 속담을 두 번 싣지 않는다', () => {
+	// 한 표제가 여러 표기 변이를 가지므로, 변이 하나라도 겹치면 같은 속담으로 본다.
+	const owners = new Map<string, number[]>();
+	PROVERBS.forEach((item) => {
+		expandVariants(item.proverb).forEach((form) => {
+			const bucket = owners.get(form) ?? [];
+			if (!bucket.includes(item.id)) {
+				bucket.push(item.id);
+			}
+			owners.set(form, bucket);
+		});
+	});
+	const collisions = [...new Set([...owners.values()].filter((ids) => ids.length > 1).map((ids) => ids.join(',')))];
+	expect(collisions).toEqual([]);
 });
 
 test('longMeaning 은 "이르는 말." 로 끝난다', () => {

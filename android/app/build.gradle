@@ -85,8 +85,8 @@ android {
         applicationId "com.tha.proverbquiz"     // TODO 변경 필요
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 35
-        versionName "2.1.0"
+        versionCode 37
+        versionName "2.2.0"
     }
     signingConfigs {
         debug {

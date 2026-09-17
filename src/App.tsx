@@ -22,7 +22,7 @@ import notifee, { AuthorizationStatus } from '@notifee/react-native';
 import { deleteLegacyVibrationChannels, parseAlarmHour, scheduleDailyQuizReminder } from './utils/NotifactionHelper';
 import { Paths } from './navigation/conf/Paths';
 import { loadBgmSetting } from './utils/BgmUtils';
-import mobileAds from 'react-native-google-mobile-ads';
+import mobileAds, { MaxAdContentRating } from 'react-native-google-mobile-ads';
 import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 // import * as RNIap from 'react-native-iap';
@@ -46,6 +46,22 @@ const App = () => {
 		const initAds = async () => {
 			await requestTrackingPermission();
 			try {
+				/**
+				 * 광고 콘텐츠 등급을 앱 등급(전체이용가)에 맞춘다 — Google Play 가족 정책 요구사항.
+				 *
+				 * 타깃 연령에 아동이 포함된 앱은 모든 광고가 아동에게 적합해야 한다. 이 설정이 없으면
+				 * AdMob 이 MA(주류·도박 등) 광고까지 내려보내 "광고 콘텐츠가 앱 등급과 맞지 않음" 으로 반려된다.
+				 * 연령 확인 화면이 없으니 모든 사용자를 아동으로 취급한다(COPPA / GDPR 동의 연령 미만).
+				 *
+				 * ⚠️ 반드시 initialize() **전에** 부를 것. initialize 가 광고를 미리 받아 두는데,
+				 *    그 요청부터 등급 제한이 걸려야 한다.
+				 */
+				await mobileAds().setRequestConfiguration({
+					maxAdContentRating: MaxAdContentRating.G,
+					tagForChildDirectedTreatment: true,
+					tagForUnderAgeOfConsent: true,
+				});
+
 				// AdMob SDK 초기화. 전면/리워드 광고는 초기화 완료 후에만 load() 동작함
 				await mobileAds().initialize();
 

@@ -59,3 +59,28 @@ test('AdMob 음소거는 initialize() 이후에 건다 (안드로이드 네이�
 
 	await unmount(tree);
 });
+
+/**
+ * Google Play 가족 정책: 광고 콘텐츠가 앱 등급(전체이용가)을 넘으면 반려된다.
+ * 등급 제한은 initialize() 전에 걸어야 SDK 가 미리 받아 두는 광고부터 적용된다.
+ */
+test('AdMob 광고 등급을 G 로 제한하고 initialize() 전에 건다 (가족 정책)', async () => {
+	adCalls().length = 0;
+	const instance = (mobileAds as unknown as { __instance: { setRequestConfiguration: jest.Mock } }).__instance;
+
+	const tree = await mountApp();
+	await ReactTestRenderer.act(async () => {
+		await Promise.resolve();
+	});
+
+	expect(instance.setRequestConfiguration).toHaveBeenCalledWith({
+		maxAdContentRating: 'G',
+		tagForChildDirectedTreatment: true,
+		tagForUnderAgeOfConsent: true,
+	});
+	const calls = adCalls();
+	expect(calls).toContain('setRequestConfiguration');
+	expect(calls.indexOf('setRequestConfiguration')).toBeLessThan(calls.indexOf('initialize'));
+
+	await unmount(tree);
+});

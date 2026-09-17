@@ -58,6 +58,10 @@ jest.mock('react-native-google-mobile-ads', () => {
 	 */
 	const calls = [];
 	const instance = {
+		setRequestConfiguration: jest.fn(() => {
+			calls.push('setRequestConfiguration');
+			return Promise.resolve();
+		}),
 		initialize: jest.fn(() => {
 			calls.push('initialize');
 			return Promise.resolve([]);

@@ -139,8 +139,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textStrong,
 		marginBottom: SPACING_H.md,
 	},
+	// 마지막 카드 marginBottom(md) + 버튼 marginTop(sm) = 20 — 다른 대화상자의 버튼 위 간격(xl)과 같다
 	levelScrollContent: {
-		paddingBottom: SPACING_H.md,
+		paddingBottom: 0,
 	},
 	levelCardBox: {
 		width: '100%',
@@ -209,12 +210,12 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	modalConfirmButton: {
 		alignSelf: 'stretch',
-		height: scaleHeight(48),
+		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginTop: SPACING_H.lg,
+		marginTop: SPACING_H.sm,
 	},
 	modalConfirmText: {
 		color: COLORS.textWhite,

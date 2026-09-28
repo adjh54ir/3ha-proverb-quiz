@@ -38,6 +38,16 @@ export const getLevelColor = (level: string): string => {
 	return map[level] || '#94A3B8';
 };
 
+/**
+ * 난이도 색을 **글자·아이콘** 으로 쓸 때의 색.
+ *
+ * 램프의 특급(#B91C1C)은 배지 채움(흰 글자)용으로 진하게 잡은 값이라, 다크 표면 위 글자로 쓰면
+ * 대비가 2.4 로 떨어진다. 특급만 모드를 따르는 dangerDeep 으로 바꾼다 — 라이트 dangerDeep 이 같은
+ * #B91C1C 라 라이트 화면은 그대로다. 배지 채움(backgroundColor)에는 getLevelColor 를 그대로 쓴다.
+ * 난이도 색이 아닌 값(카테고리 색 등)은 그대로 돌려주므로 섞인 목록에도 안전하다.
+ */
+export const getLevelInkColor = (color: string): string => (color === getLevelColor('특급') ? COLORS.dangerDeep : color);
+
 /** 난이도 숫자로 바로 색을 얻는다 (`getLevelColor(LEVEL_NAME_BY_NUMBER[n])` 반복 제거) */
 export const getLevelColorByNumber = (level: number): string => getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? '');
 

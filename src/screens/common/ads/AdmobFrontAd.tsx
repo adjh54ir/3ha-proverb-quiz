@@ -8,6 +8,8 @@ import analytics from '@react-native-firebase/analytics'; // Firebase Analytics
 import DeviceInfo from 'react-native-device-info';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { isInterstitialBlocked, recordAdClick } from '@/utils/AdGuardUtils';
+import { FullScreenPortal } from '@/screens/common/atomic/FullScreenPortal';
+import { isAdsRemoved } from '@/services/PurchaseService';
 
 const AD_UNIT_ID = Platform.select({
 	ios: __DEV__ ? TestIds.INTERSTITIAL : GOOGLE_ADMOV_IOS_FRONT!,
@@ -126,8 +128,8 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 	};
 
 	useEffect(() => {
-		// 개발 빌드에서는 전면 광고를 띄우지 않는다 — 바로 닫힌 것으로 처리해 다음 흐름을 이어간다
-		if (__DEV__) {
+		// 개발 빌드·광고 제거 구독 중에는 전면 광고를 띄우지 않는다 — 바로 닫힌 것으로 처리해 다음 흐름을 이어간다
+		if (__DEV__ || isAdsRemoved()) {
 			onAdClosed?.();
 			return;
 		}
@@ -160,15 +162,18 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 	}, []);
 
 
-	if (__DEV__ || skipped) return null;
+	if (__DEV__ || skipped || isAdsRemoved()) return null;
 
+	// 태블릿은 루트로 올려 좌우 여백까지 딤을 덮는다(화면 안에 두면 본문 기둥 경계에서 잘린다)
 	return (
-		<View style={styles.adOverlay}>
-			<View style={styles.container}>
-				<ActivityIndicator size='large' color={COLORS.primary} />
-				<Text style={styles.loadingTxt}>광고를 준비 중입니다…</Text>
+		<FullScreenPortal>
+			<View style={styles.adOverlay}>
+				<View style={styles.container}>
+					<ActivityIndicator size='large' color={COLORS.primary} />
+					<Text style={styles.loadingTxt}>광고를 준비 중입니다…</Text>
+				</View>
 			</View>
-		</View>
+		</FullScreenPortal>
 	);
 };
 

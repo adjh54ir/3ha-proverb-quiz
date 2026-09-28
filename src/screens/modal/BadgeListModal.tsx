@@ -369,7 +369,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginTop: SPACING_H.md,
 		height: DONE_BTN_HEIGHT,
 		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},

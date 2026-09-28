@@ -47,7 +47,12 @@ declare module '@env' {
 	// 앱 모드
 	export const REACT_NATIVE_APP_MODE: string;
 
+	// 1.3~1.4 에 팔던 평생 광고 제거 상품 ID (구매자 유지용)
 	export const IAP_REMOVE_AD_KEY: string;
+
+	// Supabase — 구매 기록(tb_purchases)
+	export const SUPABASE_URL: string;
+	export const SUPABASE_ANON_KEY: string;
 
 	// 광고 단위의 아이디 : 배너 광고
 	export const GOOGLE_ADMOV_ANDROID_BANNER: string;

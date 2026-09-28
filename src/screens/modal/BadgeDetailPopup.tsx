@@ -435,9 +435,9 @@ const styles = themedStyles(() => StyleSheet.create({
 	statusBannerLocked: { backgroundColor: COLORS.surfaceAlt },
 	statusText: { fontSize: FONT_SIZES.md, fontWeight: '600' },
 	closeBtn: {
-		height: scaleHeight(48),
+		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginTop: SPACING_H.xs,

@@ -203,7 +203,8 @@ const MyProverbBookDetail = () => {
 					</View>
 					<View style={{ flex: 1 }}>
 						{!!book?.description && <Text style={styles.summaryDesc} numberOfLines={1}>{book.description}</Text>}
-						<Text style={styles.summaryCount}>총 <Text style={{ color: bookColor, fontWeight: '700' }}>{proverbs.length}</Text>개의 속담</Text>
+						{/* 개수는 textStrong — 사용자가 고른 속담집 색(#475569 등 진한 색)은 다크 표면 위 글자로 대비가 2 대로 떨어진다. 색은 아이콘·테두리에만 쓴다 */}
+						<Text style={styles.summaryCount}>총 <Text style={{ color: COLORS.textStrong, fontWeight: '700' }}>{proverbs.length}</Text>개의 속담</Text>
 						{lastAttempt && (
 							<Text style={styles.summaryRecord}>최근 정답률 {lastAttempt.accuracy}% · {lastAttempt.correctCount}/{lastAttempt.correctCount + lastAttempt.wrongCount}</Text>
 						)}
@@ -218,7 +219,7 @@ const MyProverbBookDetail = () => {
 						<Text style={[styles.actionBtnText, { color: COLORS.secondary }]}>속담 추가</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
-						style={[styles.actionBtn, { backgroundColor: proverbs.length === 0 ? COLORS.surfaceAlt : COLORS.primary }]}
+						style={[styles.actionBtn, { backgroundColor: proverbs.length === 0 ? COLORS.surfaceAlt : COLORS.primaryFill }]}
 						disabled={proverbs.length === 0}
 						onPress={() => book && setQuizModeModal(book)}>
 						<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(18)} color={proverbs.length === 0 ? COLORS.textLight : COLORS.textWhite} />
@@ -342,7 +343,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		columnGap: SPACING_W.sm,
-		height: scaleHeight(46),
+		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 		borderRadius: RADIUS.md,
 	},
 	actionBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700' },
@@ -417,7 +418,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: SPACING_W.xxxl,
+		paddingHorizontal: SPACING_W.lg, // 다른 대화상자와 같은 딤 여백
 	},
 	confirmModal: {
 		width: '100%',
@@ -425,8 +426,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		maxWidth: MODAL_MAX_WIDTH,
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.xl,
-		paddingHorizontal: SPACING_W.xl,
-		paddingVertical: SPACING_H.xxl,
+		// 앱 대화상자 표준 — 좌우 lg / 위아래 xl, 1px 테두리
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xl,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		overflow: 'hidden',
 		alignItems: 'center',
 	},
 	confirmTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },

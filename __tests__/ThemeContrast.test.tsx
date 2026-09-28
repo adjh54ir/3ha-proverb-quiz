@@ -45,6 +45,10 @@ const PAIRS: Array<[keyof typeof PALETTES.light, keyof typeof PALETTES.light]> =
 	['gold', 'textOnAccent'],
 	// 옅은 틴트 배경 + 그 위 진한 글자
 	['primaryBg', 'primaryDeep'],
+	['primarySoft', 'primaryDeep'], // 정답 카드·최신 버전 배지
+	['surface', 'primaryDeep'],
+	// 주요 버튼 채움 + 흰 글자 (primary 채움은 KNOWN_GAPS — 버튼은 primaryFill 을 쓴다)
+	['primaryFill', 'textWhite'],
 	['warningBg', 'warningDeep'],
 	['dangerBg', 'dangerDeep'],
 	['accentOrangeBg', 'accentOrangeText'],
@@ -78,6 +82,16 @@ test.each(KNOWN_GAPS)('%s / %s 대비가 현재보다 더 나빠지지 않는다
 	const { light, dark } = ratios(bg, ink);
 	expect(light).toBeGreaterThanOrEqual(minLight - 0.01);
 	expect(dark).toBeGreaterThanOrEqual(minDark - 0.01);
+});
+
+/**
+ * 선명한 액센트 채움 위 글자(textOnVivid) — 라이트는 기존 흰 글자를 유지하므로(브랜드 톤) 다크만 기준선을 지킨다.
+ * 다크 팔레트의 액센트는 한 단계 밝아 흰 글자가 2 대 초반으로 떨어졌던 조합들이다.
+ */
+test.each(['primaryDark', 'accentFlame', 'accentTeal', 'accentSky'] as const)('다크 %s 위의 textOnVivid 는 대비 4.5 이상이다', (bg) => {
+	expect(contrast(PALETTES.dark[bg], PALETTES.dark.textOnVivid)).toBeGreaterThanOrEqual(4.5);
+	// 라이트는 흰색 그대로 (기존 화면 불변)
+	expect(PALETTES.light.textOnVivid).toBe(PALETTES.light.textWhite);
 });
 
 test('고정 토큰은 두 팔레트에서 값이 같다', () => {

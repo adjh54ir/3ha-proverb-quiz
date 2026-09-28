@@ -18,4 +18,7 @@ export enum MainStorageKeyType {
 	TEXT_SIZE_MODE = 'TEXT_SIZE_MODE', // 글자 크기 모드 ('default' | 'large')
 	PENDING_NOTIFICATION_ROUTE = 'PENDING_NOTIFICATION_ROUTE', // 백그라운드에서 누른 알림의 이동 대상 화면
 	AD_CLICK_GUARD = 'AD_CLICK_GUARD', // 하루 광고 클릭 수 (무효 트래픽 방지 가드)
+	AD_REMOVED = 'AD_REMOVED', // 광고 제거 구독 여부 캐시 (진실 원천은 스토어)
+	LEGACY_PURCHASE_INFO = 'PURCHASE_INFO', // 1.3~1.4 평생 광고 제거 구매 기록 ({ isRemoveAds }) — 키 이름 바꾸지 말 것
+	SUPABASE_REFRESH_TOKEN = 'SUPABASE_REFRESH_TOKEN', // 구매 기록용 익명 세션
 }

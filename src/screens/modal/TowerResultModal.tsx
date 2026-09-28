@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
-import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { isTablet, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
@@ -145,8 +145,9 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 							// 태블릿에서 화면의 90% 는 지나치게 넓다 — 다른 대화상자와 같은 모달 상한으로 묶는다
 							// (기둥 폭 700 은 대화상자로 읽히지 않는다). 폰은 상한에 닿지 않아 그대로다.
 							width: Math.min(width * 0.9, MODAL_MAX_WIDTH),
-							// 쓸 수 있는 높이의 80% → 버튼이 항상 화면 안에 들어옴
-							height: cardHeight,
+							// 쓸 수 있는 높이의 80% → 버튼이 항상 화면 안에 들어옴.
+							// 태블릿은 80% 가 870~1020pt 라 짧은 결과(패배)에서 카드 안이 휑하다 → 상한으로만 쓰고 내용에 맞춘다.
+							...(isTablet ? { maxHeight: cardHeight } : { height: cardHeight }),
 							backgroundColor: bgColor,
 							borderColor,
 						},
@@ -182,7 +183,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 
 					{/* 스크롤 가능한 본문 */}
 					<ScrollView
-						style={styles.scrollArea}
+						style={isTablet ? styles.scrollAreaFit : styles.scrollArea}
 						showsVerticalScrollIndicator={false}
 						contentContainerStyle={styles.scrollContent}>
 						{/* 점수 */}
@@ -381,6 +382,11 @@ const styles = themedStyles(() => StyleSheet.create({
 	// 스크롤 영역이 남은 공간 전부 차지
 	scrollArea: {
 		flex: 1,
+	},
+	// 태블릿: 카드가 내용 높이에 맞고, 넘칠 때만 줄어들며 스크롤된다
+	scrollAreaFit: {
+		flexGrow: 0,
+		flexShrink: 1,
 	},
 	scrollContent: {
 		paddingHorizontal: SPACING_W.lg,

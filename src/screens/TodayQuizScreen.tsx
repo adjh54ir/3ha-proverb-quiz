@@ -5,7 +5,7 @@ import { Linking, StyleSheet, Switch, Text, View, TouchableOpacity, ScrollView, 
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import notifee, { AuthorizationStatus } from '@notifee/react-native';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
@@ -31,7 +31,7 @@ import { playCorrect, playWrong, playFinish } from '@/utils/SoundUtils';
 import { scheduleDailyQuizReminder, cancelDailyQuizReminder, parseAlarmHour, DEFAULT_ALARM_HOUR } from '@/utils/NotifactionHelper';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import QuizHistoryService from '@/services/QuizHistoryService';
-import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 import * as TodayQuizService from '@/services/TodayQuizService';
 
@@ -688,7 +688,7 @@ const TodayQuizScreen = () => {
 				onScroll={onMainScroll}
 				scrollEventThrottle={16}
 				contentContainerStyle={{
-					paddingBottom: SPACING_H.xxxxl,
+					paddingBottom: SCROLL_TOP_CLEARANCE,
 				}}>
 				<View style={styles.buttonRow}>
 					{isAlarmEnabled && (
@@ -822,7 +822,7 @@ const TodayQuizScreen = () => {
 							) : !isQuizCompleted ? (
 								// 👉 시작했고 아직 안 끝났을 때는 문제 화면
 								// key 로 문항마다 재마운트 → 문제 전환 시 페이드+슬라이드업
-								<FadeInView key={currentIndex} duration={260} style={{ paddingBottom: SPACING_H.lg }}>
+								<FadeInView key={currentIndex} duration={260}>
 									{/* 목록이 새로 만들어지는 순간 index 가 범위를 벗어날 수 있어 방어한다 */}
 									{quizList[currentIndex] ? renderItem({ item: quizList[currentIndex] }) : null}
 								</FadeInView>
@@ -1504,16 +1504,11 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 
 	/* ===== 완료 카드 ===== */
+	// quizContainer2(테두리 카드) 안에 들어가므로 테두리·좌우 마진을 또 두지 않는다 (카드 속 카드 + 좌우 32 이중 여백 방지)
 	completedCard: {
 		alignItems: 'center',
-		marginTop: SPACING_H.xl,
-		marginHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xxl,
 		paddingHorizontal: SPACING_W.lg,
-		backgroundColor: COLORS.surface,
-		borderRadius: RADIUS.lg,
-		borderWidth: 1,
-		borderColor: COLORS.border,
 	},
 	completedEmojiCircle: {
 		width: scaleWidth(64),
@@ -1693,7 +1688,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	alarmModalCard: {
 		width: '100%',
-		maxWidth: scaleWidth(420),
+		maxWidth: MODAL_MAX_WIDTH, // 태블릿에서 다른 대화상자(500)보다 넓어지지 않게
 		maxHeight: '100%',
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
@@ -1767,7 +1762,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		minHeight: scaleHeight(48),
 		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},

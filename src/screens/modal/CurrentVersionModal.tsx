@@ -247,7 +247,7 @@ const styles = themedStyles(() => StyleSheet.create({
         color: COLORS.text,
     },
     updateBtn: {
-        backgroundColor: COLORS.primary,
+        backgroundColor: COLORS.primaryFill,
     },
     buttonText: {
         color: COLORS.textWhite,

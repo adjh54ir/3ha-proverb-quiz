@@ -493,7 +493,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		columnGap: SPACING_W.xsPlus,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		minHeight: scaleHeight(48),
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.md,

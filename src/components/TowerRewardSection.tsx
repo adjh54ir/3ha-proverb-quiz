@@ -293,10 +293,11 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     towerRewardScrollContent: {
         paddingHorizontal: SPACING_W.md,
+        // 아이템 marginRight 대신 gap — 마지막 아이템 뒤로 여백이 더 붙어 좌 12 / 우 24 로 어긋나던 문제
+        columnGap: SPACING_W.md,
     },
     towerRewardItem: {
         alignItems: 'center',
-        marginRight: SPACING_W.md,
         width: scaleWidth(60),
     },
     towerRewardImageWrap: {
@@ -312,11 +313,11 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     towerRewardBadge: {
         position: 'absolute',
-        bottom: -scaleHeight(4),
-        right: -scaleWidth(4),
+        bottom: -SPACING_H.xs,
+        right: -SPACING_W.xs,
         borderRadius: RADIUS.round,
         paddingHorizontal: SPACING_W.xs,
-        paddingVertical: scaleHeight(1),
+        paddingVertical: SPACING_H.xxs,
     },
     towerRewardBadgeText: {
         fontSize: FONT_SIZES.xxs,
@@ -340,8 +341,9 @@ const styles = themedStyles(() => StyleSheet.create({
         paddingHorizontal: SPACING_W.lg,
     },
     popup: {
-        width: scaleWidth(300),
-        maxWidth: '100%',
+        // 다른 대화상자와 같은 폭 규칙
+        width: '100%',
+        maxWidth: scaleWidth(340),
         // 작은 화면에서 헤더+보스+클리어 조건이 안전 영역을 넘기면 본문만 스크롤된다.
         maxHeight: '100%',
         backgroundColor: COLORS.surface,
@@ -502,7 +504,7 @@ const styles = themedStyles(() => StyleSheet.create({
         borderRadius: RADIUS.md,
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: scaleHeight(44), // 터치 영역 최소 44
+        minHeight: scaleHeight(48), // 다른 대화상자 버튼과 같은 높이
     },
     closeBtnText: {
         color: COLORS.textWhite,

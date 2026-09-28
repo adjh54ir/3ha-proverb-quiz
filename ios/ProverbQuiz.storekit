@@ -1,0 +1,90 @@
+{
+  "appPolicies": {
+    "eula": "",
+    "policies": [
+      {
+        "locale": "en_US",
+        "policyText": "",
+        "policyURL": ""
+      }
+    ]
+  },
+  "identifier": "3HA-PROVERBQUIZ-LOCAL",
+  "nonRenewingSubscriptions": [],
+  "products": [],
+  "settings": {
+    "_askToBuyEnabled": false,
+    "_billingGracePeriodEnabled": false,
+    "_billingIssuesEnabled": false,
+    "_disableDialogs": false,
+    "_failTransactionsEnabled": false,
+    "_locale": "ko",
+    "_renewalBillingIssuesEnabled": false,
+    "_storefront": "KOR",
+    "_storeKitErrors": [],
+    "_timeRate": 0
+  },
+  "subscriptionGroups": [
+    {
+      "id": "22410576",
+      "localizations": [
+        {
+          "description": "",
+          "displayName": "광고 제거",
+          "locale": "ko"
+        }
+      ],
+      "name": "광고 제거",
+      "subscriptions": [
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "3900",
+          "familyShareable": false,
+          "groupNumber": 2,
+          "internalID": "6815702489",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "구독 기간 동안 앱 내의 모든 광고를 제거합니다.",
+              "displayName": "광고 제거",
+              "locale": "ko"
+            }
+          ],
+          "productID": "com.tha.proverbquiz.remove_ad.monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "광고 제거 월간",
+          "subscriptionGroupID": "22410576",
+          "type": "RecurringSubscription",
+          "winbackOffers": []
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "19800",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "6815702491",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "구독 기간 동안 앱 내의 모든 광고를 제거합니다.",
+              "displayName": "광고 제거",
+              "locale": "ko"
+            }
+          ],
+          "productID": "com.tha.proverbquiz.remove_ad.yearly",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "광고 제거 연간",
+          "subscriptionGroupID": "22410576",
+          "type": "RecurringSubscription",
+          "winbackOffers": []
+        }
+      ]
+    }
+  ],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}

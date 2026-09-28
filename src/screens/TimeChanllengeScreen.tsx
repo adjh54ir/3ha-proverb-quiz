@@ -2,15 +2,16 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
-import { Text, TouchableOpacity, View, StyleSheet, Platform, ScrollView, Animated } from 'react-native';
+import { Text, TouchableOpacity, View, StyleSheet, ScrollView, Animated, Dimensions } from 'react-native';
+import { FullScreenPortal } from '@/screens/common/atomic/FullScreenPortal';
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
-import { CONTENT_MAX_WIDTH, isTablet, moderateScale, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { isTablet, moderateScale, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize, getThemeMode } from '@/const/common/Theme';
 import {useIsFocused} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { TimeChallengeInterceptor } from '@/services/interceptor/TimeChanllengeInterceptor';
@@ -32,6 +33,8 @@ import useCountdownTimers from '@/hooks/useCountdownTimers';
 
 const MAX_LIVES = 5;
 const CHOICE_COUNT = 4;
+/** 하단 종료 버튼 최소 높이 (터치 영역 44 이상) */
+const EXIT_BUTTON_MIN_HEIGHT = 48;
 /** 남은 시간이 이 아래로 떨어지면 '막판' — 배경음 템포를 올린다 */
 const FINAL_SPURT_MS = 10_000;
 /** 막판 배경음 배속(= 음정). 1.12 는 조급함은 주되 곡이 우스워지지 않는 선 */
@@ -104,6 +107,8 @@ const InfinityQuizScreen = () => {
 	const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
 	const [selectedChoice, setSelectedChoice] = useState<string | null>(null); // 사용자가 고른 보기
 	const [showExitModal, setShowExitModal] = useState(false);
+	// 하단 종료 바 실측 높이 — 맨 위로 버튼을 그만큼 띄운다. 버튼 높이가 글자 크기·태블릿 배율에 따라 달라 상수로 못 박지 않는다.
+	const [exitBarHeight, setExitBarHeight] = useState(0);
 
 	// 뒤로가기로 도전이 그냥 끝나지 않게, 종료 버튼과 같은 확인 팝업을 띄운다.
 	useBlockBackHandler(true, () => setShowExitModal(true));
@@ -775,16 +780,18 @@ const InfinityQuizScreen = () => {
 					<>
 						{/* 컨페티 200발은 이 앱에서 가장 큰 모션이다 — '애니메이션 줄이기'에서는 생략한다. */}
 						{showConfetti && !reducedMotion && (
-							<View style={styles.globalConfettiWrapper}>
-								<ConfettiCannon
-									count={200}
-									// 컨페티는 본문 기둥 안에서 터진다 — 태블릿은 기둥 가운데를 써야 한가운데서 퍼진다.
-									origin={{ x: isTablet ? CONTENT_MAX_WIDTH / 2 : scaleWidth(180), y: 0 }}
-									fadeOut
-									explosionSpeed={500}
-									fallSpeed={2500}
-								/>
-							</View>
+							// 태블릿은 루트로 올려 화면 전체에서 터진다(기둥 안에 두면 좌우 여백엔 안 떨어지고 오른쪽 밖으로 샌다)
+							<FullScreenPortal>
+								<View style={styles.globalConfettiWrapper}>
+									<ConfettiCannon
+										count={200}
+										origin={{ x: isTablet ? Dimensions.get('window').width / 2 : scaleWidth(180), y: 0 }}
+										fadeOut
+										explosionSpeed={500}
+										fallSpeed={2500}
+									/>
+								</View>
+							</FullScreenPortal>
 						)}
 						<View style={styles.resultWrapper}>
 							<View style={styles.gameOverBox}>
@@ -1051,7 +1058,7 @@ const InfinityQuizScreen = () => {
 				)}
 			</ScrollView>
 
-			<View style={styles.bottomExitWrapper}>
+			<View style={styles.bottomExitWrapper} onLayout={(e) => setExitBarHeight(e.nativeEvent.layout.height)}>
 				<TouchableOpacity
 					style={styles.exitButton}
 					activeOpacity={0.85}
@@ -1094,7 +1101,7 @@ const InfinityQuizScreen = () => {
 				<View style={[styles.modalOverlay, modalSafePadding]}>
 					<View style={styles.chanceModalCard}>
 						<View style={styles.chanceModalHeaderIcon}>
-							<IconComponent name="magic" type="FontAwesome" color={COLORS.textWhite} size={scaledSize(22)} />
+							<IconComponent name="magic" type="FontAwesome" color={COLORS.textOnVivid} size={scaledSize(22)} />
 						</View>
 						<Text style={styles.chanceModalTitle}>찬스 힌트</Text>
 						<Text style={styles.chanceModalSubtitle}>아래 단서를 모두 활용해 정답을 찾아보세요</Text>
@@ -1113,6 +1120,8 @@ const InfinityQuizScreen = () => {
 							)}
 						</View>
 
+						{/* 동의속담·예문은 길이가 제각각이라 작은 폰에서 카드가 화면을 넘으면 이 부분만 스크롤된다 (모달 레이아웃 규칙 2) */}
+						<ScrollView style={styles.chanceBodyScroll} showsVerticalScrollIndicator={false}>
 						{!!chanceData?.sameProverb?.length && (
 							<View style={styles.chanceKeywordBox}>
 								<Text style={styles.chanceExampleLabel}>🔑 동의속담</Text>
@@ -1136,6 +1145,7 @@ const InfinityQuizScreen = () => {
 								))}
 							</View>
 						)}
+						</ScrollView>
 
 						<TouchableOpacity
 							style={styles.chanceModalButton}
@@ -1207,7 +1217,7 @@ const InfinityQuizScreen = () => {
 			</Modal>
 
 			{/* 최하단에 위치할것!! */}
-			<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} />
+			<ScrollTopButton visible={showScrollTop} onPress={scrollToTop} bottom={exitBarHeight + SPACING_H.lg} />
 
 			{comboEffectText !== '' && (
 				<Animated.View
@@ -1259,8 +1269,8 @@ const InfinityQuizScreen = () => {
 					<View
 						style={{
 							backgroundColor: COLORS.textStrong,
-							paddingVertical: isToastClosable ? scaleHeight(20) : scaleHeight(12),
-							paddingHorizontal: isToastClosable ? scaleWidth(24) : scaleWidth(18),
+							paddingVertical: isToastClosable ? SPACING_H.xl : SPACING_H.md,
+							paddingHorizontal: isToastClosable ? SPACING_W.xxl : SPACING_W.lgPlus,
 							borderRadius: RADIUS.xl,
 							minHeight: isToastClosable ? scaleHeight(100) : undefined,
 							minWidth: isToastClosable ? scaleWidth(200) : undefined,
@@ -1270,14 +1280,15 @@ const InfinityQuizScreen = () => {
 							flexDirection: isToastClosable ? 'column' : 'row',
 							gap: SPACING_W.sm,
 						}}>
+						{/* 배경이 textStrong(다크에선 거의 흰색)인 반전 칩이라 글자는 surface 로 뒤집는다 — textWhite 면 다크에서 사라진다 */}
 						<Text
 							style={{
-								color: COLORS.textWhite,
-								fontSize: isToastClosable ? scaledSize(18) : scaledSize(14),
+								color: COLORS.surface,
+								fontSize: isToastClosable ? FONT_SIZES.xl : FONT_SIZES.md, // 토큰이라 '글자 크게' 배율을 함께 받는다
 								fontWeight: '700',
 								textAlign: 'center',
-								lineHeight: isToastClosable ? scaleHeight(28) : scaleHeight(20),
-								marginBottom: isToastClosable ? scaleHeight(12) : 0,
+								lineHeight: isToastClosable ? scaledSize(28) : scaledSize(20),
+								marginBottom: isToastClosable ? SPACING_H.md : 0,
 							}}>
 							{toastMessage}
 						</Text>
@@ -1298,7 +1309,7 @@ const InfinityQuizScreen = () => {
 								}}>
 								<Text
 									style={{
-										color: COLORS.textWhite,
+										color: COLORS.surface,
 										fontSize: FONT_SIZES.md,
 										fontWeight: '600',
 									}}>
@@ -1359,28 +1370,29 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '700',
 		fontSize: FONT_SIZES.xl,
 	},
+	// 하단 종료 바 — QuizScreen 과 같은 규격. 예전엔 바 높이(30)가 버튼(40)보다 작아 버튼이 바 밖으로 삐져나왔다.
 	bottomExitWrapper: {
 		width: '100%',
-		height: scaleHeight(30), // ✅ 명시적 높이 추가
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.lg,
 		alignItems: 'center',
 		backgroundColor: COLORS.surface,
 		borderTopWidth: 1,
-		borderTopColor: COLORS.surfaceAlt,
-		paddingTop: SPACING_H.xsPlus,
-		paddingBottom: Platform.OS === 'android' ? scaleHeight(10) : scaleHeight(14),
+		borderTopColor: COLORS.border,
 	},
 	exitButton: {
-		backgroundColor: COLORS.textSecondary,
-		paddingVertical: SPACING_H.smPlus,
-		paddingHorizontal: SPACING_W.xxxl,
-		borderRadius: RADIUS.round,
-		height: scaleHeight(40), // ✅ 버튼 높이 보장
-		justifyContent: 'center', // 수직 정렬 보장
+		// textSecondary 는 다크에서 옅은 회색(#A3AEBF)이라 흰 글자 대비가 2.2 로 떨어진다 → 다크만 고정 톤(darkMuted)
+		backgroundColor: getThemeMode() === 'dark' ? COLORS.darkMuted : COLORS.textSecondary,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.xxl,
+		minHeight: EXIT_BUTTON_MIN_HEIGHT,
+		justifyContent: 'center',
 		alignItems: 'center',
+		borderRadius: RADIUS.round,
 	},
 	exitButtonText: {
 		color: COLORS.textWhite,
-		fontSize: FONT_SIZES.md, // 🔽 기존보다 작게
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '600',
 	},
 	modalOverlay: {
@@ -1397,9 +1409,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		maxWidth: MODAL_MAX_WIDTH,
 		maxHeight: '80%',
 		backgroundColor: COLORS.surface,
-		// backgroundColor: 'red',
-		borderRadius: RADIUS.lg,
-		padding: SPACING_W.xl,
+		// 앱 대화상자 표준 — 라운드 xl, 1px 테두리, 좌우 lg / 위아래 xl
+		borderRadius: RADIUS.xl,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xl,
 	},
 	exitModalTitle: {
 		fontSize: FONT_SIZES.xxl,
@@ -1922,6 +1937,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	chanceModalCard: {
 		width: '85%',
 		maxWidth: scaleWidth(360),
+		maxHeight: '100%',
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,
@@ -1995,6 +2011,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	chanceMetaRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: SPACING_W.xsPlus, marginBottom: SPACING_H.smPlus },
 	chanceMetaChip: { backgroundColor: COLORS.secondaryBg, borderRadius: RADIUS.round, paddingHorizontal: SPACING_W.smPlus, paddingVertical: SPACING_H.xs },
 	chanceMetaChipText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.secondary },
+	chanceBodyScroll: { alignSelf: 'stretch', flexGrow: 0, flexShrink: 1 },
 	chanceKeywordBox: { width: '100%', marginBottom: SPACING_H.smPlus },
 	chanceKeywordWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING_W.xsPlus, marginTop: SPACING_H.xsPlus },
 	chanceKeywordChip: { backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.sm, paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs },
@@ -2028,7 +2045,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	chanceModalButtonText: {
-		color: COLORS.textWhite,
+		color: COLORS.textOnVivid, // primaryDark 채움 위
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
 	},

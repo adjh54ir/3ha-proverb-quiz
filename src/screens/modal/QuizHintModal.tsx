@@ -267,8 +267,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	primaryButton: {
 		flexDirection: 'row',
 		columnGap: SPACING_W.xs,
-		height: scaleHeight(48),
-		backgroundColor: COLORS.primary,
+		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
+		backgroundColor: COLORS.primaryFill,
 		borderRadius: RADIUS.md,
 		alignItems: 'center',
 		justifyContent: 'center',

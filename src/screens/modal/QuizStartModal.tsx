@@ -150,6 +150,8 @@ const QuizStartModal = ({
 										onValueChange={row.onChange}
 										trackColor={{ false: COLORS.borderDark, true: COLORS.primaryLight }}
 										thumbColor={row.on ? COLORS.primaryDark : COLORS.surfaceAlt}
+										// iOS 는 trackColor.false 를 꺼진 상태 테두리에만 쓰고 안쪽은 이 값(기본 라이트 회색)으로 칠한다
+										ios_backgroundColor={COLORS.borderDark}
 										accessibilityLabel={row.label}
 									/>
 								</View>
@@ -285,7 +287,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	buttonRow: { flexDirection: 'row', columnGap: SPACING_W.md, width: '100%' },
 	secondaryButton: {
 		flex: 1,
-		height: scaleHeight(48),
+		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 		backgroundColor: COLORS.surfaceAlt,
 		borderRadius: RADIUS.md,
 		alignItems: 'center',
@@ -296,8 +298,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		flex: 1,
 		flexDirection: 'row',
 		columnGap: SPACING_W.xs,
-		height: scaleHeight(48),
-		backgroundColor: COLORS.primary,
+		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
+		backgroundColor: COLORS.primaryFill,
 		borderRadius: RADIUS.md,
 		alignItems: 'center',
 		justifyContent: 'center',

@@ -336,7 +336,7 @@ const modalStyles = themedStyles(() => StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: RADIUS.xl,
-    paddingVertical: SPACING_H.lg,
+    paddingVertical: SPACING_H.xl, // 대화상자 표준(위아래 xl) — Contributor9Modal 과 같은 값
     paddingHorizontal: SPACING_W.lg,
     // iOS 는 테두리 있는 카드를 clip 할 때만 배경을 뷰 레이어에 직접 칠한다.
     // 없으면 scale 로 등장하는 첫 프레임에서 배경만 작게 그려진다(모달 레이아웃 규칙 7).

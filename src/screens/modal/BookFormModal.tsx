@@ -196,15 +196,17 @@ export default BookFormModal;
 const styles = themedStyles(() => StyleSheet.create({
 	headerImage: { width: scaleWidth(72), height: scaleWidth(72), alignSelf: 'center', marginTop: SPACING_H.sm },
 	overlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'center', alignItems: 'center' },
-	scrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: SPACING_H.xl, width: '100%' },
-	// maxWidth: 태블릿에서 카드가 화면 폭만큼 늘어나면 대화상자로 읽히지 않는다(폰은 88% 가 더 좁아 영향 없음).
-	modal: { width: '88%', maxWidth: MODAL_MAX_WIDTH, backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.xl },
+	// 딤 좌우 여백은 다른 대화상자와 같은 lg (예전 88% 는 이 모달만 카드 폭이 달랐다)
+	scrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: SPACING_H.xl, paddingHorizontal: SPACING_W.lg, width: '100%' },
+	// maxWidth: 태블릿에서 카드가 화면 폭만큼 늘어나면 대화상자로 읽히지 않는다.
+	// overflow: scale 로 등장하는 테두리 카드 (모달 레이아웃 규칙 7)
+	modal: { width: '100%', maxWidth: MODAL_MAX_WIDTH, backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden', paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.xl },
 	modalTitle: { fontSize: FONT_SIZES.heading, fontWeight: '700', color: COLORS.textStrong },
 	modalSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'left', marginTop: SPACING_H.xs },
 	inputWrap: { flexDirection: 'row', alignItems: 'center', height: scaleHeight(48), borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, marginTop: SPACING_H.xs, marginBottom: SPACING_H.md, backgroundColor: COLORS.surface },
 	inputWrapFocused: { borderColor: COLORS.primary },
 	input: { flex: 1, paddingVertical: 0, fontSize: FONT_SIZES.md, color: COLORS.text },
-	submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: scaleHeight(48), marginTop: SPACING_H.lg, borderRadius: RADIUS.md, gap: SPACING_W.sm, backgroundColor: COLORS.primary },
+	submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: scaleHeight(48), marginTop: SPACING_H.lg, borderRadius: RADIUS.md, gap: SPACING_W.sm, backgroundColor: COLORS.primaryFill },
 	submitBtnDisabled: { backgroundColor: COLORS.borderDark },
 	submitBtnText: { color: COLORS.textWhite, fontWeight: '700', fontSize: FONT_SIZES.lg },
 	fieldLabel: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, marginTop: SPACING_H.xs },

@@ -15,7 +15,7 @@ import BottomHomeButton from './common/BottomHomeButton';
 import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
-import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 
 /** 모드별 설명 (카드 서브텍스트) */
@@ -168,8 +168,8 @@ const InitQuizModeScreen = () => {
 										style={[styles.accordionButton, { backgroundColor: COLORS.accentFlame }]}
 										activeOpacity={0.85}
 										onPress={() => navigation.navigate(Paths.QUIZ_WRONG_REVIEW)}>
-										<IconComponent type="FontAwesome5" name="book" size={scaledSize(16)} color={COLORS.textWhite} />
-										<Text style={styles.accordionButtonText}>오답 복습</Text>
+										<IconComponent type="FontAwesome5" name="book" size={scaledSize(16)} color={COLORS.textOnVivid} />
+										<Text style={[styles.accordionButtonText, { color: COLORS.textOnVivid }]}>오답 복습</Text>
 									</TouchableOpacity>
 									<TouchableOpacity
 										style={[styles.accordionButton, { backgroundColor: COLORS.secondary }]}
@@ -205,7 +205,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	container: { flex: 1, backgroundColor: COLORS.background, paddingHorizontal: SPACING_W.lg, alignItems: 'center' },
 	animatedWrap: { flex: 1, width: '100%' },
 	scrollArea: { flex: 1 },
-	scrollContent: { flexGrow: 1, justifyContent: 'center', paddingTop: SPACING_H.sm, paddingBottom: SPACING_H.xxxxl },
+	scrollContent: { flexGrow: 1, justifyContent: 'center', paddingTop: SPACING_H.sm, paddingBottom: SCROLL_TOP_CLEARANCE },
 
 	// ===== 마스코트 / 레벨 =====
 	mascotSection: {

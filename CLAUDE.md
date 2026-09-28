@@ -74,7 +74,7 @@
    `width: '100%'` 만 두면 아이패드에서 카드가 화면 폭을 다 먹어 대화상자로 읽히지 않는다.
 
 5. 네이티브 스위치 네 개가 세트다 (`__tests__/tabletLayout.test.ts` 가 확인한다).
-   - `TARGETED_DEVICE_FAMILY` — 지금은 `1` (iPad 배포 보류). iPad 를 켤 때 `"1,2"`, Debug/Release 둘 다.
+   - `TARGETED_DEVICE_FAMILY` — 지금은 `"1,2"` (iPad 배포 중), Debug/Release 둘 다. 보류로 돌릴 때 `1`.
    - `UIRequiresFullScreen` = true (멀티태스킹을 지원하면 애플이 4방향 회전을 요구한다)
    - `UISupportedInterfaceOrientations~ipad` = Portrait 만
    - Android `PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY` = true

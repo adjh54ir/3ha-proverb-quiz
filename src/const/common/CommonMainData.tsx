@@ -2,7 +2,7 @@ import IconComponent from '@/screens/common/atomic/IconComponent';
 import { scaledSize, scaleWidth } from '@/utils/DementionUtils';
 import React, { JSX } from 'react';
 import { COLORS, FONT_SIZES, SPACING_W, themedValue } from '@/const/common/Theme';
-import { getCategoryColor, getLevelColor } from '@/screens/common/CommonProverbModule';
+import { getCategoryColor, getLevelColor, getLevelInkColor } from '@/screens/common/CommonProverbModule';
 // 공통 타입 정의
 export interface CategoryItem {
 	label: string;
@@ -83,7 +83,7 @@ export const LEVEL_DROPDOWN_ITEMS = [
 	{
 		label: '특급',
 		value: '특급',
-		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelColor('특급')} />,
+		icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelInkColor(getLevelColor('특급'))} />,
 	},
 ];
 

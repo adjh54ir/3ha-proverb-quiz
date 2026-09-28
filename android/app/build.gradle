@@ -87,6 +87,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 37
         versionName "2.2.0"
+        missingDimensionStrategy "store", "play" // react-native-iap: Google Play 결제 사용
     }
     signingConfigs {
         debug {

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 import Skeleton from '@/screens/common/atomic/Skeleton';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
@@ -18,7 +18,7 @@ import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
-import { LEVEL_NAME_BY_NUMBER, getLevelColorByNumber, getCategoryColor } from '@/screens/common/CommonProverbModule';
+import { LEVEL_NAME_BY_NUMBER, getLevelColorByNumber, getCategoryColor, getLevelInkColor } from '@/screens/common/CommonProverbModule';
 import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
@@ -61,10 +61,10 @@ const FilterChipRow = <T extends number | string>({
 						accessibilityRole="button"
 						accessibilityState={{ selected: active }}
 						accessibilityLabel={`${label} ${chip.label} ${chip.count}개`}>
-						<Text style={[styles.chipText, active && { color: chip.color, fontWeight: '700' }]} numberOfLines={1}>
+						<Text style={[styles.chipText, active && { color: getLevelInkColor(chip.color), fontWeight: '700' }]} numberOfLines={1}>
 							{chip.label}
 						</Text>
-						<Text style={[styles.chipCount, active && { color: chip.color }]}>{chip.count}</Text>
+						<Text style={[styles.chipCount, active && { color: getLevelInkColor(chip.color) }]}>{chip.count}</Text>
 					</TouchableOpacity>
 				);
 			})}
@@ -421,7 +421,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	scrollContainer: {
 		paddingTop: SPACING_H.xl,
 		paddingHorizontal: SPACING_W.lg,
-		paddingBottom: SPACING_H.xxxxl,
+		paddingBottom: SCROLL_TOP_CLEARANCE,
 		alignItems: 'center',
 		backgroundColor: COLORS.background,
 	},
@@ -577,8 +577,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		columnGap: SPACING_W.sm,
-		backgroundColor: COLORS.primary,
-		height: scaleHeight(48),
+		backgroundColor: COLORS.primaryFill,
+		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 		borderRadius: RADIUS.md,
 		marginBottom: SPACING_H.lg,
 		width: '100%',

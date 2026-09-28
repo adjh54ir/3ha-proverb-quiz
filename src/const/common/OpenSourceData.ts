@@ -37,6 +37,7 @@ export const OPEN_SOURCE_LIBS: OpenSourceLib[] = [
 	{ name: 'react-native-fast-image', license: '(MIT AND Apache-2.0)', version: '8.6.3', url: 'https://github.com/DylanVann/react-native-fast-image' },
 	{ name: 'react-native-gesture-handler', license: 'MIT', version: '2.32.0', url: 'https://github.com/software-mansion/react-native-gesture-handler' },
 	{ name: 'react-native-google-mobile-ads', license: 'Apache-2.0', version: '14.11.0', url: 'https://github.com/invertase/react-native-google-mobile-ads' },
+	{ name: 'react-native-iap', license: 'MIT', version: '13.0.4', url: 'https://github.com/hyochan/react-native-iap' },
 	{ name: 'react-native-linear-gradient', license: 'MIT', version: '2.8.3', url: 'https://github.com/react-native-linear-gradient/react-native-linear-gradient' },
 	{ name: 'react-native-markdown-display', license: 'MIT', version: '7.0.2', url: 'https://github.com/iamacup/react-native-markdown-display' },
 	{ name: 'react-native-permissions', license: 'MIT', version: '5.5.3', url: 'https://github.com/zoontek/react-native-permissions' },

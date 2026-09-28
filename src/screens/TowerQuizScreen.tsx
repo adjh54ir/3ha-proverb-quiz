@@ -409,9 +409,11 @@ const TowerQuizScreen = () => {
 
 			<SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
 				<View style={styles.header}>
-					<TouchableOpacity onPress={handleExit} style={styles.exitButton} hitSlop={HIT_SLOP}>
-						<IconComponent type="materialIcons" name="close" size={scaledSize(28)} color={COLORS.textWhite} />
-					</TouchableOpacity>
+					<View style={styles.headerLeft}>
+						<TouchableOpacity onPress={handleExit} style={styles.exitButton} hitSlop={HIT_SLOP}>
+							<IconComponent type="materialIcons" name="close" size={scaledSize(28)} color={COLORS.textWhite} />
+						</TouchableOpacity>
+					</View>
 
 					<View style={styles.headerCenter}>
 						<View style={styles.headerTitleRow}>
@@ -616,10 +618,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-	headerCenter: { flex: 1, alignItems: 'center' },
+	// 좌(닫기 44)·우(별 5개 ≈106)의 폭이 달라 가운데 제목이 왼쪽으로 쏠렸다 → 양옆을 같은 flex 로 나눠 제목을 화면 중앙에 둔다
+	headerLeft: { flex: 1, alignItems: 'flex-start' },
+	headerCenter: { flexShrink: 1, alignItems: 'center' },
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.xs },
 	headerCrest: { width: scaleWidth(28), height: scaleWidth(28) },
-	loadingCoachImage: { width: scaleWidth(150), height: scaleHeight(150), marginBottom: SPACING_H.lg },
+	loadingCoachImage: { width: scaleWidth(150), height: scaleWidth(150), marginBottom: SPACING_H.lg },
 	errorStateImage: { width: scaleWidth(150), height: scaleHeight(100), marginBottom: SPACING_H.lg },
 	levelTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
 	questionCount: { fontSize: FONT_SIZES.md, color: COLORS.darkTextSecondary, marginTop: SPACING_H.xs },
@@ -701,7 +705,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.lg,
 	},
 	nextButtonText: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
-	headerRight: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm },
+	headerRight: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: SPACING_W.sm },
 	devButton: {
 		width: scaleWidth(36),
 		height: scaleWidth(36),

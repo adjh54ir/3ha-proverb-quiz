@@ -3,7 +3,7 @@
 /* eslint-disable react-native/no-inline-styles */
 
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 import AppAlert from '@/screens/common/modal/AppAlert';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -27,6 +27,7 @@ import DeveloperAppsModal from './modal/DeveloperAppsModal';
 import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModal';
 import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
 import CurrentVersionModal from './modal/CurrentVersionModal';
+import InAppRemoveAdsSection from './common/setting/InAppRemoveAdsSection';
 import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL, APP_NAME as ENV_APP_NAME, APP_DESCRIPTION as ENV_APP_DESCRIPTION } from '@env';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import FadeInView from '@/components/animation/FadeInView';
@@ -945,6 +946,8 @@ const SettingScreen = () => {
 										onValueChange={row.onChange}
 										trackColor={{ false: COLORS.borderDark, true: COLORS.primaryLight }}
 										thumbColor={row.on ? COLORS.primaryDark : COLORS.surfaceAlt}
+										// iOS 는 trackColor.false 를 꺼진 상태 테두리에만 쓰고 안쪽은 이 값(기본 라이트 회색)으로 칠한다
+										ios_backgroundColor={COLORS.borderDark}
 										accessibilityLabel={row.label}
 									/>
 								</View>
@@ -1094,7 +1097,7 @@ const SettingScreen = () => {
 										<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
 									</View>
 									<View style={styles.storeButtons}>
-										<TouchableOpacity style={[styles.storeButton, { backgroundColor: COLORS.primary }]} onPress={shareApp} activeOpacity={0.8}>
+										<TouchableOpacity style={[styles.storeButton, { backgroundColor: COLORS.primaryFill }]} onPress={shareApp} activeOpacity={0.8}>
 											<View style={styles.iconRow}>
 												<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color={COLORS.textWhite} />
 												<Text style={styles.storeButtonText}>공유하기</Text>
@@ -1102,6 +1105,8 @@ const SettingScreen = () => {
 										</TouchableOpacity>
 									</View>
 								</View>
+								{/* 광고 제거 구독 */}
+								<InAppRemoveAdsSection onOpenPolicy={() => setShowTermsModal(true)} />
 							</View>
 						}
 						ListFooterComponent={
@@ -1198,7 +1203,7 @@ export default SettingScreen;
 
 const styles = themedStyles(() => StyleSheet.create({
 	container: { flex: 1, backgroundColor: COLORS.background },
-	listContent: { paddingBottom: SPACING_H.xxxxl },
+	listContent: { paddingBottom: SCROLL_TOP_CLEARANCE },
 	headerContainer: { marginBottom: SPACING_H.xs },
 	itemSpacing: { height: SPACING_H.md },
 	// 섹션 사이 총 간격 = 이 값 + sectionHeader marginTop(20) ≈ 24

@@ -75,6 +75,8 @@ describe('PurchaseService', () => {
 		await s.loadCachedAdsRemoved();
 		mockIap.getAvailablePurchases.mockResolvedValueOnce([{ productId: s.LIFETIME_SKU, transactionId: 'old1' }]);
 		expect(await s.checkStore()).toBe(true);
+		await new Promise(setImmediate);
+		expect(global.fetch).not.toHaveBeenCalled(); // 평생 상품은 구매 기록을 보내지 않는다
 
 		const s2 = load();
 		await s2.loadCachedAdsRemoved();

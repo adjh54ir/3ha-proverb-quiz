@@ -12,7 +12,7 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
  *   스토어 구매 이력 또는 당시 저장한 PURCHASE_INFO 플래그 중 하나만 있어도 인정한다.
  * - 권한의 진실 원천은 스토어(getAvailablePurchases = 현재 유효한 구독 + 보유 비소모성).
  *   AsyncStorage 플래그는 오프라인·앱 시작 직후용 캐시일 뿐이다.
- * - 구매 기록은 Supabase Edge Function(proverbquiz-purchases) → 공용 tb_purchases 에 남긴다. 실패해도 권한엔 영향 없음.
+ * - 구매 기록은 공용 Supabase Edge Function(purchases, 소스는 3ha-hanpick) → tb_purchases 에 남긴다. 실패해도 권한엔 영향 없음.
  *
  * [버전] RN 0.78 이라 react-native-iap 13.x 고정 (14+ 는 Kotlin 2.2 요구). Billing 8 패치는 .yarn/patches 참고
  */
@@ -157,17 +157,19 @@ export const expiresAtOf = (p: PurchaseLike): number | undefined => {
 const RECORDED_KEY = 'IAP_RECORDED';
 
 const recordPurchase = async (p: PurchaseLike) => {
-	if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !p.transactionId) return;
+	// 평생 광고 제거는 더 팔지 않는 예전 상품이라 기록하지 않는다 — 권한은 스토어·PURCHASE_INFO 로 유지
+	if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !p.transactionId || !isSubSku(p.productId)) return;
 	try {
 		const expiresAt = expiresAtOf(p);
 		const sig = `${p.transactionId}|${expiresAt ?? ''}`;
 		if ((await AsyncStorage.getItem(RECORDED_KEY)) === sig) return;
 		const token = await getAccessToken();
 		if (!token) return;
-		const r = await fetch(`${SUPABASE_URL}/functions/v1/proverbquiz-purchases`, {
+		const r = await fetch(`${SUPABASE_URL}/functions/v1/purchases`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, apikey: SUPABASE_ANON_KEY },
 			body: JSON.stringify({
+				appId: BUNDLE,
 				platform: Platform.OS,
 				transactionId: p.transactionId,
 				productId: p.productId,
@@ -179,6 +181,7 @@ const recordPurchase = async (p: PurchaseLike) => {
 		});
 		// 실패하면 표시를 남기지 않아 다음 실행 때 다시 보낸다
 		if (r.ok) await AsyncStorage.setItem(RECORDED_KEY, sig);
+		else console.warn('[IAP] purchase record rejected:', r.status, await r.text());
 	} catch (e) {
 		console.warn('[IAP] purchase record failed:', e);
 	}

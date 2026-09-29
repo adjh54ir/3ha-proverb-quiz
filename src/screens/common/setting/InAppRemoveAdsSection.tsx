@@ -20,7 +20,7 @@ import { scaledSize, scaleWidth } from '@/utils/DementionUtils';
 import { FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 
 /*
-  광고 제거 구독 카드 — 설정 화면 '앱이 마음에 드셨습니까?' 바로 아래.
+  광고 제거 카드(1개월 구독 / 평생 이용권) — 설정 화면 '앱이 마음에 드셨습니까?' 바로 아래.
   테마와 무관하게 남색 먹빛 + 금박 톤으로 고정한다(라이트/다크 어디서든 '프리미엄'으로 읽히도록).
   구조·결제 흐름은 3ha-four-idioms 의 같은 이름 컴포넌트와 같다.
 */
@@ -46,7 +46,7 @@ const APPLE_EULA_URL = 'https://www.apple.com/legal/internet-services/itunes/dev
 const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) => {
 	const adsRemoved = useAdsRemoved();
 	const reducedMotion = useReducedMotion();
-	const [plan, setPlan] = useState<PlanKey>('yearly');
+	const [plan, setPlan] = useState<PlanKey>('lifetime');
 	const [prices, setPrices] = useState<PlanPrices>(FALLBACK_PRICES);
 	const [busy, setBusy] = useState(false);
 
@@ -100,12 +100,12 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 				? '스토어에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.'
 				: owned
 					? '광고 제거가 복원되었어요.'
-					: '복원할 구독 내역이 없어요.',
+					: '복원할 구매 내역이 없어요.',
 		);
 	};
 
-	// 원화 기본가일 때만 월 환산가·할인율 노출 (타 통화는 스토어 환산가라 계산이 어긋남)
-	const isKrwBase = prices.yearly === FALLBACK_PRICES.yearly && prices.monthly === FALLBACK_PRICES.monthly;
+	// 원화 기본가일 때만 개월 환산 노출 (타 통화는 스토어 환산가라 계산이 어긋남)
+	const isKrwBase = prices.lifetime === FALLBACK_PRICES.lifetime && prices.monthly === FALLBACK_PRICES.monthly;
 	const lifetime = isLifetimeOwner();
 
 	return (
@@ -138,7 +138,7 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 			) : (
 				<>
 					<Text style={styles.title}>광고 없이,{'\n'}속담에만 집중.</Text>
-					<Text style={styles.subtitle}>한 번의 구독으로 앱 속 모든 광고를 제거합니다.</Text>
+					<Text style={styles.subtitle}>한 번의 결제로 앱 속 모든 광고를 제거합니다.</Text>
 
 					<View style={styles.divider} />
 
@@ -159,13 +159,13 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 							caption="부담 없이 시작"
 						/>
 						<PlanTile
-							selected={plan === 'yearly'}
-							onPress={() => setPlan('yearly')}
-							label="1년"
-							price={prices.yearly}
-							unit="/ 년"
-							caption={isKrwBase ? '월 1,650원 꼴' : '12개월 이용'}
-							ribbon={isKrwBase ? '58% 할인' : undefined}
+							selected={plan === 'lifetime'}
+							onPress={() => setPlan('lifetime')}
+							label="평생"
+							price={prices.lifetime}
+							unit="1회 결제"
+							caption={isKrwBase ? '7개월 요금으로 평생' : '한 번 결제, 평생 이용'}
+							ribbon="추천"
 						/>
 					</View>
 
@@ -191,7 +191,7 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 									<Text style={styles.ctaText}>결제 진행 중…</Text>
 								</View>
 							) : (
-								<Text style={styles.ctaText}>{plan === 'yearly' ? '1년 구독 시작하기' : '1개월 구독 시작하기'}</Text>
+								<Text style={styles.ctaText}>{plan === 'lifetime' ? '평생 이용권 구매하기' : '1개월 구독 시작하기'}</Text>
 							)}
 						</LinearGradient>
 					</Pressable>
@@ -220,8 +220,9 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 					</View>
 
 					<Text style={styles.legal}>
-						구독은 기간 종료 24시간 전까지 해지하지 않으면 같은 가격으로 자동 갱신되며, 결제 금액은 스토어 계정으로
-						청구됩니다. 해지는 스토어의 구독 관리에서 언제든 할 수 있습니다.
+						평생 이용권은 1회 결제이며 자동 갱신되지 않습니다. 1개월 구독은 기간 종료 24시간 전까지 해지하지 않으면
+						같은 가격으로 자동 갱신되며, 결제 금액은 스토어 계정으로 청구됩니다. 해지는 스토어의 구독 관리에서 언제든 할 수
+						있습니다.
 					</Text>
 				</>
 			)}

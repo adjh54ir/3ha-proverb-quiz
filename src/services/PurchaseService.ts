@@ -4,11 +4,11 @@ import { IAP_REMOVE_AD_KEY, SUPABASE_URL, SUPABASE_ANON_KEY } from '@env';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 
 /**
- * 광고 제거 구독 서비스 (react-native-iap v13, 자동 갱신 구독) — 3ha-four-idioms 와 같은 구조
- * - iOS·Android 공통 상품 2개: com.tha.proverbquiz.remove_ad.monthly / .yearly
- *   (iOS 는 같은 구독 그룹, Android 는 구독마다 기본 요금제(base plan) 1개)
- * - 앱의 모든 기능은 계속 무료다. 구독은 광고만 없앤다.
- * - 1.3~1.4 에서 팔던 평생 광고 제거(com.tha.iap.remove_ad, 비소모성) 구매자는 구독 없이도 영구히 광고 제거.
+ * 광고 제거 서비스 (react-native-iap v13) — 3ha-four-idioms 와 같은 구조
+ * - 판매 상품 2개: 1개월 자동 갱신 구독(com.tha.proverbquiz.remove_ad.monthly, ₩2,900)
+ *   + 평생 이용권(com.tha.proverbquiz.remove_ad, 비소모성, ₩18,900)
+ * - 앱의 모든 기능은 계속 무료다. 광고만 없앤다.
+ * - 1.3~1.4 에서 팔던 평생 광고 제거(com.tha.iap.remove_ad) 구매자도 평생 보유자로 인정한다.
  *   스토어 구매 이력 또는 당시 저장한 PURCHASE_INFO 플래그 중 하나만 있어도 인정한다.
  * - 권한의 진실 원천은 스토어(getAvailablePurchases = 현재 유효한 구독 + 보유 비소모성).
  *   AsyncStorage 플래그는 오프라인·앱 시작 직후용 캐시일 뿐이다.
@@ -17,28 +17,29 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
  * [버전] RN 0.78 이라 react-native-iap 13.x 고정 (14+ 는 Kotlin 2.2 요구). Billing 8 패치는 .yarn/patches 참고
  */
 
-export type PlanKey = 'monthly' | 'yearly';
+export type PlanKey = 'monthly' | 'lifetime';
 
 const BUNDLE = 'com.tha.proverbquiz';
-export const SKUS: Record<PlanKey, string> = {
-	monthly: `${BUNDLE}.remove_ad.monthly`,
-	yearly: `${BUNDLE}.remove_ad.yearly`,
-};
+export const SKUS = { monthly: `${BUNDLE}.remove_ad.monthly` };
 const SUB_SKUS = Object.values(SKUS);
-/** 예전 평생 광고 제거 상품 — 새로 팔지 않고 보유자만 인정한다 */
-export const LIFETIME_SKU = IAP_REMOVE_AD_KEY || 'com.tha.iap.remove_ad';
+/** 평생 광고 제거(비소모성) */
+export const LIFETIME_SKU = `${BUNDLE}.remove_ad`;
+/** 1.3~1.4 에 팔던 평생 광고 제거 — 새로 팔지 않고 보유자만 인정한다 */
+export const LEGACY_LIFETIME_SKU = IAP_REMOVE_AD_KEY || 'com.tha.iap.remove_ad';
+const isLifetimeSku = (productId?: string) => productId === LIFETIME_SKU || productId === LEGACY_LIFETIME_SKU;
 
 /** 스토어 조회 실패(시뮬레이터·심사 전) 시 화면에 보여줄 기본 가격 */
-export const FALLBACK_PRICES: Record<PlanKey, string> = { monthly: '₩3,900', yearly: '₩19,800' };
+export const FALLBACK_PRICES: Record<PlanKey, string> = { monthly: '₩2,900', lifetime: '₩18,900' };
 
 // ─── 광고 제거 플래그 (동기 캐시 + 구독) ───────────────────────
-let adsRemovedCache = false;
+/** null = 캐시를 아직 못 읽음. 이때도 광고를 띄우지 않는다 — 구매자에게 앱 시작 직후 광고가 먼저 뜨지 않게 */
+let adsRemovedCache: boolean | null = null;
 /** 평생 광고 제거 보유자 — 구독 재검증이 이 사용자를 해제하지 않는다 */
 let lifetimeOwner = false;
 const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((l) => l());
 
-export const isAdsRemoved = (): boolean => adsRemovedCache;
+export const isAdsRemoved = (): boolean => adsRemovedCache !== false;
 export const isLifetimeOwner = (): boolean => lifetimeOwner;
 
 /** useSyncExternalStore 호환 구독 */
@@ -47,25 +48,42 @@ export const subscribeAdsRemoved = (listener: () => void): (() => void) => {
 	return () => listeners.delete(listener);
 };
 
-/** 마지막 구매 반영 시각 — 결제 직후 재검증이 아직 반영 전 목록으로 되돌리지 않게 */
-let lastGrantAt = 0;
+/**
+ * 권한 만료 시각(ms) — AsyncStorage(AD_REMOVED)에 이 값을 저장한다.
+ * 스토어가 빈 목록을 돌려줘도 이 시각 전에는 해제하지 않는다. 빈 목록은 "구매 없음"만 뜻하지 않는다:
+ *   - StoreKit 2: 콜드 스타트 직후 currentEntitlements 가 동기화 전이면 비어 있다
+ *   - Play: 백그라운드 복귀 직후 결제 연결이 끊겨 조회가 실패해도 빈 배열로 resolve 한다
+ * 예전엔 이 빈 목록 한 번에 권한을 해제해, 앱을 다시 켜면 광고가 나오고 포그라운드 복귀 때 다시 사라졌다.
+ */
+let adsRemovedUntil = 0;
+const DAY = 24 * 60 * 60 * 1000;
 
-const persistAdsRemoved = async (removed: boolean) => {
-	const next = removed || lifetimeOwner;
-	if (removed) lastGrantAt = Date.now();
-	if (adsRemovedCache !== next) {
-		adsRemovedCache = next;
-		notify();
-	}
+const setAdsRemoved = (removed: boolean) => {
+	if (adsRemovedCache === removed) return;
+	adsRemovedCache = removed;
+	notify();
+};
+
+const persistAdsRemovedUntil = async (until: number) => {
+	adsRemovedUntil = until;
+	setAdsRemoved(lifetimeOwner || until > Date.now());
 	try {
-		await AsyncStorage.setItem(MainStorageKeyType.AD_REMOVED, next ? 'true' : 'false');
+		await AsyncStorage.setItem(MainStorageKeyType.AD_REMOVED, String(until));
 	} catch {}
 };
+
+/**
+ * 유효한 구매를 확인할 때마다 만료 시각을 늘려 둔다.
+ * 최소 하루는 보장 — 만료일을 모를 때(JWS 없음·평생 상품)나 스토어 시계 오차에도 광고가 끼어들지 않게.
+ */
+const grantAdsRemoved = (p: PurchaseLike) =>
+	persistAdsRemovedUntil(Math.max(expiresAtOf(p) ?? 0, Date.now() + DAY));
 
 /** 평생 구매자 표시 — 예전 앱과 같은 키·모양으로 남겨 두어 오프라인에서도 유지된다 */
 const markLifetime = async () => {
 	if (lifetimeOwner) return;
 	lifetimeOwner = true;
+	setAdsRemoved(true);
 	try {
 		await AsyncStorage.setItem(
 			MainStorageKeyType.LEGACY_PURCHASE_INFO,
@@ -103,7 +121,7 @@ const getIap = (): IapModule | null => {
 };
 
 const isSubSku = (productId?: string) => !!productId && SUB_SKUS.includes(productId);
-const isRemoveAdSku = (productId?: string) => isSubSku(productId) || productId === LIFETIME_SKU;
+const isRemoveAdSku = (productId?: string) => isSubSku(productId) || isLifetimeSku(productId);
 
 // ─── 구매 기록 (Supabase Edge Function → tb_purchases) ──────────
 /*
@@ -133,7 +151,7 @@ const getAccessToken = async (): Promise<string | null> => {
 /**
  * 구독 만료 시각(ms). 모르면(평생 상품 포함) undefined → expires_at 은 null 로 남는다.
  * - iOS: JWS payload 의 expiresDate (정확)
- * - Android: 구매 시각부터 요금제 기간(상품 ID 로 판별)을 now 이후가 될 때까지 더한 값
+ * - Android: 구매 시각부터 1개월씩 now 이후가 될 때까지 더한 값
  *   ponytail: 자동 갱신 가정의 추정치. 정확히 하려면 Play Developer API 로 서버 검증
  */
 export const expiresAtOf = (p: PurchaseLike): number | undefined => {
@@ -144,9 +162,8 @@ export const expiresAtOf = (p: PurchaseLike): number | undefined => {
 			return JSON.parse(atob(b64)).expiresDate || undefined;
 		}
 		if (!p.transactionDate) return undefined;
-		const months = p.productId === SKUS.yearly ? 12 : 1;
 		const d = new Date(p.transactionDate);
-		while (d.getTime() <= Date.now()) d.setMonth(d.getMonth() + months);
+		while (d.getTime() <= Date.now()) d.setMonth(d.getMonth() + 1);
 		return d.getTime();
 	} catch {
 		return undefined;
@@ -157,8 +174,8 @@ export const expiresAtOf = (p: PurchaseLike): number | undefined => {
 const RECORDED_KEY = 'IAP_RECORDED';
 
 const recordPurchase = async (p: PurchaseLike) => {
-	// 평생 광고 제거는 더 팔지 않는 예전 상품이라 기록하지 않는다 — 권한은 스토어·PURCHASE_INFO 로 유지
-	if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !p.transactionId || !isSubSku(p.productId)) return;
+	// 예전 평생 상품(LEGACY_LIFETIME_SKU)은 접두사가 달라 공용 함수가 400 으로 거절한다 — 보내면 실행마다 재시도만 쌓인다
+	if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !p.transactionId || !isRemoveAdSku(p.productId) || p.productId === LEGACY_LIFETIME_SKU) return;
 	try {
 		const expiresAt = expiresAtOf(p);
 		const sig = `${p.transactionId}|${expiresAt ?? ''}`;
@@ -209,8 +226,8 @@ const attachListeners = (mod: IapModule) => {
 		if (p.purchaseStateAndroid === ANDROID_PURCHASE_PENDING) return;
 		try {
 			if (isRemoveAdSku(p.productId)) {
-				if (p.productId === LIFETIME_SKU) await markLifetime();
-				await persistAdsRemoved(true);
+				if (isLifetimeSku(p.productId)) await markLifetime();
+				await grantAdsRemoved(p);
 				recordPurchase(p);
 			}
 			await mod.finishTransaction({ purchase, isConsumable: false });
@@ -251,6 +268,8 @@ export const ensureConnected = async (): Promise<boolean> => {
 
 /**
  * 스토어의 현재 유효 구독(+ 평생 상품)으로 권한 재검증
+ * - 보이면 만료 시각 갱신
+ * - 안 보이면 저장된 만료 시각이 지났을 때만 해제 (빈 목록 한 번으로는 해제하지 않는다 — adsRemovedUntil 참고)
  * @returns 광고 제거 여부, 확인 불가(오프라인·모듈 없음)면 null
  */
 export const checkStore = async (): Promise<boolean | null> => {
@@ -261,19 +280,20 @@ export const checkStore = async (): Promise<boolean | null> => {
 		const owned = purchases.filter(
 			(p) => isRemoveAdSku(p.productId) && p.purchaseStateAndroid !== ANDROID_PURCHASE_PENDING,
 		);
-		if (owned.some((p) => p.productId === LIFETIME_SKU)) await markLifetime();
+		if (owned.some((p) => isLifetimeSku(p.productId))) await markLifetime();
 		const active = owned.find((p) => isSubSku(p.productId)) ?? owned[0];
-		// 결제창이 닫히며 포그라운드 복귀 재검증이 겹칠 수 있다 — 1분 안의 구매는 해제하지 않는다
-		if (!active && Date.now() - lastGrantAt < 60_000) return true;
-		await persistAdsRemoved(!!active);
-		if (active) {
-			recordPurchase(active);
-			// 리스너를 놓친 구매(결제 직후 앱 종료 등)도 여기서 승인 — Google Play 는 3일 안에 승인 안 되면 자동 환불한다
-			if (active.isAcknowledgedAndroid === false) {
-				mod.finishTransaction({ purchase: active as never, isConsumable: false }).catch(() => {});
-			}
+		if (!active) {
+			if (lifetimeOwner || adsRemovedUntil > Date.now()) return true;
+			if (adsRemovedCache !== false) await persistAdsRemovedUntil(0);
+			return false;
 		}
-		return adsRemovedCache;
+		await grantAdsRemoved(active);
+		recordPurchase(active);
+		// 리스너를 놓친 구매(결제 직후 앱 종료 등)도 여기서 승인 — Google Play 는 3일 안에 승인 안 되면 자동 환불한다
+		if (active.isAcknowledgedAndroid === false) {
+			mod.finishTransaction({ purchase: active as never, isConsumable: false }).catch(() => {});
+		}
+		return true;
 	} catch (e) {
 		console.warn('[IAP] entitlement check failed:', e);
 		return null;
@@ -288,9 +308,10 @@ export const loadCachedAdsRemoved = async (): Promise<void> => {
 			MainStorageKeyType.LEGACY_PURCHASE_INFO,
 		]);
 		lifetimeOwner = !!legacy && JSON.parse(legacy)?.isRemoveAds === true;
-		adsRemovedCache = removed === 'true' || lifetimeOwner;
-		notify();
+		// 이전 버전은 'true'/'false' 를 저장했다 — 'true' 는 하루 유예를 주고 스토어 재검증이 실제 만료일로 바꾼다
+		adsRemovedUntil = removed === 'true' ? Date.now() + DAY : Number(removed) || 0;
 	} catch {}
+	setAdsRemoved(lifetimeOwner || adsRemovedUntil > Date.now());
 };
 
 let appStateSub: { remove: () => void } | null = null;
@@ -324,20 +345,29 @@ const fetchSubs = async (mod: IapModule): Promise<SubLike[]> => {
 	}
 };
 
-/** Android 기본 요금제(프로모션 offer 가 아닌 것) */
-const basePlanOffer = (subs: SubLike[], plan: PlanKey) =>
-	subs.find((s) => s.productId === SKUS[plan])?.subscriptionOfferDetails?.find((o) => !o.offerId);
+const fetchLifetime = async (mod: IapModule): Promise<{ localizedPrice?: string } | undefined> => {
+	try {
+		return (await mod.getProducts({ skus: [LIFETIME_SKU] }))[0];
+	} catch (e) {
+		console.warn('[IAP] getProducts failed:', e);
+		return undefined;
+	}
+};
+
+/** Android 월 구독 기본 요금제(프로모션 offer 가 아닌 것) */
+const basePlanOffer = (subs: SubLike[]) =>
+	subs.find((s) => s.productId === SKUS.monthly)?.subscriptionOfferDetails?.find((o) => !o.offerId);
 
 /** 스토어 표시 가격 (못 가져온 항목은 FALLBACK_PRICES) */
 export const getPlanPrices = async (): Promise<PlanPrices> => {
 	const mod = getIap();
 	if (!mod || !(await ensureConnected())) return FALLBACK_PRICES;
-	const subs = await fetchSubs(mod);
-	const price = (plan: PlanKey) =>
+	const [subs, lifetime] = await Promise.all([fetchSubs(mod), fetchLifetime(mod)]);
+	const monthly =
 		Platform.OS === 'ios'
-			? subs.find((s) => s.productId === SKUS[plan])?.localizedPrice
-			: basePlanOffer(subs, plan)?.pricingPhases.pricingPhaseList.slice(-1)[0]?.formattedPrice;
-	return { monthly: price('monthly') ?? FALLBACK_PRICES.monthly, yearly: price('yearly') ?? FALLBACK_PRICES.yearly };
+			? subs.find((s) => s.productId === SKUS.monthly)?.localizedPrice
+			: basePlanOffer(subs)?.pricingPhases.pricingPhaseList.slice(-1)[0]?.formattedPrice;
+	return { monthly: monthly ?? FALLBACK_PRICES.monthly, lifetime: lifetime?.localizedPrice ?? FALLBACK_PRICES.lifetime };
 };
 
 export type PurchaseFailReason = 'no-module' | 'not-connected' | 'no-product' | 'cancelled' | 'failed';
@@ -347,26 +377,32 @@ export interface PurchaseRequestResult {
 	message?: string;
 }
 
-/** 구독 요청 (성공 처리는 purchaseUpdatedListener) */
+/** 구독·평생 이용권 구매 요청 (성공 처리는 purchaseUpdatedListener) */
 export const subscribeRemoveAds = async (plan: PlanKey): Promise<PurchaseRequestResult> => {
 	const mod = getIap();
 	if (!mod) return { ok: false, reason: 'no-module' };
 	if (!(await ensureConnected())) return { ok: false, reason: 'not-connected' };
-	const subs = await fetchSubs(mod);
 	try {
+		if (plan === 'lifetime') {
+			// getProducts 를 먼저 불러야 Android 결제창이 상품을 찾는다
+			if (!(await fetchLifetime(mod))) return { ok: false, reason: 'no-product' };
+			await mod.requestPurchase(Platform.OS === 'ios' ? { sku: LIFETIME_SKU } : { skus: [LIFETIME_SKU] });
+			return { ok: true };
+		}
+		const subs = await fetchSubs(mod);
 		if (Platform.OS === 'ios') {
-			if (!subs.some((s) => s.productId === SKUS[plan])) return { ok: false, reason: 'no-product' };
-			await mod.requestSubscription({ sku: SKUS[plan] });
+			if (!subs.some((s) => s.productId === SKUS.monthly)) return { ok: false, reason: 'no-product' };
+			await mod.requestSubscription({ sku: SKUS.monthly });
 		} else {
-			const offer = basePlanOffer(subs, plan);
+			const offer = basePlanOffer(subs);
 			if (!offer) return { ok: false, reason: 'no-product' };
-			await mod.requestSubscription({ subscriptionOffers: [{ sku: SKUS[plan], offerToken: offer.offerToken }] });
+			await mod.requestSubscription({ subscriptionOffers: [{ sku: SKUS.monthly, offerToken: offer.offerToken }] });
 		}
 		return { ok: true };
 	} catch (e) {
 		const err = e as IapError;
 		if (isCancelError(err?.code)) return { ok: false, reason: 'cancelled' };
-		console.warn('[IAP] requestSubscription failed:', err?.code, err?.message);
+		console.warn('[IAP] purchase request failed:', err?.code, err?.message);
 		return { ok: false, reason: 'failed', message: err?.message };
 	}
 };

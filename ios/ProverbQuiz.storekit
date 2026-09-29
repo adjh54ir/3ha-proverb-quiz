@@ -11,7 +11,23 @@
   },
   "identifier": "3HA-PROVERBQUIZ-LOCAL",
   "nonRenewingSubscriptions": [],
-  "products": [],
+  "products": [
+    {
+      "displayPrice": "18900",
+      "familyShareable": false,
+      "internalID": "6815702493",
+      "localizations": [
+        {
+          "description": "한 번 결제로 앱 내의 모든 광고를 평생 제거합니다.",
+          "displayName": "평생 광고 제거",
+          "locale": "ko"
+        }
+      ],
+      "productID": "com.tha.proverbquiz.remove_ad",
+      "referenceName": "평생 광고 제거",
+      "type": "NonConsumable"
+    }
+  ],
   "settings": {
     "_askToBuyEnabled": false,
     "_billingGracePeriodEnabled": false,
@@ -39,7 +55,7 @@
         {
           "adHocOffers": [],
           "codeOffers": [],
-          "displayPrice": "3900",
+          "displayPrice": "2900",
           "familyShareable": false,
           "groupNumber": 2,
           "internalID": "6815702489",
@@ -54,28 +70,6 @@
           "productID": "com.tha.proverbquiz.remove_ad.monthly",
           "recurringSubscriptionPeriod": "P1M",
           "referenceName": "광고 제거 월간",
-          "subscriptionGroupID": "22410576",
-          "type": "RecurringSubscription",
-          "winbackOffers": []
-        },
-        {
-          "adHocOffers": [],
-          "codeOffers": [],
-          "displayPrice": "19800",
-          "familyShareable": false,
-          "groupNumber": 1,
-          "internalID": "6815702491",
-          "introductoryOffer": null,
-          "localizations": [
-            {
-              "description": "구독 기간 동안 앱 내의 모든 광고를 제거합니다.",
-              "displayName": "광고 제거",
-              "locale": "ko"
-            }
-          ],
-          "productID": "com.tha.proverbquiz.remove_ad.yearly",
-          "recurringSubscriptionPeriod": "P1Y",
-          "referenceName": "광고 제거 연간",
           "subscriptionGroupID": "22410576",
           "type": "RecurringSubscription",
           "winbackOffers": []

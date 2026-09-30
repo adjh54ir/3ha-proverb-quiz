@@ -14,7 +14,7 @@ import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyle
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from '../common/CommonProverbModule';
-import { getLevelIconName } from '@/screens/common/CommonProverbModule';
+import { getLevelIconName, getLevelInkColor } from '@/screens/common/CommonProverbModule';
 import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
@@ -40,7 +40,7 @@ const LEVEL_ITEMS = themedValue(() => ([
 	{ label: '초급', value: '초급', icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color={getLevelColor('초급')} /> },
 	{ label: '중급', value: '중급', icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color={COLORS.warning} /> },
 	{ label: '고급', value: '고급', icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color={getLevelColor('고급')} /> },
-	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelColor('특급')} /> },
+	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelInkColor(getLevelColor('특급'))} /> },
 ]));
 
 

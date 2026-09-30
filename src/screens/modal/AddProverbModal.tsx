@@ -14,7 +14,7 @@ import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyle
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName } from '../common/CommonProverbModule';
-import { getLevelIconName } from '@/screens/common/CommonProverbModule';
+import { getLevelIconName, getLevelInkColor } from '@/screens/common/CommonProverbModule';
 import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
@@ -40,7 +40,7 @@ const LEVEL_ITEMS = themedValue(() => ([
 	{ label: '초급', value: '초급', icon: () => <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(16)} color={getLevelColor('초급')} /> },
 	{ label: '중급', value: '중급', icon: () => <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(16)} color={COLORS.warning} /> },
 	{ label: '고급', value: '고급', icon: () => <IconComponent type="FontAwesome6" name="tree" size={scaledSize(16)} color={getLevelColor('고급')} /> },
-	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelColor('특급')} /> },
+	{ label: '특급', value: '특급', icon: () => <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(16)} color={getLevelInkColor(getLevelColor('특급'))} /> },
 ]));
 
 
@@ -395,7 +395,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', lineHeight: scaledSize(20) },
 	// paddingBottom 은 useSafeAreaInsets 로 런타임 주입 (제스처/3버튼 네비게이션 바 회피)
 	footer: { backgroundColor: COLORS.surface, paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, borderTopWidth: 1, borderTopColor: COLORS.surfaceAlt },
-	confirmBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING_W.sm, height: scaleHeight(48), borderRadius: RADIUS.md, backgroundColor: COLORS.primary },
+	confirmBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING_W.sm, height: scaleHeight(48), borderRadius: RADIUS.md, backgroundColor: COLORS.primaryFill },
 	confirmBtnDisabled: { backgroundColor: COLORS.borderDark },
 	confirmBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
 }));

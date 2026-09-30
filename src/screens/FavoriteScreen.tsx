@@ -769,7 +769,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: SPACING_W.xxxl,
+		paddingHorizontal: SPACING_W.lg, // 다른 대화상자와 같은 딤 여백
 	},
 	confirmBox: {
 		width: '100%',
@@ -777,9 +777,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		maxWidth: MODAL_MAX_WIDTH,
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.xl,
-		paddingTop: SPACING_H.xxl,
-		paddingBottom: SPACING_H.lg,
-		paddingHorizontal: SPACING_W.xl,
+		// 앱 대화상자 표준 — 좌우 lg / 위아래 xl, 1px 테두리
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xl,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		overflow: 'hidden',
 		alignItems: 'center',
 	},
 	confirmIconWrapper: {

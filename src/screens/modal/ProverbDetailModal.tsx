@@ -246,7 +246,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	modalBody: {
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.sm,
-		paddingBottom: SPACING_H.xl,
+		// 마지막 섹션 marginBottom(md) + 푸터 paddingTop(sm) = 20 이 버튼 위 간격이 된다 (예전엔 xl 이 더해져 40)
+		paddingBottom: 0,
 	},
 
 	badgeRow: {
@@ -308,9 +309,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingBottom: SPACING_H.xl,
 	},
 	modalCloseButton: {
-		height: scaleHeight(48),
+		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -326,7 +327,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.lg,
 		borderRadius: RADIUS.lg,
-		marginBottom: SPACING_H.lg,
+		marginBottom: SPACING_H.md, // 아래 sectionBox 들과 같은 섹션 간격
 	},
 	meaningQuoteBox: {
 		alignItems: 'center',

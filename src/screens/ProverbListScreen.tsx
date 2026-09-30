@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 import { matchesKeyword } from '@/utils/SearchUtils';
 import { View, Text, StyleSheet, TextInput, RefreshControl, TouchableOpacity, Keyboard, TouchableWithoutFeedback, FlatList, KeyboardAvoidingView, Animated } from 'react-native';
@@ -16,7 +16,7 @@ import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, theme
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
-import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName, getLevelIconName } from './common/CommonProverbModule';
+import { getCategoryColor, getLevelColor, getLevelInkColor, getFieldIcon, getFieldIconName, getLevelIconName } from './common/CommonProverbModule';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
@@ -47,7 +47,7 @@ const buildLevelItems = (levels: string[]) => [
 	...levels.map((lv) => ({
 		label: lv,
 		value: lv,
-		icon: () => <IconComponent type="FontAwesome6" name={getLevelIconName(lv)} size={scaledSize(15)} color={getLevelColor(lv)} />,
+		icon: () => <IconComponent type="FontAwesome6" name={getLevelIconName(lv)} size={scaledSize(15)} color={getLevelInkColor(getLevelColor(lv))} />,
 	})),
 ];
 const buildFieldItems = (fields: string[]) => [
@@ -743,6 +743,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	container: {
 		zIndex: 10,
 		paddingHorizontal: SPACING_W.lg,
+		paddingTop: SPACING_H.md, // 같은 구조의 즐겨찾기 화면(filterContainer)과 같은 상단 여백
 		overflow: 'visible',
 	},
 	// flexGrow 가 있어야 목록이 비었을 때 contentContainer 가 스크롤 영역 높이까지 늘어난다.
@@ -750,7 +751,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	flatListCotent: {
 		paddingTop: SPACING_H.md,
 		paddingHorizontal: SPACING_W.lg,
-		paddingBottom: SPACING_H.xxxxl,
+		paddingBottom: SCROLL_TOP_CLEARANCE,
 		flexGrow: 1,
 	},
 	// 위아래 여백은 스크롤되는 목록을 위한 것이라, 비었을 때는 중앙 정렬만 어긋나게 한다.

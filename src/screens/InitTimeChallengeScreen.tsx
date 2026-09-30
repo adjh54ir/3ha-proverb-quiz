@@ -15,7 +15,7 @@ import DateUtils from '@/utils/DateUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import { read } from '@/services/StorageService';
 import useCountdownTimers from '@/hooks/useCountdownTimers';
-import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 
 // 규칙 한 줄 행 (아이콘 + 한 줄 텍스트)
@@ -278,7 +278,7 @@ const InitTimeChallengeScreen = () => {
 
 						{top5History.length === 0 ? (
 							<View style={styles.emptyState}>
-								<IconComponent name="emoji-events" type="MaterialIcons" size={scaledSize(48)} color={COLORS.border} />
+								<IconComponent name="emoji-events" type="MaterialIcons" size={scaledSize(48)} color={COLORS.borderDark} />
 								<Text style={styles.emptyText}>아직 기록이 없습니다</Text>
 								<Text style={styles.emptySubtext}>첫 챌린지를 시작해보세요!</Text>
 							</View>
@@ -293,6 +293,8 @@ const InitTimeChallengeScreen = () => {
 											index === 0 && styles.rankCardFirst,
 											index === 1 && styles.rankCardSecond,
 											index === 2 && styles.rankCardThird,
+											// 마지막 카드 marginBottom 이 박스 패딩(lg)에 더해져 아래만 28 이 되던 문제
+											index === top5History.length - 1 && { marginBottom: 0 },
 										]}>
 										<View style={styles.rankLeft}>
 											<Text style={styles.medalIcon}>{medals[index]}</Text>
@@ -367,7 +369,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	scrollContainer: {
 		paddingHorizontal: SPACING_W.lg,
 		paddingTop: SPACING_H.lg,
-		paddingBottom: SPACING_H.xxxxl,
+		paddingBottom: SCROLL_TOP_CLEARANCE,
 	},
 
 	// 카운트다운

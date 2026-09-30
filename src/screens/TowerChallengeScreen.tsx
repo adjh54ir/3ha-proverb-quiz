@@ -14,6 +14,7 @@ import FastImage from 'react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
 import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
 import AdmobRewardAd from './common/ads/AdmobRewardAd';
+import useAdsRemoved from '@/hooks/useAdsRemoved';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import CompleteOverlay from './common/CompleteOverlay';
 import BottomHomeButton from './common/BottomHomeButton';
@@ -42,6 +43,8 @@ const TowerChallengeScreen = () => {
 
 	// state
 	const [showAd, setShowAd] = useState(false);
+	// 광고 제거 구독 중이면 광고 없이 바로 보상 → 문구에서 '광고'를 뺀다
+	const adsRemoved = useAdsRemoved();
 
 	// 진입 애니메이션 (헤더 → 하단 안내 순서로 fade + slide-up)
 	const headerAnim = useRef(new Animated.Value(0)).current;
@@ -138,9 +141,9 @@ const TowerChallengeScreen = () => {
 
 		// 도전 횟수가 없으면 광고 시청 유도
 		if (progress.attempts <= 0) {
-			AppAlert.alert('도전 횟수 부족', '광고를 시청하여 도전 기회를 얻으시겠습니까?', [
+			AppAlert.alert('도전 횟수 부족', adsRemoved ? '보너스 도전 기회를 사용하시겠습니까?' : '광고를 시청하여 도전 기회를 얻으시겠습니까?', [
 				{ text: '취소', style: 'cancel' },
-				{ text: '광고 시청', onPress: handleWatchAd },
+				{ text: adsRemoved ? '보너스 사용' : '광고 시청', onPress: handleWatchAd },
 			]);
 			return;
 		}
@@ -266,7 +269,7 @@ const TowerChallengeScreen = () => {
 									) : (
 										<>
 											<IconComponent type="materialIcons" name="play-circle-filled" size={scaledSize(18)} color={COLORS.textWhite} />
-											<Text style={styles.challengeButtonText}>광고 보고 도전하기</Text>
+											<Text style={styles.challengeButtonText}>{adsRemoved ? '보너스로 도전하기' : '광고 보고 도전하기'}</Text>
 										</>
 									)}
 								</>
@@ -358,7 +361,7 @@ const TowerChallengeScreen = () => {
 							activeOpacity={0.8}>
 							<IconComponent type="materialIcons" name="play-circle-filled" size={scaledSize(22)} color={COLORS.textWhite} />
 							<View style={styles.adTextContainer}>
-								<Text style={styles.adButtonTitle}>광고 보고 +1회</Text>
+								<Text style={styles.adButtonTitle}>{adsRemoved ? '보너스 +1회' : '광고 보고 +1회'}</Text>
 								<Text style={styles.adButtonSub}>
 									{progress.adRewardUsed >= 3 ? '오늘 모두 사용함' : `오늘 ${progress.adRewardUsed}/3 사용`}
 								</Text>
@@ -371,7 +374,7 @@ const TowerChallengeScreen = () => {
 						<Text style={styles.descriptionBullet}>• 각 레벨마다 5문제를 모두 맞춰야 클리어!</Text>
 						<Text style={styles.descriptionBullet}>• 클리어 시 특별한 보상을 획득할 수 있습니다</Text>
 						<Text style={styles.descriptionBullet}>• 하루 1회만 도전 가능 (매일 자정 초기화)</Text>
-						<Text style={styles.descriptionBullet}>• 광고 시청으로 최대 3회 추가 도전 가능</Text>
+						<Text style={styles.descriptionBullet}>• {adsRemoved ? '보너스로' : '광고 시청으로'} 최대 3회 추가 도전 가능</Text>
 					</View>
 				</Animated.View>
 

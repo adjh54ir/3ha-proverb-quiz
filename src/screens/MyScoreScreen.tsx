@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 import {
 	View,
@@ -505,7 +505,7 @@ const MyScoreScreen = () => {
 			<ScrollView
 				ref={scrollRef}
 				style={styles.container}
-				contentContainerStyle={{ paddingBottom: SPACING_H.xxxxl, flexGrow: 1 }}
+				contentContainerStyle={{ paddingBottom: SCROLL_TOP_CLEARANCE, flexGrow: 1 }}
 				onScroll={onMainScroll}
 				scrollEventThrottle={16}
 				refreshControl={<RefreshControl
@@ -959,7 +959,7 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'today') && (
 				<View style={styles.sectionHeaderStatic}>
 					<View style={styles.iconCircle4}>
-						<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(16)} color={COLORS.textWhite} />
+						<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(16)} color={COLORS.textOnVivid} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 오늘의 퀴즈</Text>
 				</View>
@@ -979,9 +979,15 @@ const MyScoreScreen = () => {
 
 								updateMarkedQuizDatesOnSelect(date, selectedDate, setMarkedQuizDates, todayQuizDataList);
 							}}
+							// 글자색을 안 주면 라이브러리 기본(#2d4150)이 다크 표면 위에서 사라진다 — CheckInModal 달력과 같은 토큰
 							theme={{
 								calendarBackground: COLORS.surface,
 								todayTextColor: COLORS.primary,
+								dayTextColor: COLORS.text,
+								monthTextColor: COLORS.textStrong,
+								textSectionTitleColor: COLORS.textLight,
+								textDisabledColor: COLORS.borderDark,
+								arrowColor: COLORS.primary,
 								textDayFontSize: FONT_SIZES.md,
 								textMonthFontSize: FONT_SIZES.lg,
 								textDayHeaderFontSize: FONT_SIZES.smPlus,
@@ -1017,7 +1023,7 @@ const MyScoreScreen = () => {
 						)}
 
 						{selectedDate && selectedQuizData && (
-							<View style={[styles.sectionBox, { marginTop: SPACING_H.md, borderWidth: 0, paddingHorizontal: 0, paddingVertical: SPACING_H.xsPlus, backgroundColor: 'transparent' }]}>
+							<View style={{ marginTop: SPACING_H.md }}>
 								<Text style={styles.sectionSubtitle}>{selectedDate} 퀴즈 결과</Text>
 								{selectedQuizData?.todayQuizIdArr.map((quizId, idx) => {
 									const userAnswer = selectedQuizData.selectedAnswers?.[quizId];
@@ -1102,7 +1108,7 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'time') && (
 				<View style={styles.sectionHeaderStatic}>
 					<View style={styles.iconCircle3}>
-						<IconComponent type="materialIcons" name="timer" size={scaledSize(16)} color={COLORS.textWhite} />
+						<IconComponent type="materialIcons" name="timer" size={scaledSize(16)} color={COLORS.textOnVivid} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 타임 챌린지 결과</Text>
 				</View>
@@ -1119,7 +1125,7 @@ const MyScoreScreen = () => {
 							<Text style={styles.noRecordText}>아직 기록이 없습니다. 챌린지를 시작해보세요!</Text>
 						) : (
 							timeChallengeResults.map((item, index) => (
-									<View key={index} style={styles.recordCard}>
+									<View key={index} style={[styles.recordCard, index === timeChallengeResults.length - 1 && styles.lastItem]}>
 										<View style={styles.rankRow}>
 											{index === 0 && (
 												<>
@@ -1158,7 +1164,8 @@ const MyScoreScreen = () => {
 														type="FontAwesome"
 														size={scaledSize(18)}
 														color={COLORS.accentOrangeLight}
-														style={{ marginRight: SPACING_W.lg }}
+														// 아이콘(18)+여백 = 1·2등(24+8, 20+12)과 같은 32 → 등수 라벨 좌측선 정렬
+														style={{ marginRight: SPACING_W.mdPlus }}
 													/>
 													<Text style={styles.thirdRankLabel}>3등</Text>
 													<Text style={styles.thirdRankScore}>
@@ -1177,7 +1184,7 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'tower') && (
 				<View style={styles.sectionHeaderStatic}>
 					<View style={[styles.iconCircle3, { backgroundColor: COLORS.accentSky }]}>
-						<IconComponent type="fontAwesome6" name="tower-observation" size={scaledSize(14)} color={COLORS.textWhite} />
+						<IconComponent type="fontAwesome6" name="tower-observation" size={scaledSize(14)} color={COLORS.textOnVivid} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 타워 챌린지</Text>
 				</View>
@@ -1295,7 +1302,7 @@ const MyScoreScreen = () => {
 					<>
 						<View style={styles.sectionHeaderStatic}>
 							<View style={styles.iconCircle5}>
-								<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(16)} color={COLORS.textWhite} />
+								<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(16)} color={COLORS.textOnAccent} />
 							</View>
 							<Text style={styles.sectionTitle}>나의 뱃지</Text>
 						</View>
@@ -1330,14 +1337,15 @@ const MyScoreScreen = () => {
 								if (list.length === 0) {
 									return <Text style={styles.emptyText}> - 표시할 뱃지가 없습니다.</Text>;
 								}
-								return list.map((badge) => {
+								return list.map((badge, badgeIndex) => {
 									const earned = earnedBadgeIds.includes(badge.id);
 									const rarity = BADGE_RARITY_META[badge.rarity] ?? BADGE_RARITY_META.common;
 									return (
 										<TouchableOpacity
 											key={badge.id}
 											activeOpacity={0.7}
-											style={[styles.badgeCard, earned && styles.badgeCardActive]}
+											// 마지막 카드는 marginBottom 을 빼야 카드 안 위(16)·아래 여백이 같아진다
+											style={[styles.badgeCard, earned && styles.badgeCardActive, badgeIndex === list.length - 1 && styles.lastItem]}
 											onPress={() => openBadgePopup(badge)}>
 											<View style={[styles.iconBox, earned && { backgroundColor: rarity.soft }]}>
 												<IconComponent
@@ -1432,6 +1440,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	badgeFilterText: { fontSize: FONT_SIZES.smPlus, fontWeight: '700', color: COLORS.textSecondary },
 	badgeFilterTextActive: { color: COLORS.primaryDark },
 
+	lastItem: { marginBottom: 0 },
 	badgeCard: {
 		flexDirection: 'row',
 		alignItems: 'flex-start',
@@ -2178,7 +2187,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderColor: COLORS.border,
 		borderRadius: RADIUS.lg,
 		backgroundColor: COLORS.surface,
-		marginHorizontal: scaleWidth(-8),
+		// 바깥 테두리를 위 카드(히어로·점수 카드·탭 바)와 같은 좌우선에 맞춘다. 예전 -8 은 테두리만 8dp 밖으로 튀어나왔다.
 		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: SPACING_H.md,
 		marginTop: SPACING_H.sm,

@@ -50,6 +50,9 @@ const LIGHT_COLORS = {
 	primaryBg: '#F0FDF4', // 그린 배경 틴트
 	primarySoft: '#DCFCE7', // 배지/칩 배경
 	primaryBorder: '#DCFCE7', // 그린 보더 틴트
+	// 흰 글자가 올라가는 주요 버튼 채움. primary(#22C55E)는 흰 글자 대비가 2.28 이라 한 단계 진한 green-600 을 쓴다(3.30).
+	// 칩·진행바·아이콘처럼 글자가 없는 채움은 계속 primary 를 쓴다.
+	primaryFill: '#16A34A',
 
 	// ===== Secondary (Blue) — 보조 강조/링크/정보 =====
 	secondary: '#3B82F6',
@@ -66,6 +69,9 @@ const LIGHT_COLORS = {
 	textMuted: '#475569', // 본문보다 한 톤 진한 보조 텍스트
 	textDeep: '#0F172A', // 가장 진한 텍스트
 	textWhite: '#FFFFFF', // 컬러 배경 위 텍스트 (모드 무관 고정)
+	// 선명한 액센트 채움(primaryDark/accentFlame/accentTeal/accentSky) 위 아이콘·글자.
+	// 라이트는 흰색 그대로, 다크는 액센트가 한 단계 밝아져 흰 글자가 묻히므로 진한 잉크로 뒤집는다.
+	textOnVivid: '#FFFFFF',
 
 	// ===== Background / Surface =====
 	background: '#F8FAFC', // 화면 기본 배경
@@ -145,10 +151,13 @@ const DARK_COLORS: AppColors = {
 	primary: '#34D399',
 	primaryLight: '#6EE7B7',
 	primaryDark: '#22C55E',
-	primaryDeep: '#16A34A',
+	// ~Deep 은 옅은 틴트 위 진한 글자용이라 다크에서는 밝게 뒤집어야 한다(#16A34A 는 primarySoft 위 2.76).
+	// 사용처가 전부 글자·아이콘이라 배경으로 쓰이는 곳은 없다.
+	primaryDeep: '#86EFAC',
 	primaryBg: '#10281C',
 	primarySoft: '#14532D',
 	primaryBorder: '#166534',
+	primaryFill: '#16A34A', // 다크 primary(#34D399)는 흰 글자 대비 1.92 → 라이트와 같은 green-600
 
 	// ===== Secondary (Blue) =====
 	secondary: '#60A5FA',
@@ -165,6 +174,7 @@ const DARK_COLORS: AppColors = {
 	textMuted: '#B6C0CE',
 	textDeep: '#FFFFFF',
 	textWhite: '#FFFFFF',
+	textOnVivid: '#1F2937',
 
 	// ===== Background / Surface =====
 	background: '#0F172A',

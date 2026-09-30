@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { scaledSize } from '@/utils';
 import IconComponent from './IconComponent';
-import { HIT_SLOP, COLORS, SPACING_W } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, SPACING_H, SPACING_W } from '@/const/common/Theme';
 
 /**
  * 모달 공통 닫기(X) 버튼 — 모든 콘텐츠 모달의 닫기 위치/아이콘/색을 통일합니다.
@@ -34,9 +34,12 @@ export default ModalCloseButton;
 const styles = StyleSheet.create({
 	btn: {
 		position: 'absolute',
-		top: scaleHeight(12),
-		right: scaleWidth(12),
+		// 카드 paddingTop(xl) + heading 타이틀 첫 줄의 세로 중앙에 X 중앙이 오도록 lg.
+		// (12 일 때는 X 가 타이틀보다 7px 가량 위로 떠 보였다)
+		top: SPACING_H.lg,
+		right: SPACING_W.md,
 		zIndex: 20,
-		padding: SPACING_W.xs,
+		paddingHorizontal: SPACING_W.xs,
+		paddingVertical: SPACING_H.xs,
 	},
 });

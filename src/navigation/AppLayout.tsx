@@ -8,11 +8,14 @@ import { CONTENT_MAX_WIDTH, isTablet, scaleHeight } from '@/utils';
 import { COLORS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
+import useAdsRemoved from '@/hooks/useAdsRemoved';
 import BootSplash from 'react-native-bootsplash'; // 추가
 import notifee, { EventType } from '@notifee/react-native';
 import { takePendingRoute } from '@/utils/PendingNotification';
 import { useThemeMode } from '@/hooks/useThemeMode';
 import { AppAlertHost } from '@/screens/common/modal/AppAlert';
+import { FullScreenPortalHost } from '@/screens/common/atomic/FullScreenPortal';
+import ThemeTransitionOverlay from '@/components/animation/ThemeTransitionOverlay';
 
 const AD_ALLOWED_ROUTES = [
 	Paths.TODAY_QUIZ,
@@ -43,7 +46,8 @@ const AppLayout = () => {
 	const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
 	const { height: screenHeight } = Dimensions.get('window');
 
-	const shouldShowAd = useMemo(() => AD_ALLOWED_ROUTES.includes(currentRoute as Paths), [currentRoute]);
+	const adsRemoved = useAdsRemoved(); // 광고 제거 구독(또는 평생 구매) 중이면 배너 영역 자체를 접는다
+	const shouldShowAd = useMemo(() => !adsRemoved && AD_ALLOWED_ROUTES.includes(currentRoute as Paths), [adsRemoved, currentRoute]);
 	// 스토어 스크린샷을 찍을 때만 `const shouldShowAd = false` 로 바꾼다 (appstore/capture.sh 참고)
 
 	// ✅ 라우트별 배경색 지정
@@ -229,7 +233,7 @@ const AppLayout = () => {
 						래퍼를 씌워도 그대로 삐져나온다. 좁히면 더 작은 광고 규격이 잡혀 손해만 본다.
 					*/}
 					<View style={[styles.adWrapperAbsolute, !shouldShowAd && { height: 0, opacity: 0 }]}>
-						<AdmobBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} />
+						{!adsRemoved && <AdmobBannerAd visible={shouldShowAd} paramMarginTop={0} paramMarginBottom={0} />}
 					</View>
 					{shouldShowAd && <View style={{ paddingTop: getAdPaddingTop() }} />}
 					<View style={[styles.navigatorWrapper, { paddingTop: getNavigatorPaddingTop(shouldShowAd), backgroundColor }]}>
@@ -237,6 +241,10 @@ const AppLayout = () => {
 					</View>
 				</View>
 			</SafeAreaView>
+			{/* 태블릿에서 본문 기둥 밖까지 덮어야 하는 오버레이(광고 준비 딤·컨페티)가 그려지는 곳 */}
+			<FullScreenPortalHost />
+			{/* 라이트/다크 전환 페이드 — 기둥 밖 여백·광고 영역까지 함께 덮어야 해서 루트에 둔다 */}
+			<ThemeTransitionOverlay />
 			{/* 앱 테마를 따르는 공용 알림창. 화면이 바뀌어도 살아 있도록 루트에 한 번만 둔다. */}
 			<AppAlertHost />
 		</NavigationContainer>

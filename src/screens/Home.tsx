@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing, Dimensions } from 'react-native';
+import { FullScreenPortal } from '@/screens/common/atomic/FullScreenPortal';
 import { useFocusEffect } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 import { Paths } from '@/navigation/conf/Paths';
@@ -13,7 +14,7 @@ import BadgeListModal from './modal/BadgeListModal';
 import { HIT_SLOP, COLORS, FONT_SIZES, HERO, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { CONTENT_MAX_WIDTH, isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateUtils from '@/utils/DateUtils';
 import '@/utils/KoreanLocale'; // 달력/moment 한국어 설정 (단일 소스)
@@ -31,7 +32,7 @@ import TowerRewardSection from '@/components/TowerRewardSection';
 import { playFinish } from '@/utils/SoundUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 
 const greetingMessages = [
@@ -441,16 +442,18 @@ const Home = () => {
 		<SafeAreaView style={styles.main} edges={['top']}>
 			{/* 컨페티는 화면 전체를 덮는 큰 모션이라 '애니메이션 줄이기'에서는 생략한다. */}
 			{showConfetti && !reducedMotion && (
-				<View style={styles.globalConfettiWrapper}>
-					{/* 컨페티는 본문 기둥 안에서 터진다 — 태블릿은 기둥 가운데를 써야 한가운데서 퍼진다. */}
-					<ConfettiCannon
-						count={60}
-						origin={{ x: isTablet ? CONTENT_MAX_WIDTH / 2 : scaleWidth(180), y: 0 }}
-						fadeOut
-						explosionSpeed={500}
-						fallSpeed={2500}
-					/>
-				</View>
+				// 태블릿은 루트로 올려 화면 전체에서 터진다(기둥 안에 두면 좌우 여백엔 안 떨어지고 오른쪽 밖으로 샌다)
+				<FullScreenPortal>
+					<View style={styles.globalConfettiWrapper}>
+						<ConfettiCannon
+							count={60}
+							origin={{ x: isTablet ? Dimensions.get('window').width / 2 : scaleWidth(180), y: 0 }}
+							fadeOut
+							explosionSpeed={500}
+							fallSpeed={2500}
+						/>
+					</View>
+				</FullScreenPortal>
 			)}
 			<Animated.View
 				style={[
@@ -592,12 +595,12 @@ const Home = () => {
 										onPress={refreshProgress}
 										activeOpacity={0.8}
 										hitSlop={HIT_SLOP}>
-										<IconComponent name="refresh" type="materialIcons" size={scaledSize(14)} color={COLORS.textWhite} />
+										<IconComponent name="refresh" type="materialIcons" size={scaledSize(14)} color={COLORS.textOnVivid} />
 										<Text style={styles.scoreBadgeTextItem}>기록을 불러오지 못했습니다 · 다시 시도</Text>
 									</TouchableOpacity>
 								) : (
 									<View style={styles.scoreBadgeItem}>
-										<IconComponent name="leaderboard" type="materialIcons" size={scaledSize(14)} color={COLORS.textWhite} />
+										<IconComponent name="leaderboard" type="materialIcons" size={scaledSize(14)} color={COLORS.textOnVivid} />
 										<Text style={styles.scoreBadgeTextItem}>
 											{progressStatus === 'ready' ? `${totalScore.toLocaleString()}점` : '불러오는 중…'}
 										</Text>
@@ -871,7 +874,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		flexGrow: 1,
 		// 좌우 여백은 다른 화면(속담 사전/나의 활동/즐겨찾기 …)과 같은 lg 로 맞춘다.
 		paddingHorizontal: SPACING_W.lg,
-		paddingBottom: SPACING_H.xxxxl, // 하단 잘림 방지 여백
+		paddingBottom: SCROLL_TOP_CLEARANCE, // 하단 잘림 방지 여백
 	},
 
 	// ===== 상단 히어로(캐릭터/게이지/등급) 영역 =====
@@ -962,7 +965,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		zIndex: 20,
 	},
 	petSpeechText: {
-		color: COLORS.textWhite,
+		// 말풍선 배경이 textStrong(다크에선 거의 흰색)인 반전 칩 → 글자는 surface 로 뒤집는다
+		color: COLORS.surface,
 		fontSize: FONT_SIZES.xs,
 		fontWeight: '700',
 		textAlign: 'center',
@@ -1052,7 +1056,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.danger,
 	},
 	scoreBadgeTextItem: {
-		color: COLORS.textWhite,
+		color: COLORS.textOnVivid, // primaryDark/danger 채움 위 — 다크에서 흰 글자가 묻힌다
 		fontSize: FONT_SIZES.md,
 		fontWeight: '600',
 		marginLeft: SPACING_W.xs,
@@ -1253,7 +1257,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	quickActionRow: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		marginTop: SPACING_H.sm,
+		// 바로 위 MascotMoment 의 marginBottom(md)만으로 다른 카드 간격(12)과 같아진다
 		gap: SPACING_W.md,
 	},
 	quickActionCard: {

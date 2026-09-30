@@ -456,9 +456,9 @@ const styles = themedStyles(() => StyleSheet.create({
 	// ===== 하단 버튼 =====
 	primaryButton: {
 		width: '100%',
-		height: scaleHeight(48),
+		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 		marginTop: SPACING_H.xl,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		borderRadius: RADIUS.md,
 		alignItems: 'center',
 		justifyContent: 'center',

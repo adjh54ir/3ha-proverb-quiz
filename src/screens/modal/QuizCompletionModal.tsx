@@ -163,7 +163,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                                 onPress={onReviewWrong}
                                 activeOpacity={0.85}
                                 accessibilityRole="button">
-                                <IconComponent type="MaterialIcons" name="replay" size={scaledSize(18)} color={COLORS.textWhite} />
+                                <IconComponent type="MaterialIcons" name="replay" size={scaledSize(18)} color={COLORS.textOnAccent} />
                                 <Text style={styles.reviewWrongButtonText}>틀린 문제 {wrong}개 다시 풀기</Text>
                             </TouchableOpacity>
                         )}
@@ -304,7 +304,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                             onPress={onReviewWrong}
                             activeOpacity={0.85}
                             accessibilityRole="button">
-                            <IconComponent type="MaterialIcons" name="replay" size={scaledSize(18)} color={COLORS.textWhite} />
+                            <IconComponent type="MaterialIcons" name="replay" size={scaledSize(18)} color={COLORS.textOnAccent} />
                             <Text style={styles.reviewWrongButtonText}>틀린 문제 {wrong}개 다시 풀기</Text>
                         </TouchableOpacity>
                     )}
@@ -528,7 +528,7 @@ const styles = themedStyles(() => StyleSheet.create({
     // 오답 재도전 CTA — 확인 버튼 위에 한 줄로 놓아 다음 행동을 먼저 제안한다.
     reviewWrongButton: {
         width: '100%',
-        height: scaleHeight(48),
+        minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -541,12 +541,12 @@ const styles = themedStyles(() => StyleSheet.create({
     reviewWrongButtonText: {
         fontSize: FONT_SIZES.lg,
         fontWeight: '700',
-        color: COLORS.textWhite,
+        color: COLORS.textOnAccent, // 앰버(warningDark) 채움 위 — 흰 글자는 두 모드 모두 대비 부족
     },
     primaryButton: {
         width: '100%',
-        height: scaleHeight(48),
-        backgroundColor: COLORS.primary,
+        minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
+        backgroundColor: COLORS.primaryFill,
         borderRadius: RADIUS.md,
         alignItems: 'center',
         justifyContent: 'center',
@@ -563,7 +563,7 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     secondaryButton: {
         flex: 1,
-        height: scaleHeight(48),
+        minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
         backgroundColor: COLORS.surfaceAlt,
         borderRadius: RADIUS.md,
         alignItems: 'center',

@@ -20,6 +20,15 @@ import { COLORS, HIT_SLOP, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/
 /** 이 높이(px)만큼 내려가면 버튼이 나타난다. 화면마다 제각각이던 기준을 하나로 맞춘다. */
 export const SCROLL_TOP_THRESHOLD = scaleHeight(120);
 
+const SIZE = scaleWidth(48); // 터치 최소 권장 크기(44) 이상
+
+/**
+ * 이 버튼을 쓰는 스크롤 화면의 하단 여백(contentContainer paddingBottom).
+ * 버튼은 하단 lg 위에 48 크기로 떠 있어서, 여백이 40 이면 스크롤 끝에서 마지막 항목 오른쪽을 가린다.
+ * 버튼 영역 + 한 칸(sm) 을 비워 끝까지 내려도 마지막 줄이 버튼 위로 드러나게 한다.
+ */
+export const SCROLL_TOP_CLEARANCE = SPACING_H.lg + SIZE + SPACING_H.sm;
+
 interface ScrollTopButtonProps {
 	visible: boolean;
 	onPress: () => void;
@@ -61,8 +70,6 @@ const ScrollTopButton = ({ visible, onPress, bottom }: ScrollTopButtonProps) => 
 };
 
 export default ScrollTopButton;
-
-const SIZE = scaleWidth(48); // 터치 최소 권장 크기(44) 이상
 
 const styles = themedStyles(() =>
 	StyleSheet.create({

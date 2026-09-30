@@ -171,7 +171,7 @@ const styles = themedStyles(() =>
 			backgroundColor: COLORS.dim,
 			justifyContent: 'center',
 			alignItems: 'center',
-			paddingHorizontal: SPACING_W.xxl,
+			paddingHorizontal: SPACING_W.lg, // 다른 대화상자와 같은 딤 여백
 		},
 		card: {
 			width: '100%',
@@ -181,9 +181,9 @@ const styles = themedStyles(() =>
 			borderRadius: RADIUS.xl,
 			borderWidth: 1,
 			borderColor: COLORS.border,
-			paddingHorizontal: SPACING_W.xl,
-			paddingTop: SPACING_H.xl,
-			paddingBottom: SPACING_H.lg,
+			// 앱 대화상자 표준 — 좌우 lg / 위아래 xl
+			paddingHorizontal: SPACING_W.lg,
+			paddingVertical: SPACING_H.xl,
 			// iOS 는 테두리 있는 카드를 clip 할 때만 배경을 뷰 레이어에 직접 칠한다.
 			// 없으면 scale 로 등장하는 첫 프레임에서 배경만 95% 크기로 그려진다(모달 레이아웃 규칙 6).
 			overflow: 'hidden',
@@ -202,7 +202,7 @@ const styles = themedStyles(() =>
 		},
 		buttonRow: {
 			flexDirection: 'row',
-			columnGap: SPACING_W.sm,
+			columnGap: SPACING_W.md,
 			marginTop: SPACING_H.xl,
 		},
 		buttonColumn: {
@@ -213,7 +213,7 @@ const styles = themedStyles(() =>
 			flex: 1,
 			minHeight: scaleHeight(48), // 터치 최소 높이 확보
 			borderRadius: RADIUS.md,
-			backgroundColor: COLORS.primary,
+			backgroundColor: COLORS.primaryFill,
 			alignItems: 'center',
 			justifyContent: 'center',
 			paddingHorizontal: SPACING_W.md,

@@ -33,12 +33,15 @@ const cell = (backgroundColor: string, color: string): DateMark => ({
 	},
 });
 
-/** 출석한 날 — 오늘은 앰버, 이전 날은 그린 */
-export const buildCheckedInMark = (isToday: boolean): DateMark => ({
-	marked: true,
-	dotColor: COLORS.textWhite,
-	...cell(isToday ? COLORS.warning : COLORS.primary, COLORS.textWhite),
-});
+/** 출석한 날 — 오늘은 앰버, 이전 날은 그린. 앰버 위에는 흰 글자 대신 고정 잉크(textOnAccent) */
+export const buildCheckedInMark = (isToday: boolean): DateMark => {
+	const ink = isToday ? COLORS.textOnAccent : COLORS.textWhite;
+	return {
+		marked: true,
+		dotColor: ink,
+		...cell(isToday ? COLORS.warning : COLORS.primary, ink),
+	};
+};
 
 /** 퀴즈 기록만 있고 출석은 안 한 날 */
 export const buildQuizOnlyMark = (): DateMark => ({

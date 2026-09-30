@@ -357,7 +357,7 @@ const MyProverbBook = () => {
 								<Text style={styles.actionItemLabel} numberOfLines={1}>{actionSheet?.title}</Text>
 								{!!actionSheet?.description && <Text style={styles.actionItemDesc} numberOfLines={1}>{actionSheet.description}</Text>}
 							</View>
-							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.border} />
+							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.textLight} />
 						</TouchableOpacity>
 						<View style={styles.actionDivider} />
 						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; handoff(() => setActionSheet(null), () => setAddProverbModal(b)); }}>
@@ -368,7 +368,7 @@ const MyProverbBook = () => {
 								<Text style={styles.actionItemLabel}>속담 추가</Text>
 								<Text style={styles.actionItemDesc}>속담집에 속담 추가하기</Text>
 							</View>
-							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.border} />
+							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.textLight} />
 						</TouchableOpacity>
 						<View style={styles.actionDivider} />
 						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; handoff(() => setActionSheet(null), () => setFormTarget(b)); }}>
@@ -379,7 +379,7 @@ const MyProverbBook = () => {
 								<Text style={styles.actionItemLabel}>수정</Text>
 								<Text style={styles.actionItemDesc}>이름, 색상, 아이콘 변경하기</Text>
 							</View>
-							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.border} />
+							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.textLight} />
 						</TouchableOpacity>
 						<View style={styles.actionDivider} />
 						<TouchableOpacity style={styles.actionItem} onPress={() => { const b = actionSheet; handoff(() => setActionSheet(null), () => setDeleteConfirm(b)); }}>
@@ -390,7 +390,7 @@ const MyProverbBook = () => {
 								<Text style={[styles.actionItemLabel, { color: COLORS.danger }]}>삭제</Text>
 								<Text style={styles.actionItemDesc}>속담집을 영구적으로 삭제</Text>
 							</View>
-							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.border} />
+							<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(18)} color={COLORS.textLight} />
 						</TouchableOpacity>
 						<TouchableOpacity style={styles.actionCancelBtn} onPress={() => setActionSheet(null)}>
 							<Text style={styles.actionCancelText}>취소</Text>
@@ -509,7 +509,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginTop: SPACING_H.md,
 		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 	},
 	quizBtnDisabled: { backgroundColor: COLORS.borderDark },
 	quizBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '700' },
@@ -529,7 +529,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: SPACING_W.xxxl,
+		paddingHorizontal: SPACING_W.lg, // 다른 대화상자와 같은 딤 여백
 	},
 	confirmModal: {
 		width: '100%',
@@ -537,8 +537,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		maxWidth: MODAL_MAX_WIDTH,
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.xl,
-		paddingHorizontal: SPACING_W.xl,
-		paddingVertical: SPACING_H.xxl,
+		// 앱 대화상자 표준 — 좌우 lg / 위아래 xl, 1px 테두리
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.xl,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		overflow: 'hidden',
 		alignItems: 'center',
 	},
 	confirmTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },

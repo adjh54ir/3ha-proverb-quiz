@@ -309,9 +309,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		columnGap: SPACING_W.sm,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		borderRadius: RADIUS.md,
-		height: scaleHeight(48),
+		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 	},
 	rewardBtnText: {
 		color: COLORS.textWhite,
@@ -325,7 +325,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		columnGap: SPACING_W.xs,
 		backgroundColor: COLORS.primaryBg,
 		borderRadius: RADIUS.md,
-		height: scaleHeight(48),
+		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 	},
 	rewardDoneText: {
 		color: COLORS.primaryDeep,

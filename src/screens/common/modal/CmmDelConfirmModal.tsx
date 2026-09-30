@@ -71,10 +71,14 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     modalContainer: {
         width: '100%',
-        maxWidth: scaleWidth(360),
+        maxWidth: scaleWidth(340),
         maxHeight: '100%',
         backgroundColor: COLORS.surface,
         borderRadius: RADIUS.xl,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        // scale 로 등장하는 테두리 카드 (모달 레이아웃 규칙 7)
+        overflow: 'hidden',
         paddingHorizontal: SPACING_W.lg,
         paddingVertical: SPACING_H.xl,
     },

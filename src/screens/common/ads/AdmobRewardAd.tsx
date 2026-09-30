@@ -4,7 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { RewardedAd, TestIds, RewardedAdEventType, AdEventType } from 'react-native-google-mobile-ads';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { FullScreenPortal } from '@/screens/common/atomic/FullScreenPortal';
 import { recordAdClick } from '@/utils/AdGuardUtils';
+import { isAdsRemoved } from '@/services/PurchaseService';
 
 const AD_UNIT_ID = Platform.select({
   ios: __DEV__ ? TestIds.REWARDED : GOOGLE_ADMOV_IOS_REWARD!,
@@ -20,6 +22,11 @@ const AdmobRewardAd: React.FC<{
   const rewardedRef = useRef(false); // 보상 중복 방지
 
   useEffect(() => {
+    // 광고 제거 구독 중 → 광고 없이 바로 보상
+    if (isAdsRemoved()) {
+      onRewarded();
+      return;
+    }
     const ad = RewardedAd.createForAdRequest(AD_UNIT_ID, {
       requestNonPersonalizedAdsOnly: true,
     });
@@ -69,14 +76,19 @@ const AdmobRewardAd: React.FC<{
     };
   }, []);
 
+  if (isAdsRemoved()) return null;
+
+  // 태블릿은 루트로 올려 좌우 여백까지 딤을 덮는다(화면 안에 두면 본문 기둥 경계에서 잘린다)
   return (
-    <View style={styles.adOverlay}>
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-        <Text style={styles.loadingTxt}>광고를 준비 중입니다…</Text>
-        <Text style={styles.subTxt}>시청 완료 시 도전 기회 +1회</Text>
+    <FullScreenPortal>
+      <View style={styles.adOverlay}>
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingTxt}>광고를 준비 중입니다…</Text>
+          <Text style={styles.subTxt}>시청 완료 시 도전 기회 +1회</Text>
+        </View>
       </View>
-    </View>
+    </FullScreenPortal>
   );
 };
 

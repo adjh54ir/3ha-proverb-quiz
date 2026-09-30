@@ -1388,7 +1388,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.warning,
 	},
 	learningButton: {
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 	},
 	// 앰버(learnedButton) 배경 위에서는 흰 글자가 묻힌다 — 고정 잉크로 바꾼다.
 	buttonTextOnAmber: {
@@ -1456,7 +1456,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderColor: COLORS.border,
 		borderRadius: RADIUS.lg,
 		paddingHorizontal: SPACING_W.sm,
-		paddingVertical: SPACING_H.sm,
+		paddingTop: SPACING_H.sm,
+		// 하단 버튼이 앞면(cardFace paddingVertical lg)과 같은 높이에 오도록 아래만 lg
+		paddingBottom: SPACING_H.lg,
 		flexDirection: 'column',
 		alignSelf: 'center',
 		// iOS 는 테두리 있는 카드를 clip 할 때만 배경을 뷰 레이어에 직접 칠한다.
@@ -1753,7 +1755,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: '100%',
 		alignItems: 'center',
 		paddingTop: SPACING_H.sm,
-		paddingHorizontal: SPACING_W.lg, // ➕ 앞면 카드와 동일한 좌우 여백
+		// cardFace2 좌우(sm) + 여기(sm) = 앞면 cardFace 의 lg(16). lg 를 주면 뒷면 버튼만 좁아져 뒤집을 때 튄다.
+		paddingHorizontal: SPACING_W.sm,
 	},
 	flagImageSquare: {
 		// width: '100%',

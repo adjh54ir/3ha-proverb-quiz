@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Animated, FlatList, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { FullScreenPortal } from '@/screens/common/atomic/FullScreenPortal';
 import Modal from '@/screens/common/atomic/AppModal';
 import {RouteProp, useIsFocused, useRoute} from '@react-navigation/native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
@@ -19,9 +20,9 @@ import { QuizBadgeInterceptor } from '@/services/interceptor/QuizBadgeIntercepto
 import { CONST_BADGES } from '@/const/ConstBadges';
 import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
-import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { shuffle } from '@/utils/ArrayUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, getThemeMode, themedStyles, themedValue } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber } from '@/screens/common/CommonProverbModule';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
@@ -1196,9 +1197,11 @@ const QuizScreen = () => {
 							</Animated.View>
 						)}
 
-						{/* 컨페티는 본문 기둥 안에서 터진다 — 태블릿은 화면 반이 아니라 기둥 반이 한가운데다. */}
+						{/* 태블릿은 루트로 올려 화면 전체에서 터진다 — 폰은 기둥 = 화면이라 제자리 */}
 						{confettiKey > 0 && !reducedMotion && (
-							<ConfettiCannon key={confettiKey} count={100} origin={{ x: Math.min(screenWidth, CONTENT_MAX_WIDTH) / 2, y: 0 }} fadeOut autoStart />
+							<FullScreenPortal>
+								<ConfettiCannon key={confettiKey} count={100} origin={{ x: screenWidth / 2, y: 0 }} fadeOut autoStart />
+							</FullScreenPortal>
 						)}
 					</View>
 			{/* 뱃지 모달 */}
@@ -1567,7 +1570,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderTopColor: COLORS.border,
 	},
 	exitButton: {
-		backgroundColor: COLORS.textSecondary,
+		// textSecondary 는 다크에서 옅은 회색(#A3AEBF)이라 흰 글자 대비가 2.2 로 떨어진다 → 다크만 고정 톤(darkMuted)
+		backgroundColor: getThemeMode() === 'dark' ? COLORS.darkMuted : COLORS.textSecondary,
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.xxl,
 		// ponytail: 터치 영역 44 이상 보장을 위한 고정 최소 높이
@@ -1591,7 +1595,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	exitModal: {
 		width: '100%',
-		maxWidth: scaleWidth(420),
+		maxWidth: MODAL_MAX_WIDTH, // 태블릿에서 다른 대화상자(500)보다 넓어지지 않게
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,

@@ -5,7 +5,8 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing, ScrollView 
 import Modal from '@/screens/common/atomic/AppModal';
 import {useFocusEffect} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { getLevelInkColor } from '@/screens/common/CommonProverbModule';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,7 +27,7 @@ import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
-import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 
 type QuizModeScreenRouteParams = {
@@ -216,9 +217,9 @@ const QuizModeScreen = () => {
 						{selectedMode && (
 							<View style={[styles.selectedModeBoxEnhanced, { backgroundColor: withAlpha(selectedMode.color, ALPHA.soft) }]}>
 								<View style={styles.selectedModeRow}>
-									<IconComponent type={selectedMode.type} name={selectedMode.icon} size={scaledSize(20)} color={selectedMode.color} style={{ marginRight: SPACING_W.sm }} />
+									<IconComponent type={selectedMode.type} name={selectedMode.icon} size={scaledSize(20)} color={getLevelInkColor(selectedMode.color)} style={{ marginRight: SPACING_W.sm }} />
 									<Text style={styles.selectedModeTextEnhanced}>
-										현재 선택한 모드: <Text style={[styles.selectedModeHighlight, { color: selectedMode.color }]}>{selectedMode.label}</Text>
+										현재 선택한 모드: <Text style={[styles.selectedModeHighlight, { color: getLevelInkColor(selectedMode.color) }]}>{selectedMode.label}</Text>
 									</Text>
 								</View>
 							</View>
@@ -281,7 +282,7 @@ const QuizModeScreen = () => {
 												<IconComponent type={item.type} name={item.icon} size={scaledSize(24)} color={COLORS.textWhite} />
 											</View>
 											<View style={styles.levelTextWrap}>
-												<Text style={[styles.levelLabelFull, { color: item.color }]} numberOfLines={1}>
+												<Text style={[styles.levelLabelFull, { color: getLevelInkColor(item.color) }]} numberOfLines={1}>
 													{item.label}
 												</Text>
 												<Text style={styles.levelDescFull} numberOfLines={2}>
@@ -298,7 +299,7 @@ const QuizModeScreen = () => {
 												</View>
 											</View>
 											<View style={styles.levelProgressPill}>
-												<Text style={[styles.levelProgressText, { color: item.color }]}>{`${solved}/${total}`}</Text>
+												<Text style={[styles.levelProgressText, { color: getLevelInkColor(item.color) }]}>{`${solved}/${total}`}</Text>
 											</View>
 											<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.borderDark} />
 										</TouchableOpacity>
@@ -443,7 +444,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	// ===== 스크롤 영역 =====
 	scrollContent: {
 		rowGap: SPACING_H.md,
-		paddingBottom: SPACING_H.xxxxl,
+		paddingBottom: SCROLL_TOP_CLEARANCE,
 	},
 	quizPathEmblems: { alignSelf: 'center', width: scaleWidth(190), height: scaleHeight(54), marginVertical: scaleHeight(-4) },
 	// ===== 선택된 모드 안내 =====
@@ -474,8 +475,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	levelListWrap: {
 		width: '100%',
 		rowGap: SPACING_H.md,
-		// 난이도 카드가 화면 끝에 붙어 보이던 문제 — 최소한 카테고리 그리드 거터(카드 사이 4%) 만큼은 좌우를 띄운다
-		paddingHorizontal: SPACING_W.lg,
+		// 좌우 여백은 centerWrapper(lg) 하나로 처리한다. 여기서 또 주면 카드만 32 로 들어가 탭·선택 박스와 좌측선이 어긋난다.
 	},
 	levelCardFull: {
 		width: '100%',
@@ -485,7 +485,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.lg,
 		paddingVertical: SPACING_H.lg,
-		paddingHorizontal: SPACING_W.xl,
+		paddingHorizontal: SPACING_W.lg,
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
@@ -541,8 +541,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'space-between',
 		width: '100%',
 		rowGap: SPACING_H.md,
-		// 난이도 목록과 같은 좌우 인셋 — 탭을 오갈 때 카드 좌우 끝이 어긋나지 않게 한다
-		paddingHorizontal: SPACING_W.lg,
+		// 좌우 여백은 centerWrapper(lg) 하나로 처리 — 난이도 목록과 같은 좌우선
 	},
 	categoryRowButton: {
 		width: '48%',
@@ -603,9 +602,9 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	modalContent: {
 		width: '100%',
-		maxWidth: scaleWidth(420),
+		maxWidth: MODAL_MAX_WIDTH,
 		backgroundColor: COLORS.surface,
-		paddingHorizontal: SPACING_W.xl,
+		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
 		borderRadius: RADIUS.xl,
 	},

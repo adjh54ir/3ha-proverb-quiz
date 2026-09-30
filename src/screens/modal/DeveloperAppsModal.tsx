@@ -6,7 +6,7 @@ import Modal from '@/screens/common/atomic/AppModal';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
-import { COMMON_APPS_DATA, appStoreUrl } from '@/const/common/CommonAppsData';
+import { COMMON_APPS_DATA, appStoreUrl, isNewApp } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
 import PopInView from '@/components/animation/PopInView';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
@@ -73,16 +73,6 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 		});
 	}, [selectedCategory, searchQuery]);
 
-	const newAppIds = useMemo(
-		() =>
-			new Set(
-				[...COMMON_APPS_DATA.Apps]
-					.sort((a, b) => b.id - a.id)
-					.slice(0, 2)
-					.map((app) => app.id),
-			),
-		[],
-	);
 	/**
 	 * 이 모달 위에 알림창을 바로 띄우면 RN Modal(네이티브 창)이 두 개가 되어
 	 * 이전 모달이 한 프레임 다시 보이고, iOS 에서는 알림창이 아예 뜨지 않을 수 있다.
@@ -182,7 +172,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 										<View style={{ position: 'relative' }}>
 											<Image source={app.icon} style={styles.image} resizeMode="cover" />
 
-											{newAppIds.has(app.id) && (
+											{isNewApp(app) && (
 												<View style={styles.newBadge}>
 													<Text style={styles.newBadgeText}>NEW</Text>
 												</View>

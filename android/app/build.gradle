@@ -85,7 +85,7 @@ android {
         applicationId "com.tha.proverbquiz"     // TODO 변경 필요
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 39
+        versionCode 41
         versionName "2.4.0"
         missingDimensionStrategy "store", "play" // react-native-iap: Google Play 결제 사용
     }
@@ -137,6 +137,15 @@ android {
 }
 
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+
+// JS 번들은 매 빌드 새로 만든다. 번들 태스크의 입력에 node_modules 가 빠져 있어서
+// yarn install 로 패키지가 바뀌어도 UP-TO-DATE/FROM-CACHE 로 옛 번들이 그대로 들어간다.
+// 2.4.0(39·40) 이 그렇게 react-native-iap 없는 번들로 나가 시작 30초 뒤 죽었다
+// ("Requiring unknown module \"undefined\"" → Play 16KB 테스트 비정상 종료로 보고됨).
+tasks.matching { it.name.startsWith("createBundle") && it.name.endsWith("JsAndAssets") }.configureEach {
+    outputs.upToDateWhen { false }
+    outputs.cacheIf { false }
+}
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin

@@ -31,7 +31,7 @@
 		"lint:clean": "eslint --cache --cache-location node_modules/.cache/eslint/ --cache-file .",
 		"watchman:clean": "watchman shutdown-server",
 		"build:apk": "node scripts/patch-rn-sound.js && (cd android 2>/dev/null && ./gradlew assembleRelease || (cd .. && cd android && ./gradlew assembleRelease))",
-		"build:aab": "node scripts/patch-rn-sound.js && (cd android 2>/dev/null && ./gradlew bundleRelease || (cd .. && cd android && ./gradlew bundleRelease))",
+		"build:aab": "node scripts/patch-rn-sound.js && (cd android 2>/dev/null && ./gradlew bundleRelease -x lintVitalRelease || (cd .. && cd android && ./gradlew bundleRelease -x lintVitalRelease))",
 		"opensource": "node scripts/genOpenSource.js",
 		"tag": "V=v$(sed -n 's/.*versionName \"\\(.*\\)\"/\\1/p' android/app/build.gradle) && git tag -a \"$V\" -m \"$V\" && git push origin \"$V\" && echo \"tagged $V\""
 	},

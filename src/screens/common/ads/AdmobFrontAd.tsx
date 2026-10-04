@@ -128,7 +128,7 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 	};
 
 	useEffect(() => {
-		// 개발 빌드·광고 제거 구독 중에는 전면 광고를 띄우지 않는다 — 바로 닫힌 것으로 처리해 다음 흐름을 이어간다
+		// 개발 빌드·광고 제거 이용 중에는 전면 광고를 띄우지 않는다 — 바로 닫힌 것으로 처리해 다음 흐름을 이어간다
 		if (__DEV__ || isAdsRemoved()) {
 			onAdClosed?.();
 			return;

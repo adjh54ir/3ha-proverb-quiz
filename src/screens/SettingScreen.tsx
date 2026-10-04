@@ -1105,7 +1105,7 @@ const SettingScreen = () => {
 										</TouchableOpacity>
 									</View>
 								</View>
-								{/* 광고 제거 구독 */}
+								{/* 광고 제거 (평생 이용권) */}
 								<InAppRemoveAdsSection onOpenPolicy={() => setShowTermsModal(true)} />
 							</View>
 						}

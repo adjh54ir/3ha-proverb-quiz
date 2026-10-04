@@ -46,7 +46,7 @@ const AppLayout = () => {
 	const [currentRoute, setCurrentRoute] = useState<string>(Paths.HOME);
 	const { height: screenHeight } = Dimensions.get('window');
 
-	const adsRemoved = useAdsRemoved(); // 광고 제거 구독(또는 평생 구매) 중이면 배너 영역 자체를 접는다
+	const adsRemoved = useAdsRemoved(); // 광고 제거 이용 중이면 배너 영역 자체를 접는다
 	const shouldShowAd = useMemo(() => !adsRemoved && AD_ALLOWED_ROUTES.includes(currentRoute as Paths), [adsRemoved, currentRoute]);
 	// 스토어 스크린샷을 찍을 때만 `const shouldShowAd = false` 로 바꾼다 (appstore/capture.sh 참고)
 

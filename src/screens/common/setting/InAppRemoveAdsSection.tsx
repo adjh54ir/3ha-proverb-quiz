@@ -6,21 +6,19 @@ import AppAlert from '../modal/AppAlert';
 import useAdsRemoved from '@/hooks/useAdsRemoved';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import {
-	FALLBACK_PRICES,
-	PlanKey,
-	PlanPrices,
-	getPlanPrices,
-	isLifetimeOwner,
+	FALLBACK_PRICE,
+	getRemoveAdsPrice,
+	isFromSubscription,
 	openManageSubscriptions,
+	purchaseRemoveAds,
 	restorePurchases,
 	subscribePurchaseError,
-	subscribeRemoveAds,
 } from '@/services/PurchaseService';
 import { scaledSize, scaleWidth } from '@/utils/DementionUtils';
-import { FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { FONT_SIZES, RADIUS, SPACING_H, SPACING_W, displayFontSize, themedStyles } from '@/const/common/Theme';
 
 /*
-  광고 제거 카드(1개월 구독 / 평생 이용권) — 설정 화면 '앱이 마음에 드셨습니까?' 바로 아래.
+  광고 제거 카드(평생 이용권 하나) — 설정 화면 '앱이 마음에 드셨습니까?' 바로 아래.
   테마와 무관하게 남색 먹빛 + 금박 톤으로 고정한다(라이트/다크 어디서든 '프리미엄'으로 읽히도록).
   구조·결제 흐름은 3ha-four-idioms 의 같은 이름 컴포넌트와 같다.
 */
@@ -40,19 +38,18 @@ const BENEFITS = [
 	'흐름이 끊기지 않는 온전한 속담 공부',
 ];
 
-/** Apple 표준 EULA — 자동 갱신 구독 화면에는 이용약관·개인정보 처리방침 링크가 있어야 심사를 통과한다 (가이드라인 3.1.2) */
+/** Apple 표준 EULA — 1회 결제 상품이라 필수는 아니지만(자동 갱신 구독만 3.1.2 요구) 결제 화면의 약관 안내로 남겨 둔다 */
 const APPLE_EULA_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
 
 const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) => {
 	const adsRemoved = useAdsRemoved();
 	const reducedMotion = useReducedMotion();
-	const [plan, setPlan] = useState<PlanKey>('lifetime');
-	const [prices, setPrices] = useState<PlanPrices>(FALLBACK_PRICES);
+	const [price, setPrice] = useState(FALLBACK_PRICE);
 	const [busy, setBusy] = useState(false);
 
 	useEffect(() => {
-		getPlanPrices().then(setPrices);
-		// 실패 안내는 onSubscribe 가 맡는다 — Android 는 같은 실패가 이벤트와 reject 로 두 번 와서 알림이 겹친다
+		getRemoveAdsPrice().then(setPrice);
+		// 실패 안내는 onPurchase 가 맡는다 — Android 는 같은 실패가 이벤트와 reject 로 두 번 와서 알림이 겹친다
 		return subscribePurchaseError(() => setBusy(false));
 	}, []);
 
@@ -76,9 +73,9 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 		return () => loop.stop();
 	}, [shine, reducedMotion, adsRemoved]);
 
-	const onSubscribe = async () => {
+	const onPurchase = async () => {
 		setBusy(true);
-		const r = await subscribeRemoveAds(plan);
+		const r = await purchaseRemoveAds();
 		// 결제창이 닫히면 로딩 해제 — Android 결제 대기(편의점 결제 등)에서 버튼이 영영 잠기지 않게. 성공은 카드 전환으로 보인다
 		setBusy(false);
 		if (!r.ok) {
@@ -104,10 +101,6 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 		);
 	};
 
-	// 원화 기본가일 때만 개월 환산 노출 (타 통화는 스토어 환산가라 계산이 어긋남)
-	const isKrwBase = prices.lifetime === FALLBACK_PRICES.lifetime && prices.monthly === FALLBACK_PRICES.monthly;
-	const lifetime = isLifetimeOwner();
-
 	return (
 		<View style={styles.card}>
 			<LinearGradient colors={INK} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
@@ -127,12 +120,21 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 
 			{adsRemoved ? (
 				<>
-					<Text style={styles.title}>{lifetime ? '평생 광고 제거 이용 중' : '광고 제거 이용 중'}</Text>
+					<Text style={styles.title}>평생 광고 제거 이용 중</Text>
 					<Text style={styles.subtitle}>응원해 주셔서 감사합니다.{'\n'}광고 없이 오롯이 속담에만 집중하세요.</Text>
-					{!lifetime && (
-						<Pressable style={({ pressed }) => [styles.ghostBtn, pressed && styles.pressed]} onPress={openManageSubscriptions}>
-							<Text style={styles.ghostBtnText}>구독 관리</Text>
-						</Pressable>
+					{/* 예전 월 구독 결제자 — 스토어 자동 갱신은 앱이 멈출 수 없어 직접 해지하도록 안내한다 */}
+					{isFromSubscription() && (
+						<>
+							<View style={styles.note}>
+								<IconComponent type="MaterialCommunityIcons" name="information-outline" size={scaledSize(16)} color={GOLD} />
+								<Text style={styles.noteText}>
+									월 구독이 평생 이용권으로 전환되었어요. 구독을 해지해도 광고는 다시 나오지 않아요.
+								</Text>
+							</View>
+							<Pressable style={({ pressed }) => [styles.ghostBtn, pressed && styles.pressed]} onPress={openManageSubscriptions}>
+								<Text style={styles.ghostBtnText}>구독 해지하기</Text>
+							</Pressable>
+						</>
 					)}
 				</>
 			) : (
@@ -149,27 +151,21 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 						</View>
 					))}
 
-					<View style={styles.plans}>
-						<PlanTile
-							selected={plan === 'monthly'}
-							onPress={() => setPlan('monthly')}
-							label="1개월"
-							price={prices.monthly}
-							unit="/ 월"
-							caption="부담 없이 시작"
-						/>
-						<PlanTile
-							selected={plan === 'lifetime'}
-							onPress={() => setPlan('lifetime')}
-							label="평생"
-							price={prices.lifetime}
-							unit="1회 결제"
-							caption={isKrwBase ? '7개월 요금으로 평생' : '한 번 결제, 평생 이용'}
-							ribbon="추천"
-						/>
+					{/* 단일 상품 — 큰 가격 하나로 결정 부담을 없앤다 */}
+					<View style={styles.offer}>
+						<View style={styles.offerHead}>
+							<Text style={styles.offerLabel}>평생 이용권</Text>
+							<View style={styles.offerChip}>
+								<Text style={styles.offerChipText}>1회 결제</Text>
+							</View>
+						</View>
+						<Text style={styles.offerPrice} numberOfLines={1} adjustsFontSizeToFit>
+							{price}
+						</Text>
+						<Text style={styles.offerCaption}>한 번 결제로 평생 광고 제거 · 자동 갱신 없음</Text>
 					</View>
 
-					<Pressable disabled={busy} onPress={onSubscribe} style={({ pressed }) => [styles.ctaWrap, pressed && styles.pressed]}>
+					<Pressable disabled={busy} onPress={onPurchase} style={({ pressed }) => [styles.ctaWrap, pressed && styles.pressed]}>
 						<LinearGradient colors={GOLD_BTN} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cta}>
 							{!reducedMotion && (
 								<Animated.View
@@ -191,7 +187,7 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 									<Text style={styles.ctaText}>결제 진행 중…</Text>
 								</View>
 							) : (
-								<Text style={styles.ctaText}>{plan === 'lifetime' ? '평생 이용권 구매하기' : '1개월 구독 시작하기'}</Text>
+								<Text style={styles.ctaText}>평생 이용권 구매하기</Text>
 							)}
 						</LinearGradient>
 					</Pressable>
@@ -199,10 +195,6 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 					<View style={styles.linkRow}>
 						<Text style={styles.link} onPress={busy ? undefined : onRestore}>
 							구매 복원
-						</Text>
-						<Text style={styles.linkDot}>·</Text>
-						<Text style={styles.link} onPress={openManageSubscriptions}>
-							구독 관리
 						</Text>
 					</View>
 					<View style={styles.linkRow}>
@@ -220,54 +212,13 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 					</View>
 
 					<Text style={styles.legal}>
-						평생 이용권은 1회 결제이며 자동 갱신되지 않습니다. 1개월 구독은 기간 종료 24시간 전까지 해지하지 않으면
-						같은 가격으로 자동 갱신되며, 결제 금액은 스토어 계정으로 청구됩니다. 해지는 스토어의 구독 관리에서 언제든 할 수
-						있습니다.
+						평생 이용권은 1회 결제이며 자동 갱신되지 않습니다. 결제 금액은 스토어 계정으로 청구됩니다.
 					</Text>
 				</>
 			)}
 		</View>
 	);
 };
-
-const PlanTile = ({
-	selected,
-	onPress,
-	label,
-	price,
-	unit,
-	caption,
-	ribbon,
-}: {
-	selected: boolean;
-	onPress: () => void;
-	label: string;
-	price: string;
-	unit: string;
-	caption: string;
-	ribbon?: string;
-}) => (
-	<Pressable
-		onPress={onPress}
-		accessibilityRole="radio"
-		accessibilityState={{ selected }}
-		style={({ pressed }) => [styles.tile, selected && styles.tileSelected, pressed && styles.pressed]}>
-		{ribbon && (
-			<View style={styles.ribbon}>
-				<Text style={styles.ribbonText}>{ribbon}</Text>
-			</View>
-		)}
-		<View style={styles.tileHead}>
-			<Text style={[styles.tileLabel, selected && styles.tileLabelSelected]}>{label}</Text>
-			<View style={[styles.radio, selected && styles.radioOn]}>{selected && <View style={styles.radioDot} />}</View>
-		</View>
-		<Text style={styles.tilePrice} numberOfLines={1} adjustsFontSizeToFit>
-			{price}
-		</Text>
-		<Text style={styles.tileUnit}>{unit}</Text>
-		<Text style={[styles.tileCaption, selected && styles.tileCaptionSelected]}>{caption}</Text>
-	</Pressable>
-);
 
 // 글자 크기 모드가 바뀌면 FONT_SIZES 가 달라지므로 themedStyles 로 지연 생성한다
 const styles = themedStyles(() =>
@@ -330,46 +281,32 @@ const styles = themedStyles(() =>
 		divider: { height: 1, backgroundColor: GOLD_LINE, marginVertical: SPACING_H.lg, opacity: 0.6 },
 		benefitRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm, marginBottom: SPACING_H.sm },
 		benefitText: { color: IVORY, fontSize: FONT_SIZES.md, flexShrink: 1 },
-		plans: { flexDirection: 'row', gap: SPACING_W.md, marginTop: SPACING_H.xl },
-		tile: {
-			flex: 1,
-			paddingHorizontal: SPACING_W.md,
-			paddingTop: SPACING_H.lg,
-			paddingBottom: SPACING_H.md,
+		offer: {
+			marginTop: SPACING_H.xl,
+			paddingHorizontal: SPACING_W.lg,
+			paddingVertical: SPACING_H.lg,
 			borderRadius: RADIUS.md,
 			borderWidth: 1.5,
-			borderColor: 'rgba(245,238,223,0.14)',
-			backgroundColor: 'rgba(255,255,255,0.04)',
+			borderColor: GOLD,
+			backgroundColor: GOLD_SOFT,
 		},
-		tileSelected: { borderColor: GOLD, backgroundColor: GOLD_SOFT },
-		ribbon: {
-			position: 'absolute',
-			top: -SPACING_H.smPlus,
-			right: SPACING_W.sm,
+		offerHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+		offerLabel: { color: GOLD, fontFamily: SERIF, fontSize: FONT_SIZES.lg, fontWeight: '700', letterSpacing: 0.5 },
+		offerChip: {
 			paddingHorizontal: SPACING_W.sm,
 			paddingVertical: SPACING_H.xxs,
 			borderRadius: RADIUS.round,
 			backgroundColor: SEAL,
 		},
-		ribbonText: { color: IVORY, fontSize: FONT_SIZES.xxs, fontWeight: '700' },
-		tileHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-		tileLabel: { color: IVORY_DIM, fontSize: FONT_SIZES.smPlus, fontWeight: '600' },
-		tileLabelSelected: { color: GOLD },
-		radio: {
-			width: scaledSize(16),
-			height: scaledSize(16),
-			borderRadius: RADIUS.round,
-			borderWidth: 1.5,
-			borderColor: 'rgba(245,238,223,0.35)',
-			alignItems: 'center',
-			justifyContent: 'center',
+		offerChipText: { color: IVORY, fontSize: FONT_SIZES.xxs, fontWeight: '700' },
+		offerPrice: {
+			marginTop: SPACING_H.sm,
+			color: IVORY,
+			fontSize: displayFontSize(36),
+			fontWeight: '800',
+			letterSpacing: -0.5,
 		},
-		radioOn: { borderColor: GOLD },
-		radioDot: { width: scaledSize(8), height: scaledSize(8), borderRadius: RADIUS.round, backgroundColor: GOLD },
-		tilePrice: { marginTop: SPACING_H.sm, color: IVORY, fontSize: FONT_SIZES.heading, fontWeight: '800' },
-		tileUnit: { color: IVORY_DIM, fontSize: FONT_SIZES.sm },
-		tileCaption: { marginTop: SPACING_H.sm, color: IVORY_DIM, fontSize: FONT_SIZES.sm },
-		tileCaptionSelected: { color: GOLD, fontWeight: '600' },
+		offerCaption: { marginTop: SPACING_H.xs, color: IVORY_DIM, fontSize: FONT_SIZES.sm },
 		ctaWrap: { marginTop: SPACING_H.xl, borderRadius: RADIUS.md, overflow: 'hidden' },
 		cta: {
 			height: scaledSize(52),
@@ -396,6 +333,17 @@ const styles = themedStyles(() =>
 			alignItems: 'center',
 			justifyContent: 'center',
 		},
+		note: {
+			flexDirection: 'row',
+			alignItems: 'flex-start',
+			gap: SPACING_W.sm,
+			marginTop: SPACING_H.lg,
+			paddingHorizontal: SPACING_W.md,
+			paddingVertical: SPACING_H.md,
+			borderRadius: RADIUS.md,
+			backgroundColor: GOLD_SOFT,
+		},
+		noteText: { flex: 1, color: IVORY, fontSize: FONT_SIZES.smPlus, lineHeight: FONT_SIZES.smPlus * 1.55 },
 		ghostBtnText: { color: GOLD, fontSize: FONT_SIZES.lg, fontWeight: '700' },
 		// 테두리 뷰에 scale 을 걸면 iOS 배경 서브레이어 버그를 탄다(CLAUDE.md 모달 규칙 7) — 눌림은 투명도만
 		pressed: { opacity: 0.82 },

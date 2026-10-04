@@ -22,7 +22,7 @@ const AdmobRewardAd: React.FC<{
   const rewardedRef = useRef(false); // 보상 중복 방지
 
   useEffect(() => {
-    // 광고 제거 구독 중 → 광고 없이 바로 보상
+    // 광고 제거 이용 중 → 광고 없이 바로 보상
     if (isAdsRemoved()) {
       onRewarded();
       return;

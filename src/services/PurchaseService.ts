@@ -5,42 +5,43 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 
 /**
  * 광고 제거 서비스 (react-native-iap v13) — 3ha-four-idioms 와 같은 구조
- * - 판매 상품 2개: 1개월 자동 갱신 구독(com.tha.proverbquiz.remove_ad.monthly, ₩2,900)
- *   + 평생 이용권(com.tha.proverbquiz.remove_ad, 비소모성, ₩18,900)
+ * - 판매 상품은 하나: 평생 이용권(com.tha.proverbquiz.remove_ad, 비소모성, ₩3,900)
  * - 앱의 모든 기능은 계속 무료다. 광고만 없앤다.
- * - 1.3~1.4 에서 팔던 평생 광고 제거(com.tha.iap.remove_ad) 구매자도 평생 보유자로 인정한다.
- *   스토어 구매 이력 또는 당시 저장한 PURCHASE_INFO 플래그 중 하나만 있어도 인정한다.
- * - 권한의 진실 원천은 스토어(getAvailablePurchases = 현재 유효한 구독 + 보유 비소모성).
- *   AsyncStorage 플래그는 오프라인·앱 시작 직후용 캐시일 뿐이다.
+ * - 평생 보유자로 인정하는 경우 (한 번 인정되면 LEGACY_PURCHASE_INFO 에 남겨 영구 유지)
+ *   - 평생 이용권 또는 1.3~1.4 의 평생 광고 제거(com.tha.iap.remove_ad) 구매
+ *   - 1.5 에서 팔던 1개월 구독(com.tha.proverbquiz.remove_ad.monthly) 결제자 — 판매는 끝났고,
+ *     스토어에서 보이거나(유효 구독·iOS 구매 이력) 구독 시절 권한 캐시(AD_REMOVED)가 있으면
+ *     평생으로 전환한다(fromSubscription). 해지·만료돼도 광고는 다시 나오지 않는다.
+ * - 스토어 조회는 보유 여부를 '찾을' 때만 쓴다. 빈 목록으로는 해제하지 않는다 — StoreKit 2 콜드 스타트·
+ *   Play 연결 끊김 때도 빈 목록이 오기 때문이고, 평생 상품이라 해제할 일도 환불 말고는 없다.
  * - 구매 기록은 공용 Supabase Edge Function(purchases, 소스는 3ha-hanpick) → tb_purchases 에 남긴다. 실패해도 권한엔 영향 없음.
  *
  * [버전] RN 0.78 이라 react-native-iap 13.x 고정 (14+ 는 Kotlin 2.2 요구). Billing 8 패치는 .yarn/patches 참고
  */
 
-export type PlanKey = 'monthly' | 'lifetime';
-
 const BUNDLE = 'com.tha.proverbquiz';
-export const SKUS = { monthly: `${BUNDLE}.remove_ad.monthly` };
-const SUB_SKUS = Object.values(SKUS);
-/** 평생 광고 제거(비소모성) */
+/** 평생 광고 제거(비소모성) — 유일한 판매 상품 */
 export const LIFETIME_SKU = `${BUNDLE}.remove_ad`;
 /** 1.3~1.4 에 팔던 평생 광고 제거 — 새로 팔지 않고 보유자만 인정한다 */
 export const LEGACY_LIFETIME_SKU = IAP_REMOVE_AD_KEY || 'com.tha.iap.remove_ad';
-const isLifetimeSku = (productId?: string) => productId === LIFETIME_SKU || productId === LEGACY_LIFETIME_SKU;
+/** 1.5 에 팔던 1개월 구독 — 판매 종료. 결제한 적이 있으면 평생 보유자로 인정한다 */
+export const LEGACY_MONTHLY_SKU = `${BUNDLE}.remove_ad.monthly`;
+const isRemoveAdSku = (productId?: string) =>
+	productId === LIFETIME_SKU || productId === LEGACY_LIFETIME_SKU || productId === LEGACY_MONTHLY_SKU;
 
 /** 스토어 조회 실패(시뮬레이터·심사 전) 시 화면에 보여줄 기본 가격 */
-export const FALLBACK_PRICES: Record<PlanKey, string> = { monthly: '₩2,900', lifetime: '₩18,900' };
+export const FALLBACK_PRICE = '₩3,900';
 
 // ─── 광고 제거 플래그 (동기 캐시 + 구독) ───────────────────────
 /** null = 캐시를 아직 못 읽음. 이때도 광고를 띄우지 않는다 — 구매자에게 앱 시작 직후 광고가 먼저 뜨지 않게 */
-let adsRemovedCache: boolean | null = null;
-/** 평생 광고 제거 보유자 — 구독 재검증이 이 사용자를 해제하지 않는다 */
-let lifetimeOwner = false;
+let owner: boolean | null = null;
+/** 월 구독 결제자가 평생으로 전환된 경우 — 화면에서 안내·구독 해지 버튼을 보여준다 */
+let fromSubscription = false;
 const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((l) => l());
 
-export const isAdsRemoved = (): boolean => adsRemovedCache !== false;
-export const isLifetimeOwner = (): boolean => lifetimeOwner;
+export const isAdsRemoved = (): boolean => owner !== false;
+export const isFromSubscription = (): boolean => fromSubscription;
 
 /** useSyncExternalStore 호환 구독 */
 export const subscribeAdsRemoved = (listener: () => void): (() => void) => {
@@ -48,46 +49,22 @@ export const subscribeAdsRemoved = (listener: () => void): (() => void) => {
 	return () => listeners.delete(listener);
 };
 
-/**
- * 권한 만료 시각(ms) — AsyncStorage(AD_REMOVED)에 이 값을 저장한다.
- * 스토어가 빈 목록을 돌려줘도 이 시각 전에는 해제하지 않는다. 빈 목록은 "구매 없음"만 뜻하지 않는다:
- *   - StoreKit 2: 콜드 스타트 직후 currentEntitlements 가 동기화 전이면 비어 있다
- *   - Play: 백그라운드 복귀 직후 결제 연결이 끊겨 조회가 실패해도 빈 배열로 resolve 한다
- * 예전엔 이 빈 목록 한 번에 권한을 해제해, 앱을 다시 켜면 광고가 나오고 포그라운드 복귀 때 다시 사라졌다.
- */
-let adsRemovedUntil = 0;
-const DAY = 24 * 60 * 60 * 1000;
-
-const setAdsRemoved = (removed: boolean) => {
-	if (adsRemovedCache === removed) return;
-	adsRemovedCache = removed;
+const setOwner = (v: boolean) => {
+	if (owner === v) return;
+	owner = v;
 	notify();
 };
 
-const persistAdsRemovedUntil = async (until: number) => {
-	adsRemovedUntil = until;
-	setAdsRemoved(lifetimeOwner || until > Date.now());
-	try {
-		await AsyncStorage.setItem(MainStorageKeyType.AD_REMOVED, String(until));
-	} catch {}
-};
-
-/**
- * 유효한 구매를 확인할 때마다 만료 시각을 늘려 둔다.
- * 최소 하루는 보장 — 만료일을 모를 때(JWS 없음·평생 상품)나 스토어 시계 오차에도 광고가 끼어들지 않게.
- */
-const grantAdsRemoved = (p: PurchaseLike) =>
-	persistAdsRemovedUntil(Math.max(expiresAtOf(p) ?? 0, Date.now() + DAY));
-
 /** 평생 구매자 표시 — 예전 앱과 같은 키·모양으로 남겨 두어 오프라인에서도 유지된다 */
-const markLifetime = async () => {
-	if (lifetimeOwner) return;
-	lifetimeOwner = true;
-	setAdsRemoved(true);
+const markLifetime = async (sub = false) => {
+	if (owner && (fromSubscription || !sub)) return;
+	fromSubscription ||= sub;
+	owner = true;
+	notify();
 	try {
 		await AsyncStorage.setItem(
 			MainStorageKeyType.LEGACY_PURCHASE_INFO,
-			JSON.stringify({ isRemoveAds: true, purchaseDate: new Date().toISOString(), platform: Platform.OS }),
+			JSON.stringify({ isRemoveAds: true, fromSubscription, purchaseDate: new Date().toISOString(), platform: Platform.OS }),
 		);
 	} catch {}
 };
@@ -101,7 +78,7 @@ type PurchaseLike = {
 	purchaseToken?: string;
 	purchaseStateAndroid?: number;
 	isAcknowledgedAndroid?: boolean;
-	/** StoreKit 2 서명 트랜잭션 — payload 에 만료일(expiresDate)이 들어 있다 */
+	/** StoreKit 2 서명 트랜잭션 — 구매 기록에 영수증 대신 남긴다 */
 	jwsRepresentationIos?: string;
 };
 
@@ -119,9 +96,6 @@ const getIap = (): IapModule | null => {
 		return null;
 	}
 };
-
-const isSubSku = (productId?: string) => !!productId && SUB_SKUS.includes(productId);
-const isRemoveAdSku = (productId?: string) => isSubSku(productId) || isLifetimeSku(productId);
 
 // ─── 구매 기록 (Supabase Edge Function → tb_purchases) ──────────
 /*
@@ -148,38 +122,14 @@ const getAccessToken = async (): Promise<string | null> => {
 	return session.access_token;
 };
 
-/**
- * 구독 만료 시각(ms). 모르면(평생 상품 포함) undefined → expires_at 은 null 로 남는다.
- * - iOS: JWS payload 의 expiresDate (정확)
- * - Android: 구매 시각부터 1개월씩 now 이후가 될 때까지 더한 값
- *   ponytail: 자동 갱신 가정의 추정치. 정확히 하려면 Play Developer API 로 서버 검증
- */
-export const expiresAtOf = (p: PurchaseLike): number | undefined => {
-	if (!isSubSku(p.productId)) return undefined;
-	try {
-		if (p.jwsRepresentationIos) {
-			const b64 = p.jwsRepresentationIos.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-			return JSON.parse(atob(b64)).expiresDate || undefined;
-		}
-		if (!p.transactionDate) return undefined;
-		const d = new Date(p.transactionDate);
-		while (d.getTime() <= Date.now()) d.setMonth(d.getMonth() + 1);
-		return d.getTime();
-	} catch {
-		return undefined;
-	}
-};
-
 /** 마지막으로 서버에 남긴 기록 — 앱을 켤 때마다 같은 영수증을 다시 보내지 않게 */
 const RECORDED_KEY = 'IAP_RECORDED';
 
 const recordPurchase = async (p: PurchaseLike) => {
-	// 예전 평생 상품(LEGACY_LIFETIME_SKU)은 접두사가 달라 공용 함수가 400 으로 거절한다 — 보내면 실행마다 재시도만 쌓인다
-	if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !p.transactionId || !isRemoveAdSku(p.productId) || p.productId === LEGACY_LIFETIME_SKU) return;
+	// 판매 중인 평생 이용권만 남긴다 — 예전 평생 상품(LEGACY_LIFETIME_SKU)은 접두사가 달라 공용 함수가 400 으로 거절한다
+	if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !p.transactionId || p.productId !== LIFETIME_SKU) return;
 	try {
-		const expiresAt = expiresAtOf(p);
-		const sig = `${p.transactionId}|${expiresAt ?? ''}`;
-		if ((await AsyncStorage.getItem(RECORDED_KEY)) === sig) return;
+		if ((await AsyncStorage.getItem(RECORDED_KEY)) === p.transactionId) return;
 		const token = await getAccessToken();
 		if (!token) return;
 		const r = await fetch(`${SUPABASE_URL}/functions/v1/purchases`, {
@@ -193,11 +143,10 @@ const recordPurchase = async (p: PurchaseLike) => {
 				// iOS 는 purchaseToken 이 비어 있어 서명 트랜잭션(JWS)을 대신 남긴다 — 추후 서버 검증용
 				purchaseToken: p.purchaseToken || p.jwsRepresentationIos || undefined,
 				purchasedAt: p.transactionDate || undefined,
-				expiresAt,
 			}),
 		});
 		// 실패하면 표시를 남기지 않아 다음 실행 때 다시 보낸다
-		if (r.ok) await AsyncStorage.setItem(RECORDED_KEY, sig);
+		if (r.ok) await AsyncStorage.setItem(RECORDED_KEY, p.transactionId);
 		else console.warn('[IAP] purchase record rejected:', r.status, await r.text());
 	} catch (e) {
 		console.warn('[IAP] purchase record failed:', e);
@@ -226,8 +175,8 @@ const attachListeners = (mod: IapModule) => {
 		if (p.purchaseStateAndroid === ANDROID_PURCHASE_PENDING) return;
 		try {
 			if (isRemoveAdSku(p.productId)) {
-				if (isLifetimeSku(p.productId)) await markLifetime();
-				await grantAdsRemoved(p);
+				// 판매 종료된 월 구독의 자동 갱신도 여기로 온다 — 평생으로 전환하고 승인은 그대로 한다
+				await markLifetime(p.productId === LEGACY_MONTHLY_SKU);
 				recordPurchase(p);
 			}
 			await mod.finishTransaction({ purchase, isConsumable: false });
@@ -267,9 +216,8 @@ export const ensureConnected = async (): Promise<boolean> => {
 };
 
 /**
- * 스토어의 현재 유효 구독(+ 평생 상품)으로 권한 재검증
- * - 보이면 만료 시각 갱신
- * - 안 보이면 저장된 만료 시각이 지났을 때만 해제 (빈 목록 한 번으로는 해제하지 않는다 — adsRemovedUntil 참고)
+ * 스토어 보유 목록(getAvailablePurchases = 보유 비소모성 + 현재 유효한 구독)에서 광고 제거 상품을 찾으면 평생 보유자로 저장
+ * - 못 찾아도 이미 보유자면 해제하지 않는다 (빈 목록은 "구매 없음"만 뜻하지 않는다 — 머리 주석 참고)
  * @returns 광고 제거 여부, 확인 불가(오프라인·모듈 없음)면 null
  */
 export const checkStore = async (): Promise<boolean | null> => {
@@ -280,20 +228,16 @@ export const checkStore = async (): Promise<boolean | null> => {
 		const owned = purchases.filter(
 			(p) => isRemoveAdSku(p.productId) && p.purchaseStateAndroid !== ANDROID_PURCHASE_PENDING,
 		);
-		if (owned.some((p) => isLifetimeSku(p.productId))) await markLifetime();
-		const active = owned.find((p) => isSubSku(p.productId)) ?? owned[0];
-		if (!active) {
-			if (lifetimeOwner || adsRemovedUntil > Date.now()) return true;
-			if (adsRemovedCache !== false) await persistAdsRemovedUntil(0);
-			return false;
+		if (owned.length) await markLifetime(owned.some((p) => p.productId === LEGACY_MONTHLY_SKU));
+		else setOwner(!!owner);
+		for (const p of owned) {
+			recordPurchase(p);
+			// 리스너를 놓친 구매(결제 직후 앱 종료 등)도 여기서 승인 — Google Play 는 3일 안에 승인 안 되면 자동 환불한다
+			if (p.isAcknowledgedAndroid === false) {
+				mod.finishTransaction({ purchase: p as never, isConsumable: false }).catch(() => {});
+			}
 		}
-		await grantAdsRemoved(active);
-		recordPurchase(active);
-		// 리스너를 놓친 구매(결제 직후 앱 종료 등)도 여기서 승인 — Google Play 는 3일 안에 승인 안 되면 자동 환불한다
-		if (active.isAcknowledgedAndroid === false) {
-			mod.finishTransaction({ purchase: active as never, isConsumable: false }).catch(() => {});
-		}
-		return true;
+		return !!owner;
 	} catch (e) {
 		console.warn('[IAP] entitlement check failed:', e);
 		return null;
@@ -307,11 +251,13 @@ export const loadCachedAdsRemoved = async (): Promise<void> => {
 			MainStorageKeyType.AD_REMOVED,
 			MainStorageKeyType.LEGACY_PURCHASE_INFO,
 		]);
-		lifetimeOwner = !!legacy && JSON.parse(legacy)?.isRemoveAds === true;
-		// 이전 버전은 'true'/'false' 를 저장했다 — 'true' 는 하루 유예를 주고 스토어 재검증이 실제 만료일로 바꾼다
-		adsRemovedUntil = removed === 'true' ? Date.now() + DAY : Number(removed) || 0;
+		const info = legacy ? JSON.parse(legacy) : null;
+		fromSubscription = info?.fromSubscription === true;
+		if (info?.isRemoveAds === true) return setOwner(true);
+		// 월 구독 시절 권한 캐시('true' 또는 만료 시각 ms). 0 이 아닌 값은 결제한 적이 있다는 뜻 → 만료됐어도 평생으로 전환
+		if (removed === 'true' || Number(removed) > 0) return await markLifetime(true);
 	} catch {}
-	setAdsRemoved(lifetimeOwner || adsRemovedUntil > Date.now());
+	setOwner(!!owner);
 };
 
 let appStateSub: { remove: () => void } | null = null;
@@ -320,31 +266,13 @@ let appStateSub: { remove: () => void } | null = null;
 export const initPurchase = async (): Promise<void> => {
 	await loadCachedAdsRemoved();
 	await checkStore();
-	// 포그라운드 복귀마다 재검증 — 구독 관리에서 해지·만료, 다른 기기 구매를 앱 재시작 없이 반영
+	// 포그라운드 복귀마다 재검증 — 다른 기기에서 산 구매를 앱 재시작 없이 반영
 	appStateSub ??= AppState.addEventListener('change', (s) => {
 		if (s === 'active') checkStore();
 	});
 };
 
 // ─── 상품 조회 / 구매 ─────────────────────────────────────────
-export type PlanPrices = Record<PlanKey, string>;
-type AndroidOffer = {
-	basePlanId: string;
-	offerId?: string | null;
-	offerToken: string;
-	pricingPhases: { pricingPhaseList: { formattedPrice: string }[] };
-};
-type SubLike = { productId: string; localizedPrice?: string; subscriptionOfferDetails?: AndroidOffer[] };
-
-const fetchSubs = async (mod: IapModule): Promise<SubLike[]> => {
-	try {
-		return (await mod.getSubscriptions({ skus: SUB_SKUS })) as SubLike[];
-	} catch (e) {
-		console.warn('[IAP] getSubscriptions failed:', e);
-		return [];
-	}
-};
-
 const fetchLifetime = async (mod: IapModule): Promise<{ localizedPrice?: string } | undefined> => {
 	try {
 		return (await mod.getProducts({ skus: [LIFETIME_SKU] }))[0];
@@ -354,20 +282,11 @@ const fetchLifetime = async (mod: IapModule): Promise<{ localizedPrice?: string 
 	}
 };
 
-/** Android 월 구독 기본 요금제(프로모션 offer 가 아닌 것) */
-const basePlanOffer = (subs: SubLike[]) =>
-	subs.find((s) => s.productId === SKUS.monthly)?.subscriptionOfferDetails?.find((o) => !o.offerId);
-
-/** 스토어 표시 가격 (못 가져온 항목은 FALLBACK_PRICES) */
-export const getPlanPrices = async (): Promise<PlanPrices> => {
+/** 평생 이용권 스토어 표시 가격 (못 가져오면 FALLBACK_PRICE) */
+export const getRemoveAdsPrice = async (): Promise<string> => {
 	const mod = getIap();
-	if (!mod || !(await ensureConnected())) return FALLBACK_PRICES;
-	const [subs, lifetime] = await Promise.all([fetchSubs(mod), fetchLifetime(mod)]);
-	const monthly =
-		Platform.OS === 'ios'
-			? subs.find((s) => s.productId === SKUS.monthly)?.localizedPrice
-			: basePlanOffer(subs)?.pricingPhases.pricingPhaseList.slice(-1)[0]?.formattedPrice;
-	return { monthly: monthly ?? FALLBACK_PRICES.monthly, lifetime: lifetime?.localizedPrice ?? FALLBACK_PRICES.lifetime };
+	if (!mod || !(await ensureConnected())) return FALLBACK_PRICE;
+	return (await fetchLifetime(mod))?.localizedPrice ?? FALLBACK_PRICE;
 };
 
 export type PurchaseFailReason = 'no-module' | 'not-connected' | 'no-product' | 'cancelled' | 'failed';
@@ -377,27 +296,15 @@ export interface PurchaseRequestResult {
 	message?: string;
 }
 
-/** 구독·평생 이용권 구매 요청 (성공 처리는 purchaseUpdatedListener) */
-export const subscribeRemoveAds = async (plan: PlanKey): Promise<PurchaseRequestResult> => {
+/** 평생 이용권 구매 요청 (성공 처리는 purchaseUpdatedListener) */
+export const purchaseRemoveAds = async (): Promise<PurchaseRequestResult> => {
 	const mod = getIap();
 	if (!mod) return { ok: false, reason: 'no-module' };
 	if (!(await ensureConnected())) return { ok: false, reason: 'not-connected' };
 	try {
-		if (plan === 'lifetime') {
-			// getProducts 를 먼저 불러야 Android 결제창이 상품을 찾는다
-			if (!(await fetchLifetime(mod))) return { ok: false, reason: 'no-product' };
-			await mod.requestPurchase(Platform.OS === 'ios' ? { sku: LIFETIME_SKU } : { skus: [LIFETIME_SKU] });
-			return { ok: true };
-		}
-		const subs = await fetchSubs(mod);
-		if (Platform.OS === 'ios') {
-			if (!subs.some((s) => s.productId === SKUS.monthly)) return { ok: false, reason: 'no-product' };
-			await mod.requestSubscription({ sku: SKUS.monthly });
-		} else {
-			const offer = basePlanOffer(subs);
-			if (!offer) return { ok: false, reason: 'no-product' };
-			await mod.requestSubscription({ subscriptionOffers: [{ sku: SKUS.monthly, offerToken: offer.offerToken }] });
-		}
+		// getProducts 를 먼저 불러야 Android 결제창이 상품을 찾는다
+		if (!(await fetchLifetime(mod))) return { ok: false, reason: 'no-product' };
+		await mod.requestPurchase(Platform.OS === 'ios' ? { sku: LIFETIME_SKU } : { skus: [LIFETIME_SKU] });
 		return { ok: true };
 	} catch (e) {
 		const err = e as IapError;
@@ -407,10 +314,25 @@ export const subscribeRemoveAds = async (plan: PlanKey): Promise<PurchaseRequest
 	}
 };
 
-/** 구매 복원 — 기기 변경·재설치 */
-export const restorePurchases = checkStore;
+/**
+ * 구매 복원 — 기기 변경·재설치, 해지된 예전 월 구독 결제자
+ * iOS 는 구매 이력(StoreKit 2 는 만료된 구독도 돌려준다)까지 본다.
+ * Android 는 Billing 8 에서 구매 이력 API 가 없어져, 해지·만료된 구독은 앱에서 확인할 길이 없다(유효 구독만 보인다).
+ */
+export const restorePurchases = async (): Promise<boolean | null> => {
+	const owned = await checkStore();
+	if (owned !== false || Platform.OS !== 'ios') return owned;
+	try {
+		const history = ((await getIap()?.getPurchaseHistory()) ?? []) as PurchaseLike[];
+		const found = history.filter((p) => isRemoveAdSku(p.productId));
+		if (found.length) await markLifetime(found.some((p) => p.productId === LEGACY_MONTHLY_SKU));
+	} catch (e) {
+		console.warn('[IAP] purchase history failed:', e);
+	}
+	return !!owner;
+};
 
-/** 스토어 구독 관리 화면 (해지·플랜 변경) */
+/** 스토어 구독 관리 화면 — 판매는 끝났지만 예전 월 구독이 아직 자동 갱신 중일 수 있다(판매 중단은 기존 갱신을 멈추지 않는다) */
 export const openManageSubscriptions = () => {
 	const url =
 		Platform.OS === 'ios'

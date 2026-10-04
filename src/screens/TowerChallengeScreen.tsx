@@ -43,7 +43,7 @@ const TowerChallengeScreen = () => {
 
 	// state
 	const [showAd, setShowAd] = useState(false);
-	// 광고 제거 구독 중이면 광고 없이 바로 보상 → 문구에서 '광고'를 뺀다
+	// 광고 제거 이용 중이면 광고 없이 바로 보상 → 문구에서 '광고'를 뺀다
 	const adsRemoved = useAdsRemoved();
 
 	// 진입 애니메이션 (헤더 → 하단 안내 순서로 fade + slide-up)

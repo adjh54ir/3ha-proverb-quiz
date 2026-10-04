@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { isAdsRemoved, subscribeAdsRemoved } from '@/services/PurchaseService';
 
-/** 광고 제거 여부 (구독·평생 구매 — 구매 즉시 모든 광고 컴포넌트에 실시간 반영) */
+/** 광고 제거 여부 (평생 이용권 — 구매 즉시 모든 광고 컴포넌트에 실시간 반영) */
 export const useAdsRemoved = (): boolean => useSyncExternalStore(subscribeAdsRemoved, isAdsRemoved, isAdsRemoved);
 
 export default useAdsRemoved;

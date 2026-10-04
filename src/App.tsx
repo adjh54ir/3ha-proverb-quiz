@@ -41,7 +41,7 @@ const App = () => {
 		console.log('Now env mode : [', REACT_NATIVE_APP_MODE, ']');
 
 		checkTodayQuiz();
-		initPurchase(); // 광고 제거 구독(·예전 평생 구매) 여부 복원 → 스토어 재검증
+		initPurchase(); // 광고 제거(평생 이용권) 보유 여부 복원 → 스토어 재검증
 		// iOS 는 ATT 응답 전에 광고 SDK 를 초기화하면 그 세션 동안 광고 식별자를 못 쓴다.
 		// requestTrackingPermission 은 요청을 예약만 하고 즉시 반환하므로 await 해도 멈추지 않는다.
 		// (Android / iOS 14 미만은 내부에서 바로 통과)

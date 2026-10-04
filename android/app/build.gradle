@@ -85,8 +85,8 @@ android {
         applicationId "com.tha.proverbquiz"     // TODO 변경 필요
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 41
-        versionName "2.4.0"
+        versionCode 42
+        versionName "2.5.0"
         missingDimensionStrategy "store", "play" // react-native-iap: Google Play 결제 사용
     }
     signingConfigs {

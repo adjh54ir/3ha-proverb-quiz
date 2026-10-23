@@ -2,7 +2,6 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -119,14 +118,6 @@ android {
             shrinkResources enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
 
-            // 난독화 매핑(mapping.txt)을 Crashlytics 로 자동 업로드해
-            // Play Console/Crashlytics 에서 비정상 종료·ANR 스택을 복원할 수 있게 한다.
-            // 산출물 경로: android/app/build/outputs/mapping/release/mapping.txt
-            firebaseCrashlytics {
-                mappingFileUploadEnabled true
-                nativeSymbolUploadEnabled false
-            }
-
             // 네이티브(C++/Hermes) 프레임까지 심볼화해야 Play Console 의 ANR/비정상 종료가 읽힌다.
             // AAB 안에 디버그 심볼이 함께 담겨 별도 업로드가 필요 없다.
             ndk {
@@ -153,7 +144,6 @@ dependencies {
     	// dependencies 내에 포함시킴
 	implementation platform('com.google.firebase:firebase-bom')
     implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-crashlytics'
     
     implementation 'com.unity3d.ads-mediation:adquality-sdk:7.24.1'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'

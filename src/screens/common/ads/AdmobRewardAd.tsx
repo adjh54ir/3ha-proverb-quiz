@@ -7,6 +7,7 @@ import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '
 import { FullScreenPortal } from '@/screens/common/atomic/FullScreenPortal';
 import { recordAdClick } from '@/utils/AdGuardUtils';
 import { isAdsRemoved } from '@/services/PurchaseService';
+import { logAdClick } from './logAdClick';
 
 const AD_UNIT_ID = Platform.select({
   ios: __DEV__ ? TestIds.REWARDED : GOOGLE_ADMOV_IOS_REWARD!,
@@ -63,6 +64,7 @@ const AdmobRewardAd: React.FC<{
     // 다만 클릭은 같은 카운터에 쌓아야 전면 광고 가드가 정확해진다(AdMob 도 형식을 나눠 보지 않는다).
     const unsubscribeClicked = ad.addAdEventListener(AdEventType.CLICKED, () => {
       recordAdClick();
+      void logAdClick('rewarded', AD_UNIT_ID);
     });
 
     ad.load();

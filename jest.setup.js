@@ -109,7 +109,6 @@ jest.mock('@notifee/react-native', () => ({
 jest.mock('@react-native-firebase/analytics', () => () => ({
 	logEvent: jest.fn().mockResolvedValue(undefined),
 	setUserProperty: jest.fn().mockResolvedValue(undefined),
-	logScreenView: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('@react-native-community/slider', () => 'Slider', { virtual: true });

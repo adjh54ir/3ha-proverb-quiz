@@ -23,7 +23,7 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 /** 키별 직렬화 큐 — 같은 키에 대한 update 가 겹치지 않게 순서대로 실행한다. */
 const queues = new Map<string, Promise<unknown>>();
 
-/** 저장소 읽기/쓰기 실패를 한 곳에서 보고한다(추후 Crashlytics 연결 지점). */
+/** 저장소 읽기/쓰기 실패를 한 곳에서 보고한다. */
 const report = (action: string, key: string, error: unknown): void => {
 	console.warn(`[Storage] ${action} 실패: ${key}`, error);
 };

@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, getAppInstanceId, logEvent } from '@react-native-firebase/analytics';
 import DeviceInfo from 'react-native-device-info';
 import DateUtils from '@/utils/DateUtils';
 
@@ -8,8 +8,8 @@ export type AdClickFormat = 'banner' | 'interstitial' | 'rewarded' | 'app_open';
 /** 광고 클릭 로깅 — Firebase 로 보내는 유일한 이벤트. 실패해도 광고 흐름은 그대로 간다. */
 export const logAdClick = async (format: AdClickFormat, adUnitId: string, extra: Record<string, string> = {}): Promise<void> => {
 	try {
-		const instanceId = await analytics().getAppInstanceId();
-		await analytics().logEvent(`ad_${format}_clicked`, {
+		const instanceId = await getAppInstanceId(getAnalytics());
+		await logEvent(getAnalytics(), `ad_${format}_clicked`, {
 			ad_platform: 'admob',
 			ad_format: format,
 			ad_unit_id: adUnitId,

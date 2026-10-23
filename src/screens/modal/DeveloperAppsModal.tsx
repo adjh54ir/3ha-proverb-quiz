@@ -1,12 +1,12 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
 import AppAlert from '@/screens/common/modal/AppAlert';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Linking, TextInput, KeyboardAvoidingView, Keyboard, Pressable } from 'react-native';
+import { ActivityIndicator, View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Linking, TextInput, KeyboardAvoidingView, Keyboard, Pressable } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
-import { COMMON_APPS_DATA, appStoreUrl, isNewApp } from '@/const/common/CommonAppsData';
+import { appIconUrl, appStoreUrl, fetchCommonApps, isNewApp } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
 import PopInView from '@/components/animation/PopInView';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
@@ -52,6 +52,18 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [searchFocused, setSearchFocused] = useState(false);
 
+	// 목록은 Storage 에서 받는다 — null 이면 받는 중. 한 번 받으면 앱이 떠 있는 동안 다시 묻지 않는다(fetchCommonApps)
+	const [apps, setApps] = useState<CommonType.AppItem[] | null>(null);
+	const [failed, setFailed] = useState(false);
+	const loadApps = useCallback(() => {
+		fetchCommonApps().then(setApps, () => setFailed(true));
+	}, []);
+	useEffect(loadApps, [loadApps]);
+	const retryApps = () => {
+		setFailed(false);
+		loadApps();
+	};
+
 	// AppModal 은 visible=false 면 '내용'만 언마운트하고 이 컴포넌트는 계속 살아 있다.
 	// 그래서 닫는 경로(닫기 버튼 / 백버튼 / 부모가 visible 을 내리는 경우)에 상관없이
 	// 여기서 한 번만 초기화해야 다음에 열 때 이전 필터·검색어가 남지 않는다.
@@ -65,13 +77,13 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 	}, [visible]);
 
 	const filteredApps = useMemo(() => {
-		return COMMON_APPS_DATA.Apps.filter((app) => {
+		return (apps ?? []).filter((app) => {
 			const categoryMatch = selectedCategory === 'all' || app.category === selectedCategory;
 			const q = searchQuery.trim().toLowerCase();
 			const textMatch = !q || app.title.toLowerCase().includes(q) || app.desc.toLowerCase().includes(q);
 			return categoryMatch && textMatch;
 		});
-	}, [selectedCategory, searchQuery]);
+	}, [apps, selectedCategory, searchQuery]);
 
 	/**
 	 * 이 모달 위에 알림창을 바로 띄우면 RN Modal(네이티브 창)이 두 개가 되어
@@ -149,18 +161,31 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 					<View style={styles.divider} />
 
 					{/* 카운트 */}
-					<Text style={styles.countLabel}>{filteredApps.length}개 앱</Text>
+					{/* 받기 전에는 '0개' 로 보이지 않게 비워 둔다(자리는 남겨 목록이 위로 튀지 않게) */}
+					<Text style={styles.countLabel}>{apps ? `${filteredApps.length}개 앱` : ' '}</Text>
 
 					{/* 리스트 */}
 					<ScrollView
 						ref={scrollRef}
 						onScroll={onListScroll}
 						scrollEventThrottle={16}
-						contentContainerStyle={[styles.scroll, filteredApps.length === 0 && styles.scrollEmpty]}
+						contentContainerStyle={[styles.scroll, (!apps || filteredApps.length === 0) && styles.scrollEmpty]}
 						showsVerticalScrollIndicator={false}
 						keyboardShouldPersistTaps="handled"
 						keyboardDismissMode="on-drag">
-						{filteredApps.length === 0 ? (
+						{failed ? (
+							<View style={styles.emptyState}>
+								<Text style={styles.emptyText}>앱 목록을 불러오지 못했습니다</Text>
+								<TouchableOpacity style={[styles.downloadButton, styles.retryButton]} activeOpacity={0.8} onPress={retryApps}>
+									<IconComponent type="Feather" name="refresh-cw" size={scaledSize(12)} color={COLORS.secondaryDark} />
+									<Text style={styles.downloadText}>다시 시도</Text>
+								</TouchableOpacity>
+							</View>
+						) : !apps ? (
+							<View style={styles.emptyState}>
+								<ActivityIndicator color={COLORS.secondaryDark} />
+							</View>
+						) : filteredApps.length === 0 ? (
 							<View style={styles.emptyState}>
 								<Text style={styles.emptyText}>검색 결과가 없습니다</Text>
 							</View>
@@ -170,7 +195,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 								return (
 									<View key={app.id} style={styles.appCard}>
 										<View style={{ position: 'relative' }}>
-											<Image source={app.icon} style={styles.image} resizeMode="cover" />
+											<Image source={{ uri: appIconUrl(app) }} style={styles.image} resizeMode="cover" />
 
 											{isNewApp(app) && (
 												<View style={styles.newBadge}>
@@ -340,6 +365,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		height: scaleWidth(52),
 		borderRadius: RADIUS.md,
 		flexShrink: 0,
+		// 아이콘을 받아 오는 동안 빈 칸으로 보이지 않게 옅은 바탕을 깐다
+		backgroundColor: COLORS.surfaceAlt,
 	},
 	appInfo: {
 		flex: 1,
@@ -393,6 +420,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	emptyText: {
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.textLight,
+	},
+	// 다운로드 단추와 같은 테두리 칩 — 안내 문구와 한 칸 띄운다
+	retryButton: {
+		marginTop: SPACING_H.md,
 	},
 	newBadge: {
 		position: 'absolute',

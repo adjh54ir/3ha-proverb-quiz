@@ -7,7 +7,7 @@ import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/S
 import { useScrollTop } from '@/hooks/useScrollTop';
 import AppAlert from '@/screens/common/modal/AppAlert';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, AppState, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Animated, AppState, FlatList, Image, Linking, Platform, SectionList, Share, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -22,7 +22,8 @@ import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import { MainDataType } from '@/types/MainDataType';
 import { CONST_BADGES } from '@/const/ConstBadges';
 import ProverbServices from '@/services/ProverbServices';
-import { COMMON_APPS_DATA } from '@/const/common/CommonAppsData';
+import { appIconUrl, fetchCommonApps } from '@/const/common/CommonAppsData';
+import { CommonType } from '@/types/CommonType';
 import DeveloperAppsModal from './modal/DeveloperAppsModal';
 import { OpenSourceModal, TermsOfServiceModal } from './common/modal/SettingModal';
 import CmmDelConfirmModal from './common/modal/CmmDelConfirmModal';
@@ -331,6 +332,12 @@ const SettingScreen = () => {
 
 	const [showDevModal, setShowDevModal] = useState(false);
 	const [showAppsModal, setShowAppsModal] = useState(false);
+	// 하단 앱 목록 — Storage 에서 받는다. null 이면 받는 중, 실패하면 줄째 숨긴다(팝업에서 다시 시도할 수 있다)
+	const [apps, setApps] = useState<CommonType.AppItem[] | null>(null);
+	const [appsFailed, setAppsFailed] = useState(false);
+	useEffect(() => {
+		fetchCommonApps().then(setApps, () => setAppsFailed(true));
+	}, []);
 	const [showTermsModal, setShowTermsModal] = useState(false);
 	const [showOpenSourceModal, setShowOpenSourceModal] = useState(false);
 	const [showVersionModal, setShowVersionModal] = useState(false);
@@ -709,12 +716,12 @@ const SettingScreen = () => {
 	const newAppIds = useMemo(
 		() =>
 			new Set(
-				[...COMMON_APPS_DATA.Apps]
+				[...(apps ?? [])]
 					.sort((a, b) => b.id - a.id)
 					.slice(0, 2)
 					.map((app) => app.id),
 			),
-		[],
+		[apps],
 	);
 
 	/**
@@ -1114,42 +1121,46 @@ const SettingScreen = () => {
 								<Text style={styles.appVerText}>
 									📱 현재 앱 버전: <Text style={styles.appVerBoldText}>v{appVersion}</Text>
 								</Text>
-								<FlatList
-									horizontal
-									data={COMMON_APPS_DATA.Apps}
-									keyExtractor={(item, index) => `${item.id}-${index}`}
-									showsHorizontalScrollIndicator={false}
-									contentContainerStyle={styles.footerAppList}
-									renderItem={({ item }) => {
-										const handlePress = async () => {
-											const storeUrl = Platform.OS === 'android' ? item.android : item.ios;
-											if (!storeUrl) {
-												AppAlert.alert('Coming Soon..!', '아직 이 플랫폼에서는 출시되지 않았습니다.');
-												return;
-											}
-											const supported = await Linking.canOpenURL(storeUrl);
-											supported ? Linking.openURL(storeUrl) : AppAlert.alert('오류', '스토어 페이지를 열 수 없습니다.');
-										};
-										return (
-											<TouchableOpacity style={styles.footerAppCard} onPress={handlePress} activeOpacity={0.8}>
-												<View style={{ position: 'relative' }}>
-													<View style={styles.footerAppIconWrapper}>
-														<Image source={item.icon} style={styles.footerAppIcon} resizeMode="contain" />
-													</View>
-													{newAppIds.has(item.id) && (
-														<View style={styles.footerNewBadge}>
-															<Text style={styles.footerNewBadgeText}>NEW</Text>
+								{appsFailed ? null : !apps ? (
+									<ActivityIndicator color={COLORS.textLight} style={styles.footerAppLoading} />
+								) : (
+									<FlatList
+										horizontal
+										data={apps}
+										keyExtractor={(item, index) => `${item.id}-${index}`}
+										showsHorizontalScrollIndicator={false}
+										contentContainerStyle={styles.footerAppList}
+										renderItem={({ item }) => {
+											const handlePress = async () => {
+												const storeUrl = Platform.OS === 'android' ? item.android : item.ios;
+												if (!storeUrl) {
+													AppAlert.alert('Coming Soon..!', '아직 이 플랫폼에서는 출시되지 않았습니다.');
+													return;
+												}
+												const supported = await Linking.canOpenURL(storeUrl);
+												supported ? Linking.openURL(storeUrl) : AppAlert.alert('오류', '스토어 페이지를 열 수 없습니다.');
+											};
+											return (
+												<TouchableOpacity style={styles.footerAppCard} onPress={handlePress} activeOpacity={0.8}>
+													<View style={{ position: 'relative' }}>
+														<View style={styles.footerAppIconWrapper}>
+															<Image source={{ uri: appIconUrl(item) }} style={styles.footerAppIcon} resizeMode="contain" />
 														</View>
-													)}
-												</View>
-												<Text style={styles.footerAppTitle}>{item.title}</Text>
-												<Text style={styles.footerAppDesc} numberOfLines={2}>
-													{item.desc}
-												</Text>
-											</TouchableOpacity>
-										);
-									}}
-								/>
+														{newAppIds.has(item.id) && (
+															<View style={styles.footerNewBadge}>
+																<Text style={styles.footerNewBadgeText}>NEW</Text>
+															</View>
+														)}
+													</View>
+													<Text style={styles.footerAppTitle}>{item.title}</Text>
+													<Text style={styles.footerAppDesc} numberOfLines={2}>
+														{item.desc}
+													</Text>
+												</TouchableOpacity>
+											);
+										}}
+									/>
+								)}
 							</View>
 						}
 					/>
@@ -1445,8 +1456,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 		overflow: 'hidden',
 		marginBottom: SPACING_H.sm,
+		// 아이콘을 받아 오는 동안 빈 칸으로 보이지 않게 옅은 바탕을 깐다
+		backgroundColor: COLORS.surfaceAlt,
 	},
 	footerAppIcon: { width: '100%', height: '100%' },
+	// 받는 동안 자리 — 카드 한 줄 높이만큼 비워 두어 받은 뒤 아래가 덜 튄다
+	footerAppLoading: { paddingVertical: SPACING_H.xxl },
 	// 아이콘 우상단 NEW 배지 — 이전에는 삼각형 리본 + 5px 회전 텍스트라 글자가 읽히지 않았다.
 	footerNewBadge: {
 		position: 'absolute',

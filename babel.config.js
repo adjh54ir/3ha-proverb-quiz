@@ -35,7 +35,7 @@ module.exports = {
 	],
 	env: {
 		// 운영(release) 번들에서는 console.* 호출을 전부 제거한다.
-		// error 는 문제 추적 단서라 남긴다.
+		// error 까지 지우면 Crashlytics 로 올라가는 단서가 사라지므로 남긴다.
 		production: {
 			plugins: [['transform-remove-console', { exclude: ['error'] }]],
 		},

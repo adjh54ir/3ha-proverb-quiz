@@ -15,6 +15,7 @@ export const OPEN_SOURCE_LIBS: OpenSourceLib[] = [
 	{ name: '@react-native-community/slider', license: 'MIT', version: '5.2.0', url: 'https://github.com/callstack/react-native-slider' },
 	{ name: '@react-native-firebase/analytics', license: 'Apache-2.0', version: '22.4.0', url: 'https://github.com/invertase/react-native-firebase/tree/main/packages/analytics' },
 	{ name: '@react-native-firebase/app', license: 'Apache-2.0', version: '22.4.0', url: 'https://github.com/invertase/react-native-firebase/tree/main/packages/app' },
+	{ name: '@react-native-firebase/crashlytics', license: 'Apache-2.0', version: '22.4.0', url: 'https://github.com/invertase/react-native-firebase/tree/main/packages/crashlytics' },
 	{ name: '@react-navigation/bottom-tabs', license: 'MIT', version: '7.18.0', url: 'https://github.com/react-navigation/react-navigation' },
 	{ name: '@react-navigation/native', license: 'MIT', version: '7.3.1', url: 'https://github.com/react-navigation/react-navigation' },
 	{ name: '@react-navigation/stack', license: 'MIT', version: '7.10.3', url: 'https://github.com/react-navigation/react-navigation' },

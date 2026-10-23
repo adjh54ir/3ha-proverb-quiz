@@ -5,7 +5,7 @@ import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, T
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CONTENT_MAX_WIDTH, isTablet, scaleHeight } from '@/utils';
-import { COLORS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { COLORS, SPACING_H, themedStyles } from '@/const/common/Theme';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 import useAdsRemoved from '@/hooks/useAdsRemoved';
@@ -263,7 +263,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		right: 0,
 		zIndex: 10,
 		paddingVertical: SPACING_H.xs,
-		marginHorizontal: SPACING_W.lg,
 		alignItems: 'center',
 	},
 	container: {

@@ -6,7 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import AddProverbModal from './modal/AddProverbModal';
@@ -136,9 +137,9 @@ const MyProverbBookDetail = () => {
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
 		const isSelected = selectedForRemove.has(item.id);
 		return (
-			<AnimatedListItem index={index}>
+			<AnimatedListItem index={index} style={listGrid?.cell}>
 				<TouchableOpacity
-					style={[styles.itemCard, removeMode && isSelected && styles.itemCardSelected]}
+					style={[styles.itemCard, listGrid?.fill, removeMode && isSelected && styles.itemCardSelected]}
 					activeOpacity={0.8}
 					onPress={() => {
 						if (removeMode) {
@@ -204,7 +205,7 @@ const MyProverbBookDetail = () => {
 					<View style={{ flex: 1 }}>
 						{!!book?.description && <Text style={styles.summaryDesc} numberOfLines={1}>{book.description}</Text>}
 						{/* 개수는 textStrong — 사용자가 고른 속담집 색(#475569 등 진한 색)은 다크 표면 위 글자로 대비가 2 대로 떨어진다. 색은 아이콘·테두리에만 쓴다 */}
-						<Text style={styles.summaryCount}>총 <Text style={{ color: COLORS.textStrong, fontWeight: '700' }}>{proverbs.length}</Text>개의 속담</Text>
+						<Text style={styles.summaryCount}>총 <Text style={{ color: COLORS.textStrong, fontWeight: '700' }}>{proverbs.length.toLocaleString()}</Text>개의 속담</Text>
 						{lastAttempt && (
 							<Text style={styles.summaryRecord}>최근 정답률 {lastAttempt.accuracy}% · {lastAttempt.correctCount}/{lastAttempt.correctCount + lastAttempt.wrongCount}</Text>
 						)}
@@ -230,6 +231,8 @@ const MyProverbBookDetail = () => {
 				<FlatList
 					ref={listRef}
 					data={proverbs}
+					numColumns={LIST_COLUMNS}
+					columnWrapperStyle={listGrid?.row}
 					onScroll={onListScroll}
 					scrollEventThrottle={16}
 					keyExtractor={(item) => item.id.toString()}
@@ -378,7 +381,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	checkboxChecked: { backgroundColor: COLORS.danger, borderColor: COLORS.danger },
-	itemProverb: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong },
+	itemProverb: { fontFamily: FONTS.display, fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong },
 	itemMeaning: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, marginTop: SPACING_H.xs },
 	itemBadges: { rowGap: SPACING_H.xs, alignItems: 'flex-end' },
 	miniBadge: { paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs, borderRadius: RADIUS.round },
@@ -434,7 +437,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		overflow: 'hidden',
 		alignItems: 'center',
 	},
-	confirmTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
+	confirmTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
 	confirmDesc: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.textSecondary,

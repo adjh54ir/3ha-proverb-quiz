@@ -3,7 +3,7 @@ import React, {  } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleWidth, scaleHeight } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { useModalEnter } from '@/hooks/useModalEnter';
@@ -93,6 +93,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	// ===== 헤더 =====
 	headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 	title: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,

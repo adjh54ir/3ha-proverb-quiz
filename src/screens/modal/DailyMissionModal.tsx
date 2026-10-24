@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, Image, ScrollView } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import DateUtils from '@/utils/DateUtils';
 import { computeDailyMissions, countDoneMissions, allMissionsDone, DailyMission } from '@/utils/DailyMissionUtils';
@@ -211,6 +211,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 	},
 	title: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textWhite,

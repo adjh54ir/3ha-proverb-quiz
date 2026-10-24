@@ -51,4 +51,6 @@ export const OPEN_SOURCE_LIBS: OpenSourceLib[] = [
 	{ name: 'react-redux', license: 'MIT', version: '9.3.0', url: 'https://github.com/reduxjs/react-redux' },
 	{ name: 'redux-persist', license: 'MIT', version: '6.0.0', url: 'https://github.com/rt2zz/redux-persist#readme' },
 	{ name: 'zod', license: 'MIT', version: '3.25.76', url: 'https://github.com/colinhacks/zod' },
+	{ name: 'Gowun Batang (font)', license: 'OFL-1.1', version: '2.000', url: 'https://github.com/yangheeryu/Gowun-Batang' },
+	{ name: 'Pretendard (font)', license: 'OFL-1.1', version: '1.3.9', url: 'https://github.com/orioncactus/pretendard' },
 ];

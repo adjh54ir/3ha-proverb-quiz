@@ -15,7 +15,7 @@ import {
 	subscribePurchaseError,
 } from '@/services/PurchaseService';
 import { scaledSize, scaleWidth } from '@/utils/DementionUtils';
-import { FONT_SIZES, RADIUS, SPACING_H, SPACING_W, displayFontSize, themedStyles } from '@/const/common/Theme';
+import { FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, displayFontSize, themedStyles } from '@/const/common/Theme';
 
 /*
   광고 제거 카드(평생 이용권 하나) — 설정 화면 '앱이 마음에 드셨습니까?' 바로 아래.
@@ -30,7 +30,6 @@ const GOLD_BTN = ['#F3DDAB', '#D9B77A', '#B58B4A'];
 const SEAL = '#B8322A';
 const IVORY = '#F5EEDF';
 const IVORY_DIM = 'rgba(245,238,223,0.64)';
-const SERIF = Platform.select({ ios: 'AppleMyungjo', default: 'serif' });
 
 const BENEFITS = [
 	'배너·전면 광고가 앱 전체에서 사라져요',
@@ -263,11 +262,11 @@ const styles = themedStyles(() =>
 			alignItems: 'center',
 			transform: [{ rotate: '4deg' }],
 		},
-		sealText: { color: IVORY, fontFamily: SERIF, fontSize: FONT_SIZES.lg, lineHeight: FONT_SIZES.lg * 1.2, fontWeight: '700' },
+		sealText: { color: IVORY, fontFamily: FONTS.display, fontSize: FONT_SIZES.lg, lineHeight: FONT_SIZES.lg * 1.2, fontWeight: '700' },
 		title: {
 			marginTop: SPACING_H.md,
 			color: IVORY,
-			fontFamily: SERIF,
+			fontFamily: FONTS.display,
 			fontSize: FONT_SIZES.title,
 			lineHeight: FONT_SIZES.title * 1.32,
 			fontWeight: '700',
@@ -291,7 +290,7 @@ const styles = themedStyles(() =>
 			backgroundColor: GOLD_SOFT,
 		},
 		offerHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-		offerLabel: { color: GOLD, fontFamily: SERIF, fontSize: FONT_SIZES.lg, fontWeight: '700', letterSpacing: 0.5 },
+		offerLabel: { color: GOLD, fontFamily: FONTS.display, fontSize: FONT_SIZES.lg, fontWeight: '700', letterSpacing: 0.5 },
 		offerChip: {
 			paddingHorizontal: SPACING_W.sm,
 			paddingVertical: SPACING_H.xxs,

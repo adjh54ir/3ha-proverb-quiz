@@ -11,7 +11,7 @@ import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { isTablet, moderateScale, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize, getThemeMode } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize, getThemeMode } from '@/const/common/Theme';
 import {useIsFocused} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { TimeChallengeInterceptor } from '@/services/interceptor/TimeChanllengeInterceptor';
@@ -139,7 +139,7 @@ const InfinityQuizScreen = () => {
 	const [gameResult, setGameResult] = useState<MainDataType.TimeChallengeResult | null>(null);
 	const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
-	const labelColors = [COLORS.secondary, COLORS.primary, COLORS.accentFlame, COLORS.accentPink]; // A, B, C, D 색상 (각각 다르게)
+	const labelColors = [COLORS.primary, COLORS.accentFlame, COLORS.accentTeal, COLORS.accentPink]; // A, B, C, D 색상 (각각 다르게)
 	const solvedProverbs = questionList.slice(0, currentIndex + 1).filter((q) => resultMap[q.id]);
 	// 해설 헤더에 접힌 상태에서도 성적을 보여주기 위한 요약
 	const solvedCorrectCount = solvedProverbs.filter((q) => resultMap[q.id] === 'correct').length;
@@ -820,11 +820,11 @@ const InfinityQuizScreen = () => {
 									<>
 										{/* ✅ 정답 / 오답 강조 카드 */}
 										<View style={styles.resultScoreCardRow}>
-											<View style={[styles.resultScoreCard, { backgroundColor: COLORS.primaryBg, borderColor: COLORS.successBorder }]}>
-												<View style={[styles.resultScoreIcon, { backgroundColor: COLORS.primary }]}>
+											<View style={[styles.resultScoreCard, { backgroundColor: COLORS.successBg, borderColor: COLORS.successBorder }]}>
+												<View style={[styles.resultScoreIcon, { backgroundColor: COLORS.success }]}>
 													<IconComponent name="check" type="materialIcons" color={COLORS.textWhite} size={scaledSize(16)} />
 												</View>
-												<Text style={[styles.resultScoreValue, { color: COLORS.primaryDark }]}>{gameResult.correctCount}</Text>
+												<Text style={[styles.resultScoreValue, { color: COLORS.successDark }]}>{gameResult.correctCount}</Text>
 												<Text style={styles.resultScoreLabel}>정답</Text>
 											</View>
 											<View style={[styles.resultScoreCard, { backgroundColor: COLORS.dangerSoftBg, borderColor: COLORS.dangerBorderSoft }]}>
@@ -936,8 +936,8 @@ const InfinityQuizScreen = () => {
 								{solvedProverbs.map((q, i) => {
 									const isCorrect = resultMap[q.id] === 'correct';
 									const tint = isCorrect ? COLORS.success : COLORS.danger;
-									const soft = isCorrect ? COLORS.primarySoft : COLORS.dangerBg;
-									const deep = isCorrect ? COLORS.primaryDark : COLORS.dangerDark;
+									const soft = isCorrect ? COLORS.successSoft : COLORS.dangerBg;
+									const deep = isCorrect ? COLORS.successDark : COLORS.dangerDark;
 									return (
 										<TouchableOpacity
 											key={q.id}
@@ -1006,9 +1006,9 @@ const InfinityQuizScreen = () => {
 										type="materialIcons"
 										name={feedback === 'correct' ? 'check-circle' : 'cancel'}
 										size={scaledSize(14)}
-										color={feedback === 'correct' ? COLORS.primaryDark : COLORS.dangerDark}
+										color={feedback === 'correct' ? COLORS.successDark : COLORS.dangerDark}
 									/>
-									<Text style={[styles.feedbackTagText, { color: feedback === 'correct' ? COLORS.primaryDark : COLORS.dangerDark }]}>
+									<Text style={[styles.feedbackTagText, { color: feedback === 'correct' ? COLORS.successDark : COLORS.dangerDark }]}>
 										{feedback === 'correct' ? '정답입니다' : '오답입니다'}
 									</Text>
 								</View>
@@ -1048,7 +1048,7 @@ const InfinityQuizScreen = () => {
 										{choice}
 									</Text>
 									{showCorrect && (
-										<IconComponent name="check-circle" type="materialIcons" size={scaledSize(20)} color={COLORS.primaryDark} />
+										<IconComponent name="check-circle" type="materialIcons" size={scaledSize(20)} color={COLORS.successDark} />
 									)}
 									{showWrong && <IconComponent name="cancel" type="materialIcons" size={scaledSize(20)} color={COLORS.dangerDark} />}
 								</TouchableOpacity>
@@ -1417,6 +1417,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xl,
 	},
 	exitModalTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xxl,
 		fontWeight: '700',
 		color: COLORS.text,
@@ -1559,6 +1560,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		lineHeight: scaleHeight(28),
 	},
 	questionIdiom: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xxl,
 		color: COLORS.secondary,
 		fontWeight: '800',
@@ -1578,7 +1580,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,
 	},
-	feedbackTagCorrect: { backgroundColor: COLORS.primarySoft },
+	feedbackTagCorrect: { backgroundColor: COLORS.successSoft },
 	feedbackTagWrong: { backgroundColor: COLORS.dangerBg },
 	feedbackTagText: { fontSize: FONT_SIZES.smPlus, fontWeight: '800' },
 	choicesWrapper: {
@@ -1618,8 +1620,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '800',
 	},
 	choiceBtnCorrect: {
-		backgroundColor: COLORS.primarySoft,
-		borderColor: COLORS.primaryDark,
+		backgroundColor: COLORS.successSoft,
+		borderColor: COLORS.successDark,
 	},
 	choiceBtnWrong: {
 		backgroundColor: COLORS.dangerBg,
@@ -1629,7 +1631,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		opacity: 0.5,
 	},
 	choiceTextCorrect: {
-		color: COLORS.primaryDeep,
+		color: COLORS.successDeep,
 		fontWeight: '800',
 	},
 	choiceTextWrong: {
@@ -1743,7 +1745,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	feedbackToggleTextWrap: { flex: 1 },
 	feedbackToggleTitle: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong },
 	feedbackToggleSub: { marginTop: SPACING_H.xxs, fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
-	feedbackToggleCorrect: { fontWeight: '700', color: COLORS.primaryDark },
+	feedbackToggleCorrect: { fontWeight: '700', color: COLORS.successDark },
 	feedbackToggleWrong: { fontWeight: '700', color: COLORS.dangerDark },
 	feedbackList: {
 		width: '100%',
@@ -1787,6 +1789,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	feedbackResultBadgeText: { fontSize: FONT_SIZES.xs, fontWeight: '800' },
 	feedbackTitle: {
 		flex: 1,
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -1957,6 +1960,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.smPlus,
 	},
 	chanceModalTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '800',
 		color: COLORS.textStrong,
@@ -2015,7 +2019,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	chanceKeywordBox: { width: '100%', marginBottom: SPACING_H.smPlus },
 	chanceKeywordWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING_W.xsPlus, marginTop: SPACING_H.xsPlus },
 	chanceKeywordChip: { backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.sm, paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs },
-	chanceKeywordText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textMuted },
+	chanceKeywordText: { fontFamily: FONTS.display, fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textMuted },
 
 	chanceExampleBox: {
 		width: '100%',
@@ -2097,6 +2101,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	timeResultImage: { width: scaleWidth(148), height: scaleHeight(104), marginBottom: SPACING_H.xs },
 	resultHeaderTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xxl,
 		fontWeight: '800',
 		color: COLORS.textStrong,
@@ -2183,6 +2188,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.border,
 	},
 	scoreHeroNumber: {
+		fontFamily: FONTS.body,
 		fontSize: displayFontSize(56),
 		fontWeight: '700',
 		color: COLORS.danger,

@@ -5,7 +5,7 @@ import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import IconComponent from '../atomic/IconComponent';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 
 interface Props {
 	visible: boolean;
@@ -168,6 +168,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 	},
 	name: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
 		color: COLORS.textStrong,

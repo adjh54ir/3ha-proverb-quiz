@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import PopInView from '@/components/animation/PopInView';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
@@ -164,6 +164,7 @@ const styles = themedStyles(() => StyleSheet.create({
         color: COLORS.warningDeep,
     },
     title: {
+        fontFamily: FONTS.display,
         fontSize: FONT_SIZES.heading,
         fontWeight: '700',
         color: COLORS.textStrong,

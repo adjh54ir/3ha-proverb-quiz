@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Animated } from '
 import Modal from '@/screens/common/atomic/AppModal';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber } from '@/screens/common/CommonProverbModule';
 
 /** 레벨 번호 → 난이도 이름 (공통 난이도 램프 조회용) */
@@ -236,6 +236,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		position: 'relative',
 	},
 	modalHeaderTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -273,6 +274,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 
 	modalProverbText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xxl,
 		fontWeight: '700',
 		color: COLORS.secondaryDark, // 파란색 강조
@@ -353,6 +355,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 	},
 	sameProverbText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.md,
 		color: COLORS.text,
 		lineHeight: scaledSize(20),

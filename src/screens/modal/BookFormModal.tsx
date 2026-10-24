@@ -3,7 +3,7 @@ import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
 import { Animated, Image, Keyboard, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { BOOK_COLORS, BOOK_ICONS } from '../common/CommonProverbModule';
@@ -201,7 +201,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	// maxWidth: 태블릿에서 카드가 화면 폭만큼 늘어나면 대화상자로 읽히지 않는다.
 	// overflow: scale 로 등장하는 테두리 카드 (모달 레이아웃 규칙 7)
 	modal: { width: '100%', maxWidth: MODAL_MAX_WIDTH, backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden', paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.xl },
-	modalTitle: { fontSize: FONT_SIZES.heading, fontWeight: '700', color: COLORS.textStrong },
+	modalTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.heading, fontWeight: '700', color: COLORS.textStrong },
 	modalSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'left', marginTop: SPACING_H.xs },
 	inputWrap: { flexDirection: 'row', alignItems: 'center', height: scaleHeight(48), borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, marginTop: SPACING_H.xs, marginBottom: SPACING_H.md, backgroundColor: COLORS.surface },
 	inputWrapFocused: { borderColor: COLORS.primary },

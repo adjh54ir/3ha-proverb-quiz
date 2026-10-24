@@ -87,7 +87,7 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     checkIcon: {
         fontSize: displayFontSize(36),
-        color: COLORS.primary,
+        color: COLORS.success,
         fontWeight: '700',
         lineHeight: scaledSize(44),
     },

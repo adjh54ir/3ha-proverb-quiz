@@ -64,9 +64,12 @@
 2. `scaleWidth` / `scaleHeight` / `scaledSize` 의 배율에는 상한이 있다.
    폰 `MAX_SCALE = 1.25`, 태블릿 `TABLET_MAX_SCALE = 1.35`.
    태블릿이 너무 작거나 크게 느껴지면 **레이아웃을 새로 짜기 전에 이 값부터** 조정한다.
+   예외 하나 — 짧은 변 1000dp 이상(13인치)은 글씨·아이콘(`scaledSize`)만 `LARGE_TABLET_FONT_SCALE = 1.45`.
 
 3. 화면 본문은 `AppLayout` 의 `navigatorWrapper` 가 `CONTENT_MAX_WIDTH` 로 묶고 가운데 정렬한다.
-   화면 코드에서 따로 폭을 제한할 필요가 없다.
+   화면 코드에서 따로 폭을 제한할 필요가 없다. 기둥은 짧은 변 × 0.92, 최대 900 이다.
+   카드형 목록은 태블릿에서 2열이다 — `src/const/common/ListGrid.ts` 의 `LIST_COLUMNS` / `listGrid`
+   (`numColumns` + `columnWrapperStyle={listGrid?.row}`, 셀 `AnimatedListItem style={listGrid?.cell}`, 카드에 `listGrid?.fill`).
 
 4. 모달 카드 폭은 `maxWidth` 를 반드시 준다.
    - 가운데 뜨는 다이얼로그: `scaleWidth(340)` 계열 또는 `MODAL_MAX_WIDTH`
@@ -109,3 +112,30 @@ notifee `createChannel` 에는 **반드시 `vibration: false`** 를 준다(기�
 끝나지 않는 루프(`Animated.loop`)와 컨페티는 `useReducedMotion()` 으로 반드시 게이트한다.
 OS '애니메이션 줄이기'를 켠 사용자에게는 **정보를 잃지 않는 선에서 모션만** 뺀다
 (예: 퀴즈 타이머 깜빡임은 빼도 숫자 타이머가 남는다, 결과 모달은 최종 상태로 바로 세운다).
+
+## 색·서체 규칙 (쪽빛과 감빛)
+
+팔레트와 서체는 `src/const/common/Theme.ts` 한 곳에서 정한다. 컨셉은 '청출어람' — 옛말에서 나온 색을 요즘 채도로.
+
+1. **브랜드(쪽빛) ≠ 정답(청포).** `primary*` 는 주요 액션·선택·활성에만 쓴다.
+   정답·완료·승리 표시는 반드시 `success` / `successBg` / `successSoft` / `successBorder` / `successDark` / `successDeep`.
+   (예전 그린 primary 시절 코드가 정답에 primary 를 썼다 — 새로 만들 때 따라 하지 말 것)
+2. 서체는 두 벌이다.
+   - `FONTS.body`(Pretendard) — 전역 기본값이라(`TextDefaults.ts`) 화면에서 지정하지 않는다.
+   - `FONTS.display`(고운바탕, 'Gowun Batang') — **두 곳에만** 쓴다. 규칙은 "명조 = 속담" 하나로 읽혀야 한다.
+     1) 속담 문장 — 어디에 어떤 모양(제목·목록·칩·태그·보기)으로 나오든 전부.
+     2) 화면 타이틀(헤더·화면 최상단 헤드라인 하나)과 모달/다이얼로그/바텀시트 타이틀.
+     섹션 제목, 카드 제목, 빈 화면 제목, 등급·뱃지·타워 이름, 마크다운 헤딩, 본문·뜻풀이·예문·버튼·숫자는 전부 본문 서체다.
+     예외는 하나 — `InAppRemoveAdsSection` 의 프리미엄 카드(원래부터 명조 디자인).
+   - 같은 자리에 모드에 따라 속담 또는 뜻이 오는 퀴즈 UI 는 속담이 올 때만 붙인다 (`QuizScreen` 의 `proverbFont` 참고).
+   - 중첩 `<Text>` 는 부모 서체를 물려받는다(`TextDefaults` 가 중첩에는 기본값을 넣지 않는다).
+     속담만 강조하려면 바깥이 아니라 속담 부분의 안쪽 `<Text>` 에 붙인다.
+3. 서체 파일은 `android/app/src/main/res/font` 한 곳에만 둔다(iOS 는 같은 파일을 Xcode 에서 참조).
+   추가·교체 시 XML 패밀리, `MainApplication` 등록, `Info.plist` UIAppFonts, Xcode 리소스를 함께 고친다 —
+   `__tests__/fontAssets.test.ts` 가 넷의 일치를 확인한다. OFL 고지는 `scripts/genOpenSource.js` 의 `BUNDLED_FONTS`.
+4. 고운바탕은 원본(굵기별 8MB)을 가공해서 넣었다. 원본으로 갈아끼우면 다시 해야 한다.
+   - 한글은 완성형 2,350자 + `src` 데이터에 나오는 음절만 남기고 힌팅 제거(→ 1.4MB). 사용자가 입력한
+     드문 음절은 시스템 서체로 그려진다. 속담 데이터를 늘리면 다시 서브셋한다.
+   - 줄높이(hhea) 1.448em → 1.2em (시스템 서체와 같게). 안 하면 제목 박스가 커진다.
+   - 한글 디스플레이 서체를 고를 때는 굵은 두께의 한글 모양을 직접 렌더해서 본다.
+     처음 고른 Hahmlet 은 600/700 에서 한글이 고딕처럼 보여 본문과 구분되지 않았다.

@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Animated, Easing 
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import { useModalEnter } from '@/hooks/useModalEnter';
@@ -54,7 +54,7 @@ const QuizResultModal = ({
 	const themeColor = resultType === 'correct' ? COLORS.success : resultType === 'wrong' ? COLORS.danger : COLORS.warning;
 	const cardBg = resultType === 'correct' ? COLORS.successBg : resultType === 'wrong' ? COLORS.dangerBg : COLORS.warningBg;
 	const cardBorder = resultType === 'correct' ? COLORS.successBorder : resultType === 'wrong' ? COLORS.dangerBorderSoft : COLORS.warningBorder;
-	const subTextColor = resultType === 'correct' ? COLORS.primaryDeep : resultType === 'wrong' ? COLORS.dangerDark : COLORS.warningDark;
+	const subTextColor = resultType === 'correct' ? COLORS.successDeep : resultType === 'wrong' ? COLORS.dangerDark : COLORS.warningDark;
 
 	const mascotSource =
 		resultType === 'correct'
@@ -182,7 +182,7 @@ const QuizResultModal = ({
 								<Text style={styles.answerBadgeText}>정답</Text>
 							</View>
 
-							<Text style={styles.answerMain}>{answerText}</Text>
+							<Text style={[styles.answerMain, quizMode !== 'meaning' && styles.answerProverb]}>{answerText}</Text>
 
 							{quizMode === 'blank' && !!blankWord && (
 								<Text style={styles.answerBlankText}>
@@ -300,6 +300,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginLeft: SPACING_W.md,
 	},
 	title: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		marginBottom: SPACING_H.xs,
@@ -353,6 +354,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textStrong,
 		textAlign: 'center',
 		lineHeight: scaledSize(28),
+	},
+	// 정답이 속담(또는 속담의 빈칸 단어)일 때만. 뜻 문제의 정답은 뜻풀이라 본문 서체.
+	answerProverb: {
+		fontFamily: FONTS.display,
 	},
 	answerBlankText: {
 		fontSize: FONT_SIZES.smPlus,
@@ -408,6 +413,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.xs,
 	},
 	proverbInExplain: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -447,6 +453,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderColor: COLORS.accentTeal,
 	},
 	sameText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.md,
 		color: COLORS.text,
 		fontWeight: '400',

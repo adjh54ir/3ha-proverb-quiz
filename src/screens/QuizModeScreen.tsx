@@ -7,7 +7,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { getLevelInkColor } from '@/screens/common/CommonProverbModule';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainDataType } from '@/types/MainDataType';
@@ -616,6 +616,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		padding: SPACING_W.xs,
 	},
 	modalTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,

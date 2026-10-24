@@ -7,7 +7,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { getBadgeProgress, BadgeProgress } from '@/utils/BadgeProgressUtils';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
@@ -366,6 +366,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	iconCircleLocked: { backgroundColor: COLORS.surfaceAlt },
 	badgeName: {
+		fontFamily: FONTS.display,
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',

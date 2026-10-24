@@ -9,7 +9,8 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
 import { CONTENT_MAX_WIDTH, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { listGrid } from '@/const/common/ListGrid';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import BookFormModal from './modal/BookFormModal';
@@ -247,14 +248,15 @@ const MyProverbBook = () => {
 							</TouchableOpacity>
 						</View>
 					) : (
-						filteredBooks.map((book, index) => {
+						<View style={listGrid?.wrap}>
+						{filteredBooks.map((book, index) => {
 							const bookColor = book.color || getDefaultColor();
 							const bookIcon = book.icon || DEFAULT_ICON;
 							const proverbs = ALL_PROVERBS.filter((p) => book.proverbIds.includes(p.id));
 							const preview = proverbs.slice(0, 4);
 							return (
-								<AnimatedListItem key={book.id} index={index}>
-								<TouchableOpacity style={styles.bookCard} activeOpacity={0.8} onPress={() => navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: book.id })}>
+								<AnimatedListItem key={book.id} index={index} style={listGrid?.cell}>
+								<TouchableOpacity style={[styles.bookCard, listGrid?.fill]} activeOpacity={0.8} onPress={() => navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: book.id })}>
 									<View style={styles.bookCardPreviewHeader}>
 										<View style={[styles.bookCardIconWrap, { backgroundColor: bookColor, }]}>
 											<IconComponent type="materialIcons" name={bookIcon} size={scaledSize(26)} color={readableTextOn(bookColor)} />
@@ -274,7 +276,7 @@ const MyProverbBook = () => {
 										<View style={styles.previewRow}>
 											{preview.map((p) => (
 												<View key={p.id} style={styles.previewTag}>
-													<Text style={styles.previewTagText} numberOfLines={1}>{p.proverb}</Text>
+													<Text style={[styles.previewTagText, styles.previewTagProverb]} numberOfLines={1}>{p.proverb}</Text>
 												</View>
 											))}
 											{proverbs.length > 4 && (
@@ -295,7 +297,8 @@ const MyProverbBook = () => {
 								</TouchableOpacity>
 								</AnimatedListItem>
 							);
-						})
+						})}
+						</View>
 					)}
 				</Animated.ScrollView>
 
@@ -490,6 +493,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xs,
 	},
 	previewTagText: { fontSize: FONT_SIZES.sm, color: COLORS.text, fontWeight: '600' },
+	previewTagProverb: { fontFamily: FONTS.display },
 	emptyPreview: {
 		marginTop: SPACING_H.md,
 		paddingVertical: SPACING_H.md,
@@ -545,7 +549,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		overflow: 'hidden',
 		alignItems: 'center',
 	},
-	confirmTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
+	confirmTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
 	confirmDesc: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.textSecondary,

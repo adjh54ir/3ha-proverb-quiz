@@ -11,7 +11,7 @@ import { useScrollTop } from '@/hooks/useScrollTop';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight } from '@/utils/DementionUtils';
 import Markdown from 'react-native-markdown-display';
 import IconComponent from '../atomic/IconComponent';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue, getThemeMode } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue, getThemeMode } from '@/const/common/Theme';
 
 const markdown = `
 # 1) 개인정보처리방침
@@ -363,6 +363,7 @@ const modalStyles = themedStyles(() => StyleSheet.create({
   },
   modalTitle: {
     flex: 1,
+    fontFamily: FONTS.display,
     fontSize: FONT_SIZES.xl,
     fontWeight: '700',
     textAlign: 'center',
@@ -436,6 +437,7 @@ const styles = themedStyles(() => StyleSheet.create({
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const markdownStyles = themedValue(() => ({
   body: {
+    fontFamily: FONTS.body,
     color: COLORS.text,
     fontSize: FONT_SIZES.md,
     lineHeight: scaledSize(24),

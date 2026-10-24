@@ -5,7 +5,7 @@ import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, T
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CONTENT_MAX_WIDTH, isTablet, scaleHeight } from '@/utils';
-import { COLORS, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, SPACING_H, themedStyles } from '@/const/common/Theme';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 import useAdsRemoved from '@/hooks/useAdsRemoved';
@@ -206,6 +206,13 @@ const AppLayout = () => {
 				text: COLORS.text,
 				border: COLORS.border,
 				notification: COLORS.danger,
+			},
+			// 탭 라벨·헤더는 이 테마의 fontFamily('System')를 직접 박아 전역 본문 서체(TextDefaults)를 덮어쓴다.
+			fonts: {
+				regular: { fontFamily: FONTS.body, fontWeight: '400' },
+				medium: { fontFamily: FONTS.body, fontWeight: '500' },
+				bold: { fontFamily: FONTS.body, fontWeight: '600' },
+				heavy: { fontFamily: FONTS.body, fontWeight: '700' },
 			},
 		};
 	}, [themeMode]);

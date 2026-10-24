@@ -3,7 +3,7 @@ import AppAlert from '@/screens/common/modal/AppAlert';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
@@ -239,7 +239,7 @@ const styles = themedStyles(() => StyleSheet.create({
 
 	// ===== 타이틀 =====
 	titleWrap: { marginBottom: SPACING_H.xl, alignItems: 'center' },
-	titleLine: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text, textAlign: 'center', marginBottom: SPACING_H.xs },
+	titleLine: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text, textAlign: 'center', marginBottom: SPACING_H.xs },
 
 	// ===== 모드 카드 =====
 	gridWrap: { width: '100%', rowGap: SPACING_H.md, marginBottom: SPACING_H.xl },

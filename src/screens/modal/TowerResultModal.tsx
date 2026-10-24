@@ -3,7 +3,7 @@ import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDime
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { isTablet, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
@@ -115,8 +115,8 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 	const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
 	const accentColor = isVictory ? COLORS.gold : COLORS.dangerLight;
 	const bgColor = isVictory ? COLORS.towerVictoryBg : COLORS.towerDefeatBg;
-	const headerBgColor = isVictory ? COLORS.primary : COLORS.dangerDeep;
-	const borderColor = isVictory ? COLORS.primary : COLORS.danger;
+	const headerBgColor = isVictory ? COLORS.success : COLORS.dangerDeep;
+	const borderColor = isVictory ? COLORS.success : COLORS.danger;
 
 	const renderScoreDots = () =>
 		Array.from({ length: totalQuestions }).map((_, i) => (
@@ -143,7 +143,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 						styles.modalContainer,
 						{
 							// 태블릿에서 화면의 90% 는 지나치게 넓다 — 다른 대화상자와 같은 모달 상한으로 묶는다
-							// (기둥 폭 700 은 대화상자로 읽히지 않는다). 폰은 상한에 닿지 않아 그대로다.
+							// (기둥 폭(태블릿 최대 900)은 대화상자로 읽히지 않는다). 폰은 상한에 닿지 않아 그대로다.
 							width: Math.min(width * 0.9, MODAL_MAX_WIDTH),
 							// 쓸 수 있는 높이의 80% → 버튼이 항상 화면 안에 들어옴.
 							// 태블릿은 80% 가 870~1020pt 라 짧은 결과(패배)에서 카드 안이 휑하다 → 상한으로만 쓰고 내용에 맞춘다.
@@ -317,6 +317,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		// flex 없음 → 컨텐츠 크기만큼만 차지
 	},
 	resultTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textWhite,

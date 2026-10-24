@@ -11,7 +11,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import { Paths } from '@/navigation/conf/Paths';
 import { generateTowerQuiz, TowerQuizQuestion } from '@/const/ConstTowerQuizData';
@@ -125,7 +125,7 @@ const TowerQuizScreen = () => {
 
 	const playEffectText = (isCorrect: boolean) => {
 		const texts = isCorrect ? CORRECT_TEXTS : WRONG_TEXTS;
-		const color = isCorrect ? COLORS.primary : COLORS.danger;
+		const color = isCorrect ? COLORS.success : COLORS.danger;
 		const text = texts[Math.floor(Math.random() * texts.length)];
 
 		setEffectText(text);
@@ -514,7 +514,7 @@ const TowerQuizScreen = () => {
 
 							let backgroundColor = 'rgba(255, 255, 255, 0.1)';
 							if (showCorrect) {
-								backgroundColor = COLORS.primary;
+								backgroundColor = COLORS.success;
 							} else if (showWrong) {
 								backgroundColor = COLORS.danger;
 							} else if (isSelected) {
@@ -555,9 +555,9 @@ const TowerQuizScreen = () => {
 										type="materialIcons"
 										name={isCorrectAnswer ? 'check-circle' : 'info'}
 										size={scaledSize(24)}
-										color={isCorrectAnswer ? COLORS.primary : COLORS.danger}
+										color={isCorrectAnswer ? COLORS.success : COLORS.danger}
 									/>
-									<Text style={[styles.explanationTitle, { color: isCorrectAnswer ? COLORS.primary : COLORS.danger }]}>
+									<Text style={[styles.explanationTitle, { color: isCorrectAnswer ? COLORS.success : COLORS.danger }]}>
 										{isCorrectAnswer ? '정답입니다!' : '틀렸습니다'}
 									</Text>
 								</View>
@@ -625,7 +625,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	headerCrest: { width: scaleWidth(28), height: scaleWidth(28) },
 	loadingCoachImage: { width: scaleWidth(150), height: scaleWidth(150), marginBottom: SPACING_H.lg },
 	errorStateImage: { width: scaleWidth(150), height: scaleHeight(100), marginBottom: SPACING_H.lg },
-	levelTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
+	levelTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
 	questionCount: { fontSize: FONT_SIZES.md, color: COLORS.darkTextSecondary, marginTop: SPACING_H.xs },
 	progressBarContainer: { paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.lg },
 	progressLabelRow: {
@@ -663,6 +663,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		textAlign: 'center',
 	},
 	questionProverb: {
+		fontFamily: FONTS.display,
 		color: COLORS.darkAccent, // ✅ 속담 부분만 파란색 강조
 		fontWeight: '700',
 	},

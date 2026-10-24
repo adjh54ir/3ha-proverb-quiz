@@ -1,7 +1,7 @@
 // QuizCompletionModal.tsx 수정
 
 import { scaleWidth, scaleHeight, scaledSize } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, useWindowDimensions } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
@@ -356,6 +356,7 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     // ===== 공통 타이포 =====
     title: {
+        fontFamily: FONTS.display,
         fontSize: FONT_SIZES.heading,
         fontWeight: '700',
         color: COLORS.textStrong,

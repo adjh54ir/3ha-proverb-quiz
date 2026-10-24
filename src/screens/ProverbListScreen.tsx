@@ -12,7 +12,8 @@ import FastImage from 'react-native-fast-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
@@ -425,7 +426,7 @@ const ProverbListScreen = () => {
 									</TouchableOpacity>
 									{/* 검색 개수와 한 줄로 흘려 둔다 — 절대 배치하면 카드 모서리로 쏠려 보인다 */}
 									<View style={styles.listCountRight}>
-										<Text style={styles.listCountText}>총 {mainList.length}개가 검색되었습니다!</Text>
+										<Text style={styles.listCountText}>총 {mainList.length.toLocaleString()}개가 검색되었습니다!</Text>
 										<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
 									</View>
 								</View>
@@ -437,6 +438,8 @@ const ProverbListScreen = () => {
 							<FlatList
 								ref={scrollRef}
 								data={visibleList}
+								numColumns={LIST_COLUMNS}
+								columnWrapperStyle={listGrid?.row}
 								scrollEnabled={!fieldOpen && !levelOpen} // ⛔ 드롭다운 열려 있으면 스크롤 막기
 								keyExtractor={(item) => item.id.toString()}
 								refreshControl={<RefreshControl
@@ -463,9 +466,9 @@ const ProverbListScreen = () => {
 								contentContainerStyle={[styles.flatListCotent, visibleList.length === 0 && styles.flatListContentEmpty]}
 								renderItem={({ item, index }) => {
 									return (
-										<AnimatedListItem index={index} offsetY={16}>
+										<AnimatedListItem index={index} offsetY={16} style={listGrid?.cell}>
 										<TouchableOpacity
-											style={styles.itemBox}
+											style={[styles.itemBox, listGrid?.fill]}
 											activeOpacity={0.8}
 											onPress={() => {
 												setSelectedProverb(item);
@@ -719,6 +722,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '700',
 	},
 	sameProverbText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.text,
 		fontWeight: '400',
@@ -734,6 +738,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: 0,
 	},
 	proverbTextMulti: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		color: COLORS.textStrong,

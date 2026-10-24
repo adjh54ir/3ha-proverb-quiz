@@ -489,7 +489,7 @@ const Home = () => {
 										color={streakInfo.current > 0 ? COLORS.accentFlame : COLORS.textLight}
 									/>
 									<Text style={[styles.streakChipText, streakInfo.current > 0 && styles.streakChipTextActive]}>
-										{streakInfo.current > 0 ? `${streakInfo.current}일 연속 출석 중` : '오늘 출석하기'}
+										{streakInfo.current > 0 ? `${streakInfo.current.toLocaleString()}일 연속 출석 중` : '오늘 출석하기'}
 									</Text>
 								</View>
 							</View>
@@ -552,7 +552,7 @@ const Home = () => {
 							</View>
 
 							{/* ✅ 문제 개수 안내 텍스트 추가 */}
-							{questionsToNext > 0 && <Text style={styles.progressBarTextBelow}>다음 레벨까지 {questionsToNext}문제 남음</Text>}
+							{questionsToNext > 0 && <Text style={styles.progressBarTextBelow}>다음 레벨까지 {questionsToNext.toLocaleString()}문제 남음</Text>}
 						</View>
 						<View style={styles.titleContainer}>
 							<View style={styles.titleInnerBox}>

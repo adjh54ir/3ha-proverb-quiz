@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from '
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
@@ -65,7 +65,7 @@ const QuizHintModal: React.FC<QuizHintModalProps> = ({ visible, question, mode, 
 									<Text style={styles.sectionLabel}>문제</Text>
 								</View>
 								<View style={styles.questionBox}>
-									<Text style={styles.questionText}>{questionPrompt}</Text>
+									<Text style={[styles.questionText, (mode === 'meaning' || mode === 'blank') && styles.questionProverbText]}>{questionPrompt}</Text>
 								</View>
 							</View>
 						)}
@@ -173,6 +173,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 	},
 	title: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -221,6 +222,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderColor: COLORS.warningBorder,
 	},
 	tagText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.smPlus,
 		fontWeight: '600',
 		color: COLORS.warningDark,
@@ -247,6 +249,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '600',
 		color: COLORS.textStrong,
 		lineHeight: scaledSize(23),
+	},
+	// 문제 프롬프트가 속담 문장일 때만(뜻·예문 문제는 본문 서체). QuizScreen 의 proverbFont 조건과 같다.
+	questionProverbText: {
+		fontFamily: FONTS.display,
 	},
 	exampleText: {
 		fontSize: FONT_SIZES.md,

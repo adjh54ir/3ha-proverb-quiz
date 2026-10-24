@@ -9,7 +9,7 @@ import IconComponent from './common/atomic/IconComponent';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -665,6 +665,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textSecondary,
 	},
 	reviewProverbText: {
+		fontFamily: FONTS.display,
 		flex: 1,
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',

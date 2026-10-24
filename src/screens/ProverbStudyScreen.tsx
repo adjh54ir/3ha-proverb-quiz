@@ -19,7 +19,7 @@ import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { CONTENT_MAX_WIDTH, isTablet, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme, getThemeMode } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme, getThemeMode } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber, LEVEL_NAME_BY_NUMBER } from '@/screens/common/CommonProverbModule';
 import { LEVEL_DROPDOWN_ITEMS, FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
@@ -88,7 +88,7 @@ const isAndroid = Platform.OS === 'android';
  * 학습 카드 크기.
  *
  * 태블릿은 `scaleHeight(고정값)` 을 쓰지 않는다 — 배율 상한(1.35)에 걸려 어떤 기기든 756pt 로
- * 굳어 버려서, 13인치에서는 카드 아래로 화면 높이의 4분의 1이 비고 폭도 기둥(700) 안에서
+ * 굳어 버려서, 13인치에서는 카드 아래로 화면 높이의 4분의 1이 비고 폭도 본문 기둥 안에서
  * 500 밖에 안 써 좌우가 휑했다. 기기 크기에 비례시켜 기둥과 화면을 채운다.
  * 폰은 두 값 모두 기존 그대로다.
  */
@@ -97,7 +97,8 @@ const CARD_HEIGHT = isTablet
 	: isAndroid
 		? scaleHeight(550) // 📌 iOS 대비 20 높게
 		: scaleHeight(540);
-const CARD_WIDTH = isTablet ? Math.round(CONTENT_MAX_WIDTH * 0.88) : scaleWidth(370);
+// 태블릿 폭은 높이의 85% 까지만 — 넓어진 기둥(13인치 900)을 그대로 따르면 카드가 정사각형에 가까워진다.
+const CARD_WIDTH = isTablet ? Math.round(Math.min(CONTENT_MAX_WIDTH * 0.88, CARD_HEIGHT * 0.85)) : scaleWidth(370);
 
 const praiseMessages = [
 	'속담 하나를 더 마스터했습니다! 🎉',
@@ -837,7 +838,7 @@ const QuizStudyScreen = () => {
 											{item.sameProverb
 												.filter((sp) => sp.trim() !== '')
 												.map((sp, idx) => (
-													<Text key={idx} style={styles.sectionText}>
+													<Text key={idx} style={[styles.sectionText, styles.sameProverbText]}>
 														- {sp}
 													</Text>
 												))}
@@ -1709,6 +1710,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.md,
 	},
 	exitTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -1765,6 +1767,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignSelf: 'center',
 	},
 	hanjaText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.display,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -1834,6 +1837,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 
 	cardBackTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.title,
 		fontWeight: '700',
 		color: COLORS.secondaryDark,
@@ -1869,6 +1873,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		lineHeight: scaledSize(21),
 		marginBottom: SPACING_H.xs,
 	},
+	// 동의 속담은 예문과 같은 박스지만 속담 문장이라 display 서체 (ProverbDetailModal·QuizResultModal 과 동일)
+	sameProverbText: { fontFamily: FONTS.display },
 	meaningQuoteBox: {
 		alignItems: 'center', // 중앙 정렬
 		justifyContent: 'center',

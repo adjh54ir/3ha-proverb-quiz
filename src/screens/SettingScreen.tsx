@@ -32,7 +32,7 @@ import InAppRemoveAdsSection from './common/setting/InAppRemoveAdsSection';
 import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL, APP_NAME as ENV_APP_NAME, APP_DESCRIPTION as ENV_APP_DESCRIPTION } from '@env';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import FadeInView from '@/components/animation/FadeInView';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue } from '@/const/common/Theme';
 import { SCORE_PER_QUESTION } from '@/const/common/CommonCharacterData';
 import { AppPermissionInfo, loadAppPermissions, requestAppPermission } from '@/utils/PermissionUtils';
 import DateUtils from '@/utils/DateUtils';
@@ -1385,7 +1385,7 @@ const styles = themedStyles(() => StyleSheet.create({
 
 
 	modalTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: SPACING_H.md },
-	modalTitleText: { fontSize: FONT_SIZES.xl, lineHeight: scaledSize(26), fontWeight: '700', color: COLORS.textStrong, textAlign: 'center' },
+	modalTitleText: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, lineHeight: scaledSize(26), fontWeight: '700', color: COLORS.textStrong, textAlign: 'center' },
 	iconLeft: { marginRight: SPACING_W.sm },
 
 	recommendSection: {

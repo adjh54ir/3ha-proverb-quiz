@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { useAppNavigation } from '@/navigation/conf/Types';
@@ -53,8 +53,9 @@ const TowerChallengeScreen = () => {
 	// 캐러셀은 항상 1단계부터 보여주고 있었다. 클리어하고 돌아와도 다시 1단계라
 	// 매번 손으로 넘겨야 했으므로, 도전할 차례인 단계로 맞춰 준다.
 	const carouselRef = useRef<ICarouselInstance>(null);
-	// 캐러셀은 본문 기둥 안에 놓인다 — 화면 폭으로 재면 태블릿에서 기둥(700)보다 커져 양옆이 잘린다.
-	const carouselWidth = Math.min(Math.min(windowWidth, CONTENT_MAX_WIDTH) * 0.9, scaleWidth(520));
+	// 캐러셀은 본문 기둥 안에 놓인다 — 화면 폭으로 재면 태블릿에서 기둥(최대 900)보다 커져 양옆이 잘린다.
+	// 별도 상한을 두지 않는다 — 두면 태블릿에서 이 화면만 기둥보다 좁아진다. 폰은 화면 폭 기준이라 그대로다.
+	const carouselWidth = Math.min(windowWidth, CONTENT_MAX_WIDTH) * 0.9;
 	/** 도전할 차례인 단계의 캐러셀 인덱스 (마지막 단계까지 깼으면 마지막 카드) */
 	const currentIndex = Math.min(Math.max(progress.level, 1), TOWER_LEVELS.length) - 1;
 
@@ -440,6 +441,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	towerGuideImage: { position: 'absolute', right: SPACING_W.lg, top: 0, width: scaleWidth(78), height: scaleHeight(82) },
 	mainTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.title,
 		fontWeight: '700',
 		color: COLORS.textWhite,

@@ -11,7 +11,8 @@ import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import IconComponent from './common/atomic/IconComponent';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
@@ -240,9 +241,9 @@ const FavoriteScreen = () => {
 		const isSelected = selectedIds.includes(item.id);
 
 		return (
-			<AnimatedListItem index={index}>
+			<AnimatedListItem index={index} style={listGrid?.cell}>
 				<TouchableOpacity
-					style={[styles.itemCard, isSelectionMode && isSelected && styles.itemCardSelected]}
+					style={[styles.itemCard, listGrid?.fill, isSelectionMode && isSelected && styles.itemCardSelected]}
 					activeOpacity={0.8}
 					onPress={() => {
 						if (isSelectionMode) {
@@ -453,7 +454,7 @@ const FavoriteScreen = () => {
 								<View style={styles.resultSummaryRow}>
 									{!isSelectionMode ? (
 										<Text style={styles.headerSubText}>
-											총 <Text style={styles.headerCount}>{allFavorites.length}</Text>개가 저장되었습니다!
+											총 <Text style={styles.headerCount}>{allFavorites.length.toLocaleString()}</Text>개가 저장되었습니다!
 										</Text>
 									) : (
 										<Text style={styles.headerSubText}>
@@ -467,6 +468,8 @@ const FavoriteScreen = () => {
 						<FlatList
 							ref={flatListRef}
 							data={filteredList}
+							numColumns={LIST_COLUMNS}
+							columnWrapperStyle={listGrid?.row}
 							onScroll={onListScroll}
 							scrollEventThrottle={16}
 							scrollEnabled={!fieldOpen && !levelOpen}
@@ -583,7 +586,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
 	favoriteHeroImage: { width: scaleWidth(70), height: scaleHeight(58) },
 	// 다른 화면 헤더(ScreenHeader)와 같은 타이틀 크기 — 탭을 오갈 때 글자 크기가 튀지 않게
-	headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },
+	headerTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },
 	headerSubText: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'right' },
 	headerCount: { fontWeight: '700', color: COLORS.warning, fontSize: FONT_SIZES.smPlus },
 	headerCountDelete: { fontWeight: '700', color: COLORS.danger, fontSize: FONT_SIZES.smPlus },
@@ -704,6 +707,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	badgeInlineRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.sm },
 	proverbBlock: { marginBottom: 0 },
 	proverbTextMulti: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -794,7 +798,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		marginBottom: SPACING_H.md,
 	},
-	confirmTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
+	confirmTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
 	confirmDesc: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.textSecondary,

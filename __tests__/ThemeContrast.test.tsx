@@ -47,8 +47,11 @@ const PAIRS: Array<[keyof typeof PALETTES.light, keyof typeof PALETTES.light]> =
 	['primaryBg', 'primaryDeep'],
 	['primarySoft', 'primaryDeep'], // 정답 카드·최신 버전 배지
 	['surface', 'primaryDeep'],
-	// 주요 버튼 채움 + 흰 글자 (primary 채움은 KNOWN_GAPS — 버튼은 primaryFill 을 쓴다)
+	// 주요 버튼 채움 + 흰 글자
 	['primaryFill', 'textWhite'],
+	// 쪽빛 팔레트로 바꾸면서 기준선을 넘어 KNOWN_GAPS 에서 올라온 조합
+	['primary', 'textWhite'],
+	['secondary', 'textWhite'],
 	['warningBg', 'warningDeep'],
 	['dangerBg', 'dangerDeep'],
 	['accentOrangeBg', 'accentOrangeText'],
@@ -69,13 +72,11 @@ test.each(PAIRS)('%s 배경 위의 %s 는 두 모드 모두 대비 3.0 이상이
 
 /**
  * 아직 기준선을 못 넘는 조합 — 브랜드 색을 바꿔야 해서 보류 중이다.
- * (solid 버튼 채움색 + 흰 글자. primary 는 두 모드 모두 3.0 미만)
+ * (solid 버튼 채움색 + 흰 글자. danger 는 다크에서 3.0 미만)
  * 여기서는 "지금보다 더 나빠지지 않는 것" 만 지킨다. 고치면 이 표에서 빼고 위 PAIRS 로 옮긴다.
  */
 const KNOWN_GAPS: Array<[keyof typeof PALETTES.light, keyof typeof PALETTES.light, number, number]> = [
-	['primary', 'textWhite', 2.28, 1.92],
-	['secondary', 'textWhite', 3.68, 2.54],
-	['danger', 'textWhite', 3.76, 2.77],
+	['danger', 'textWhite', 3.91, 2.97],
 ];
 
 test.each(KNOWN_GAPS)('%s / %s 대비가 현재보다 더 나빠지지 않는다', (bg, ink, minLight, minDark) => {

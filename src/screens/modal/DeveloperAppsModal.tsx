@@ -4,7 +4,7 @@ import AppAlert from '@/screens/common/modal/AppAlert';
 import { ActivityIndicator, View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Linking, TextInput, KeyboardAvoidingView, Keyboard, Pressable } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { appIconUrl, appStoreUrl, fetchCommonApps, isNewApp } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
@@ -266,6 +266,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.md,
 	},
 	titleText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,

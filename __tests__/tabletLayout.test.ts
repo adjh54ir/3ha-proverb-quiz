@@ -10,11 +10,13 @@
  */
 import {
 	computeContentMaxWidth,
+	computeFontScale,
 	computeModalMaxWidth,
 	computeScaleRatios,
 	designHeight,
 	designWidth,
 	isTabletSize,
+	LARGE_TABLET_FONT_SCALE,
 	MAX_SCALE,
 	TABLET_MAX_SCALE,
 	TABLET_MIN_SHORT_SIDE,
@@ -88,6 +90,22 @@ describe('태블릿 배율은 상한으로 묶인다', () => {
 	});
 });
 
+describe('글씨 배율', () => {
+	test.each(PHONES)('%s 는 가로·세로 중 작은 배율 그대로다 (폰 불변)', (_name, w, h) => {
+		expect(computeFontScale(w, h)).toBeCloseTo(Math.min(w / designWidth, h / designHeight));
+	});
+
+	test('11인치 이하 태블릿은 태블릿 상한을 넘지 않는다', () => {
+		expect(computeFontScale(820, 1180, computeScaleRatios(820, 1180, TABLET_MAX_SCALE))).toBeLessThanOrEqual(TABLET_MAX_SCALE);
+	});
+
+	test('13인치는 한 단계 더 크다', () => {
+		const scale = computeFontScale(1024, 1366, computeScaleRatios(1024, 1366, TABLET_MAX_SCALE));
+		expect(scale).toBe(LARGE_TABLET_FONT_SCALE);
+		expect(scale).toBeGreaterThan(TABLET_MAX_SCALE);
+	});
+});
+
 describe('본문 기둥 폭', () => {
 	test.each(PHONES)('%s 에서는 화면 폭보다 넓어 걸리지 않는다', (_name, w, h) => {
 		expect(computeContentMaxWidth(w, h)).toBeGreaterThan(w);
@@ -104,7 +122,7 @@ describe('본문 기둥 폭', () => {
 	});
 
 	test('기둥이 무한히 넓어지지는 않는다', () => {
-		expect(computeContentMaxWidth(2000, 3000)).toBeLessThanOrEqual(700);
+		expect(computeContentMaxWidth(2000, 3000)).toBeLessThanOrEqual(900);
 	});
 });
 

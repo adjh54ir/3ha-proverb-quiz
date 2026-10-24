@@ -29,6 +29,12 @@
 		BC8A921C3224348034CFD15B /* finish.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 7B90307ABA74E825B9ED101F /* finish.m4a */; };
 		BDDAD110C7AFBFEE3CCD39D7 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		FB9CA12FBAE996CA872C5337 /* complete.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 970B103FA9D3C75652561C4A /* complete.m4a */; };
+		F11C3BCC2B5F2F9257F268DE /* pretendard_regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 097B2C6DB9F373F5384354F8 /* pretendard_regular.otf */; };
+		5D3760ADFF0596CB7E8BE61A /* pretendard_medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = C513D97131C3941767E11246 /* pretendard_medium.otf */; };
+		F9C659592C724ED6A8CADF7C /* pretendard_semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0D5B1543D07BBA8B42EBD1EA /* pretendard_semibold.otf */; };
+		4E814441068C9034DBEA7CE8 /* pretendard_bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = A9388B8BCA3EE905D854CC56 /* pretendard_bold.otf */; };
+		D703BFDF31269CB6563649C9 /* gowunbatang_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F6EDB06F381B0D98D3457584 /* gowunbatang_regular.ttf */; };
+		4E8CA83BE438502CBDF4D8F7 /* gowunbatang_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BC6B8D6ECA92150B699A01EA /* gowunbatang_bold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +65,12 @@
 		F4A172E53CFC59E29745D4A7 /* combo.m4a */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; path = combo.m4a; sourceTree = "<group>"; };
 		FB3E4CE0CBDC1CDC7A1AAE89 /* pop.m4a */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; path = pop.m4a; sourceTree = "<group>"; };
 		FBAC0347A09B47018C7047A0 /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = ProverbQuiz/BootSplash.storyboard; sourceTree = "<group>"; };
+		097B2C6DB9F373F5384354F8 /* pretendard_regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = pretendard_regular.otf; path = ../android/app/src/main/res/font/pretendard_regular.otf; sourceTree = SOURCE_ROOT; };
+		C513D97131C3941767E11246 /* pretendard_medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = pretendard_medium.otf; path = ../android/app/src/main/res/font/pretendard_medium.otf; sourceTree = SOURCE_ROOT; };
+		0D5B1543D07BBA8B42EBD1EA /* pretendard_semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = pretendard_semibold.otf; path = ../android/app/src/main/res/font/pretendard_semibold.otf; sourceTree = SOURCE_ROOT; };
+		A9388B8BCA3EE905D854CC56 /* pretendard_bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = pretendard_bold.otf; path = ../android/app/src/main/res/font/pretendard_bold.otf; sourceTree = SOURCE_ROOT; };
+		F6EDB06F381B0D98D3457584 /* gowunbatang_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = gowunbatang_regular.ttf; path = ../android/app/src/main/res/font/gowunbatang_regular.ttf; sourceTree = SOURCE_ROOT; };
+		BC6B8D6ECA92150B699A01EA /* gowunbatang_bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = gowunbatang_bold.ttf; path = ../android/app/src/main/res/font/gowunbatang_bold.ttf; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +111,19 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		A8E7D6C913E320B264351FA4 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				097B2C6DB9F373F5384354F8 /* pretendard_regular.otf */,
+				C513D97131C3941767E11246 /* pretendard_medium.otf */,
+				0D5B1543D07BBA8B42EBD1EA /* pretendard_semibold.otf */,
+				A9388B8BCA3EE905D854CC56 /* pretendard_bold.otf */,
+				F6EDB06F381B0D98D3457584 /* gowunbatang_regular.ttf */,
+				BC6B8D6ECA92150B699A01EA /* gowunbatang_bold.ttf */,
+			);
+			name = Fonts;
+			sourceTree = SOURCE_ROOT;
+		};
 		3E6C30A1F04A63DF14C44F7A /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
@@ -135,6 +160,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
 				3E6C30A1F04A63DF14C44F7A /* Sounds */,
+				A8E7D6C913E320B264351FA4 /* Fonts */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -229,6 +255,12 @@
 				4710D17E6B8048DAADCDBA3A /* BootSplash.storyboard in Resources */,
 				50DD17319E934E4F81CAA745 /* Colors.xcassets in Resources */,
 				A0201AC0DCCC92257DB983D2 /* correct.m4a in Resources */,
+				F11C3BCC2B5F2F9257F268DE /* pretendard_regular.otf in Resources */,
+				5D3760ADFF0596CB7E8BE61A /* pretendard_medium.otf in Resources */,
+				F9C659592C724ED6A8CADF7C /* pretendard_semibold.otf in Resources */,
+				4E814441068C9034DBEA7CE8 /* pretendard_bold.otf in Resources */,
+				D703BFDF31269CB6563649C9 /* gowunbatang_regular.ttf in Resources */,
+				4E8CA83BE438502CBDF4D8F7 /* gowunbatang_bold.ttf in Resources */,
 				2F05EE29B3D4FEF90D0562B0 /* wrong.m4a in Resources */,
 				BC8A921C3224348034CFD15B /* finish.m4a in Resources */,
 				6AE234BBC8CD4505A5FBC4DC /* timeout.m4a in Resources */,

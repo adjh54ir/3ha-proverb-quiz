@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { useNavigation } from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import IconComponent from './atomic/IconComponent';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
@@ -144,6 +144,7 @@ const modalStyles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.md,
 	},
 	title: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
 		color: COLORS.textStrong,

@@ -5,7 +5,7 @@ import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { Calendar } from 'react-native-calendars';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { PET_REWARDS } from '@/const/ConstInfoData';
@@ -102,6 +102,9 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 									todayTextColor: COLORS.danger,
 									todayBackgroundColor: COLORS.dangerBg,
 									arrowColor: COLORS.primary,
+									textDayFontFamily: FONTS.body,
+									textMonthFontFamily: FONTS.body,
+									textDayHeaderFontFamily: FONTS.body,
 									textDayFontSize: FONT_SIZES.smPlus,
 									textDayFontWeight: '600',
 									textMonthFontSize: FONT_SIZES.mdPlus,
@@ -176,6 +179,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		overflow: 'hidden',
 	},
 	modalTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,

@@ -3,7 +3,7 @@ import { scaledSize, scaleWidth, scaleHeight } from '@/utils/DementionUtils';
 /**
  * 앱 전체 디자인 토큰 (단일 소스, Single Source of Truth)
  * - 색상/폰트/여백/라운드는 반드시 이 파일의 토큰을 사용한다.
- * - Primary: 그린 / Text: 슬레이트 (라이트/다크 두 팔레트가 같은 키를 공유)
+ * - Primary: 쪽빛 / Accent: 감빛 / Text: 먹 (라이트/다크 두 팔레트가 같은 키를 공유)
  *
  * ── 다크모드 동작 방식 ─────────────────────────────────────────────
  * `COLORS` 는 일반 객체가 아니라 **현재 모드의 팔레트를 그때그때 읽어오는 Proxy** 다.
@@ -18,216 +18,230 @@ import { scaledSize, scaleWidth, scaleHeight } from '@/utils/DementionUtils';
  */
 
 /**
+ * ── 팔레트 컨셉: 쪽빛과 감빛 ─────────────────────────────────────
+ * '청출어람(靑出於藍)' — 쪽에서 뽑은 푸른빛이 쪽보다 푸르다. 옛말에서 나온 색을 요즘 채도로 다시 뽑았다.
+ * - 쪽빛(Indigo)  : 브랜드·주요 액션. 전통 쪽물보다 맑고 선명하게.
+ * - 감빛(Persimmon): 히어로·연속 출석·불꽃 포인트. 마스코트 볼터치와 같은 계열의 따뜻한 주홍.
+ * - 치자(Gardenia) : 골드·경고. 쪽빛의 보색.
+ * - 먹(Ink)       : 텍스트·보더. 순수 회색이 아니라 쪽빛이 살짝 도는 먹색.
+ * - 정답은 브랜드색(쪽빛)과 섞이지 않게 별도의 청포(green) 계열 `success*` 를 쓴다.
+ */
+
+/**
  * 모드와 무관하게 값이 같아야 하는 토큰.
  * 앰버/골드처럼 두 모드 모두 '밝은' 배경 위에 올라가는 글자는 팔레트를 따라 뒤집으면 안 된다.
  * (다크 팔레트의 text/textStrong/textDeep 은 흰색 계열이라 금색 위에서 그대로 사라진다)
  */
 const FIXED_TOKENS = {
-	textOnAccent: '#1F2937', // 앰버/골드 등 밝은 액센트 배경 위 글자·아이콘
+	textOnAccent: '#1A1E3A', // 치자/골드 등 밝은 액센트 배경 위 글자·아이콘
 };
 
-/** 타워/챌린지 화면 전용 다크 톤 — 라이트/다크 공통으로 같은 값을 쓴다. */
+/** 타워/챌린지 화면 전용 다크 톤(밤의 쪽빛) — 라이트/다크 공통으로 같은 값을 쓴다. */
 const FIXED_DARK_SCREEN = {
-	darkBg: '#1a1a2e',
-	darkBgAlt: '#16213e',
-	darkSurface: '#0f3460',
-	darkGradient: ['#2B2D3A', '#21222C', '#191A21'] as [string, string, string],
-	darkText: '#F1F5F9',
-	darkTextSecondary: '#CBD5E1',
-	darkAccent: '#60A5FA',
-	darkMuted: '#475569', // 잠김/비활성 요소 배경 (모드 무관 고정)
-	towerVictoryBg: '#064E3B',
-	towerDefeatBg: '#7F1D1D',
+	darkBg: '#15173A',
+	darkBgAlt: '#1A1D47',
+	darkSurface: '#26307A',
+	darkGradient: ['#272B58', '#1B1E42', '#13152E'] as [string, string, string],
+	darkText: '#F1F2FA',
+	darkTextSecondary: '#C5C9E0',
+	darkAccent: '#8A96FF',
+	darkMuted: '#4A4F72', // 잠김/비활성 요소 배경 (모드 무관 고정)
+	towerVictoryBg: '#0C5A3E',
+	towerDefeatBg: '#7F1D24',
 };
 
 /** 라이트(기본) 팔레트 */
 const LIGHT_COLORS = {
-	// ===== Primary (Green) — 메인 액션/활성/정답 강조 =====
-	primary: '#22C55E', // 메인 액센트
-	primaryLight: '#4ADE80', // 밝은 그린 (활성/포인트)
-	primaryDark: '#16A34A', // 진한 그린 (눌림/강조)
-	primaryDeep: '#15803D', // 가장 진한 강조
-	primaryBg: '#F0FDF4', // 그린 배경 틴트
-	primarySoft: '#DCFCE7', // 배지/칩 배경
-	primaryBorder: '#DCFCE7', // 그린 보더 틴트
-	// 흰 글자가 올라가는 주요 버튼 채움. primary(#22C55E)는 흰 글자 대비가 2.28 이라 한 단계 진한 green-600 을 쓴다(3.30).
-	// 칩·진행바·아이콘처럼 글자가 없는 채움은 계속 primary 를 쓴다.
-	primaryFill: '#16A34A',
+	// ===== Primary (쪽빛 Indigo) — 메인 액션/활성/선택 강조 =====
+	primary: '#3D4EDB', // 메인 액센트 (흰 글자 대비 6.34)
+	primaryLight: '#6F7DF0', // 밝은 쪽빛 (활성/포인트)
+	primaryDark: '#2F3EC4', // 진한 쪽빛 (눌림/강조)
+	primaryDeep: '#242F9E', // 가장 진한 강조
+	primaryBg: '#EFF1FE', // 쪽빛 배경 틴트
+	primarySoft: '#E0E4FD', // 배지/칩 배경
+	primaryBorder: '#D3D8FB', // 쪽빛 보더 틴트
+	// 흰 글자가 올라가는 주요 버튼 채움. 쪽빛은 그 자체로 흰 글자 대비가 충분해(6.34) primary 와 같은 값을 쓴다.
+	primaryFill: '#3D4EDB',
 
-	// ===== Secondary (Blue) — 보조 강조/링크/정보 =====
-	secondary: '#3B82F6',
-	secondaryLight: '#93C5FD',
-	secondaryDark: '#2563EB',
-	secondarySoft: '#DBEAFE',
-	secondaryBg: '#EFF6FF',
+	// ===== Secondary (물빛 Cyan-blue) — 보조 강조/진행률/정보 =====
+	secondary: '#1688CC',
+	secondaryLight: '#8CC8EE',
+	secondaryDark: '#0B6FAE',
+	secondarySoft: '#D7EDFA',
+	secondaryBg: '#EEF7FD',
 
-	// ===== Text (Slate) =====
-	text: '#334155', // 본문/타이틀
-	textStrong: '#1E293B', // 강한 제목
-	textSecondary: '#64748B', // 보조 텍스트
-	textLight: '#94A3B8', // 비활성/캡션
-	textMuted: '#475569', // 본문보다 한 톤 진한 보조 텍스트
-	textDeep: '#0F172A', // 가장 진한 텍스트
+	// ===== Text (먹 Ink) =====
+	text: '#2A2F4F', // 본문/타이틀
+	textStrong: '#1A1E3A', // 강한 제목
+	textSecondary: '#5F6488', // 보조 텍스트
+	textLight: '#9196B2', // 비활성/캡션
+	textMuted: '#444A6E', // 본문보다 한 톤 진한 보조 텍스트
+	textDeep: '#10132B', // 가장 진한 텍스트
 	textWhite: '#FFFFFF', // 컬러 배경 위 텍스트 (모드 무관 고정)
 	// 선명한 액센트 채움(primaryDark/accentFlame/accentTeal/accentSky) 위 아이콘·글자.
-	// 라이트는 흰색 그대로, 다크는 액센트가 한 단계 밝아져 흰 글자가 묻히므로 진한 잉크로 뒤집는다.
+	// 라이트는 흰색 그대로, 다크는 액센트가 한 단계 밝아져 흰 글자가 묻히므로 진한 먹색으로 뒤집는다.
 	textOnVivid: '#FFFFFF',
 
 	// ===== Background / Surface =====
-	background: '#F8FAFC', // 화면 기본 배경
+	background: '#F5F6FB', // 화면 기본 배경 (쪽빛이 아주 옅게 도는 흰색)
 	surface: '#FFFFFF', // 카드/모달 표면
-	surfaceAlt: '#F1F5F9', // 옅은 회색 표면
+	surfaceAlt: '#EDEFF7', // 옅은 먹빛 표면
 
 	// ===== Border / Divider =====
-	border: '#E2E8F0',
-	borderLight: '#E2E8F0',
-	borderDark: '#CBD5E1',
-	secondaryBorder: '#BFDBFE', // 블루 보더
+	border: '#E1E4F0',
+	borderLight: '#E9EBF4',
+	borderDark: '#C8CCE0',
+	secondaryBorder: '#B5DCF3', // 물빛 보더
 
-	// ===== Accent (Orange/Amber) — 히어로 배너·연속 출석·선택 강조 =====
-	accentOrange: '#EA580C', // 강한 주황 (텍스트/포인트)
-	accentOrangeDark: '#D97706', // 상단 강조 보더
-	accentOrangeDeep: '#7C2D12', // 주황 배경 위 제목
-	accentOrangeText: '#9A3412', // 주황 배경 위 본문
-	accentOrangeBg: '#FFF7ED', // 주황 배경 틴트
-	accentOrangeBorder: '#FDBA74', // 주황 보더
-	accentFlame: '#F97316', // 불꽃/연속 도전 포인트 (밝은 주황)
-	accentOrangeLight: '#FB923C', // 옅은 주황 (3위/보조 포인트)
-	accentOrangeSoft: '#FFEDD5', // 주황 칩 배경
-	accentTeal: '#14B8A6', // 틸 포인트 (오늘의 퀴즈)
-	accentTealBg: '#CCFBF1', // 틸 칩 배경
+	// ===== Accent (감빛 Persimmon) — 히어로 배너·연속 출석·선택 강조 =====
+	accentOrange: '#E8562C', // 강한 감빛 (텍스트/포인트)
+	accentOrangeDark: '#D9481F', // 상단 강조 보더
+	accentOrangeDeep: '#7A2410', // 감빛 배경 위 제목
+	accentOrangeText: '#93361A', // 감빛 배경 위 본문
+	accentOrangeBg: '#FFF3EE', // 감빛 배경 틴트
+	accentOrangeBorder: '#FDBBA3', // 감빛 보더
+	accentFlame: '#F26A3D', // 불꽃/연속 도전 포인트 (밝은 감빛)
+	accentOrangeLight: '#FF9468', // 옅은 감빛 (3위/보조 포인트)
+	accentOrangeSoft: '#FFE4D8', // 감빛 칩 배경
+	accentTeal: '#12A594', // 비취 포인트 (오늘의 퀴즈)
+	accentTealBg: '#D5F5EF', // 비취 칩 배경
 	accentSky: '#0EA5E9', // 스카이 포인트 (정복 섹션)
 	accentSkyBg: '#E0F2FE', // 스카이 칩 배경
-	accentTealDeep: '#115E59', // 틸 배경 위 진한 텍스트
-	accentPink: '#EC4899', // 보기 라벨/카테고리 구분용 핑크 포인트
+	accentTealDeep: '#0D5E55', // 비취 배경 위 진한 텍스트
+	accentPink: '#D9468A', // 연지 — 보기 라벨/카테고리 구분용 포인트
 
 	// ===== Semantic =====
-	success: '#22C55E',
-	successBg: '#F0FDF4',
-	successSoft: '#DCFCE7',
-	successBorder: '#BBF7D0', // 그린 보더
-	info: '#3B82F6',
-	infoDark: '#2563EB',
-	infoBg: '#EFF6FF',
-	warning: '#F59E0B',
-	warningDark: '#D97706',
-	warningBg: '#FEF3C7',
-	warningSoft: '#FFFBEB', // 옅은 앰버 틴트 (선택된 카드/힌트 버튼 배경)
-	warningDeep: '#B45309', // 앰버 배경 위 진한 텍스트
-	warningBorder: '#FDE68A', // 옅은 앰버 보더
-	danger: '#EF4444',
-	dangerLight: '#F87171', // 옅은 레드 (패배/오답 강조 배경 위 텍스트)
+	// 정답/완료. 브랜드(쪽빛)와 구분되는 청포 계열.
+	success: '#1FA36A',
+	successDark: '#15885A', // 옅은 정답 틴트 위 아이콘·숫자
+	successDeep: '#0E6B45', // 옅은 정답 틴트 위 글자
+	successBg: '#ECF8F1',
+	successSoft: '#D3F1E0',
+	successBorder: '#A8E2C3', // 청포 보더
+	info: '#1688CC',
+	infoDark: '#0B6FAE',
+	infoBg: '#EEF7FD',
+	warning: '#F5A623',
+	warningDark: '#D48806',
+	warningBg: '#FEF3D6',
+	warningSoft: '#FFFAEB', // 옅은 치자 틴트 (선택된 카드/힌트 버튼 배경)
+	warningDeep: '#A85F00', // 치자 배경 위 진한 텍스트
+	warningBorder: '#FADB8A', // 옅은 치자 보더
+	danger: '#E5484D',
+	dangerLight: '#F07C80', // 옅은 레드 (패배/오답 강조 배경 위 텍스트)
 	dangerSoftBg: '#FEF2F2', // 가장 옅은 레드 배경 (오답 카드)
-	dangerBorder: '#FCA5A5', // 레드 보더
-	dangerBorderSoft: '#FECACA', // 옅은 레드 보더
-	dangerDark: '#DC2626',
-	dangerDeep: '#B91C1C', // 가장 진한 레드 (특급/실패 강조)
-	dangerBg: '#FEE2E2',
-	gold: '#FACC15',
-	goldLight: '#FDE047',
+	dangerBorder: '#F7A9AB', // 레드 보더
+	dangerBorderSoft: '#FBD0D1', // 옅은 레드 보더
+	dangerDark: '#CC2F35',
+	dangerDeep: '#A3242A', // 가장 진한 레드 (특급/실패 강조)
+	dangerBg: '#FDE3E3',
+	gold: '#F6C026', // 치자
+	goldLight: '#FFDF6E',
 
 	// ===== Dark (타워/챌린지 다크 화면 전용) =====
 	...FIXED_DARK_SCREEN,
 	...FIXED_TOKENS,
 
 	// ===== Dim =====
-	dim: 'rgba(0, 0, 0, 0.5)',
-	dimLight: 'rgba(0, 0, 0, 0.3)',
+	dim: 'rgba(16, 19, 43, 0.5)',
+	dimLight: 'rgba(16, 19, 43, 0.3)',
 };
 
 /** 팔레트 타입 — 다크 팔레트는 라이트와 완전히 같은 키를 가져야 한다. */
 export type AppColors = typeof LIGHT_COLORS;
 
 /**
- * 다크 팔레트
- * - 배경은 슬레이트 900/800, 텍스트는 슬레이트 100 계열로 뒤집는다.
- * - 액센트(그린/블루/오렌지…)는 어두운 배경에서 묻히지 않게 한 단계 밝은 톤으로 올린다.
+ * 다크 팔레트 (밤의 쪽빛)
+ * - 배경은 먹빛 남색, 텍스트는 쪽빛이 도는 흰색 계열로 뒤집는다.
+ * - 액센트(쪽빛/물빛/감빛…)는 어두운 배경에서 묻히지 않게 한 단계 밝은 톤으로 올린다.
  * - `~Bg` / `~Soft` 처럼 "옅은 틴트 배경"용 토큰은 어두운 틴트로 반전시키고,
  *   그 위에 올라가는 `~Deep` / `~Text` 토큰은 반대로 밝게 뒤집어 대비를 유지한다.
  * - `textWhite` 는 컬러 버튼 위 글자색이라 두 모드 모두 흰색을 유지한다.
  */
 const DARK_COLORS: AppColors = {
-	// ===== Primary (Green) =====
-	primary: '#34D399',
-	primaryLight: '#6EE7B7',
-	primaryDark: '#22C55E',
-	// ~Deep 은 옅은 틴트 위 진한 글자용이라 다크에서는 밝게 뒤집어야 한다(#16A34A 는 primarySoft 위 2.76).
+	// ===== Primary (쪽빛) =====
+	primary: '#7C89FF', // 흰 글자 3.05 / 표면 위 5.37
+	primaryLight: '#A3ADFF',
+	primaryDark: '#6676F2',
+	// ~Deep 은 옅은 틴트 위 진한 글자용이라 다크에서는 밝게 뒤집어야 한다.
 	// 사용처가 전부 글자·아이콘이라 배경으로 쓰이는 곳은 없다.
-	primaryDeep: '#86EFAC',
-	primaryBg: '#10281C',
-	primarySoft: '#14532D',
-	primaryBorder: '#166534',
-	primaryFill: '#16A34A', // 다크 primary(#34D399)는 흰 글자 대비 1.92 → 라이트와 같은 green-600
+	primaryDeep: '#BFC6FF',
+	primaryBg: '#171B45',
+	primarySoft: '#232A6B',
+	primaryBorder: '#2E3784',
+	primaryFill: '#4A5AE6', // 흰 글자 버튼은 한 단계 진한 쪽빛으로 채운다(5.39)
 
-	// ===== Secondary (Blue) =====
-	secondary: '#60A5FA',
-	secondaryLight: '#93C5FD',
-	secondaryDark: '#3B82F6',
-	secondarySoft: '#1E3A5F',
-	secondaryBg: '#0F2438',
+	// ===== Secondary (물빛) =====
+	secondary: '#2E9BE0',
+	secondaryLight: '#8CC8EE',
+	secondaryDark: '#1C86CB',
+	secondarySoft: '#12385A',
+	secondaryBg: '#0C2338',
 
 	// ===== Text =====
-	text: '#E2E8F0',
-	textStrong: '#F8FAFC',
-	textSecondary: '#A3AEBF',
-	textLight: '#7C8799',
-	textMuted: '#B6C0CE',
+	text: '#E4E6F3',
+	textStrong: '#F7F8FD',
+	textSecondary: '#A6AACB',
+	textLight: '#7A7FA3',
+	textMuted: '#BCC0DA',
 	textDeep: '#FFFFFF',
 	textWhite: '#FFFFFF',
-	textOnVivid: '#1F2937',
+	textOnVivid: '#14163A',
 
 	// ===== Background / Surface =====
-	background: '#0F172A',
-	surface: '#1B2536',
-	surfaceAlt: '#243044',
+	background: '#10122A',
+	surface: '#1A1D3A',
+	surfaceAlt: '#242848',
 
 	// ===== Border / Divider =====
-	border: '#334155',
-	borderLight: '#2C3A4F',
-	borderDark: '#475569',
-	secondaryBorder: '#2C4A6E',
+	border: '#2F3459',
+	borderLight: '#2A2E50',
+	borderDark: '#464C78',
+	secondaryBorder: '#1F4C72',
 
-	// ===== Accent (Orange/Amber) =====
-	accentOrange: '#FB923C',
-	accentOrangeDark: '#F59E0B',
-	accentOrangeDeep: '#FDBA74',
-	accentOrangeText: '#FCD9B6',
-	accentOrangeBg: '#2A1C0F',
-	accentOrangeBorder: '#7C4A15',
-	accentFlame: '#FB923C',
-	accentOrangeLight: '#FDBA74',
-	accentOrangeSoft: '#3A2612',
+	// ===== Accent (감빛) =====
+	accentOrange: '#FF8A5C',
+	accentOrangeDark: '#F26A3D',
+	accentOrangeDeep: '#FFB497',
+	accentOrangeText: '#FFD3C2',
+	accentOrangeBg: '#2B1712',
+	accentOrangeBorder: '#7A3420',
+	accentFlame: '#FF8A5C',
+	accentOrangeLight: '#FFB497',
+	accentOrangeSoft: '#3D1F15',
 	accentTeal: '#2DD4BF',
 	accentTealBg: '#0F3A36',
 	accentSky: '#38BDF8',
 	accentSkyBg: '#0C2E44',
 	accentTealDeep: '#99F6E4',
-	accentPink: '#F472B6',
+	accentPink: '#F07AB0',
 
 	// ===== Semantic =====
-	success: '#34D399',
-	successBg: '#10281C',
-	successSoft: '#14532D',
-	successBorder: '#166534',
-	info: '#60A5FA',
-	infoDark: '#3B82F6',
-	infoBg: '#0F2438',
-	warning: '#FBBF24',
-	warningDark: '#F59E0B',
+	success: '#3DD68C',
+	successDark: '#3DD68C',
+	successDeep: '#8CEBB9',
+	successBg: '#0F2A20',
+	successSoft: '#144B33',
+	successBorder: '#1D6B48',
+	info: '#2E9BE0',
+	infoDark: '#1C86CB',
+	infoBg: '#0C2338',
+	warning: '#FFC23D',
+	warningDark: '#F5A623',
 	warningBg: '#3A2C0A',
 	warningSoft: '#2A2210',
-	warningDeep: '#FCD34D',
+	warningDeep: '#FFD978',
 	warningBorder: '#7C5A12',
-	danger: '#F87171',
-	dangerLight: '#FCA5A5',
-	dangerSoftBg: '#2A1416',
-	dangerBorder: '#7F2A2A',
-	dangerBorderSoft: '#5C1F22',
-	dangerDark: '#EF4444',
-	dangerDeep: '#FCA5A5',
-	dangerBg: '#3A1A1C',
-	gold: '#FDE047',
-	goldLight: '#FEF08A',
+	danger: '#F26A6E',
+	dangerLight: '#FFA5A8',
+	dangerSoftBg: '#2C1418',
+	dangerBorder: '#7F2A30',
+	dangerBorderSoft: '#5C1F25',
+	dangerDark: '#F2555B',
+	dangerDeep: '#FFA5A8',
+	dangerBg: '#3A1A1F',
+	gold: '#FFD34D',
+	goldLight: '#FFE58A',
 
 	// ===== Dark (타워/챌린지 화면은 두 모드 동일) =====
 	...FIXED_DARK_SCREEN,
@@ -357,7 +371,7 @@ const createLivePalette = <T extends object>(read: (palette: AppColors) => T): T
 export const COLORS: AppColors = createLivePalette((palette) => palette);
 
 /**
- * 화면 상단 히어로 배너 전용 톤 (앰버/오렌지 계열로 통일)
+ * 화면 상단 히어로 배너 전용 톤 (감빛 계열로 통일)
  * - 화면마다 제각각이던 배경/보더/텍스트 색 리터럴을 이 토큰 하나로 수렴시킨다.
  */
 export const HERO = createLivePalette((palette) => ({
@@ -412,6 +426,20 @@ export const themedValue = <T extends object>(factory: () => T): T => {
  * 모드가 바뀌어도 컴포넌트가 리렌더되면 새 팔레트 스타일이 적용된다.
  */
 export const themedStyles = themedValue;
+
+/**
+ * 서체 토큰. 네이티브 등록은 android/app/src/main/res/font (iOS 는 같은 파일을 번들에 참조한다).
+ *
+ * - `body`    : Pretendard. 전역 기본 서체라 `TextDefaults.ts` 가 모든 <Text> 에 넣는다. 화면에서 따로 쓸 일이 없다.
+ * - `display` : 고운바탕(붓맛을 덜어낸 현대 명조). 화면·모달 타이틀, 섹션 헤딩, **속담 문장 자체**에만 쓴다.
+ *               본문·버튼·숫자에는 쓰지 않는다 — 속담이 화면에서 가장 먼저 읽히게 하는 장치다.
+ *               두께는 400/700 두 벌만 있다(500 이하는 Regular, 600 이상은 Bold 로 맞춰진다).
+ *               한글은 완성형 2,350자 + 앱 데이터에 나오는 글자만 넣었다. 그 밖의 글자는 시스템 서체로 그려진다.
+ */
+export const FONTS = {
+	body: 'Pretendard',
+	display: 'Gowun Batang',
+} as const;
 
 /**
  * 폰트 사이즈 체계 (scaledSize 적용 완료 값)

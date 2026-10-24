@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconComponent from '../common/atomic/IconComponent';
 import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName } from '../common/CommonProverbModule';
@@ -284,7 +284,7 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 											)}
 											modalProps={DROPDOWN_MODAL_PROPS}
 											modalContentContainerStyle={DROPDOWN_MODAL_CONTENT_STYLE}
-											modalTitleStyle={{ fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, textAlign: 'center', paddingVertical: SPACING_H.md, paddingHorizontal: SPACING_W.lg }}
+											modalTitleStyle={{ fontFamily: FONTS.display, fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, textAlign: 'center', paddingVertical: SPACING_H.md, paddingHorizontal: SPACING_W.lg }}
 										/>
 									</View>
 								</View>
@@ -296,7 +296,7 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 											<Text style={styles.selectAllText}>전체 선택</Text>
 										</TouchableOpacity>
 									)}
-									<Text style={styles.listCountText}>총 {filteredList.length}개</Text>
+									<Text style={styles.listCountText}>총 {filteredList.length.toLocaleString()}개</Text>
 								</View>
 							</View>
 
@@ -352,7 +352,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	handleBar: { width: scaleWidth(40), height: scaleHeight(4), borderRadius: RADIUS.round, backgroundColor: COLORS.border, alignSelf: 'center', marginBottom: SPACING_H.md },
 	headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.xs },
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm, flex: 1, marginRight: SPACING_W.md },
-	headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3, flexShrink: 1 },
+	headerTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3, flexShrink: 1 },
 	headerSubText: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary },
 	headerCount: { fontWeight: '700', color: COLORS.primary },
 	body: { flex: 1 },
@@ -386,7 +386,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	badgeText: { color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '600' },
 	checkbox: { width: scaleWidth(22), height: scaleWidth(22), borderRadius: RADIUS.sm, borderWidth: 2, borderColor: COLORS.borderDark, backgroundColor: COLORS.surface, justifyContent: 'center', alignItems: 'center' },
 	checkboxChecked: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-	hanjaText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.xs },
+	hanjaText: { fontFamily: FONTS.display, fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.xs },
 	meaningText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, lineHeight: scaledSize(19) },
 	// 빈 영역 전체를 채우고 그 정중앙에 놓인다. 위쪽 여백을 따로 주면 그만큼 아래로 밀린다.
 	emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },

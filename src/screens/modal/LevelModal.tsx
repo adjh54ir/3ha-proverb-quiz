@@ -4,7 +4,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Animated } from '
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { LEVEL_DATA } from '@/const/ConstInfoData';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
@@ -134,6 +134,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		overflow: 'hidden',
 	},
 	levelModalTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,

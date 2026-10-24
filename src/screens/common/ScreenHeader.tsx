@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { scaledSize, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, HIT_SLOP, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, HIT_SLOP, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import IconComponent from './atomic/IconComponent';
 
 /**
@@ -82,6 +82,7 @@ const styles = themedStyles(() =>
 			columnGap: SPACING_W.sm,
 		},
 		title: {
+			fontFamily: FONTS.display,
 			fontSize: FONT_SIZES.xl,
 			fontWeight: '700',
 			color: COLORS.textStrong,

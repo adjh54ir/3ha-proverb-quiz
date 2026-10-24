@@ -27,7 +27,7 @@ import FastImage from 'react-native-fast-image';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
@@ -138,7 +138,7 @@ const ConquerHeader = ({
 		<Text style={styles.conquerHeaderTitle}>{title}</Text>
 		<View style={[styles.conquerCountPill, { backgroundColor: chipBg }]}>
 			<Text style={[styles.conquerCountText, { color: tint }]}>
-				{current} / {total}
+				{current.toLocaleString()} / {total.toLocaleString()}
 			</Text>
 		</View>
 	</View>
@@ -604,9 +604,9 @@ const MyScoreScreen = () => {
 					const solvedPct = totalCountryCount > 0 ? Math.round((totalSolved / totalCountryCount) * 100) : 0;
 					const badgePct = CONST_BADGES.length > 0 ? Math.round((earnedBadgeIds.length / CONST_BADGES.length) * 100) : 0;
 					const metrics = [
-						{ icon: 'school', color: COLORS.primary, soft: COLORS.primarySoft, label: '학습 진척도', value: `${studyCountries.length}/${totalCountryCount}`, pct: studyPct },
+						{ icon: 'school', color: COLORS.primary, soft: COLORS.primarySoft, label: '학습 진척도', value: `${studyCountries.length.toLocaleString()}/${totalCountryCount.toLocaleString()}`, pct: studyPct },
 						{ icon: 'check-circle', color: COLORS.secondary, soft: COLORS.secondarySoft, label: '퀴즈 정답률', value: `${accuracy}%`, pct: accuracy },
-						{ icon: 'play-circle-filled', color: COLORS.accentTeal, soft: COLORS.accentTealBg, label: '퀴즈 진척도', value: `${totalSolved}/${totalCountryCount}`, pct: solvedPct },
+						{ icon: 'play-circle-filled', color: COLORS.accentTeal, soft: COLORS.accentTealBg, label: '퀴즈 진척도', value: `${totalSolved.toLocaleString()}/${totalCountryCount.toLocaleString()}`, pct: solvedPct },
 						{ icon: 'military-tech', color: COLORS.warning, soft: COLORS.warningBg, label: '획득 뱃지', value: `${earnedBadgeIds.length}/${CONST_BADGES.length}`, pct: badgePct },
 					];
 					return (
@@ -714,14 +714,14 @@ const MyScoreScreen = () => {
 								<View style={styles.chartLegendRow}>
 									<View style={[styles.legendDot, { backgroundColor: COLORS.primary }]} />
 									<Text style={styles.chartLegendText}>
-										학습한 속담 <Text style={styles.chartLegendStrong}>{studyCountries.length}개</Text>
+										학습한 속담 <Text style={styles.chartLegendStrong}>{studyCountries.length.toLocaleString()}개</Text>
 									</Text>
 								</View>
 								<View style={styles.chartLegendRow}>
 									<View style={[styles.legendDot, { backgroundColor: COLORS.border }]} />
 									<Text style={styles.chartLegendText}>
 										남은 속담{' '}
-										<Text style={styles.chartLegendStrong}>{Math.max(totalCountryCount - studyCountries.length, 0)}개</Text>
+										<Text style={styles.chartLegendStrong}>{Math.max(totalCountryCount - studyCountries.length, 0).toLocaleString()}개</Text>
 									</Text>
 								</View>
 							</View>
@@ -732,7 +732,7 @@ const MyScoreScreen = () => {
 									<IconComponent type="materialIcons" name="track-changes" size={scaledSize(18)} color={COLORS.primary} />
 								</View>
 								<Text style={styles.statValue}>
-									{studyCountries.length} / {totalCountryCount}
+									{studyCountries.length.toLocaleString()} / {totalCountryCount.toLocaleString()}
 								</Text>
 								<Text style={styles.statLabel}>
 									학습 완료 ({Math.round((studyCountries.length / totalCountryCount) * 100)}%)
@@ -768,15 +768,15 @@ const MyScoreScreen = () => {
 							<View style={styles.chartLegend}>
 								<Text style={styles.chartLegendTitle}>정답 / 오답 비율</Text>
 								<View style={styles.chartLegendRow}>
-									<View style={[styles.legendDot, { backgroundColor: COLORS.primary }]} />
+									<View style={[styles.legendDot, { backgroundColor: COLORS.success }]} />
 									<Text style={styles.chartLegendText}>
-										정답 <Text style={styles.chartLegendStrong}>{correctCount}개</Text>
+										정답 <Text style={styles.chartLegendStrong}>{correctCount.toLocaleString()}개</Text>
 									</Text>
 								</View>
 								<View style={styles.chartLegendRow}>
 									<View style={[styles.legendDot, { backgroundColor: COLORS.danger }]} />
 									<Text style={styles.chartLegendText}>
-										오답 <Text style={styles.chartLegendStrong}>{wrongCount}개</Text>
+										오답 <Text style={styles.chartLegendStrong}>{wrongCount.toLocaleString()}개</Text>
 									</Text>
 								</View>
 								<View style={styles.stackBarTrack}>
@@ -790,7 +790,7 @@ const MyScoreScreen = () => {
 								<IconComponent type="materialIcons" name="calculate" size={scaledSize(18)} color={COLORS.secondary} />
 							</View>
 							<Text style={styles.statValue}>
-								{totalSolved} / {totalCountryCount}
+								{totalSolved.toLocaleString()} / {totalCountryCount.toLocaleString()}
 							</Text>
 							<Text style={styles.statLabel}> 총 푼 퀴즈 ({Math.round((totalSolved / totalCountryCount) * 100)}%) </Text>
 							<View style={styles.progressBarBackground}>
@@ -802,7 +802,7 @@ const MyScoreScreen = () => {
 								<View style={[styles.statIconChip, { backgroundColor: COLORS.accentOrangeSoft }]}>
 									<IconComponent type="fontAwesome6" name="fire" size={scaledSize(16)} color={COLORS.accentFlame} />
 								</View>
-								<Text style={styles.statValue}> {bestCombo} Combo </Text>
+								<Text style={styles.statValue}> {bestCombo.toLocaleString()} Combo </Text>
 								<Text style={styles.statLabel}> 최고 콤보 </Text>
 							</View>
 							<View style={styles.summaryStatCard}>
@@ -991,6 +991,9 @@ const MyScoreScreen = () => {
 								textDayFontSize: FONT_SIZES.md,
 								textMonthFontSize: FONT_SIZES.lg,
 								textDayHeaderFontSize: FONT_SIZES.smPlus,
+								textDayFontFamily: FONTS.body,
+								textMonthFontFamily: FONTS.body,
+								textDayHeaderFontFamily: FONTS.body,
 							}}
 						/>
 						<View style={[styles.subtitleRow, { marginTop: SPACING_H.sm }]}>
@@ -1054,6 +1057,7 @@ const MyScoreScreen = () => {
 												<View style={{ flex: 1 }}>
 													<Text
 														style={{
+															fontFamily: FONTS.display,
 															fontSize: FONT_SIZES.md,
 															fontWeight: '700',
 															marginBottom: SPACING_H.sm,
@@ -1070,7 +1074,7 @@ const MyScoreScreen = () => {
 																flexDirection: 'row',
 																alignItems: 'center',
 																gap: SPACING_W.xs,
-																backgroundColor: isCorrect ? COLORS.primarySoft : COLORS.dangerBg,
+																backgroundColor: isCorrect ? COLORS.successSoft : COLORS.dangerBg,
 																borderRadius: RADIUS.round,
 																paddingHorizontal: SPACING_W.sm,
 																paddingVertical: SPACING_H.xs,
@@ -1080,9 +1084,9 @@ const MyScoreScreen = () => {
 																type="materialIcons"
 																name={isCorrect ? 'check-circle' : 'cancel'}
 																size={scaledSize(13)}
-																color={isCorrect ? COLORS.primaryDark : COLORS.dangerDark}
+																color={isCorrect ? COLORS.successDark : COLORS.dangerDark}
 															/>
-															<Text style={{ fontSize: FONT_SIZES.sm, fontWeight: '700', color: isCorrect ? COLORS.primaryDark : COLORS.dangerDark }}>
+															<Text style={{ fontSize: FONT_SIZES.sm, fontWeight: '700', color: isCorrect ? COLORS.successDark : COLORS.dangerDark }}>
 																{isCorrect ? '정답' : '오답'}
 															</Text>
 														</View>
@@ -1138,7 +1142,7 @@ const MyScoreScreen = () => {
 													/>
 													<Text style={styles.firstRankLabel}>1등</Text>
 													<Text style={styles.firstRankScore}>
-														{item.finalScore}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
+														{item.finalScore.toLocaleString()}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
 													</Text>
 												</>
 											)}
@@ -1153,7 +1157,7 @@ const MyScoreScreen = () => {
 													/>
 													<Text style={styles.secondRankLabel}>2등</Text>
 													<Text style={styles.secondRankScore}>
-														{item.finalScore}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
+														{item.finalScore.toLocaleString()}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
 													</Text>
 												</>
 											)}
@@ -1169,7 +1173,7 @@ const MyScoreScreen = () => {
 													/>
 													<Text style={styles.thirdRankLabel}>3등</Text>
 													<Text style={styles.thirdRankScore}>
-														{item.finalScore}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
+														{item.finalScore.toLocaleString()}점<Text style={styles.rankDate}> ({getRelativeDateLabel(item.quizDate)})</Text>
 													</Text>
 												</>
 											)}
@@ -1421,6 +1425,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 	},
 	pageTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xxl,
 		fontWeight: '700',
 		marginBottom: SPACING_H.xl,
@@ -1984,7 +1989,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginTop: SPACING_H.sm,
 		backgroundColor: COLORS.surfaceAlt,
 	},
-	stackBarCorrect: { backgroundColor: COLORS.primary },
+	stackBarCorrect: { backgroundColor: COLORS.success },
 	stackBarWrong: { backgroundColor: COLORS.danger },
 	subtitleRow: {
 		flexDirection: 'row',

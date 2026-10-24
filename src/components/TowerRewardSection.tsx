@@ -4,7 +4,7 @@ import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { TOWER_LEVELS } from '@/const/ConstTowerData';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 import useReducedMotion from '@/hooks/useReducedMotion';
@@ -372,6 +372,7 @@ const styles = themedStyles(() => StyleSheet.create({
         marginBottom: SPACING_H.xs,
     },
     bossName: {
+        fontFamily: FONTS.display,
         fontSize: FONT_SIZES.lg,
         fontWeight: '700',
         color: COLORS.textStrong,

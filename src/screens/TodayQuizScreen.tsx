@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import notifee, { AuthorizationStatus } from '@notifee/react-native';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
 import { read, write } from '@/services/StorageService';
@@ -86,7 +86,7 @@ const TodayQuizScreen = () => {
 	const [quizOptionsMap, setQuizOptionsMap] = useState<{ [id: number]: string[] }>({});
 	const [currentIndex, setCurrentIndex] = useState(0); // 현재 문제 번호
 	const [progressPercent, setProgressPercent] = useState(quizList.length > 0 ? (currentIndex / quizList.length) * 100 : 0);
-	const labelColors = [COLORS.secondary, COLORS.primary, COLORS.accentTeal, COLORS.accentFlame]; // A, B, C, D 보기 라벨
+	const labelColors = [COLORS.primary, COLORS.accentFlame, COLORS.accentTeal, COLORS.accentPink]; // A, B, C, D 보기 라벨
 	const [showAlarmModal, setShowAlarmModal] = useState(false);
 
 	const [tempIsAlarmEnabled, setTempIsAlarmEnabled] = useState(false);
@@ -628,10 +628,10 @@ const TodayQuizScreen = () => {
 						{result !== undefined && (
 							<View style={styles.resultBannerWrap}>
 								<View style={[styles.resultBanner, result ? styles.resultBannerCorrect : styles.resultBannerWrong]}>
-									<View style={[styles.resultBannerIcon, { backgroundColor: result ? COLORS.primary : COLORS.danger }]}>
+									<View style={[styles.resultBannerIcon, { backgroundColor: result ? COLORS.success : COLORS.danger }]}>
 										<IconComponent type="materialIcons" name={result ? 'check' : 'close'} size={scaledSize(16)} color={COLORS.textWhite} />
 									</View>
-									<Text style={[styles.resultBannerText, { color: result ? COLORS.primaryDeep : COLORS.dangerDark }]}>
+									<Text style={[styles.resultBannerText, { color: result ? COLORS.successDeep : COLORS.dangerDark }]}>
 										{result ? '정답입니다!' : '아쉽습니다, 오답입니다'}
 									</Text>
 								</View>
@@ -837,7 +837,7 @@ const TodayQuizScreen = () => {
 											<Text style={styles.completedTitle}>오늘의 문제 끝!</Text>
 											<Text style={styles.completedSubtitle}>내일 또 뵙겠습니다 👋</Text>
 											<View style={styles.completedScorePill}>
-												<IconComponent type="materialIcons" name="check-circle" size={scaledSize(16)} color={COLORS.primary} />
+												<IconComponent type="materialIcons" name="check-circle" size={scaledSize(16)} color={COLORS.success} />
 												<Text style={styles.completedScoreText}>
 													<Text style={styles.completedScoreNum}>{correct}</Text>
 													<Text style={styles.completedScoreTotal}> / {quizList.length}</Text> 정답
@@ -1207,6 +1207,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	todayHeroImage: { width: scaleWidth(190), height: scaleHeight(126), marginBottom: SPACING_H.sm },
 	title: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
 		marginBottom: SPACING_H.md,
@@ -1359,6 +1360,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.lg,
 	},
 	questionMain: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.secondary,
@@ -1386,8 +1388,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 	},
 	resultBannerCorrect: {
-		backgroundColor: COLORS.primaryBg,
-		borderColor: COLORS.primarySoft,
+		backgroundColor: COLORS.successBg,
+		borderColor: COLORS.successSoft,
 	},
 	resultBannerWrong: {
 		backgroundColor: COLORS.dangerBg,
@@ -1424,8 +1426,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		textAlign: 'left',
 	},
 	correctOption: {
-		backgroundColor: COLORS.primaryBg,
-		borderColor: COLORS.primary,
+		backgroundColor: COLORS.successBg,
+		borderColor: COLORS.success,
 		borderWidth: 2,
 	},
 	wrongOption: {
@@ -1434,7 +1436,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 2,
 	},
 	correctText: {
-		color: COLORS.primaryDark,
+		color: COLORS.successDark,
 		fontWeight: '700',
 	},
 	wrongText: {
@@ -1442,7 +1444,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '700',
 	},
 	highlightCorrectBorder: {
-		borderColor: COLORS.primary,
+		borderColor: COLORS.success,
 		borderWidth: 2,
 	},
 	nextButton: {
@@ -1514,7 +1516,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: scaleWidth(64),
 		height: scaleWidth(64),
 		borderRadius: scaleWidth(64) / 2,
-		backgroundColor: COLORS.primaryBg,
+		backgroundColor: COLORS.successBg,
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginBottom: SPACING_H.md,
@@ -1543,9 +1545,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.sm,
 		paddingHorizontal: SPACING_W.lg,
 		borderRadius: RADIUS.round,
-		backgroundColor: COLORS.primaryBg,
+		backgroundColor: COLORS.successBg,
 		borderWidth: 1,
-		borderColor: COLORS.primarySoft,
+		borderColor: COLORS.successSoft,
 	},
 	completedScoreText: {
 		fontSize: FONT_SIZES.md,
@@ -1554,7 +1556,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	completedScoreNum: {
 		fontSize: FONT_SIZES.lg,
-		color: COLORS.primaryDark,
+		color: COLORS.successDark,
 		fontWeight: '700',
 	},
 	completedScoreTotal: {
@@ -1602,6 +1604,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		flex: 1,
 	},
 	reviewItemTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -1630,8 +1633,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginTop: SPACING_H.sm,
 	},
 	answerExplainCorrect: {
-		backgroundColor: COLORS.primaryBg,
-		borderColor: COLORS.primary,
+		backgroundColor: COLORS.successBg,
+		borderColor: COLORS.success,
 	},
 	answerExplainWrong: {
 		backgroundColor: COLORS.dangerBg,
@@ -1644,6 +1647,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 	},
 	explainIdiom: {
+		fontFamily: FONTS.display,
 		flexShrink: 1,
 		flexWrap: 'wrap',
 		fontSize: FONT_SIZES.xl,
@@ -1665,8 +1669,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 	},
 	pillCorrect: {
-		backgroundColor: COLORS.primarySoft,
-		borderColor: COLORS.primary,
+		backgroundColor: COLORS.successSoft,
+		borderColor: COLORS.success,
 	},
 	pillWrong: {
 		backgroundColor: COLORS.dangerBg,
@@ -1699,11 +1703,13 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	modalTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
 		color: COLORS.textStrong,
 	},
 	modalTitle2: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
 		marginBottom: SPACING_H.lg,
 		fontWeight: '700',
@@ -1874,6 +1880,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	historyIdiom: {
+		fontFamily: FONTS.display,
 		flex: 1,
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',

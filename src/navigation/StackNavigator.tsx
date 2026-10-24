@@ -10,7 +10,7 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 import ProverbStudyScreen from '@/screens/ProverbStudyScreen';
 import WrongReviewScreen from '@/screens/WrongReviewScreen';
 import { scaledSize } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, SPACING_W } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, SPACING_W } from '@/const/common/Theme';
 import InitTimeChallengeScreen from '@/screens/InitTimeChallengeScreen';
 import TimeChanllengeScreen from '@/screens/TimeChanllengeScreen';
 import QuizModeScreen from '@/screens/QuizModeScreen';
@@ -73,6 +73,7 @@ const StackNavigator = () => {
 					backgroundColor: COLORS.background,
 				},
 				headerTitleStyle: {
+					fontFamily: FONTS.display,
 					fontSize: FONT_SIZES.xl,
 					fontWeight: '700',
 					color: COLORS.text,

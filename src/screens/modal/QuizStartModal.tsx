@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, Animated, StyleSheet, Image, Switch, ScrollView } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { isSoundEnabled, setSoundEnabled } from '@/utils/SoundUtils';
 import { isBgmEnabled, setBgmEnabled, startBgm, stopBgm, BgmTrack } from '@/utils/BgmUtils';
@@ -223,6 +223,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 	},
 	title: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,

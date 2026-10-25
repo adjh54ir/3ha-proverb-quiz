@@ -3,7 +3,7 @@ import ModalCloseButton from '@/screens/common/atomic/ModalCloseButton';
 import { Animated, Image, Keyboard, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, PALETTES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { BOOK_COLORS, BOOK_ICONS } from '../common/CommonProverbModule';
@@ -18,9 +18,12 @@ type PickerProps = {
 	onIconChange: (i: string) => void;
 };
 
-// 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
-const getDefaultColor = (): string => COLORS.primary;
+// 속담집 색은 저장되는 값이라 모드에 따라 바뀌는 COLORS.primary 를 쓰면 다크에서 만든 속담집이
+// 다크 톤(#7C89FF)으로 굳어 라이트에서 물빠져 보인다. 모드와 무관한 기본 쪽빛으로 고정한다.
+const getDefaultColor = (): string => PALETTES.light.primary;
 const DEFAULT_ICON = 'menu-book';
+/** 색(30)·아이콘(38) 점 터치 확장 — 점 사이 간격이 좁아 이웃과 겹치지 않는 만큼만 */
+const DOT_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
 
 type Props = {
 	visible: boolean;
@@ -45,6 +48,7 @@ const ColorIconPicker = ({ selectedColor, selectedIcon, onColorChange, onIconCha
 									key={icon}
 									style={[pickerStyles.iconDot, selectedIcon === icon && [pickerStyles.iconDotSelected, { borderColor: selectedColor, backgroundColor: withAlpha(selectedColor, ALPHA.faint) }]]}
 									activeOpacity={0.8}
+									hitSlop={DOT_HIT_SLOP}
 									onPress={() => onIconChange(icon)}>
 									<IconComponent type="materialIcons" name={icon} size={scaledSize(20)} color={selectedIcon === icon ? selectedColor : COLORS.textLight} />
 								</TouchableOpacity>
@@ -63,6 +67,7 @@ const ColorIconPicker = ({ selectedColor, selectedIcon, onColorChange, onIconCha
 									key={color}
 									style={[pickerStyles.colorDot, { backgroundColor: color }, selectedColor === color && pickerStyles.colorDotSelected]}
 									activeOpacity={0.8}
+									hitSlop={DOT_HIT_SLOP}
 									onPress={() => onColorChange(color)}>
 									{selectedColor === color && <IconComponent type="materialIcons" name="check" size={scaledSize(14)} color={readableTextOn(color)} />}
 								</TouchableOpacity>
@@ -128,7 +133,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 			<KeyboardAvoidingView behavior="padding" style={[styles.overlay, safePadding]}>
 				{/* 카드 밖(딤 영역)을 누르면 키보드를 닫는다 */}
 				<Pressable style={StyleSheet.absoluteFill} onPress={Keyboard.dismiss} />
-				<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
+				<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 					<Animated.View style={[styles.modal, enterStyle]}>
 						<ModalCloseButton onPress={onClose} />
 
@@ -203,10 +208,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	modal: { width: '100%', maxWidth: MODAL_MAX_WIDTH, backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden', paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.xl },
 	modalTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.heading, fontWeight: '700', color: COLORS.textStrong },
 	modalSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'left', marginTop: SPACING_H.xs },
-	inputWrap: { flexDirection: 'row', alignItems: 'center', height: scaleHeight(48), borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, marginTop: SPACING_H.xs, marginBottom: SPACING_H.md, backgroundColor: COLORS.surface },
+	inputWrap: { flexDirection: 'row', alignItems: 'center', minHeight: scaleHeight(48), borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, marginTop: SPACING_H.xs, marginBottom: SPACING_H.md, backgroundColor: COLORS.surface },
 	inputWrapFocused: { borderColor: COLORS.primary },
 	input: { flex: 1, paddingVertical: 0, fontSize: FONT_SIZES.md, color: COLORS.text },
-	submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: scaleHeight(48), marginTop: SPACING_H.lg, borderRadius: RADIUS.md, gap: SPACING_W.sm, backgroundColor: COLORS.primaryFill },
+	submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', minHeight: scaleHeight(48), marginTop: SPACING_H.lg, borderRadius: RADIUS.md, gap: SPACING_W.sm, backgroundColor: COLORS.primaryFill },
 	submitBtnDisabled: { backgroundColor: COLORS.borderDark },
 	submitBtnText: { color: COLORS.textWhite, fontWeight: '700', fontSize: FONT_SIZES.lg },
 	fieldLabel: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, marginTop: SPACING_H.xs },

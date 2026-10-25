@@ -62,6 +62,8 @@ const PAIRS: Array<[keyof typeof PALETTES.light, keyof typeof PALETTES.light]> =
 	['darkMuted', 'textWhite'],
 	['towerVictoryBg', 'textWhite'],
 	['towerDefeatBg', 'textWhite'],
+	['towerVictoryBanner', 'textWhite'],
+	['towerDefeatBanner', 'textWhite'],
 ];
 
 test.each(PAIRS)('%s 배경 위의 %s 는 두 모드 모두 대비 3.0 이상이다', (bg, ink) => {
@@ -96,7 +98,20 @@ test.each(['primaryDark', 'accentFlame', 'accentTeal', 'accentSky'] as const)('�
 });
 
 test('고정 토큰은 두 팔레트에서 값이 같다', () => {
-	(['textOnAccent', 'darkMuted', 'darkBg', 'towerVictoryBg', 'towerDefeatBg'] as const).forEach((key) => {
+	(['textOnAccent', 'darkMuted', 'darkBg', 'towerVictoryBg', 'towerDefeatBg', 'towerVictoryBanner', 'towerDefeatBanner'] as const).forEach((key) => {
 		expect(PALETTES.dark[key]).toBe(PALETTES.light[key]);
 	});
+});
+
+/**
+ * 흰 글자 버튼 채움 토큰 — 다크에서 액센트가 밝아져 흰 글자가 3 근처로 떨어졌던 조합을 따로 둔 토큰이다.
+ * 라이트는 기존 버튼 색을 유지하므로(브랜드 톤) 다크만 본문 기준선 4.5 를 지킨다.
+ */
+test.each(['primaryFill', 'secondaryFill', 'dangerFill'] as const)('다크 %s 위의 흰 글자는 대비 4.5 이상이다', (bg) => {
+	expect(contrast(PALETTES.dark[bg], PALETTES.dark.textWhite)).toBeGreaterThanOrEqual(4.5);
+});
+
+test('채움 토큰은 라이트에서 원래 버튼 색과 같다 (라이트 화면 불변)', () => {
+	expect(PALETTES.light.secondaryFill).toBe(PALETTES.light.secondary);
+	expect(PALETTES.light.dangerFill).toBe(PALETTES.light.danger);
 });

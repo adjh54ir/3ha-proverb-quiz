@@ -164,10 +164,10 @@ const MyProverbBookDetail = () => {
 					</View>
 					<View style={styles.itemBadges}>
 						<View style={[styles.miniBadge, { backgroundColor: getLevelColor(item.levelName) }]}>
-							<Text style={styles.miniBadgeText}>{item.levelName}</Text>
+							<Text style={[styles.miniBadgeText, { color: readableTextOn(getLevelColor(item.levelName)) }]}>{item.levelName}</Text>
 						</View>
 						<View style={[styles.miniBadge, { backgroundColor: getCategoryColor(item.category) }]}>
-							<Text style={styles.miniBadgeText}>{item.category}</Text>
+							<Text style={[styles.miniBadgeText, { color: readableTextOn(getCategoryColor(item.category)) }]}>{item.category}</Text>
 						</View>
 					</View>
 				</TouchableOpacity>
@@ -352,7 +352,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	actionBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700' },
 	listContent: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.xs, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
 	// 편집 모드에서만 하단 삭제 바(absolute)가 뜨므로 그때만 그만큼 더 비운다.
-	listContentWithBar: { paddingBottom: scaleHeight(100) },
+	listContentWithBar: { paddingBottom: BOTTOM_BAR_HEIGHT + SPACING_H.lg },
 	// 위아래 여백은 스크롤되는 목록을 위한 것이라, 비었을 때는 중앙 정렬만 어긋나게 한다.
 	listContentEmpty: { paddingTop: 0, paddingBottom: 0 },
 	itemCard: {
@@ -380,7 +380,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-	checkboxChecked: { backgroundColor: COLORS.danger, borderColor: COLORS.danger },
+	checkboxChecked: { backgroundColor: COLORS.dangerFill, borderColor: COLORS.dangerFill },
 	itemProverb: { fontFamily: FONTS.display, fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong },
 	itemMeaning: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, marginTop: SPACING_H.xs },
 	itemBadges: { rowGap: SPACING_H.xs, alignItems: 'flex-end' },
@@ -412,7 +412,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		columnGap: SPACING_W.sm,
 		height: scaleHeight(52),
 		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.danger,
+		backgroundColor: COLORS.dangerFill,
 	},
 	removeBtnDisabled: { backgroundColor: COLORS.borderDark },
 	removeBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '700' },
@@ -448,6 +448,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	confirmBtnRow: { flexDirection: 'row', width: '100%', columnGap: SPACING_W.md },
 	confirmBtn: { flex: 1, height: scaleHeight(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
 	confirmBtnCancel: { backgroundColor: COLORS.surfaceAlt },
-	confirmBtnDelete: { backgroundColor: COLORS.danger },
+	confirmBtnDelete: { backgroundColor: COLORS.dangerFill },
 	confirmBtnText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
 }));

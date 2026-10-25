@@ -227,7 +227,7 @@ const styles = themedStyles(() =>
 			backgroundColor: COLORS.surfaceAlt,
 		},
 		buttonDestructive: {
-			backgroundColor: COLORS.danger,
+			backgroundColor: COLORS.dangerFill,
 		},
 		buttonText: {
 			fontSize: FONT_SIZES.mdPlus,

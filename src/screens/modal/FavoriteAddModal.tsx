@@ -9,6 +9,8 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconComponent from '../common/atomic/IconComponent';
 import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
+import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
+import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
@@ -173,23 +175,24 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 	const isAllSelected = filteredList.length > 0 && filteredList.every((item) => selectedIds.includes(item.id));
 
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
-		const isLast = index === filteredList.length - 1;
+		// 마지막 '행' — 태블릿 2열에서는 마지막 두 장(홀수 개면 한 장)이 같은 행이다
+		const isLast = index >= filteredList.length - (filteredList.length % LIST_COLUMNS || LIST_COLUMNS);
 		const isSelected = selectedIds.includes(item.id);
 
 		return (
-			<FadeInView delay={staggerDelay(index)} duration={240} offsetY={10}>
+			<FadeInView delay={staggerDelay(index)} duration={240} offsetY={10} style={listGrid?.cell}>
 			<TouchableOpacity
-				style={[styles.itemCard, { marginBottom: isLast ? SPACING_H.xl : SPACING_H.md }, isSelected && styles.itemCardSelected]}
+				style={[styles.itemCard, listGrid?.fill, { marginBottom: isLast ? SPACING_H.xl : SPACING_H.md }, isSelected && styles.itemCardSelected]}
 				activeOpacity={0.75}
 				onPress={() => toggleSelection(item.id)}>
 				<View style={styles.itemHeader}>
 					<View style={styles.badgeRow}>
 						<View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.levelName) }]}>
-							<IconComponent type="FontAwesome6" name={getLevelIconName(item.levelName)} size={scaledSize(10)} color={COLORS.textWhite} />
-							<Text style={styles.badgeText}>{item.levelName}</Text>
+							<IconComponent type="FontAwesome6" name={getLevelIconName(item.levelName)} size={scaledSize(10)} color={readableTextOn(getLevelColor(item.levelName))} />
+							<Text style={[styles.badgeText, { color: readableTextOn(getLevelColor(item.levelName)) }]}>{item.levelName}</Text>
 						</View>
 						<View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(item.category) }]}>
-							<Text style={styles.badgeText}>{item.category || '미지정'}</Text>
+							<Text style={[styles.badgeText, { color: readableTextOn(getCategoryColor(item.category)) }]}>{item.category || '미지정'}</Text>
 						</View>
 					</View>
 					<View style={[styles.checkbox, isSelected && styles.checkboxChecked]}>
@@ -324,7 +327,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 
 								<View style={styles.listCountRow}>
 									{filteredList.length > 0 && (
-										<TouchableOpacity style={styles.selectAllBtn} onPress={handleSelectAll} activeOpacity={0.7}>
+										<TouchableOpacity style={styles.selectAllBtn} onPress={handleSelectAll} hitSlop={HIT_SLOP} activeOpacity={0.7}>
 											<View style={[styles.miniCheckbox, isAllSelected && styles.miniCheckboxChecked]}>
 												{isAllSelected && <Icon name="check" size={scaledSize(9)} color={COLORS.textOnAccent} />}
 											</View>
@@ -343,8 +346,8 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 								scrollEnabled={!levelOpen && !categoryOpen}
 								onScroll={onListScroll}
 								scrollEventThrottle={16}
-								keyboardShouldPersistTaps="handled"
-								keyboardDismissMode="on-drag"
+								numColumns={LIST_COLUMNS}
+								columnWrapperStyle={listGrid?.row}
 								contentContainerStyle={[styles.listContent, filteredList.length === 0 && styles.listContentEmpty]}
 								showsVerticalScrollIndicator={false}
 								ListEmptyComponent={() => (
@@ -436,7 +439,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', lineHeight: scaledSize(20) },
 	// paddingBottom 은 useSafeAreaInsets 로 런타임 주입 (제스처/3버튼 네비게이션 바 회피)
 	footer: { backgroundColor: COLORS.surface, paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, borderTopWidth: 1, borderTopColor: COLORS.surfaceAlt },
-	confirmBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING_W.sm, height: scaleHeight(48), borderRadius: RADIUS.md, backgroundColor: COLORS.warning },
+	confirmBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING_W.sm, minHeight: scaleHeight(48), borderRadius: RADIUS.md, backgroundColor: COLORS.warning },
 	confirmBtnDisabled: { backgroundColor: COLORS.surfaceAlt },
 	confirmBtnTextDisabled: { color: COLORS.textLight },
 	confirmBtnText: { color: COLORS.textOnAccent, fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },

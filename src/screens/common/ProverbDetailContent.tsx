@@ -5,6 +5,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { scaledSize, scaleWidth } from '@/utils';
 import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber } from './CommonProverbModule';
+import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './atomic/IconComponent';
 
@@ -30,13 +31,13 @@ const CATEGORY_ICON: Record<string, { type: string; name: string }> = {
 const getLevelIcon = (level: number) => {
 	switch (level) {
 		case 1:
-			return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(13)} color={COLORS.textWhite} />;
+			return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(13)} color={readableTextOn(getLevelColorByNumber(level))} />;
 		case 2:
-			return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(13)} color={COLORS.textWhite} />;
+			return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(13)} color={readableTextOn(getLevelColorByNumber(level))} />;
 		case 3:
-			return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(13)} color={COLORS.textWhite} />;
+			return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(13)} color={readableTextOn(getLevelColorByNumber(level))} />;
 		case 4:
-			return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(13)} color={COLORS.textWhite} />;
+			return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(13)} color={readableTextOn(getLevelColorByNumber(level))} />;
 		default:
 			return null;
 	}
@@ -65,11 +66,11 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 			<View style={styles.badgeRow}>
 				<View style={[styles.levelBadge, { backgroundColor: getLevelColorByNumber(proverb.level) }]}>
 					{getLevelIcon(proverb.level)}
-					<Text style={styles.levelBadgeText}>{proverb.levelName}</Text>
+					<Text style={[styles.levelBadgeText, { color: readableTextOn(getLevelColorByNumber(proverb.level)) }]}>{proverb.levelName}</Text>
 				</View>
 				<View style={[styles.badge2, { backgroundColor: getCategoryColor(proverb.category) }]}>
-					{categoryIcon && <IconComponent type={categoryIcon.type} name={categoryIcon.name} size={scaledSize(13)} color={COLORS.textWhite} />}
-					<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{proverb.category}</Text>
+					{categoryIcon && <IconComponent type={categoryIcon.type} name={categoryIcon.name} size={scaledSize(13)} color={readableTextOn(getCategoryColor(proverb.category))} />}
+					<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs, color: readableTextOn(getCategoryColor(proverb.category)) }]}>{proverb.category}</Text>
 				</View>
 			</View>
 

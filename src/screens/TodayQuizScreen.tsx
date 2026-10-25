@@ -7,7 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import notifee, { AuthorizationStatus } from '@notifee/react-native';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles, displayFontSize } from '@/const/common/Theme';
+import { listGrid } from '@/const/common/ListGrid';
 import { useFocusEffect } from '@react-navigation/native';
 import { MainDataType } from '@/types/MainDataType';
 import { read, write } from '@/services/StorageService';
@@ -34,6 +35,9 @@ import QuizHistoryService from '@/services/QuizHistoryService';
 import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 import * as TodayQuizService from '@/services/TodayQuizService';
+
+/** 시간 칩(약 33pt) 세로 터치 확장 — 가로는 이웃 칩과 겹치지 않게 두지 않는다 */
+const HOUR_CHIP_HIT_SLOP = { top: 6, bottom: 6 };
 
 /** 저장 포맷('HH:mm') 으로 변환 */
 const toAlarmTimeString = (hour: number) => `${String(hour).padStart(2, '0')}:00`;
@@ -628,8 +632,9 @@ const TodayQuizScreen = () => {
 						{result !== undefined && (
 							<View style={styles.resultBannerWrap}>
 								<View style={[styles.resultBanner, result ? styles.resultBannerCorrect : styles.resultBannerWrong]}>
-									<View style={[styles.resultBannerIcon, { backgroundColor: result ? COLORS.success : COLORS.danger }]}>
-										<IconComponent type="materialIcons" name={result ? 'check' : 'close'} size={scaledSize(16)} color={COLORS.textWhite} />
+									<View style={[styles.resultBannerIcon, { backgroundColor: result ? COLORS.success : COLORS.dangerFill }]}>
+										{/* 다크 success(#3DD68C) 위 흰 아이콘은 1.8:1 — textOnVivid 가 다크에서만 먹색으로 뒤집는다 */}
+										<IconComponent type="materialIcons" name={result ? 'check' : 'close'} size={scaledSize(16)} color={result ? COLORS.textOnVivid : COLORS.textWhite} />
 									</View>
 									<Text style={[styles.resultBannerText, { color: result ? COLORS.successDeep : COLORS.dangerDark }]}>
 										{result ? '정답입니다!' : '아쉽습니다, 오답입니다'}
@@ -664,7 +669,7 @@ const TodayQuizScreen = () => {
 						{/* 마지막 문제를 풀면 상위에서 곧바로 완료 화면으로 전환되므로 '다음 문제'만 노출한다 */}
 						{result !== undefined && currentIndex < quizList.length - 1 && (
 							<TouchableOpacity
-								style={styles.nextButton}
+								style={[styles.nextButton, SOLO_BUTTON]}
 								activeOpacity={0.8}
 								onPress={() => {
 									setCurrentIndex((prev) => prev + 1);
@@ -753,6 +758,7 @@ const TodayQuizScreen = () => {
 												key={hour}
 												activeOpacity={0.8}
 												onPress={() => setTempSelectedHour(hour)}
+												hitSlop={HOUR_CHIP_HIT_SLOP}
 												style={[styles.hourButton, isSelected && styles.hourButtonSelected]}>
 												<Text style={[styles.hourText, isSelected && styles.hourTextSelected]}>{hour.toString().padStart(2, '0')}시</Text>
 											</TouchableOpacity>
@@ -806,7 +812,7 @@ const TodayQuizScreen = () => {
 									<Text style={styles.emptyQuizSubtitle}>지금 바로 시작해 보세요!</Text>
 
 									<TouchableOpacity
-										style={styles.startQuizButton}
+										style={[styles.startQuizButton, SOLO_BUTTON]}
 										activeOpacity={0.8}
 										onPress={async () => {
 											if (quizList.length === 0) {
@@ -858,15 +864,15 @@ const TodayQuizScreen = () => {
 									</TouchableOpacity>
 
 									{showTodayReview && (
-										<View style={styles.reviewList}>
+										<View style={[styles.reviewList, listGrid?.wrap]}>
 											{quizList.map((item, idx) => {
 												const itemResult = answerResults[item.id];
 												return (
 													// 리스트 stagger — 최대 6개까지만 지연
-													<FadeInView key={item.id} delay={staggerDelay(idx)} duration={260} offsetY={8}>
+													<FadeInView key={item.id} delay={staggerDelay(idx)} duration={260} offsetY={8} style={listGrid?.cell}>
 														<TouchableOpacity
 															activeOpacity={0.85}
-															style={styles.reviewItemCard}
+															style={[styles.reviewItemCard, listGrid?.fill]}
 															onPress={() => {
 																setDetailQuiz(item);
 																setDetailModalVisible(true);
@@ -954,6 +960,7 @@ const TodayQuizScreen = () => {
 													key={hour}
 													activeOpacity={0.8}
 													onPress={() => setTempSelectedHour(hour)}
+													hitSlop={HOUR_CHIP_HIT_SLOP}
 													style={[styles.hourButton, isSelected && styles.hourButtonSelected]}>
 													<Text style={[styles.hourText, isSelected && styles.hourTextSelected]}>{hour.toString().padStart(2, '0')}시</Text>
 												</TouchableOpacity>
@@ -1263,8 +1270,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surfaceAlt,
 	},
 	hourButtonSelected: {
-		backgroundColor: COLORS.primary,
-		borderColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
+		borderColor: COLORS.primaryFill,
 	},
 	hourText: {
 		fontSize: FONT_SIZES.md,
@@ -1453,7 +1460,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		minHeight: scaleHeight(48),
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.xl,
 		borderRadius: RADIUS.md,
@@ -1494,7 +1501,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		minHeight: scaleHeight(48),
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.xxl,
 		borderRadius: RADIUS.md,

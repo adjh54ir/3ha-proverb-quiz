@@ -1,4 +1,5 @@
 import React from 'react';
+import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { scaledSize } from '@/utils';
 import IconComponent from './atomic/IconComponent';
 import { COLORS } from '@/const/common/Theme';
@@ -68,7 +69,8 @@ export const getFieldIconName = (category: string): string => {
 
 /** 카테고리별 아이콘 (배경 위 흰색 표시용) */
 export const getFieldIcon = (category: string): React.ReactNode => {
-	return <IconComponent type="materialIcons" name={getFieldIconName(category)} size={scaledSize(14)} color={COLORS.textWhite} />;
+	// 카테고리 배지 위 아이콘 — 밝은 카테고리색(#22C55E, #F59E0B …) 위에서는 진한 잉크로 뒤집는다
+	return <IconComponent type="materialIcons" name={getFieldIconName(category)} size={scaledSize(14)} color={readableTextOn(getCategoryColor(category))} />;
 };
 
 /** 난이도(levelName)별 아이콘 이름 (FontAwesome6) — 속담 목록 레벨 배지와 동일 */

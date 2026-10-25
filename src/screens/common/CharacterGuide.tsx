@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import FastImage from 'react-native-fast-image';
 import IconComponent from '@/screens/common/atomic/IconComponent';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, HIT_SLOP, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { LEVEL_DATA } from '@/const/common/CommonCharacterData';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
@@ -67,7 +67,7 @@ export const CharacterGuideButton: React.FC<{ onPress: () => void; color?: strin
 }) => (
 	<TouchableOpacity
 		onPress={onPress}
-		hitSlop={{ top: scaleHeight(10), bottom: scaleHeight(10), left: scaleWidth(10), right: scaleWidth(10) }}
+		hitSlop={HIT_SLOP}
 		activeOpacity={0.7}
 		accessibilityRole="button"
 		accessibilityLabel="이 화면 사용법 다시 보기">
@@ -247,7 +247,8 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 							{isTyping && <Text style={{ color: accent }}>▌</Text>}
 						</Text>
 						<TouchableOpacity
-							style={[styles.cta, { backgroundColor: isLast ? accent : `${accent}1F` }]}
+							// 마지막 단계는 흰 글자 채움 — 기본 쪽빛이면 다크에서 흰 글자 대비가 충분한 primaryFill 로 칠한다
+							style={[styles.cta, { backgroundColor: isLast ? (accent === COLORS.primary ? COLORS.primaryFill : accent) : `${accent}1F` }]}
 							activeOpacity={0.9}
 							onPress={next}
 							accessibilityRole="button"

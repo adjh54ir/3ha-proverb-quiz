@@ -16,6 +16,7 @@ const HALF_GAP = SPACING_W.md / 2;
 /**
  * - `row`  : FlatList `columnWrapperStyle` (ScrollView 라면 감싸는 View 에 `wrap` 을 쓴다)
  * - `cell` : 각 아이템을 감싸는 `AnimatedListItem` 의 style — 반 폭 + 양옆 반 간격
+ * - `full` : 홀수 개 묶음의 마지막처럼 한 행을 혼자 쓰는 셀 — 가장자리는 `cell` 과 맞춘다
  * - `fill` : 카드 본체 — 같은 행의 더 긴 카드에 높이를 맞춘다
  */
 export const listGrid =
@@ -24,6 +25,7 @@ export const listGrid =
 				row: { marginHorizontal: -HALF_GAP },
 				wrap: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -HALF_GAP },
 				cell: { width: '50%', paddingHorizontal: HALF_GAP },
+				full: { width: '100%', paddingHorizontal: HALF_GAP },
 				fill: { flexGrow: 1 },
 			})
 		: null;

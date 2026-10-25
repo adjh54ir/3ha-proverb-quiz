@@ -269,7 +269,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: scaleWidth(16),
 		height: scaleWidth(16),
 		borderRadius: scaleWidth(16) / 2,
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderWidth: 1.5,
@@ -286,7 +286,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	petCurrentBadge: {
 		marginTop: SPACING_H.xs,
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: SPACING_H.xs / 2,

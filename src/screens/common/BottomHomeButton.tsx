@@ -120,12 +120,12 @@ const modalStyles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: SPACING_W.xxl,
-		paddingVertical: SPACING_H.xxl,
+		// 다른 다이얼로그 딤과 같은 좌우 여백. 위아래는 useModalSafePadding 이 덮어써 따로 두지 않는다.
+		paddingHorizontal: SPACING_W.lg,
 	},
 	card: {
 		width: '100%',
-		maxWidth: scaleWidth(320),
+		maxWidth: scaleWidth(340), // 다른 대화상자와 같은 폭
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,
@@ -171,7 +171,7 @@ const modalStyles = themedStyles(() => StyleSheet.create({
 	cancelText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.textSecondary },
 	confirmBtn: {
 		flex: 1,
-		backgroundColor: COLORS.danger,
+		backgroundColor: COLORS.dangerFill,
 		borderRadius: RADIUS.md,
 		minHeight: scaleHeight(MIN_TOUCH),
 		paddingVertical: SPACING_H.md,

@@ -26,7 +26,8 @@ import { useCallback } from 'react';
 import FastImage from 'react-native-fast-image';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
@@ -70,6 +71,9 @@ const DIFFICULTIES = [
 	{ key: 'Level 3', title: 'Level 3', subtitle: '고급', icon: 'tree' },
 	{ key: 'Level 4', title: 'Level 4', subtitle: '특급', icon: 'trophy' },
 ];
+
+/** 정복한 레벨 타일 열 수 — 태블릿은 기둥이 넓어 2열 정사각형이 한 장에 300pt 가까이 커지므로 한 줄에 4개 */
+const LEVEL_COLUMNS = isTablet ? 4 : 2;
 
 const STYLE_MAP = {
 	초급: {
@@ -530,7 +534,9 @@ const MyScoreScreen = () => {
 							<View
 								style={{
 									position: 'absolute',
-									right: scaleWidth(40),
+									// 폰은 화면 오른쪽 기준으로 캐릭터 오른쪽 어깨에 걸친다. 태블릿은 기둥이 넓어 오른쪽 기준이면
+									// 캐릭터에서 한참 떨어지므로 가운데 기준으로 같은 자리(가운데 + 71)에 둔다.
+									...(isTablet ? { left: '50%', marginLeft: scaleWidth(71) } : { right: scaleWidth(40) }),
 									top: scaleHeight(38),
 									width: scaleWidth(60),
 									height: scaleWidth(60),
@@ -836,12 +842,14 @@ const MyScoreScreen = () => {
 								<FlatList
 									data={DIFFICULTIES}
 									keyExtractor={(item) => item.key}
-									numColumns={2}
+									numColumns={LEVEL_COLUMNS}
 									scrollEnabled={false}
 									columnWrapperStyle={{ justifyContent: 'space-around' }}
 									renderItem={({ item }) => {
 										const isEarned = levelMaster.includes(item.title);
 										const levelStyle = getLevelStyle(item.subtitle);
+										// 초급(#34D399)·중급(#F59E0B) 처럼 밝은 레벨색 위에서는 흰 글자가 묻힌다
+										const earnedInk = readableTextOn(levelStyle.bg);
 										return (
 											<View
 												style={[
@@ -855,11 +863,11 @@ const MyScoreScreen = () => {
 													name={item.icon}
 													type="fontAwesome6"
 													size={scaledSize(24)}
-													color={isEarned ? COLORS.textWhite : COLORS.textLight}
+													color={isEarned ? earnedInk : COLORS.textLight}
 													style={{ marginBottom: SPACING_H.xsPlus }}
 												/>
-												<Text style={[styles.levelText, isEarned && { color: COLORS.textWhite, fontWeight: '700' }]}> {item.title} </Text>
-												<Text style={[styles.levelSubText, isEarned && { color: COLORS.textWhite }]}> {item.subtitle} </Text>
+												<Text style={[styles.levelText, isEarned && { color: earnedInk, fontWeight: '700' }]}> {item.title} </Text>
+												<Text style={[styles.levelSubText, isEarned && { color: earnedInk }]}> {item.subtitle} </Text>
 
 												{/* ✅ 정복 배지 */}
 												{isEarned && (
@@ -891,6 +899,8 @@ const MyScoreScreen = () => {
 								data={allCategories}
 								keyExtractor={(item) => item}
 								scrollEnabled={false}
+								numColumns={LIST_COLUMNS}
+								columnWrapperStyle={listGrid?.row}
 								renderItem={({ item: category }) => {
 									const isEarned = categoryMaster.includes(category);
 									const categoryInfo = FIELD_DROPDOWN_ITEMS.find((item) => item.label === category || item.value === category);
@@ -901,11 +911,14 @@ const MyScoreScreen = () => {
 											name: categoryInfo?.iconName ?? 'circle-question',
 										},
 									};
+									const earnedInk = readableTextOn(meta.color);
 
 									return (
+										<View style={listGrid?.cell}>
 										<View
 											style={[
 												styles.categoryRowCard,
+												listGrid?.fill,
 												isEarned && {
 													backgroundColor: meta.color,
 													borderColor: meta.color,
@@ -925,14 +938,14 @@ const MyScoreScreen = () => {
 													type={meta.icon.type}
 													name={meta.icon.name}
 													size={scaledSize(18)}
-													color={isEarned ? COLORS.textWhite : meta.color}
+													color={isEarned ? earnedInk : meta.color}
 												/>
 											</View>
 											<Text
 												style={[
 													styles.categoryRowText,
 													isEarned && {
-														color: COLORS.textWhite,
+														color: earnedInk,
 														fontWeight: '700',
 														textShadowColor: 'rgba(0, 0, 0, 0.15)',
 														textShadowOffset: { width: 1, height: 1 },
@@ -948,6 +961,7 @@ const MyScoreScreen = () => {
 													<Text style={styles.conquerTagText}>정복</Text>
 												</View>
 											)}
+										</View>
 										</View>
 									);
 								}}
@@ -1015,7 +1029,7 @@ const MyScoreScreen = () => {
 									borderColor: COLORS.border,
 									backgroundColor: COLORS.background,
 									borderRadius: RADIUS.lg,
-									padding: SPACING_W.lg,
+									paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
 									marginTop: SPACING_H.md,
 									alignSelf: 'stretch',
 								}}>
@@ -1028,14 +1042,15 @@ const MyScoreScreen = () => {
 						{selectedDate && selectedQuizData && (
 							<View style={{ marginTop: SPACING_H.md }}>
 								<Text style={styles.sectionSubtitle}>{selectedDate} 퀴즈 결과</Text>
+								<View style={listGrid?.wrap}>
 								{selectedQuizData?.todayQuizIdArr.map((quizId, idx) => {
 									const userAnswer = selectedQuizData.selectedAnswers?.[quizId];
 									const isCorrect = selectedQuizData.answerResults?.[quizId];
 									const quizItem = ProverbServices.selectProverbById(quizId); // 예시 함수
 
 									return (
+										<View key={idx} style={listGrid?.cell}>
 										<TouchableOpacity
-											key={idx}
 											activeOpacity={0.85}
 											onPress={() => {
 												if (quizItem) {
@@ -1043,7 +1058,7 @@ const MyScoreScreen = () => {
 													setDetailVisible(true);
 												}
 											}}
-											style={{
+											style={[listGrid?.fill, {
 												width: '100%', // 👈 추가
 												backgroundColor: COLORS.surface,
 												borderRadius: RADIUS.lg,
@@ -1052,7 +1067,7 @@ const MyScoreScreen = () => {
 												borderWidth: 0,
 												marginBottom: SPACING_H.md,
 												alignSelf: 'stretch', // ✅ 전체 너비 확보
-											}}>
+											}]}>
 											<View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: SPACING_W.sm }}>
 												<View style={{ flex: 1 }}>
 													<Text
@@ -1092,7 +1107,7 @@ const MyScoreScreen = () => {
 														</View>
 													)}
 													{!!(quizItem?.longMeaning || quizItem?.meaning) && (
-														<Text style={{ fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, lineHeight: scaleHeight(18) }} numberOfLines={2}>
+														<Text style={{ fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, lineHeight: scaledSize(18) }} numberOfLines={2}>
 															{quizItem.longMeaning || quizItem.meaning}
 														</Text>
 													)}
@@ -1100,8 +1115,10 @@ const MyScoreScreen = () => {
 												<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.textLight} style={{ alignSelf: 'center' }} />
 											</View>
 										</TouchableOpacity>
+										</View>
 									);
 								})}
+								</View>
 							</View>
 						)}
 
@@ -1206,12 +1223,13 @@ const MyScoreScreen = () => {
 							total={TOWER_LEVELS.length}
 						/>
 						<Text style={styles.regionHelperText}>레벨별 보스를 클리어하면 보상을 받을 수 있습니다</Text>
+						{/* 타워 카드는 이미지+정보 가로 배치라 2열이면 아이패드 미니에서 배지가 잘린다 — 태블릿도 한 열 */}
 						{TOWER_LEVELS.map((tower) => {
 							const isCleared = unlockedRewards.includes(tower.level);
 							return (
 								<View
 									key={tower.level}
-									style={{
+									style={[{
 										flexDirection: 'row',
 										borderRadius: RADIUS.lg,
 										overflow: 'hidden',
@@ -1220,7 +1238,7 @@ const MyScoreScreen = () => {
 										borderColor: isCleared ? tower.color : COLORS.border,
 										backgroundColor: COLORS.surface,
 										opacity: isCleared ? 1 : 0.55,
-									}}>
+									}]}>
 									{/* 왼쪽: 보스 이미지 + 레벨 배지 */}
 									<View
 										style={{
@@ -1229,7 +1247,7 @@ const MyScoreScreen = () => {
 											backgroundColor: isCleared ? withAlpha(tower.color, ALPHA.soft) : COLORS.surfaceAlt,
 											alignItems: 'center',
 											justifyContent: 'center',
-											padding: SPACING_W.sm,
+											paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.sm,
 										}}>
 										<FastImage
 											source={tower.bossImage}
@@ -1251,7 +1269,7 @@ const MyScoreScreen = () => {
 									</View>
 
 									{/* 오른쪽: 보스 정보 + 보상 */}
-									<View style={{ flex: 1, padding: SPACING_W.md, justifyContent: 'center' }}>
+									<View style={{ flex: 1, paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md, justifyContent: 'center' }}>
 										<Text style={{ fontSize: FONT_SIZES.xxs, color: COLORS.textLight, marginBottom: SPACING_H.xxs }}>{tower.bossTitle}</Text>
 										<Text style={{ fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, marginBottom: SPACING_H.xsPlus }}>{tower.bossName}</Text>
 
@@ -1291,7 +1309,7 @@ const MyScoreScreen = () => {
 													paddingHorizontal: SPACING_W.sm,
 													paddingVertical: SPACING_H.xs,
 												}}>
-												<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>{isCleared ? '클리어 ✓' : '미클리어 🔒'}</Text>
+												<Text style={{ color: isCleared ? readableTextOn(tower.color) : COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>{isCleared ? '클리어 ✓' : '미클리어 🔒'}</Text>
 											</View>
 										</View>
 									</View>
@@ -1341,15 +1359,19 @@ const MyScoreScreen = () => {
 								if (list.length === 0) {
 									return <Text style={styles.emptyText}> - 표시할 뱃지가 없습니다.</Text>;
 								}
-								return list.map((badge, badgeIndex) => {
+								// 마지막 '행'의 카드 수 — 태블릿 2열에서 홀수 개면 마지막 행은 한 장이다
+								const lastRowCount = list.length % LIST_COLUMNS || LIST_COLUMNS;
+								return (
+									<View style={listGrid?.wrap}>
+										{list.map((badge, badgeIndex) => {
 									const earned = earnedBadgeIds.includes(badge.id);
 									const rarity = BADGE_RARITY_META[badge.rarity] ?? BADGE_RARITY_META.common;
 									return (
+										<View key={badge.id} style={listGrid?.cell}>
 										<TouchableOpacity
-											key={badge.id}
 											activeOpacity={0.7}
-											// 마지막 카드는 marginBottom 을 빼야 카드 안 위(16)·아래 여백이 같아진다
-											style={[styles.badgeCard, earned && styles.badgeCardActive, badgeIndex === list.length - 1 && styles.lastItem]}
+											// 마지막 행 카드는 marginBottom 을 빼야 카드 안 위(16)·아래 여백이 같아진다
+											style={[styles.badgeCard, listGrid?.fill, earned && styles.badgeCardActive, badgeIndex >= list.length - lastRowCount && styles.lastItem]}
 											onPress={() => openBadgePopup(badge)}>
 											<View style={[styles.iconBox, earned && { backgroundColor: rarity.soft }]}>
 												<IconComponent
@@ -1361,13 +1383,13 @@ const MyScoreScreen = () => {
 											</View>
 											<View style={styles.textBox}>
 												<View style={styles.badgeTitleRow}>
-													<Text style={[styles.badgeTitle, earned && styles.badgeTitleActive]} numberOfLines={1}>{badge.name}</Text>
+													<Text style={[styles.badgeTitle, earned && styles.badgeTitleActive]} numberOfLines={isTablet ? 2 : 1}>{badge.name}</Text>
 													<View style={[styles.badgeRarityTag, { backgroundColor: earned ? rarity.soft : COLORS.surfaceAlt }]}>
 														<IconComponent type="materialIcons" name="auto-awesome" size={scaledSize(9)} color={rarity.color} />
 														<Text style={[styles.badgeRarityTagText, { color: rarity.color }]}>{rarity.label}</Text>
 													</View>
 												</View>
-												<Text style={[styles.badgeDesc, earned && styles.badgeDescActive]} numberOfLines={1}>{badge.description}</Text>
+												<Text style={[styles.badgeDesc, earned && styles.badgeDescActive]} numberOfLines={isTablet ? 2 : 1}>{badge.description}</Text>
 												<View style={styles.badgeCondRow}>
 													<IconComponent type="materialIcons" name="flag" size={scaledSize(10)} color={COLORS.textLight} />
 													<Text style={styles.badgeCondText} numberOfLines={1}>{badge.condition}</Text>
@@ -1375,8 +1397,11 @@ const MyScoreScreen = () => {
 											</View>
 											<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={earned ? COLORS.primary : COLORS.borderDark} style={{ alignSelf: 'center' }} />
 										</TouchableOpacity>
+										</View>
 									);
-								});
+										})}
+									</View>
+								);
 							})()}
 						</View>
 					</>
@@ -1498,7 +1523,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.textSecondary,
 		marginTop: SPACING_H.xxs,
-		lineHeight: scaleHeight(18),
+		lineHeight: scaledSize(18),
 	},
 	badgeDescActive: {
 		color: COLORS.primary,
@@ -1520,7 +1545,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	scoreDashCard: {
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.lg,
-		padding: SPACING_W.lg,
+		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
 		marginBottom: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: COLORS.border,
@@ -1536,7 +1561,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: scaleWidth(24),
 		height: scaleWidth(24),
 		borderRadius: scaleWidth(8),
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -1551,9 +1576,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xs,
 	},
 	scoreDashScoreText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.warningDark },
-	scoreDashGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: SPACING_H.sm },
+	scoreDashGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: SPACING_H.sm, columnGap: SPACING_W.sm },
 	scoreDashTile: {
-		width: '48%',
+		// 태블릿은 네 타일을 한 줄로 — 2x2 로 두면 타일 하나가 400pt 가까이 늘어진다
+		width: isTablet ? '23.5%' : '48%',
 		backgroundColor: COLORS.background,
 		borderRadius: RADIUS.md,
 		paddingHorizontal: SPACING_W.smPlus,
@@ -1581,7 +1607,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	scoreDashTilePct: { fontSize: FONT_SIZES.xs, fontWeight: '700', marginTop: SPACING_H.xs, textAlign: 'right' },
 	subSectionBox1: {
 		backgroundColor: COLORS.surface,
-		padding: SPACING_W.lg,
+		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
 		borderRadius: RADIUS.lg,
 		marginBottom: SPACING_H.md,
 		borderWidth: 1,
@@ -1589,7 +1615,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	subSectionBox2: {
 		backgroundColor: COLORS.surface,
-		padding: SPACING_W.lg,
+		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
 		borderRadius: RADIUS.lg,
 		marginBottom: SPACING_H.md,
 		borderWidth: 1,
@@ -1631,7 +1657,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	quizSummaryBox: {
 		backgroundColor: COLORS.surfaceAlt,
 		borderRadius: scaleWidth(12),
-		padding: SPACING_W.md,
+		paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md,
 		marginTop: SPACING_H.sm,
 		marginBottom: SPACING_H.lg,
 	},
@@ -1676,7 +1702,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	levelCardBox: {
 		backgroundColor: COLORS.background,
 		borderRadius: scaleWidth(14),
-		padding: SPACING_W.lg,
+		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
 		alignItems: 'center',
 		marginBottom: SPACING_H.mdPlus,
 		width: '100%',
@@ -1689,7 +1715,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 2,
 	},
 	levelBadge: {
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		paddingHorizontal: SPACING_W.smPlus,
 		paddingVertical: SPACING_H.xs,
 		borderRadius: scaleWidth(12),
@@ -1720,7 +1746,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.primary,
 		marginTop: SPACING_H.xsPlus,
 		textAlign: 'center',
-		lineHeight: scaleHeight(20),
+		lineHeight: scaledSize(20),
 	},
 	levelIconWrapSmall: {
 		width: scaleWidth(28),
@@ -1756,7 +1782,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginTop: SPACING_H.lg,
 		paddingVertical: SPACING_H.smPlus,
 		paddingHorizontal: SPACING_W.xxl,
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		borderRadius: scaleWidth(8),
 	},
 	modalConfirmText: {
@@ -1774,7 +1800,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.textSecondary,
 		textAlign: 'center',
-		lineHeight: scaleHeight(18),
+		lineHeight: scaledSize(18),
 		marginBottom: SPACING_H.xs,
 	},
 	levelScoreText: {
@@ -1792,7 +1818,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	activityCardBox: {
 		backgroundColor: COLORS.surfaceAlt,
 		borderRadius: RADIUS.lg,
-		padding: SPACING_W.lg,
+		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
 		marginBottom: SPACING_H.xxl,
 		borderWidth: 1,
 		borderColor: COLORS.border,
@@ -1814,7 +1840,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	summaryCard: {
 		backgroundColor: HERO.bg,
-		padding: SPACING_W.lg,
+		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
 		borderRadius: scaleWidth(12),
 		marginBottom: SPACING_H.lg,
 		borderWidth: 1,
@@ -1869,7 +1895,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginHorizontal: SPACING_W.xs,
 	},
 	levelCard: {
-		width: '42%',
+		width: isTablet ? '21%' : '42%',
 		aspectRatio: 1,
 		borderWidth: 1.5,
 		borderColor: COLORS.border,
@@ -1897,14 +1923,14 @@ const styles = themedStyles(() => StyleSheet.create({
 	summaryStatGrid: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		columnGap: SPACING_W.xs,
+		// 카드 사이는 예전과 같은 12, 바깥 카드는 위 chartRow 가장자리에 맞춘다(카드 marginHorizontal 제거)
+		columnGap: SPACING_W.md,
 	},
 	summaryStatCard: {
 		flex: 1,
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.lg,
 		paddingVertical: SPACING_H.md,
-		marginHorizontal: SPACING_W.xs,
 		alignItems: 'center',
 		borderWidth: 1,
 		borderColor: COLORS.border,
@@ -1937,7 +1963,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.lg,
-		padding: SPACING_W.lg,
+		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
 		marginBottom: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: COLORS.border,
@@ -2056,7 +2082,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textLight,
 		textAlign: 'center',
 		marginTop: scaleHeight(1),
-		lineHeight: scaleHeight(13),
+		lineHeight: scaledSize(13),
 		fontWeight: '400',
 	},
 	levelSubText: {
@@ -2064,7 +2090,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textLight,
 		textAlign: 'center',
 		marginTop: scaleHeight(1),
-		lineHeight: scaleHeight(13),
+		lineHeight: scaledSize(13),
 		fontWeight: '400',
 	},
 	sectionSubtitle: {
@@ -2110,7 +2136,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	scoreBadge: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.xs,
@@ -2129,7 +2155,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: COLORS.primary, // 🎨 학습 모드(홈 버튼) 초록
+		backgroundColor: COLORS.primaryFill, // 🎨 학습 모드(홈 버튼) 초록
 	},
 	iconCircle2: {
 		width: scaleWidth(30),
@@ -2138,7 +2164,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: SPACING_W.xsPlus,
-		backgroundColor: COLORS.secondary, // 🎨 밝은 파랑 배경 추가
+		backgroundColor: COLORS.secondaryFill, // 🎨 밝은 파랑 배경 추가
 	},
 
 	iconCircle3: {
@@ -2214,7 +2240,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		gap: SPACING_W.xsPlus,
 	},
 	activityTabChipActive: {
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 	},
 	activityTabText: {
 		fontSize: FONT_SIZES.smPlus,
@@ -2258,11 +2284,11 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textSecondary,
 		textAlign: 'center',
 		marginTop: SPACING_H.xsPlus,
-		lineHeight: scaleHeight(18),
+		lineHeight: scaledSize(18),
 	},
 	timeResultCard: {
 		marginBottom: SPACING_H.md,
-		padding: SPACING_W.md,
+		paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md,
 		backgroundColor: COLORS.background,
 		borderRadius: scaleWidth(10),
 		borderWidth: 1,
@@ -2295,7 +2321,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	timeCard: {
 		marginBottom: SPACING_H.md,
-		padding: SPACING_W.md,
+		paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md,
 		backgroundColor: COLORS.surface,
 		borderRadius: scaleWidth(10),
 		borderWidth: 1,
@@ -2355,9 +2381,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 
+	// 글자는 진한 치자(라이트 #F6C026 은 흰 표면 위 1.7:1), 트로피 아이콘은 gold 그대로
 	firstRankLabel: {
 		fontSize: FONT_SIZES.mdPlus,
-		color: COLORS.gold,
+		color: COLORS.warningDeep,
 		fontWeight: '700',
 		marginRight: SPACING_W.sm,
 	},
@@ -2371,7 +2398,7 @@ const styles = themedStyles(() => StyleSheet.create({
 
 	thirdRankLabel: {
 		fontSize: FONT_SIZES.md,
-		color: COLORS.accentOrangeLight,
+		color: COLORS.accentOrange, // 옅은 감빛(2.6:1) 대신 강한 감빛 — 아이콘은 옅은 감빛 유지
 		fontWeight: '700',
 		marginRight: SPACING_W.sm,
 	},
@@ -2424,7 +2451,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		flex: 1,
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.text,
-		lineHeight: scaleHeight(19),
+		lineHeight: scaledSize(19),
 		fontWeight: '500',
 	},
 	levelHighlight: {

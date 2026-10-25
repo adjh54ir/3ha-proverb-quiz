@@ -1,4 +1,4 @@
-import { getThemeMode } from '@/const/common/Theme';
+import { COLORS, getThemeMode } from '@/const/common/Theme';
 
 /**
  * 색상에 투명도를 입힌 값을 만든다.
@@ -72,3 +72,13 @@ export const readableTextOn = (background: string): string => {
 const LIGHT_FG = '#FFFFFF';
 /** 밝은 배경 위 글자 — 두 모드 모두 같은 색이어야 칩 안에서 일관된다. */
 const DARK_FG = '#1E293B';
+
+/**
+ * 채움 위 글자/아이콘 색 — 브랜드 액센트와 데이터 색을 나눠 고른다.
+ *
+ * `readableTextOn` 은 흰 글자 4.5 기준이라 라이트의 물빛(#1688CC, 3.87)까지 진한 글자로 뒤집어
+ * 브랜드 버튼 톤이 바뀐다. 쪽빛·물빛 채움은 라이트에서 흰색을 유지하고 다크에서만 뒤집는
+ * `textOnVivid` 를 쓰고, 난이도·카테고리처럼 밝은 데이터 색은 밝기로 고른다.
+ */
+export const inkOnFill = (background: string): string =>
+	background === COLORS.primary || background === COLORS.secondary ? COLORS.textOnVivid : readableTextOn(background);

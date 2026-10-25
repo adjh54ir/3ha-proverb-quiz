@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Animated, Easing, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import IconComponent from '../common/atomic/IconComponent';
@@ -174,8 +174,8 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 						</View>
 					</View>
 
-					{/* 본문 */}
-					<View style={styles.body}>
+					{/* 본문 — 작은 폰·큰 글자 모드에서 카드가 maxHeight 에 걸리면 본문만 스크롤돼 '닫기' 가 잘리지 않는다 */}
+					<ScrollView style={styles.bodyScroll} contentContainerStyle={styles.body} showsVerticalScrollIndicator={false} bounces={false}>
 						<InfoRow icon="format-quote" label="뱃지 설명" value={badge.description} tint={meta.color} />
 						<InfoRow icon="flag" label="획득 조건" value={badge.condition} tint={meta.color} />
 
@@ -246,7 +246,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 						<TouchableOpacity style={styles.closeBtn} onPress={onClose} activeOpacity={0.85}>
 							<Text style={styles.closeBtnText}>닫기</Text>
 						</TouchableOpacity>
-					</View>
+					</ScrollView>
 				</Animated.View>
 
 				{/* 컨페티는 화면 전체를 덮는 큰 모션이라 '애니메이션 줄이기'에서는 생략한다. */}
@@ -298,6 +298,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderColor: COLORS.border,
 		overflow: 'hidden',
 	},
+	// 내용이 짧으면 내용 높이만, 카드가 maxHeight 에 걸리면 남는 높이로 줄어든다
+	bodyScroll: { flexGrow: 0, flexShrink: 1 },
 	headerGrad: {
 		width: '100%',
 		paddingTop: SPACING_H.lg,

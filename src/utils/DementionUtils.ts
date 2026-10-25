@@ -67,33 +67,22 @@ export const isTablet = isTabletSize(deviceWidth, deviceHeight);
 const PHONE_CONTENT_MAX_WIDTH = 600;
 
 /**
- * 태블릿에서 본문이 차지할 최대 폭 — 넘는 만큼은 좌우 여백으로 남긴다.
+ * 태블릿 본문 폭 — 화면 가로를 가득 쓴다(기기 짧은 변 = 세로 고정 화면의 폭).
  *
- * 고정값 하나로 두면 11인치(짧은 변 820)와 13인치(1024)가 같은 폭을 써서, 큰 기기일수록
- * 좌우 여백만 넓어지고 앱이 화면 가운데 박힌 폰처럼 보인다. 기기 짧은 변에 비례시키되
- * 상한을 둬 한 줄이 지나치게 길어지지 않게 한다.
- *   - 소형 태블릿(600) → 552 / 아이패드 미니(744) → 684 / 11인치(820) → 754 / 13인치(1024) → 900
- *
- * 예전 값(0.85, 상한 700)은 13인치에서 좌우 여백이 162 씩 남아 휑했다. 여백은 화면 안쪽 padding 이
- * 따로 있으므로 기둥 바깥 여백은 '가장자리에서 살짝 떨어진' 정도면 충분하다.
- *
- * 하한을 두지 않는 이유 — 짧은 변 600dp 짜리 최소 태블릿에서는 하한이 기기 폭을 넘어
- * 좌우 여백이 사라진다. 비율만 쓰면 어떤 크기에서도 여백이 남는다.
+ * 예전에는 짧은 변 × 0.92(최대 900)로 기둥을 좁혀 좌우에 여백을 남겼는데, 화면 안쪽 padding 과
+ * 겹쳐 가로 영역이 불필요하게 비어 보였다. 넓어진 폭은 늘리기보다 목록 2열(`ListGrid`)로 쓴다.
+ * 모달·단독 버튼처럼 적정 폭이 필요한 것은 `MODAL_MAX_WIDTH` / `SOLO_BUTTON` 으로 따로 묶는다.
  */
-const TABLET_CONTENT_WIDTH_RATIO = 0.92;
-const TABLET_CONTENT_MAX_WIDTH = 900;
-
-/** 기기 크기에서 본문 기둥 폭을 뽑는다 */
 export const computeContentMaxWidth = (width: number, height: number) => {
 	if (!isTabletSize(width, height)) {
 		return PHONE_CONTENT_MAX_WIDTH;
 	}
-	return Math.round(Math.min(Math.min(width, height) * TABLET_CONTENT_WIDTH_RATIO, TABLET_CONTENT_MAX_WIDTH));
+	return Math.min(width, height);
 };
 
 /**
- * 본문(화면) 기둥 폭.
- * 폰은 화면이 이 값보다 좁아 아무 영향이 없고, 태블릿에서만 좌우 여백이 생긴다.
+ * 본문(화면) 폭 상한. 폰은 화면이 이 값보다 좁고, 태블릿은 화면 폭 그대로라 둘 다 실제로는 걸리지 않는다.
+ * 바텀시트·카드 폭 계산의 기준값으로 쓴다.
  */
 export const CONTENT_MAX_WIDTH = computeContentMaxWidth(deviceWidth, deviceHeight);
 

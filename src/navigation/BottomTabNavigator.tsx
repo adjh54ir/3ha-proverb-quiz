@@ -86,6 +86,14 @@ const FreshSettingScreen = withThemedScreen(withFreshMount(SettingScreen));
 
 const Tab = createBottomTabNavigator();
 
+/**
+ * 태블릿 탭바 내용 높이 — 위 여백 + 탭 아이템 상하 패딩(라이브러리 5+5) + 아이콘 + 라벨 한 줄.
+ * 고정 scaleHeight(50) 은 배율 상한(1.35)에 걸려 67 에서 멈추는데, 그 안에 들어가는 아이콘·라벨은
+ * 글자 배율(13인치 1.45, 큰 글자 모드)을 따라 커져 라벨이 탭바 밖으로 밀려났다. 내용에서 높이를 계산한다.
+ * 글자 크기 모드가 바뀌면 다시 계산되도록 함수로 둔다.
+ */
+const getTabletTabContentHeight = () => scaleHeight(8) + 10 + scaledSize(24) + Math.ceil(FONT_SIZES.sm * 1.4);
+
 const BottomTabNavigator = () => {
 	useThemeMode(); // 모드 변경 시 탭바 색상 재적용
 	const insets = useSafeAreaInsets();
@@ -95,11 +103,13 @@ const BottomTabNavigator = () => {
 		tabBarActiveTintColor: COLORS.primary,
 		tabBarInactiveTintColor: COLORS.textLight,
 		tabBarStyle: {
-			height: scaleHeight(50) + insets.bottom,
+			height: (isTablet ? getTabletTabContentHeight() : scaleHeight(50)) + insets.bottom,
 			paddingTop: isTablet ? scaleHeight(8) : 0,
 			backgroundColor: COLORS.surface,
 			borderTopColor: COLORS.borderLight,
 		},
+		// 라이브러리 아이콘 상자(31x28 고정)보다 태블릿 아이콘(33~35)이 커서 상자를 글리프 크기로 맞춘다
+		tabBarIconStyle: isTablet ? { width: scaledSize(24), height: scaledSize(24) } : undefined,
 		tabBarLabelStyle: {
 			fontSize: isTablet ? FONT_SIZES.sm : FONT_SIZES.xs,
 			marginTop: 0,

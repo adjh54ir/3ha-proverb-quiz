@@ -115,7 +115,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 	const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
 	const accentColor = isVictory ? COLORS.gold : COLORS.dangerLight;
 	const bgColor = isVictory ? COLORS.towerVictoryBg : COLORS.towerDefeatBg;
-	const headerBgColor = isVictory ? COLORS.success : COLORS.dangerDeep;
+	const headerBgColor = isVictory ? COLORS.towerVictoryBanner : COLORS.towerDefeatBanner;
 	const borderColor = isVictory ? COLORS.success : COLORS.danger;
 
 	const renderScoreDots = () =>
@@ -279,7 +279,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 								</TouchableOpacity>
 							)
 						) : (
-							<TouchableOpacity onPress={onRetry} style={[styles.btnPrimary, { backgroundColor: COLORS.danger }]} activeOpacity={0.8}>
+							<TouchableOpacity onPress={onRetry} style={[styles.btnPrimary, { backgroundColor: COLORS.dangerFill }]} activeOpacity={0.8}>
 								<IconComponent type="materialIcons" name="refresh" size={scaledSize(20)} color={COLORS.textWhite} />
 								<Text style={[styles.btnPrimaryText, { color: COLORS.textWhite }]}>RETRY</Text>
 							</TouchableOpacity>

@@ -1,4 +1,4 @@
-import { scaledSize, scaleWidth, scaleHeight } from '@/utils/DementionUtils';
+import { isTablet, MODAL_MAX_WIDTH, scaledSize, scaleWidth, scaleHeight } from '@/utils/DementionUtils';
 
 /**
  * 앱 전체 디자인 토큰 (단일 소스, Single Source of Truth)
@@ -48,6 +48,10 @@ const FIXED_DARK_SCREEN = {
 	darkMuted: '#4A4F72', // 잠김/비활성 요소 배경 (모드 무관 고정)
 	towerVictoryBg: '#0C5A3E',
 	towerDefeatBg: '#7F1D24',
+	// 결과 모달 제목 띠 — 모드를 따르는 success/dangerDeep 을 쓰면 다크에서 밝게 뒤집혀 흰 제목이 묻힌다.
+	// 라이트 팔레트 값 그대로 고정해 라이트 화면은 바뀌지 않는다.
+	towerVictoryBanner: '#1FA36A',
+	towerDefeatBanner: '#A3242A',
 };
 
 /** 라이트(기본) 팔레트 */
@@ -69,6 +73,8 @@ const LIGHT_COLORS = {
 	secondaryDark: '#0B6FAE',
 	secondarySoft: '#D7EDFA',
 	secondaryBg: '#EEF7FD',
+	// 흰 글자가 올라가는 물빛 버튼 채움. 라이트는 secondary 그대로(3.87), 다크만 한 단계 진하게 뒤집는다.
+	secondaryFill: '#1688CC',
 
 	// ===== Text (먹 Ink) =====
 	text: '#2A2F4F', // 본문/타이틀
@@ -128,6 +134,8 @@ const LIGHT_COLORS = {
 	warningDeep: '#A85F00', // 치자 배경 위 진한 텍스트
 	warningBorder: '#FADB8A', // 옅은 치자 보더
 	danger: '#E5484D',
+	// 흰 글자가 올라가는 삭제·재도전 버튼 채움. 라이트는 danger 그대로(3.91).
+	dangerFill: '#E5484D',
 	dangerLight: '#F07C80', // 옅은 레드 (패배/오답 강조 배경 위 텍스트)
 	dangerSoftBg: '#FEF2F2', // 가장 옅은 레드 배경 (오답 카드)
 	dangerBorder: '#F7A9AB', // 레드 보더
@@ -177,6 +185,7 @@ const DARK_COLORS: AppColors = {
 	secondaryDark: '#1C86CB',
 	secondarySoft: '#12385A',
 	secondaryBg: '#0C2338',
+	secondaryFill: '#1A7BBF', // 다크 secondary(#2E9BE0)는 흰 글자 3.05 → 진한 물빛 4.54
 
 	// ===== Text =====
 	text: '#E4E6F3',
@@ -233,6 +242,7 @@ const DARK_COLORS: AppColors = {
 	warningDeep: '#FFD978',
 	warningBorder: '#7C5A12',
 	danger: '#F26A6E',
+	dangerFill: '#D13C42', // 다크 danger(#F26A6E)는 흰 글자 2.97 → 4.73
 	dangerLight: '#FFA5A8',
 	dangerSoftBg: '#2C1418',
 	dangerBorder: '#7F2A30',
@@ -560,3 +570,10 @@ export const SPACING_H = {
  * 화면 배율이 아니라 손가락 크기에 맞추는 값이라 scale 을 적용하지 않는다.
  */
 export const HIT_SLOP = { top: 10, bottom: 10, left: 10, right: 10 } as const;
+
+/**
+ * 한 행을 혼자 쓰는 단독 버튼(예: '오늘의 퀴즈 시작', '공유하기').
+ * 태블릿에서 본문 기둥(최대 900)만큼 늘어나면 버튼이 아니라 띠처럼 보여 다이얼로그 폭에서 멈춘다.
+ * 폰은 null 이라 기존 스타일이 그대로다. `[styles.button, SOLO_BUTTON]` 처럼 뒤에 얹는다.
+ */
+export const SOLO_BUTTON = isTablet ? ({ width: '100%', maxWidth: MODAL_MAX_WIDTH, alignSelf: 'center' } as const) : null;

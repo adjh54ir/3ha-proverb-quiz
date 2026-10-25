@@ -10,6 +10,7 @@ import Animated, {
     cancelAnimation,
 } from 'react-native-reanimated';
 import { scaledSize, scaleWidth } from '@/utils';
+import { withAlpha } from '@/utils/ColorAlphaUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 
 const CompleteOverlay = () => {
@@ -70,7 +71,8 @@ const styles = themedStyles(() => StyleSheet.create({
     overlay: {
         ...StyleSheet.absoluteFillObject,
         // 부모 towerCard 와 동일한 라운드(RADIUS.lg) 유지
-        backgroundColor: 'rgba(34, 197, 94, 0.88)',
+        // 하드코딩 초록(흰 글자 2.3:1) 대신 고정 정답 띠 색 — 타워 카드는 모드와 무관하게 같은 톤이다
+        backgroundColor: withAlpha(COLORS.towerVictoryBanner, 0.92),
         borderRadius: RADIUS.lg,
         justifyContent: 'center',
         alignItems: 'center',

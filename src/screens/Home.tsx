@@ -1,7 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing, Dimensions, StyleProp, ViewStyle } from 'react-native';
+import { listGrid } from '@/const/common/ListGrid';
+import { inkOnFill } from '@/utils/ColorAlphaUtils';
 import { FullScreenPortal } from '@/screens/common/atomic/FullScreenPortal';
 import { useFocusEffect } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
@@ -49,6 +51,9 @@ const greetingMessages = [
 ];
 
 
+/** 뱃지 칩(38) 터치 확장 — 칩 사이 간격이 좁아 공통 HIT_SLOP(10)이면 이웃 칩과 겹친다 */
+const BADGE_CHIP_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
+
 /**
  * 홈 화면 메인 액션 카드
  * - Home 내부가 아닌 모듈 스코프에 정의: 리렌더마다 재마운트되어 진입 애니메이션이 반복되는 문제 방지
@@ -63,6 +68,7 @@ const ActionCard = ({
 	isNew,
 	index = 0,
 	primary = false,
+	style,
 }: {
 	iconName: string;
 	iconType: string;
@@ -74,16 +80,19 @@ const ActionCard = ({
 	index?: number;
 	/** 그 화면에서 가장 먼저 눌러야 할 동작인지 — 보더를 색으로 칠해 위계를 만든다 */
 	primary?: boolean;
+	/** 태블릿 2열 묶음의 셀 스타일 (listGrid.cell / full) */
+	style?: StyleProp<ViewStyle>;
 }) => {
 	return (
 		// 카드 8장이 위에서부터 차례로 떠오른다 (공통 리스트 진입 애니메이션)
-		<FadeInView delay={staggerDelay(index, 8)} duration={280}>
+		<FadeInView delay={staggerDelay(index, 8)} duration={280} style={style}>
 			<TouchableOpacity
-				style={[styles.actionCard, primary && { borderColor: color, borderWidth: 1.5 }]}
+				style={[styles.actionCard, listGrid?.fill, primary && { borderColor: color, borderWidth: 1.5 }]}
 				activeOpacity={0.85}
 				onPress={onPress}>
 				<View style={[styles.iconCircle, { backgroundColor: color }]}>
-					<IconComponent name={iconName} type={iconType} size={scaledSize(24)} color={COLORS.textWhite} />
+					{/* 다크에서는 채움색이 밝아져 흰 아이콘이 묻힌다 → textOnVivid 가 진한 먹색으로 뒤집는다 */}
+					<IconComponent name={iconName} type={iconType} size={scaledSize(24)} color={COLORS.textOnVivid} />
 				</View>
 				<View style={styles.cardTextBox}>
 					<Text style={styles.cardTitle}>{label}</Text>
@@ -548,7 +557,10 @@ const Home = () => {
 									},
 								]}>
 								<Animated.View style={[styles.progressBarFill, { width: `${progressPercent}%`, backgroundColor: progressColor }]} />
-								<Text style={styles.progressBarTextInside}>{Math.floor(progressPercent)}%</Text>
+								{/* 가운데 숫자가 채움 위에 놓이면(절반 이상) 채움색에 맞춰 잉크를 고른다 — 다크 앰버(#FFC23D) 위 흰 글자 1.6:1 방지 */}
+								<Text style={[styles.progressBarTextInside, progressPercent >= 50 && { color: inkOnFill(progressColor) }]}>
+									{Math.floor(progressPercent)}%
+								</Text>
 							</View>
 
 							{/* ✅ 문제 개수 안내 텍스트 추가 */}
@@ -635,6 +647,7 @@ const Home = () => {
 													key={item.id}
 													activeOpacity={0.8}
 													onPress={() => setSelectedBadge(item)}
+													hitSlop={BADGE_CHIP_HIT_SLOP}
 													style={styles.badgeChipTouch}>
 													<Animated.View
 														style={[
@@ -654,6 +667,7 @@ const Home = () => {
 											<TouchableOpacity
 												activeOpacity={0.85}
 												onPress={() => setShowBadgeModal(true)}
+												hitSlop={BADGE_CHIP_HIT_SLOP}
 												style={[styles.iconBoxActive, styles.badgeMoreChip]}>
 												<Text style={styles.badgeMoreText}>+{extraBadgeCount}</Text>
 											</TouchableOpacity>
@@ -664,26 +678,31 @@ const Home = () => {
 						</View>
 					</View>
 
-					<ActionCard
-						index={0}
-						iconName="play-arrow"
-						iconType="materialIcons"
-						label="시작하기"
-						description="속담 뜻, 속담 찾기, 빈칸 채우기 퀴즈를 선택해서 퀴즈를 풀어 봅니다"
-						color={COLORS.secondary}
-						primary
-						onPress={moveToHandler.quiz}
-					/>
-					<ActionCard
-						index={1}
-						iconName="school"
-						iconType="materialIcons"
-						label="학습 모드"
-						description="카드 형식으로 속담과 속담의 의미를 재미있게 익힙니다"
-						color={COLORS.primary}
-						primary
-						onPress={moveToHandler.study}
-					/>
+					{/* 태블릿은 카드 두 장씩 한 행 — 폰은 listGrid 가 null 이라 그대로 한 열이다 */}
+					<View style={listGrid?.wrap}>
+						<ActionCard
+							index={0}
+							style={listGrid?.cell}
+							iconName="play-arrow"
+							iconType="materialIcons"
+							label="시작하기"
+							description="속담 뜻, 속담 찾기, 빈칸 채우기 퀴즈를 선택해서 퀴즈를 풀어 봅니다"
+							color={COLORS.secondary}
+							primary
+							onPress={moveToHandler.quiz}
+						/>
+						<ActionCard
+							index={1}
+							iconName="school"
+							iconType="materialIcons"
+							label="학습 모드"
+							description="카드 형식으로 속담과 속담의 의미를 재미있게 익힙니다"
+							color={COLORS.primary}
+							primary
+							style={listGrid?.cell}
+							onPress={moveToHandler.study}
+						/>
+					</View>
 					<MascotMoment
 						image={require('@/assets/images/home-mascot-moments/mascot-study.png')}
 						title="속담은 뜻을 알면 더 오래 남습니다"
@@ -691,33 +710,38 @@ const Home = () => {
 						backgroundColor={HERO.bg}
 						accentColor={HERO.accent}
 					/>
-					<ActionCard
-						index={2}
-						iconName="replay"
-						iconType="materialIcons"
-						label="오답 복습"
-						description="틀린 퀴즈를 다시 풀면서 기억을 더 확실히 다집니다"
-						color={COLORS.warning}
-						onPress={moveToHandler.wrongReview}
-					/>
-					<ActionCard
-						index={3}
-						iconName="schedule"
-						iconType="materialIcons"
-						label="타임 챌린지"
-						description="180초 제한 시간 안에 5개의 하트로 문제를 최대한 많이 풀어보세요!"
-						color={COLORS.accentFlame}
-						onPress={moveToHandler.timechalleng}
-					/>
-					<ActionCard
-						index={4}
-						iconName="castle"
-						iconType="materialCommunityIcons"
-						label="타워 챌린지"
-						description="레벨별 보스를 차례로 도전하고 특별한 보상을 획득하세요!"
-						color={COLORS.accentOrange}
-						onPress={moveToHandler.towerchalleng}
-					/>
+					<View style={listGrid?.wrap}>
+						<ActionCard
+							index={2}
+							style={listGrid?.cell}
+							iconName="replay"
+							iconType="materialIcons"
+							label="오답 복습"
+							description="틀린 퀴즈를 다시 풀면서 기억을 더 확실히 다집니다"
+							color={COLORS.warning}
+							onPress={moveToHandler.wrongReview}
+						/>
+						<ActionCard
+							index={3}
+							style={listGrid?.cell}
+							iconName="schedule"
+							iconType="materialIcons"
+							label="타임 챌린지"
+							description="180초 제한 시간 안에 5개의 하트로 문제를 최대한 많이 풀어보세요!"
+							color={COLORS.accentFlame}
+							onPress={moveToHandler.timechalleng}
+						/>
+						<ActionCard
+							index={4}
+							style={listGrid?.full}
+							iconName="castle"
+							iconType="materialCommunityIcons"
+							label="타워 챌린지"
+							description="레벨별 보스를 차례로 도전하고 특별한 보상을 획득하세요!"
+							color={COLORS.accentOrange}
+							onPress={moveToHandler.towerchalleng}
+						/>
+					</View>
 					<MascotMoment
 						image={require('@/assets/images/home-mascot-moments/mascot-challenge-final.png')}
 						title="준비됐다면 기록에 도전!"
@@ -726,26 +750,30 @@ const Home = () => {
 						accentColor={HERO.accent}
 						imageOnRight
 					/>
-					<ActionCard
-						index={5}
-						iconName="star"
-						iconType="materialIcons"
-						label="즐겨찾기"
-						description="자주 보고 싶은 속담을 모아두고 한눈에 다시 확인합니다"
-						color={COLORS.accentTeal}
-						onPress={moveToHandler.favorite}
-						isNew
-					/>
-					<ActionCard
-						index={6}
-						iconName="menu-book"
-						iconType="materialIcons"
-						label="나만의 속담집"
-						description="원하는 속담을 모아 나만의 속담집을 만들고 퀴즈로 풀어 봅니다"
-						color={COLORS.accentSky}
-						onPress={moveToHandler.myBook}
-						isNew
-					/>
+					<View style={listGrid?.wrap}>
+						<ActionCard
+							index={5}
+							style={listGrid?.cell}
+							iconName="star"
+							iconType="materialIcons"
+							label="즐겨찾기"
+							description="자주 보고 싶은 속담을 모아두고 한눈에 다시 확인합니다"
+							color={COLORS.accentTeal}
+							onPress={moveToHandler.favorite}
+							isNew
+						/>
+						<ActionCard
+							index={6}
+							style={listGrid?.cell}
+							iconName="menu-book"
+							iconType="materialIcons"
+							label="나만의 속담집"
+							description="원하는 속담을 모아 나만의 속담집을 만들고 퀴즈로 풀어 봅니다"
+							color={COLORS.accentSky}
+							onPress={moveToHandler.myBook}
+							isNew
+						/>
+					</View>
 					<MascotMoment
 						image={require('@/assets/images/home-mascot-moments/mascot-collection.png')}
 						title="나만의 지혜 창고를 채워 보세요"
@@ -1053,7 +1081,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 	},
 	scoreBadgeItemError: {
-		backgroundColor: COLORS.danger,
+		backgroundColor: COLORS.dangerFill,
 	},
 	scoreBadgeTextItem: {
 		color: COLORS.textOnVivid, // primaryDark/danger 채움 위 — 다크에서 흰 글자가 묻힌다
@@ -1166,7 +1194,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		top: scaleWidth(10),
 		right: -scaleWidth(14),
 		width: scaleWidth(64),
-		backgroundColor: COLORS.danger,
+		backgroundColor: COLORS.dangerFill,
 		paddingVertical: SPACING_H.xs,
 		transform: [{ rotate: '45deg' }],
 		alignItems: 'center',

@@ -45,6 +45,8 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 	const reducedMotion = useReducedMotion();
 	const [price, setPrice] = useState(FALLBACK_PRICE);
 	const [busy, setBusy] = useState(false);
+	// 반짝임이 버튼 끝까지 지나가도록 실제 버튼 폭을 잰다 (태블릿은 폰 기준 380 보다 훨씬 넓다)
+	const [ctaWidth, setCtaWidth] = useState(0);
 
 	useEffect(() => {
 		getRemoveAdsPrice().then(setPrice);
@@ -164,7 +166,11 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 						<Text style={styles.offerCaption}>한 번 결제로 평생 광고 제거 · 자동 갱신 없음</Text>
 					</View>
 
-					<Pressable disabled={busy} onPress={onPurchase} style={({ pressed }) => [styles.ctaWrap, pressed && styles.pressed]}>
+					<Pressable
+						disabled={busy}
+						onPress={onPurchase}
+						onLayout={(e) => setCtaWidth(e.nativeEvent.layout.width)}
+						style={({ pressed }) => [styles.ctaWrap, pressed && styles.pressed]}>
 						<LinearGradient colors={GOLD_BTN} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cta}>
 							{!reducedMotion && (
 								<Animated.View
@@ -173,7 +179,7 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 										styles.shine,
 										{
 											transform: [
-												{ translateX: shine.interpolate({ inputRange: [0, 1], outputRange: [-scaleWidth(80), scaleWidth(380)] }) },
+												{ translateX: shine.interpolate({ inputRange: [0, 1], outputRange: [-scaleWidth(80), ctaWidth || scaleWidth(380)] }) },
 												{ rotate: '20deg' },
 											],
 										},
@@ -308,7 +314,7 @@ const styles = themedStyles(() =>
 		offerCaption: { marginTop: SPACING_H.xs, color: IVORY_DIM, fontSize: FONT_SIZES.sm },
 		ctaWrap: { marginTop: SPACING_H.xl, borderRadius: RADIUS.md, overflow: 'hidden' },
 		cta: {
-			height: scaledSize(52),
+			minHeight: scaledSize(52),
 			borderRadius: RADIUS.md,
 			alignItems: 'center',
 			justifyContent: 'center',
@@ -325,7 +331,7 @@ const styles = themedStyles(() =>
 		ctaText: { color: INK[0], fontSize: FONT_SIZES.lg, fontWeight: '800', letterSpacing: 0.5 },
 		ghostBtn: {
 			marginTop: SPACING_H.lg,
-			height: scaledSize(46),
+			minHeight: scaledSize(46),
 			borderRadius: RADIUS.md,
 			borderWidth: 1,
 			borderColor: GOLD,
@@ -354,7 +360,7 @@ const styles = themedStyles(() =>
 			gap: SPACING_W.sm,
 			marginTop: SPACING_H.md,
 		},
-		link: { color: IVORY_DIM, fontSize: FONT_SIZES.sm, textDecorationLine: 'underline', padding: SPACING_W.xs },
+		link: { color: IVORY_DIM, fontSize: FONT_SIZES.sm, textDecorationLine: 'underline', paddingHorizontal: SPACING_W.xs, paddingVertical: SPACING_H.xs },
 		linkDot: { color: IVORY_DIM, fontSize: FONT_SIZES.sm },
 		legal: {
 			marginTop: SPACING_H.sm,

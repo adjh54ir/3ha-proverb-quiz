@@ -5,7 +5,7 @@ import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { TOWER_LEVELS } from '@/const/ConstTowerData';
 import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
-import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
+import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 import useReducedMotion from '@/hooks/useReducedMotion';
 
@@ -199,7 +199,7 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
                                     resizeMode="cover"
                                 />
                                 <View style={[styles.towerRewardBadge, { backgroundColor: tower.color }]}>
-                                    <Text style={styles.towerRewardBadgeText}>LV.{tower.level}</Text>
+                                    <Text style={[styles.towerRewardBadgeText, { color: readableTextOn(tower.color) }]}>LV.{tower.level}</Text>
                                 </View>
                             </View>
                             <Text style={styles.towerRewardName} numberOfLines={2}>
@@ -271,7 +271,7 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
                                     style={[styles.closeBtn, { backgroundColor: selectedTower.color }]}
                                     activeOpacity={0.85}
                                     onPress={() => setSelectedLevel(null)}>
-                                    <Text style={styles.closeBtnText}>확인</Text>
+                                    <Text style={[styles.closeBtnText, { color: readableTextOn(selectedTower.color) }]}>확인</Text>
                                 </TouchableOpacity>
                             </>
                             )}
@@ -348,6 +348,9 @@ const styles = themedStyles(() => StyleSheet.create({
         maxHeight: '100%',
         backgroundColor: COLORS.surface,
         borderRadius: RADIUS.xl,
+        // 다른 대화상자와 같은 1px 테두리 — 없으면 다크에서 카드가 딤에 묻힌다
+        borderWidth: 1,
+        borderColor: COLORS.border,
         overflow: 'hidden',
     },
     popupHeader: {

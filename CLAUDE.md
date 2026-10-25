@@ -66,10 +66,13 @@
    태블릿이 너무 작거나 크게 느껴지면 **레이아웃을 새로 짜기 전에 이 값부터** 조정한다.
    예외 하나 — 짧은 변 1000dp 이상(13인치)은 글씨·아이콘(`scaledSize`)만 `LARGE_TABLET_FONT_SCALE = 1.45`.
 
-3. 화면 본문은 `AppLayout` 의 `navigatorWrapper` 가 `CONTENT_MAX_WIDTH` 로 묶고 가운데 정렬한다.
-   화면 코드에서 따로 폭을 제한할 필요가 없다. 기둥은 짧은 변 × 0.92, 최대 900 이다.
+3. 화면 본문은 태블릿에서도 **가로를 가득 채운다** (`CONTENT_MAX_WIDTH` = 화면 폭, 좌우 기둥 여백 없음).
+   화면 코드에서 폭을 제한하지 않는다 — 넓어진 폭은 늘리기보다 아래 2열 그리드로 쓴다.
    카드형 목록은 태블릿에서 2열이다 — `src/const/common/ListGrid.ts` 의 `LIST_COLUMNS` / `listGrid`
    (`numColumns` + `columnWrapperStyle={listGrid?.row}`, 셀 `AnimatedListItem style={listGrid?.cell}`, 카드에 `listGrid?.fill`).
+   `.map` 목록은 감싸는 View 에 `listGrid?.wrap`, 홀수 개 묶음의 마지막처럼 한 행을 혼자 쓰는 셀은 `listGrid?.full`.
+   `width: '100%'` 컨테이너에는 `wrap` 의 음수 여백이 먹지 않으니 퍼센트 셀(`isTablet ? '49%'`)로 나눈다.
+   한 행을 혼자 쓰는 단독 버튼은 `[styles.button, SOLO_BUTTON]` (`Theme.ts`, 태블릿만 다이얼로그 폭에서 멈춤).
 
 4. 모달 카드 폭은 `maxWidth` 를 반드시 준다.
    - 가운데 뜨는 다이얼로그: `scaleWidth(340)` 계열 또는 `MODAL_MAX_WIDTH`
@@ -120,6 +123,10 @@ OS '애니메이션 줄이기'를 켠 사용자에게는 **정보를 잃지 않�
 1. **브랜드(쪽빛) ≠ 정답(청포).** `primary*` 는 주요 액션·선택·활성에만 쓴다.
    정답·완료·승리 표시는 반드시 `success` / `successBg` / `successSoft` / `successBorder` / `successDark` / `successDeep`.
    (예전 그린 primary 시절 코드가 정답에 primary 를 썼다 — 새로 만들 때 따라 하지 말 것)
+   흰 글자·아이콘이 올라가는 채움은 `primaryFill` / `secondaryFill` / `dangerFill` 을 쓴다
+   (라이트는 원래 색과 같고, 다크에서 원래 색은 흰 글자 대비가 3.0 근처로 떨어진다).
+   채움 위 글자색을 골라야 하면 `inkOnFill(bg)` (`ColorAlphaUtils`) — 쪽빛·물빛은 `textOnVivid`,
+   난이도·카테고리·타워 같은 데이터 색은 밝기로 흰색/먹색을 고른다. 데이터 색 배지에 `textWhite` 를 박지 않는다.
 2. 서체는 두 벌이다.
    - `FONTS.body`(Pretendard) — 전역 기본값이라(`TextDefaults.ts`) 화면에서 지정하지 않는다.
    - `FONTS.display`(고운바탕, 'Gowun Batang') — **두 곳에만** 쓴다. 규칙은 "명조 = 속담" 하나로 읽혀야 한다.

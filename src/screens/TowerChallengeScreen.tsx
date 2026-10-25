@@ -5,7 +5,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated, useWindowDimensions
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
-import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { CONTENT_MAX_WIDTH, isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
@@ -27,6 +27,7 @@ import { read, write } from '@/services/StorageService';
 const TOWER_STORAGE_KEY = MainStorageKeyType.TOWER_CHALLENGE_PROGRESS;
 const TowerChallengeScreen = () => {
 	const { width: windowWidth } = useWindowDimensions();
+	const [carouselSpace, setCarouselSpace] = useState(0);
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('towerChallenge');
 	const navigation = useAppNavigation();
@@ -55,7 +56,10 @@ const TowerChallengeScreen = () => {
 	const carouselRef = useRef<ICarouselInstance>(null);
 	// 캐러셀은 본문 기둥 안에 놓인다 — 화면 폭으로 재면 태블릿에서 기둥(최대 900)보다 커져 양옆이 잘린다.
 	// 별도 상한을 두지 않는다 — 두면 태블릿에서 이 화면만 기둥보다 좁아진다. 폰은 화면 폭 기준이라 그대로다.
-	const carouselWidth = Math.min(windowWidth, CONTENT_MAX_WIDTH) * 0.9;
+	// 태블릿은 아래 안내 박스(lg)와 좌우선을 맞춰 가로를 가득 쓴다 — 카드 칸 안쪽 여백(sm)만큼 더한다.
+	const carouselWidth = isTablet
+		? Math.min(windowWidth, CONTENT_MAX_WIDTH) - (SPACING_W.lg - SPACING_W.sm) * 2
+		: Math.min(windowWidth, CONTENT_MAX_WIDTH) * 0.9;
 	/** 도전할 차례인 단계의 캐러셀 인덱스 (마지막 단계까지 깼으면 마지막 카드) */
 	const currentIndex = Math.min(Math.max(progress.level, 1), TOWER_LEVELS.length) - 1;
 
@@ -210,9 +214,9 @@ const TowerChallengeScreen = () => {
 					<View style={[styles.levelBadge, { backgroundColor: tower.color }]}>
 						<Text style={[styles.levelText, { color: readableTextOn(tower.color) }]}>LV.{tower.level}</Text>
 						{isCompleted && (
-							<IconComponent type="materialIcons" name="check-circle" size={scaledSize(18)} color={COLORS.textWhite} style={styles.badgeIcon} />
+							<IconComponent type="materialIcons" name="check-circle" size={scaledSize(18)} color={readableTextOn(tower.color)} style={styles.badgeIcon} />
 						)}
-						{isLocked && <IconComponent type="materialIcons" name="lock" size={scaledSize(18)} color={COLORS.textWhite} style={styles.badgeIcon} />}
+						{isLocked && <IconComponent type="materialIcons" name="lock" size={scaledSize(18)} color={readableTextOn(tower.color)} style={styles.badgeIcon} />}
 					</View>
 					<Text style={styles.towerName}>{tower.name}</Text>
 					{/* 보스 섹션 */}
@@ -260,12 +264,13 @@ const TowerChallengeScreen = () => {
 						]}
 						activeOpacity={0.8}>
 						<View style={styles.buttonContent}>
+							{/* 레벨색 채움(LV1 라임 #82c91e 등)일 때만 밝기에 맞춰 잉크를 뒤집는다 — 나머지 채움은 흰 글자 기준색이다 */}
 							{!isCompleted && !isLocked && (
 								<>
 									{progress.attempts > 0 ? (
 										<>
-											<IconComponent type="materialIcons" name="favorite" size={scaledSize(18)} color={COLORS.textWhite} />
-											<Text style={styles.challengeButtonText}>도전하기 (하트 -1)</Text>
+											<IconComponent type="materialIcons" name="favorite" size={scaledSize(18)} color={readableTextOn(tower.color)} />
+											<Text style={[styles.challengeButtonText, { color: readableTextOn(tower.color) }]}>도전하기 (하트 -1)</Text>
 										</>
 									) : (
 										<>
@@ -313,7 +318,7 @@ const TowerChallengeScreen = () => {
 				{/* 도전 횟수 표시 */}
 
 				{/* 캐러셀 */}
-				<View style={styles.carouselContainer}>
+				<View style={styles.carouselContainer} onLayout={(e) => setCarouselSpace(Math.floor(e.nativeEvent.layout.height))}>
 					<Carousel
 						// reanimated-carousel 은 width 프롭이 바뀌어도 내부 오프셋을 다시 재지 않는다.
 						// 회전/폴더블 펼침에서 카드가 어긋나므로 폭을 key 로 걸어 새로 마운트시킨다(defaultIndex 로 위치 유지).
@@ -322,13 +327,16 @@ const TowerChallengeScreen = () => {
 						defaultIndex={currentIndex}
 						loop={false}
 						width={carouselWidth}
-						height={scaleHeight(480)} // 620 → 480
+						// 설계 높이 480 — 짧은 태블릿(600x960 등)은 헤더·안내 박스를 빼고 남는 자리가 이보다 작아
+						// 캐러셀이 위아래로 넘쳐 겹친다. 실제 남는 높이를 넘지 않게 묶는다(넉넉한 기기는 그대로 480).
+						height={carouselSpace ? Math.min(scaleHeight(480), carouselSpace) : scaleHeight(480)}
 						data={TOWER_LEVELS}
 						renderItem={renderTowerCard}
 						mode="parallax"
 						modeConfig={{
-							parallaxScrollingScale: 0.92,
-							parallaxScrollingOffset: 45,
+							// 태블릿은 가운데 카드를 줄이지 않는다 — 줄이면 가득 채운 폭이 다시 좁아진다
+							parallaxScrollingScale: isTablet ? 1 : 0.92,
+							parallaxScrollingOffset: isTablet ? 0 : 45,
 						}}
 					/>
 				</View>
@@ -460,7 +468,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		flexDirection: 'row',
 		gap: SPACING_W.md,
 		marginBottom: SPACING_H.md,
-		height: scaleHeight(90), // alignItems: 'stretch' 제거, 고정 높이
+		// 최소 높이만 고정 — 큰 글자 모드·13인치에서 숫자(displayFontSize)가 커져도 잘리지 않게
+		minHeight: scaleHeight(90),
 	},
 	attemptCard: {
 		flex: 1,
@@ -482,7 +491,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		borderWidth: 1.5,
 		borderColor: 'rgba(59, 130, 246, 0.5)',
-		backgroundColor: COLORS.secondary, // LinearGradient 대신 단색
+		backgroundColor: COLORS.secondaryFill, // LinearGradient 대신 단색
 		paddingHorizontal: SPACING_W.lg,
 	},
 	adCardDisabled: {
@@ -680,7 +689,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 	},
 	challengeButtonCompleted: {
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 	},
 	challengeButtonLocked: {
 		backgroundColor: COLORS.darkMuted,
@@ -717,7 +726,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		gap: SPACING_W.sm,
 	},
 	challengeButtonAd: {
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 	},
 	devButton: {
 		position: 'absolute',

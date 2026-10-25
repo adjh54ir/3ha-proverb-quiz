@@ -9,7 +9,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
 import { CONTENT_MAX_WIDTH, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, PALETTES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { listGrid } from '@/const/common/ListGrid';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
@@ -38,8 +38,9 @@ const SHEET_SLIDE_DURATION = 260;
 import { read, write } from '@/services/StorageService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
-// 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
-const getDefaultColor = () => COLORS.primary;
+// 속담집 색은 저장되는 값이라 모드에 따라 바뀌는 COLORS.primary 를 쓰면 다크에서 만든 속담집이
+// 다크 톤(#7C89FF)으로 굳어 라이트에서 물빠져 보인다. 모드와 무관한 기본 쪽빛으로 고정한다.
+const getDefaultColor = (): string => PALETTES.light.primary;
 const DEFAULT_ICON = 'menu-book';
 const STORAGE_KEY = MainStorageKeyType.USER_PROVERB_BOOKS;
 
@@ -220,7 +221,7 @@ const MyProverbBook = () => {
 						</View>
 						<View style={styles.sortRow}>
 							{SORT_OPTIONS.map((opt) => (
-								<TouchableOpacity key={opt.key} style={[styles.sortChip, sortType === opt.key && styles.sortChipActive]} onPress={() => setSortType(opt.key)}>
+								<TouchableOpacity key={opt.key} style={[styles.sortChip, sortType === opt.key && styles.sortChipActive]} hitSlop={{ top: 6, bottom: 6 }} onPress={() => setSortType(opt.key)}>
 									<Text style={[styles.sortChipText, sortType === opt.key && styles.sortChipTextActive]}>{opt.label}</Text>
 								</TouchableOpacity>
 							))}
@@ -228,7 +229,7 @@ const MyProverbBook = () => {
 					</View>
 				)}
 
-				<Animated.ScrollView ref={scrollRef} onScroll={onListScroll} scrollEventThrottle={16} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ opacity: fadeAnim }} contentContainerStyle={[styles.booksContainer, filteredBooks.length === 0 && styles.booksContainerEmpty]} showsVerticalScrollIndicator={false}>
+				<Animated.ScrollView ref={scrollRef} onScroll={onListScroll} scrollEventThrottle={16} style={{ opacity: fadeAnim }} contentContainerStyle={[styles.booksContainer, filteredBooks.length === 0 && styles.booksContainerEmpty]} showsVerticalScrollIndicator={false}>
 					{books.length === 0 ? (
 						<View style={styles.emptyView}>
 							<Image source={require('@/assets/images/screen-heroes/library-shelf.png')} style={styles.emptyShelfImage} resizeMode="contain" />
@@ -443,7 +444,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
-	sortChipActive: { backgroundColor: COLORS.secondary, borderColor: COLORS.secondary },
+	sortChipActive: { backgroundColor: COLORS.secondaryFill, borderColor: COLORS.secondaryFill },
 	sortChipText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary },
 	sortChipTextActive: { color: COLORS.textWhite },
 	booksContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, paddingBottom: scaleHeight(120), flexGrow: 1 },
@@ -460,7 +461,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.xxl,
 		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 	},
 	emptyBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '700' },
 	bookCard: {
@@ -524,7 +525,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: FAB_SIZE,
 		height: FAB_SIZE,
 		borderRadius: FAB_SIZE / 2,
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -560,7 +561,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	confirmBtnRow: { flexDirection: 'row', width: '100%', columnGap: SPACING_W.md },
 	confirmBtn: { flex: 1, height: scaleHeight(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
 	confirmBtnCancel: { backgroundColor: COLORS.surfaceAlt },
-	confirmBtnDelete: { backgroundColor: COLORS.danger },
+	confirmBtnDelete: { backgroundColor: COLORS.dangerFill },
 	confirmBtnText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
 	actionSheetOverlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'flex-end' },
 	actionSheet: {

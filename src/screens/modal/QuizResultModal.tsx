@@ -251,8 +251,9 @@ const QuizResultModal = ({
 					<TouchableOpacity style={styles.primaryButton} onPress={onNext} activeOpacity={0.8}>
 						<Text style={styles.primaryButtonText}>다음 퀴즈</Text>
 					</TouchableOpacity>
-					<ToastView />
 				</Animated.View>
+				{/* 토스트는 overflow:hidden 카드 밖에 둔다 — 카드 안이면 잘리고 '다음 퀴즈' 버튼을 가린다 (ProverbDetailModal 과 같은 자리) */}
+				<ToastView />
 			</View>
 		</Modal>
 	);

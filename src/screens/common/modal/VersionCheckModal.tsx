@@ -390,6 +390,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.primaryBg,
 		borderWidth: 1,
 		borderColor: COLORS.primaryBorder,
+		// 맥박(scale 1→1.06)이 걸리는 테두리 원 — 모달 레이아웃 규칙 7
+		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginBottom: SPACING_H.md,
@@ -514,7 +516,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textOnAccent,
 	},
 	laterButton: {
-		minHeight: scaleHeight(40),
+		minHeight: scaleHeight(44), // 터치 영역 44
 		alignItems: 'center',
 		justifyContent: 'center',
 		paddingVertical: SPACING_H.sm,

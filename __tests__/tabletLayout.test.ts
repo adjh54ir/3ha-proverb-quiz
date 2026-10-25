@@ -111,18 +111,8 @@ describe('본문 기둥 폭', () => {
 		expect(computeContentMaxWidth(w, h)).toBeGreaterThan(w);
 	});
 
-	test.each(TABLETS)('%s 에서는 좌우 여백이 남는다', (_name, w, h) => {
-		expect(computeContentMaxWidth(w, h)).toBeLessThan(w);
-	});
-
-	test('큰 태블릿일수록 기둥이 넓어진다 (고정값이면 여백만 늘어난다)', () => {
-		const widths = TABLETS.map(([, w, h]) => computeContentMaxWidth(w, h));
-		const sorted = [...widths].sort((a, b) => a - b);
-		expect(widths).toEqual(sorted);
-	});
-
-	test('기둥이 무한히 넓어지지는 않는다', () => {
-		expect(computeContentMaxWidth(2000, 3000)).toBeLessThanOrEqual(900);
+	test.each(TABLETS)('%s 에서는 화면 가로를 가득 채운다 (좌우 여백 없음)', (_name, w, h) => {
+		expect(computeContentMaxWidth(w, h)).toBe(Math.min(w, h));
 	});
 });
 

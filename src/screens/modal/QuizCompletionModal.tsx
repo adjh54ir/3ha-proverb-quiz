@@ -3,7 +3,7 @@
 import { scaleWidth, scaleHeight, scaledSize } from '@/utils';
 import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, useWindowDimensions } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import ConfettiCannon from 'react-native-confetti-cannon';
@@ -195,7 +195,8 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                 )}
 
                 <Animated.View style={[styles.card, enterStyle]}>
-
+                    {/* 본문만 스크롤 — 작은 폰·큰 글자 모드에서 카드가 maxHeight 에 걸려도 아래 버튼은 항상 보인다 */}
+                    <ScrollView style={styles.bodyScroll} contentContainerStyle={styles.bodyScrollContent} showsVerticalScrollIndicator={false} bounces={false}>
                     <View style={styles.practiceHeader}>
                         <Animated.View
                             style={{
@@ -298,6 +299,8 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                         </Text>
                     </View>
 
+                    </ScrollView>
+
                     {wrong > 0 && onReviewWrong && (
                         <TouchableOpacity
                             style={styles.reviewWrongButton}
@@ -341,6 +344,9 @@ const styles = themedStyles(() => StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: SPACING_W.lg,
     },
+    // 내용이 짧으면 내용 높이만, 카드가 maxHeight 에 걸리면 남는 높이로 줄어든다
+    bodyScroll: { flexGrow: 0, flexShrink: 1, width: '100%' },
+    bodyScrollContent: { alignItems: 'center' },
     card: {
         width: '100%',
         maxWidth: scaleWidth(340),

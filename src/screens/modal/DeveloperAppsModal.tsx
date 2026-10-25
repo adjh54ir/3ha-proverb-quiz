@@ -143,10 +143,11 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 						</View>
 
 						{/* 카테고리 필터 */}
-						<ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.tabsContainer}>
+						<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContainer}>
 							{CATEGORY_TABS.map((tab) => (
 								<TouchableOpacity
 									key={tab.key}
+									hitSlop={{ top: 6, bottom: 6 }}
 									style={[styles.tabButton, selectedCategory === tab.key && styles.tabButtonActive]}
 									activeOpacity={0.8}
 									onPress={() => setSelectedCategory(tab.key)}>
@@ -170,9 +171,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 						onScroll={onListScroll}
 						scrollEventThrottle={16}
 						contentContainerStyle={[styles.scroll, (!apps || filteredApps.length === 0) && styles.scrollEmpty]}
-						showsVerticalScrollIndicator={false}
-						keyboardShouldPersistTaps="handled"
-						keyboardDismissMode="on-drag">
+						showsVerticalScrollIndicator={false}>
 						{failed ? (
 							<View style={styles.emptyState}>
 								<Text style={styles.emptyText}>앱 목록을 불러오지 못했습니다</Text>
@@ -214,7 +213,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 												<View style={[styles.categoryBadge, { backgroundColor: catColor.bg }]}>
 													<Text style={[styles.categoryBadgeText, { color: catColor.text }]}>{CATEGORY_LABEL[app.category]}</Text>
 												</View>
-												<TouchableOpacity style={styles.downloadButton} activeOpacity={0.8} onPress={() => onDownloadApp(app)}>
+												<TouchableOpacity style={styles.downloadButton} activeOpacity={0.8} hitSlop={HIT_SLOP} onPress={() => onDownloadApp(app)}>
 													<IconComponent type="Feather" name="download" size={scaledSize(12)} color={COLORS.secondaryDark} />
 													<Text style={styles.downloadText}>다운로드</Text>
 												</TouchableOpacity>
@@ -428,9 +427,9 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	newBadge: {
 		position: 'absolute',
-		top: -scaleWidth(4),
-		left: -scaleWidth(4),
-		backgroundColor: COLORS.danger,
+		top: -SPACING_H.xs,
+		left: -SPACING_W.xs,
+		backgroundColor: COLORS.dangerFill,
 		borderRadius: RADIUS.sm,
 		paddingHorizontal: SPACING_W.xs,
 		paddingVertical: SPACING_H.xs,

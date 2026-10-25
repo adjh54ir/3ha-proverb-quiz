@@ -32,7 +32,7 @@ import InAppRemoveAdsSection from './common/setting/InAppRemoveAdsSection';
 import { APP_STORE_URL, GOOGLE_PLAY_STORE_URL, APP_NAME as ENV_APP_NAME, APP_DESCRIPTION as ENV_APP_DESCRIPTION } from '@env';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import FadeInView from '@/components/animation/FadeInView';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, SOLO_BUTTON, themedStyles, themedValue } from '@/const/common/Theme';
 import { SCORE_PER_QUESTION } from '@/const/common/CommonCharacterData';
 import { AppPermissionInfo, loadAppPermissions, requestAppPermission } from '@/utils/PermissionUtils';
 import DateUtils from '@/utils/DateUtils';
@@ -1103,7 +1103,7 @@ const SettingScreen = () => {
 									<View style={styles.appIconWrapper}>
 										<Image source={require('@/assets/images/mainIcon.png')} style={styles.appIcon} resizeMode="contain" />
 									</View>
-									<View style={styles.storeButtons}>
+									<View style={[styles.storeButtons, SOLO_BUTTON]}>
 										<TouchableOpacity style={[styles.storeButton, { backgroundColor: COLORS.primaryFill }]} onPress={shareApp} activeOpacity={0.8}>
 											<View style={styles.iconRow}>
 												<IconComponent type="MaterialCommunityIcons" name="share-variant" size={scaledSize(16)} color={COLORS.textWhite} />
@@ -1373,7 +1373,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'center',
 		backgroundColor: COLORS.surfaceAlt,
 	},
-	themeIconChipActive: { backgroundColor: COLORS.primary },
+	themeIconChipActive: { backgroundColor: COLORS.primaryFill },
 	themeTextWrap: { flex: 1 },
 	themeLabel: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text },
 	themeLabelActive: { color: COLORS.primaryDeep },
@@ -1470,7 +1470,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.xs,
 		paddingVertical: scaleHeight(1),
 		borderRadius: RADIUS.round,
-		backgroundColor: COLORS.danger,
+		backgroundColor: COLORS.dangerFill,
 		borderWidth: 1,
 		borderColor: COLORS.surface,
 	},

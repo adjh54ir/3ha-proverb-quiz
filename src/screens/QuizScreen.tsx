@@ -24,6 +24,7 @@ import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, getThemeMode, themedStyles, themedValue } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber } from '@/screens/common/CommonProverbModule';
+import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import StartModal from './modal/QuizStartModal';
@@ -821,13 +822,13 @@ const QuizScreen = () => {
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type='FontAwesome6' name='seedling' size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='seedling' size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 2:
-				return <IconComponent type='FontAwesome6' name='leaf' size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='leaf' size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 3:
-				return <IconComponent type='FontAwesome6' name='tree' size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='tree' size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 4:
-				return <IconComponent type='FontAwesome6' name='trophy' size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='trophy' size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			default:
 				return null;
 		}
@@ -836,23 +837,23 @@ const QuizScreen = () => {
 	const getFieldIcon = (field: string) => {
 		switch (field) {
 			case '운/우연':
-				return <IconComponent type='FontAwesome6' name='dice' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='dice' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '인간관계':
-				return <IconComponent type='FontAwesome6' name='users' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='users' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '세상 이치':
-				return <IconComponent type='fontawesome5' name='globe' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='globe' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '근면/검소':
-				return <IconComponent type='fontawesome5' name='hammer' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='hammer' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '노력/성공':
-				return <IconComponent type='fontawesome5' name='medal' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='medal' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '경계/조심':
-				return <IconComponent type='fontawesome5' name='exclamation-triangle' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='exclamation-triangle' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '욕심/탐욕':
-				return <IconComponent type='fontawesome5' name='hand-holding-usd' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='hand-holding-usd' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '배신/불신':
-				return <IconComponent type='fontawesome5' name='user-slash' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='user-slash' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			default:
-				return <IconComponent type='FontAwesome6' name='tag' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='tag' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 		}
 	};
 
@@ -953,14 +954,14 @@ const QuizScreen = () => {
 											{/* 레벨 표시 */}
 											<View style={[styles.badgePill, { backgroundColor: getLevelColor(question.level) }]}>
 												{getLevelIcon(question.level)}
-												<Text style={styles.badgeText}>{getLevelLabel(question.level)}</Text>
+												<Text style={[styles.badgeText, { color: readableTextOn(getLevelColor(question.level)) }]}>{getLevelLabel(question.level)}</Text>
 											</View>
 
 											{/* 카테고리 표시 */}
 											{question?.category && (
 												<View style={[styles.badgePill, { backgroundColor: getFieldColor(question.category) }]}>
 													{getFieldIcon(question.category)}
-													<Text style={styles.badgeText}> {question.category}</Text>
+													<Text style={[styles.badgeText, { color: readableTextOn(getFieldColor(question.category)) }]}> {question.category}</Text>
 												</View>
 											)}
 										</View>
@@ -1645,7 +1646,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	exitModalConfirmButton: {
 		flex: 1,
-		backgroundColor: COLORS.danger,
+		backgroundColor: COLORS.dangerFill,
 		paddingVertical: SPACING_H.md,
 		// ponytail: 터치 영역 44 이상 보장을 위한 고정 최소 높이
 		minHeight: 48,

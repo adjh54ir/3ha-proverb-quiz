@@ -5,7 +5,7 @@ import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import IconComponent from '../atomic/IconComponent';
-import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 
 interface Props {
 	visible: boolean;
@@ -109,7 +109,7 @@ const Contributor9Modal = ({ visible, onClose }: Props) => {
 						{LINK_ROWS.map((row, index) => (
 							<View key={row.label} style={[styles.rowItem, index === LINK_ROWS.length - 1 && styles.rowItemLast]}>
 								<Text style={styles.labelText}>{row.label}</Text>
-								<TouchableOpacity style={styles.rightButton} activeOpacity={0.8} onPress={() => handleOpenUrl(row.url)}>
+								<TouchableOpacity style={styles.rightButton} activeOpacity={0.8} hitSlop={HIT_SLOP} onPress={() => handleOpenUrl(row.url)}>
 									<IconComponent type={row.iconType} name={row.icon} size={scaledSize(16)} color={COLORS.secondary} />
 									<Text style={styles.buttonText}>{row.action}</Text>
 								</TouchableOpacity>
@@ -224,7 +224,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	closeButton: {
 		marginTop: SPACING_H.xl,
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		minHeight: scaleHeight(48),
 		justifyContent: 'center',
 		paddingVertical: SPACING_H.md,

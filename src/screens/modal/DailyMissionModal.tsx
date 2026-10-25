@@ -127,7 +127,7 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 						)}
 						{missions.map((m) => (
 							<View key={m.id} style={[styles.missionRow, m.done && styles.missionRowDone]}>
-								<View style={[styles.missionIcon, { backgroundColor: m.done ? COLORS.primary : COLORS.border }]}>
+								<View style={[styles.missionIcon, { backgroundColor: m.done ? COLORS.primaryFill : COLORS.border }]}>
 									<IconComponent type={m.iconType} name={m.icon} size={scaledSize(18)} color={m.done ? COLORS.textWhite : COLORS.textLight} />
 								</View>
 								<View style={styles.missionTextWrap}>
@@ -195,7 +195,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		overflow: 'hidden',
 	},
 	header: {
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		paddingTop: SPACING_H.xl,
 		paddingBottom: SPACING_H.lg,
 		paddingHorizontal: SPACING_W.lg,

@@ -5,7 +5,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing, ScrollView 
 import Modal from '@/screens/common/atomic/AppModal';
 import {useFocusEffect} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
-import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { isTablet, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { getLevelInkColor } from '@/screens/common/CommonProverbModule';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
@@ -23,7 +23,7 @@ import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
 import FastImage from 'react-native-fast-image';
 import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
-import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
+import { withAlpha, ALPHA, inkOnFill, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
@@ -279,7 +279,7 @@ const QuizModeScreen = () => {
 												}
 											}}>
 											<View style={[styles.levelIconChip, { backgroundColor: item.color }]}>
-												<IconComponent type={item.type} name={item.icon} size={scaledSize(24)} color={COLORS.textWhite} />
+												<IconComponent type={item.type} name={item.icon} size={scaledSize(24)} color={inkOnFill(item.color)} />
 											</View>
 											<View style={styles.levelTextWrap}>
 												<Text style={[styles.levelLabelFull, { color: getLevelInkColor(item.color) }]} numberOfLines={1}>
@@ -318,6 +318,8 @@ const QuizModeScreen = () => {
 										const solvedSet = new Set([...correctSet, ...wrongSet]);
 
 										const solved = filteredProverbs.filter((p) => solvedSet.has(p.id)).length;
+										// 밝은 카테고리색(#22C55E, #F59E0B …)과 다크의 '전체'(textSecondary) 위에서는 흰 글자가 묻힌다
+										const ink = readableTextOn(item.color);
 
 										return (
 											<TouchableOpacity
@@ -333,15 +335,15 @@ const QuizModeScreen = () => {
 													}
 												}}>
 												<View style={styles.categoryCardTitleRow}>
-													<IconComponent type={item.type} name={item.icon} size={scaledSize(22)} color={COLORS.textWhite} />
-													<Text style={styles.categoryRowText}>{item.label}</Text>
+													<IconComponent type={item.type} name={item.icon} size={scaledSize(22)} color={ink} />
+													<Text style={[styles.categoryRowText, { color: ink }]}>{item.label}</Text>
 												</View>
 
 												<View style={styles.progressWrapper}>
 													<View style={styles.progressBarBackground}>
-														<View style={[styles.progressBarFill, { width: `${total > 0 ? (solved / total) * 100 : 0}%` }]} />
+														<View style={[styles.progressBarFill, { width: `${total > 0 ? (solved / total) * 100 : 0}%`, backgroundColor: ink }]} />
 													</View>
-													<Text style={styles.categoryRowProgress}>{`${solved}/${total}`}</Text>
+													<Text style={[styles.categoryRowProgress, { color: ink }]}>{`${solved}/${total}`}</Text>
 												</View>
 											</TouchableOpacity>
 										);
@@ -475,6 +477,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	levelListWrap: {
 		width: '100%',
 		rowGap: SPACING_H.md,
+		// 태블릿도 한 열 — 아이콘·설명·진행률·화살표가 가로로 놓인 카드라 2열이면 아이패드 미니에서 설명이 잘린다
 		// 좌우 여백은 centerWrapper(lg) 하나로 처리한다. 여기서 또 주면 카드만 32 로 들어가 탭·선택 박스와 좌측선이 어긋난다.
 	},
 	levelCardFull: {
@@ -544,7 +547,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		// 좌우 여백은 centerWrapper(lg) 하나로 처리 — 난이도 목록과 같은 좌우선
 	},
 	categoryRowButton: {
-		width: '48%',
+		// 태블릿은 3열(카테고리 9개 = 3x3) — 2열이면 카드 한 장이 400pt 넘게 늘어난다
+		width: isTablet ? '32%' : '48%',
 		minHeight: scaleHeight(92),
 		justifyContent: 'space-between',
 		paddingVertical: SPACING_H.md,
@@ -607,6 +611,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
 		borderRadius: RADIUS.xl,
+		// 다른 다이얼로그와 같은 1px 테두리 — 없으면 다크에서 표면(#1A1D3A)이 딤에 묻힌다
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		overflow: 'hidden',
 	},
 	modalCloseIcon: {
 		position: 'absolute',
@@ -632,7 +640,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	modalCloseButton: {
 		alignSelf: 'center',
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.xxl,
 		// ponytail: 터치 영역 44 이상 보장을 위한 고정 최소 높이

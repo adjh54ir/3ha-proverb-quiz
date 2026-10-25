@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import AppAlert from '@/screens/common/modal/AppAlert';
-import { Linking, StyleSheet, Switch, Text, View, TouchableOpacity, ScrollView, ActivityIndicator, Image } from 'react-native';
+import { Linking, StyleSheet, Switch, Text, View, TouchableOpacity, ScrollView, ActivityIndicator, Image, StyleProp, ViewStyle } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import notifee, { AuthorizationStatus } from '@notifee/react-native';
-import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { isTablet, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { inkOnFill } from '@/utils/ColorAlphaUtils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { listGrid } from '@/const/common/ListGrid';
@@ -49,6 +50,56 @@ const hourToDate = (hour: number) => {
 	return date;
 };
 
+const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
+
+/**
+ * 알림 시각 선택 칩.
+ * 폰은 가로 스크롤 한 줄, 태블릿은 넓은 폭을 살려 스크롤 없이 한눈에 보이는 그리드로 놓는다.
+ */
+const HourPicker = ({
+	selected,
+	onSelect,
+	columns,
+	contentContainerStyle,
+}: {
+	selected: number;
+	onSelect: (hour: number) => void;
+	columns: number;
+	contentContainerStyle?: StyleProp<ViewStyle>;
+}) => {
+	const renderChip = (hour: number) => {
+		const isSelected = selected === hour;
+		return (
+			<TouchableOpacity
+				key={hour}
+				activeOpacity={0.8}
+				onPress={() => onSelect(hour)}
+				hitSlop={HOUR_CHIP_HIT_SLOP}
+				style={[styles.hourButton, isTablet && styles.hourButtonGrid, isSelected && styles.hourButtonSelected]}>
+				<Text style={[styles.hourText, isSelected && styles.hourTextSelected]}>{hour.toString().padStart(2, '0')}시</Text>
+			</TouchableOpacity>
+		);
+	};
+
+	if (isTablet) {
+		return (
+			<View style={styles.hourGrid}>
+				{HOURS.map((hour) => (
+					<View key={hour} style={[styles.hourCell, { width: `${100 / columns}%` }]}>
+						{renderChip(hour)}
+					</View>
+				))}
+			</View>
+		);
+	}
+
+	return (
+		<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={contentContainerStyle}>
+			{HOURS.map(renderChip)}
+		</ScrollView>
+	);
+};
+
 type GroupedPrevQuiz = {
 	date: string;
 	formattedDate: string;
@@ -66,7 +117,6 @@ const TodayQuizScreen = () => {
 
 	// 전체 스크롤 + '맨 위로' 버튼 (문제를 다 풀면 한 화면을 훌쩍 넘는다)
 	const { scrollRef, showScrollTop, onScroll: onMainScroll, scrollToTop } = useScrollTop<ScrollView>();
-	const hourScrollRef = useRef<ScrollView>(null); // 알람 시간 선택 스크롤
 	const modalScrollRef = useRef<ScrollView>(null); // 모달 내부 스크롤
 	const [isTodayUnsolved, setIsTodayUnsolved] = useState(false);
 	const [hasStarted, setHasStarted] = useState(false);
@@ -624,8 +674,8 @@ const TodayQuizScreen = () => {
 				) : (
 					<>
 						{/* 👉 문제 텍스트 출력 추가 (속담 / 의미는? 줄바꿈) */}
-						<View style={styles.questionCombined}>
-							<Text style={styles.questionMain}>{item.proverb}</Text>
+						<View style={[styles.questionCombined, isTablet && styles.questionCombinedTablet]}>
+							<Text style={[styles.questionMain, isTablet && styles.questionMainTablet]}>{item.proverb}</Text>
 							{!isQuizCompleted && <Text style={styles.questionSub}>의미는?</Text>}
 						</View>
 
@@ -643,29 +693,47 @@ const TodayQuizScreen = () => {
 							</View>
 						)}
 
-						{options.map((option, idx) => {
-							const isAnswered = result !== undefined;
-							const isCorrectOption = option === item.longMeaning;
-							const isUserSelected = selected?.value === option;
-							const shouldHighlight = highlightAnswerId === item.id && isCorrectOption;
+						{/* 태블릿은 넓은 폭을 2×2 보기 그리드로 쓴다 (폰은 listGrid 가 null 이라 한 줄씩 그대로) */}
+						<View style={listGrid?.wrap}>
+							{options.map((option, idx) => {
+								const isAnswered = result !== undefined;
+								const isCorrectOption = option === item.longMeaning;
+								const isUserSelected = selected?.value === option;
+								const shouldHighlight = highlightAnswerId === item.id && isCorrectOption;
+								const labelColor = labelColors[idx % labelColors.length];
+								const textStyle = [styles.optionTextBase, isUserSelected && (isCorrectOption ? styles.correctText : styles.wrongText)];
 
-							return (
-								<TouchableOpacity
-									key={idx}
-									activeOpacity={0.8}
-									onPress={() => handleAnswer(item.id, option, item.longMeaning)}
-									disabled={isAnswered}
-									style={[
-										styles.optionBase,
-										isUserSelected && (isCorrectOption ? styles.correctOption : styles.wrongOption),
-										shouldHighlight && styles.highlightCorrectBorder,
-									]}>
-									<Text style={[styles.optionTextBase, isUserSelected && (isCorrectOption ? styles.correctText : styles.wrongText)]}>
-										<Text style={{ color: labelColors[idx % labelColors.length], fontWeight: '700' }}>{String.fromCharCode(65 + idx)}.</Text> {option}
-									</Text>
-								</TouchableOpacity>
-							);
-						})}
+								return (
+									// 보기가 위에서부터 차례로 떠오른다
+									<FadeInView key={idx} delay={staggerDelay(idx, 4, 60)} duration={240} offsetY={8} style={listGrid?.cell}>
+										<TouchableOpacity
+											activeOpacity={0.8}
+											onPress={() => handleAnswer(item.id, option, item.longMeaning)}
+											disabled={isAnswered}
+											style={[
+												styles.optionBase,
+												isTablet && styles.optionTablet,
+												listGrid?.fill,
+												isUserSelected && (isCorrectOption ? styles.correctOption : styles.wrongOption),
+												shouldHighlight && styles.highlightCorrectBorder,
+											]}>
+											{isTablet ? (
+												<>
+													<View style={[styles.optionLabelChip, { backgroundColor: labelColor }]}>
+														<Text style={[styles.optionLabelChipText, { color: inkOnFill(labelColor) }]}>{String.fromCharCode(65 + idx)}</Text>
+													</View>
+													<Text style={[textStyle, styles.optionTextTablet]}>{option}</Text>
+												</>
+											) : (
+												<Text style={textStyle}>
+													<Text style={{ color: labelColor, fontWeight: '700' }}>{String.fromCharCode(65 + idx)}.</Text> {option}
+												</Text>
+											)}
+										</TouchableOpacity>
+									</FadeInView>
+								);
+							})}
+						</View>
 						{/* 마지막 문제를 풀면 상위에서 곧바로 완료 화면으로 전환되므로 '다음 문제'만 노출한다 */}
 						{result !== undefined && currentIndex < quizList.length - 1 && (
 							<TouchableOpacity
@@ -713,58 +781,69 @@ const TodayQuizScreen = () => {
 				<View style={styles.rightAlignedRow} />
 
 				{!isAlarmEnabled && (
-					<View style={styles.content}>
-						<Image source={require('@/assets/images/screen-heroes/today-quiz.png')} style={styles.todayHeroImage} resizeMode="contain" />
-						<Text style={styles.title}>🍀 매일 '오늘의 퀴즈'가 도착합니다! 🍀</Text>
+					<View style={[styles.content, isTablet && styles.contentTablet]}>
+						{/* 태블릿: 이미지 | 설명 을 가로로 놓고 아래에 알림 설정을 구분선으로 나눈다 */}
+						<View style={[styles.introHead, isTablet && styles.introHeadTablet]}>
+							<Image
+								source={require('@/assets/images/screen-heroes/today-quiz.png')}
+								style={[styles.todayHeroImage, isTablet && styles.todayHeroImageTablet]}
+								resizeMode="contain"
+							/>
+							{isTablet ? (
+								// 태블릿: 고른 시각이 그대로 들어간 한 문장으로 무엇을 받는지 말한다. 시각을 바꾸면 숫자만 새로 떠오른다.
+								<View style={[styles.introHead, styles.introTextTablet]}>
+									<View style={styles.promiseLine}>
+										<Text style={styles.promiseText}>매일 </Text>
+										<FadeInView key={tempSelectedHour} duration={220} offsetY={6}>
+											<Text style={[styles.promiseText, styles.promiseHour]}>{tempSelectedHour.toString().padStart(2, '0')}시</Text>
+										</FadeInView>
+										<Text style={styles.promiseText}>,</Text>
+									</View>
+									<Text style={styles.promiseText}>속담 다섯 문제가 도착합니다</Text>
+									<Text style={styles.promiseSub}>알림을 켜면 오늘 문제부터 바로 풀 수 있고,{'\n'}다섯 문제를 모두 풀면 뜻·유래·예시 해설이 열립니다.</Text>
+								</View>
+							) : (
+								<View style={styles.introHead}>
+									<Text style={styles.title}>🍀 매일 '오늘의 퀴즈'가 도착합니다! 🍀</Text>
 
-						<View style={{ alignSelf: 'stretch', marginTop: SPACING_H.sm }}>
-							<View style={styles.bulletRow}>
-								<Text style={styles.bullet}>•</Text>
-								<Text style={styles.bulletText}>매일 5개의 속담 퀴즈가 도착합니다.</Text>
-							</View>
-							<View style={styles.bulletRow}>
-								<Text style={styles.bullet}>•</Text>
-								<Text style={styles.bulletText}>원하는 시간에 푸시 알림을 받을 수 있습니다.</Text>
-							</View>
-							<View style={styles.bulletRow}>
-								<Text style={styles.bullet}>•</Text>
-								<Text style={styles.bulletText}>문제를 모두 풀면 자세한 해설을 볼 수 있습니다.</Text>
-							</View>
+									<View style={{ alignSelf: 'stretch', marginTop: SPACING_H.sm }}>
+										<View style={styles.bulletRow}>
+											<Text style={styles.bullet}>•</Text>
+											<Text style={styles.bulletText}>매일 5개의 속담 퀴즈가 도착합니다.</Text>
+										</View>
+										<View style={styles.bulletRow}>
+											<Text style={styles.bullet}>•</Text>
+											<Text style={styles.bulletText}>원하는 시간에 푸시 알림을 받을 수 있습니다.</Text>
+										</View>
+										<View style={styles.bulletRow}>
+											<Text style={styles.bullet}>•</Text>
+											<Text style={styles.bulletText}>문제를 모두 풀면 자세한 해설을 볼 수 있습니다.</Text>
+										</View>
+									</View>
+								</View>
+							)}
 						</View>
 
 						<View style={styles.alarmRow}>
 							<View style={{ flexDirection: 'column', width: '100%', marginTop: SPACING_H.sm }}>
 								<View style={styles.alarmRow}>
-									<Text style={styles.switchLabel}>알림 설정/시간</Text>
-									<Text style={styles.selectedHourText}>{tempSelectedHour.toString().padStart(2, '0')}시</Text>
-									<Switch
-										value={isAlarmEnabled}
-										onValueChange={handleToggleAlarm}
-										trackColor={{ false: COLORS.borderDark, true: COLORS.primaryLight }}
-										thumbColor={isAlarmEnabled ? COLORS.primary : COLORS.surface}
-										ios_backgroundColor={COLORS.borderDark}
-									/>
+									<Text style={styles.switchLabel}>{isTablet ? '받을 시각' : '알림 설정/시간'}</Text>
+									{/* 태블릿은 시각이 위 문장에 들어가 있어 여기서는 빼고 스위치에 이름을 붙인다 */}
+									{!isTablet && <Text style={styles.selectedHourText}>{tempSelectedHour.toString().padStart(2, '0')}시</Text>}
+									<View style={styles.switchGroup}>
+										{isTablet && <Text style={styles.switchCaption}>알림 받기</Text>}
+										<Switch
+											value={isAlarmEnabled}
+											onValueChange={handleToggleAlarm}
+											trackColor={{ false: COLORS.borderDark, true: COLORS.primaryLight }}
+											thumbColor={isAlarmEnabled ? COLORS.primary : COLORS.surface}
+											ios_backgroundColor={COLORS.borderDark}
+										/>
+									</View>
 								</View>
 
-								<ScrollView
-									ref={hourScrollRef}
-									horizontal
-									showsHorizontalScrollIndicator={false}
-									contentContainerStyle={styles.hourScrollContainer}>
-									{Array.from({ length: 24 }).map((_, hour) => {
-										const isSelected = tempSelectedHour === hour;
-										return (
-											<TouchableOpacity
-												key={hour}
-												activeOpacity={0.8}
-												onPress={() => setTempSelectedHour(hour)}
-												hitSlop={HOUR_CHIP_HIT_SLOP}
-												style={[styles.hourButton, isSelected && styles.hourButtonSelected]}>
-												<Text style={[styles.hourText, isSelected && styles.hourTextSelected]}>{hour.toString().padStart(2, '0')}시</Text>
-											</TouchableOpacity>
-										);
-									})}
-								</ScrollView>
+								{/* 태블릿 8열 × 3줄 — 0~7 / 8~15 / 16~23 시 */}
+								<HourPicker selected={tempSelectedHour} onSelect={setTempSelectedHour} columns={8} contentContainerStyle={styles.hourScrollContainer} />
 							</View>
 						</View>
 					</View>
@@ -806,24 +885,33 @@ const TodayQuizScreen = () => {
 						<View style={styles.quizContainer2}>
 							{!hasStarted && isTodayUnsolved ? (
 								// 👉 아직 시작 안 했을 때는 "퀴즈 도착 카드"
-								<View style={styles.emptyQuizBox}>
-								<Image source={require('@/assets/images/feature-states/today-quiz-arrival.png')} style={styles.todayQuizArrivalImage} resizeMode="contain" />
-									<Text style={styles.emptyQuizTitle}>오늘의 퀴즈가 도착했습니다 ✨</Text>
-									<Text style={styles.emptyQuizSubtitle}>지금 바로 시작해 보세요!</Text>
+								// 태블릿: 이미지 | 제목·버튼 을 가로로 놓아 큰 카드 안이 휑하지 않게 한다
+								<View style={[styles.emptyQuizBox, isTablet && styles.emptyQuizBoxTablet]}>
+									<Image
+										source={require('@/assets/images/feature-states/today-quiz-arrival.png')}
+										style={[styles.todayQuizArrivalImage, isTablet && styles.todayQuizArrivalImageTablet]}
+										resizeMode="contain"
+									/>
+									<View style={[styles.emptyQuizBody, isTablet && styles.emptyQuizBodyTablet]}>
+										<Text style={[styles.emptyQuizTitle, isTablet && [styles.textStartTablet, styles.emptyQuizTitleTablet]]}>오늘의 퀴즈가 도착했습니다 ✨</Text>
+										<Text style={[styles.emptyQuizSubtitle, isTablet && styles.textStartTablet]}>
+											{isTablet ? `${getFormattedDate()} · 속담 ${quizList.length}문제가 기다리고 있습니다.` : '지금 바로 시작해 보세요!'}
+										</Text>
 
-									<TouchableOpacity
-										style={[styles.startQuizButton, SOLO_BUTTON]}
-										activeOpacity={0.8}
-										onPress={async () => {
-											if (quizList.length === 0) {
-												await initQuiz();
-											}
-											setHasStarted(true); // ✅ 시작 상태 켜기
-											setCurrentIndex(0);
-											scrollRef.current?.scrollTo({ y: 0, animated: true });
-										}}>
-										<Text style={styles.startQuizButtonText}>오늘의 퀴즈 시작</Text>
-									</TouchableOpacity>
+										<TouchableOpacity
+											style={[styles.startQuizButton, isTablet ? styles.startQuizButtonTablet : SOLO_BUTTON]}
+											activeOpacity={0.8}
+											onPress={async () => {
+												if (quizList.length === 0) {
+													await initQuiz();
+												}
+												setHasStarted(true); // ✅ 시작 상태 켜기
+												setCurrentIndex(0);
+												scrollRef.current?.scrollTo({ y: 0, animated: true });
+											}}>
+											<Text style={styles.startQuizButtonText}>오늘의 퀴즈 시작</Text>
+										</TouchableOpacity>
+									</View>
 								</View>
 							) : !isQuizCompleted ? (
 								// 👉 시작했고 아직 안 끝났을 때는 문제 화면
@@ -945,28 +1033,7 @@ const TodayQuizScreen = () => {
 										<Text style={styles.selectedHourText}>{tempSelectedHour.toString().padStart(2, '0')}시</Text>
 									</View>
 
-									<ScrollView
-										ref={modalScrollRef}
-										horizontal
-										showsHorizontalScrollIndicator={false}
-										contentContainerStyle={{
-											paddingVertical: SPACING_H.sm,
-											paddingHorizontal: SPACING_W.xs,
-										}}>
-										{Array.from({ length: 24 }).map((_, hour) => {
-											const isSelected = tempSelectedHour === hour;
-											return (
-												<TouchableOpacity
-													key={hour}
-													activeOpacity={0.8}
-													onPress={() => setTempSelectedHour(hour)}
-													hitSlop={HOUR_CHIP_HIT_SLOP}
-													style={[styles.hourButton, isSelected && styles.hourButtonSelected]}>
-													<Text style={[styles.hourText, isSelected && styles.hourTextSelected]}>{hour.toString().padStart(2, '0')}시</Text>
-												</TouchableOpacity>
-											);
-										})}
-									</ScrollView>
+									<HourPicker selected={tempSelectedHour} onSelect={setTempSelectedHour} columns={6} contentContainerStyle={styles.modalHourScrollContainer} />
 								</View>
 							</View>
 						)}
@@ -1213,6 +1280,53 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	todayHeroImage: { width: scaleWidth(190), height: scaleHeight(126), marginBottom: SPACING_H.sm },
+	contentTablet: {
+		paddingHorizontal: SPACING_W.xxl,
+	},
+	introHead: {
+		alignSelf: 'stretch',
+		alignItems: 'center',
+	},
+	// 이미지 | 설명 — 아래 알림 설정과는 구분선으로 나눈다
+	introHeadTablet: {
+		flexDirection: 'row',
+		columnGap: SPACING_W.xxl,
+		paddingBottom: SPACING_H.lg,
+		marginBottom: SPACING_H.md,
+		borderBottomWidth: 1,
+		borderBottomColor: COLORS.border,
+	},
+	introTextTablet: {
+		flex: 1,
+		alignItems: 'flex-start',
+		justifyContent: 'center',
+	},
+	// 고운바탕 = 화면 최상단 헤드라인. 고른 시각만 쪽빛으로 — 선택된 시간 칩(primaryFill)과 같은 색이라 둘이 이어져 읽힌다
+	promiseLine: {
+		flexDirection: 'row',
+		alignItems: 'flex-end',
+	},
+	promiseText: {
+		fontFamily: FONTS.display,
+		fontSize: FONT_SIZES.heading,
+		lineHeight: displayFontSize(32),
+		fontWeight: '700',
+		color: COLORS.textStrong,
+	},
+	promiseHour: {
+		color: COLORS.primary,
+	},
+	promiseSub: {
+		marginTop: SPACING_H.md,
+		fontSize: FONT_SIZES.md,
+		lineHeight: scaledSize(22),
+		color: COLORS.textSecondary,
+	},
+	// 폭 비율로 잡아 iPad mini(744)에서도 오른쪽 문장이 한 줄씩 들어갈 자리가 남는다
+	todayHeroImageTablet: { width: '32%', height: undefined, aspectRatio: 768 / 512, marginBottom: 0 },
+	textStartTablet: {
+		textAlign: 'left',
+	},
 	title: {
 		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
@@ -1257,8 +1371,38 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.secondary,
 		fontWeight: '700',
 	},
+	switchGroup: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: SPACING_W.sm,
+	},
+	switchCaption: {
+		fontSize: FONT_SIZES.md,
+		color: COLORS.textSecondary,
+		fontWeight: '600',
+	},
 	hourScrollContainer: {
 		paddingVertical: SPACING_H.sm,
+	},
+	modalHourScrollContainer: {
+		paddingVertical: SPACING_H.sm,
+		paddingHorizontal: SPACING_W.xs,
+	},
+	// 태블릿 시간 그리드 — 셀 양옆 xs 씩, 행을 그만큼 바깥으로 당겨 가장자리를 맞춘다
+	hourGrid: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		marginHorizontal: -SPACING_W.xs,
+		paddingTop: SPACING_H.sm,
+	},
+	hourCell: {
+		paddingHorizontal: SPACING_W.xs,
+		paddingBottom: SPACING_H.sm,
+	},
+	hourButtonGrid: {
+		marginRight: 0,
+		paddingHorizontal: 0,
+		alignItems: 'center',
 	},
 	hourButton: {
 		paddingVertical: SPACING_H.sm,
@@ -1375,6 +1519,14 @@ const styles = themedStyles(() => StyleSheet.create({
 		lineHeight: scaledSize(30),
 		textAlign: 'center',
 	},
+	questionCombinedTablet: {
+		paddingVertical: SPACING_H.md,
+		marginBottom: SPACING_H.xl,
+	},
+	questionMainTablet: {
+		fontSize: FONT_SIZES.display,
+		lineHeight: displayFontSize(40),
+	},
 	questionSub: {
 		fontSize: FONT_SIZES.mdPlus,
 		color: COLORS.textSecondary,
@@ -1432,6 +1584,31 @@ const styles = themedStyles(() => StyleSheet.create({
 		lineHeight: scaledSize(20),
 		textAlign: 'left',
 	},
+	// 태블릿 2×2 보기 — 행 간격을 열 간격(listGrid, SPACING_W.md)과 맞춘다
+	optionTablet: {
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+		columnGap: SPACING_W.md,
+		paddingVertical: SPACING_H.lg,
+		marginBottom: SPACING_W.md,
+	},
+	optionLabelChip: {
+		width: scaledSize(28),
+		height: scaledSize(28),
+		borderRadius: scaledSize(14),
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	optionLabelChipText: {
+		fontSize: FONT_SIZES.sm,
+		fontWeight: '800',
+	},
+	optionTextTablet: {
+		flex: 1,
+		// 칩(28) 가운데에 첫 줄을 맞춘다
+		paddingTop: scaledSize(3),
+		lineHeight: scaledSize(22),
+	},
 	correctOption: {
 		backgroundColor: COLORS.successBg,
 		borderColor: COLORS.success,
@@ -1482,6 +1659,28 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: scaleWidth(168),
 		height: scaleWidth(168),
 	},
+	emptyQuizBoxTablet: {
+		flexDirection: 'row',
+		columnGap: SPACING_W.xxxl,
+		paddingVertical: SPACING_H.xxl,
+		paddingHorizontal: SPACING_W.xxxl,
+	},
+	todayQuizArrivalImageTablet: {
+		width: scaleWidth(180),
+		height: scaleWidth(180),
+	},
+	emptyQuizBody: {
+		alignSelf: 'stretch',
+		alignItems: 'center',
+	},
+	emptyQuizBodyTablet: {
+		flex: 1,
+		alignSelf: 'auto',
+		alignItems: 'flex-start',
+	},
+	emptyQuizTitleTablet: {
+		marginTop: 0,
+	},
 	emptyQuizTitle: {
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
@@ -1505,6 +1704,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.xxl,
 		borderRadius: RADIUS.md,
+	},
+	startQuizButtonTablet: {
+		alignSelf: 'flex-start',
+		paddingHorizontal: SPACING_W.xxxl,
 	},
 	startQuizButtonText: {
 		fontSize: FONT_SIZES.lg,

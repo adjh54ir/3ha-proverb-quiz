@@ -26,7 +26,7 @@ import { useCallback } from 'react';
 import FastImage from 'react-native-fast-image';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
-import { isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { isTablet, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -558,6 +558,7 @@ const MyScoreScreen = () => {
 									justifyContent: 'center',
 								}}
 								activeOpacity={0.7}
+								hitSlop={HIT_SLOP}
 								onPress={() => setShowLevelModal(true)}>
 								<IconComponent type="fontAwesome6" name={icon} size={scaledSize(18)} color={COLORS.primary} />
 								<Text style={{ fontSize: FONT_SIZES.lg, color: COLORS.primary, fontWeight: '700', marginLeft: SPACING_W.xsPlus }}>
@@ -677,6 +678,7 @@ const MyScoreScreen = () => {
 								key={tab.key}
 								activeOpacity={0.8}
 								onPress={() => handleActivityTabPress(tab.key)}
+								hitSlop={{ top: 6, bottom: 6 }}
 								style={[styles.activityTabChip, isActive && styles.activityTabChipActive]}>
 								<IconComponent
 									type="materialIcons"
@@ -984,7 +986,8 @@ const MyScoreScreen = () => {
 						<Calendar
 							markedDates={markedQuizDates}
 							markingType="custom"
-							style={[styles.calendarStyle, { width: '100%' }]}
+							// 태블릿에서 화면 폭을 다 쓰면 7칸이 납작하게 벌어진다 — 다이얼로그 폭에서 멈춘다
+							style={[styles.calendarStyle, { width: '100%' }, isTablet && { maxWidth: MODAL_MAX_WIDTH, alignSelf: 'center' }]}
 							onDayPress={(day) => {
 								const date = day.dateString;
 								const matchedData = todayQuizDataList.find((item) => DateUtils.toLocalDateKey(item.quizDate) === date);
@@ -1341,6 +1344,7 @@ const MyScoreScreen = () => {
 										key={ff.key}
 										activeOpacity={0.8}
 										onPress={() => setBadgeFilter(ff.key)}
+										hitSlop={{ top: 6, bottom: 6 }}
 										style={[styles.badgeFilterChip, active && styles.badgeFilterChipActive]}>
 										<Text style={[styles.badgeFilterText, active && styles.badgeFilterTextActive]}>{ff.label}</Text>
 									</TouchableOpacity>

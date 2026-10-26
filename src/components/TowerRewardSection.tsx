@@ -219,6 +219,9 @@ const TowerRewardSection = ({ unlockedRewards }: Props) => {
                     <Animated.View
                         style={{
                             // 카드가 안전 여백 안에서 스스로 줄어들도록 중간 래퍼에도 상한을 준다.
+                            // 폭이 없으면 내용 폭으로 줄어들어 팝업 width '100%' 가 대화상자 폭(340)을 못 채운다.
+                            width: '100%',
+                            alignItems: 'center',
                             maxHeight: '100%',
                             opacity: popupAnim,
                             transform: [
@@ -455,7 +458,8 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     popupBody: {
         paddingHorizontal: SPACING_W.lg,
-        paddingVertical: SPACING_H.lg,
+        paddingTop: SPACING_H.lg,
+        paddingBottom: SPACING_H.xl, // 내용 → 버튼 20 (다른 대화상자와 같은 간격)
     },
     sectionTitle: {
         fontSize: FONT_SIZES.md,
@@ -503,7 +507,7 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     closeBtn: {
         marginHorizontal: SPACING_W.lg,
-        marginBottom: SPACING_H.lg,
+        marginBottom: SPACING_H.xl, // 카드 아래 여백도 다른 카드의 paddingVertical(xl) 과 맞춘다
         paddingVertical: SPACING_H.md,
         borderRadius: RADIUS.md,
         alignItems: 'center',

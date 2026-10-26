@@ -8,7 +8,7 @@ import useReducedMotion from '@/hooks/useReducedMotion';
 import FastImage from 'react-native-fast-image';
 import IconComponent from '@/screens/common/atomic/IconComponent';
 import { COLORS, FONT_SIZES, HIT_SLOP, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
-import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { LEVEL_DATA } from '@/const/common/CommonCharacterData';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 
@@ -288,12 +288,12 @@ const CHAR = scaleWidth(112);
 const styles = themedStyles(() =>
 	StyleSheet.create({
 		backdrop: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'flex-end' },
-		// 이 모달은 AppLayout 의 본문 기둥 밖에서 뜬다. 폭을 묶지 않으면 태블릿에서 말풍선이
-		// 화면 폭(1024)까지 늘어나 고정 위치인 꼬리가 캐릭터를 못 가리킨다.
-		// 폰은 화면이 CONTENT_MAX_WIDTH(600)보다 좁아 아무 영향이 없다.
+		// 폭을 묶지 않으면 태블릿에서 말풍선이 화면 폭(1024)까지 늘어나 한 줄이 지나치게 길어진다.
+		// 본문 폭(CONTENT_MAX_WIDTH)은 이제 화면 폭 그대로라 걸리지 않으니 대화상자 폭에서 멈춘다.
+		// 폰은 화면이 MODAL_MAX_WIDTH(460)보다 좁아 아무 영향이 없다.
 		wrap: {
 			width: '100%',
-			maxWidth: CONTENT_MAX_WIDTH,
+			maxWidth: MODAL_MAX_WIDTH,
 			alignSelf: 'center',
 			paddingHorizontal: SPACING_W.xl,
 			alignItems: 'flex-start',

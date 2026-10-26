@@ -12,7 +12,7 @@ import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
 import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from '../common/CommonProverbModule';
@@ -365,7 +365,7 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 
 					<View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, SPACING_H.lg) }]}>
 						<TouchableOpacity
-							style={[styles.confirmBtn, isConfirmDisabled && styles.confirmBtnDisabled]}
+							style={[styles.confirmBtn, SOLO_BUTTON, isConfirmDisabled && styles.confirmBtnDisabled]}
 							disabled={isConfirmDisabled}
 							onPress={handleConfirm}
 							activeOpacity={0.85}>

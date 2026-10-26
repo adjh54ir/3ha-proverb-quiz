@@ -9,8 +9,9 @@ import { isTablet, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '
 import { inkOnFill } from '@/utils/ColorAlphaUtils';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles, displayFontSize } from '@/const/common/Theme';
-import { listGrid } from '@/const/common/ListGrid';
-import { useFocusEffect } from '@react-navigation/native';
+import { listGrid, optionGrid } from '@/const/common/ListGrid';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { optionIndexOf, useHardwareKeys } from '@/utils/HardwareKeys';
 import { MainDataType } from '@/types/MainDataType';
 import { read, write } from '@/services/StorageService';
 import IconComponent from './common/atomic/IconComponent';
@@ -640,8 +641,35 @@ const TodayQuizScreen = () => {
 		return `${month}월 ${day}일(${dayOfWeek})`;
 	};
 
+	const goToNextQuiz = () => {
+		setCurrentIndex((prev) => prev + 1);
+		scrollRef.current?.scrollTo({ y: 0, animated: true });
+	};
+
+	// 외장 키보드: 1~4 로 보기 고르기, 답한 뒤 Enter 로 다음 문제 (문제 화면이 떠 있을 때만)
+	const isFocused = useIsFocused();
+	useHardwareKeys((key) => {
+		const item = quizList[currentIndex];
+		const isQuizVisible = isAlarmEnabled && (hasStarted || !isTodayUnsolved) && !isQuizCompleted;
+		if (!item || !isQuizVisible) {
+			return;
+		}
+		const index = optionIndexOf(key);
+		if (index === null) {
+			if (answerResults[item.id] !== undefined && currentIndex < quizList.length - 1) {
+				goToNextQuiz();
+			}
+			return;
+		}
+		const option = quizOptionsMap[item.id]?.[index];
+		if (option) {
+			handleAnswer(item.id, option, item.longMeaning);
+		}
+	}, isFocused);
+
 	const renderItem = ({ item }: { item: MainDataType.Proverb }) => {
 		const options = quizOptionsMap[item.id] || [];
+		const grid = optionGrid(options); // 긴 뜻 보기가 섞이면 태블릿도 한 열로 쌓는다
 		const result = answerResults[item.id];
 		const selected = selectedAnswers[item.id];
 		const getChoiceLabel = (index: number) => String.fromCharCode(65 + index);
@@ -693,8 +721,8 @@ const TodayQuizScreen = () => {
 							</View>
 						)}
 
-						{/* 태블릿은 넓은 폭을 2×2 보기 그리드로 쓴다 (폰은 listGrid 가 null 이라 한 줄씩 그대로) */}
-						<View style={listGrid?.wrap}>
+						{/* 태블릿은 넓은 폭을 2×2 보기 그리드로 쓴다 (폰·긴 보기는 그리드가 null 이라 한 줄씩) */}
+						<View style={grid?.wrap}>
 							{options.map((option, idx) => {
 								const isAnswered = result !== undefined;
 								const isCorrectOption = option === item.longMeaning;
@@ -705,7 +733,7 @@ const TodayQuizScreen = () => {
 
 								return (
 									// 보기가 위에서부터 차례로 떠오른다
-									<FadeInView key={idx} delay={staggerDelay(idx, 4, 60)} duration={240} offsetY={8} style={listGrid?.cell}>
+									<FadeInView key={idx} delay={staggerDelay(idx, 4, 60)} duration={240} offsetY={8} style={grid?.cell}>
 										<TouchableOpacity
 											activeOpacity={0.8}
 											onPress={() => handleAnswer(item.id, option, item.longMeaning)}
@@ -713,7 +741,7 @@ const TodayQuizScreen = () => {
 											style={[
 												styles.optionBase,
 												isTablet && styles.optionTablet,
-												listGrid?.fill,
+												grid?.fill,
 												isUserSelected && (isCorrectOption ? styles.correctOption : styles.wrongOption),
 												shouldHighlight && styles.highlightCorrectBorder,
 											]}>
@@ -739,10 +767,7 @@ const TodayQuizScreen = () => {
 							<TouchableOpacity
 								style={[styles.nextButton, SOLO_BUTTON]}
 								activeOpacity={0.8}
-								onPress={() => {
-									setCurrentIndex((prev) => prev + 1);
-									scrollRef.current?.scrollTo({ y: 0, animated: true });
-								}}>
+								onPress={goToNextQuiz}>
 								<Text style={styles.nextButtonText}>다음 문제</Text>
 							</TouchableOpacity>
 						)}

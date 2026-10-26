@@ -333,7 +333,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	bossGlowRing: {
 		position: 'absolute',
-		top: SPACING_H.md,
+		// 링(110)과 이미지(90)의 중심을 맞춘다 — 이미지 위 끝(paddingVertical lg)에서 지름 차의 절반만큼 위로
+		top: SPACING_H.lg - scaleWidth(10),
 		width: scaleWidth(110),
 		height: scaleWidth(110),
 		borderRadius: scaleWidth(110) / 2,

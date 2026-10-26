@@ -243,7 +243,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	tagsWrapper: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		gap: SPACING_W.sm,
+		columnGap: SPACING_W.sm,
+		rowGap: SPACING_H.sm, // 줄바꿈된 태그 행 간격은 세로 토큰으로
 		marginTop: SPACING_H.xs,
 	},
 	tagItem: {

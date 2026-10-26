@@ -196,7 +196,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.text,
 		textAlign: 'center',
 		lineHeight: scaledSize(20),
-		marginBottom: SPACING_H.md,
 	},
 	bonusChip: {
 		flexDirection: 'row',
@@ -206,7 +205,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.sm,
-		marginBottom: SPACING_H.lg,
+		marginTop: SPACING_H.md,
 	},
 	bonusText: {
 		color: COLORS.primaryDeep,
@@ -215,6 +214,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	confirmBtn: {
 		alignSelf: 'stretch',
+		marginTop: SPACING_H.xl, // 내용 → 버튼 20 (다른 대화상자와 같은 간격, 보너스 칩 유무와 무관)
 		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.primaryFill,

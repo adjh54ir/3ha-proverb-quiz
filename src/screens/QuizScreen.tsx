@@ -23,6 +23,8 @@ import { Paths } from '@/navigation/conf/Paths';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, getThemeMode, themedStyles, themedValue } from '@/const/common/Theme';
+import { optionGrid } from '@/const/common/ListGrid';
+import { optionIndexOf, useHardwareKeys } from '@/utils/HardwareKeys';
 import { getCategoryColor, getLevelColorByNumber } from '@/screens/common/CommonProverbModule';
 import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -103,6 +105,7 @@ const QuizScreen = () => {
 	const [proverbs, setProverbs] = useState<MainDataType.Proverb[]>([]);
 	const [question, setQuestion] = useState<MainDataType.Proverb | null>(null);
 	const [options, setOptions] = useState<string[]>([]);
+	const grid = optionGrid(options); // 긴 뜻 보기가 섞이면 태블릿도 한 열
 	const [selected, setSelected] = useState<string | null>(null);
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 	const [remainingTime, setRemainingTime] = useState(QUESTION_TIME_LIMIT);
@@ -733,6 +736,15 @@ const QuizScreen = () => {
 		// navigation.goBack(); // 그래도 예외적으로 강제로
 	};
 
+	// 외장 키보드: 1~4 로 보기 고르기 (결과 팝업의 Enter → 다음 문제는 QuizResultModal 이 받는다)
+	useHardwareKeys((key) => {
+		const index = optionIndexOf(key);
+		const option = index === null ? undefined : options[index];
+		if (option && question && !isAnswerLocked && !isAnyModalOpen) {
+			handleSelect(option);
+		}
+	}, isFocused);
+
 	const handleNextQuestion = () => {
 		const isFinal = resultType === 'done';
 
@@ -1090,11 +1102,14 @@ const QuizScreen = () => {
 
 								<Animated.View style={[styles.optionsContainer, questionEnterStyle]}>
 									<FlatList
-										key={question?.id} // ✅ 질문이 바뀔 때마다 강제 리렌더
+										key={`${question?.id}-${grid ? 2 : 1}`} // ✅ 질문·열 수가 바뀔 때마다 새로 그린다 (numColumns 는 즉석 변경 불가)
 										ref={flatListRef}
 										data={options}
 										scrollEnabled={true} // ✅ 항상 스크롤 가능
 										keyExtractor={(item, index) => `${item}-${index}`}
+										// 태블릿은 넓은 폭을 2×2 보기 그리드로 쓴다 (오늘의 퀴즈와 같은 배치, 폰·긴 보기는 한 열)
+										numColumns={grid ? 2 : 1}
+										columnWrapperStyle={grid?.row}
 										contentContainerStyle={{ paddingBottom: SPACING_H.xxxxl }}
 										showsVerticalScrollIndicator
 										renderItem={({ item, index }) => {
@@ -1127,12 +1142,13 @@ const QuizScreen = () => {
 											};
 
 											return (
-												<Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+												<Animated.View style={[grid?.cell, { transform: [{ scale: scaleAnim }] }]}>
 													<TouchableOpacity
 														onPressIn={handlePressIn}
 														onPressOut={handlePressOut}
 														style={[
 															styles.optionCard,
+															grid?.fill,
 															isSelected && styles.optionSelectedCard, // ✅ 내가 선택한 보기 (파란색 배경)
 															selected && isCorrectAnswer && styles.optionCorrectCard, // ⭕ 정답은 항상 초록 강조
 															selected && isSelectedWrong && styles.optionWrongCard, // ❌ 오답이면 빨강 배경

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Image } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
-import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
-import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize } from '@/const/common/Theme';
+import { isTablet, scaleHeight, scaleWidth, scaledSize } from '@/utils';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, SOLO_BUTTON, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -246,7 +246,7 @@ const InitTimeChallengeScreen = () => {
 									<Text style={styles.warningText}>시작 버튼을 누르면 3초 뒤에 퀴즈가 시작됩니다!</Text>
 								</View>
 
-								<TouchableOpacity onPress={() => setShowAllRules(false)} style={styles.toggleButton} activeOpacity={0.7}>
+								<TouchableOpacity onPress={() => setShowAllRules(false)} style={styles.toggleButton} hitSlop={HIT_SLOP} activeOpacity={0.7}>
 									<Text style={styles.toggleText}>간단히 보기</Text>
 									<IconComponent name="chevron-up" type="Feather" size={scaledSize(16)} color={COLORS.primary} />
 								</TouchableOpacity>
@@ -261,7 +261,7 @@ const InitTimeChallengeScreen = () => {
 									<Text style={styles.warningText}>시작 버튼을 누르면 3초 뒤에 퀴즈가 시작됩니다!</Text>
 								</View>
 
-								<TouchableOpacity onPress={() => setShowAllRules(true)} style={styles.toggleButton} activeOpacity={0.7}>
+								<TouchableOpacity onPress={() => setShowAllRules(true)} style={styles.toggleButton} hitSlop={HIT_SLOP} activeOpacity={0.7}>
 									<Text style={styles.toggleText}>자세히 보기</Text>
 									<IconComponent name="chevron-down" type="Feather" size={scaledSize(16)} color={COLORS.primary} />
 								</TouchableOpacity>
@@ -318,7 +318,7 @@ const InitTimeChallengeScreen = () => {
 
 			{/* 주 동작(시작)은 스크롤 밖에 고정한다 — 규칙·랭킹을 끝까지 내려야 누를 수 있으면 안 된다. */}
 			<View style={styles.startButtonBar}>
-				<TouchableOpacity style={styles.startButton} onPress={handleStartChallenge} activeOpacity={0.85}>
+				<TouchableOpacity style={[styles.startButton, SOLO_BUTTON]} onPress={handleStartChallenge} activeOpacity={0.85}>
 					<Text style={styles.startButtonText}>챌린지 시작하기</Text>
 					<IconComponent
 						name="play-circle"
@@ -536,10 +536,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 
 	// 콤보 리스트
-	comboList: {
-		gap: SPACING_H.sm,
-	},
+	// 태블릿은 콤보 4단계를 한 줄에 나란히 — 한 줄씩 쌓으면 화면 폭만큼 늘어난 띠 네 개가 된다
+	comboList: isTablet ? { flexDirection: 'row', columnGap: SPACING_W.sm } : { rowGap: SPACING_H.sm },
 	comboItem: {
+		...(isTablet && { flex: 1 }),
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',

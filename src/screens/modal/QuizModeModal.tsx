@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {  } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleWidth, scaleHeight } from '@/utils';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
@@ -45,6 +45,8 @@ const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
 						</View>
 						<Text style={styles.subtitle}>원하는 퀴즈 모드를 선택해주세요</Text>
 
+						{/* 작은 폰 + 큰 글자에서 카드가 maxHeight 에 걸리면 마지막 모드가 잘린다 — 목록만 스크롤 */}
+						<ScrollView style={styles.modeScroll} showsVerticalScrollIndicator={false} bounces={false}>
 						{MODES.map((m, i) => (
 							<TouchableOpacity
 								key={m.key}
@@ -61,6 +63,7 @@ const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
 								<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(20)} color={COLORS.borderDark} />
 							</TouchableOpacity>
 						))}
+						</ScrollView>
 					</TouchableOpacity>
 				</Animated.View>
 			</TouchableOpacity>
@@ -79,6 +82,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: SPACING_W.lg,
 	},
+	modeScroll: { flexShrink: 1 },
 	card: {
 		width: '100%',
 		maxWidth: scaleWidth(340),

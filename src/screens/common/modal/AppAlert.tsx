@@ -1,5 +1,5 @@
 import React, { useCallback, useSyncExternalStore } from 'react';
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Modal from '@/screens/common/atomic/AppModal';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
@@ -132,7 +132,12 @@ export const AppAlertHost = (): React.ReactElement | null => {
 			<View style={[styles.overlay, safePadding]}>
 				<Animated.View style={[styles.card, enterStyle]}>
 					<Text style={styles.title}>{current.title}</Text>
-					{!!current.message && <Text style={styles.message}>{current.message}</Text>}
+					{/* 긴 문구 + '글자 크게'에서 카드가 maxHeight 에 걸리면 버튼이 밀려 잘린다 — 문구만 스크롤로 줄인다 */}
+					{!!current.message && (
+						<ScrollView style={styles.messageScroll} bounces={false}>
+							<Text style={styles.message}>{current.message}</Text>
+						</ScrollView>
+					)}
 
 					<View style={[styles.buttonRow, isStacked && styles.buttonColumn]}>
 						{current.buttons.map((button, index) => (
@@ -195,8 +200,11 @@ const styles = themedStyles(() =>
 			color: COLORS.textStrong,
 			textAlign: 'center',
 		},
-		message: {
+		messageScroll: {
+			flexShrink: 1,
 			marginTop: SPACING_H.smPlus,
+		},
+		message: {
 			fontSize: FONT_SIZES.md,
 			color: COLORS.textSecondary,
 			textAlign: 'center',

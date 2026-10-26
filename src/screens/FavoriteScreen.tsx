@@ -11,8 +11,8 @@ import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import IconComponent from './common/atomic/IconComponent';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
-import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { CARD_LIST_COLUMNS, cardListGrid } from '@/const/common/ListGrid';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
@@ -242,9 +242,9 @@ const FavoriteScreen = () => {
 		const isSelected = selectedIds.includes(item.id);
 
 		return (
-			<AnimatedListItem index={index} style={listGrid?.cell}>
+			<AnimatedListItem index={index} style={cardListGrid?.cell}>
 				<TouchableOpacity
-					style={[styles.itemCard, listGrid?.fill, isSelectionMode && isSelected && styles.itemCardSelected]}
+					style={[styles.itemCard, cardListGrid?.fill, isSelectionMode && isSelected && styles.itemCardSelected]}
 					activeOpacity={0.8}
 					onPress={() => {
 						if (isSelectionMode) {
@@ -469,8 +469,8 @@ const FavoriteScreen = () => {
 						<FlatList
 							ref={flatListRef}
 							data={filteredList}
-							numColumns={LIST_COLUMNS}
-							columnWrapperStyle={listGrid?.row}
+							numColumns={CARD_LIST_COLUMNS}
+							columnWrapperStyle={cardListGrid?.row}
 							onScroll={onListScroll}
 							scrollEventThrottle={16}
 							scrollEnabled={!fieldOpen && !levelOpen}
@@ -517,7 +517,7 @@ const FavoriteScreen = () => {
 						{isSelectionMode && (
 							<View style={styles.bottomActionBar}>
 								<TouchableOpacity
-									style={[styles.deleteActionBtn, selectedIds.length === 0 && styles.deleteActionBtnDisabled]}
+									style={[styles.deleteActionBtn, SOLO_BUTTON, selectedIds.length === 0 && styles.deleteActionBtnDisabled]}
 									disabled={selectedIds.length === 0}
 									onPress={() => setShowDeleteConfirmModal(true)}
 									activeOpacity={0.85}>

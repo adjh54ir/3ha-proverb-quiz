@@ -21,6 +21,7 @@ import {
 	TABLET_MAX_SCALE,
 	TABLET_MIN_SHORT_SIDE,
 } from '@/utils/DementionUtils';
+import { LONG_OPTION_LENGTH, pickOptionColumns } from '@/const/common/ListGrid';
 
 const PHONES: Array<[string, number, number]> = [
 	['iPhone SE', 375, 667],
@@ -183,5 +184,22 @@ describe('네이티브 기기 설정', () => {
 		expect(manifest).toMatch(/android:screenOrientation="portrait"/);
 		// targetSdk 36 부터는 sw600dp 이상에서 screenOrientation 이 무시된다 → 이 속성으로 유지한다.
 		expect(manifest).toMatch(/PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY/);
+	});
+});
+
+describe('퀴즈 보기 열 수', () => {
+	const short = ['가는 말이 고와야 오는 말이 곱다', '낮말은 새가 듣고 밤말은 쥐가 듣는다', '소 잃고 외양간 고친다', '티끌 모아 태산'];
+	const long = '가'.repeat(LONG_OPTION_LENGTH + 1);
+
+	test('폰은 보기가 짧아도 한 열이다', () => {
+		expect(pickOptionColumns(short, 1)).toBe(1);
+	});
+
+	test('태블릿에서 보기가 모두 짧으면 2×2 다', () => {
+		expect(pickOptionColumns(short, 2)).toBe(2);
+	});
+
+	test('긴 보기가 하나라도 섞이면 태블릿도 한 열이다', () => {
+		expect(pickOptionColumns([...short.slice(0, 3), long], 2)).toBe(1);
 	});
 });

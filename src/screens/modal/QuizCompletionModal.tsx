@@ -129,6 +129,8 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                         <View style={styles.bgCircle1} />
                         <View style={styles.bgCircle2} />
 
+                        {/* 연습 모드와 같이 본문만 스크롤 — 작은 폰·큰 글자에서 카드가 maxHeight 에 걸려도 버튼은 보인다 */}
+                        <ScrollView style={styles.bodyScroll} contentContainerStyle={styles.bodyScrollContent} showsVerticalScrollIndicator={false} bounces={false}>
                         <View style={styles.completionHeader}>
                             <Animated.View
                                 style={{
@@ -156,6 +158,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                                 <Text style={styles.celebrateEmoji}>🎊</Text>
                             </View>
                         </View>
+                        </ScrollView>
 
                         {wrong > 0 && onReviewWrong && (
                             <TouchableOpacity

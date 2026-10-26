@@ -264,8 +264,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	petEarnedCheck: {
 		position: 'absolute',
-		top: -SPACING_H.xs / 2,
-		right: -SPACING_W.xs / 2,
+		top: -SPACING_H.xxs,
+		right: -SPACING_W.xxs,
 		width: scaleWidth(16),
 		height: scaleWidth(16),
 		borderRadius: scaleWidth(16) / 2,
@@ -289,7 +289,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.secondaryFill,
 		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.sm,
-		paddingVertical: SPACING_H.xs / 2,
+		paddingVertical: SPACING_H.xxs,
 	},
 	petCurrentBadgeText: {
 		fontSize: FONT_SIZES.xxs,
@@ -324,7 +324,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	petStageText: {
 		fontSize: FONT_SIZES.xxs,
 		color: COLORS.textSecondary,
-		marginTop: SPACING_H.xs / 2,
+		marginTop: SPACING_H.xxs,
 		textAlign: 'center',
 	},
 	arrowIcon: {

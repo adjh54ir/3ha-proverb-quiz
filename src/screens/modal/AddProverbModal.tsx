@@ -12,7 +12,7 @@ import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
 import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
 import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor, getFieldIcon, getFieldIconName } from '../common/CommonProverbModule';
@@ -329,7 +329,7 @@ const AddProverbModal = ({ visible, book, onClose, onAdd }: Props) => {
 					</TouchableWithoutFeedback>
 
 					<View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, SPACING_H.lg) }]}>
-						<TouchableOpacity style={[styles.confirmBtn, selectedIds.length === 0 && styles.confirmBtnDisabled]} disabled={selectedIds.length === 0} onPress={handleConfirm} activeOpacity={0.85}>
+						<TouchableOpacity style={[styles.confirmBtn, SOLO_BUTTON, selectedIds.length === 0 && styles.confirmBtnDisabled]} disabled={selectedIds.length === 0} onPress={handleConfirm} activeOpacity={0.85}>
 							<IconComponent type="materialIcons" name="add" size={scaledSize(16)} color={COLORS.textWhite} />
 							<Text style={styles.confirmBtnText}>{selectedIds.length > 0 ? `${selectedIds.length}개 추가하기` : '속담을 선택해주세요'}</Text>
 						</TouchableOpacity>

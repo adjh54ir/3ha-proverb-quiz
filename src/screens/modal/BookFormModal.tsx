@@ -211,7 +211,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	inputWrap: { flexDirection: 'row', alignItems: 'center', minHeight: scaleHeight(48), borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, marginTop: SPACING_H.xs, marginBottom: SPACING_H.md, backgroundColor: COLORS.surface },
 	inputWrapFocused: { borderColor: COLORS.primary },
 	input: { flex: 1, paddingVertical: 0, fontSize: FONT_SIZES.md, color: COLORS.text },
-	submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', minHeight: scaleHeight(48), marginTop: SPACING_H.lg, borderRadius: RADIUS.md, gap: SPACING_W.sm, backgroundColor: COLORS.primaryFill },
+	submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', minHeight: scaleHeight(48), marginTop: SPACING_H.sm /* + 색 행 sm + scrollArea xs = 20 */, borderRadius: RADIUS.md, gap: SPACING_W.sm, backgroundColor: COLORS.primaryFill },
 	submitBtnDisabled: { backgroundColor: COLORS.borderDark },
 	submitBtnText: { color: COLORS.textWhite, fontWeight: '700', fontSize: FONT_SIZES.lg },
 	fieldLabel: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, marginTop: SPACING_H.xs },

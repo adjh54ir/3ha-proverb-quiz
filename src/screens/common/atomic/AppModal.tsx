@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Dimensions, Modal, ModalProps, NativeSyntheticEvent, View } from 'react-native';
+import { useHardwareKeys } from '@/utils/HardwareKeys';
 
 /**
  * 앱 공용 모달
@@ -25,6 +26,9 @@ import { Dimensions, Modal, ModalProps, NativeSyntheticEvent, View } from 'react
  *  3. translucent 두 속성은 `{...props}` **뒤에** 둔다 — 호출부가 실수로 꺼도 딤이 잘리지 않게.
  */
 const AppModal = ({ children, onShow, ...props }: ModalProps) => {
+	// 열려 있는 동안 뒤 화면이 외장 키보드 단축키를 받지 못하게 막는다
+	useHardwareKeys(null, props.visible ?? true); // RN Modal 은 visible 을 빼면 열린 상태다
+
 	// 회전·폴더블 접기처럼 화면 크기가 바뀌면 따라가야 한다(고정값이면 딤이 다시 잘린다).
 	const [screen, setScreen] = useState(() => Dimensions.get('screen'));
 	useEffect(() => {

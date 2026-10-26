@@ -258,7 +258,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	rarityRibbon: {
 		position: 'absolute',
-		top: scaleHeight(-12),
+		top: -SPACING_H.md,
 		alignSelf: 'center',
 		flexDirection: 'row',
 		alignItems: 'center',

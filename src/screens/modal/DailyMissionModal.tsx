@@ -296,7 +296,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	rewardWrap: {
 		paddingHorizontal: SPACING_W.lg,
-		marginTop: SPACING_H.xs,
+		marginTop: SPACING_H.sm, // + 마지막 미션 행 mb md = 20
 		marginBottom: SPACING_H.sm,
 	},
 	rewardHint: {

@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IconComponent from './common/atomic/IconComponent';
 import { CONTENT_MAX_WIDTH, isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { useAppNavigation } from '@/navigation/conf/Types';
@@ -251,7 +251,6 @@ const TowerChallengeScreen = () => {
 						)}
 					</View>
 					{/* 도전 버튼 */}
-					{/* 도전 버튼 */}
 					<TouchableOpacity
 						onPress={() => handleStartChallenge(tower.level)}
 						disabled={isLocked}
@@ -261,6 +260,7 @@ const TowerChallengeScreen = () => {
 							isLocked && styles.challengeButtonLocked,
 							!isCompleted && !isLocked && progress.attempts > 0 && { backgroundColor: tower.color },
 							!isCompleted && !isLocked && progress.attempts <= 0 && styles.challengeButtonAd,
+							SOLO_BUTTON,
 						]}
 						activeOpacity={0.8}>
 						<View style={styles.buttonContent}>

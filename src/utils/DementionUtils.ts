@@ -63,6 +63,9 @@ export const isTabletSize = (width: number, height: number) => Math.min(width, h
 /** 지금 기기가 태블릿인지 (창이 아니라 기기 화면 기준) */
 export const isTablet = isTabletSize(deviceWidth, deviceHeight);
 
+/** 13인치급 큰 태블릿인지 — 속담 카드 목록 3열 판정에 쓴다 */
+export const isLargeTablet = Math.min(deviceWidth, deviceHeight) >= LARGE_TABLET_MIN_SHORT_SIDE;
+
 /** 폰에서 쓰는 본문 기둥 폭 — 폰 화면이 이보다 좁아 실제로는 걸리지 않는다 */
 const PHONE_CONTENT_MAX_WIDTH = 600;
 

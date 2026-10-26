@@ -190,7 +190,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	content: {
 		rowGap: SPACING_H.xl,
-		paddingBottom: SPACING_H.xs,
 	},
 	section: {
 		rowGap: SPACING_H.sm,

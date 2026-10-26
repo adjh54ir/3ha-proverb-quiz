@@ -443,7 +443,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.primaryFill,
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginTop: SPACING_H.xs,
+		marginTop: SPACING_H.sm, // + body rowGap md = 20 (다른 대화상자의 내용 → 버튼 간격)
 	},
 	closeBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '700' },
 }));

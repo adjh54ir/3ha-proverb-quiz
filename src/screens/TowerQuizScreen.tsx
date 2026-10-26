@@ -6,12 +6,14 @@ import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import AppAlert from '@/screens/common/modal/AppAlert';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {useRoute, RouteProp} from '@react-navigation/native';
+import {useRoute, RouteProp, useIsFocused} from '@react-navigation/native';
+import { optionIndexOf, useHardwareKeys } from '@/utils/HardwareKeys';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles } from '@/const/common/Theme';
+import { optionGrid } from '@/const/common/ListGrid';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import { Paths } from '@/navigation/conf/Paths';
 import { generateTowerQuiz, TowerQuizQuestion } from '@/const/ConstTowerQuizData';
@@ -44,6 +46,7 @@ type RouteParams = {
 const TowerQuizScreen = () => {
 	const navigation = useAppNavigation();
 	const route = useRoute<RouteProp<RouteParams, 'TowerQuiz'>>();
+	const isFocused = useIsFocused();
 	const level = route.params?.level || 1; // number (TOWER_LEVELS 기준)
 	const proverbLevel = TOWER_LEVEL_MAP[level] ?? 1; // generateTowerQuiz용 난이도(number)
 
@@ -73,6 +76,7 @@ const TowerQuizScreen = () => {
 
 	const towerLevel = TOWER_LEVELS.find((t) => t.level === level);
 	const currentQuestion = quizData[currentQuestionIndex];
+	const answerGrid = optionGrid(currentQuestion?.options ?? []); // 긴 보기가 섞이면 태블릿도 한 열
 	const totalQuestions = quizData.length;
 
 	// 다음 레벨 계산 (number 기반)
@@ -271,9 +275,14 @@ const TowerQuizScreen = () => {
 			setSelectedAnswer(null);
 			setIsAnswered(false);
 		} else {
+			// 연타·Enter 반복으로 결과 처리가 두 번 돌지 않게
+			if (completeTimerRef.current) {
+				return;
+			}
 			setIsAnswered(true);
 			requestAnimationFrame(() => {
 				completeTimerRef.current = setTimeout(() => {
+					completeTimerRef.current = null;
 					handleQuizComplete();
 				}, 300);
 			});
@@ -359,6 +368,21 @@ const TowerQuizScreen = () => {
 	// 뒤로가기로 그냥 나가면 도전 횟수 차감 안내 없이 시도가 사라진다 — 종료 버튼과 같은 확인을 거친다.
 	useBlockBackHandler(true, handleExit);
 
+	// 외장 키보드: 1~4 로 보기 고르기, 답한 뒤 Enter 로 다음 문제·결과 확인 (결과 팝업이 뜨면 모달이 막는다)
+	useHardwareKeys((key) => {
+		if (!currentQuestion) {
+			return;
+		}
+		const index = optionIndexOf(key);
+		if (index === null) {
+			if (isAnswered && !showResultModal) {
+				handleNext();
+			}
+		} else if (!isAnswered && index < currentQuestion.options.length) {
+			handleAnswerSelect(index);
+		}
+	}, isFocused);
+
 	if (isLoading) {
 		return (
 			<View style={styles.container}>
@@ -378,7 +402,7 @@ const TowerQuizScreen = () => {
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
 					<FastImage source={require('@/assets/images/screen-heroes/data-retry.png')} style={styles.errorStateImage} resizeMode="contain" />
 					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>타워 정보를 찾을 수 없습니다.</Text>
-					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: SPACING_H.xl }}>
+					<TouchableOpacity onPress={() => navigation.goBack()} hitSlop={HIT_SLOP} style={{ marginTop: SPACING_H.xl, padding: SPACING_W.sm }}>
 						<Text style={{ color: COLORS.darkAccent, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
 					</TouchableOpacity>
 				</SafeAreaView>
@@ -393,7 +417,7 @@ const TowerQuizScreen = () => {
 				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
 					<FastImage source={require('@/assets/images/screen-heroes/data-retry.png')} style={styles.errorStateImage} resizeMode="contain" />
 					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>레벨 {level}에 해당하는 단어가 없습니다.</Text>
-					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: SPACING_H.xl }}>
+					<TouchableOpacity onPress={() => navigation.goBack()} hitSlop={HIT_SLOP} style={{ marginTop: SPACING_H.xl, padding: SPACING_W.sm }}>
 						<Text style={{ color: COLORS.darkAccent, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
 					</TouchableOpacity>
 				</SafeAreaView>
@@ -505,7 +529,8 @@ const TowerQuizScreen = () => {
 						</View>
 						</View>
 
-						<View style={styles.answersContainer}>
+						{/* 태블릿은 넓은 폭을 2×2 보기 그리드로 쓴다 (폰·긴 보기는 그리드가 null 이라 한 줄씩) */}
+						<View style={[styles.answersContainer, answerGrid?.wrap]}>
 						{currentQuestion.options.map((option, index) => {
 							const isSelected = selectedAnswer === index;
 							const isCorrect = index === currentQuestion.correctAnswer;
@@ -526,12 +551,12 @@ const TowerQuizScreen = () => {
 							}
 
 							return (
+								<View key={index} style={answerGrid?.cell}>
 								<TouchableOpacity
-									key={index}
 									onPress={() => handleAnswerSelect(index)}
 									disabled={isAnswered}
-									style={styles.answerButton}>
-									<View style={[styles.answerGradient, { backgroundColor }]}>
+									style={[styles.answerButton, answerGrid?.fill]}>
+									<View style={[styles.answerGradient, answerGrid?.fill, { backgroundColor }]}>
 										<View style={styles.answerContent}>
 											<View style={styles.answerNumber}>
 												<Text style={[styles.answerNumberText, { color: ink }]}>{index + 1}</Text>
@@ -542,6 +567,7 @@ const TowerQuizScreen = () => {
 										</View>
 									</View>
 								</TouchableOpacity>
+								</View>
 							);
 						})}
 						</View>
@@ -573,7 +599,7 @@ const TowerQuizScreen = () => {
 
 				{isAnswered && (
 					<View style={styles.nextButtonContainer}>
-						<TouchableOpacity onPress={handleNext} style={styles.nextButton}>
+						<TouchableOpacity onPress={handleNext} style={[styles.nextButton, SOLO_BUTTON]}>
 							<View style={[styles.nextButtonGradient, { backgroundColor: towerLevel.color }]}>
 								<Text style={[styles.nextButtonText, { color: readableTextOn(towerLevel.color) }]}>
 									{currentQuestionIndex < totalQuestions - 1 ? '다음 문제' : '결과 확인'}
@@ -675,9 +701,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textWhite, // 질문 문구는 흰색
 		fontWeight: '600',
 	},
-	answersContainer: { gap: SPACING_H.md },
+	// 2열(태블릿)에서 gap 은 열 사이에도 붙어 50% 셀이 넘친다 — 행 간격만 둔다
+	answersContainer: { rowGap: SPACING_H.md },
 	answerButton: { borderRadius: RADIUS.md, overflow: 'hidden' },
-	answerGradient: { paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg },
+	answerGradient: { justifyContent: 'center', paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg },
 	answerContent: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.md },
 	answerNumber: {
 		width: scaleWidth(32),

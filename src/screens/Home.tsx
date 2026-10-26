@@ -1015,7 +1015,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	progressBarBackground: {
 		width: '85%',
-		height: scaleHeight(20),
+		// 고정 height 면 큰 태블릿 + '글자 크게'에서 가운데 숫자가 바 높이를 넘어 아래가 잘린다.
+		// 숫자를 흐름 안에 두고 바가 글자 높이를 따라 늘어나게 한다.
+		minHeight: scaleHeight(20),
+		justifyContent: 'center',
 		borderRadius: RADIUS.round,
 		borderWidth: 1.5,
 		borderColor: COLORS.primaryDark,
@@ -1024,17 +1027,14 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignSelf: 'center',
 	},
 	progressBarFill: {
-		height: '100%',
 		backgroundColor: COLORS.primary,
 		borderRadius: RADIUS.round,
 		position: 'absolute', // ✅ 항상 왼쪽에서부터 차도록
+		top: 0,
+		bottom: 0,
 		left: 0, // ✅ 시작 위치 고정
 	},
 	progressBarTextInside: {
-		position: 'absolute',
-		top: SPACING_H.xs / 2,
-		left: 0,
-		right: 0,
 		textAlign: 'center',
 		textAlignVertical: 'center', // Android 전용
 		fontSize: FONT_SIZES.xs,

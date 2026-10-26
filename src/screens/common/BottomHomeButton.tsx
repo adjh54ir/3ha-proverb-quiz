@@ -130,8 +130,9 @@ const modalStyles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
+		maxHeight: '100%',
 		paddingVertical: SPACING_H.xl,
-		paddingHorizontal: SPACING_W.xl,
+		paddingHorizontal: SPACING_W.lg,
 		alignItems: 'center',
 	},
 	iconCircle: {

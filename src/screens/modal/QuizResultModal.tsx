@@ -10,6 +10,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 import { useToast } from '@/hooks/useToast';
+import { useHardwareKeys } from '@/utils/HardwareKeys';
 
 type ResultType = 'correct' | 'wrong' | 'timeout' | 'done' | '';
 
@@ -45,6 +46,12 @@ const QuizResultModal = ({
 
 	// 모달 공통 진입 애니메이션 (fade + scale)
 	const enterStyle = useModalEnter(visible);
+	// 외장 키보드 Enter → 다음 문제 (모달이 키를 막고 있어 여기서 직접 받는다)
+	useHardwareKeys((key) => {
+		if (key === 'enter') {
+			onNext();
+		}
+	}, visible);
 
 	// ✅ 정답 카드 / 해설 카드 등장 애니메이션
 	const answerAnim = useRef(new Animated.Value(0)).current;
@@ -151,7 +158,6 @@ const QuizResultModal = ({
 
 					<ScrollView
 						style={styles.scroll}
-						contentContainerStyle={styles.scrollContent}
 						showsVerticalScrollIndicator={false}>
 						{/* ✅ 정답 카드: 해설 위에 정답이 깔끔하게 표시 */}
 						<Animated.View
@@ -319,9 +325,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	scroll: {
 		width: '100%',
 		flexShrink: 1,
-	},
-	scrollContent: {
-		paddingBottom: SPACING_H.xs,
 	},
 	// ✅ 정답 카드
 	answerCard: {

@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
-import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
+import { CARD_LIST_COLUMNS, cardListGrid } from '@/const/common/ListGrid';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
@@ -440,8 +440,8 @@ const ProverbListScreen = () => {
 							<FlatList
 								ref={scrollRef}
 								data={visibleList}
-								numColumns={LIST_COLUMNS}
-								columnWrapperStyle={listGrid?.row}
+								numColumns={CARD_LIST_COLUMNS}
+								columnWrapperStyle={cardListGrid?.row}
 								scrollEnabled={!fieldOpen && !levelOpen} // ⛔ 드롭다운 열려 있으면 스크롤 막기
 								keyExtractor={(item) => item.id.toString()}
 								refreshControl={<RefreshControl
@@ -466,9 +466,9 @@ const ProverbListScreen = () => {
 								contentContainerStyle={[styles.flatListCotent, visibleList.length === 0 && styles.flatListContentEmpty]}
 								renderItem={({ item, index }) => {
 									return (
-										<AnimatedListItem index={index} offsetY={16} style={listGrid?.cell}>
+										<AnimatedListItem index={index} offsetY={16} style={cardListGrid?.cell}>
 										<TouchableOpacity
-											style={[styles.itemBox, listGrid?.fill]}
+											style={[styles.itemBox, cardListGrid?.fill]}
 											activeOpacity={0.8}
 											onPress={() => {
 												setSelectedProverb(item);

@@ -6,8 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
-import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles } from '@/const/common/Theme';
+import { CARD_LIST_COLUMNS, cardListGrid } from '@/const/common/ListGrid';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import AddProverbModal from './modal/AddProverbModal';
@@ -137,9 +137,9 @@ const MyProverbBookDetail = () => {
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
 		const isSelected = selectedForRemove.has(item.id);
 		return (
-			<AnimatedListItem index={index} style={listGrid?.cell}>
+			<AnimatedListItem index={index} style={cardListGrid?.cell}>
 				<TouchableOpacity
-					style={[styles.itemCard, listGrid?.fill, removeMode && isSelected && styles.itemCardSelected]}
+					style={[styles.itemCard, cardListGrid?.fill, removeMode && isSelected && styles.itemCardSelected]}
 					activeOpacity={0.8}
 					onPress={() => {
 						if (removeMode) {
@@ -231,8 +231,8 @@ const MyProverbBookDetail = () => {
 				<FlatList
 					ref={listRef}
 					data={proverbs}
-					numColumns={LIST_COLUMNS}
-					columnWrapperStyle={listGrid?.row}
+					numColumns={CARD_LIST_COLUMNS}
+					columnWrapperStyle={cardListGrid?.row}
 					onScroll={onListScroll}
 					scrollEventThrottle={16}
 					keyExtractor={(item) => item.id.toString()}
@@ -257,7 +257,7 @@ const MyProverbBookDetail = () => {
 				{removeMode && (
 					<View style={styles.removeBar}>
 						<TouchableOpacity
-							style={[styles.removeBtn, selectedForRemove.size === 0 && styles.removeBtnDisabled]}
+							style={[styles.removeBtn, SOLO_BUTTON, selectedForRemove.size === 0 && styles.removeBtnDisabled]}
 							disabled={selectedForRemove.size === 0}
 							onPress={() => setRemoveConfirmVisible(true)}>
 							<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(16)} color={COLORS.textWhite} />

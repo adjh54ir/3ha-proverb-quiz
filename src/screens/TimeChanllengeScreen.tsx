@@ -10,7 +10,8 @@ import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { isTablet, moderateScale, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { listGrid } from '@/const/common/ListGrid';
+import { listGrid, optionGrid } from '@/const/common/ListGrid';
+import { optionIndexOf, useHardwareKeys } from '@/utils/HardwareKeys';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize, getThemeMode } from '@/const/common/Theme';
 import {useIsFocused} from '@react-navigation/native';
@@ -104,6 +105,7 @@ const InfinityQuizScreen = () => {
 	const [questionList, setQuestionList] = useState<MainDataType.Proverb[]>([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [choices, setChoices] = useState<string[]>([]);
+	const choiceGrid = optionGrid(choices); // 긴 뜻 보기가 섞이면 태블릿도 한 열
 	const [isGameOver, setIsGameOver] = useState(false);
 	const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
 	const [selectedChoice, setSelectedChoice] = useState<string | null>(null); // 사용자가 고른 보기
@@ -526,6 +528,15 @@ const InfinityQuizScreen = () => {
 		},
 		[questionList, currentIndex, lives],
 	);
+
+	// 외장 키보드: 1~4 로 보기 고르기 (채점 뒤엔 자동으로 다음 문제라 Enter 는 쓰지 않는다)
+	useHardwareKeys((key) => {
+		const index = optionIndexOf(key);
+		const choice = index === null ? undefined : choices[index];
+		if (choice && feedback === null && !isGameOver && !isPaused && !isCountingDown) {
+			handleAnswer(choice);
+		}
+	}, isFocused);
 
 	const triggerScoreAnim = () => {
 		scoreAnim.setValue(1.4);
@@ -1018,6 +1029,8 @@ const InfinityQuizScreen = () => {
 							)}
 						</View>
 
+						{/* 태블릿은 넓은 폭을 2×2 보기 그리드로 쓴다 (폰·긴 보기는 그리드가 null 이라 한 줄씩) */}
+						<View style={choiceGrid?.wrap}>
 						{choices.map((choice, index) => {
 							const isCorrectAnswer = choice === (current.longMeaning || current.meaning);
 							const isUserSelected = selectedChoice === choice;
@@ -1028,10 +1041,11 @@ const InfinityQuizScreen = () => {
 							const isDimmed = feedback !== null && !showCorrect && !showWrong;
 
 							return (
+								<View key={choice} style={choiceGrid?.cell}>
 								<TouchableOpacity
-									key={choice}
 									style={[
 										styles.choiceBtn,
+										choiceGrid?.fill,
 										showCorrect && styles.choiceBtnCorrect,
 										showWrong && styles.choiceBtnWrong,
 										isDimmed && styles.choiceBtnDimmed,
@@ -1055,8 +1069,10 @@ const InfinityQuizScreen = () => {
 									)}
 									{showWrong && <IconComponent name="cancel" type="materialIcons" size={scaledSize(20)} color={COLORS.dangerDark} />}
 								</TouchableOpacity>
+								</View>
 							);
 						})}
+						</View>
 					</Animated.View>
 				)}
 			</ScrollView>
@@ -1277,7 +1293,7 @@ const InfinityQuizScreen = () => {
 							borderRadius: RADIUS.xl,
 							minHeight: isToastClosable ? scaleHeight(100) : undefined,
 							minWidth: isToastClosable ? scaleWidth(200) : undefined,
-							maxWidth: '88%',
+							maxWidth: isTablet ? MODAL_MAX_WIDTH : '88%', // 태블릿에서 긴 토스트가 화면 폭만큼 늘어나지 않게
 							justifyContent: 'center',
 							alignItems: 'center',
 							flexDirection: isToastClosable ? 'column' : 'row',
@@ -1299,6 +1315,7 @@ const InfinityQuizScreen = () => {
 						{/* ✅ 하단 닫기 버튼: long toast에만 표시 */}
 						{isToastClosable && (
 							<TouchableOpacity
+								hitSlop={HIT_SLOP}
 								onPress={() => {
 									setToastMessage('');
 									toastOpacity.setValue(0);
@@ -1886,7 +1903,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	lifeBarWrapper: {
 		position: 'relative',
-		height: scaleHeight(32),
+		minHeight: scaleHeight(32), // 큰 태블릿에서 찬스/스킵 칩이 높이를 꽉 채워 여유가 없다 — 칩 따라 늘어나게
 		justifyContent: 'center',
 		marginBottom: SPACING_H.xsPlus,
 		paddingVertical: SPACING_H.xs,

@@ -1,5 +1,5 @@
-import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
-import { setThemeMode } from '@/const/common/Theme';
+import { withAlpha, ALPHA, inkOnFill, readableTextOn } from '@/utils/ColorAlphaUtils';
+import { COLORS, PALETTES, setThemeMode } from '@/const/common/Theme';
 
 describe('withAlpha', () => {
 	afterEach(() => setThemeMode('light'));
@@ -51,5 +51,26 @@ describe('readableTextOn', () => {
 	it('hex 가 아니면 기존 동작대로 흰 글자', () => {
 		expect(readableTextOn('rgba(0,0,0,1)')).toBe('#FFFFFF');
 		expect(readableTextOn('')).toBe('#FFFFFF');
+	});
+});
+
+describe('inkOnFill', () => {
+	afterEach(() => setThemeMode('light'));
+
+	it('라이트의 쪽빛·물빛 채움은 흰 글자를 유지한다 (브랜드 버튼 톤 불변)', () => {
+		setThemeMode('light');
+		expect(inkOnFill(COLORS.primary)).toBe('#FFFFFF');
+		expect(inkOnFill(COLORS.secondary)).toBe('#FFFFFF');
+	});
+
+	it('다크의 쪽빛·물빛 채움은 진한 글자로 뒤집는다', () => {
+		setThemeMode('dark');
+		expect(inkOnFill(COLORS.primary)).toBe(PALETTES.dark.textOnVivid);
+		expect(inkOnFill(COLORS.secondary)).toBe(PALETTES.dark.textOnVivid);
+	});
+
+	it('밝은 데이터 색(초급 #34D399)은 모드와 무관하게 밝기로 고른다', () => {
+		expect(inkOnFill('#34D399')).toBe(readableTextOn('#34D399'));
+		expect(inkOnFill('#B91C1C')).toBe('#FFFFFF');
 	});
 });

@@ -9,7 +9,8 @@ import IconComponent from './common/atomic/IconComponent';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { listGrid } from '@/const/common/ListGrid';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,6 +21,9 @@ import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import { LEVEL_NAME_BY_NUMBER, getLevelColorByNumber, getCategoryColor, getLevelInkColor } from '@/screens/common/CommonProverbModule';
 import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
+
+/** 필터 칩 세로 터치 확장 — 칩 행 사이 간격 안에서만 */
+const CHIP_HIT_SLOP = { top: 8, bottom: 8 };
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
@@ -57,6 +61,8 @@ const FilterChipRow = <T extends number | string>({
 						key={String(chip.value)}
 						style={[styles.chip, active && { backgroundColor: withAlpha(chip.color, ALPHA.faint), borderColor: withAlpha(chip.color, ALPHA.border) }]}
 						onPress={() => onSelect(chip.value)}
+						// 칩 높이가 25pt 남짓이라 세로로만 넓힌다 (가로는 이웃 칩과 겹친다)
+						hitSlop={CHIP_HIT_SLOP}
 						activeOpacity={0.8}
 						accessibilityRole="button"
 						accessibilityState={{ selected: active }}
@@ -336,7 +342,7 @@ const WrongReviewScreen = () => {
 					)}
 
 					<TouchableOpacity
-						style={[styles.startButton, filteredWrong.length === 0 && styles.startButtonDisabled]}
+						style={[styles.startButton, SOLO_BUTTON, filteredWrong.length === 0 && styles.startButtonDisabled]}
 						onPress={startWrongReview}
 						disabled={filteredWrong.length === 0}
 						activeOpacity={0.8}>
@@ -366,10 +372,12 @@ const WrongReviewScreen = () => {
 
 				{showWrongList && (
 					<Animated.View style={[styles.reviewCardList, { opacity: listFade }]}>
+						{/* 태블릿은 두 장씩 한 행 — 폰은 listGrid 가 null 이라 한 열 그대로다 */}
+						<View style={listGrid?.wrap}>
 						{filteredWrong.map((proverb, idx) => (
+							<View key={proverb.id} style={listGrid?.cell}>
 							<TouchableOpacity
-								key={proverb.id}
-								style={styles.reviewCard}
+								style={[styles.reviewCard, listGrid?.fill]}
 								activeOpacity={0.8}
 								onPress={() => {
 									setDetailProverb(proverb);
@@ -386,7 +394,9 @@ const WrongReviewScreen = () => {
 								</View>
 								<IconComponent type="MaterialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.borderDark} />
 							</TouchableOpacity>
+							</View>
 						))}
+						</View>
 					</Animated.View>
 				)}
 			</ScrollView>
@@ -538,7 +548,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		columnGap: SPACING_W.sm,
 	},
 	chipRowLabel: {
-		width: scaleWidth(38),
+		// 고정 폭이면 큰 글자 모드에서 '난이도' 가 두 줄로 접힌다 — 최소 폭만 맞춘다
+		minWidth: scaleWidth(38),
 		fontSize: FONT_SIZES.xs,
 		fontWeight: '600',
 		color: COLORS.textLight,
@@ -665,6 +676,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textSecondary,
 	},
 	reviewProverbText: {
+		fontFamily: FONTS.display,
 		flex: 1,
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',

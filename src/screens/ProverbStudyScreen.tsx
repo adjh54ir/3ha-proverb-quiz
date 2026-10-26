@@ -19,8 +19,9 @@ import { MainDataType } from '@/types/MainDataType';
 import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { CONTENT_MAX_WIDTH, isTablet, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme, getThemeMode } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme, getThemeMode } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber, LEVEL_NAME_BY_NUMBER } from '@/screens/common/CommonProverbModule';
+import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { LEVEL_DROPDOWN_ITEMS, FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -88,7 +89,7 @@ const isAndroid = Platform.OS === 'android';
  * 학습 카드 크기.
  *
  * 태블릿은 `scaleHeight(고정값)` 을 쓰지 않는다 — 배율 상한(1.35)에 걸려 어떤 기기든 756pt 로
- * 굳어 버려서, 13인치에서는 카드 아래로 화면 높이의 4분의 1이 비고 폭도 기둥(700) 안에서
+ * 굳어 버려서, 13인치에서는 카드 아래로 화면 높이의 4분의 1이 비고 폭도 본문 기둥 안에서
  * 500 밖에 안 써 좌우가 휑했다. 기기 크기에 비례시켜 기둥과 화면을 채운다.
  * 폰은 두 값 모두 기존 그대로다.
  */
@@ -97,7 +98,9 @@ const CARD_HEIGHT = isTablet
 	: isAndroid
 		? scaleHeight(550) // 📌 iOS 대비 20 높게
 		: scaleHeight(540);
-const CARD_WIDTH = isTablet ? Math.round(CONTENT_MAX_WIDTH * 0.88) : scaleWidth(370);
+// 태블릿은 앞·뒷면을 한 카드에 나란히 놓으므로(splitCard) 화면 폭을 가득 쓴다 —
+// 위 학습 현황 카드와 같은 좌우 여백(lg)만 남긴다.
+const CARD_WIDTH = isTablet ? Math.round(CONTENT_MAX_WIDTH - SPACING_W.lg * 2) : scaleWidth(370);
 
 const praiseMessages = [
 	'속담 하나를 더 마스터했습니다! 🎉',
@@ -263,13 +266,13 @@ const QuizStudyScreen = () => {
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 2:
-				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 3:
-				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 4:
-				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			default:
 				return null;
 		}
@@ -281,7 +284,7 @@ const QuizStudyScreen = () => {
 			return null;
 		}
 		const matched = FIELD_DROPDOWN_ITEMS.find((i) => i.value === category) as { iconType: string; iconName: string } | undefined;
-		return matched ? <IconComponent type={matched.iconType} name={matched.iconName} size={scaledSize(14)} color={COLORS.textWhite} /> : null;
+		return matched ? <IconComponent type={matched.iconType} name={matched.iconName} size={scaledSize(14)} color={readableTextOn(getCategoryColor(category ?? ''))} /> : null;
 	};
 
 	/** 뒷면은 다시 열릴 때 항상 맨 위부터 보이게 한다 */
@@ -687,6 +690,189 @@ const QuizStudyScreen = () => {
 		const frontOpacity = flipAnim.interpolate({ inputRange: [0, 80, 90, 180], outputRange: [1, 1, 0, 0] });
 		const backOpacity = flipAnim.interpolate({ inputRange: [0, 90, 100, 180], outputRange: [0, 0, 1, 1] });
 
+		// 앞·뒷면 조각 — 폰은 뒤집기 카드, 태블릿은 두 면을 나란히 놓는 같은 조각을 쓴다
+		const frontImage = (
+			<View style={styles.flagSection}>
+				<View style={styles.flagContainer}>
+					<FastImage source={proverbScene} style={styles.flagImageSquare} resizeMode="cover" />
+				</View>
+			</View>
+		);
+		const frontMiddle = (
+			// 태블릿 앞면은 그림·속담을 한 덩어리로 가운데 모은다 (flex 1 이면 둘 사이가 크게 벌어진다)
+			<View style={[styles.cardMiddle, isTablet && styles.splitFrontMiddle]}>
+				{/* 대표 속담: 가독성이 핵심이라 축소 하한(0.85)을 둬 안드로이드 과축소를 막는다 */}
+				<Text style={styles.hanjaText} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.85}>
+					{item.proverb}
+				</Text>
+
+				<View style={styles.badgeSection}>
+					{/* 배지 + 태그 한 줄 */}
+					<View style={styles.badgeInlineRow}>
+						{/* 레벨 뱃지 */}
+						<View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.level) }]}>
+							{getLevelIcon(item.level)}
+							<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs, color: readableTextOn(getLevelColor(item.level)) }]}>{LEVEL_NAME_BY_NUMBER[item.level] || '알 수 없음'}</Text>
+						</View>
+
+						{/* 카테고리 뱃지 */}
+						<View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(item.category) }]}>
+							{getCategoryIcon(item.category)}
+							<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs, color: readableTextOn(getCategoryColor(item.category)) }]}>{item.category || '미지정'}</Text>
+						</View>
+
+						{/* 태그 */}
+						{/* {Array.isArray(item.tags) && item.tags.length > 0 && (
+							<View style={styles.tagWrap}>
+								{item.tags.map((t, i) => (
+									<View key={i} style={styles.tagChip}>
+										<Text style={styles.tagText}>#{t}</Text>
+									</View>
+								))}
+							</View>
+						)} */}
+					</View>
+				</View>
+
+				{/* <Text style={styles.hangulText}>{item.hangul}</Text> */}
+				{/* 태블릿은 앞·뒷면을 나란히 보여 줘서 뒤집기 안내가 필요 없다 */}
+				{!isTablet && <Text style={styles.cardHint}>카드를 탭하면 속담 정보가 나옵니다 👆</Text>}
+			</View>
+		);
+		const learnButton = (
+			<TouchableOpacity
+				style={[
+					styles.button,
+					isLearned ? styles.learnedButton : styles.learningButton,
+					{ opacity: isButtonDisabled ? 0.6 : 1 },
+				]}
+				activeOpacity={0.8}
+				onPress={(e) => {
+					e.stopPropagation(); // ✅ 여기서 이벤트 버블링 차단
+					if (isButtonDisabled) {
+						return;
+					}
+					setIsButtonDisabled(true); // ✅ 중복 방지
+					handleAnimatedButtonPress(proverbId, () => {
+						completeStudy(proverbId);
+						runLater(() => setIsButtonDisabled(false), 1000); // 1초 후 재활성화
+					});
+				}}
+				disabled={isButtonDisabled}
+				hitSlop={HIT_SLOP} // 여유 클릭 범위
+			>
+				<Text style={[styles.buttonText, isLearned && styles.buttonTextOnAmber]}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
+			</TouchableOpacity>
+		);
+		const backContent = (
+			<View style={styles.cardBackSurface}>
+				<GHScrollView
+					ref={(sv) => {
+						backScrollRefs.current[proverbId] = sv;
+					}}
+					style={styles.cardBackScroll}
+					contentContainerStyle={styles.cardBackScrollContent}
+					scrollIndicatorInsets={{ right: scaleWidth(2) }}
+					// 검정 고정이면 다크 모드 카드 위에서 스크롤바가 보이지 않는다
+					indicatorStyle={getThemeMode() === 'dark' ? 'white' : 'black'}
+					persistentScrollbar
+					removeClippedSubviews={false}
+					nestedScrollEnabled
+					showsVerticalScrollIndicator>
+					{/* <View style={[styles.badge, { backgroundColor: getLevelColor(item.level) }]}>
+					<Text style={styles.badgeText}>{item.level}</Text>
+				</View> */}
+
+					<View style={styles.cardBackContainer}>
+						{/* 제목 */}
+						<Text style={styles.cardBackTitle}>{item.proverb}</Text>
+
+						{/* 뜻 풀이 강조 박스 */}
+						<View style={styles.meaningQuoteBox}>
+							<IconComponent
+								type="fontAwesome6"
+								name="quote-left"
+								size={scaledSize(24)}
+								color={COLORS.primary}
+								style={{ marginBottom: SPACING_H.sm }}
+							/>
+							<Text style={styles.meaningQuoteText}>{item.longMeaning}</Text>
+						</View>
+						{/* 예문 */}
+						{item.example && (
+							<View style={styles.exampleBox}>
+								<Text style={styles.sectionTitle}>✍️ 예문</Text>
+								{item.example.map((ex, idx) => (
+									<Text key={idx} style={styles.sectionText}>
+										• {ex.trim()}
+									</Text>
+								))}
+							</View>
+						)}
+						{/* 같은 속담 */}
+						{item.sameProverb && item.sameProverb.filter((sp) => sp.trim() !== '').length > 0 && (
+							<View style={styles.sectionBox}>
+								<Text style={styles.sectionTitle}>💬 동의 속담</Text>
+								{item.sameProverb
+									.filter((sp) => sp.trim() !== '')
+									.map((sp, idx) => (
+										<Text key={idx} style={[styles.sectionText, styles.sameProverbText]}>
+											- {sp}
+										</Text>
+									))}
+							</View>
+						)}
+					</View>
+
+					{/* 뜻 풀이 */}
+					{/* <View style={styles.meaningBox}>
+							<Text style={styles.sectionContent}>💡 {item.meaning}</Text>
+						</View> */}
+					{/* 구성 한자 */}
+					{/* <View style={styles.charList}>
+							{item.characters.map((char, i) => (
+								<View key={i} style={styles.charRow}>
+									<Text style={styles.charMain}>{char.char}</Text>
+									<Text style={styles.charMeaning}>{char.meaning}</Text>
+									<Text style={styles.charSub}>
+										({char.strokes}획, 부수: {char.radical})
+									</Text>
+								</View>
+							))}
+						</View> */}
+
+					{/* 예문 */}
+					{/* <View style={styles.exampleBox}>
+							<Text style={styles.sectionTitle}>📝 예문</Text>
+							<Text style={styles.sectionContent}>{item.example}</Text>
+						</View> */}
+				</GHScrollView>
+				{/* 아래에 내용이 더 있다는 신호. 내용이 짧으면 표면색끼리 겹쳐 보이지 않는다 */}
+				<LinearGradient colors={[`${COLORS.surface}00`, COLORS.surface]} style={styles.cardBackFade} pointerEvents="none" />
+			</View>
+		);
+
+		/**
+		 * 태블릿 — 앞면(그림·속담)과 뒷면(뜻·예문)을 한 카드에 나란히 둔다.
+		 * 넓은 화면에서 탭해서 뒤집는 동작 없이 바로 읽히게 하고, 학습 완료 버튼은 뜻 쪽 아래에 둔다.
+		 */
+		if (isTablet) {
+			return (
+				<View style={styles.cardWrapper}>
+					<View style={styles.splitCard}>
+						<View style={styles.splitFront}>
+							{frontImage}
+							{frontMiddle}
+						</View>
+						<View style={styles.splitBack}>
+							{backContent}
+							<View style={styles.fixedBottomButton}>{learnButton}</View>
+						</View>
+					</View>
+				</View>
+			);
+		}
+
 		return (
 			<View style={styles.cardWrapper}>
 				<Pressable onPress={handleCardPress} style={styles.cardFront}>
@@ -701,76 +887,10 @@ const QuizStudyScreen = () => {
 								position: 'absolute',
 							},
 						]}>
-						<View style={styles.flagSection}>
-							<View style={styles.flagContainer}>
-								<FastImage source={proverbScene} style={styles.flagImageSquare} resizeMode="cover" />
-							</View>
-						</View>
-						{flippedCard !== proverbId && (
-							// JSX 내부
-							<View style={styles.cardMiddle}>
-								{/* 대표 속담: 가독성이 핵심이라 축소 하한(0.85)을 둬 안드로이드 과축소를 막는다 */}
-								<Text style={styles.hanjaText} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.85}>
-									{item.proverb}
-								</Text>
+						{frontImage}
+						{flippedCard !== proverbId && frontMiddle}
 
-								<View style={styles.badgeSection}>
-									{/* 배지 + 태그 한 줄 */}
-									<View style={styles.badgeInlineRow}>
-										{/* 레벨 뱃지 */}
-										<View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.level) }]}>
-											{getLevelIcon(item.level)}
-											<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{LEVEL_NAME_BY_NUMBER[item.level] || '알 수 없음'}</Text>
-										</View>
-
-										{/* 카테고리 뱃지 */}
-										<View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(item.category) }]}>
-											{getCategoryIcon(item.category)}
-											<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs }]}>{item.category || '미지정'}</Text>
-										</View>
-
-										{/* 태그 */}
-										{/* {Array.isArray(item.tags) && item.tags.length > 0 && (
-											<View style={styles.tagWrap}>
-												{item.tags.map((t, i) => (
-													<View key={i} style={styles.tagChip}>
-														<Text style={styles.tagText}>#{t}</Text>
-													</View>
-												))}
-											</View>
-										)} */}
-									</View>
-								</View>
-
-								{/* <Text style={styles.hangulText}>{item.hangul}</Text> */}
-								<Text style={styles.cardHint}>카드를 탭하면 속담 정보가 나옵니다 👆</Text>
-							</View>
-						)}
-
-						<TouchableOpacity
-							style={[
-								styles.button,
-								{ width: '100%', alignSelf: 'center' }, // ✅ 수정된 부분
-								isLearned ? styles.learnedButton : styles.learningButton,
-								{ opacity: isButtonDisabled ? 0.6 : 1 },
-							]}
-							activeOpacity={0.8}
-							onPress={(e) => {
-								e.stopPropagation(); // ✅ 여기서 이벤트 버블링 차단
-								if (isButtonDisabled) {
-									return;
-								}
-								setIsButtonDisabled(true); // ✅ 중복 방지
-								handleAnimatedButtonPress(proverbId, () => {
-									completeStudy(proverbId);
-									runLater(() => setIsButtonDisabled(false), 1000); // 1초 후 재활성화
-								});
-							}}
-							disabled={isButtonDisabled}
-							hitSlop={HIT_SLOP} // 여유 클릭 범위
-						>
-							<Text style={[styles.buttonText, isLearned && styles.buttonTextOnAmber]}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
-						</TouchableOpacity>
+						{learnButton}
 					</Animated.View>
 
 					<Animated.View
@@ -786,114 +906,10 @@ const QuizStudyScreen = () => {
 								position: 'absolute',
 							},
 						]}>
-						<View style={styles.cardBackSurface}>
-							<GHScrollView
-								ref={(sv) => {
-									backScrollRefs.current[proverbId] = sv;
-								}}
-								style={styles.cardBackScroll}
-								contentContainerStyle={styles.cardBackScrollContent}
-								scrollIndicatorInsets={{ right: scaleWidth(2) }}
-								// 검정 고정이면 다크 모드 카드 위에서 스크롤바가 보이지 않는다
-								indicatorStyle={getThemeMode() === 'dark' ? 'white' : 'black'}
-								persistentScrollbar
-								removeClippedSubviews={false}
-								nestedScrollEnabled
-								showsVerticalScrollIndicator>
-								{/* <View style={[styles.badge, { backgroundColor: getLevelColor(item.level) }]}>
-								<Text style={styles.badgeText}>{item.level}</Text>
-							</View> */}
-
-								<View style={styles.cardBackContainer}>
-									{/* 제목 */}
-									<Text style={styles.cardBackTitle}>{item.proverb}</Text>
-
-									{/* 뜻 풀이 강조 박스 */}
-									<View style={styles.meaningQuoteBox}>
-										<IconComponent
-											type="fontAwesome6"
-											name="quote-left"
-											size={scaledSize(24)}
-											color={COLORS.primary}
-											style={{ marginBottom: SPACING_H.sm }}
-										/>
-										<Text style={styles.meaningQuoteText}>{item.longMeaning}</Text>
-									</View>
-									{/* 예문 */}
-									{item.example && (
-										<View style={styles.exampleBox}>
-											<Text style={styles.sectionTitle}>✍️ 예문</Text>
-											{item.example.map((ex, idx) => (
-												<Text key={idx} style={styles.sectionText}>
-													• {ex.trim()}
-												</Text>
-											))}
-										</View>
-									)}
-									{/* 같은 속담 */}
-									{item.sameProverb && item.sameProverb.filter((sp) => sp.trim() !== '').length > 0 && (
-										<View style={styles.sectionBox}>
-											<Text style={styles.sectionTitle}>💬 동의 속담</Text>
-											{item.sameProverb
-												.filter((sp) => sp.trim() !== '')
-												.map((sp, idx) => (
-													<Text key={idx} style={styles.sectionText}>
-														- {sp}
-													</Text>
-												))}
-										</View>
-									)}
-								</View>
-
-								{/* 뜻 풀이 */}
-								{/* <View style={styles.meaningBox}>
-										<Text style={styles.sectionContent}>💡 {item.meaning}</Text>
-									</View> */}
-								{/* 구성 한자 */}
-								{/* <View style={styles.charList}>
-										{item.characters.map((char, i) => (
-											<View key={i} style={styles.charRow}>
-												<Text style={styles.charMain}>{char.char}</Text>
-												<Text style={styles.charMeaning}>{char.meaning}</Text>
-												<Text style={styles.charSub}>
-													({char.strokes}획, 부수: {char.radical})
-												</Text>
-											</View>
-										))}
-									</View> */}
-
-								{/* 예문 */}
-								{/* <View style={styles.exampleBox}>
-										<Text style={styles.sectionTitle}>📝 예문</Text>
-										<Text style={styles.sectionContent}>{item.example}</Text>
-									</View> */}
-							</GHScrollView>
-							{/* 아래에 내용이 더 있다는 신호. 내용이 짧으면 표면색끼리 겹쳐 보이지 않는다 */}
-							<LinearGradient colors={[`${COLORS.surface}00`, COLORS.surface]} style={styles.cardBackFade} pointerEvents="none" />
-						</View>
+						{backContent}
 
 						{/* ✅ 하단 버튼 영역 고정 */}
-						<View style={styles.fixedBottomButton}>
-							<TouchableOpacity
-								style={[styles.button, isLearned ? styles.learnedButton : styles.learningButton, { opacity: isButtonDisabled ? 0.6 : 1 }]}
-								activeOpacity={0.8}
-								onPress={(e) => {
-									e.stopPropagation(); // 필수!
-									if (isButtonDisabled) {
-										return;
-									}
-									setIsButtonDisabled(true);
-									handleAnimatedButtonPress(proverbId, () => {
-										completeStudy(proverbId);
-										runLater(() => setIsButtonDisabled(false), 1000);
-									});
-								}}
-								disabled={isButtonDisabled}
-								hitSlop={HIT_SLOP} // 여유 클릭 범위
-							>
-								<Text style={[styles.buttonText, isLearned && styles.buttonTextOnAmber]}>{isLearned ? '다시 학습하기' : '학습 완료'}</Text>
-							</TouchableOpacity>
-						</View>
+						<View style={styles.fixedBottomButton}>{learnButton}</View>
 					</Animated.View>
 				</Pressable>
 			</View>
@@ -952,6 +968,8 @@ const QuizStudyScreen = () => {
 										key={label}
 										onPress={() => setFilter(value)}
 										activeOpacity={0.8}
+										// 칩 높이 32 남짓 — 세로로만 넓혀 44 를 맞춘다(가로는 이웃 칩과 겹친다)
+										hitSlop={{ top: 6, bottom: 6 }}
 										style={[styles.filterButton, isActive && styles.filterButtonActive]}>
 										<Text style={[styles.filterText, isActive && styles.filterTextActive]}>{label}</Text>
 									</TouchableOpacity>
@@ -1124,9 +1142,10 @@ const QuizStudyScreen = () => {
 										windowSize={3}
 										pagingEnabled={true}
 										scrollAnimationDuration={600}
+										// 태블릿은 가운데 카드를 축소(0.92)하지 않아야 화면 폭을 가득 쓴 카드가 위 현황 카드와 좌우선이 맞는다
 										modeConfig={{
-											parallaxScrollingScale: 0.92,
-											parallaxScrollingOffset: 30,
+											parallaxScrollingScale: isTablet ? 1 : 0.92,
+											parallaxScrollingOffset: isTablet ? 0 : 30,
 											parallaxAdjacentItemScale: 0.9,
 										}}
 										onSnapToItem={() => {
@@ -1193,7 +1212,7 @@ const QuizStudyScreen = () => {
 								<Text style={[styles.exitButtonText, { color: COLORS.text }]}>취소</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
-								style={[styles.exitButton, { backgroundColor: COLORS.danger }]}
+								style={[styles.exitButton, { backgroundColor: COLORS.dangerFill }]}
 								activeOpacity={0.8}
 								onPress={() => {
 									setShowExitModal(false);
@@ -1275,7 +1294,8 @@ const QuizStudyScreen = () => {
 				onClose={guide.close}
 				lines={[
 					'학습은 속담 카드를 한 장씩 넘기며 익히는 곳입니다.',
-					'카드를 누르면 뜻과 유래, 예문까지 펼쳐집니다.',
+					// 태블릿은 뒤집지 않고 앞·뒷면을 나란히 보여 준다
+					isTablet ? '카드 오른쪽에서 뜻과 유래, 예문까지 바로 볼 수 있습니다.' : '카드를 누르면 뜻과 유래, 예문까지 펼쳐집니다.',
 					'읽은 카드는 학습 완료로 기록됩니다 — 학습 현황의 숫자는 전체 속담 중 지금까지 익힌 개수입니다!',
 				]}
 				title="학습, 이렇게 씁니다"
@@ -1293,7 +1313,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surface,
 	},
 	cardWrapper: {
-		height: scaleHeight(812 * 0.7),
+		// 태블릿 카드는 화면 높이 비례(CARD_HEIGHT)라 고정 568×배율 래퍼를 넘친다 — 캐러셀 높이와 같게 맞춘다
+		height: isTablet ? CARD_HEIGHT + scaleHeight(40) : scaleHeight(812 * 0.7),
 		width: '100%',
 		alignItems: 'center',
 		justifyContent: 'flex-start',
@@ -1307,8 +1328,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'center',
 	},
 	flagContainer: {
+		// 장면 이미지는 정사각형(aspectRatio 1) — 틀도 정사각형이어야 아래가 잘리지 않는다
 		width: isTablet ? scaleWidth(180) : scaleWidth(260),
-		height: isTablet ? scaleWidth(160) : scaleWidth(260),
+		height: isTablet ? scaleWidth(180) : scaleWidth(260),
 		backgroundColor: COLORS.background,
 		borderRadius: RADIUS.md,
 		overflow: 'hidden',
@@ -1332,7 +1354,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginRight: SPACING_W.sm,
 	},
 	progressBadge: {
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		paddingVertical: SPACING_H.xs,
 		paddingHorizontal: SPACING_W.md,
 		borderRadius: RADIUS.round,
@@ -1369,7 +1391,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		textAlign: 'center',
 	},
 	filterButtonActive: {
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 	},
 	filterTextActive: {
 		color: COLORS.textWhite,
@@ -1378,7 +1400,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		height: scaleHeight(50),
 		marginTop: SPACING_H.lg,
 		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		justifyContent: 'center',
 		alignItems: 'center', // ✅ 변경 (기존 `alignContent` → `alignItems`)
 		width: '100%', // ✅ 항상 100% 사용
@@ -1448,6 +1470,37 @@ const styles = themedStyles(() => StyleSheet.create({
 		overflow: 'hidden',
 	},
 
+	// ===== 태블릿 나란히 카드 =====
+	splitCard: {
+		width: CARD_WIDTH,
+		height: CARD_HEIGHT,
+		flexDirection: 'row',
+		alignSelf: 'center',
+		backgroundColor: COLORS.surface,
+		borderRadius: RADIUS.lg,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		overflow: 'hidden',
+	},
+	// 앞면(그림·속담) — 옅은 바탕으로 뒷면(읽을거리)과 면을 나눈다
+	splitFront: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingHorizontal: SPACING_W.lg,
+		paddingVertical: SPACING_H.lg,
+		backgroundColor: COLORS.background,
+		borderRightWidth: StyleSheet.hairlineWidth,
+		borderRightColor: COLORS.border,
+	},
+	splitFrontMiddle: { flex: 0 },
+	// 뒷면(뜻·예문) — 글이 길어 조금 더 넓게. 안쪽 여백은 폰 뒷면(cardFace2)과 같은 규칙
+	splitBack: {
+		flex: 1.15,
+		paddingHorizontal: SPACING_W.sm,
+		paddingTop: SPACING_H.md,
+		paddingBottom: SPACING_H.lg,
+	},
 	cardFace2: {
 		width: CARD_WIDTH,
 		height: CARD_HEIGHT, // ✅ 여기 반영
@@ -1675,7 +1728,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: '100%',
 		alignItems: 'center',
 		paddingVertical: SPACING_H.md,
-		paddingBottom: scaleHeight(Platform.OS === 'android' ? 30 : 20), // ← 이 부분을 조정
+		paddingBottom: Platform.OS === 'android' ? SPACING_H.xxxl : SPACING_H.xl, // 안드로이드는 내비게이션 바 여유만큼 더
 		borderTopWidth: 1,
 		borderColor: COLORS.border,
 	},
@@ -1709,6 +1762,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.md,
 	},
 	exitTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -1744,7 +1798,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	cardMiddle: {
 		flex: 1,
-		marginTop: scaleHeight(70),
+		// 폰은 이미지(260)가 flagSection(200)보다 커서 넘친 만큼 내린다. 태블릿 이미지는 섹션 안에 들어가 내릴 필요가 없다.
+		marginTop: isTablet ? 0 : scaleHeight(70),
 		alignItems: 'center',
 		justifyContent: 'center',
 		paddingHorizontal: 0, // ✅ 좌우 여백은 cardFace(SPACING_W.lg)에서 일괄 처리
@@ -1765,6 +1820,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignSelf: 'center',
 	},
 	hanjaText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.display,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -1834,6 +1890,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 
 	cardBackTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.title,
 		fontWeight: '700',
 		color: COLORS.secondaryDark,
@@ -1869,6 +1926,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		lineHeight: scaledSize(21),
 		marginBottom: SPACING_H.xs,
 	},
+	// 동의 속담은 예문과 같은 박스지만 속담 문장이라 display 서체 (ProverbDetailModal·QuizResultModal 과 동일)
+	sameProverbText: { fontFamily: FONTS.display },
 	meaningQuoteBox: {
 		alignItems: 'center', // 중앙 정렬
 		justifyContent: 'center',

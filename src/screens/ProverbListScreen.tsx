@@ -12,11 +12,13 @@ import FastImage from 'react-native-fast-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
-import { getCategoryColor, getLevelColor, getLevelInkColor, getFieldIcon, getFieldIconName, getLevelIconName } from './common/CommonProverbModule';
+import { getCategoryColor, getLevelColor, getLevelInkColor, getFieldIcon, getFieldIconName, getLevelIconName, LEVEL_NAME_BY_NUMBER } from './common/CommonProverbModule';
+import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
@@ -245,13 +247,13 @@ const ProverbListScreen = () => {
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={readableTextOn(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
 			case 2:
-				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={readableTextOn(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
 			case 3:
-				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={readableTextOn(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
 			case 4:
-				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={readableTextOn(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
 			default:
 				return null;
 		}
@@ -397,8 +399,8 @@ const ProverbListScreen = () => {
 											}}
 											closeIconContainerStyle={{
 												position: 'absolute',
-												right: scaleWidth(12),
-												top: scaleHeight(12),
+												right: SPACING_W.md,
+												top: SPACING_H.md,
 												padding: SPACING_W.xs,
 												zIndex: 1,
 											}}
@@ -414,6 +416,7 @@ const ProverbListScreen = () => {
 								<View style={styles.listCountWrapper}>
 									<TouchableOpacity
 										style={[styles.favoriteFilterButton, showFavoritesOnly && styles.favoriteFilterButtonActive]}
+										hitSlop={HIT_SLOP}
 										onPress={() => {
 											setShowFavoritesOnly(!showFavoritesOnly);
 											scrollToTop();
@@ -425,7 +428,7 @@ const ProverbListScreen = () => {
 									</TouchableOpacity>
 									{/* 검색 개수와 한 줄로 흘려 둔다 — 절대 배치하면 카드 모서리로 쏠려 보인다 */}
 									<View style={styles.listCountRight}>
-										<Text style={styles.listCountText}>총 {mainList.length}개가 검색되었습니다!</Text>
+										<Text style={styles.listCountText}>총 {mainList.length.toLocaleString()}개가 검색되었습니다!</Text>
 										<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
 									</View>
 								</View>
@@ -437,6 +440,8 @@ const ProverbListScreen = () => {
 							<FlatList
 								ref={scrollRef}
 								data={visibleList}
+								numColumns={LIST_COLUMNS}
+								columnWrapperStyle={listGrid?.row}
 								scrollEnabled={!fieldOpen && !levelOpen} // ⛔ 드롭다운 열려 있으면 스크롤 막기
 								keyExtractor={(item) => item.id.toString()}
 								refreshControl={<RefreshControl
@@ -450,8 +455,6 @@ const ProverbListScreen = () => {
 								onEndReachedThreshold={0.5}
 								onScroll={onListScroll}
 								scrollEventThrottle={16}
-								keyboardShouldPersistTaps="handled"
-								keyboardDismissMode="on-drag"
 								ListEmptyComponent={() => (
 									<View style={styles.emptyWrapper}>
 										<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
@@ -463,9 +466,9 @@ const ProverbListScreen = () => {
 								contentContainerStyle={[styles.flatListCotent, visibleList.length === 0 && styles.flatListContentEmpty]}
 								renderItem={({ item, index }) => {
 									return (
-										<AnimatedListItem index={index} offsetY={16}>
+										<AnimatedListItem index={index} offsetY={16} style={listGrid?.cell}>
 										<TouchableOpacity
-											style={styles.itemBox}
+											style={[styles.itemBox, listGrid?.fill]}
 											activeOpacity={0.8}
 											onPress={() => {
 												setSelectedProverb(item);
@@ -476,11 +479,11 @@ const ProverbListScreen = () => {
 													<View style={styles.badgeGroup}>
 														<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
 															{getLevelIcon(item.level)}
-															<Text style={styles.badgeText}>{item.levelName}</Text>
+															<Text style={[styles.badgeText, { color: readableTextOn(getLevelColor(item.levelName)) }]}>{item.levelName}</Text>
 														</View>
 														<View style={[styles.badge, { backgroundColor: getCategoryColor(item.category) }]}>
 															{item?.category && getFieldIcon(item.category)}
-															<Text style={styles.badgeText}>{item.category || '미지정'}</Text>
+															<Text style={[styles.badgeText, { color: readableTextOn(getCategoryColor(item.category)) }]}>{item.category || '미지정'}</Text>
 														</View>
 													</View>
 
@@ -719,6 +722,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '700',
 	},
 	sameProverbText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.text,
 		fontWeight: '400',
@@ -734,6 +738,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: 0,
 	},
 	proverbTextMulti: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		color: COLORS.textStrong,

@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { useNavigation } from '@react-navigation/native';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import IconComponent from './atomic/IconComponent';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
@@ -120,12 +120,12 @@ const modalStyles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.dim,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: SPACING_W.xxl,
-		paddingVertical: SPACING_H.xxl,
+		// 다른 다이얼로그 딤과 같은 좌우 여백. 위아래는 useModalSafePadding 이 덮어써 따로 두지 않는다.
+		paddingHorizontal: SPACING_W.lg,
 	},
 	card: {
 		width: '100%',
-		maxWidth: scaleWidth(320),
+		maxWidth: scaleWidth(340), // 다른 대화상자와 같은 폭
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,
@@ -144,6 +144,7 @@ const modalStyles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.md,
 	},
 	title: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -170,7 +171,7 @@ const modalStyles = themedStyles(() => StyleSheet.create({
 	cancelText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.textSecondary },
 	confirmBtn: {
 		flex: 1,
-		backgroundColor: COLORS.danger,
+		backgroundColor: COLORS.dangerFill,
 		borderRadius: RADIUS.md,
 		minHeight: scaleHeight(MIN_TOUCH),
 		paddingVertical: SPACING_H.md,

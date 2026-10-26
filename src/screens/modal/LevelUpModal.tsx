@@ -157,7 +157,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		columnGap: SPACING_W.xs,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,

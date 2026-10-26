@@ -25,7 +25,9 @@ test('번들되는 모든 의존성이 고지 목록에 있다', () => {
 
 test('고지 목록에 더 이상 쓰지 않는 항목이 남아 있지 않다', () => {
 	const declared = new Set(runtimeDeps);
-	expect(OPEN_SOURCE_LIBS.map((lib) => lib.name).filter((name) => !declared.has(name))).toEqual([]);
+	// 서체는 npm 의존성이 아니라 파일로 번들된다 (genOpenSource.js 의 BUNDLED_FONTS)
+	const isBundledFont = (name: string) => name.endsWith(' (font)');
+	expect(OPEN_SOURCE_LIBS.map((lib) => lib.name).filter((name) => !declared.has(name) && !isBundledFont(name))).toEqual([]);
 });
 
 test('라이선스 종류를 못 읽은 항목이 없다', () => {

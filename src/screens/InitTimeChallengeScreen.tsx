@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Image } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaleHeight, scaleWidth, scaledSize } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -440,6 +440,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.lg,
 	},
 	heroTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.title,
 		fontWeight: '700',
 		color: COLORS.textWhite,
@@ -544,7 +545,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: COLORS.accentOrangeBg,
 		borderRadius: RADIUS.sm,
-		padding: SPACING_W.md,
+		paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: COLORS.accentOrangeSoft,
 	},
@@ -565,7 +566,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: COLORS.dangerSoftBg,
 		borderRadius: RADIUS.sm,
-		padding: SPACING_W.md,
+		paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md,
 		marginTop: SPACING_H.lg,
 		borderWidth: 1,
 		borderColor: COLORS.dangerBorderSoft,
@@ -709,7 +710,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	startButton: {
 		flexDirection: 'row',
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		paddingVertical: SPACING_H.lg,
 		borderRadius: RADIUS.md,
 		alignItems: 'center',

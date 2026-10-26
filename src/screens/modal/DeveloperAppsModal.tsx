@@ -4,7 +4,7 @@ import AppAlert from '@/screens/common/modal/AppAlert';
 import { ActivityIndicator, View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Linking, TextInput, KeyboardAvoidingView, Keyboard, Pressable } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { appIconUrl, appStoreUrl, fetchCommonApps, isNewApp } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
@@ -143,10 +143,11 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 						</View>
 
 						{/* 카테고리 필터 */}
-						<ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.tabsContainer}>
+						<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContainer}>
 							{CATEGORY_TABS.map((tab) => (
 								<TouchableOpacity
 									key={tab.key}
+									hitSlop={{ top: 6, bottom: 6 }}
 									style={[styles.tabButton, selectedCategory === tab.key && styles.tabButtonActive]}
 									activeOpacity={0.8}
 									onPress={() => setSelectedCategory(tab.key)}>
@@ -170,9 +171,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 						onScroll={onListScroll}
 						scrollEventThrottle={16}
 						contentContainerStyle={[styles.scroll, (!apps || filteredApps.length === 0) && styles.scrollEmpty]}
-						showsVerticalScrollIndicator={false}
-						keyboardShouldPersistTaps="handled"
-						keyboardDismissMode="on-drag">
+						showsVerticalScrollIndicator={false}>
 						{failed ? (
 							<View style={styles.emptyState}>
 								<Text style={styles.emptyText}>앱 목록을 불러오지 못했습니다</Text>
@@ -214,7 +213,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 												<View style={[styles.categoryBadge, { backgroundColor: catColor.bg }]}>
 													<Text style={[styles.categoryBadgeText, { color: catColor.text }]}>{CATEGORY_LABEL[app.category]}</Text>
 												</View>
-												<TouchableOpacity style={styles.downloadButton} activeOpacity={0.8} onPress={() => onDownloadApp(app)}>
+												<TouchableOpacity style={styles.downloadButton} activeOpacity={0.8} hitSlop={HIT_SLOP} onPress={() => onDownloadApp(app)}>
 													<IconComponent type="Feather" name="download" size={scaledSize(12)} color={COLORS.secondaryDark} />
 													<Text style={styles.downloadText}>다운로드</Text>
 												</TouchableOpacity>
@@ -266,6 +265,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.md,
 	},
 	titleText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -427,9 +427,9 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	newBadge: {
 		position: 'absolute',
-		top: -scaleWidth(4),
-		left: -scaleWidth(4),
-		backgroundColor: COLORS.danger,
+		top: -SPACING_H.xs,
+		left: -SPACING_W.xs,
+		backgroundColor: COLORS.dangerFill,
 		borderRadius: RADIUS.sm,
 		paddingHorizontal: SPACING_W.xs,
 		paddingVertical: SPACING_H.xs,

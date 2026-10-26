@@ -3,7 +3,7 @@ import React, {  } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleWidth, scaleHeight } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { useModalEnter } from '@/hooks/useModalEnter';
@@ -35,7 +35,7 @@ const QuizModeModal = ({ book, onClose, onSelect }: Props) => {
 	return (
 		<Modal visible={!!book} transparent animationType="fade" onRequestClose={onClose}>
 			<TouchableOpacity style={[styles.overlay, safePadding]} activeOpacity={1} onPress={onClose}>
-				<Animated.View style={{ width: '100%', alignItems: 'center', ...enterStyle }}>
+				<Animated.View style={{ width: '100%', maxHeight: '100%', alignItems: 'center', ...enterStyle }}>
 					<TouchableOpacity activeOpacity={1} style={styles.card}>
 						<View style={styles.headerRow}>
 							<Text style={styles.title} numberOfLines={1}>{book?.title ? `${book.title} 퀴즈` : '퀴즈 모드 선택'}</Text>
@@ -87,12 +87,15 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		borderRadius: RADIUS.xl,
+		// scale 로 등장하는 래퍼 안의 테두리 카드 — 모달 레이아웃 규칙 7
+		overflow: 'hidden',
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.xl,
 	},
 	// ===== 헤더 =====
 	headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 	title: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,

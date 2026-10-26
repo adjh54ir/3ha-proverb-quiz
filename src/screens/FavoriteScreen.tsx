@@ -11,10 +11,12 @@ import FastImage from 'react-native-fast-image';
 import DropDownPicker from 'react-native-dropdown-picker';
 import IconComponent from './common/atomic/IconComponent';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
+import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
 import { MainDataType } from '@/types/MainDataType';
 import ProverbServices from '@/services/ProverbServices';
 import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
+import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
@@ -240,9 +242,9 @@ const FavoriteScreen = () => {
 		const isSelected = selectedIds.includes(item.id);
 
 		return (
-			<AnimatedListItem index={index}>
+			<AnimatedListItem index={index} style={listGrid?.cell}>
 				<TouchableOpacity
-					style={[styles.itemCard, isSelectionMode && isSelected && styles.itemCardSelected]}
+					style={[styles.itemCard, listGrid?.fill, isSelectionMode && isSelected && styles.itemCardSelected]}
 					activeOpacity={0.8}
 					onPress={() => {
 						if (isSelectionMode) {
@@ -266,12 +268,12 @@ const FavoriteScreen = () => {
 										type="FontAwesome6"
 										name={getLevelIcon(item.levelName)}
 										size={scaledSize(14)}
-										color={COLORS.textWhite}
+										color={readableTextOn(getLevelColor(item.levelName))}
 									/>
-									<Text style={styles.badgeText}>{item.levelName}</Text>
+									<Text style={[styles.badgeText, { color: readableTextOn(getLevelColor(item.levelName)) }]}>{item.levelName}</Text>
 								</View>
 								<View style={[styles.badge, { backgroundColor: getCategoryColor(item.category) }]}>
-									<Text style={styles.badgeText}>{item.category || '미지정'}</Text>
+									<Text style={[styles.badgeText, { color: readableTextOn(getCategoryColor(item.category)) }]}>{item.category || '미지정'}</Text>
 								</View>
 							</View>
 
@@ -340,7 +342,7 @@ const FavoriteScreen = () => {
 												style={styles.headerActionBtn}
 												onPress={() => setShowAddModal(true)}
 												hitSlop={HIT_SLOP}>
-												<Icon name="plus" size={scaledSize(14)} color={COLORS.warning} />
+												<Icon name="plus" size={scaledSize(14)} color={COLORS.warningDeep} />
 												<Text style={styles.headerActionText}>추가</Text>
 											</TouchableOpacity>
 											{allFavorites.length > 0 && (
@@ -441,7 +443,7 @@ const FavoriteScreen = () => {
 
 								<View style={styles.listCountWrapper}>
 									{isSelectionMode && filteredList.length > 0 && (
-										<TouchableOpacity style={styles.selectAllBtn} onPress={handleSelectAll}>
+										<TouchableOpacity style={styles.selectAllBtn} onPress={handleSelectAll} hitSlop={HIT_SLOP}>
 											<View style={[styles.miniCheckbox, isAllSelected && styles.miniCheckboxChecked]}>
 												{isAllSelected && <Icon name="check" size={scaledSize(9)} color={COLORS.textOnAccent} />}
 											</View>
@@ -453,7 +455,7 @@ const FavoriteScreen = () => {
 								<View style={styles.resultSummaryRow}>
 									{!isSelectionMode ? (
 										<Text style={styles.headerSubText}>
-											총 <Text style={styles.headerCount}>{allFavorites.length}</Text>개가 저장되었습니다!
+											총 <Text style={styles.headerCount}>{allFavorites.length.toLocaleString()}</Text>개가 저장되었습니다!
 										</Text>
 									) : (
 										<Text style={styles.headerSubText}>
@@ -467,14 +469,14 @@ const FavoriteScreen = () => {
 						<FlatList
 							ref={flatListRef}
 							data={filteredList}
+							numColumns={LIST_COLUMNS}
+							columnWrapperStyle={listGrid?.row}
 							onScroll={onListScroll}
 							scrollEventThrottle={16}
 							scrollEnabled={!fieldOpen && !levelOpen}
 							keyExtractor={(item) => item.id.toString()}
 							renderItem={renderItem}
 							contentContainerStyle={[styles.listContent, isSelectionMode && styles.listContentWithBar, filteredList.length === 0 && styles.listContentEmpty]}
-							keyboardShouldPersistTaps="handled"
-							keyboardDismissMode="on-drag"
 							refreshControl={<RefreshControl
 									refreshing={refreshing}
 									onRefresh={onRefresh}
@@ -583,9 +585,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
 	favoriteHeroImage: { width: scaleWidth(70), height: scaleHeight(58) },
 	// 다른 화면 헤더(ScreenHeader)와 같은 타이틀 크기 — 탭을 오갈 때 글자 크기가 튀지 않게
-	headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },
+	headerTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },
 	headerSubText: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'right' },
-	headerCount: { fontWeight: '700', color: COLORS.warning, fontSize: FONT_SIZES.smPlus },
+	// 치자(#F5A623)를 글자로 쓰면 라이트에서 2:1 — 같은 계열의 진한 글자 토큰으로
+	headerCount: { fontWeight: '700', color: COLORS.warningDeep, fontSize: FONT_SIZES.smPlus },
 	headerCountDelete: { fontWeight: '700', color: COLORS.danger, fontSize: FONT_SIZES.smPlus },
 	headerActions: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
 	headerActionBtn: {
@@ -599,7 +602,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.warningBorder,
 	},
-	headerActionText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.warning },
+	headerActionText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.warningDeep },
 	headerActionBtnDelete: { backgroundColor: COLORS.dangerBg, borderColor: COLORS.dangerBorder },
 	headerActionTextDelete: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.danger },
 	cancelBtn: {
@@ -676,9 +679,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	miniCheckboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
-	listContent: { paddingTop: SPACING_H.xs, paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
+	// 필터 카드 아래 첫 카드까지 간격을 속담 사전(ProverbListScreen)과 같게 맞춘다 (md + sm)
+	listContent: { paddingTop: SPACING_H.sm, paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
 	// 선택 모드에서만 하단 삭제 바(absolute)가 뜨므로 그때만 그만큼 더 비운다.
-	listContentWithBar: { paddingBottom: scaleHeight(100) },
+	listContentWithBar: { paddingBottom: BOTTOM_BAR_HEIGHT + SPACING_H.lg },
 	// 위아래 여백은 스크롤되는 목록을 위한 것이라, 비었을 때는 중앙 정렬만 어긋나게 한다.
 	listContentEmpty: { paddingTop: 0, paddingBottom: 0 },
 	itemCard: {
@@ -704,6 +708,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	badgeInlineRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING_H.sm },
 	proverbBlock: { marginBottom: 0 },
 	proverbTextMulti: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -760,7 +765,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		columnGap: SPACING_W.sm,
 		height: scaleHeight(52),
 		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.danger,
+		backgroundColor: COLORS.dangerFill,
 	},
 	deleteActionBtnDisabled: { backgroundColor: COLORS.borderDark },
 	deleteActionBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '700' },
@@ -794,7 +799,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		marginBottom: SPACING_H.md,
 	},
-	confirmTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
+	confirmTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
 	confirmDesc: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.textSecondary,
@@ -807,6 +812,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	confirmBtn: { flex: 1, height: scaleHeight(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
 	confirmBtnCancel: { backgroundColor: COLORS.surfaceAlt },
 	confirmBtnCancelText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textSecondary },
-	confirmBtnDelete: { backgroundColor: COLORS.danger },
+	confirmBtnDelete: { backgroundColor: COLORS.dangerFill },
 	confirmBtnDeleteText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textWhite },
 }));

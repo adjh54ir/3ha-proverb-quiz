@@ -22,8 +22,9 @@ import IconComponent from './common/atomic/IconComponent';
 import { Paths } from '@/navigation/conf/Paths';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { shuffle } from '@/utils/ArrayUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, getThemeMode, themedStyles, themedValue } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, getThemeMode, themedStyles, themedValue } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber } from '@/screens/common/CommonProverbModule';
+import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import StartModal from './modal/QuizStartModal';
@@ -41,7 +42,7 @@ import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
-const labelColors = themedValue(() => [COLORS.secondary, COLORS.primary, COLORS.accentTeal, COLORS.accentFlame]); // A, B, C, D 보기 라벨
+const labelColors = themedValue(() => [COLORS.primary, COLORS.accentFlame, COLORS.accentTeal, COLORS.accentPink]); // A, B, C, D 보기 라벨
 
 const STORAGE_KEY = MainStorageKeyType.USER_QUIZ_HISTORY;
 
@@ -821,13 +822,13 @@ const QuizScreen = () => {
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type='FontAwesome6' name='seedling' size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='seedling' size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 2:
-				return <IconComponent type='FontAwesome6' name='leaf' size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='leaf' size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 3:
-				return <IconComponent type='FontAwesome6' name='tree' size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='tree' size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 4:
-				return <IconComponent type='FontAwesome6' name='trophy' size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='trophy' size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			default:
 				return null;
 		}
@@ -836,23 +837,23 @@ const QuizScreen = () => {
 	const getFieldIcon = (field: string) => {
 		switch (field) {
 			case '운/우연':
-				return <IconComponent type='FontAwesome6' name='dice' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='dice' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '인간관계':
-				return <IconComponent type='FontAwesome6' name='users' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='users' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '세상 이치':
-				return <IconComponent type='fontawesome5' name='globe' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='globe' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '근면/검소':
-				return <IconComponent type='fontawesome5' name='hammer' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='hammer' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '노력/성공':
-				return <IconComponent type='fontawesome5' name='medal' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='medal' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '경계/조심':
-				return <IconComponent type='fontawesome5' name='exclamation-triangle' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='exclamation-triangle' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '욕심/탐욕':
-				return <IconComponent type='fontawesome5' name='hand-holding-usd' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='hand-holding-usd' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '배신/불신':
-				return <IconComponent type='fontawesome5' name='user-slash' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='fontawesome5' name='user-slash' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			default:
-				return <IconComponent type='FontAwesome6' name='tag' size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type='FontAwesome6' name='tag' size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 		}
 	};
 
@@ -953,14 +954,14 @@ const QuizScreen = () => {
 											{/* 레벨 표시 */}
 											<View style={[styles.badgePill, { backgroundColor: getLevelColor(question.level) }]}>
 												{getLevelIcon(question.level)}
-												<Text style={styles.badgeText}>{getLevelLabel(question.level)}</Text>
+												<Text style={[styles.badgeText, { color: readableTextOn(getLevelColor(question.level)) }]}>{getLevelLabel(question.level)}</Text>
 											</View>
 
 											{/* 카테고리 표시 */}
 											{question?.category && (
 												<View style={[styles.badgePill, { backgroundColor: getFieldColor(question.category) }]}>
 													{getFieldIcon(question.category)}
-													<Text style={styles.badgeText}> {question.category}</Text>
+													<Text style={[styles.badgeText, { color: readableTextOn(getFieldColor(question.category)) }]}> {question.category}</Text>
 												</View>
 											)}
 										</View>
@@ -1041,7 +1042,7 @@ const QuizScreen = () => {
 
 								{question ? (
 									<Animated.View style={[{ alignItems: 'center', marginBottom: SPACING_H.sm }, questionEnterStyle]}>
-										<Text style={[styles.questionText, { textAlign: 'center' }]}>
+										<Text style={[styles.questionText, { textAlign: 'center' }, (routeMode === 'meaning' || routeMode === 'blank') && styles.proverbFont]}>
 											{routeMode === 'blank' || routeMode === 'example' || routeMode === 'exampleBlank'
 												? questionText || '문제 준비중...'
 												: routeMode === 'meaning'
@@ -1143,7 +1144,7 @@ const QuizScreen = () => {
 															<Text style={[styles.optionLabel, { color: labelColors[index] }]}>{['A.', 'B.', 'C.', 'D.'][index]}</Text>
 
 															<View style={{ flex: 1 }}>
-																<Text style={styles.optionContent}>{item}</Text>
+																<Text style={[styles.optionContent, routeMode !== 'meaning' && routeMode !== 'blank' && styles.proverbFont]}>{item}</Text>
 															</View>
 
 															{/* ✅ 선택 이후에만 아이콘 표시 */}
@@ -1347,7 +1348,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	// ===== 상단 진행/상태 영역 =====
 	progressStatusWrapper: {
 		width: '100%',
-		maxWidth: scaleWidth(500),
 		backgroundColor: COLORS.surface,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.md,
@@ -1467,6 +1467,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		textAlign: 'center',
 		color: COLORS.secondaryDark,
 		lineHeight: scaledSize(28),
+	},
+	// 속담 문장일 때만 — 문제·보기가 모드에 따라 뜻풀이/예문이 되기도 해서 스타일에 박지 않는다
+	proverbFont: {
+		fontFamily: FONTS.display,
 	},
 	loadingText: {
 		fontSize: FONT_SIZES.md,
@@ -1605,6 +1609,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	exitModalTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -1641,7 +1646,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	exitModalConfirmButton: {
 		flex: 1,
-		backgroundColor: COLORS.danger,
+		backgroundColor: COLORS.dangerFill,
 		paddingVertical: SPACING_H.md,
 		// ponytail: 터치 영역 44 이상 보장을 위한 고정 최소 높이
 		minHeight: 48,

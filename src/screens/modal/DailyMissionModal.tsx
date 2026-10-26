@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, Image, ScrollView } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 import DateUtils from '@/utils/DateUtils';
 import { computeDailyMissions, countDoneMissions, allMissionsDone, DailyMission } from '@/utils/DailyMissionUtils';
@@ -127,7 +127,7 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 						)}
 						{missions.map((m) => (
 							<View key={m.id} style={[styles.missionRow, m.done && styles.missionRowDone]}>
-								<View style={[styles.missionIcon, { backgroundColor: m.done ? COLORS.primary : COLORS.border }]}>
+								<View style={[styles.missionIcon, { backgroundColor: m.done ? COLORS.primaryFill : COLORS.border }]}>
 									<IconComponent type={m.iconType} name={m.icon} size={scaledSize(18)} color={m.done ? COLORS.textWhite : COLORS.textLight} />
 								</View>
 								<View style={styles.missionTextWrap}>
@@ -195,7 +195,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		overflow: 'hidden',
 	},
 	header: {
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		paddingTop: SPACING_H.xl,
 		paddingBottom: SPACING_H.lg,
 		paddingHorizontal: SPACING_W.lg,
@@ -211,6 +211,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 	},
 	title: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textWhite,

@@ -9,7 +9,8 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
 import { CONTENT_MAX_WIDTH, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, PALETTES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { listGrid } from '@/const/common/ListGrid';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
 import BookFormModal from './modal/BookFormModal';
@@ -37,8 +38,9 @@ const SHEET_SLIDE_DURATION = 260;
 import { read, write } from '@/services/StorageService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 
-// 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
-const getDefaultColor = () => COLORS.primary;
+// 속담집 색은 저장되는 값이라 모드에 따라 바뀌는 COLORS.primary 를 쓰면 다크에서 만든 속담집이
+// 다크 톤(#7C89FF)으로 굳어 라이트에서 물빠져 보인다. 모드와 무관한 기본 쪽빛으로 고정한다.
+const getDefaultColor = (): string => PALETTES.light.primary;
 const DEFAULT_ICON = 'menu-book';
 const STORAGE_KEY = MainStorageKeyType.USER_PROVERB_BOOKS;
 
@@ -219,7 +221,7 @@ const MyProverbBook = () => {
 						</View>
 						<View style={styles.sortRow}>
 							{SORT_OPTIONS.map((opt) => (
-								<TouchableOpacity key={opt.key} style={[styles.sortChip, sortType === opt.key && styles.sortChipActive]} onPress={() => setSortType(opt.key)}>
+								<TouchableOpacity key={opt.key} style={[styles.sortChip, sortType === opt.key && styles.sortChipActive]} hitSlop={{ top: 6, bottom: 6 }} onPress={() => setSortType(opt.key)}>
 									<Text style={[styles.sortChipText, sortType === opt.key && styles.sortChipTextActive]}>{opt.label}</Text>
 								</TouchableOpacity>
 							))}
@@ -227,7 +229,7 @@ const MyProverbBook = () => {
 					</View>
 				)}
 
-				<Animated.ScrollView ref={scrollRef} onScroll={onListScroll} scrollEventThrottle={16} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ opacity: fadeAnim }} contentContainerStyle={[styles.booksContainer, filteredBooks.length === 0 && styles.booksContainerEmpty]} showsVerticalScrollIndicator={false}>
+				<Animated.ScrollView ref={scrollRef} onScroll={onListScroll} scrollEventThrottle={16} style={{ opacity: fadeAnim }} contentContainerStyle={[styles.booksContainer, filteredBooks.length === 0 && styles.booksContainerEmpty]} showsVerticalScrollIndicator={false}>
 					{books.length === 0 ? (
 						<View style={styles.emptyView}>
 							<Image source={require('@/assets/images/screen-heroes/library-shelf.png')} style={styles.emptyShelfImage} resizeMode="contain" />
@@ -247,14 +249,15 @@ const MyProverbBook = () => {
 							</TouchableOpacity>
 						</View>
 					) : (
-						filteredBooks.map((book, index) => {
+						<View style={listGrid?.wrap}>
+						{filteredBooks.map((book, index) => {
 							const bookColor = book.color || getDefaultColor();
 							const bookIcon = book.icon || DEFAULT_ICON;
 							const proverbs = ALL_PROVERBS.filter((p) => book.proverbIds.includes(p.id));
 							const preview = proverbs.slice(0, 4);
 							return (
-								<AnimatedListItem key={book.id} index={index}>
-								<TouchableOpacity style={styles.bookCard} activeOpacity={0.8} onPress={() => navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: book.id })}>
+								<AnimatedListItem key={book.id} index={index} style={listGrid?.cell}>
+								<TouchableOpacity style={[styles.bookCard, listGrid?.fill]} activeOpacity={0.8} onPress={() => navigation.navigate(Paths.MY_PROVERB_BOOK_DETAIL, { bookId: book.id })}>
 									<View style={styles.bookCardPreviewHeader}>
 										<View style={[styles.bookCardIconWrap, { backgroundColor: bookColor, }]}>
 											<IconComponent type="materialIcons" name={bookIcon} size={scaledSize(26)} color={readableTextOn(bookColor)} />
@@ -274,7 +277,7 @@ const MyProverbBook = () => {
 										<View style={styles.previewRow}>
 											{preview.map((p) => (
 												<View key={p.id} style={styles.previewTag}>
-													<Text style={styles.previewTagText} numberOfLines={1}>{p.proverb}</Text>
+													<Text style={[styles.previewTagText, styles.previewTagProverb]} numberOfLines={1}>{p.proverb}</Text>
 												</View>
 											))}
 											{proverbs.length > 4 && (
@@ -295,7 +298,8 @@ const MyProverbBook = () => {
 								</TouchableOpacity>
 								</AnimatedListItem>
 							);
-						})
+						})}
+						</View>
 					)}
 				</Animated.ScrollView>
 
@@ -440,7 +444,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
-	sortChipActive: { backgroundColor: COLORS.secondary, borderColor: COLORS.secondary },
+	sortChipActive: { backgroundColor: COLORS.secondaryFill, borderColor: COLORS.secondaryFill },
 	sortChipText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary },
 	sortChipTextActive: { color: COLORS.textWhite },
 	booksContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, paddingBottom: scaleHeight(120), flexGrow: 1 },
@@ -457,7 +461,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.xxl,
 		paddingVertical: SPACING_H.md,
 		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 	},
 	emptyBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '700' },
 	bookCard: {
@@ -490,6 +494,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xs,
 	},
 	previewTagText: { fontSize: FONT_SIZES.sm, color: COLORS.text, fontWeight: '600' },
+	previewTagProverb: { fontFamily: FONTS.display },
 	emptyPreview: {
 		marginTop: SPACING_H.md,
 		paddingVertical: SPACING_H.md,
@@ -520,7 +525,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: FAB_SIZE,
 		height: FAB_SIZE,
 		borderRadius: FAB_SIZE / 2,
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -545,7 +550,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		overflow: 'hidden',
 		alignItems: 'center',
 	},
-	confirmTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
+	confirmTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
 	confirmDesc: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.textSecondary,
@@ -556,7 +561,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	confirmBtnRow: { flexDirection: 'row', width: '100%', columnGap: SPACING_W.md },
 	confirmBtn: { flex: 1, height: scaleHeight(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
 	confirmBtnCancel: { backgroundColor: COLORS.surfaceAlt },
-	confirmBtnDelete: { backgroundColor: COLORS.danger },
+	confirmBtnDelete: { backgroundColor: COLORS.dangerFill },
 	confirmBtnText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
 	actionSheetOverlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'flex-end' },
 	actionSheet: {

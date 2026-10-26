@@ -2,8 +2,10 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import AppAlert from '@/screens/common/modal/AppAlert';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { listGrid } from '@/const/common/ListGrid';
+import { inkOnFill } from '@/utils/ColorAlphaUtils';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
@@ -89,7 +91,7 @@ const InitQuizModeScreen = () => {
 		<SafeAreaView style={styles.main} edges={['bottom']}>
 			<View style={styles.container}>
 				<Animated.View style={[styles.animatedWrap, { opacity: enterAnim }]}>
-					<ScrollView ref={scrollRef} style={styles.scrollArea} contentContainerStyle={styles.scrollContent} onScroll={onListScroll} scrollEventThrottle={16} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+					<ScrollView ref={scrollRef} style={styles.scrollArea} contentContainerStyle={styles.scrollContent} onScroll={onListScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
 						<View style={styles.mascotSection}>
 							<FastImage
 								source={require('@/assets/images/screen-heroes/quiz-mode.png')}
@@ -115,11 +117,12 @@ const InitQuizModeScreen = () => {
 									<Animated.View
 										key={mode.key}
 										style={{
+											...(isTablet && styles.modeCell),
 											opacity: cardAnim,
 											transform: [{ translateY: cardAnim.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(12), 0] }) }],
 										}}>
 										<TouchableOpacity
-											style={[styles.modeCardFull, isComingSoon && styles.modeCardDisabled]}
+											style={[styles.modeCardFull, listGrid?.fill, isComingSoon && styles.modeCardDisabled]}
 											activeOpacity={isComingSoon ? 1 : 0.85}
 											onPress={() => {
 												if (isComingSoon) {
@@ -129,7 +132,7 @@ const InitQuizModeScreen = () => {
 												handleSelectMode(mode.key as 'meaning' | 'proverb' | 'blank' | 'example' | 'exampleBlank');
 											}}>
 											<View style={[styles.modeIconChipFull, { backgroundColor: isComingSoon ? COLORS.borderDark : mode.color }]}>
-												<IconComponent type={mode.type} name={mode.icon} size={scaledSize(24)} color={COLORS.textWhite} />
+												<IconComponent type={mode.type} name={mode.icon} size={scaledSize(24)} color={isComingSoon ? COLORS.textWhite : inkOnFill(mode.color)} />
 											</View>
 											<View style={styles.modeTextWrap}>
 												<Text style={[styles.modeLabelFull, { color: isComingSoon ? COLORS.textLight : mode.color }]} numberOfLines={1}>
@@ -172,7 +175,7 @@ const InitQuizModeScreen = () => {
 										<Text style={[styles.accordionButtonText, { color: COLORS.textOnVivid }]}>오답 복습</Text>
 									</TouchableOpacity>
 									<TouchableOpacity
-										style={[styles.accordionButton, { backgroundColor: COLORS.secondary }]}
+										style={[styles.accordionButton, { backgroundColor: COLORS.secondaryFill }]}
 										activeOpacity={0.85}
 										onPress={() => navigation.navigate(Paths.MAIN_TAB, { screen: Paths.SETTING })}>
 										<IconComponent type="MaterialCommunityIcons" name="reload" size={scaledSize(18)} color={COLORS.textWhite} />
@@ -239,10 +242,17 @@ const styles = themedStyles(() => StyleSheet.create({
 
 	// ===== 타이틀 =====
 	titleWrap: { marginBottom: SPACING_H.xl, alignItems: 'center' },
-	titleLine: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text, textAlign: 'center', marginBottom: SPACING_H.xs },
+	titleLine: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text, textAlign: 'center', marginBottom: SPACING_H.xs },
 
 	// ===== 모드 카드 =====
-	gridWrap: { width: '100%', rowGap: SPACING_H.md, marginBottom: SPACING_H.xl },
+	gridWrap: {
+		width: '100%',
+		rowGap: SPACING_H.md,
+		marginBottom: SPACING_H.xl,
+		// 태블릿은 2x2 — 폭 100% 컨테이너라 listGrid 음수 여백 대신 퍼센트 셀(modeCell)로 나눈다
+		...(isTablet && { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }),
+	},
+	modeCell: { width: '49%' },
 	modeCardFull: {
 		width: '100%',
 		flexDirection: 'row',

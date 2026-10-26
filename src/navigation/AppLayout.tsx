@@ -5,7 +5,7 @@ import { DarkTheme, DefaultTheme, NavigationContainer, NavigationContainerRef, T
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CONTENT_MAX_WIDTH, isTablet, scaleHeight } from '@/utils';
-import { COLORS, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, SPACING_H, themedStyles } from '@/const/common/Theme';
 import StackNavigator from './StackNavigator';
 import AdmobBannerAd from '@/screens/common/ads/AdmobBannerAd';
 import useAdsRemoved from '@/hooks/useAdsRemoved';
@@ -60,44 +60,17 @@ const AppLayout = () => {
 			case Paths.TODAY_QUIZ:
 				return COLORS.background;
 			case Paths.PROVERB_LIST:
+			// 이 화면들은 본문을 background 로 칠한다. surface 로 두면 광고 아래 띠(상단 안전영역 + 본문 위 여백)만
+			// 다른 색으로 떠 다크에서 특히 도드라진다(#1A1D3A vs #10122A).
+			case Paths.FAVORITE:
+			case Paths.MY_PROVERB_BOOK:
+			case Paths.MY_PROVERB_BOOK_DETAIL:
 				return COLORS.background;
 			default:
 				return COLORS.surface; // 기본값
 		}
 		// themeMode 가 바뀌면 COLORS 가 다른 팔레트를 가리키므로 다시 계산해야 한다.
 	}, [currentRoute, themeMode]);
-
-	/**
-	 * 태블릿에서 본문 기둥(navigatorWrapper) 양옆에 남는 여백의 색.
-	 *
-	 * 기둥 폭이 화면보다 좁아 남는 자리는 이 색으로 칠해진다. 위 `backgroundColor` 는 화면 몇
-	 * 개만 구분해 두고 나머지는 흰색(surface)이라, 배경이 다른 화면에서는 여백만 흰 띠로 떠 보였다
-	 * (특히 타워 챌린지 — 어두운 화면 좌우가 흰색).
-	 *
-	 * `backgroundColor` 자체를 고치지 않는 이유 — 그 값은 폰에서도 상단 안전영역(광고가 뜨는
-	 * 화면)에 그대로 칠해져서, 건드리면 폰 화면이 같이 바뀐다. 그래서 태블릿에서만 갈아 끼운다.
-	 */
-	const gutterColor = useMemo(() => {
-		if (!isTablet) {
-			return backgroundColor;
-		}
-		switch (currentRoute) {
-			case Paths.TOWER_CHANLLENGE:
-			case Paths.TOWER_QUIZ:
-				// 화면은 세로 그라데이션이라 완전히 같게는 못 맞춘다 — 가운데 톤으로 이어 붙인다.
-				return COLORS.darkGradient[1];
-			case Paths.PROVERB_QUIZ_MODE_SELECT:
-			case Paths.QUIZ_WRONG_REVIEW:
-			case Paths.INIT_TIME_CHANLLENGE:
-			case Paths.FAVORITE:
-			case Paths.MY_PROVERB_BOOK:
-			case Paths.MY_PROVERB_BOOK_DETAIL:
-				return COLORS.background;
-			default:
-				return backgroundColor;
-		}
-		// themeMode 가 바뀌면 COLORS 가 다른 팔레트를 가리키므로 다시 계산해야 한다.
-	}, [currentRoute, backgroundColor, themeMode]);
 
 	const getAdPaddingTop = () => {
 		if (!shouldShowAd) {
@@ -207,6 +180,13 @@ const AppLayout = () => {
 				border: COLORS.border,
 				notification: COLORS.danger,
 			},
+			// 탭 라벨·헤더는 이 테마의 fontFamily('System')를 직접 박아 전역 본문 서체(TextDefaults)를 덮어쓴다.
+			fonts: {
+				regular: { fontFamily: FONTS.body, fontWeight: '400' },
+				medium: { fontFamily: FONTS.body, fontWeight: '500' },
+				bold: { fontFamily: FONTS.body, fontWeight: '600' },
+				heavy: { fontFamily: FONTS.body, fontWeight: '700' },
+			},
 		};
 	}, [themeMode]);
 
@@ -224,9 +204,8 @@ const AppLayout = () => {
 					setCurrentRoute(routeName);
 				}
 			}}>
-			{/* 기둥 바깥(태블릿 좌우 여백)까지 덮는 두 겹은 여백 색을 쓴다 — 폰에서는 backgroundColor 와 같은 값이다. */}
-			<SafeAreaView style={[styles.safeArea, { backgroundColor: gutterColor }]} edges={shouldShowAd ? ['top'] : []}>
-				<View style={[styles.container, { backgroundColor: gutterColor }]}>
+			<SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={shouldShowAd ? ['top'] : []}>
+				<View style={[styles.container, { backgroundColor }]}>
 					{/*
 						배너는 본문 기둥(CONTENT_MAX_WIDTH)에 맞추지 않는다.
 						앵커드 어댑티브 배너의 네이티브 뷰는 컨테이너가 아니라 '기기 폭'으로 크기를 정해
@@ -270,9 +249,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	navigatorWrapper: {
 		flex: 1,
-		// 태블릿에서 화면 폭을 다 쓰면 한 줄이 지나치게 길고 카드가 늘어져 읽기 어렵다.
-		// 본문을 가운데 기둥으로 묶고 남는 좌우는 배경색으로 둔다.
-		// 폰은 화면 폭이 CONTENT_MAX_WIDTH 보다 좁아 아무 영향이 없다.
+		// 폰·태블릿 모두 화면 폭을 가득 쓴다(CONTENT_MAX_WIDTH = 화면 폭). 분할 화면에서 창이 기기보다
+		// 좁아질 때만 상한이 걸리지 않도록 width 100% 와 함께 둔다.
 		width: '100%',
 		maxWidth: CONTENT_MAX_WIDTH,
 		alignSelf: 'center',

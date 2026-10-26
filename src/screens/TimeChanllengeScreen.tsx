@@ -10,8 +10,9 @@ import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { isTablet, moderateScale, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
+import { listGrid } from '@/const/common/ListGrid';
 import { sampleSize, shuffle } from '@/utils/ArrayUtils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize, getThemeMode } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles, displayFontSize, getThemeMode } from '@/const/common/Theme';
 import {useIsFocused} from '@react-navigation/native';
 import { Paths } from '@/navigation/conf/Paths';
 import { TimeChallengeInterceptor } from '@/services/interceptor/TimeChanllengeInterceptor';
@@ -139,7 +140,7 @@ const InfinityQuizScreen = () => {
 	const [gameResult, setGameResult] = useState<MainDataType.TimeChallengeResult | null>(null);
 	const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
-	const labelColors = [COLORS.secondary, COLORS.primary, COLORS.accentFlame, COLORS.accentPink]; // A, B, C, D 색상 (각각 다르게)
+	const labelColors = [COLORS.primary, COLORS.accentFlame, COLORS.accentTeal, COLORS.accentPink]; // A, B, C, D 색상 (각각 다르게)
 	const solvedProverbs = questionList.slice(0, currentIndex + 1).filter((q) => resultMap[q.id]);
 	// 해설 헤더에 접힌 상태에서도 성적을 보여주기 위한 요약
 	const solvedCorrectCount = solvedProverbs.filter((q) => resultMap[q.id] === 'correct').length;
@@ -642,8 +643,7 @@ const InfinityQuizScreen = () => {
 				style={{ flex: 1 }}
 				contentContainerStyle={isGameOver ? styles.resultScrollContent : styles.quizScrollContent}
 				onScroll={onMainScroll}
-				scrollEventThrottle={16}
-				keyboardShouldPersistTaps="handled">
+				scrollEventThrottle={16}>
 				{!isGameOver && (
 					<View style={styles.statusBoxRow}>
 						{/* 🎯 점수 */}
@@ -820,15 +820,15 @@ const InfinityQuizScreen = () => {
 									<>
 										{/* ✅ 정답 / 오답 강조 카드 */}
 										<View style={styles.resultScoreCardRow}>
-											<View style={[styles.resultScoreCard, { backgroundColor: COLORS.primaryBg, borderColor: COLORS.successBorder }]}>
-												<View style={[styles.resultScoreIcon, { backgroundColor: COLORS.primary }]}>
-													<IconComponent name="check" type="materialIcons" color={COLORS.textWhite} size={scaledSize(16)} />
+											<View style={[styles.resultScoreCard, { backgroundColor: COLORS.successBg, borderColor: COLORS.successBorder }]}>
+												<View style={[styles.resultScoreIcon, { backgroundColor: COLORS.success }]}>
+													<IconComponent name="check" type="materialIcons" color={COLORS.textOnVivid} size={scaledSize(16)} />
 												</View>
-												<Text style={[styles.resultScoreValue, { color: COLORS.primaryDark }]}>{gameResult.correctCount}</Text>
+												<Text style={[styles.resultScoreValue, { color: COLORS.successDark }]}>{gameResult.correctCount}</Text>
 												<Text style={styles.resultScoreLabel}>정답</Text>
 											</View>
 											<View style={[styles.resultScoreCard, { backgroundColor: COLORS.dangerSoftBg, borderColor: COLORS.dangerBorderSoft }]}>
-												<View style={[styles.resultScoreIcon, { backgroundColor: COLORS.danger }]}>
+												<View style={[styles.resultScoreIcon, { backgroundColor: COLORS.dangerFill }]}>
 													<IconComponent name="close" type="materialIcons" color={COLORS.textWhite} size={scaledSize(16)} />
 												</View>
 												<Text style={[styles.resultScoreValue, { color: COLORS.dangerDark }]}>{gameResult.wrongCount}</Text>
@@ -933,22 +933,23 @@ const InfinityQuizScreen = () => {
 						{/* 문제별 정오답 + 의미 */}
 						{isFeedbackOpen && (
 							<View style={styles.feedbackList}>
+								{/* 태블릿은 두 장씩 한 행 — 폰은 listGrid 가 null 이라 한 열 그대로다 */}
+								<View style={[listGrid?.wrap, styles.feedbackGrid]}>
 								{solvedProverbs.map((q, i) => {
 									const isCorrect = resultMap[q.id] === 'correct';
-									const tint = isCorrect ? COLORS.success : COLORS.danger;
-									const soft = isCorrect ? COLORS.primarySoft : COLORS.dangerBg;
-									const deep = isCorrect ? COLORS.primaryDark : COLORS.dangerDark;
+									// 예전 왼쪽 색 띠 대신 옅은 테두리 톤으로 정오답을 구분한다 (번호 칩·결과 배지와 같은 계열)
+									const edge = isCorrect ? COLORS.successBorder : COLORS.dangerBorderSoft;
+									const soft = isCorrect ? COLORS.successSoft : COLORS.dangerBg;
+									const deep = isCorrect ? COLORS.successDark : COLORS.dangerDark;
 									return (
+										<View key={q.id} style={listGrid?.cell}>
 										<TouchableOpacity
-											key={q.id}
 											activeOpacity={0.7}
 											onPress={() => {
 												setSelectedProverb(q);
 												setDetailModalVisible(true);
 											}}
-											style={styles.feedbackItem}>
-											{/* 왼쪽 색 띠 하나로 정오답을 구분한다 — 카드 전체를 물들이지 않아 글자가 선명하다 */}
-											<View style={[styles.feedbackAccent, { backgroundColor: tint }]} />
+											style={[styles.feedbackItem, listGrid?.fill, { borderColor: edge }]}>
 											<View style={styles.feedbackBody}>
 												<View style={styles.feedbackTitleRow}>
 													<View style={[styles.feedbackNoChip, { backgroundColor: soft }]}>
@@ -979,8 +980,10 @@ const InfinityQuizScreen = () => {
 												style={styles.feedbackArrow}
 											/>
 										</TouchableOpacity>
+										</View>
 									);
 								})}
+								</View>
 							</View>
 						)}
 					</>
@@ -1006,9 +1009,9 @@ const InfinityQuizScreen = () => {
 										type="materialIcons"
 										name={feedback === 'correct' ? 'check-circle' : 'cancel'}
 										size={scaledSize(14)}
-										color={feedback === 'correct' ? COLORS.primaryDark : COLORS.dangerDark}
+										color={feedback === 'correct' ? COLORS.successDark : COLORS.dangerDark}
 									/>
-									<Text style={[styles.feedbackTagText, { color: feedback === 'correct' ? COLORS.primaryDark : COLORS.dangerDark }]}>
+									<Text style={[styles.feedbackTagText, { color: feedback === 'correct' ? COLORS.successDark : COLORS.dangerDark }]}>
 										{feedback === 'correct' ? '정답입니다' : '오답입니다'}
 									</Text>
 								</View>
@@ -1048,7 +1051,7 @@ const InfinityQuizScreen = () => {
 										{choice}
 									</Text>
 									{showCorrect && (
-										<IconComponent name="check-circle" type="materialIcons" size={scaledSize(20)} color={COLORS.primaryDark} />
+										<IconComponent name="check-circle" type="materialIcons" size={scaledSize(20)} color={COLORS.successDark} />
 									)}
 									{showWrong && <IconComponent name="cancel" type="materialIcons" size={scaledSize(20)} color={COLORS.dangerDark} />}
 								</TouchableOpacity>
@@ -1176,12 +1179,12 @@ const InfinityQuizScreen = () => {
 							<View style={styles.modalButtonRow}>
 								<TouchableOpacity
 									activeOpacity={0.85}
-									style={[styles.modalBackButton, { backgroundColor: COLORS.borderDark }]}
+									style={styles.modalBackButton}
 									onPress={() => {
 										setShowExitModal(false);
 										setIsPaused(false); // 타이머 재개
 									}}>
-									<Text style={styles.modalButtonText}>취소</Text>
+									<Text style={styles.modalBackButtonText}>취소</Text>
 								</TouchableOpacity>
 								<TouchableOpacity
 									activeOpacity={0.85}
@@ -1327,10 +1330,11 @@ const InfinityQuizScreen = () => {
 export default InfinityQuizScreen;
 
 const styles = themedStyles(() => StyleSheet.create({
-	container: { flex: 1, paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.md, backgroundColor: COLORS.surface },
+	// 좌우·위 여백은 스크롤 내용에 둔다 — 여기 두면 하단 종료 바의 구분선이 화면 끝까지 닿지 않고
+	// 바 아래에 여백이 한 겹 더 생긴다 (QuizScreen 과 같은 구조).
+	container: { flex: 1, backgroundColor: COLORS.surface },
 	header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
 	score: { fontSize: FONT_SIZES.xxl, fontWeight: '700' },
-	lives: { fontSize: FONT_SIZES.xxl, color: 'red' },
 	statusText: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.textSecondary,
@@ -1361,7 +1365,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	restartBtn: {
 		paddingVertical: SPACING_H.mdPlus,
 		paddingHorizontal: SPACING_W.xxxl,
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 		borderRadius: RADIUS.sm,
 		marginBottom: SPACING_H.xxl,
 	},
@@ -1417,6 +1421,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xl,
 	},
 	exitModalTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xxl,
 		fontWeight: '700',
 		color: COLORS.text,
@@ -1428,12 +1433,13 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textSecondary,
 		marginBottom: SPACING_H.xl,
 		textAlign: 'center',
-		lineHeight: scaleHeight(22),
+		lineHeight: scaledSize(22),
 	},
 	exitModalConfirmButton: {
 		flex: 1,
-		backgroundColor: COLORS.danger,
-		padding: SPACING_H.md,
+		backgroundColor: COLORS.dangerFill,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.md,
 		borderRadius: RADIUS.sm,
 		marginLeft: SPACING_W.xsPlus,
 		alignItems: 'center',
@@ -1445,19 +1451,27 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	modalBackButton: {
 		flex: 1,
-		backgroundColor: COLORS.borderDark,
-		padding: SPACING_H.md,
+		// 회색 채움(borderDark) 위 흰 글자는 라이트에서 1.6:1 — QuizScreen 취소 버튼과 같은 옅은 면 + 보조 글자로
+		backgroundColor: COLORS.surfaceAlt,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.md,
 		borderRadius: RADIUS.sm,
 		marginRight: SPACING_W.xsPlus,
 		alignItems: 'center',
 	},
 	modalStartButton: {
 		flex: 1,
-		backgroundColor: COLORS.secondary,
-		padding: SPACING_H.md,
+		backgroundColor: COLORS.secondaryFill,
+		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.md,
 		borderRadius: RADIUS.sm,
 		marginLeft: SPACING_W.xsPlus,
 		alignItems: 'center',
+	},
+	modalBackButtonText: {
+		color: COLORS.textSecondary,
+		fontWeight: '600',
+		fontSize: FONT_SIZES.mdPlus,
 	},
 	modalButtonText: {
 		color: COLORS.textWhite,
@@ -1556,9 +1570,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '700',
 		textAlign: 'center',
 		color: COLORS.text,
-		lineHeight: scaleHeight(28),
+		lineHeight: scaledSize(28),
 	},
 	questionIdiom: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xxl,
 		color: COLORS.secondary,
 		fontWeight: '800',
@@ -1578,7 +1593,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,
 	},
-	feedbackTagCorrect: { backgroundColor: COLORS.primarySoft },
+	feedbackTagCorrect: { backgroundColor: COLORS.successSoft },
 	feedbackTagWrong: { backgroundColor: COLORS.dangerBg },
 	feedbackTagText: { fontSize: FONT_SIZES.smPlus, fontWeight: '800' },
 	choicesWrapper: {
@@ -1618,8 +1633,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '800',
 	},
 	choiceBtnCorrect: {
-		backgroundColor: COLORS.primarySoft,
-		borderColor: COLORS.primaryDark,
+		backgroundColor: COLORS.successSoft,
+		borderColor: COLORS.successDark,
 	},
 	choiceBtnWrong: {
 		backgroundColor: COLORS.dangerBg,
@@ -1629,7 +1644,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		opacity: 0.5,
 	},
 	choiceTextCorrect: {
-		color: COLORS.primaryDeep,
+		color: COLORS.successDeep,
 		fontWeight: '800',
 	},
 	choiceTextWrong: {
@@ -1743,11 +1758,14 @@ const styles = themedStyles(() => StyleSheet.create({
 	feedbackToggleTextWrap: { flex: 1 },
 	feedbackToggleTitle: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong },
 	feedbackToggleSub: { marginTop: SPACING_H.xxs, fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
-	feedbackToggleCorrect: { fontWeight: '700', color: COLORS.primaryDark },
+	feedbackToggleCorrect: { fontWeight: '700', color: COLORS.successDark },
 	feedbackToggleWrong: { fontWeight: '700', color: COLORS.dangerDark },
 	feedbackList: {
 		width: '100%',
 		marginTop: SPACING_H.smPlus,
+	},
+	// 카드 사이 세로 간격 — 폰(한 열)·태블릿(두 열) 모두 이 묶음이 카드를 직접 담는다
+	feedbackGrid: {
 		rowGap: SPACING_H.smPlus,
 	},
 	feedbackItem: {
@@ -1759,7 +1777,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surface,
 		overflow: 'hidden',
 	},
-	feedbackAccent: { width: scaleWidth(4), alignSelf: 'stretch' },
 	feedbackBody: { flex: 1, paddingVertical: SPACING_H.md, paddingHorizontal: SPACING_W.md },
 	feedbackTitleRow: {
 		flexDirection: 'row',
@@ -1787,6 +1804,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	feedbackResultBadgeText: { fontSize: FONT_SIZES.xs, fontWeight: '800' },
 	feedbackTitle: {
 		flex: 1,
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -1816,7 +1834,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: scaleWidth(160),
 		height: scaleWidth(160),
 		borderRadius: scaleWidth(80),
-		backgroundColor: 'rgba(20, 184, 166, 0.2)',
+		// 예전 그린 primary 시절의 틸 틴트가 남아 있던 자리 — 테두리와 같은 쪽빛 틴트로
+		backgroundColor: withAlpha(COLORS.primary, ALPHA.soft),
 		borderWidth: 4,
 		borderColor: COLORS.primary,
 		justifyContent: 'center',
@@ -1863,7 +1882,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.xs,
 		color: COLORS.accentTealDeep,
 		fontWeight: '700',
-		lineHeight: scaleHeight(13),
+		lineHeight: scaledSize(13),
 	},
 	lifeBarWrapper: {
 		position: 'relative',
@@ -1921,7 +1940,7 @@ const styles = themedStyles(() => StyleSheet.create({
 
 	chanceText: {
 		fontSize: FONT_SIZES.xs,
-		lineHeight: scaleHeight(13),
+		lineHeight: scaledSize(13),
 		color: COLORS.primaryDark,
 		fontWeight: '700',
 	},
@@ -1957,6 +1976,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.smPlus,
 	},
 	chanceModalTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '800',
 		color: COLORS.textStrong,
@@ -2015,7 +2035,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	chanceKeywordBox: { width: '100%', marginBottom: SPACING_H.smPlus },
 	chanceKeywordWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING_W.xsPlus, marginTop: SPACING_H.xsPlus },
 	chanceKeywordChip: { backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.sm, paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs },
-	chanceKeywordText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textMuted },
+	chanceKeywordText: { fontFamily: FONTS.display, fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textMuted },
 
 	chanceExampleBox: {
 		width: '100%',
@@ -2035,7 +2055,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.text,
 		fontWeight: '600',
-		lineHeight: scaleHeight(20),
+		lineHeight: scaledSize(20),
 	},
 	chanceModalButton: {
 		width: '100%',
@@ -2065,12 +2085,16 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	quizScrollContent: {
 		// 도움말 버튼 행을 걷어내며 상태 박스가 화면 위쪽에 바짝 붙었다 — 그만큼 위를 띄운다
-		paddingTop: SPACING_H.md,
+		// (예전 SafeAreaView 위 여백 md + 여기 md)
+		paddingTop: SPACING_H.xxl,
+		paddingHorizontal: SPACING_W.lg,
 		paddingBottom: SPACING_H.xxxxl,
 	},
 	resultScrollContent: {
 		flexGrow: 1,
 		justifyContent: 'center',
+		paddingTop: SPACING_H.md,
+		paddingHorizontal: SPACING_W.lg,
 		paddingBottom: SPACING_H.xl,
 	},
 	resultWrapper: {
@@ -2080,7 +2104,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderColor: COLORS.borderDark,
 		borderRadius: RADIUS.lg,
 		backgroundColor: COLORS.surface,
-		padding: SPACING_W.lg,
+		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
 	},
 	resultButtons: {
 		flexDirection: 'row',
@@ -2097,6 +2121,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	timeResultImage: { width: scaleWidth(148), height: scaleHeight(104), marginBottom: SPACING_H.xs },
 	resultHeaderTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xxl,
 		fontWeight: '800',
 		color: COLORS.textStrong,
@@ -2183,6 +2208,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.border,
 	},
 	scoreHeroNumber: {
+		fontFamily: FONTS.body,
 		fontSize: displayFontSize(56),
 		fontWeight: '700',
 		color: COLORS.danger,
@@ -2199,7 +2225,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textMuted,
 		textAlign: 'center',
 		fontWeight: '600',
-		lineHeight: scaleHeight(20),
+		lineHeight: scaledSize(20),
 		marginTop: SPACING_H.xsPlus,
 	},
 	statGrid: {
@@ -2258,7 +2284,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.md,
 	},
 	resultBtnPrimary: {
-		backgroundColor: COLORS.secondary,
+		backgroundColor: COLORS.secondaryFill,
 	},
 	resultBtnPrimaryText: {
 		fontSize: FONT_SIZES.md,

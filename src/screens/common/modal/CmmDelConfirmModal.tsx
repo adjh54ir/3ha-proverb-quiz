@@ -106,7 +106,7 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     // 파괴적 액션 — 취소 버튼과 색/간격으로 확실히 구분
     modalDelete: {
-        backgroundColor: COLORS.danger,
+        backgroundColor: COLORS.dangerFill,
     },
     modalButtonText: {
         color: COLORS.textWhite,

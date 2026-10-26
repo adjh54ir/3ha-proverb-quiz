@@ -4,7 +4,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Animated } from '
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { LEVEL_DATA } from '@/const/ConstInfoData';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
@@ -28,6 +28,8 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 
 	// 역순 정렬된 데이터
 	const reversedLevelData = useMemo(() => [...LEVEL_DATA].reverse(), []);
+	// 현재 등급 카드의 실제 위치 — 카드 높이는 글자 배율·설명 길이·태블릿 배율에 따라 달라 추정값으로는 어긋난다
+	const currentCardY = useRef<number | null>(null);
 
 
 	/**
@@ -40,10 +42,8 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 			if (currentLevelIndex !== -1) {
 				// ✅ 더 긴 딜레이와 정확한 높이 계산
 				scrollTimerRef.current = setTimeout(() => {
-					// 각 카드의 높이: 마스코트(160) + 패딩 + 텍스트 영역 + 마진
-					// 현재 등급 카드는 배지가 있어서 더 높음
-					const estimatedCardHeight = scaleHeight(280); // 예상 카드 높이
-					const scrollY = currentLevelIndex * estimatedCardHeight;
+					// 측정값이 아직 없을 때(레이아웃 전)만 예전 추정치로 이동한다
+					const scrollY = currentCardY.current ?? currentLevelIndex * scaleHeight(280);
 
 					levelScrollRef.current?.scrollTo({
 						y: scrollY,
@@ -78,7 +78,10 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 						{reversedLevelData.map((item) => {
 							const isCurrent = totalScore >= item.score && totalScore < item.next;
 							return (
-								<View key={item.label} style={[styles.levelCardBox, isCurrent && styles.levelCardBoxActive]}>
+								<View
+									key={item.label}
+									style={[styles.levelCardBox, isCurrent && styles.levelCardBoxActive]}
+									onLayout={isCurrent ? (e) => (currentCardY.current = e.nativeEvent.layout.y) : undefined}>
 									{isCurrent && (
 										<View style={styles.levelBadge}>
 											<IconComponent type="fontAwesome6" name="trophy" size={scaledSize(11)} color={COLORS.textWhite} />
@@ -134,6 +137,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		overflow: 'hidden',
 	},
 	levelModalTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -162,7 +166,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		columnGap: SPACING_W.xs,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,

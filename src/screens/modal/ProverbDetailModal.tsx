@@ -4,8 +4,9 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Animated } from '
 import Modal from '@/screens/common/atomic/AppModal';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber } from '@/screens/common/CommonProverbModule';
+import { readableTextOn } from '@/utils/ColorAlphaUtils';
 
 /** 레벨 번호 → 난이도 이름 (공통 난이도 램프 조회용) */
 import { MainDataType } from '@/types/MainDataType';
@@ -66,13 +67,13 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 2:
-				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 3:
-				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			case 4:
-				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
 			default:
 				return null;
 		}
@@ -81,23 +82,23 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 	const getFieldIcon = (field: string) => {
 		switch (field) {
 			case '운/우연':
-				return <IconComponent type="FontAwesome6" name="dice" size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="dice" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '인간관계':
-				return <IconComponent type="FontAwesome6" name="users" size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="users" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '세상 이치':
-				return <IconComponent type="fontawesome5" name="globe" size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type="fontawesome5" name="globe" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '근면/검소':
-				return <IconComponent type="fontawesome5" name="hammer" size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type="fontawesome5" name="hammer" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '노력/성공':
-				return <IconComponent type="fontawesome5" name="medal" size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type="fontawesome5" name="medal" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '경계/조심':
-				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '욕심/탐욕':
-				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			case '배신/불신':
-				return <IconComponent type="fontawesome5" name="user-slash" size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type="fontawesome5" name="user-slash" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 			default:
-				return <IconComponent type="FontAwesome6" name="tag" size={scaledSize(12)} color={COLORS.textWhite} />;
+				return <IconComponent type="FontAwesome6" name="tag" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
 		}
 	};
 	const handleToggleFavorite = async () => {
@@ -134,13 +135,13 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 						<View style={styles.badgeRow}>
 							<View style={[styles.badge, { backgroundColor: getLevelColor(proverb.level) }]}>
 								{getLevelIcon(proverb.level)}
-								<Text style={styles.badgeText}>
+								<Text style={[styles.badgeText, { color: readableTextOn(getLevelColor(proverb.level)) }]}>
 									{{ 1: '초급', 2: '중급', 3: '고급', 4: '특급' }[proverb.level] || '알 수 없음'}
 								</Text>
 							</View>
 							<View style={[styles.badge, { backgroundColor: getFieldColor(proverb.category) }]}>
 								{getFieldIcon(proverb.category)}
-								<Text style={styles.badgeText}>{proverb.category || '미지정'}</Text>
+								<Text style={[styles.badgeText, { color: readableTextOn(getFieldColor(proverb.category)) }]}>{proverb.category || '미지정'}</Text>
 							</View>
 						</View>
 
@@ -236,6 +237,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		position: 'relative',
 	},
 	modalHeaderTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -273,6 +275,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 
 	modalProverbText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xxl,
 		fontWeight: '700',
 		color: COLORS.secondaryDark, // 파란색 강조
@@ -353,6 +356,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 	},
 	sameProverbText: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.md,
 		color: COLORS.text,
 		lineHeight: scaledSize(20),

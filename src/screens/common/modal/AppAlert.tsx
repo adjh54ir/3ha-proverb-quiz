@@ -5,7 +5,7 @@ import Modal from '@/screens/common/atomic/AppModal';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import { scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 
 /**
@@ -189,6 +189,7 @@ const styles = themedStyles(() =>
 			overflow: 'hidden',
 		},
 		title: {
+			fontFamily: FONTS.display,
 			fontSize: FONT_SIZES.heading,
 			fontWeight: '700',
 			color: COLORS.textStrong,
@@ -226,7 +227,7 @@ const styles = themedStyles(() =>
 			backgroundColor: COLORS.surfaceAlt,
 		},
 		buttonDestructive: {
-			backgroundColor: COLORS.danger,
+			backgroundColor: COLORS.dangerFill,
 		},
 		buttonText: {
 			fontSize: FONT_SIZES.mdPlus,

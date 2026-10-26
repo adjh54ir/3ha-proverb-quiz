@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 제목·속담 문장용 서체. MainApplication 에서 "Gowun Batang" 으로 등록한다. 500 이하는 Regular, 600 이상은 Bold 로 맞춰진다. -->
+<font-family xmlns:app="http://schemas.android.com/apk/res-auto">
+    <font app:fontStyle="normal" app:fontWeight="400" app:font="@font/gowunbatang_regular" />
+    <font app:fontStyle="normal" app:fontWeight="700" app:font="@font/gowunbatang_bold" />
+</font-family>

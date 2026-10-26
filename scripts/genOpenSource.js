@@ -96,7 +96,16 @@ if (missing.length > 0) {
 	process.exit(1);
 }
 
-const body = rows
+/**
+ * npm 패키지가 아니라 파일로 번들되는 서체 (android/app/src/main/res/font, iOS 는 같은 파일을 참조).
+ * 둘 다 SIL OFL 1.1 이라 고지 의무가 있다. 서체를 바꾸면 여기도 고친다.
+ */
+const BUNDLED_FONTS = [
+	{ name: 'Gowun Batang (font)', license: 'OFL-1.1', version: '2.000', url: 'https://github.com/yangheeryu/Gowun-Batang' },
+	{ name: 'Pretendard (font)', license: 'OFL-1.1', version: '1.3.9', url: 'https://github.com/orioncactus/pretendard' },
+];
+
+const body = [...rows, ...BUNDLED_FONTS]
 	.map((r) => `\t{ name: '${r.name}', license: '${r.license}', version: '${r.version}', url: '${r.url}' },`)
 	.join('\n');
 

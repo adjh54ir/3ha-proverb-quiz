@@ -1,7 +1,7 @@
 // components/VersionCheckModal.tsx
 import { setCurrentAppVerion } from '@/store/slice/UserDeviceInfoSlice';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, themedStyles } from '@/const/common/Theme';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, AppState, View, Text, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Linking, Platform, Easing } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -390,6 +390,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.primaryBg,
 		borderWidth: 1,
 		borderColor: COLORS.primaryBorder,
+		// 맥박(scale 1→1.06)이 걸리는 테두리 원 — 모달 레이아웃 규칙 7
+		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginBottom: SPACING_H.md,
@@ -419,6 +421,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.warningDeep,
 	},
 	title: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -513,7 +516,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textOnAccent,
 	},
 	laterButton: {
-		minHeight: scaleHeight(40),
+		minHeight: scaleHeight(44), // 터치 영역 44
 		alignItems: 'center',
 		justifyContent: 'center',
 		paddingVertical: SPACING_H.sm,

@@ -11,7 +11,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import { Paths } from '@/navigation/conf/Paths';
 import { generateTowerQuiz, TowerQuizQuestion } from '@/const/ConstTowerQuizData';
@@ -21,7 +21,7 @@ import TowerResultModal from './modal/TowerResultModal';
 import DateUtils from '@/utils/DateUtils';
 import { playCorrect, playWrong, playWhoosh, playFinish } from '@/utils/SoundUtils';
 import { startBgm, stopBgm } from '@/utils/BgmUtils';
-import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
+import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import { read, write } from '@/services/StorageService';
 
@@ -125,7 +125,7 @@ const TowerQuizScreen = () => {
 
 	const playEffectText = (isCorrect: boolean) => {
 		const texts = isCorrect ? CORRECT_TEXTS : WRONG_TEXTS;
-		const color = isCorrect ? COLORS.primary : COLORS.danger;
+		const color = isCorrect ? COLORS.success : COLORS.danger;
 		const text = texts[Math.floor(Math.random() * texts.length)];
 
 		setEffectText(text);
@@ -379,7 +379,7 @@ const TowerQuizScreen = () => {
 					<FastImage source={require('@/assets/images/screen-heroes/data-retry.png')} style={styles.errorStateImage} resizeMode="contain" />
 					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>타워 정보를 찾을 수 없습니다.</Text>
 					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: SPACING_H.xl }}>
-						<Text style={{ color: COLORS.primary, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
+						<Text style={{ color: COLORS.darkAccent, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
 					</TouchableOpacity>
 				</SafeAreaView>
 			</View>
@@ -394,7 +394,7 @@ const TowerQuizScreen = () => {
 					<FastImage source={require('@/assets/images/screen-heroes/data-retry.png')} style={styles.errorStateImage} resizeMode="contain" />
 					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>레벨 {level}에 해당하는 단어가 없습니다.</Text>
 					<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: SPACING_H.xl }}>
-						<Text style={{ color: COLORS.primary, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
+						<Text style={{ color: COLORS.darkAccent, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
 					</TouchableOpacity>
 				</SafeAreaView>
 			</View>
@@ -512,13 +512,17 @@ const TowerQuizScreen = () => {
 							const showCorrect = isAnswered && isCorrect;
 							const showWrong = isAnswered && isSelected && !isCorrect;
 
+							// 채움마다 글자색을 맞춘다 — 다크의 success(#3DD68C)·밝은 레벨색 위에서는 흰 글자가 묻힌다
 							let backgroundColor = 'rgba(255, 255, 255, 0.1)';
+							let ink: string = COLORS.textWhite;
 							if (showCorrect) {
-								backgroundColor = COLORS.primary;
+								backgroundColor = COLORS.success;
+								ink = COLORS.textOnVivid;
 							} else if (showWrong) {
-								backgroundColor = COLORS.danger;
+								backgroundColor = COLORS.dangerFill;
 							} else if (isSelected) {
 								backgroundColor = towerLevel.color;
+								ink = readableTextOn(towerLevel.color);
 							}
 
 							return (
@@ -530,11 +534,11 @@ const TowerQuizScreen = () => {
 									<View style={[styles.answerGradient, { backgroundColor }]}>
 										<View style={styles.answerContent}>
 											<View style={styles.answerNumber}>
-												<Text style={styles.answerNumberText}>{index + 1}</Text>
+												<Text style={[styles.answerNumberText, { color: ink }]}>{index + 1}</Text>
 											</View>
-											<Text style={styles.answerText}>{option}</Text>
-											{showCorrect && <IconComponent type="materialIcons" name="check-circle" size={scaledSize(24)} color={COLORS.textWhite} />}
-											{showWrong && <IconComponent type="materialIcons" name="cancel" size={scaledSize(24)} color={COLORS.textWhite} />}
+											<Text style={[styles.answerText, { color: ink }]}>{option}</Text>
+											{showCorrect && <IconComponent type="materialIcons" name="check-circle" size={scaledSize(24)} color={ink} />}
+											{showWrong && <IconComponent type="materialIcons" name="cancel" size={scaledSize(24)} color={ink} />}
 										</View>
 									</View>
 								</TouchableOpacity>
@@ -555,9 +559,9 @@ const TowerQuizScreen = () => {
 										type="materialIcons"
 										name={isCorrectAnswer ? 'check-circle' : 'info'}
 										size={scaledSize(24)}
-										color={isCorrectAnswer ? COLORS.primary : COLORS.danger}
+										color={isCorrectAnswer ? COLORS.success : COLORS.danger}
 									/>
-									<Text style={[styles.explanationTitle, { color: isCorrectAnswer ? COLORS.primary : COLORS.danger }]}>
+									<Text style={[styles.explanationTitle, { color: isCorrectAnswer ? COLORS.success : COLORS.danger }]}>
 										{isCorrectAnswer ? '정답입니다!' : '틀렸습니다'}
 									</Text>
 								</View>
@@ -571,14 +575,14 @@ const TowerQuizScreen = () => {
 					<View style={styles.nextButtonContainer}>
 						<TouchableOpacity onPress={handleNext} style={styles.nextButton}>
 							<View style={[styles.nextButtonGradient, { backgroundColor: towerLevel.color }]}>
-								<Text style={styles.nextButtonText}>
+								<Text style={[styles.nextButtonText, { color: readableTextOn(towerLevel.color) }]}>
 									{currentQuestionIndex < totalQuestions - 1 ? '다음 문제' : '결과 확인'}
 								</Text>
 								<IconComponent
 									type="materialIcons"
 									name={currentQuestionIndex < totalQuestions - 1 ? 'arrow-forward' : 'check'}
 									size={scaledSize(24)}
-									color={COLORS.textWhite}
+									color={readableTextOn(towerLevel.color)}
 								/>
 							</View>
 						</TouchableOpacity>
@@ -625,7 +629,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	headerCrest: { width: scaleWidth(28), height: scaleWidth(28) },
 	loadingCoachImage: { width: scaleWidth(150), height: scaleWidth(150), marginBottom: SPACING_H.lg },
 	errorStateImage: { width: scaleWidth(150), height: scaleHeight(100), marginBottom: SPACING_H.lg },
-	levelTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
+	levelTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
 	questionCount: { fontSize: FONT_SIZES.md, color: COLORS.darkTextSecondary, marginTop: SPACING_H.xs },
 	progressBarContainer: { paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.lg },
 	progressLabelRow: {
@@ -663,6 +667,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		textAlign: 'center',
 	},
 	questionProverb: {
+		fontFamily: FONTS.display,
 		color: COLORS.darkAccent, // ✅ 속담 부분만 파란색 강조
 		fontWeight: '700',
 	},

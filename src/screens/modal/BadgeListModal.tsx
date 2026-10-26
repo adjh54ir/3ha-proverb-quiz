@@ -4,7 +4,7 @@ import Modal from '@/screens/common/atomic/AppModal';
 import IconComponent from '../common/atomic/IconComponent';
 import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { useModalEnter } from '@/hooks/useModalEnter';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
@@ -214,12 +214,13 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: scaleWidth(58),
 		height: scaleWidth(58),
 		borderRadius: scaleWidth(58) / 2,
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: SPACING_H.md,
 	},
 	badgeModalTitle: {
+		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,
@@ -259,15 +260,16 @@ const styles = themedStyles(() => StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'center',
-		height: scaleHeight(36),
+		minHeight: scaleHeight(36),
+		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
 	badgeFilterChipActive: {
-		backgroundColor: COLORS.primary,
-		borderColor: COLORS.primary,
+		backgroundColor: COLORS.primaryFill,
+		borderColor: COLORS.primaryFill,
 	},
 	badgeFilterChipText: {
 		fontSize: FONT_SIZES.sm,
@@ -367,7 +369,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignSelf: 'stretch',
 		marginHorizontal: SPACING_W.lg,
 		marginTop: SPACING_H.md,
-		height: DONE_BTN_HEIGHT,
+		// 최소 높이 — 큰 글자 모드에서 버튼 글자가 잘리지 않게
+		minHeight: DONE_BTN_HEIGHT,
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.primaryFill,
 		justifyContent: 'center',

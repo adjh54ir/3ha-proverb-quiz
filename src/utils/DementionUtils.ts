@@ -47,6 +47,16 @@ export const MAX_SCALE = 1.25;
  */
 export const TABLET_MAX_SCALE = 1.35;
 
+/**
+ * 큰 태블릿(짧은 변 1000dp 이상 — 12.9/13인치 아이패드) 글씨 배율 상한.
+ *
+ * 본문 기둥이 900 까지 넓어지면 1.35배 글씨로는 한 줄이 지나치게 길어 읽기 힘들다.
+ * 글씨·아이콘(`scaledSize`)만 한 단계 키우고 간격·높이(`scaleWidth`/`scaleHeight`)는 그대로 둬
+ * 세로로 짠 화면이 넘치지 않게 한다. 폰·11인치 이하 태블릿은 영향이 없다.
+ */
+export const LARGE_TABLET_MIN_SHORT_SIDE = 1000;
+export const LARGE_TABLET_FONT_SCALE = 1.45;
+
 /** 짧은 변 기준 태블릿 판정 (테스트에서 임의 기기를 넣어 검증할 수 있게 순수 함수) */
 export const isTabletSize = (width: number, height: number) => Math.min(width, height) >= TABLET_MIN_SHORT_SIDE;
 
@@ -57,30 +67,22 @@ export const isTablet = isTabletSize(deviceWidth, deviceHeight);
 const PHONE_CONTENT_MAX_WIDTH = 600;
 
 /**
- * 태블릿에서 본문이 차지할 최대 폭 — 넘는 만큼은 좌우 여백으로 남긴다.
+ * 태블릿 본문 폭 — 화면 가로를 가득 쓴다(기기 짧은 변 = 세로 고정 화면의 폭).
  *
- * 고정값 하나로 두면 11인치(짧은 변 820)와 13인치(1024)가 같은 폭을 써서, 큰 기기일수록
- * 좌우 여백만 넓어지고 앱이 화면 가운데 박힌 폰처럼 보인다. 기기 짧은 변에 비례시키되
- * 상한을 둬 한 줄이 지나치게 길어지지 않게 한다.
- *   - 소형 태블릿(600) → 510 / 아이패드 미니(744) → 632 / 11인치(820) → 697 / 13인치(1024) → 700
- *
- * 하한을 두지 않는 이유 — 짧은 변 600dp 짜리 최소 태블릿에서는 하한이 기기 폭을 넘어
- * 좌우 여백이 사라진다. 비율만 쓰면 어떤 크기에서도 여백이 남는다.
+ * 예전에는 짧은 변 × 0.92(최대 900)로 기둥을 좁혀 좌우에 여백을 남겼는데, 화면 안쪽 padding 과
+ * 겹쳐 가로 영역이 불필요하게 비어 보였다. 넓어진 폭은 늘리기보다 목록 2열(`ListGrid`)로 쓴다.
+ * 모달·단독 버튼처럼 적정 폭이 필요한 것은 `MODAL_MAX_WIDTH` / `SOLO_BUTTON` 으로 따로 묶는다.
  */
-const TABLET_CONTENT_WIDTH_RATIO = 0.85;
-const TABLET_CONTENT_MAX_WIDTH = 700;
-
-/** 기기 크기에서 본문 기둥 폭을 뽑는다 */
 export const computeContentMaxWidth = (width: number, height: number) => {
 	if (!isTabletSize(width, height)) {
 		return PHONE_CONTENT_MAX_WIDTH;
 	}
-	return Math.round(Math.min(Math.min(width, height) * TABLET_CONTENT_WIDTH_RATIO, TABLET_CONTENT_MAX_WIDTH));
+	return Math.min(width, height);
 };
 
 /**
- * 본문(화면) 기둥 폭.
- * 폰은 화면이 이 값보다 좁아 아무 영향이 없고, 태블릿에서만 좌우 여백이 생긴다.
+ * 본문(화면) 폭 상한. 폰은 화면이 이 값보다 좁고, 태블릿은 화면 폭 그대로라 둘 다 실제로는 걸리지 않는다.
+ * 바텀시트·카드 폭 계산의 기준값으로 쓴다.
  */
 export const CONTENT_MAX_WIDTH = computeContentMaxWidth(deviceWidth, deviceHeight);
 
@@ -88,7 +90,7 @@ export const CONTENT_MAX_WIDTH = computeContentMaxWidth(deviceWidth, deviceHeigh
  * 모달 카드가 차지할 최대 폭 (본문 기둥보다 좁아야 대화상자처럼 보인다).
  *
  * 태블릿은 기둥이 넓어진 만큼 카드도 같이 키우되, 기둥의 90% 를 넘지 않게 묶는다.
- * 짧은 변 600dp 짜리 최소 태블릿은 기둥 자체가 510 이라 고정값 500 을 쓰면 카드가 기둥에
+ * 짧은 변 600dp 짜리 최소 태블릿은 기둥 자체가 552 라 고정값 500 을 쓰면 카드가 기둥에
  * 꽉 차 딤 배경이 보이지 않고 대화상자로 읽히지 않는다.
  * 폰은 화면이 460 보다 좁아 영향이 없다.
  */
@@ -125,8 +127,18 @@ const scaleWidth = (val: number) => val * widthRatio;
 
 const scaleHeight = (val: number) => val * heightRatio;
 
-/** 글꼴·아이콘처럼 가로/세로 중 더 작은 배율을 따라야 하는 값 */
-const fontScale = Math.min(widthRatio, heightRatio);
+/**
+ * 글꼴·아이콘 배율 — 가로/세로 중 더 작은 배율을 따른다.
+ * 큰 태블릿만 상한을 LARGE_TABLET_FONT_SCALE 로 올린다 (테스트에서 임의 기기를 넣을 수 있게 순수 함수).
+ */
+export const computeFontScale = (width: number, height: number, ratios = computeScaleRatios(width, height)) =>
+	Math.min(width, height) >= LARGE_TABLET_MIN_SHORT_SIDE
+		? Math.min(width / designWidth, height / designHeight, LARGE_TABLET_FONT_SCALE)
+		: Math.min(ratios.widthRatio, ratios.heightRatio);
+
+const fontScale = isTablet
+	? computeFontScale(deviceWidth, deviceHeight, { widthRatio, heightRatio })
+	: Math.min(widthRatio, heightRatio);
 
 const moderateScale = (size: number, factor = 1) => size + (scaleWidth(size) - size) * factor;
 

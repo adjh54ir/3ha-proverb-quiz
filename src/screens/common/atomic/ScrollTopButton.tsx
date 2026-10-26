@@ -83,7 +83,7 @@ const styles = themedStyles(() =>
 			// 그림자 대신 테두리로 구분한다(앱 전역 규칙).
 			borderWidth: 1,
 			borderColor: COLORS.border,
-			backgroundColor: COLORS.secondary,
+			backgroundColor: COLORS.secondaryFill,
 			overflow: 'hidden',
 		},
 		button: {

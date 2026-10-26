@@ -1,0 +1,25 @@
+Mode: built-in image_gen
+
+SEARCH RESULTS
+Use case: ads-marketing
+Create a finished promotional image for the iOS App Store SEARCH RESULTS placement of Korean app "속픽: 속담 퀴즈". Landscape aspect ratio EXACTLY 3:2, desired 1920 x 1280 pixels. Use the provided existing header as reference for brand and visual continuity, and the provided app icon as reference for the exact recognizable rabbit mascot (cream rabbit with dark brown outline, peach cheeks, dark brown Korean gat, parchment).
+A distinct companion to the header, composed specifically for 3:2: warm ivory textured background, rich cobalt #3D4EDB, persimmon orange #E8562C and ink navy typography. Clean modern polished Korean editorial illustration with subtle paper texture, uncluttered, ample breathing room.
+Top-left small brand line "속픽 · 속담 퀴즈"
+Large high-legibility main headline in two lines near top-left: "아는 속담도" then "퀴즈로 새롭게!"
+Below headline, a large beautiful floating ivory quiz flashcard with a discreet cobalt top rule, displaying exactly:
+small label "빈칸 채우기"
+question "가는 말이 고와야"
+next line "오는 말이 ____."
+Two large option chips underneath side by side: "곱다" (cobalt fill with white text and small check mark) and "많다" (ivory fill, ink text).
+Right side: large app rabbit mascot with Korean gat smiling encouragingly, holding an open small blank cream book, not obstructing headline or quiz text. Tiny restrained Korean cloud motifs and warm orange sun disk behind mascot. Small bottom supporting line "속담 뜻 · 빈칸 퀴즈 · 오늘의 퀴즈"
+Finished full-bleed campaign art. Keep all typography inside safe inner 88%. High quality crisp Korean spelling. No purple, no left accent line, no phone mockup, no fake screenshots, no watermark, no ratings or price claims, no Apple logos. Only one complete landscape image.
+
+HEADER
+Use case: ads-marketing
+Create a finished premium iOS App Store promotional HEADER for Korean app "속픽: 속담 퀴즈". Wide landscape aspect ratio exactly 3840:1646, target 3840 x 1646 pixels. Reference image is the app icon: preserve this recognizable cute cream rabbit with dark brown outlines, peach cheeks, and dark brown Korean gat hat, holding an unrolled parchment. This is a new marketing illustration, not a screenshot.
+Art direction: sophisticated playful Korean learning app, clean modern editorial composition, warm ivory paper background with extremely subtle texture, cobalt blue #3D4EDB (blue NOT purple), persimmon #E8562C, ink navy and warm tan accents. Large crisp Korean typography on left, generous whitespace. Right half: large charming mascot confidently presenting a cream parchment titled "속담 퀴즈", a few floating polished flashcards and tiny Korean cloud motifs, tasteful simple shapes. Premium crisp flat illustration with subtle tactile dimensionality, restrained clean shadows, beautifully balanced. No phones, no fake app interface.
+Exact text, correctly spelled and easy to read:
+small top label "속픽 · 속담 퀴즈"
+large two-line headline "속담 한 문제," then "지혜 한 걸음."
+small supporting line "맞히는 재미, 배우는 즐거움"
+All important content within inner 85% safe area. Mascot entirely visible, not clipped. No purple, no left accent border, no watermarks, no Apple or App Store logos, no rating claims, no price, no purchase CTA. Single finished full-bleed banner, no surrounding mockup.

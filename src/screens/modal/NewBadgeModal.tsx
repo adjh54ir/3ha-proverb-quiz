@@ -9,6 +9,7 @@ import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
+import { inkOnFill } from '@/utils/ColorAlphaUtils';
 import { playComplete } from '@/utils/SoundUtils';
 import { useModalEnterExit } from '@/hooks/useModalEnter';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
@@ -116,12 +117,14 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 						showsVerticalScrollIndicator={false}>
 						{badges.map((badge, index) => {
 							const rarity = BADGE_RARITY_META[badge.rarity] ?? BADGE_RARITY_META.common;
+							// 희귀도 색은 데이터 색이라 흰 글자를 박지 않는다 — 영웅(#F59E0B) 위 흰 글자는 2.2:1
+							const ribbonInk = inkOnFill(rarity.color);
 							return (
 								<View key={index} style={[styles.badgeCard, { backgroundColor: rarity.soft, borderColor: rarity.color }]}>
 									{/* 희귀도 리본 (등급 + 별점) */}
 									<View style={[styles.rarityRibbon, { backgroundColor: rarity.color }]}>
-										<IconComponent type="materialIcons" name="military-tech" size={scaledSize(13)} color={COLORS.textWhite} />
-										<Text style={styles.rarityRibbonText}>{rarity.label}</Text>
+										<IconComponent type="materialIcons" name="military-tech" size={scaledSize(13)} color={ribbonInk} />
+										<Text style={[styles.rarityRibbonText, { color: ribbonInk }]}>{rarity.label}</Text>
 										<View style={styles.ribbonStarRow}>
 											{Array.from({ length: 4 }).map((_, i) => (
 												<IconComponent
@@ -129,7 +132,8 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 													type="materialIcons"
 													name="star"
 													size={scaledSize(11)}
-													color={i < rarity.stars ? COLORS.textWhite : 'rgba(255,255,255,0.4)'}
+													color={ribbonInk}
+													style={i < rarity.stars ? undefined : styles.ribbonStarOff}
 												/>
 											))}
 										</View>
@@ -267,13 +271,14 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,
 	},
+	// 글자색은 리본 채움색에 맞춰 inkOnFill 로 런타임 주입
 	rarityRibbonText: {
-		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.xs,
 		fontWeight: '700',
 		marginRight: SPACING_W.xxs,
 	},
 	ribbonStarRow: { flexDirection: 'row', columnGap: scaleWidth(1) },
+	ribbonStarOff: { opacity: 0.4 },
 	emblemStage: {
 		marginTop: SPACING_H.sm,
 		marginBottom: SPACING_H.sm,
@@ -324,7 +329,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.primaryFill,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: SPACING_H.lg,
+		// 마지막 뱃지 카드 marginBottom(md) + 스크롤 paddingBottom(xs) + xs = 20 — 다른 대화상자의 버튼 위 간격
+		marginTop: SPACING_H.xs,
 	},
 	modalConfirmText: {
 		color: COLORS.textWhite,

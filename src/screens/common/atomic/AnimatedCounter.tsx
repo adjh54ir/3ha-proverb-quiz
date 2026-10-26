@@ -23,12 +23,17 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ value, duration = 900
 	useEffect(() => {
 		anim.setValue(0);
 		const id = anim.addListener(({ value: v }) => setDisplay(Math.round(v)));
-		Animated.timing(anim, {
+		const animation = Animated.timing(anim, {
 			toValue: value,
 			duration,
 			useNativeDriver: false,
-		}).start();
-		return () => anim.removeListener(id);
+		});
+		animation.start();
+		// JS 드라이버라 언마운트 뒤에도 끝날 때까지 매 프레임 돈다 — 리스너와 함께 멈춘다 (DonutChart 와 같은 이유)
+		return () => {
+			animation.stop();
+			anim.removeListener(id);
+		};
 	}, [value, duration, anim]);
 
 	const text = useComma ? display.toLocaleString() : String(display);

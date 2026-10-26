@@ -494,7 +494,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xs,
 	},
 	previewTagText: { fontSize: FONT_SIZES.sm, color: COLORS.text, fontWeight: '600' },
-	previewTagProverb: { fontFamily: FONTS.display },
+	previewTagProverb: { fontFamily: FONTS.display, fontWeight: '400' },
 	emptyPreview: {
 		marginTop: SPACING_H.md,
 		paddingVertical: SPACING_H.md,

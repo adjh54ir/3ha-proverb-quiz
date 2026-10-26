@@ -362,6 +362,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	// 정답이 속담(또는 속담의 빈칸 단어)일 때만. 뜻 문제의 정답은 뜻풀이라 본문 서체.
 	answerProverb: {
 		fontFamily: FONTS.display,
+		fontWeight: '700',
 	},
 	answerBlankText: {
 		fontSize: FONT_SIZES.smPlus,
@@ -488,6 +489,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.borderDark,
 		backgroundColor: COLORS.surface,
+		marginLeft: SPACING_W.sm, // 긴 결과 문구가 별 버튼에 붙지 않게
 	},
 	favoriteButtonActive: {
 		borderColor: COLORS.warning,

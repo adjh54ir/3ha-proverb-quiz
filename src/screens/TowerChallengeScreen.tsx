@@ -712,12 +712,13 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.md,
 		borderWidth: 1,
 		borderColor: 'rgba(255, 255, 255, 0.1)',
+		// 줄 사이만 띄운다 — 줄마다 marginBottom 이면 마지막 줄 뒤에도 붙어 박스 아래 여백이 위보다 커진다
+		rowGap: SPACING_H.xs,
 	},
 	descriptionBullet: {
 		fontSize: FONT_SIZES.sm,
 		color: COLORS.darkText,
 		lineHeight: scaledSize(18),
-		marginBottom: SPACING_H.xs,
 	},
 	buttonContent: {
 		flexDirection: 'row',

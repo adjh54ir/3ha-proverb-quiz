@@ -377,6 +377,7 @@ const styles = themedStyles(() => StyleSheet.create({
         color: COLORS.textSecondary,
         marginBottom: SPACING_H.xs,
     },
+    // 팝업의 타이틀 자리라 명조 (TowerChallengeScreen 카드 안의 보스 이름은 본문 서체)
     bossName: {
         fontFamily: FONTS.display,
         fontSize: FONT_SIZES.lg,

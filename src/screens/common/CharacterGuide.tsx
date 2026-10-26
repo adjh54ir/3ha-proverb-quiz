@@ -152,13 +152,18 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 			setStep(0);
 			return;
 		}
+		// 포커스를 잃으면 아래에서 null 을 그린다 — 보이지 않는 캐릭터의 흔들림 루프도 멈춘다.
+		if (!focused) {
+			return;
+		}
 		if (reducedMotion) {
 			enter.setValue(1);
 			bob.setValue(0);
 			return;
 		}
 		enter.setValue(0);
-		Animated.spring(enter, { toValue: 1, friction: 7, tension: 70, useNativeDriver: true }).start();
+		const pop = Animated.spring(enter, { toValue: 1, friction: 7, tension: 70, useNativeDriver: true });
+		pop.start();
 		const loop = Animated.loop(
 			Animated.sequence([
 				Animated.timing(bob, { toValue: 1, duration: 900, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
@@ -166,8 +171,11 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 			]),
 		);
 		loop.start();
-		return () => loop.stop();
-	}, [visible, enter, bob, reducedMotion]);
+		return () => {
+			pop.stop();
+			loop.stop();
+		};
+	}, [visible, focused, enter, bob, reducedMotion]);
 
 	// 문장 타이핑 — 한 글자씩 노출
 	const line = lines[step] ?? '';

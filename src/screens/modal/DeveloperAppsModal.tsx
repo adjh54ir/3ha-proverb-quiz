@@ -275,6 +275,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		position: 'relative',
 		top: 0,
 		right: 0,
+		// 버튼 자체 패딩(xs)만큼 당겨 X 아이콘 오른쪽 끝을 검색창·카드 끝선(lg)에 맞춘다 (다른 모달의 X 인셋과 같다)
+		marginRight: -SPACING_W.xs,
 	},
 	searchBox: {
 		flexDirection: 'row',

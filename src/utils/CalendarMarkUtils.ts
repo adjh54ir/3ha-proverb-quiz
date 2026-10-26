@@ -39,7 +39,8 @@ export const buildCheckedInMark = (isToday: boolean): DateMark => {
 	return {
 		marked: true,
 		dotColor: ink,
-		...cell(isToday ? COLORS.warning : COLORS.primary, ink),
+		// 흰 글자가 올라가는 칸은 *Fill — 다크 primary(#7C89FF) 위 흰 글자는 3.05:1 (라이트는 같은 값)
+		...cell(isToday ? COLORS.warning : COLORS.primaryFill, ink),
 	};
 };
 
@@ -55,7 +56,7 @@ export const buildDateMark = (isCheckedIn: boolean, isToday: boolean): DateMark 
 	isCheckedIn ? buildCheckedInMark(isToday) : buildQuizOnlyMark();
 
 /** 아직 출석하지 않은 오늘 — "지금 누르세요" 강조 */
-export const buildTodayPendingMark = (): DateMark => cell(COLORS.secondary, COLORS.textWhite);
+export const buildTodayPendingMark = (): DateMark => cell(COLORS.secondaryFill, COLORS.textWhite);
 
 /** 사용자가 달력에서 고른 날 */
 export const buildSelectedMark = (): DateMark => cell(COLORS.border, COLORS.text);

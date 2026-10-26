@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
-import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 import { Text, TouchableOpacity, View, StyleSheet, ScrollView, Animated, Dimensions } from 'react-native';
 import { FullScreenPortal } from '@/screens/common/atomic/FullScreenPortal';
@@ -131,7 +131,8 @@ const InfinityQuizScreen = () => {
 
 	const formattedTime = `${(timeLeftMs / 1000).toFixed(2)}초`;
 	const [isPaused, setIsPaused] = useState(false);
-	const [heartAnimations, setHeartAnimations] = useState(Array.from({ length: MAX_LIVES }, () => new Animated.Value(1)));
+	// 지연 초기화 — 인자로 바로 넘기면 100ms 타이머 리렌더마다 Animated.Value 5개를 새로 만들고 버린다
+	const [heartAnimations] = useState(() => Array.from({ length: MAX_LIVES }, () => new Animated.Value(1)));
 
 	const [isCountingDown, setIsCountingDown] = useState(false);
 	const [count, setCount] = useState(3);
@@ -1593,7 +1594,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xxl,
 		color: COLORS.secondary,
-		fontWeight: '800',
+		fontWeight: '700',
 	},
 	questionAsk: {
 		fontSize: FONT_SIZES.md,
@@ -1612,7 +1613,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	feedbackTagCorrect: { backgroundColor: COLORS.successSoft },
 	feedbackTagWrong: { backgroundColor: COLORS.dangerBg },
-	feedbackTagText: { fontSize: FONT_SIZES.smPlus, fontWeight: '800' },
+	feedbackTagText: { fontSize: FONT_SIZES.smPlus, fontWeight: '700' },
 	choicesWrapper: {
 		gap: SPACING_H.smPlus,
 	},
@@ -1647,7 +1648,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	choiceLabelText: {
 		fontSize: FONT_SIZES.md,
-		fontWeight: '800',
+		fontWeight: '700',
 	},
 	choiceBtnCorrect: {
 		backgroundColor: COLORS.successSoft,
@@ -1662,7 +1663,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	choiceTextCorrect: {
 		color: COLORS.successDeep,
-		fontWeight: '800',
+		fontWeight: '700',
 	},
 	choiceTextWrong: {
 		color: COLORS.dangerDeep,
@@ -1809,7 +1810,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	feedbackNoText: { fontSize: FONT_SIZES.xs, fontWeight: '800' },
+	feedbackNoText: { fontSize: FONT_SIZES.xs, fontWeight: '700' },
 	feedbackResultBadge: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -1818,7 +1819,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: SPACING_H.xxs,
 	},
-	feedbackResultBadgeText: { fontSize: FONT_SIZES.xs, fontWeight: '800' },
+	feedbackResultBadgeText: { fontSize: FONT_SIZES.xs, fontWeight: '700' },
 	feedbackTitle: {
 		flex: 1,
 		fontFamily: FONTS.display,
@@ -1995,7 +1996,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	chanceModalTitle: {
 		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xl,
-		fontWeight: '800',
+		fontWeight: '700',
 		color: COLORS.textStrong,
 		marginBottom: SPACING_H.xxs,
 	},
@@ -2021,14 +2022,14 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	chanceCharChar: {
 		fontSize: FONT_SIZES.xl,
-		fontWeight: '800',
+		fontWeight: '700',
 		color: COLORS.textDeep,
 		marginBottom: SPACING_H.xs,
 	},
 	chanceCharReading: {
 		fontSize: FONT_SIZES.xs,
 		color: COLORS.secondary,
-		fontWeight: '800',
+		fontWeight: '700',
 		textAlign: 'center',
 		marginTop: SPACING_H.xxs,
 	},
@@ -2052,7 +2053,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	chanceKeywordBox: { width: '100%', marginBottom: SPACING_H.smPlus },
 	chanceKeywordWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING_W.xsPlus, marginTop: SPACING_H.xsPlus },
 	chanceKeywordChip: { backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.sm, paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs },
-	chanceKeywordText: { fontFamily: FONTS.display, fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textMuted },
+	chanceKeywordText: { fontFamily: FONTS.display, fontSize: FONT_SIZES.sm, fontWeight: '400', color: COLORS.textMuted },
 
 	chanceExampleBox: {
 		width: '100%',
@@ -2064,7 +2065,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	chanceExampleLabel: {
 		fontSize: FONT_SIZES.sm,
-		fontWeight: '800',
+		fontWeight: '700',
 		color: COLORS.primaryDeep,
 		marginBottom: SPACING_H.xs,
 	},
@@ -2105,7 +2106,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		// (예전 SafeAreaView 위 여백 md + 여기 md)
 		paddingTop: SPACING_H.xxl,
 		paddingHorizontal: SPACING_W.lg,
-		paddingBottom: SPACING_H.xxxxl,
+		// 맨 위로 버튼이 종료 바 위에 떠 있어 40 으로는 마지막 보기 오른쪽(정답/오답 아이콘)을 가린다
+		paddingBottom: SCROLL_TOP_CLEARANCE,
 	},
 	resultScrollContent: {
 		flexGrow: 1,
@@ -2140,7 +2142,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	resultHeaderTitle: {
 		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.xxl,
-		fontWeight: '800',
+		fontWeight: '700',
 		color: COLORS.textStrong,
 	},
 	resultHeaderSub: {
@@ -2185,7 +2187,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	resultScoreValue: {
 		fontSize: FONT_SIZES.title,
-		fontWeight: '800',
+		fontWeight: '700',
 	},
 	resultScoreLabel: {
 		fontSize: FONT_SIZES.sm,
@@ -2218,7 +2220,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	statLineValue: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.textStrong,
-		fontWeight: '800',
+		fontWeight: '700',
 	},
 	statLineDivider: {
 		height: 1,
@@ -2266,7 +2268,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	statChipValue: {
 		fontSize: FONT_SIZES.xl,
-		fontWeight: '800',
+		fontWeight: '700',
 		color: COLORS.text,
 		marginBottom: SPACING_H.xxs,
 	},
@@ -2305,7 +2307,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	resultBtnPrimaryText: {
 		fontSize: FONT_SIZES.md,
-		fontWeight: '800',
+		fontWeight: '700',
 		color: COLORS.textWhite,
 	},
 	resultBtnSecondary: {
@@ -2315,7 +2317,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	resultBtnSecondaryText: {
 		fontSize: FONT_SIZES.md,
-		fontWeight: '800',
+		fontWeight: '700',
 		color: COLORS.secondary,
 	},
 	globalConfettiWrapper: {

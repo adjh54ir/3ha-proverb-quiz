@@ -5,7 +5,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import { isTablet, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { listGrid } from '@/const/common/ListGrid';
 import { inkOnFill } from '@/utils/ColorAlphaUtils';
-import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
 import { Paths } from '@/navigation/conf/Paths';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconComponent from './common/atomic/IconComponent';
@@ -242,7 +242,8 @@ const styles = themedStyles(() => StyleSheet.create({
 
 	// ===== 타이틀 =====
 	titleWrap: { marginBottom: SPACING_H.xl, alignItems: 'center' },
-	titleLine: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text, textAlign: 'center', marginBottom: SPACING_H.xs },
+	// 내비게이션 헤더가 이미 명조 타이틀이라 본문 서체 (명조 헤드라인은 화면당 하나)
+	titleLine: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text, textAlign: 'center', marginBottom: SPACING_H.xs },
 
 	// ===== 모드 카드 =====
 	gridWrap: {

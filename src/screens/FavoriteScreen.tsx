@@ -19,7 +19,7 @@ import { getCategoryColor, getLevelColor } from './common/CommonProverbModule';
 import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import ProverbDetailModal from './modal/ProverbDetailModal';
-import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
+import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
 import { useToast } from '@/hooks/useToast';
 import BottomHomeButton from './common/BottomHomeButton';
@@ -680,7 +680,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	miniCheckboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
 	// 필터 카드 아래 첫 카드까지 간격을 속담 사전(ProverbListScreen)과 같게 맞춘다 (md + sm)
-	listContent: { paddingTop: SPACING_H.sm, paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
+	// 맨 위로 버튼이 목록 영역 하단에 떠 있어(홈 버튼은 이 영역 밖) 40 으로는 마지막 카드 오른쪽 아래를 가린다
+	listContent: { paddingTop: SPACING_H.sm, paddingHorizontal: SPACING_W.lg, paddingBottom: SCROLL_TOP_CLEARANCE, flexGrow: 1 },
 	// 선택 모드에서만 하단 삭제 바(absolute)가 뜨므로 그때만 그만큼 더 비운다.
 	listContentWithBar: { paddingBottom: BOTTOM_BAR_HEIGHT + SPACING_H.lg },
 	// 위아래 여백은 스크롤되는 목록을 위한 것이라, 비었을 때는 중앙 정렬만 어긋나게 한다.

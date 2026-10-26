@@ -894,32 +894,28 @@ const QuizScreen = () => {
 		}
 	}, [remainingTime, question, selected]);
 
+	// 깜빡임은 남은 시간을 알리는 보조 신호다(숫자 타이머가 본 신호).
+	// '애니메이션 줄이기'에서는 정보 손실 없이 깜빡임만 뺀다.
+	// deps 는 이 boolean 하나 — remainingTime 을 넣으면 매초 cleanup 이 루프를 끊고 새로 시작해
+	// 깜빡임이 끊기고, 구간을 벗어날 때 값이 0 으로 돌아오지 않았다.
+	const hintGlowOn = !reducedMotion && remainingTime <= 20 && remainingTime > 0 && !!question && selected === null;
 	useEffect(() => {
-		// 깜빡임은 남은 시간을 알리는 보조 신호다(숫자 타이머가 본 신호).
-		// '애니메이션 줄이기'에서는 정보 손실 없이 깜빡임만 뺀다.
-		const inWarning = !reducedMotion && remainingTime <= 20 && remainingTime > 0 && !!question && selected === null;
-		if (inWarning) {
-			if (!hintGlowLoopRef.current) {
-				hintGlowLoopRef.current = Animated.loop(
-					Animated.sequence([
-						Animated.timing(hintGlowAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
-						Animated.timing(hintGlowAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
-					]),
-				);
-				hintGlowLoopRef.current.start();
-			}
-		} else if (hintGlowLoopRef.current) {
-			hintGlowLoopRef.current.stop();
-			hintGlowLoopRef.current = null;
+		if (!hintGlowOn) {
 			hintGlowAnim.setValue(0);
+			return;
 		}
+		hintGlowLoopRef.current = Animated.loop(
+			Animated.sequence([
+				Animated.timing(hintGlowAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+				Animated.timing(hintGlowAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
+			]),
+		);
+		hintGlowLoopRef.current.start();
 		return () => {
-			if (hintGlowLoopRef.current) {
-				hintGlowLoopRef.current.stop();
-				hintGlowLoopRef.current = null;
-			}
+			hintGlowLoopRef.current?.stop();
+			hintGlowLoopRef.current = null;
 		};
-	}, [remainingTime, question, selected, hintGlowAnim, reducedMotion]);
+	}, [hintGlowOn, hintGlowAnim]);
 
 	// 🎞 문제가 바뀔 때 문제/보기 영역 페이드 + 살짝 슬라이드 업
 	useEffect(() => {
@@ -1487,6 +1483,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	// 속담 문장일 때만 — 문제·보기가 모드에 따라 뜻풀이/예문이 되기도 해서 스타일에 박지 않는다
 	proverbFont: {
 		fontFamily: FONTS.display,
+		fontWeight: '700',
 	},
 	loadingText: {
 		fontSize: FONT_SIZES.md,

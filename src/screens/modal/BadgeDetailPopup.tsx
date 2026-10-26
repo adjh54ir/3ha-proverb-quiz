@@ -367,6 +367,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'center',
 	},
 	iconCircleLocked: { backgroundColor: COLORS.surfaceAlt },
+	// 팝업의 타이틀 자리라 명조 (목록 안의 뱃지 이름은 본문 서체)
 	badgeName: {
 		fontFamily: FONTS.display,
 		color: COLORS.textWhite,

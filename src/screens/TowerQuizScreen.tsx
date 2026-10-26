@@ -655,6 +655,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	headerCrest: { width: scaleWidth(28), height: scaleWidth(28) },
 	loadingCoachImage: { width: scaleWidth(150), height: scaleWidth(150), marginBottom: SPACING_H.lg },
 	errorStateImage: { width: scaleWidth(150), height: scaleHeight(100), marginBottom: SPACING_H.lg },
+	// 헤더 자리라 화면 타이틀로 본다(타워 이름이지만 명조)
 	levelTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
 	questionCount: { fontSize: FONT_SIZES.md, color: COLORS.darkTextSecondary, marginTop: SPACING_H.xs },
 	progressBarContainer: { paddingHorizontal: SPACING_W.lg, paddingBottom: SPACING_H.lg },

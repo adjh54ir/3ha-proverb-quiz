@@ -223,7 +223,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	tagText: {
 		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.smPlus,
-		fontWeight: '600',
+		fontWeight: '400',
 		color: COLORS.warningDark,
 	},
 	exampleBox: {
@@ -252,6 +252,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	// 문제 프롬프트가 속담 문장일 때만(뜻·예문 문제는 본문 서체). QuizScreen 의 proverbFont 조건과 같다.
 	questionProverbText: {
 		fontFamily: FONTS.display,
+		fontWeight: '700',
 	},
 	exampleText: {
 		fontSize: FONT_SIZES.md,

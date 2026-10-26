@@ -509,7 +509,9 @@ const MyScoreScreen = () => {
 			<ScrollView
 				ref={scrollRef}
 				style={styles.container}
-				contentContainerStyle={{ paddingBottom: SCROLL_TOP_CLEARANCE, flexGrow: 1 }}
+				// 첫 카드가 테두리 카드라 위 여백이 없으면 iOS 광고 제거 상태(레이아웃 상단 여백 0)에서 상태바 밑에 붙는다.
+				// 속담 사전(container paddingTop md)과 같은 위 여백.
+				contentContainerStyle={{ paddingTop: SPACING_H.md, paddingBottom: SCROLL_TOP_CLEARANCE, flexGrow: 1 }}
 				onScroll={onMainScroll}
 				scrollEventThrottle={16}
 				refreshControl={<RefreshControl

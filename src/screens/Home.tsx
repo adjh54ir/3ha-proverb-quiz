@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Easing,
 import { listGrid } from '@/const/common/ListGrid';
 import { inkOnFill } from '@/utils/ColorAlphaUtils';
 import { FullScreenPortal } from '@/screens/common/atomic/FullScreenPortal';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 import { Paths } from '@/navigation/conf/Paths';
 import { useAppNavigation } from '@/navigation/conf/Types';
@@ -252,8 +252,10 @@ const Home = () => {
 	);
 
 	// 🏅 뱃지 리스트 은은한 펄스 애니메이션 루프
+	// 탭 화면은 다른 탭으로 가도 마운트된 채 남는다 — 포커스를 잃으면 루프도 멈춘다.
+	const isFocused = useIsFocused();
 	useEffect(() => {
-		if (reducedMotion) {
+		if (reducedMotion || !isFocused) {
 			// 끊임없이 맥박치는 요소는 '애니메이션 줄이기'에서 가장 먼저 빠져야 한다.
 			badgePulse.setValue(0);
 			return;
@@ -266,7 +268,7 @@ const Home = () => {
 		);
 		loop.start();
 		return () => loop.stop();
-	}, [badgePulse, reducedMotion]);
+	}, [badgePulse, reducedMotion, isFocused]);
 
 	// 펫 통통 튀는 모션
 	const bouncePet = useCallback(() => {

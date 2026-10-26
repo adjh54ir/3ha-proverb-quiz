@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Image, StyleSheet, Text, View } from 'react-native';
-import { scaleHeight, scaleWidth } from '@/utils/DementionUtils';
+import { isTablet, MODAL_MAX_WIDTH, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 
 interface Props {
@@ -79,6 +79,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	toast: {
 		position: 'absolute',
 		alignSelf: 'center',
+		// 문구가 길어 줄바꿈되면 토스트가 화면 폭을 다 먹어 좌우 끝에 붙는다 — 타임 챌린지 토스트와 같은 폭 상한.
+		maxWidth: isTablet ? MODAL_MAX_WIDTH : '88%',
 		backgroundColor: COLORS.gold,
 		paddingVertical: SPACING_H.lg,
 		paddingHorizontal: SPACING_W.xl,

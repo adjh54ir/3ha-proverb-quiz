@@ -257,6 +257,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontFamily: FONTS.display,
 		color: COLORS.warningDeep,
 		fontSize: FONT_SIZES.sm,
-		fontWeight: '700',
+		fontWeight: '400',
 	},
 }));

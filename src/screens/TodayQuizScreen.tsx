@@ -1626,7 +1626,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	optionLabelChipText: {
 		fontSize: FONT_SIZES.sm,
-		fontWeight: '800',
+		fontWeight: '700',
 	},
 	optionTextTablet: {
 		flex: 1,

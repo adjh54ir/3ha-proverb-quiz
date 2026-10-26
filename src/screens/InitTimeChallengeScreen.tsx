@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Image } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { isTablet, scaleHeight, scaleWidth, scaledSize } from '@/utils';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, SOLO_BUTTON, themedStyles, displayFontSize } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONT_SIZES, RADIUS, SPACING_H, SPACING_W, SOLO_BUTTON, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './common/atomic/IconComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -439,8 +439,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.lg,
 	},
+	// 내비게이션 헤더가 이미 명조 타이틀이라 본문 서체 (명조 헤드라인은 화면당 하나)
 	heroTitle: {
-		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.title,
 		fontWeight: '700',
 		color: COLORS.textWhite,

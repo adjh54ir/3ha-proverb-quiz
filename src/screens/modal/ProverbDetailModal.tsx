@@ -289,7 +289,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderColor: COLORS.border,
 		backgroundColor: COLORS.surface,
 		paddingHorizontal: SPACING_W.lg,
-		paddingVertical: SPACING_H.md,
+		paddingTop: SPACING_H.md,
+		// 마지막 항목(sameProverbBox)의 marginBottom(sm) + xs = md — 위아래 안쪽 여백을 맞춘다
+		paddingBottom: SPACING_H.xs,
 		borderRadius: RADIUS.lg,
 		marginBottom: SPACING_H.md,
 	},

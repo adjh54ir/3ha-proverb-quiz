@@ -153,7 +153,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	scroll: {
 		alignItems: 'center',
-		paddingBottom: SPACING_H.sm,
 	},
 	profileSection: {
 		alignItems: 'center',

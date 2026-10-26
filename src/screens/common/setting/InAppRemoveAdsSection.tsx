@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Easing, Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import { useIsFocused } from '@react-navigation/native';
 import IconComponent from '../atomic/IconComponent';
 import AppAlert from '../modal/AppAlert';
 import useAdsRemoved from '@/hooks/useAdsRemoved';
@@ -61,8 +62,13 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 
 	// CTA 금박 위로 빛이 한 번씩 지나간다 — '애니메이션 줄이기' 사용자는 정지 (정보 손실 없음)
 	const shine = useRef(new Animated.Value(0)).current;
+	// 설정은 탭 화면이라 다른 탭에 가도 마운트된 채 남는다 — 포커스를 잃으면 루프를 멈춘다.
+	const isFocused = useIsFocused();
 	useEffect(() => {
-		if (reducedMotion || adsRemoved) return;
+		if (reducedMotion || adsRemoved || !isFocused) {
+			shine.setValue(0); // 지나가던 빛이 버튼 중간에 멈춰 남지 않게
+			return;
+		}
 		const loop = Animated.loop(
 			Animated.sequence([
 				Animated.timing(shine, { toValue: 1, duration: 1300, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
@@ -72,7 +78,7 @@ const InAppRemoveAdsSection = ({ onOpenPolicy }: { onOpenPolicy: () => void }) =
 		);
 		loop.start();
 		return () => loop.stop();
-	}, [shine, reducedMotion, adsRemoved]);
+	}, [shine, reducedMotion, adsRemoved, isFocused]);
 
 	const onPurchase = async () => {
 		setBusy(true);
@@ -308,7 +314,7 @@ const styles = themedStyles(() =>
 			marginTop: SPACING_H.sm,
 			color: IVORY,
 			fontSize: displayFontSize(36),
-			fontWeight: '800',
+			fontWeight: '700',
 			letterSpacing: -0.5,
 		},
 		offerCaption: { marginTop: SPACING_H.xs, color: IVORY_DIM, fontSize: FONT_SIZES.sm },
@@ -328,7 +334,7 @@ const styles = themedStyles(() =>
 			width: scaleWidth(36),
 			backgroundColor: 'rgba(255,255,255,0.38)',
 		},
-		ctaText: { color: INK[0], fontSize: FONT_SIZES.lg, fontWeight: '800', letterSpacing: 0.5 },
+		ctaText: { color: INK[0], fontSize: FONT_SIZES.lg, fontWeight: '700', letterSpacing: 0.5 },
 		ghostBtn: {
 			marginTop: SPACING_H.lg,
 			minHeight: scaledSize(46),

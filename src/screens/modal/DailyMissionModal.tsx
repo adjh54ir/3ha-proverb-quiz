@@ -127,8 +127,9 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 						)}
 						{missions.map((m) => (
 							<View key={m.id} style={[styles.missionRow, m.done && styles.missionRowDone]}>
-								<View style={[styles.missionIcon, { backgroundColor: m.done ? COLORS.primaryFill : COLORS.border }]}>
-									<IconComponent type={m.iconType} name={m.icon} size={scaledSize(18)} color={m.done ? COLORS.textWhite : COLORS.textLight} />
+								{/* 완료 = 청포(success). 다크 success 위 흰 아이콘은 1.8:1 이라 textOnVivid 가 먹색으로 뒤집는다 */}
+								<View style={[styles.missionIcon, { backgroundColor: m.done ? COLORS.success : COLORS.border }]}>
+									<IconComponent type={m.iconType} name={m.icon} size={scaledSize(18)} color={m.done ? COLORS.textOnVivid : COLORS.textLight} />
 								</View>
 								<View style={styles.missionTextWrap}>
 									<Text style={[styles.missionLabel, m.done && styles.missionLabelDone]} numberOfLines={2} ellipsizeMode="tail">
@@ -142,7 +143,7 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 									type="materialIcons"
 									name={m.done ? 'check-circle' : 'radio-button-unchecked'}
 									size={scaledSize(22)}
-									color={m.done ? COLORS.primary : COLORS.borderDark}
+									color={m.done ? COLORS.success : COLORS.borderDark}
 								/>
 							</View>
 						))}
@@ -154,7 +155,7 @@ const DailyMissionModal: React.FC<DailyMissionModalProps> = ({ visible, onClose,
 							<Text style={styles.rewardHint}>미션을 모두 완료하면 보너스 +{MISSION_BONUS}점!</Text>
 						) : claimedToday ? (
 							<View style={styles.rewardDone}>
-								<IconComponent type="materialIcons" name="verified" size={scaledSize(18)} color={COLORS.primaryDeep} />
+								<IconComponent type="materialIcons" name="verified" size={scaledSize(18)} color={COLORS.successDeep} />
 								<Text style={styles.rewardDoneText}>오늘 보상 완료! (+{MISSION_BONUS}점)</Text>
 							</View>
 						) : (
@@ -266,9 +267,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.md,
 		marginBottom: SPACING_H.md,
 	},
+	// 완료 표시는 브랜드(쪽빛)가 아니라 청포(success) — 색·서체 규칙 1
 	missionRowDone: {
-		backgroundColor: COLORS.primaryBg,
-		borderColor: COLORS.primarySoft,
+		backgroundColor: COLORS.successBg,
+		borderColor: COLORS.successSoft,
 	},
 	missionIcon: {
 		width: scaleWidth(38),
@@ -286,7 +288,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.text,
 	},
 	missionLabelDone: {
-		color: COLORS.primaryDeep,
+		color: COLORS.successDeep,
 	},
 	missionProgress: {
 		fontSize: FONT_SIZES.sm,
@@ -324,12 +326,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		columnGap: SPACING_W.xs,
-		backgroundColor: COLORS.primaryBg,
+		backgroundColor: COLORS.successBg,
 		borderRadius: RADIUS.md,
 		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 	},
 	rewardDoneText: {
-		color: COLORS.primaryDeep,
+		color: COLORS.successDeep,
 		fontSize: FONT_SIZES.md,
 		fontWeight: '700',
 	},
@@ -338,5 +340,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textLight,
 		textAlign: 'center',
 		marginTop: SPACING_H.sm,
+		// 카드에 좌우 패딩이 없다(헤더 밴드 때문) — 큰 글자에서 줄바꿈될 때 카드 끝에 붙지 않게
+		paddingHorizontal: SPACING_W.lg,
 	},
 }));

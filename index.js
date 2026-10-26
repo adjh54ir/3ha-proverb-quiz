@@ -33,4 +33,9 @@ notifee.onBackgroundEvent(async ({type, detail}) => {
   }
 });
 
+// Crashlytics 모듈을 처음 만들 때 전역 JS 예외 핸들러와
+// unhandled promise rejection 핸들러가 설치된다.
+// 한 번도 호출하지 않으면 JS 에러가 아무 데도 기록되지 않으므로 시작하자마자 붙여 둔다.
+require('@react-native-firebase/crashlytics').default();
+
 AppRegistry.registerComponent(appName, () => App);

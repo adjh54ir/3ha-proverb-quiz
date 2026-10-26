@@ -1,6 +1,6 @@
 {
 	"react-native": {
 		"crashlytics_debug_enabled": true,
-		"firebase_crashlytics_enabled": true
+		"crashlytics_is_error_generation_on_js_crash_enabled": true
 	}
 }

@@ -270,7 +270,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	// 완료 표시는 브랜드(쪽빛)가 아니라 청포(success) — 색·서체 규칙 1
 	missionRowDone: {
 		backgroundColor: COLORS.successBg,
-		borderColor: COLORS.successSoft,
+		borderColor: COLORS.successBorder,
 	},
 	missionIcon: {
 		width: scaleWidth(38),
@@ -319,7 +319,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	rewardBtnText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
+		fontWeight: '600',
 	},
 	rewardDone: {
 		flexDirection: 'row',

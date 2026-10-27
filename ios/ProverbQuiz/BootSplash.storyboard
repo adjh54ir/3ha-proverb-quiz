@@ -18,7 +18,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView autoresizesSubviews="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="BootSplashLogo-8f0605" translatesAutoresizingMaskIntoConstraints="NO" id="3lX-Ut-9ad">
-                                <rect key="frame" x="-12.5" y="133.5" width="400" height="400"/>
+                                <rect key="frame" x="63.5" y="209.5" width="248" height="248"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="248" id="splash-logo-width"/>
+                                    <constraint firstAttribute="height" constant="248" id="splash-logo-height"/>
+                                </constraints>
                                 <accessibility key="accessibilityConfiguration">
                                     <accessibilityTraits key="traits" image="YES" notEnabled="YES"/>
                                 </accessibility>
@@ -38,7 +42,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="BootSplashLogo-8f0605" width="400" height="400"/>
+        <image name="BootSplashLogo-8f0605" width="248" height="248"/>
         <namedColor name="BootSplashBackground-8f0605">
             <color red="0.980392156862745" green="0.941176470588235" blue="0.862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

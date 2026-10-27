@@ -10,6 +10,7 @@ import IconComponent from '@/screens/common/atomic/IconComponent';
 import { COLORS, FONT_SIZES, HIT_SLOP, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { LEVEL_DATA } from '@/const/common/CommonCharacterData';
+import { ALPHA, withAlpha } from '@/utils/ColorAlphaUtils';
 import { MainStorageKeyType } from '@/types/MainStorageKeyType';
 
 /** 안내를 이미 본 화면인지 기록하는 키 접두사 */
@@ -225,6 +226,10 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 		setStep((s) => s + 1);
 	};
 
+	// hex 알파를 문자열로 이어 붙이면 accent 가 rgba/3자리일 때 깨지고 다크에서 틴트가 흐려진다
+	const accentBorder = withAlpha(accent, ALPHA.border);
+	const accentTint = withAlpha(accent, ALPHA.soft);
+
 	const translateY = enter.interpolate({ inputRange: [0, 1], outputRange: [scaleHeight(40), 0] });
 	const bobY = bob.interpolate({ inputRange: [0, 1], outputRange: [0, -scaleHeight(6)] });
 
@@ -238,7 +243,7 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 				accessibilityLabel="안내 다음으로">
 				<Animated.View style={[styles.wrap, { opacity: enter, transform: [{ translateY }] }]}>
 					{/* 말풍선 */}
-					<View style={[styles.bubble, { borderColor: `${accent}55` }]}>
+					<View style={[styles.bubble, { borderColor: accentBorder }]}>
 						<View style={styles.bubbleHead}>
 							<IconComponent type="materialicons" name="tips-and-updates" size={scaledSize(15)} color={accent} />
 							<Text style={[styles.bubbleTitle, { color: accent }]} numberOfLines={1}>
@@ -256,7 +261,7 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 						</Text>
 						<TouchableOpacity
 							// 마지막 단계는 흰 글자 채움 — 기본 쪽빛이면 다크에서 흰 글자 대비가 충분한 primaryFill 로 칠한다
-							style={[styles.cta, { backgroundColor: isLast ? (accent === COLORS.primary ? COLORS.primaryFill : accent) : `${accent}1F` }]}
+							style={[styles.cta, { backgroundColor: isLast ? (accent === COLORS.primary ? COLORS.primaryFill : accent) : accentTint }]}
 							activeOpacity={0.9}
 							onPress={next}
 							accessibilityRole="button"
@@ -273,13 +278,13 @@ const CharacterGuide: React.FC<CharacterGuideProps> = ({
 						</TouchableOpacity>
 						{/* 말풍선 꼬리 — 캐릭터 쪽을 향한다 */}
 						<View style={[styles.tail, { borderTopColor: COLORS.surface }]} />
-						<View style={[styles.tailBorder, { borderTopColor: `${accent}55` }]} />
+						<View style={[styles.tailBorder, { borderTopColor: accentBorder }]} />
 					</View>
 
 					{/* 캐릭터 */}
 					{!!charImg && (
 						<Animated.View style={[styles.charWrap, { transform: [{ translateY: bobY }] }]}>
-							<View style={[styles.charGlow, { backgroundColor: `${accent}1F` }]} />
+							<View style={[styles.charGlow, { backgroundColor: accentTint }]} />
 							<FastImage source={charImg} style={styles.charImg} resizeMode={FastImage.resizeMode.contain} />
 						</Animated.View>
 					)}

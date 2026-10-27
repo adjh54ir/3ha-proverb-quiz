@@ -9,8 +9,6 @@ import {
 	ScrollView,
 	TouchableOpacity,
 	RefreshControl,
-	Alert,
-	Modal,
 	FlatList,
 	Animated,
 } from 'react-native';
@@ -28,7 +26,8 @@ import { CONST_BADGES, BADGE_RARITY_META } from '@/const/ConstBadges';
 import BadgeDetailPopup from './modal/BadgeDetailPopup';
 import { isTablet, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, HERO, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, displayFontSize, themedStyles } from '@/const/common/Theme';
+import FadeInView from '@/components/animation/FadeInView';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
@@ -45,7 +44,7 @@ import { getLevelColor } from '@/screens/common/CommonProverbModule';
 import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import { buildDateMark, buildTodayPendingMark, buildSelectedMark } from '@/utils/CalendarMarkUtils';
-import { withAlpha, ALPHA, readableTextOn } from '@/utils/ColorAlphaUtils';
+import { withAlpha, ALPHA, inkOnFill } from '@/utils/ColorAlphaUtils';
 import { read } from '@/services/StorageService';
 import QuizHistoryService from '@/services/QuizHistoryService';
 
@@ -592,7 +591,7 @@ const MyScoreScreen = () => {
 						</View>
 						{/* 카드 높이가 padding 기반이라 유연하다. 중첩 Text + 1줄 축소는 안드로이드에서 과축소되므로 2줄 허용으로 대체 */}
 						<Text style={styles.levelDescriptionText} numberOfLines={2} ellipsizeMode="tail">
-							전체 퀴즈 완료 시 <Text style={[styles.levelHighlight, { color: COLORS.warningDark }]}>'속담 전설'</Text> 등급을 획득합니다
+							전체 퀴즈 완료 시 <Text style={[styles.levelHighlight, { color: COLORS.warningDark }]}>"속담 전설"</Text> 등급을 획득합니다
 						</Text>
 					</View>
 
@@ -694,11 +693,12 @@ const MyScoreScreen = () => {
 					})}
 				</ScrollView>
 
-				<View style={styles.activityGroupBox}>
+				{/* 탭을 바꾸면 내용이 통째로 바뀐다 — key 로 다시 마운트해 짧게 떠오르게 해서 전환을 알아채게 한다 */}
+				<FadeInView key={activeTab} style={styles.activityGroupBox} duration={220} offsetY={8}>
 
 				{(activeTab === 'all' || activeTab === 'study') && (
 				<View style={styles.sectionHeaderStatic}>
-					<View style={styles.iconCircle1}>
+					<View style={[styles.sectionIcon, { backgroundColor: COLORS.primaryFill }]}>
 						<IconComponent type="materialIcons" name="school" size={scaledSize(16)} color={COLORS.textWhite} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 학습 활동</Text>
@@ -752,8 +752,8 @@ const MyScoreScreen = () => {
 								<View style={[styles.statIconChip, { backgroundColor: COLORS.secondarySoft }]}>
 									<IconComponent type="materialIcons" name="event-note" size={scaledSize(18)} color={COLORS.secondary} />
 								</View>
-								<Text style={styles.statValue}> {lastStudyAt ? DateUtils.formatLocal(lastStudyAt, 'type6') : '없음'} </Text>
-								<Text style={styles.statLabel}> 마지막 학습일 </Text>
+								<Text style={styles.statValue}>{lastStudyAt ? DateUtils.formatLocal(lastStudyAt, 'type6') : '없음'}</Text>
+								<Text style={styles.statLabel}>마지막 학습일</Text>
 							</View>
 						</View>
 					</View>
@@ -762,7 +762,7 @@ const MyScoreScreen = () => {
 				{/* 나의 퀴즈 활동 요약 */}
 				{(activeTab === 'all' || activeTab === 'quiz') && (
 				<View style={styles.sectionHeaderStatic}>
-					<View style={styles.iconCircle2}>
+					<View style={[styles.sectionIcon, { backgroundColor: COLORS.secondaryFill }]}>
 						<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(16)} color={COLORS.textWhite} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 퀴즈 활동</Text>
@@ -802,7 +802,7 @@ const MyScoreScreen = () => {
 							<Text style={styles.statValue}>
 								{totalSolved.toLocaleString()} / {totalCountryCount.toLocaleString()}
 							</Text>
-							<Text style={styles.statLabel}> 총 푼 퀴즈 ({Math.round((totalSolved / totalCountryCount) * 100)}%) </Text>
+							<Text style={styles.statLabel}>총 푼 퀴즈 ({Math.round((totalSolved / totalCountryCount) * 100)}%)</Text>
 							<View style={styles.progressBarBackground}>
 								<View style={[styles.progressBarFill, { width: `${Math.round((totalSolved / totalCountryCount) * 100)}%` }]} />
 							</View>
@@ -812,26 +812,26 @@ const MyScoreScreen = () => {
 								<View style={[styles.statIconChip, { backgroundColor: COLORS.accentOrangeSoft }]}>
 									<IconComponent type="fontAwesome6" name="fire" size={scaledSize(16)} color={COLORS.accentFlame} />
 								</View>
-								<Text style={styles.statValue}> {bestCombo.toLocaleString()} Combo </Text>
-								<Text style={styles.statLabel}> 최고 콤보 </Text>
+								<Text style={styles.statValue}>{bestCombo.toLocaleString()} Combo</Text>
+								<Text style={styles.statLabel}>최고 콤보</Text>
 							</View>
 							<View style={styles.summaryStatCard}>
 								<View style={[styles.statIconChip, { backgroundColor: COLORS.primarySoft }]}>
 									<IconComponent type="materialIcons" name="check-circle" size={scaledSize(18)} color={COLORS.primary} />
 								</View>
-								<Text style={styles.statValue}> {accuracy}% </Text>
-								<Text style={styles.statLabel}> 정답률 </Text>
+								<Text style={styles.statValue}>{accuracy}%</Text>
+								<Text style={styles.statLabel}>정답률</Text>
 							</View>
 							<View style={styles.summaryStatCard}>
 								<View style={[styles.statIconChip, { backgroundColor: COLORS.accentTealBg }]}>
 									<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(16)} color={COLORS.accentTeal} />
 								</View>
-								<Text style={styles.statValue}> {lastAnsweredAt ? DateUtils.formatLocal(lastAnsweredAt, 'type6') : '없음'} </Text>
-								<Text style={styles.statLabel}> 마지막 퀴즈일 </Text>
+								<Text style={styles.statValue}>{lastAnsweredAt ? DateUtils.formatLocal(lastAnsweredAt, 'type6') : '없음'}</Text>
+								<Text style={styles.statLabel}>마지막 퀴즈일</Text>
 							</View>
 						</View>
 
-						<View style={styles.subSectionBox2}>
+						<View style={styles.subSectionBox}>
 							<ConquerHeader
 								iconType="fontAwesome6"
 								iconName="medal"
@@ -853,7 +853,7 @@ const MyScoreScreen = () => {
 										const isEarned = levelMaster.includes(item.title);
 										const levelStyle = getLevelStyle(item.subtitle);
 										// 초급(#34D399)·중급(#F59E0B) 처럼 밝은 레벨색 위에서는 흰 글자가 묻힌다
-										const earnedInk = readableTextOn(levelStyle.bg);
+										const earnedInk = inkOnFill(levelStyle.bg);
 										return (
 											<View
 												style={[
@@ -870,13 +870,13 @@ const MyScoreScreen = () => {
 													color={isEarned ? earnedInk : COLORS.textLight}
 													style={{ marginBottom: SPACING_H.xsPlus }}
 												/>
-												<Text style={[styles.levelText, isEarned && { color: earnedInk, fontWeight: '700' }]}> {item.title} </Text>
-												<Text style={[styles.levelSubText, isEarned && { color: earnedInk }]}> {item.subtitle} </Text>
+												<Text style={[styles.levelText, isEarned && { color: earnedInk, fontWeight: '700' }]}>{item.title}</Text>
+												<Text style={[styles.levelSubText, isEarned && { color: earnedInk }]}>{item.subtitle}</Text>
 
 												{/* ✅ 정복 배지 */}
 												{isEarned && (
 													<View style={[styles.conquerTag, { marginTop: SPACING_H.xsPlus }]}>
-														<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color={COLORS.primaryDark} />
+														<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color={COLORS.successDark} />
 														<Text style={styles.conquerTagText}>정복</Text>
 													</View>
 												)}
@@ -888,7 +888,7 @@ const MyScoreScreen = () => {
 						</View>
 
 						{/* ✅ 정복한 카테고리 출력 */}
-						<View style={styles.subSectionBox1}>
+						<View style={styles.subSectionBox}>
 							<ConquerHeader
 								iconType="fontAwesome6"
 								iconName="brain"
@@ -915,7 +915,7 @@ const MyScoreScreen = () => {
 											name: categoryInfo?.iconName ?? 'circle-question',
 										},
 									};
-									const earnedInk = readableTextOn(meta.color);
+									const earnedInk = inkOnFill(meta.color);
 
 									return (
 										<View style={listGrid?.cell}>
@@ -932,10 +932,11 @@ const MyScoreScreen = () => {
 												style={{
 													width: scaleWidth(34),
 													height: scaleWidth(34),
-													borderRadius: scaleWidth(11),
+													borderRadius: RADIUS.sm,
 													alignItems: 'center',
 													justifyContent: 'center',
 													marginRight: SPACING_W.smPlus,
+													// 데이터 색 채움 위의 흰 막 — 채움이 모드와 무관하니 막도 고정값 (withAlpha 는 다크에서 1.6배로 진해진다)
 													backgroundColor: isEarned ? 'rgba(255,255,255,0.22)' : COLORS.surfaceAlt,
 												}}>
 												<IconComponent
@@ -951,9 +952,6 @@ const MyScoreScreen = () => {
 													isEarned && {
 														color: earnedInk,
 														fontWeight: '700',
-														textShadowColor: 'rgba(0, 0, 0, 0.15)',
-														textShadowOffset: { width: 1, height: 1 },
-														textShadowRadius: 2,
 													},
 												]}>
 												{category}
@@ -961,7 +959,7 @@ const MyScoreScreen = () => {
 											{/* ✅ 정복 배지 */}
 											{isEarned && (
 												<View style={[styles.conquerTag, { marginLeft: 'auto' }]}>
-													<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color={COLORS.primaryDark} />
+													<IconComponent type="materialIcons" name="check-circle" size={scaledSize(11)} color={COLORS.successDark} />
 													<Text style={styles.conquerTagText}>정복</Text>
 												</View>
 											)}
@@ -976,7 +974,7 @@ const MyScoreScreen = () => {
 
 				{(activeTab === 'all' || activeTab === 'today') && (
 				<View style={styles.sectionHeaderStatic}>
-					<View style={styles.iconCircle4}>
+					<View style={[styles.sectionIcon, { backgroundColor: COLORS.accentTeal }]}>
 						<IconComponent type="materialIcons" name="calendar-today" size={scaledSize(16)} color={COLORS.textOnVivid} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 오늘의 퀴즈</Text>
@@ -1112,7 +1110,7 @@ const MyScoreScreen = () => {
 														</View>
 													)}
 													{!!(quizItem?.longMeaning || quizItem?.meaning) && (
-														<Text style={{ fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, lineHeight: scaledSize(18) }} numberOfLines={2}>
+														<Text style={{ fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, lineHeight: displayFontSize(18) }} numberOfLines={2}>
 															{quizItem.longMeaning || quizItem.meaning}
 														</Text>
 													)}
@@ -1133,7 +1131,7 @@ const MyScoreScreen = () => {
 				{/* 기존 결과 화면 */}
 				{(activeTab === 'all' || activeTab === 'time') && (
 				<View style={styles.sectionHeaderStatic}>
-					<View style={styles.iconCircle3}>
+					<View style={[styles.sectionIcon, { backgroundColor: COLORS.accentFlame }]}>
 						<IconComponent type="materialIcons" name="timer" size={scaledSize(16)} color={COLORS.textOnVivid} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 타임 챌린지 결과</Text>
@@ -1209,7 +1207,7 @@ const MyScoreScreen = () => {
 				{/* 나의 타워 챌린지 내역 */}
 				{(activeTab === 'all' || activeTab === 'tower') && (
 				<View style={styles.sectionHeaderStatic}>
-					<View style={[styles.iconCircle3, { backgroundColor: COLORS.accentSky }]}>
+					<View style={[styles.sectionIcon, { backgroundColor: COLORS.accentSky }]}>
 						<IconComponent type="fontAwesome6" name="tower-observation" size={scaledSize(14)} color={COLORS.textOnVivid} />
 					</View>
 					<Text style={styles.sectionTitle}>나의 타워 챌린지</Text>
@@ -1256,7 +1254,7 @@ const MyScoreScreen = () => {
 										}}>
 										<FastImage
 											source={tower.bossImage}
-											style={{ width: scaleWidth(56), height: scaleWidth(56), borderRadius: scaleWidth(8) }}
+											style={{ width: scaleWidth(56), height: scaleWidth(56), borderRadius: RADIUS.sm }}
 											resizeMode="contain"
 										/>
 										<View
@@ -1267,7 +1265,7 @@ const MyScoreScreen = () => {
 												paddingHorizontal: SPACING_W.sm,
 												paddingVertical: SPACING_H.xxs,
 											}}>
-											<Text style={{ color: isCleared ? readableTextOn(tower.color) : COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>
+											<Text style={{ color: isCleared ? inkOnFill(tower.color) : COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>
 												LV.{tower.level}
 											</Text>
 										</View>
@@ -1286,7 +1284,7 @@ const MyScoreScreen = () => {
 												style={{
 													width: scaleWidth(36),
 													height: scaleWidth(36),
-													borderRadius: scaleWidth(6),
+													borderRadius: RADIUS.sm,
 													borderWidth: 1,
 													borderColor: COLORS.border,
 												}}
@@ -1314,7 +1312,7 @@ const MyScoreScreen = () => {
 													paddingHorizontal: SPACING_W.sm,
 													paddingVertical: SPACING_H.xs,
 												}}>
-												<Text style={{ color: isCleared ? readableTextOn(tower.color) : COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>{isCleared ? '클리어 ✓' : '미클리어 🔒'}</Text>
+												<Text style={{ color: isCleared ? inkOnFill(tower.color) : COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' }}>{isCleared ? '클리어 ✓' : '미클리어 🔒'}</Text>
 											</View>
 										</View>
 									</View>
@@ -1328,7 +1326,7 @@ const MyScoreScreen = () => {
 				{(activeTab === 'all' || activeTab === 'badge') && (
 					<>
 						<View style={styles.sectionHeaderStatic}>
-							<View style={styles.iconCircle5}>
+							<View style={[styles.sectionIcon, { backgroundColor: COLORS.warning }]}>
 								<IconComponent type="materialIcons" name="emoji-events" size={scaledSize(16)} color={COLORS.textOnAccent} />
 							</View>
 							<Text style={styles.sectionTitle}>나의 뱃지</Text>
@@ -1363,7 +1361,7 @@ const MyScoreScreen = () => {
 									return true;
 								});
 								if (list.length === 0) {
-									return <Text style={styles.emptyText}> - 표시할 뱃지가 없습니다.</Text>;
+									return <Text style={styles.emptyText}>표시할 뱃지가 없습니다.</Text>;
 								}
 								// 마지막 '행'의 카드 수 — 태블릿 2열에서 홀수 개면 마지막 행은 한 장이다
 								const lastRowCount = list.length % LIST_COLUMNS || LIST_COLUMNS;
@@ -1401,7 +1399,7 @@ const MyScoreScreen = () => {
 													<Text style={styles.badgeCondText} numberOfLines={1}>{badge.condition}</Text>
 												</View>
 											</View>
-											<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={earned ? COLORS.primary : COLORS.borderDark} style={{ alignSelf: 'center' }} />
+											<IconComponent type="materialIcons" name="chevron-right" size={scaledSize(22)} color={COLORS.textLight} style={{ alignSelf: 'center' }} />
 										</TouchableOpacity>
 										</View>
 									);
@@ -1412,7 +1410,7 @@ const MyScoreScreen = () => {
 						</View>
 					</>
 				)}
-				</View>
+				</FadeInView>
 			</ScrollView>
 
 			{/* 등급 안내 팝업 — 홈과 동일한 공통 컴포넌트 사용 */}
@@ -1455,13 +1453,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	container: {
 		paddingHorizontal: SPACING_W.lg,
 	},
-	pageTitle: {
-		fontFamily: FONTS.display,
-		fontSize: FONT_SIZES.xxl,
-		fontWeight: '700',
-		marginBottom: SPACING_H.xl,
-		color: COLORS.text,
-	},
 	badgeFilterRow: { flexDirection: 'row', gap: SPACING_W.sm, marginBottom: SPACING_H.md },
 	badgeFilterChip: {
 		flex: 1,
@@ -1488,9 +1479,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
+	// 획득 = 달성(완료) 표시라 브랜드 쪽빛이 아니라 청포 (CLAUDE.md 색 규칙 1)
 	badgeCardActive: {
-		borderColor: COLORS.primary,
-		backgroundColor: COLORS.primaryBg,
+		borderColor: COLORS.successBorder,
+		backgroundColor: COLORS.successBg,
 	},
 	iconBox: {
 		width: scaleWidth(32),
@@ -1501,9 +1493,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		marginRight: SPACING_W.md,
 	},
-	iconBoxActive: {
-		backgroundColor: COLORS.primarySoft,
-	},
 	badgeTitle: {
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '600',
@@ -1511,7 +1500,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		flexShrink: 1,
 	},
 	badgeTitleActive: {
-		color: COLORS.primary,
+		color: COLORS.textStrong,
 	},
 	badgeTitleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.xsPlus },
 	badgeRarityTag: {
@@ -1529,10 +1518,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.textSecondary,
 		marginTop: SPACING_H.xxs,
-		lineHeight: scaledSize(18),
+		lineHeight: displayFontSize(18), // scaledSize 는 '글자 크게' 배율이 빠져 큰 글자에서 윗줄이 잘린다
 	},
 	badgeDescActive: {
-		color: COLORS.primary,
+		color: COLORS.text,
 	},
 	characterHelpButton: {
 		// 카드 오른쪽 모서리에 절대 배치하면 등급 라벨과 떨어져 '우측으로 쏠린' 인상을 준다.
@@ -1566,12 +1555,12 @@ const styles = themedStyles(() => StyleSheet.create({
 	scoreDashIconChip: {
 		width: scaleWidth(24),
 		height: scaleWidth(24),
-		borderRadius: scaleWidth(8),
+		borderRadius: RADIUS.sm,
 		backgroundColor: COLORS.primaryFill,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	scoreDashTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.textStrong },
+	scoreDashTitle: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong },
 	scoreDashScorePill: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -1597,7 +1586,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	scoreDashTileIcon: {
 		width: scaleWidth(22),
 		height: scaleWidth(22),
-		borderRadius: scaleWidth(7),
+		borderRadius: RADIUS.sm,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -1605,21 +1594,13 @@ const styles = themedStyles(() => StyleSheet.create({
 	scoreDashTileValue: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.xs },
 	scoreDashBarTrack: {
 		height: scaleHeight(6),
-		borderRadius: scaleWidth(3),
+		borderRadius: RADIUS.round,
 		backgroundColor: COLORS.border,
 		overflow: 'hidden',
 	},
-	scoreDashBarFill: { height: '100%', borderRadius: scaleWidth(3) },
+	scoreDashBarFill: { height: '100%', borderRadius: RADIUS.round },
 	scoreDashTilePct: { fontSize: FONT_SIZES.xs, fontWeight: '700', marginTop: SPACING_H.xs, textAlign: 'right' },
-	subSectionBox1: {
-		backgroundColor: COLORS.surface,
-		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
-		borderRadius: RADIUS.lg,
-		marginBottom: SPACING_H.md,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-	subSectionBox2: {
+	subSectionBox: {
 		backgroundColor: COLORS.surface,
 		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
 		borderRadius: RADIUS.lg,
@@ -1628,199 +1609,11 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderColor: COLORS.border,
 	},
 
-	statItem: {
-		fontSize: FONT_SIZES.md,
-		color: COLORS.text,
-		marginBottom: SPACING_H.xsPlus,
-	},
-	subTitle: {
-		fontSize: FONT_SIZES.mdPlus,
-		fontWeight: '600',
-		color: COLORS.text,
-		marginBottom: SPACING_H.xsPlus,
-	},
-	tagItem: {
-		fontSize: FONT_SIZES.md,
-		color: COLORS.primary,
-		marginBottom: SPACING_H.xs,
-	},
 	emptyText: {
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.textLight,
 	},
 	textBox: { flex: 1 },
-	levelRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: SPACING_H.sm,
-	},
-	levelTitle: {
-		fontSize: FONT_SIZES.lg,
-		marginLeft: SPACING_W.xsPlus,
-		color: COLORS.primary,
-		fontWeight: '700',
-	},
-	quizSummaryBox: {
-		backgroundColor: COLORS.surfaceAlt,
-		borderRadius: scaleWidth(12),
-		paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md,
-		marginTop: SPACING_H.sm,
-		marginBottom: SPACING_H.lg,
-	},
-	levelIconWrap: {
-		width: scaleWidth(36),
-		height: scaleWidth(36),
-		borderRadius: scaleWidth(18),
-		borderWidth: 2,
-		borderColor: COLORS.primary,
-		backgroundColor: COLORS.secondaryBg,
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: SPACING_W.sm,
-	},
-	levelModal: {
-		backgroundColor: COLORS.surface,
-		paddingHorizontal: SPACING_W.xl,
-		paddingTop: SPACING_H.xl,
-		paddingBottom: SPACING_H.md,
-		borderRadius: scaleWidth(16),
-		width: '85%',
-		alignItems: 'center',
-	},
-	levelModalTitle: {
-		fontSize: FONT_SIZES.xl,
-		fontWeight: '700',
-		marginBottom: SPACING_H.md,
-		color: COLORS.text,
-	},
-	levelRowItem: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		width: '100%',
-		paddingVertical: SPACING_H.sm,
-		borderBottomWidth: 1,
-		borderColor: COLORS.border,
-	},
-	levelRowItemActive: {
-		backgroundColor: COLORS.secondaryBg,
-		borderColor: COLORS.primary,
-	},
-	levelCardBox: {
-		backgroundColor: COLORS.background,
-		borderRadius: scaleWidth(14),
-		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
-		alignItems: 'center',
-		marginBottom: SPACING_H.mdPlus,
-		width: '100%',
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-	levelCardBoxActive: {
-		backgroundColor: COLORS.secondaryBg,
-		borderColor: COLORS.primary,
-		borderWidth: 2,
-	},
-	levelBadge: {
-		backgroundColor: COLORS.secondaryFill,
-		paddingHorizontal: SPACING_W.smPlus,
-		paddingVertical: SPACING_H.xs,
-		borderRadius: scaleWidth(12),
-		marginBottom: SPACING_H.sm,
-	},
-	levelBadgeText: {
-		color: COLORS.textWhite,
-		fontSize: FONT_SIZES.sm,
-		fontWeight: '700',
-	},
-	levelMascot: {
-		width: scaleWidth(80),
-		height: scaleWidth(80),
-		marginBottom: SPACING_H.smPlus,
-	},
-	levelLabel: {
-		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
-		color: COLORS.text,
-		marginBottom: SPACING_H.xxs,
-	},
-	levelScore: {
-		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.textSecondary,
-	},
-	levelEncourage: {
-		fontSize: FONT_SIZES.sm,
-		color: COLORS.primary,
-		marginTop: SPACING_H.xsPlus,
-		textAlign: 'center',
-		lineHeight: scaledSize(20),
-	},
-	levelIconWrapSmall: {
-		width: scaleWidth(28),
-		height: scaleWidth(28),
-		borderRadius: scaleWidth(14),
-		backgroundColor: COLORS.secondarySoft,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginRight: SPACING_W.smPlus,
-	},
-	levelModalText: {
-		flex: 1,
-		fontSize: FONT_SIZES.md,
-		color: COLORS.text,
-	},
-	levelModalScore: {
-		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.textSecondary,
-	},
-	levelNowText: {
-		marginLeft: SPACING_W.xsPlus,
-		fontSize: FONT_SIZES.md,
-		color: COLORS.primary,
-		fontWeight: '700',
-	},
-	modalOverlay: {
-		flex: 1,
-		backgroundColor: COLORS.dim,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	modalConfirmButton: {
-		marginTop: SPACING_H.lg,
-		paddingVertical: SPACING_H.smPlus,
-		paddingHorizontal: SPACING_W.xxl,
-		backgroundColor: COLORS.secondaryFill,
-		borderRadius: scaleWidth(8),
-	},
-	modalConfirmText: {
-		color: COLORS.textWhite,
-		fontWeight: '600',
-		fontSize: FONT_SIZES.md,
-	},
-	levelCenteredRow: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginBottom: SPACING_H.md,
-	},
-	levelDescription: {
-		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.textSecondary,
-		textAlign: 'center',
-		lineHeight: scaledSize(18),
-		marginBottom: SPACING_H.xs,
-	},
-	levelScoreText: {
-		fontSize: FONT_SIZES.mdPlus,
-		color: COLORS.textSecondary,
-		textAlign: 'center',
-		marginTop: SPACING_H.xs,
-	},
-	levelScoreHighlight: {
-		fontSize: FONT_SIZES.xl,
-		fontWeight: '700',
-		color: COLORS.primary,
-		marginTop: SPACING_H.xs,
-	},
 	activityCardBox: {
 		backgroundColor: COLORS.surfaceAlt,
 		borderRadius: RADIUS.lg,
@@ -1829,76 +1622,18 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 1,
 		borderColor: COLORS.border,
 	},
-	activityRow: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginBottom: SPACING_H.smPlus,
-	},
-	activityLabel: {
-		fontSize: FONT_SIZES.md,
-		color: COLORS.text,
-	},
-	activityValue: {
-		fontSize: FONT_SIZES.md,
-		fontWeight: '700',
-		color: COLORS.text,
-	},
-	summaryCard: {
-		backgroundColor: HERO.bg,
-		paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg,
-		borderRadius: scaleWidth(12),
-		marginBottom: SPACING_H.lg,
-		borderWidth: 1,
-		borderColor: COLORS.gold,
-	},
-	summaryTitle: {
-		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
-		color: COLORS.warning,
-		marginBottom: SPACING_H.sm,
-	},
-	progressRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	progressText: {
-		fontSize: FONT_SIZES.md,
-		color: COLORS.text,
-		marginRight: SPACING_W.md,
-	},
 	progressBarBackground: {
 		width: '80%',
 		height: scaleHeight(6),
 		backgroundColor: COLORS.surfaceAlt,
-		borderRadius: scaleHeight(3),
+		borderRadius: RADIUS.round,
 		marginTop: SPACING_H.xsPlus,
 		alignSelf: 'center',
 	},
 	progressBarFill: {
 		height: scaleHeight(6),
 		backgroundColor: COLORS.secondary,
-		borderRadius: scaleHeight(3),
-	},
-	gridRow: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-		marginTop: SPACING_H.xsPlus,
-	},
-	regionCard: {
-		width: '28%',
-		height: scaleHeight(100),
-		borderWidth: 1,
-		borderColor: COLORS.borderDark,
-		borderRadius: scaleWidth(16),
-		alignItems: 'center',
-		justifyContent: 'center',
-		paddingHorizontal: SPACING_W.xsPlus,
-		paddingVertical: SPACING_H.sm,
-		backgroundColor: COLORS.surface,
-		marginBottom: SPACING_H.md,
-		marginHorizontal: SPACING_W.xs,
+		borderRadius: RADIUS.round,
 	},
 	levelCard: {
 		width: isTablet ? '21%' : '42%',
@@ -1912,19 +1647,11 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginHorizontal: SPACING_W.sm,
 		marginBottom: SPACING_H.md,
 	},
-	regionText: {
-		fontSize: FONT_SIZES.md,
-		textAlign: 'center',
-		color: COLORS.textSecondary,
-	},
 	levelText: {
 		fontSize: FONT_SIZES.mdPlus,
 		textAlign: 'center',
 		color: COLORS.text,
 		fontWeight: '700',
-	},
-	cardActive: {
-		backgroundColor: COLORS.secondaryBg,
 	},
 	summaryStatGrid: {
 		flexDirection: 'row',
@@ -1937,14 +1664,11 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.lg,
 		paddingVertical: SPACING_H.md,
+		paddingHorizontal: SPACING_W.sm,
 		alignItems: 'center',
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		marginBottom: SPACING_H.md,
-	},
-	statIcon: {
-		fontSize: FONT_SIZES.heading,
-		marginBottom: SPACING_H.xs,
 	},
 	statValue: {
 		fontSize: FONT_SIZES.mdPlus,
@@ -1959,7 +1683,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	statIconChip: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),
-		borderRadius: scaleWidth(10),
+		borderRadius: RADIUS.sm,
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginBottom: SPACING_H.xsPlus,
@@ -1989,7 +1713,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginLeft: SPACING_W.md,
 	},
 	chartLegendTitle: {
-		fontSize: FONT_SIZES.md,
+		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
 		color: COLORS.textStrong,
 		marginBottom: SPACING_H.smPlus,
@@ -2016,7 +1740,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	stackBarTrack: {
 		flexDirection: 'row',
 		height: scaleHeight(8),
-		borderRadius: scaleHeight(4),
+		borderRadius: RADIUS.round,
 		overflow: 'hidden',
 		marginTop: SPACING_H.sm,
 		backgroundColor: COLORS.surfaceAlt,
@@ -2039,7 +1763,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	conquerHeaderIcon: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
-		borderRadius: scaleWidth(9),
+		borderRadius: RADIUS.sm,
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginRight: SPACING_W.sm,
@@ -2070,34 +1794,19 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	conquerTagText: {
 		fontSize: FONT_SIZES.xs,
-		color: COLORS.primaryDark,
-		fontWeight: '700',
-	},
-	sectionSubtitleInline: {
-		fontSize: FONT_SIZES.mdPlus,
-		color: COLORS.text,
+		color: COLORS.successDark, // 정복 = 완료 표시
 		fontWeight: '700',
 	},
 	topRankingTitleInline: {
-		fontSize: FONT_SIZES.lg,
+		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
 		color: COLORS.text,
-	},
-	regionSubText: {
-		fontSize: FONT_SIZES.xxs,
-		color: COLORS.textLight,
-		textAlign: 'center',
-		marginTop: scaleHeight(1),
-		lineHeight: scaledSize(13),
-		fontWeight: '400',
 	},
 	levelSubText: {
 		fontSize: FONT_SIZES.sm,
 		color: COLORS.textLight,
 		textAlign: 'center',
-		marginTop: scaleHeight(1),
-		lineHeight: scaledSize(13),
-		fontWeight: '400',
+		marginTop: SPACING_H.xxs,
 	},
 	sectionSubtitle: {
 		fontSize: FONT_SIZES.mdPlus,
@@ -2105,13 +1814,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.md,
 		marginTop: SPACING_H.sm,
 		fontWeight: '700',
-	},
-	gridRowNoBottomGap: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-		marginTop: SPACING_H.md,
-		paddingBottom: SPACING_H.xsPlus,
 	},
 	regionHelperText: {
 		fontSize: FONT_SIZES.sm,
@@ -2123,21 +1825,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textSecondary,
 		marginTop: SPACING_H.xs,
 		marginBottom: SPACING_H.lg,
-	},
-	adContainer: {
-		backgroundColor: COLORS.surface,
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginTop: SPACING_H.smPlus,
-		paddingVertical: SPACING_H.xsPlus,
-	},
-	regionCardActive: {
-		backgroundColor: COLORS.secondaryBg,
-		borderColor: COLORS.primary,
-	},
-	regionTextActive: {
-		color: COLORS.primary,
-		fontWeight: '700',
 	},
 	scoreBadge: {
 		flexDirection: 'row',
@@ -2154,65 +1841,15 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '700',
 		marginLeft: SPACING_W.xsPlus,
 	},
-	iconCircle1: {
-		width: scaleWidth(30),
-		height: scaleWidth(30),
-		marginRight: SPACING_W.xsPlus,
-		borderRadius: scaleWidth(15),
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: COLORS.primaryFill, // 🎨 학습 모드(홈 버튼) 초록
-	},
-	iconCircle2: {
+	// 섹션 헤더 아이콘 원 — 배경색은 섹션마다 JSX 에서 준다
+	sectionIcon: {
 		width: scaleWidth(30),
 		height: scaleWidth(30),
 		borderRadius: scaleWidth(15),
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: SPACING_W.xsPlus,
-		backgroundColor: COLORS.secondaryFill, // 🎨 밝은 파랑 배경 추가
+		marginRight: SPACING_W.sm,
 	},
-
-	iconCircle3: {
-		width: scaleWidth(30),
-		height: scaleWidth(30),
-		borderRadius: scaleWidth(15),
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: SPACING_W.xsPlus,
-		backgroundColor: COLORS.accentFlame,
-	},
-
-	iconCircle4: {
-		width: scaleWidth(30),
-		height: scaleWidth(30),
-		borderRadius: scaleWidth(15),
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: SPACING_W.xsPlus,
-		backgroundColor: COLORS.accentTeal, // 오늘의 퀴즈 — 비중복 틸 컬러
-	},
-	iconCircle5: {
-		width: scaleWidth(30),
-		height: scaleWidth(30),
-		borderRadius: scaleWidth(15),
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: SPACING_W.xsPlus,
-		backgroundColor: COLORS.warning,
-	},
-	sectionHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginTop: SPACING_H.lg,
-		marginBottom: SPACING_H.smPlus,
-		backgroundColor: COLORS.surface,
-		borderRadius: scaleWidth(14),
-		borderWidth: 1,
-		borderColor: COLORS.border,
-		paddingVertical: SPACING_H.md,
-		paddingHorizontal: SPACING_W.mdPlus,
-},
 	sectionHeaderStatic: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -2226,7 +1863,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surface,
 		// 바깥 테두리를 위 카드(히어로·점수 카드·탭 바)와 같은 좌우선에 맞춘다. 예전 -8 은 테두리만 8dp 밖으로 튀어나왔다.
 		paddingHorizontal: SPACING_W.sm,
-		paddingVertical: SPACING_H.md,
+		// 위: lg + 첫 섹션 헤더 marginTop(sm) = 24 / 아래: 마지막 섹션 카드 marginBottom(xxl) = 24 — 위아래를 맞춘다
+		paddingTop: SPACING_H.lg,
 		marginTop: SPACING_H.sm,
 	},
 	activityTabBar: {
@@ -2262,12 +1900,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '700',
 		color: COLORS.textStrong,
 	},
-	sectionTitle2: {
-		fontSize: FONT_SIZES.xl,
-		fontWeight: '700',
-		marginBottom: SPACING_H.md,
-		color: COLORS.text,
-	},
 	categoryRowCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -2284,85 +1916,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.mdPlus,
 		color: COLORS.text,
 		fontWeight: '600',
-	},
-	levelDetailDescription: {
-		fontSize: FONT_SIZES.sm,
-		color: COLORS.textSecondary,
-		textAlign: 'center',
-		marginTop: SPACING_H.xsPlus,
-		lineHeight: scaledSize(18),
-	},
-	timeResultCard: {
-		marginBottom: SPACING_H.md,
-		paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md,
-		backgroundColor: COLORS.background,
-		borderRadius: scaleWidth(10),
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-	timeResultDate: {
-		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.textSecondary,
-		marginBottom: SPACING_H.xs,
-	},
-	timeResultScore: {
-		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
-		color: COLORS.text,
-		marginBottom: SPACING_H.xsPlus,
-	},
-	timeResultRow: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		marginBottom: SPACING_H.xs,
-	},
-	timeResultItem: {
-		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.text,
-	},
-	timeResultTime: {
-		fontSize: FONT_SIZES.sm,
-		color: COLORS.textSecondary,
-		textAlign: 'right',
-	},
-	timeCard: {
-		marginBottom: SPACING_H.md,
-		paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md,
-		backgroundColor: COLORS.surface,
-		borderRadius: scaleWidth(10),
-		borderWidth: 1,
-		borderColor: COLORS.borderDark,
-	},
-	timeCardDate: {
-		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.textSecondary,
-		marginBottom: SPACING_H.xxs,
-	},
-	timeCardScore: {
-		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
-		color: COLORS.text,
-		marginBottom: SPACING_H.xsPlus,
-	},
-	timeCardRow: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		marginBottom: SPACING_H.xs,
-	},
-	timeCardItem: {
-		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.text,
-	},
-	timeCardUsed: {
-		fontSize: FONT_SIZES.sm,
-		color: COLORS.textSecondary,
-		textAlign: 'right',
-	},
-	topRankingTitle: {
-		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
-		color: COLORS.text,
-		marginBottom: SPACING_H.md,
 	},
 
 	noRecordText: {
@@ -2449,7 +2002,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	levelDescIconChip: {
 		width: scaleWidth(28),
 		height: scaleWidth(28),
-		borderRadius: scaleWidth(9),
+		borderRadius: RADIUS.sm,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -2457,7 +2010,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		flex: 1,
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.text,
-		lineHeight: scaledSize(19),
+		lineHeight: displayFontSize(19),
 		fontWeight: '500',
 	},
 	levelHighlight: {

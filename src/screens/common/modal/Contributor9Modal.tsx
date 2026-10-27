@@ -166,9 +166,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderColor: COLORS.border,
 		marginBottom: SPACING_H.sm,
 	},
+	// 이 팝업의 타이틀 자리 — 다이얼로그 타이틀 기본값(heading)
 	name: {
 		fontFamily: FONTS.display,
-		fontSize: FONT_SIZES.xl,
+		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,
 		marginBottom: SPACING_H.xs,
@@ -219,7 +220,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textLight,
 		textAlign: 'center',
 		marginTop: SPACING_H.lg,
-		lineHeight: scaledSize(20),
+		lineHeight: FONT_SIZES.smPlus * 1.5,
 	},
 	closeButton: {
 		marginTop: SPACING_H.xl,

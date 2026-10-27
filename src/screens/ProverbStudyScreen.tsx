@@ -21,7 +21,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { CONTENT_MAX_WIDTH, isTablet, MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles, themedValue, getPickerTheme, getThemeMode } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber, LEVEL_NAME_BY_NUMBER } from '@/screens/common/CommonProverbModule';
-import { readableTextOn } from '@/utils/ColorAlphaUtils';
+import { inkOnFill } from '@/utils/ColorAlphaUtils';
 import { LEVEL_DROPDOWN_ITEMS, FIELD_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -36,6 +36,8 @@ import DateUtils from '@/utils/DateUtils';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
 import { read, write } from '@/services/StorageService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { useModalEnter } from '@/hooks/useModalEnter';
+import FadeInView from '@/components/animation/FadeInView';
 
 // 난이도/카테고리 드롭다운은 CommonMainData 단일 소스를 쓴다.
 // (이 화면에 복사돼 있던 사본은 badgeId 가 category_world/category_success 로 잘못돼 있었다)
@@ -126,6 +128,9 @@ const DETAIL_FILTER_HEIGHT = scaleHeight(60);
 const IMAGE_HEIGHT = isAndroid ? scaleHeight(220) : scaleHeight(200);
 const QuizStudyScreen = () => {
 	const modalSafePadding = useModalSafePadding();
+	const [showExitModal, setShowExitModal] = useState(false);
+	// 종료 확인 팝업도 다른 모달과 같은 등장 모션(fade + scale)
+	const exitEnterStyle = useModalEnter(showExitModal);
 	// 안내 정책: 화면에 처음 들어갈 때 1회 자동 노출. 다시 보려면 설정 > 화면 안내.
 	const guide = useCharacterGuideOnce('study');
 	// 회전/폴더블 대응: 캐러셀 높이는 실시간 화면 높이를 따른다.
@@ -179,7 +184,6 @@ const QuizStudyScreen = () => {
 	const [isDetailFilterOpen, setIsDetailFilterOpen] = useState(false);
 	const [levelOpen, setLevelOpen] = useState(false);
 	const [regionOpen, setRegionOpen] = useState(false);
-	const [showExitModal, setShowExitModal] = useState(false);
 
 	// 뒤로가기로도 학습을 그냥 빠져나가지 않게, 종료 버튼과 같은 확인 팝업을 띄운다.
 	useBlockBackHandler(true, () => setShowExitModal(true));
@@ -266,13 +270,13 @@ const QuizStudyScreen = () => {
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
+				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={inkOnFill(getLevelColorByNumber(level))} />;
 			case 2:
-				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
+				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={inkOnFill(getLevelColorByNumber(level))} />;
 			case 3:
-				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
+				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={inkOnFill(getLevelColorByNumber(level))} />;
 			case 4:
-				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
+				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={inkOnFill(getLevelColorByNumber(level))} />;
 			default:
 				return null;
 		}
@@ -284,7 +288,7 @@ const QuizStudyScreen = () => {
 			return null;
 		}
 		const matched = FIELD_DROPDOWN_ITEMS.find((i) => i.value === category) as { iconType: string; iconName: string } | undefined;
-		return matched ? <IconComponent type={matched.iconType} name={matched.iconName} size={scaledSize(14)} color={readableTextOn(getCategoryColor(category ?? ''))} /> : null;
+		return matched ? <IconComponent type={matched.iconType} name={matched.iconName} size={scaledSize(14)} color={inkOnFill(getCategoryColor(category ?? ''))} /> : null;
 	};
 
 	/** 뒷면은 다시 열릴 때 항상 맨 위부터 보이게 한다 */
@@ -712,29 +716,17 @@ const QuizStudyScreen = () => {
 						{/* 레벨 뱃지 */}
 						<View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.level) }]}>
 							{getLevelIcon(item.level)}
-							<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs, color: readableTextOn(getLevelColor(item.level)) }]}>{LEVEL_NAME_BY_NUMBER[item.level] || '알 수 없음'}</Text>
+							<Text style={[styles.badgeText, { color: inkOnFill(getLevelColor(item.level)) }]}>{LEVEL_NAME_BY_NUMBER[item.level] || '알 수 없음'}</Text>
 						</View>
 
 						{/* 카테고리 뱃지 */}
 						<View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(item.category) }]}>
 							{getCategoryIcon(item.category)}
-							<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs, color: readableTextOn(getCategoryColor(item.category)) }]}>{item.category || '미지정'}</Text>
+							<Text style={[styles.badgeText, { color: inkOnFill(getCategoryColor(item.category)) }]}>{item.category || '미지정'}</Text>
 						</View>
-
-						{/* 태그 */}
-						{/* {Array.isArray(item.tags) && item.tags.length > 0 && (
-							<View style={styles.tagWrap}>
-								{item.tags.map((t, i) => (
-									<View key={i} style={styles.tagChip}>
-										<Text style={styles.tagText}>#{t}</Text>
-									</View>
-								))}
-							</View>
-						)} */}
 					</View>
 				</View>
 
-				{/* <Text style={styles.hangulText}>{item.hangul}</Text> */}
 				{/* 태블릿은 앞·뒷면을 나란히 보여 줘서 뒤집기 안내가 필요 없다 */}
 				{!isTablet && <Text style={styles.cardHint}>카드를 탭하면 속담 정보가 나옵니다 👆</Text>}
 			</View>
@@ -800,7 +792,7 @@ const QuizStudyScreen = () => {
 						</View>
 						{/* 예문 */}
 						{item.example && (
-							<View style={styles.exampleBox}>
+							<View style={styles.sectionBox}>
 								<Text style={styles.sectionTitle}>✍️ 예문</Text>
 								{item.example.map((ex, idx) => (
 									<Text key={idx} style={styles.sectionText}>
@@ -824,10 +816,6 @@ const QuizStudyScreen = () => {
 						)}
 					</View>
 
-					{/* 뜻 풀이 */}
-					{/* <View style={styles.meaningBox}>
-							<Text style={styles.sectionContent}>💡 {item.meaning}</Text>
-						</View> */}
 					{/* 구성 한자 */}
 					{/* <View style={styles.charList}>
 							{item.characters.map((char, i) => (
@@ -841,11 +829,6 @@ const QuizStudyScreen = () => {
 							))}
 						</View> */}
 
-					{/* 예문 */}
-					{/* <View style={styles.exampleBox}>
-							<Text style={styles.sectionTitle}>📝 예문</Text>
-							<Text style={styles.sectionContent}>{item.example}</Text>
-						</View> */}
 				</GHScrollView>
 				{/* 아래에 내용이 더 있다는 신호. 내용이 짧으면 표면색끼리 겹쳐 보이지 않는다 */}
 				<LinearGradient colors={[`${COLORS.surface}00`, COLORS.surface]} style={styles.cardBackFade} pointerEvents="none" />
@@ -1009,9 +992,8 @@ const QuizStudyScreen = () => {
 						{isDetailFilterOpen && (
 							<Animated.View style={[styles.detailFilterWrapper, { height: detailFilterHeightAnim }]}>
 								<View style={styles.subFilterRow}>
+									{/* zIndex 역전 방지 */}
 									<View style={{ flex: 1, zIndex: regionOpen ? 1000 : 2000 }}>
-										{' '}
-										{/* zIndex 역전 방지 */}
 										<DropDownPicker
 											theme={getPickerTheme()}
 											open={isDetailFilterOpen && levelOpen}
@@ -1114,7 +1096,7 @@ const QuizStudyScreen = () => {
 						// 카드가 세로로 쌓이는 화면이라, 같은 형태를 미리 깔아 두면 로딩이 끝나도 레이아웃이 안 흔들린다.
 						<SkeletonCardList count={4} />
 					) : getFilteredData().length === 0 ? (
-						<View style={styles.emptyWrapper}>
+						<FadeInView style={styles.emptyWrapper}>
 							<Image source={require('@/assets/images/feature-states/empty-search.png')} style={styles.emptyImage} resizeMode="contain" />
 							<Text style={styles.emptyText}>
 								{filter === 'learned'
@@ -1123,7 +1105,7 @@ const QuizStudyScreen = () => {
 										? '진행 중인 속담이 없습니다.\n다시 학습하기 버튼으로 시작해 보세요!'
 										: '등록된 속담이 없습니다.'}
 							</Text>
-						</View>
+						</FadeInView>
 					) : (
 						<>
 							<Animated.View style={[styles.carouselContainer, { zIndex: 1, alignSelf: 'center' }]}>
@@ -1183,7 +1165,7 @@ const QuizStudyScreen = () => {
 
 			<Modal visible={showExitModal} transparent animationType="fade" onRequestClose={() => setShowExitModal(false)}>
 				<View style={[styles.modalOverlay, modalSafePadding]}>
-					<View style={styles.exitModalBox}>
+					<Animated.View style={[styles.exitModalBox, exitEnterStyle]}>
 						{/* 헤더 아이콘 + 타이틀 */}
 						<View style={styles.exitHeader}>
 							<IconComponent
@@ -1221,15 +1203,16 @@ const QuizStudyScreen = () => {
 								<Text style={styles.exitButtonText}>종료하기</Text>
 							</TouchableOpacity>
 						</View>
-					</View>
+					</Animated.View>
 				</View>
 			</Modal>
 
 			{showToast &&
 				(() => {
 					const isComplete = typeof completedCardId === 'number' && (studyHistory.studyProverbes ?? []).includes(completedCardId);
-					const accent = isComplete ? COLORS.primary : COLORS.secondary;
-					const accentSoft = isComplete ? COLORS.primarySoft : COLORS.secondarySoft;
+					// 완료는 청포(success), 복습은 물빛 — 쪽빛(primary)은 액션 전용이라 완료 표시에 쓰지 않는다
+					const accent = isComplete ? COLORS.successDark : COLORS.secondary;
+					const accentSoft = isComplete ? COLORS.successSoft : COLORS.secondarySoft;
 					const learnedCount = (studyHistory.studyProverbes ?? []).length;
 					const totalCount = proverbList.length;
 					const pct = totalCount > 0 ? Math.min(Math.round((learnedCount / totalCount) * 100), 100) : 0;
@@ -1756,6 +1739,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xl,
 		borderRadius: RADIUS.xl,
 		alignItems: 'center',
+		overflow: 'hidden', // scale 로 등장하는 테두리 카드 (모달 레이아웃 규칙 7)
 	},
 	exitHeader: {
 		alignItems: 'center',
@@ -1793,7 +1777,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	exitButtonText: {
 		color: COLORS.textWhite,
-		fontWeight: '700',
+		fontWeight: '600',
 		fontSize: FONT_SIZES.mdPlus,
 	},
 	cardMiddle: {
@@ -1832,14 +1816,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: '100%', // ✅ 부모 영역 꽉 차게
 	},
 
-	hangulText: {
-		fontSize: FONT_SIZES.lg,
-		color: COLORS.textSecondary,
-		fontWeight: '500',
-		textAlign: 'center',
-		lineHeight: scaledSize(24),
-		marginBottom: SPACING_H.sm,
-	},
 	badgeSection: {
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -1864,38 +1840,13 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.sm,
 	},
 
-	meaningBox: {
-		borderRadius: RADIUS.md,
-		backgroundColor: COLORS.warningBg, // 밝은 크림색
-		borderWidth: 1,
-		borderColor: COLORS.warning, // 옅은 옐로 보더
-		paddingHorizontal: SPACING_W.lg,
-		paddingVertical: SPACING_H.md,
-		marginBottom: SPACING_H.md,
-	},
-
-	exampleBox: {
-		backgroundColor: COLORS.secondaryBg, // 연한 하늘색
-		borderRadius: RADIUS.md,
-		paddingHorizontal: SPACING_W.lg,
-		paddingVertical: SPACING_H.md,
-		marginBottom: SPACING_H.md,
-	},
-
-	sectionContent: {
-		fontSize: FONT_SIZES.mdPlus,
-		color: COLORS.text,
-		lineHeight: scaledSize(23),
-		textAlign: 'left',
-	},
-
 	cardBackTitle: {
 		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.title,
 		fontWeight: '700',
 		color: COLORS.secondaryDark,
 		textAlign: 'center',
-		lineHeight: scaledSize(34),
+		lineHeight: scaledSize(36), // 명조 속담 여러 줄 — 1.5배 여유
 		marginBottom: SPACING_H.lg,
 	},
 	dropdownField: {
@@ -1958,6 +1909,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center', // 세로 중앙 고정
 		justifyContent: 'center',
+		columnGap: SPACING_W.xs,
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,
@@ -1966,32 +1918,15 @@ const styles = themedStyles(() => StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center', // 세로 중앙 고정
 		justifyContent: 'center',
+		columnGap: SPACING_W.xs,
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,
 	},
 	badgeText: {
-		color: COLORS.textWhite,
+		// 글자색은 배지 채움에 맞춰 inkOnFill 로 인라인 지정한다
 		fontSize: FONT_SIZES.smPlus,
 		fontWeight: '600',
-	},
-	tagWrap: {
-		flexDirection: 'row',
-		flexWrap: 'wrap', // ✅ 태그도 여러 줄
-		justifyContent: 'center', // ✅ 중앙 모으기
-	},
-	tagChip: {
-		paddingHorizontal: SPACING_W.md,
-		paddingVertical: SPACING_H.xs,
-		borderRadius: RADIUS.round,
-		backgroundColor: COLORS.surfaceAlt,
-		marginRight: SPACING_W.xs,
-	},
-
-	tagText: {
-		fontSize: FONT_SIZES.smPlus,
-		fontWeight: '600',
-		color: COLORS.text,
 	},
 }));
 

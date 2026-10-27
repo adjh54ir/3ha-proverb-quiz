@@ -9,6 +9,7 @@ import IconComponent from '../common/atomic/IconComponent';
 import { appIconUrl, appStoreUrl, fetchCommonApps, isNewApp } from '@/const/common/CommonAppsData';
 import { CommonType } from '@/types/CommonType';
 import PopInView from '@/components/animation/PopInView';
+import { AnimatedListItem } from '@/components/animation/FadeInView';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
 import ScrollTopButton from '@/screens/common/atomic/ScrollTopButton';
@@ -33,7 +34,7 @@ const CATEGORY_LABEL: Record<CommonType.AppCategory, string> = {
 const CATEGORY_COLORS: Record<CommonType.AppCategory, { bg: string; text: string }> = themedValue(() => ({
 	quiz: { bg: COLORS.secondaryBg, text: COLORS.secondaryDark },
 	calculator: { bg: COLORS.primaryBg, text: COLORS.primaryDeep },
-	utility: { bg: COLORS.accentOrangeBg, text: COLORS.warningDeep },
+	utility: { bg: COLORS.accentOrangeBg, text: COLORS.accentOrangeText }, // 감빛 틴트 위 글자는 같은 계열
 }));
 
 interface Props {
@@ -189,10 +190,11 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 								<Text style={styles.emptyText}>검색 결과가 없습니다</Text>
 							</View>
 						) : (
-							filteredApps.map((app) => {
+							filteredApps.map((app, index) => {
 								const catColor = CATEGORY_COLORS[app.category];
 								return (
-									<View key={app.id} style={styles.appCard}>
+									// 카드 목록은 앞쪽 몇 장만 순차로 떠오른다(필터를 바꿔 새로 들어온 카드도 같은 모션)
+									<AnimatedListItem key={app.id} index={index} style={styles.appCard}>
 										<View style={{ position: 'relative' }}>
 											<Image source={{ uri: appIconUrl(app) }} style={styles.image} resizeMode="cover" />
 
@@ -219,7 +221,7 @@ const DeveloperAppsModal = ({ visible, onClose }: Props) => {
 												</TouchableOpacity>
 											</View>
 										</View>
-									</View>
+									</AnimatedListItem>
 								);
 							})
 						)}
@@ -383,7 +385,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	appDesc: {
 		fontSize: FONT_SIZES.sm,
 		color: COLORS.textSecondary,
-		lineHeight: scaledSize(18),
+		lineHeight: FONT_SIZES.sm * 1.5,
 		marginBottom: SPACING_H.sm,
 	},
 	appFooter: {
@@ -427,20 +429,23 @@ const styles = themedStyles(() => StyleSheet.create({
 	retryButton: {
 		marginTop: SPACING_H.md,
 	},
+	// 설정 화면 하단 앱 목록의 NEW 배지와 같은 모양(우상단 pill + 표면색 테두리) — 같은 데이터는 같은 표시
 	newBadge: {
 		position: 'absolute',
 		top: -SPACING_H.xs,
-		left: -SPACING_W.xs,
+		right: -SPACING_W.xsPlus,
 		backgroundColor: COLORS.dangerFill,
-		borderRadius: RADIUS.sm,
+		borderRadius: RADIUS.round,
+		borderWidth: 1,
+		borderColor: COLORS.surface,
 		paddingHorizontal: SPACING_W.xs,
-		paddingVertical: SPACING_H.xs,
+		paddingVertical: SPACING_H.xxs,
 		zIndex: 1,
 	},
 	newBadgeText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.xxs,
 		fontWeight: '700',
-		letterSpacing: 0.5,
+		letterSpacing: 0.2,
 	},
 }));

@@ -762,8 +762,8 @@ const SettingScreen = () => {
 									onPress={() => setOpenAccordion(isOpen ? null : groupKey)}
 									activeOpacity={0.7}>
 									<View style={styles.row}>
-										<View style={[styles.accordionIconChip, { backgroundColor: group.iconBg }]}>
-											<IconComponent type="MaterialCommunityIcons" name={group.icon} size={scaledSize(16)} color={group.iconColor} />
+										<View style={[styles.itemIconChip, { backgroundColor: group.iconBg }]}>
+											<IconComponent type="MaterialCommunityIcons" name={group.icon} size={scaledSize(18)} color={group.iconColor} />
 										</View>
 										<Text style={styles.accordionHeaderText}>{group.label}</Text>
 									</View>
@@ -775,8 +775,9 @@ const SettingScreen = () => {
 									/>
 								</TouchableOpacity>
 
+								{/* 펼칠 때 위에서 살짝 내려오며 나타난다 — 사용자 동작에 대한 응답 모션 */}
 								{isOpen && (
-									<View style={styles.accordionBody}>
+									<FadeInView style={styles.accordionBody} duration={220} offsetY={-SPACING_H.sm}>
 										{group.items.map((subItem, index) => (
 											<TouchableOpacity
 												key={subItem.key}
@@ -793,7 +794,7 @@ const SettingScreen = () => {
 												<Text style={styles.accordionSubText}>{subItem.label}</Text>
 											</TouchableOpacity>
 										))}
-									</View>
+									</FadeInView>
 								)}
 							</View>
 						);
@@ -805,8 +806,8 @@ const SettingScreen = () => {
 						activeOpacity={0.8}>
 						<View style={styles.accordionHeader}>
 							<View style={styles.row}>
-								<View style={[styles.accordionIconChip, { backgroundColor: COLORS.dangerBg }]}>
-									<IconComponent type="materialIcons" name="delete" size={scaledSize(16)} color={COLORS.danger} />
+								<View style={[styles.itemIconChip, styles.itemIconChipDanger]}>
+									<IconComponent type="materialIcons" name="delete" size={scaledSize(18)} color={COLORS.danger} />
 								</View>
 								<Text style={[styles.accordionHeaderText, { color: COLORS.danger }]}>전체 데이터 초기화</Text>
 							</View>
@@ -1040,6 +1041,7 @@ const SettingScreen = () => {
 						</View>
 						<Text style={styles.cardText}>{config.label}</Text>
 					</View>
+					<IconComponent type="MaterialCommunityIcons" name="chevron-right" size={scaledSize(20)} color={COLORS.textSecondary} />
 				</View>
 			</AnimatedPressCard>
 		);
@@ -1236,11 +1238,11 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
+	// 섹션 제목 — 행 라벨(mdPlus)보다 한 단계 커야 위계가 선다(밀도 높은 화면이라 lg)
 	sectionHeaderText: {
-		fontSize: FONT_SIZES.smPlus,
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
-		color: COLORS.textSecondary,
-		letterSpacing: 0.3,
+		color: COLORS.textStrong,
 	},
 
 	cardButton: {
@@ -1254,8 +1256,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginHorizontal: SPACING_W.lg,
 		flexDirection: 'row',
 		alignItems: 'center',
+		justifyContent: 'space-between',
 	},
-	row: { flexDirection: 'row', alignItems: 'center' },
+	row: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
 	itemIconChip: {
 		width: scaleWidth(34),
 		height: scaleWidth(34),
@@ -1266,7 +1269,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginRight: SPACING_W.md,
 	},
 	itemIconChipDanger: { backgroundColor: COLORS.dangerBg },
-	cardText: { fontSize: FONT_SIZES.mdPlus, color: COLORS.text, fontWeight: '500', letterSpacing: 0.3, flexShrink: 1 },
+	// 행 라벨 — 설정 화면의 모든 행(일반·아코디언·소리·권한)이 같은 크기·굵기를 쓴다
+	cardText: { fontSize: FONT_SIZES.mdPlus, color: COLORS.text, fontWeight: '600', flexShrink: 1 },
 
 	// ── 아코디언 ──
 	accordionWrapper: { marginHorizontal: SPACING_W.lg, gap: SPACING_H.md },
@@ -1280,8 +1284,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	// 파괴적 액션 — 위 그룹들과 한 칸 더 띄운다
 	accordionGroupDanger: {
 		marginTop: SPACING_H.sm,
-		borderWidth: 1,
-		borderColor: COLORS.dangerBg,
+		borderColor: COLORS.dangerBorderSoft,
 	},
 	accordionHeader: {
 		flexDirection: 'row',
@@ -1290,14 +1293,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		minHeight: scaleHeight(52),
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.lg,
-	},
-	accordionIconChip: {
-		width: scaleWidth(28),
-		height: scaleWidth(28),
-		borderRadius: scaleWidth(28) / 2,
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: SPACING_W.md,
 	},
 	accordionHeaderText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '600', color: COLORS.text },
 	accordionBody: { borderTopWidth: 1, borderTopColor: COLORS.border, backgroundColor: COLORS.background },
@@ -1323,7 +1318,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderBottomColor: COLORS.border,
 	},
 	permissionTextWrap: { flex: 1, marginRight: SPACING_W.md },
-	permissionLabel: { fontSize: FONT_SIZES.mdPlus, fontWeight: '600', color: COLORS.text, letterSpacing: 0.3 },
+	permissionLabel: { fontSize: FONT_SIZES.mdPlus, fontWeight: '600', color: COLORS.text },
 	permissionDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: SPACING_H.xs },
 	permissionBadge: {
 		borderWidth: 1,
@@ -1378,14 +1373,15 @@ const styles = themedStyles(() => StyleSheet.create({
 	themeLabel: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text },
 	themeLabelActive: { color: COLORS.primaryDeep },
 	themeDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: SPACING_H.xxs },
-	themeHint: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, lineHeight: scaledSize(18) },
-	themeGroupLabel: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.xs },
+	themeHint: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, lineHeight: FONT_SIZES.sm * 1.5 },
+	// 앞 안내문과는 md+sm 으로 떼고 자기 선택지와는 md 로 붙여 묶음이 읽히게 한다
+	themeGroupLabel: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.sm },
 	textSizeSample: { fontWeight: '700', color: COLORS.textSecondary },
 	textSizeSampleActive: { color: COLORS.textWhite },
 
 
 	modalTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: SPACING_H.md },
-	modalTitleText: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, lineHeight: scaledSize(26), fontWeight: '700', color: COLORS.textStrong, textAlign: 'center' },
+	modalTitleText: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, lineHeight: FONT_SIZES.xl * 1.45, fontWeight: '700', color: COLORS.textStrong, textAlign: 'center' },
 	iconLeft: { marginRight: SPACING_W.sm },
 
 	recommendSection: {
@@ -1431,7 +1427,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	storeButtonText: { color: COLORS.textWhite, fontWeight: '700', fontSize: FONT_SIZES.mdPlus },
+	storeButtonText: { color: COLORS.textWhite, fontWeight: '600', fontSize: FONT_SIZES.lg },
 	iconRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING_W.sm },
 
 	appVerText: { fontSize: FONT_SIZES.sm, color: COLORS.textLight, textAlign: 'center', marginBottom: SPACING_H.lg },
@@ -1465,8 +1461,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	// 아이콘 우상단 NEW 배지 — 이전에는 삼각형 리본 + 5px 회전 텍스트라 글자가 읽히지 않았다.
 	footerNewBadge: {
 		position: 'absolute',
-		top: -scaleHeight(4),
-		right: -scaleWidth(6),
+		top: -SPACING_H.xs,
+		right: -SPACING_W.xsPlus,
 		paddingHorizontal: SPACING_W.xs,
 		paddingVertical: scaleHeight(1),
 		borderRadius: RADIUS.round,

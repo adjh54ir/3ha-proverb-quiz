@@ -57,9 +57,12 @@ const COMMON_ALL_OPTION = {
 		return COLORS.textSecondary;
 	},
 	icon: () => <IconComponent type="FontAwesome6" name="clipboard-list" size={scaledSize(16)} color={COLORS.textSecondary} />,
-	labelStyle: {
-		marginLeft: SPACING_W.xsPlus,
-		fontSize: FONT_SIZES.md,
+	// getter — 모듈 로드 시점에 FONT_SIZES.md 를 읽어 두면 '글자 크게' 모드 배율이 빠진다
+	get labelStyle() {
+		return {
+			marginLeft: SPACING_W.xsPlus,
+			fontSize: FONT_SIZES.md,
+		};
 	},
 };
 

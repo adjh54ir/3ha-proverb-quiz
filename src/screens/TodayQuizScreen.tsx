@@ -29,6 +29,7 @@ import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
+import PopInView from '@/components/animation/PopInView';
 import useModalSafePadding from '@/hooks/useModalSafePadding';
 import { playCorrect, playWrong, playFinish } from '@/utils/SoundUtils';
 import { scheduleDailyQuizReminder, cancelDailyQuizReminder, parseAlarmHour, DEFAULT_ALARM_HOUR } from '@/utils/NotifactionHelper';
@@ -708,7 +709,7 @@ const TodayQuizScreen = () => {
 						</View>
 
 						{result !== undefined && (
-							<View style={styles.resultBannerWrap}>
+							<PopInView style={styles.resultBannerWrap}>
 								<View style={[styles.resultBanner, result ? styles.resultBannerCorrect : styles.resultBannerWrong]}>
 									<View style={[styles.resultBannerIcon, { backgroundColor: result ? COLORS.success : COLORS.dangerFill }]}>
 										{/* 다크 success(#3DD68C) 위 흰 아이콘은 1.8:1 — textOnVivid 가 다크에서만 먹색으로 뒤집는다 */}
@@ -718,7 +719,7 @@ const TodayQuizScreen = () => {
 										{result ? '정답입니다!' : '아쉽습니다, 오답입니다'}
 									</Text>
 								</View>
-							</View>
+							</PopInView>
 						)}
 
 						{/* 태블릿은 넓은 폭을 2×2 보기 그리드로 쓴다 (폰·긴 보기는 그리드가 null 이라 한 줄씩) */}
@@ -803,8 +804,6 @@ const TodayQuizScreen = () => {
 					<CharacterGuideButton onPress={guide.open} size={scaledSize(18)} />
 				</View>
 
-				<View style={styles.rightAlignedRow} />
-
 				{!isAlarmEnabled && (
 					<View style={[styles.content, isTablet && styles.contentTablet]}>
 						{/* 태블릿: 이미지 | 설명 을 가로로 놓고 아래에 알림 설정을 구분선으로 나눈다 */}
@@ -829,7 +828,7 @@ const TodayQuizScreen = () => {
 								</View>
 							) : (
 								<View style={styles.introHead}>
-									<Text style={styles.title}>🍀 매일 '오늘의 퀴즈'가 도착합니다! 🍀</Text>
+									<Text style={styles.title}>🍀 매일 "오늘의 퀴즈"가 도착합니다! 🍀</Text>
 
 									<View style={{ alignSelf: 'stretch', marginTop: SPACING_H.sm }}>
 										<View style={styles.bulletRow}>
@@ -950,9 +949,9 @@ const TodayQuizScreen = () => {
 								<>
 									<FadeInView>
 										<View style={styles.completedCard}>
-											<View style={styles.completedEmojiCircle}>
+											<PopInView style={styles.completedEmojiCircle}>
 												<Text style={styles.completedEmoji}>🎉</Text>
-											</View>
+											</PopInView>
 											<Text style={styles.completedTitle}>오늘의 문제 끝!</Text>
 											<Text style={styles.completedSubtitle}>내일 또 뵙겠습니다 👋</Text>
 											<View style={styles.completedScorePill}>
@@ -1251,7 +1250,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.background,
 	},
 	container: {
-		paddingVertical: SPACING_H.sm,
+		paddingVertical: SPACING_H.md,
 	},
 
 	/* ===== 상단 버튼 행 ===== */
@@ -1284,11 +1283,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	iconSpacing: {
 		marginRight: SPACING_W.xs,
-	},
-	rightAlignedRow: {
-		flexDirection: 'row',
-		justifyContent: 'flex-end',
-		marginHorizontal: SPACING_W.lg,
 	},
 
 	/* ===== 알림 미설정 안내 카드 ===== */
@@ -1541,7 +1535,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '700',
 		color: COLORS.secondary,
 		marginBottom: SPACING_H.sm,
-		lineHeight: scaledSize(30),
+		lineHeight: displayFontSize(32),
 		textAlign: 'center',
 	},
 	questionCombinedTablet: {
@@ -1570,14 +1564,15 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.md,
 		borderRadius: RADIUS.round,
 		borderWidth: 1,
+		overflow: 'hidden', // PopInView(scale) 안의 테두리 뷰 — 모달 규칙 7
 	},
 	resultBannerCorrect: {
 		backgroundColor: COLORS.successBg,
-		borderColor: COLORS.successSoft,
+		borderColor: COLORS.successBorder,
 	},
 	resultBannerWrong: {
 		backgroundColor: COLORS.dangerBg,
-		borderColor: COLORS.danger,
+		borderColor: COLORS.dangerBorder,
 	},
 	resultBannerIcon: {
 		width: scaleWidth(22),
@@ -1670,7 +1665,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	nextButtonText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
+		fontWeight: '600',
 	},
 
 	/* ===== 퀴즈 시작 카드 ===== */
@@ -1736,7 +1731,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	startQuizButtonText: {
 		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
+		fontWeight: '600',
 		color: COLORS.textWhite,
 	},
 
@@ -1782,7 +1777,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.round,
 		backgroundColor: COLORS.successBg,
 		borderWidth: 1,
-		borderColor: COLORS.successSoft,
+		borderColor: COLORS.successBorder,
 	},
 	completedScoreText: {
 		fontSize: FONT_SIZES.md,
@@ -2010,7 +2005,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	saveButtonText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.mdPlus,
-		fontWeight: '700',
+		fontWeight: '600',
 	},
 	modalCloseIcon: {
 		position: 'absolute',
@@ -2034,7 +2029,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	modalFooterButtonText: {
 		fontSize: FONT_SIZES.mdPlus,
-		fontWeight: '700',
+		fontWeight: '600',
 		color: COLORS.text,
 	},
 	scrollView: {
@@ -2127,7 +2122,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginTop: SPACING_H.sm,
 		paddingVertical: SPACING_H.sm,
 		paddingHorizontal: SPACING_W.md,
-		borderRadius: RADIUS.sm,
+		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.background,
 		borderWidth: 1,
 		borderColor: COLORS.border,

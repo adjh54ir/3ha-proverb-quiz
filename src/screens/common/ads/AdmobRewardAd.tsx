@@ -1,4 +1,3 @@
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { GOOGLE_ADMOV_ANDROID_REWARD, GOOGLE_ADMOV_IOS_REWARD } from '@env';
 import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View, ActivityIndicator, Text, StyleSheet } from 'react-native';
@@ -104,7 +103,8 @@ const styles = themedStyles(() => StyleSheet.create({
     zIndex: 999,
   },
   container: {
-    padding: SPACING_H.xxl,
+    paddingHorizontal: SPACING_W.xxl,
+    paddingVertical: SPACING_H.xxl,
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.xl,
     alignItems: 'center',

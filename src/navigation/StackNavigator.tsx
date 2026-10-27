@@ -76,7 +76,7 @@ const StackNavigator = () => {
 					fontFamily: FONTS.display,
 					fontSize: FONT_SIZES.xl,
 					fontWeight: '700',
-					color: COLORS.text,
+					color: COLORS.textStrong, // 다른 화면 타이틀·뒤로가기 아이콘과 같은 먹색
 				},
 				headerShadowVisible: false,
 			}}

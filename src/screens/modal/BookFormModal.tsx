@@ -81,10 +81,11 @@ const ColorIconPicker = ({ selectedColor, selectedIcon, onColorChange, onIconCha
 };
 
 const pickerStyles = themedStyles(() => StyleSheet.create({
-	container: { width: '100%', marginTop: SPACING_H.md },
+	container: { width: '100%' },
 	preview: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.md, borderWidth: 1, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, paddingVertical: SPACING_H.md, marginBottom: SPACING_H.md },
 	previewIcon: { width: scaleWidth(44), height: scaleWidth(44), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
-	previewLabel: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
+	// 실제 속담집 카드(MyProverbBook)처럼 먹색 — 고른 색은 틴트 배경 위 글자로 대비가 무너진다(색은 아이콘 타일이 보여 준다)
+	previewLabel: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textStrong },
 	sectionLabel: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, marginBottom: SPACING_H.sm, marginTop: SPACING_H.xs },
 	scrollArea: { marginBottom: SPACING_H.xs },
 	row: { flexDirection: 'row', marginBottom: SPACING_H.sm },
@@ -138,15 +139,15 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 						<ModalCloseButton onPress={onClose} />
 
 						<Text style={styles.modalTitle}>{isEdit ? '속담집 편집' : '새 속담집 만들기'}</Text>
-						{!isEdit && <Image source={require('@/assets/images/home-actions/action-my-book.png')} style={styles.headerImage} resizeMode="contain" />}
 						{!isEdit && <Text style={styles.modalSubtitle}>이름을 정하고, 속담집에 속담을 추가해 보세요</Text>}
+						{!isEdit && <Image source={require('@/assets/images/home-actions/action-my-book.png')} style={styles.headerImage} resizeMode="contain" />}
 
 						<View style={[pickerStyles.preview, { backgroundColor: withAlpha(color, ALPHA.soft), borderColor: withAlpha(color, ALPHA.border), width: '100%', marginTop: SPACING_H.md }]}>
 							<View style={[pickerStyles.previewIcon, { backgroundColor: color }]}>
 								<IconComponent type="materialIcons" name={icon} size={scaledSize(26)} color={readableTextOn(color)} />
 							</View>
 							<View style={{ flex: 1 }}>
-								<Text style={[pickerStyles.previewLabel, { color }]} numberOfLines={1}>{title.trim() || '속담집 이름'}</Text>
+								<Text style={pickerStyles.previewLabel} numberOfLines={1}>{title.trim() || '속담집 이름'}</Text>
 								{desc.trim() ? <Text style={pickerStyles.previewDesc} numberOfLines={1}>{desc.trim()}</Text> : null}
 							</View>
 						</View>
@@ -187,7 +188,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 							onPress={handleSubmit}
 							activeOpacity={0.85}
 							disabled={!title.trim()}>
-							<Text style={styles.submitBtnText}>{isEdit ? '저장' : '생성'}</Text>
+							<Text style={[styles.submitBtnText, !title.trim() && styles.submitBtnTextDisabled]}>{isEdit ? '저장' : '생성'}</Text>
 						</TouchableOpacity>
 					</Animated.View>
 				</ScrollView>
@@ -199,7 +200,7 @@ const BookFormModal = ({ visible, editTarget, onClose, onSubmit }: Props) => {
 export default BookFormModal;
 
 const styles = themedStyles(() => StyleSheet.create({
-	headerImage: { width: scaleWidth(72), height: scaleWidth(72), alignSelf: 'center', marginTop: SPACING_H.sm },
+	headerImage: { width: scaleWidth(72), height: scaleWidth(72), alignSelf: 'center', marginTop: SPACING_H.md },
 	overlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'center', alignItems: 'center' },
 	// 딤 좌우 여백은 다른 대화상자와 같은 lg (예전 88% 는 이 모달만 카드 폭이 달랐다)
 	scrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: SPACING_H.xl, paddingHorizontal: SPACING_W.lg, width: '100%' },
@@ -208,11 +209,13 @@ const styles = themedStyles(() => StyleSheet.create({
 	modal: { width: '100%', maxWidth: MODAL_MAX_WIDTH, backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden', paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.xl },
 	modalTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.heading, fontWeight: '700', color: COLORS.textStrong },
 	modalSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'left', marginTop: SPACING_H.xs },
-	inputWrap: { flexDirection: 'row', alignItems: 'center', minHeight: scaleHeight(48), borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, marginTop: SPACING_H.xs, marginBottom: SPACING_H.md, backgroundColor: COLORS.surface },
+	inputWrap: { flexDirection: 'row', alignItems: 'center', minHeight: scaleHeight(48), borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: SPACING_W.md, marginTop: SPACING_H.sm, marginBottom: SPACING_H.md, backgroundColor: COLORS.surface },
 	inputWrapFocused: { borderColor: COLORS.primary },
 	input: { flex: 1, paddingVertical: 0, fontSize: FONT_SIZES.md, color: COLORS.text },
 	submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', minHeight: scaleHeight(48), marginTop: SPACING_H.sm /* + 색 행 sm + scrollArea xs = 20 */, borderRadius: RADIUS.md, gap: SPACING_W.sm, backgroundColor: COLORS.primaryFill },
-	submitBtnDisabled: { backgroundColor: COLORS.borderDark },
-	submitBtnText: { color: COLORS.textWhite, fontWeight: '700', fontSize: FONT_SIZES.lg },
+	// 비활성 — 옅은 표면 + 흐린 글자 (borderDark 위 흰 글자는 라이트에서 1.6:1)
+	submitBtnDisabled: { backgroundColor: COLORS.surfaceAlt },
+	submitBtnTextDisabled: { color: COLORS.textLight },
+	submitBtnText: { color: COLORS.textWhite, fontWeight: '600', fontSize: FONT_SIZES.lg },
 	fieldLabel: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, marginTop: SPACING_H.xs },
 }));

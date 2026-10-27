@@ -525,7 +525,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: displayFontSize(26),
 		fontWeight: '700',
 		color: COLORS.textWhite,
-		lineHeight: scaledSize(30),
+		// 글자 크게 모드에서도 숫자와 같은 배율로 늘어야 위아래가 잘리지 않는다
+		lineHeight: displayFontSize(30),
 	},
 	attemptUnit: {
 		fontSize: FONT_SIZES.md,
@@ -622,7 +623,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: scaleWidth(53),
 		borderWidth: 2,
 		borderColor: 'rgba(255, 255, 255, 0.1)',
-		marginBottom: SPACING_H.sm,
+		// 잠금 해제 카드(bossWrapper)와 같은 간격 — 달라서 보스 이름 위치가 카드마다 어긋났다
+		marginBottom: SPACING_H.xs,
 	},
 	lockedText: {
 		fontSize: FONT_SIZES.sm,
@@ -688,8 +690,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'center',
 		borderRadius: RADIUS.md,
 	},
+	// 완료는 정답·승리 계열(청포). 모드를 따르는 success 는 다크에서 밝아져 흰 글자가 묻히므로 고정 배너 톤을 쓴다.
 	challengeButtonCompleted: {
-		backgroundColor: COLORS.secondaryFill,
+		backgroundColor: COLORS.towerVictoryBanner,
 	},
 	challengeButtonLocked: {
 		backgroundColor: COLORS.darkMuted,
@@ -697,7 +700,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	challengeButtonText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
+		fontWeight: '600',
 		letterSpacing: 0.5,
 	},
 	descriptionSection: {
@@ -747,6 +750,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	devButtonText: {
 		fontSize: FONT_SIZES.xs,
 		color: COLORS.warning,
-		fontWeight: '700',
+		fontWeight: '600',
 	},
 }));

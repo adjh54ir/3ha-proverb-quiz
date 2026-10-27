@@ -23,7 +23,7 @@ import BottomHomeButton from './common/BottomHomeButton';
 import DateUtils from '@/utils/DateUtils';
 import FastImage from 'react-native-fast-image';
 import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/CharacterGuide';
-import { withAlpha, ALPHA, inkOnFill, readableTextOn } from '@/utils/ColorAlphaUtils';
+import { withAlpha, ALPHA, inkOnFill } from '@/utils/ColorAlphaUtils';
 import { useAppNavigation } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
@@ -318,8 +318,8 @@ const QuizModeScreen = () => {
 										const solvedSet = new Set([...correctSet, ...wrongSet]);
 
 										const solved = filteredProverbs.filter((p) => solvedSet.has(p.id)).length;
-										// 밝은 카테고리색(#22C55E, #F59E0B …)과 다크의 '전체'(textSecondary) 위에서는 흰 글자가 묻힌다
-										const ink = readableTextOn(item.color);
+										// 밝은 카테고리색과 다크의 '전체'(textSecondary) 위에서는 흰 글자가 묻힌다 — 데이터 색 채움은 밝기로 고른다
+										const ink = inkOnFill(item.color);
 
 										return (
 											<TouchableOpacity
@@ -340,7 +340,7 @@ const QuizModeScreen = () => {
 												</View>
 
 												<View style={styles.progressWrapper}>
-													<View style={styles.progressBarBackground}>
+													<View style={[styles.progressBarBackground, { backgroundColor: withAlpha(ink, ALPHA.border) }]}>
 														<View style={[styles.progressBarFill, { width: `${total > 0 ? (solved / total) * 100 : 0}%`, backgroundColor: ink }]} />
 													</View>
 													<Text style={[styles.categoryRowProgress, { color: ink }]}>{`${solved}/${total}`}</Text>
@@ -576,7 +576,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	progressBarBackground: {
 		width: '100%',
 		height: scaleHeight(10),
-		backgroundColor: 'rgba(255,255,255,0.25)',
+		// 트랙 색은 채움 글자색(ink)의 25% — 밝은 카테고리에서 흰 트랙이 배경에 묻히지 않게 화면에서 준다
 		borderRadius: RADIUS.round,
 		overflow: 'hidden',
 		marginBottom: SPACING_H.xs,

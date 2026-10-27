@@ -65,7 +65,7 @@ const LevelModal: React.FC<LevelModalProps> = ({ visible, totalScore, onClose })
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<View style={[styles.modalOverlay, safePadding]}>
 				<Animated.View
-					style={[styles.levelModal, { maxHeight: '100%', ...enterStyle }]}>
+					style={[styles.levelModal, enterStyle]}>
 					<ModalCloseButton onPress={onClose} />
 
 					<Text style={styles.levelModalTitle}>등급 안내</Text>
@@ -125,6 +125,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	levelModal: {
 		width: '100%',
 		maxWidth: scaleWidth(340),
+		maxHeight: '100%', // 카드가 시스템 바를 넘지 않도록(모달 레이아웃 규칙 2)
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,

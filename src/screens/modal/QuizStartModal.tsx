@@ -27,7 +27,7 @@ interface Props {
 const MODE_META: Record<QuizStartMode, { title: string; desc: string; icon: string }> = {
 	meaning: { title: '뜻 맞추기', desc: '속담을 보고 올바른 뜻을 골라보세요.', icon: 'lightbulb' },
 	proverb: { title: '속담 찾기', desc: '뜻을 보고 알맞은 속담을 골라보세요.', icon: 'search' },
-	blank: { title: '빈 칸 채우기', desc: '속담의 빠진 부분을 채워보세요.', icon: 'edit' },
+	blank: { title: '빈칸 채우기', desc: '속담의 빠진 부분을 채워보세요.', icon: 'edit' },
 	example: { title: '예문 속담', desc: '예문을 보고 어울리는 속담을 골라보세요.', icon: 'subject' },
 	exampleBlank: { title: '예문 빈칸', desc: '예문 속 빈칸에 들어갈 속담을 골라보세요.', icon: 'edit-note' },
 	arrange: { title: '단어 조각 배열', desc: '섞인 단어를 순서대로 배열해 속담을 완성하세요.', icon: 'extension' },
@@ -208,15 +208,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		overflow: 'hidden',
 	},
 	// ===== 헤더 =====
-	iconCircle: {
-		width: scaleWidth(60),
-		height: scaleWidth(60),
-		borderRadius: scaleWidth(60) / 2,
-		backgroundColor: COLORS.primaryBg,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginBottom: SPACING_H.md,
-	},
 	headerMascot: {
 		width: scaleWidth(96),
 		height: scaleWidth(96),
@@ -294,7 +285,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	secondaryButtonText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textSecondary },
+	secondaryButtonText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.textSecondary },
 	primaryButton: {
 		flex: 1,
 		flexDirection: 'row',
@@ -305,5 +296,5 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	primaryButtonText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textWhite },
+	primaryButtonText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.textWhite },
 }));

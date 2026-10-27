@@ -4,6 +4,7 @@ import { Animated, View } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
 import { isTablet, scaleWidth } from '@/utils';
 import { COLORS } from '@/const/common/Theme';
+import useReducedMotion from '@/hooks/useReducedMotion';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -44,8 +45,14 @@ const DonutChart: React.FC<DonutChartProps> = ({
 
 	const progress = useRef(new Animated.Value(0)).current;
 	const clamped = Math.min(Math.max(percent, 0), 100);
+	const reducedMotion = useReducedMotion();
 
 	useEffect(() => {
+		// '애니메이션 줄이기': 채워지는 모션 없이 최종 값으로 바로 그린다
+		if (reducedMotion) {
+			progress.setValue(clamped);
+			return;
+		}
 		const animation = Animated.timing(progress, {
 			toValue: clamped,
 			duration: 900,
@@ -55,7 +62,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
 		// useNativeDriver:false 라 매 프레임 JS 에서 값을 밀어 넣는다. 차트가 사라진 뒤에도
 		// 900ms 동안 계속 돌지 않도록 언마운트/값 변경 시 반드시 멈춘다.
 		return () => animation.stop();
-	}, [clamped, progress]);
+	}, [clamped, progress, reducedMotion]);
 
 	const strokeDashoffset = progress.interpolate({
 		inputRange: [0, 100],

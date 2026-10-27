@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {  } from 'react';
+import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Animated } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import FastImage from 'react-native-fast-image';
@@ -41,7 +41,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 					<ScrollView style={{ width: '100%' }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 						<View style={styles.rowCentered}>
 							<FastImage source={require('@/assets/images/screen-heroes/check-in-stamp.png')} style={styles.checkInHeroImage} resizeMode={FastImage.resizeMode.contain} />
-							<Text style={[styles.modalText, { flex: 1 }]}>매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어 줍니다!{'\n'}</Text>
+							<Text style={[styles.modalText, { flex: 1 }]}>매일 접속하면 퀴즈에서 얻은 나의 캐릭터가 출석 스탬프를 찍어 줍니다!</Text>
 						</View>
 
 						<View style={styles.highlightBox}>
@@ -67,7 +67,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ visible, isCheckedIn, check
 												/>
 												{isEarned && (
 													<View style={styles.petEarnedCheck}>
-														<IconComponent type="materialIcons" name="check" size={scaledSize(10)} color={COLORS.textWhite} />
+														<IconComponent type="materialIcons" name="check" size={scaledSize(10)} color={COLORS.textOnVivid} />
 													</View>
 												)}
 												{isLocked && (
@@ -191,16 +191,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	rowCentered: {
 		flexDirection: 'row',
+		alignItems: 'center', // 문구 끝 빈 줄로 맞추던 세로 위치를 정렬로 맞춘다
 		justifyContent: 'center',
 		columnGap: SPACING_W.md,
 		marginBottom: SPACING_H.md,
-	},
-	mascotImage: {
-		width: scaleWidth(48),
-		height: scaleWidth(48),
-		borderRadius: scaleWidth(48) / 2,
-		borderWidth: 2,
-		borderColor: COLORS.primary,
 	},
 	checkInHeroImage: { width: scaleWidth(96), height: scaleHeight(92) },
 	modalText: {
@@ -215,7 +209,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.warningBg,
 		borderRadius: RADIUS.md,
 		borderWidth: 1,
-		borderColor: COLORS.warning,
+		borderColor: COLORS.warningBorder,
 	},
 	highlightText: {
 		fontSize: FONT_SIZES.smPlus,
@@ -224,9 +218,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		lineHeight: scaledSize(20),
 		fontWeight: '500',
 	},
+	// 안내 → 펫 → 달력 묶음 사이는 lg, 묶음 안(문구-강조 상자)은 md
 	petScrollContainer: {
-		marginTop: SPACING_H.md,
-		marginBottom: SPACING_H.md,
+		marginVertical: SPACING_H.lg,
 	},
 	petScrollContent: {
 		paddingHorizontal: SPACING_W.xs,
@@ -269,7 +263,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: scaleWidth(16),
 		height: scaleWidth(16),
 		borderRadius: scaleWidth(16) / 2,
-		backgroundColor: COLORS.secondaryFill,
+		// 획득 = 완료 표시라 청포(success) — 색·서체 규칙 1. 다크 success 위 흰 아이콘이 묻혀 textOnVivid 로 뒤집는다
+		backgroundColor: COLORS.success,
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderWidth: 1.5,
@@ -286,7 +281,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	petCurrentBadge: {
 		marginTop: SPACING_H.xs,
-		backgroundColor: COLORS.secondaryFill,
+		// '현재' = 활성 → 카드 보더(primary)와 같은 쪽빛
+		backgroundColor: COLORS.primaryFill,
 		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: SPACING_H.xxs,
@@ -346,13 +342,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.lg,
 		color: COLORS.danger,
 		fontWeight: '700',
-		textShadowColor: 'rgba(0,0,0,0.2)',
-		textShadowOffset: { width: 1, height: 1 },
-		textShadowRadius: 2,
 	},
 	calendarWrapper: {
 		width: '100%',
-		marginTop: SPACING_H.md,
 		marginBottom: SPACING_H.sm,
 	},
 	calendarContainer: {
@@ -386,7 +378,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	checkInCompleteText: {
 		fontSize: FONT_SIZES.md,
-		color: COLORS.primary,
+		color: COLORS.successDark, // 출석 완료 = 청포(success). 표면 위 글자라 한 단계 진한 successDark
 		marginTop: SPACING_H.md,
 		fontWeight: '700',
 		textAlign: 'center',

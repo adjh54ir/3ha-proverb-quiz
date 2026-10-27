@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { scaleHeight } from '@/utils/DementionUtils';
+import { SPACING_H } from '@/const/common/Theme';
 import FavoriteToast from '@/screens/common/FavoriteToast';
 
 interface ToastState {
@@ -23,7 +23,7 @@ interface ToastState {
  * showToast('속담집 삭제', '선택한 속담집을 삭제했습니다.');
  * return (<>...<ToastView /></>);
  */
-export const useToast = (bottom: number = scaleHeight(30)) => {
+export const useToast = (bottom: number = SPACING_H.xxxl) => {
 	const [toast, setToast] = useState<ToastState>({ visible: false, message: '' });
 
 	const showToast = useCallback((message: string, subMessage?: string) => {

@@ -681,11 +681,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.mdPlus,
 		fontWeight: '700',
 		color: COLORS.textStrong,
+		lineHeight: scaledSize(23), // 명조 속담이 두 줄로 접힐 때 획이 붙지 않게
 	},
 	reviewMeaningText: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.textSecondary,
-		lineHeight: scaledSize(20),
+		lineHeight: scaledSize(21), // 이 화면 본문(encourage·guide)과 같은 줄높이
 	},
 	// ===== 빈 상태 =====
 	emptyWrap: {

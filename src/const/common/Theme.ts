@@ -469,7 +469,8 @@ export const FONTS = {
  *               (예: AddProverbModal / FavoriteAddModal 의 headerTitle)
  * - `heading` : 가운데 뜨는 다이얼로그형 모달의 타이틀 기본값.
  *               (예: QuizStartModal, CheckInModal, DailyMissionModal …)
- * - `xxl`     : 화면(Screen) 타이틀. 모달에는 쓰지 않는다.
+ * - `xxl`     : 화면(Screen) 본문 최상단 헤드라인. 모달에는 쓰지 않는다.
+ *               상단 헤더 바의 타이틀(StackNavigator·ScreenHeader·화면 자체 헤더)은 `xl` 로 통일한다.
  * 새 모달을 만들 때 이 규칙을 벗어나면 화면 간 위계가 흔들리므로 반드시 둘 중 하나를 고른다.
  *
  * 예외 — 타이틀이 길어 `heading` 으로는 좁은 카드 안에서 두 줄로 접히는 다이얼로그는 `xl` 을 쓴다.

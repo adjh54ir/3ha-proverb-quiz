@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome6';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber } from '@/screens/common/CommonProverbModule';
-import { readableTextOn } from '@/utils/ColorAlphaUtils';
+import { inkOnFill } from '@/utils/ColorAlphaUtils';
 
 /** 레벨 번호 → 난이도 이름 (공통 난이도 램프 조회용) */
 import { MainDataType } from '@/types/MainDataType';
@@ -67,13 +67,13 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
+				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={inkOnFill(getLevelColorByNumber(level))} />;
 			case 2:
-				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
+				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={inkOnFill(getLevelColorByNumber(level))} />;
 			case 3:
-				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
+				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={inkOnFill(getLevelColorByNumber(level))} />;
 			case 4:
-				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={readableTextOn(getLevelColorByNumber(level))} />;
+				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={inkOnFill(getLevelColorByNumber(level))} />;
 			default:
 				return null;
 		}
@@ -82,23 +82,23 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 	const getFieldIcon = (field: string) => {
 		switch (field) {
 			case '운/우연':
-				return <IconComponent type="FontAwesome6" name="dice" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
+				return <IconComponent type="FontAwesome6" name="dice" size={scaledSize(12)} color={inkOnFill(getCategoryColor(field))} />;
 			case '인간관계':
-				return <IconComponent type="FontAwesome6" name="users" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
+				return <IconComponent type="FontAwesome6" name="users" size={scaledSize(12)} color={inkOnFill(getCategoryColor(field))} />;
 			case '세상 이치':
-				return <IconComponent type="fontawesome5" name="globe" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
+				return <IconComponent type="fontawesome5" name="globe" size={scaledSize(12)} color={inkOnFill(getCategoryColor(field))} />;
 			case '근면/검소':
-				return <IconComponent type="fontawesome5" name="hammer" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
+				return <IconComponent type="fontawesome5" name="hammer" size={scaledSize(12)} color={inkOnFill(getCategoryColor(field))} />;
 			case '노력/성공':
-				return <IconComponent type="fontawesome5" name="medal" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
+				return <IconComponent type="fontawesome5" name="medal" size={scaledSize(12)} color={inkOnFill(getCategoryColor(field))} />;
 			case '경계/조심':
-				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
+				return <IconComponent type="fontawesome5" name="exclamation-triangle" size={scaledSize(12)} color={inkOnFill(getCategoryColor(field))} />;
 			case '욕심/탐욕':
-				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
+				return <IconComponent type="fontawesome5" name="hand-holding-usd" size={scaledSize(12)} color={inkOnFill(getCategoryColor(field))} />;
 			case '배신/불신':
-				return <IconComponent type="fontawesome5" name="user-slash" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
+				return <IconComponent type="fontawesome5" name="user-slash" size={scaledSize(12)} color={inkOnFill(getCategoryColor(field))} />;
 			default:
-				return <IconComponent type="FontAwesome6" name="tag" size={scaledSize(12)} color={readableTextOn(getCategoryColor(field))} />;
+				return <IconComponent type="FontAwesome6" name="tag" size={scaledSize(12)} color={inkOnFill(getCategoryColor(field))} />;
 		}
 	};
 	const handleToggleFavorite = async () => {
@@ -135,13 +135,13 @@ const ProverbDetailModal = ({ visible, proverb, onClose, onFavoriteChange }: Pro
 						<View style={styles.badgeRow}>
 							<View style={[styles.badge, { backgroundColor: getLevelColor(proverb.level) }]}>
 								{getLevelIcon(proverb.level)}
-								<Text style={[styles.badgeText, { color: readableTextOn(getLevelColor(proverb.level)) }]}>
+								<Text style={[styles.badgeText, { color: inkOnFill(getLevelColor(proverb.level)) }]}>
 									{{ 1: '초급', 2: '중급', 3: '고급', 4: '특급' }[proverb.level] || '알 수 없음'}
 								</Text>
 							</View>
 							<View style={[styles.badge, { backgroundColor: getFieldColor(proverb.category) }]}>
 								{getFieldIcon(proverb.category)}
-								<Text style={[styles.badgeText, { color: readableTextOn(getFieldColor(proverb.category)) }]}>{proverb.category || '미지정'}</Text>
+								<Text style={[styles.badgeText, { color: inkOnFill(getFieldColor(proverb.category)) }]}>{proverb.category || '미지정'}</Text>
 							</View>
 						</View>
 
@@ -269,7 +269,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.round,
 	},
 	badgeText: {
-		color: COLORS.textWhite,
+		// 글자색은 배지 채움에 맞춰 inkOnFill 로 인라인 지정한다
 		fontSize: FONT_SIZES.sm,
 		fontWeight: '600',
 	},
@@ -280,7 +280,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '700',
 		color: COLORS.secondaryDark, // 파란색 강조
 		textAlign: 'center',
-		lineHeight: scaledSize(28),
+		lineHeight: scaledSize(30), // 명조 속담이 두 줄로 접힐 때 1.5배 여유
 		marginBottom: SPACING_H.md,
 	},
 
@@ -295,8 +295,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		marginBottom: SPACING_H.md,
 	},
+	// 다이얼로그 안 섹션 — 타이틀(heading)·속담(xxl) 아래로 위계가 내려가도록 lg
 	sectionTitle: {
-		fontSize: FONT_SIZES.xl,
+		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		color: COLORS.textStrong,
 		marginBottom: SPACING_H.md,
@@ -304,7 +305,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	exampleText: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.text,
-		lineHeight: scaledSize(20),
+		lineHeight: scaledSize(21),
 	},
 
 	/* ✅ 닫기 버튼 */
@@ -323,7 +324,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	modalCloseButtonText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
+		fontWeight: '600',
 	},
 	meaningHighlight: {
 		borderWidth: 1.5,
@@ -360,8 +361,9 @@ const styles = themedStyles(() => StyleSheet.create({
 	sameProverbText: {
 		fontFamily: FONTS.display,
 		fontSize: FONT_SIZES.md,
+		fontWeight: '400', // 곁들이는 속담
 		color: COLORS.text,
-		lineHeight: scaledSize(20),
+		lineHeight: scaledSize(22),
 	},
 	favoriteIconButton: {
 		alignSelf: 'center',

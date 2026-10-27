@@ -11,6 +11,8 @@ import { useModalEnter } from '@/hooks/useModalEnter';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 import { useToast } from '@/hooks/useToast';
 import { useHardwareKeys } from '@/utils/HardwareKeys';
+import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
+import useReducedMotion from '@/hooks/useReducedMotion';
 
 type ResultType = 'correct' | 'wrong' | 'timeout' | 'done' | '';
 
@@ -41,6 +43,7 @@ const QuizResultModal = ({
 }: Props) => {
 	// AppModal 이 시스템 바까지 덮으므로 오버레이가 직접 안전 여백을 준다.
 	const safePadding = useModalSafePadding();
+	const reducedMotion = useReducedMotion();
 	// ✅ Toast (자동 숨김·애니메이션은 공통 훅이 담당)
 	const { showToast, hideToast, ToastView } = useToast();
 
@@ -57,11 +60,12 @@ const QuizResultModal = ({
 	const answerAnim = useRef(new Animated.Value(0)).current;
 	const explainAnim = useRef(new Animated.Value(0)).current;
 
-	// ✅ 정답/오답 색상은 시맨틱 토큰으로 통일
-	const themeColor = resultType === 'correct' ? COLORS.success : resultType === 'wrong' ? COLORS.danger : COLORS.warning;
-	const cardBg = resultType === 'correct' ? COLORS.successBg : resultType === 'wrong' ? COLORS.dangerBg : COLORS.warningBg;
-	const cardBorder = resultType === 'correct' ? COLORS.successBorder : resultType === 'wrong' ? COLORS.dangerBorderSoft : COLORS.warningBorder;
-	const subTextColor = resultType === 'correct' ? COLORS.successDeep : resultType === 'wrong' ? COLORS.dangerDark : COLORS.warningDark;
+	// ✅ 결과 헤더만 결과 톤(정답 청포 / 오답 레드 / 시간초과 치자)을 따른다.
+	// 아래 정답 카드는 '정답'을 보여주는 자리라 결과와 무관하게 항상 청포(success) — 오답일 때 정답이 빨갛게 보이지 않게.
+	// 제목은 옅은 틴트 위 글자라 한 단계 진한 토큰(치자 warning 은 틴트 위 대비가 2 안팎이라 warningDeep).
+	const titleColor = resultType === 'correct' ? COLORS.successDark : resultType === 'wrong' ? COLORS.dangerDark : COLORS.warningDeep;
+	const headerBg = resultType === 'correct' ? COLORS.successBg : resultType === 'wrong' ? COLORS.dangerBg : COLORS.warningBg;
+	const headerBorder = resultType === 'correct' ? COLORS.successBorder : resultType === 'wrong' ? COLORS.dangerBorderSoft : COLORS.warningBorder;
 
 	const mascotSource =
 		resultType === 'correct'
@@ -74,6 +78,13 @@ const QuizResultModal = ({
 			// 닫힐 때 초기화해야 다음 문제에서 열릴 때 첫 프레임이 opacity 0 으로 그려진다(이전 문제 잔상 방지)
 			answerAnim.setValue(0);
 			explainAnim.setValue(0);
+			return;
+		}
+
+		// '애니메이션 줄이기' — 정답·해설 카드를 최종 상태로 바로 세운다
+		if (reducedMotion) {
+			answerAnim.setValue(1);
+			explainAnim.setValue(1);
 			return;
 		}
 
@@ -99,7 +110,7 @@ const QuizResultModal = ({
 
 		// ✅ 언마운트/visible 변경 시 애니메이션 정리 (메모리 누수 방지)
 		return () => contentAnim.stop();
-	}, [visible, answerAnim, explainAnim, hideToast]);
+	}, [visible, answerAnim, explainAnim, hideToast, reducedMotion]);
 
 	// ✅ 즐겨찾기 토글 + Toast
 	const handleToggleFavoriteWithToast = async () => {
@@ -132,10 +143,10 @@ const QuizResultModal = ({
 			<View style={[styles.overlay, safePadding]}>
 				<Animated.View style={[styles.card, enterStyle]}>
 					{/* 상단 결과 영역 */}
-					<View style={[styles.resultHeader, { backgroundColor: cardBg, borderColor: cardBorder }]}>
+					<View style={[styles.resultHeader, { backgroundColor: headerBg, borderColor: headerBorder }]}>
 						<FastImage source={mascotSource} style={styles.mascot} resizeMode={FastImage.resizeMode.contain} />
 						<View style={styles.resultHeaderTextBox}>
-							<Text style={[styles.title, { color: themeColor }]}>{resultTitle}</Text>
+							<Text style={[styles.title, { color: titleColor }]}>{resultTitle}</Text>
 							<Text style={styles.messageBig}>{resultMessage}</Text>
 						</View>
 
@@ -164,8 +175,6 @@ const QuizResultModal = ({
 							style={[
 								styles.answerCard,
 								{
-									backgroundColor: cardBg,
-									borderColor: cardBorder,
 									opacity: answerAnim,
 									transform: [
 										{
@@ -183,8 +192,8 @@ const QuizResultModal = ({
 									],
 								},
 							]}>
-							<View style={[styles.answerBadge, { backgroundColor: themeColor }]}>
-								<IconComponent type="MaterialIcons" name="check-circle" size={scaledSize(14)} color={COLORS.textWhite} />
+							<View style={styles.answerBadge}>
+								<IconComponent type="MaterialIcons" name="check-circle" size={scaledSize(14)} color={COLORS.successDark} />
 								<Text style={styles.answerBadgeText}>정답</Text>
 							</View>
 
@@ -192,7 +201,7 @@ const QuizResultModal = ({
 
 							{quizMode === 'blank' && !!blankWord && (
 								<Text style={styles.answerBlankText}>
-									빈칸 정답: <Text style={[styles.answerBlankHighlight, { color: subTextColor }]}>{blankWord}</Text>
+									빈칸 정답: <Text style={styles.answerBlankHighlight}>{blankWord}</Text>
 								</Text>
 							)}
 						</Animated.View>
@@ -214,7 +223,7 @@ const QuizResultModal = ({
 								},
 							]}>
 							<View style={styles.explainHeader}>
-								<View style={[styles.explainHeaderIcon, { backgroundColor: themeColor }]}>
+								<View style={styles.explainHeaderIcon}>
 									<IconComponent type="MaterialIcons" name="menu-book" size={scaledSize(14)} color={COLORS.textWhite} />
 								</View>
 								<Text style={styles.explainTitle}>속담 해설</Text>
@@ -331,6 +340,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: '100%',
 		borderRadius: RADIUS.lg,
 		borderWidth: 1,
+		backgroundColor: COLORS.successBg,
+		borderColor: COLORS.successBorder,
 		paddingVertical: SPACING_H.lg,
 		paddingHorizontal: SPACING_W.lg,
 		alignItems: 'center',
@@ -343,12 +354,14 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 		columnGap: SPACING_W.xs,
 		borderRadius: RADIUS.round,
+		// 흰 글자 채움 대신 틴트 칩 — 다크의 밝은 청포(#3DD68C) 위 흰 글자는 대비가 무너진다
+		backgroundColor: COLORS.successSoft,
 		paddingVertical: SPACING_H.xs,
 		paddingHorizontal: SPACING_W.md,
 		marginBottom: SPACING_H.sm,
 	},
 	answerBadgeText: {
-		color: COLORS.textWhite,
+		color: COLORS.successDeep,
 		fontSize: FONT_SIZES.sm,
 		fontWeight: '700',
 	},
@@ -373,6 +386,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	answerBlankHighlight: {
 		fontWeight: '700',
 		fontSize: FONT_SIZES.md,
+		color: COLORS.successDeep,
 	},
 	// ✅ 해설 카드
 	explainCard: {
@@ -395,6 +409,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: scaleWidth(24),
 		height: scaleWidth(24),
 		borderRadius: RADIUS.sm,
+		// 해설은 결과 톤과 무관한 정보 블록 — 브랜드 채움
+		backgroundColor: COLORS.primaryFill,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -445,7 +461,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.text,
 		fontWeight: '400',
 		lineHeight: scaledSize(21),
-		fontStyle: 'italic',
 		marginTop: SPACING_H.xs,
 	},
 	sameBlock: {
@@ -455,7 +470,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.md,
 		marginTop: SPACING_H.md,
 		borderWidth: 1,
-		borderColor: COLORS.accentTeal,
+		// 다른 블록과 같은 옅은 보더 — 원색 보더만 혼자 튀었다
+		borderColor: withAlpha(COLORS.accentTeal, ALPHA.border),
 	},
 	sameText: {
 		fontFamily: FONTS.display,
@@ -478,7 +494,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	primaryButtonText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
+		fontWeight: '600',
 	},
 	favoriteButton: {
 		alignItems: 'center',

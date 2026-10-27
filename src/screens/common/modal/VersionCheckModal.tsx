@@ -371,7 +371,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.xl,
 		borderWidth: 1,
-		borderColor: COLORS.borderLight,
+		borderColor: COLORS.border,
 		// 위·아래·좌·우 여백을 20 으로 맞춘다 — 버튼이 하나(강제)든 둘(선택)이든 아래가 비어 보이지 않는다
 		paddingVertical: SPACING_H.xl,
 		paddingHorizontal: SPACING_W.xl,
@@ -484,7 +484,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.md,
 		textAlign: 'center',
 		color: COLORS.textSecondary,
-		lineHeight: scaledSize(21),
+		lineHeight: FONT_SIZES.md * 1.5,
 		marginBottom: SPACING_H.xl,
 	},
 	actions: {
@@ -509,7 +509,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	updateButtonText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
+		fontWeight: '600',
 	},
 	// 앰버 위 흰 글자는 두 모드 모두 대비가 모자라므로 고정 잉크를 쓴다
 	updateButtonTextForce: {

@@ -392,7 +392,7 @@ const Home = () => {
 
 	// 진행도(다음 등급까지 %) — 중앙 헬퍼 사용
 	const progressPercent = getProgressPercent(totalScore);
-	let progressColor: string = COLORS.primary; // 그린 (0~59%)
+	let progressColor: string = COLORS.primary; // 쪽빛 (0~59%)
 
 	if (progressPercent >= 60 && progressPercent < 90) {
 		progressColor = COLORS.warning; // 앰버 (60~89%)
@@ -720,7 +720,8 @@ const Home = () => {
 							iconType="materialIcons"
 							label="오답 복습"
 							description="틀린 퀴즈를 다시 풀면서 기억을 더 확실히 다집니다"
-							color={COLORS.warning}
+							// warning(#F5A623) 위 흰 아이콘은 2:1 — 한 단계 진한 치자로 칠해 램프는 유지하고 아이콘을 살린다
+							color={COLORS.warningDark}
 							onPress={moveToHandler.wrongReview}
 						/>
 						<ActionCard
@@ -904,6 +905,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		flexGrow: 1,
 		// 좌우 여백은 다른 화면(속담 사전/나의 활동/즐겨찾기 …)과 같은 lg 로 맞춘다.
 		paddingHorizontal: SPACING_W.lg,
+		// 상태바 바로 밑에 연속 출석 칩이 붙지 않게 한 숨 띄운다
+		paddingTop: SPACING_H.sm,
 		paddingBottom: SCROLL_TOP_CLEARANCE, // 하단 잘림 방지 여백
 	},
 
@@ -937,7 +940,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 
 	// ===== 말풍선 =====
-	speechWrapper: { alignItems: 'center', marginBottom: scaleHeight(-10) },
+	speechWrapper: { alignItems: 'center', marginBottom: -SPACING_H.smPlus }, // 꼬리가 캐릭터 머리에 살짝 겹친다
 	speechBubble: {
 		backgroundColor: COLORS.warningSoft,
 		paddingVertical: SPACING_H.md,
@@ -1180,7 +1183,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '400',
 		color: COLORS.textSecondary,
 		marginTop: SPACING_H.xs,
-		lineHeight: scaledSize(18),
+		lineHeight: scaledSize(20), // 13 × 1.5 — 두 줄 설명이 빽빽하지 않게
 	},
 	newBadgeWrapper: {
 		position: 'absolute',
@@ -1217,7 +1220,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.lg,
 		paddingHorizontal: SPACING_W.lg,
 		paddingVertical: SPACING_H.sm,
-		marginBottom: SPACING_H.md,
+		// 메뉴 묶음 사이 구분 띠 — 카드 사이(md 12)보다 넓게 띄워 묶음이 읽히게 한다(위 md+sm=20 / 아래 xl=20)
+		marginTop: SPACING_H.sm,
+		marginBottom: SPACING_H.xl,
 		overflow: 'hidden',
 	},
 	mascotMomentRight: {
@@ -1287,7 +1292,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	quickActionRow: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		// 바로 위 MascotMoment 의 marginBottom(md)만으로 다른 카드 간격(12)과 같아진다
+		// 바로 위 MascotMoment 의 marginBottom(xl)이 묶음 간격(20)이 된다
 		gap: SPACING_W.md,
 	},
 	quickActionCard: {

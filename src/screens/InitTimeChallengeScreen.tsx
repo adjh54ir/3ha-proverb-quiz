@@ -17,6 +17,8 @@ import { read } from '@/services/StorageService';
 import useCountdownTimers from '@/hooks/useCountdownTimers';
 import ScrollTopButton, { SCROLL_TOP_CLEARANCE } from '@/screens/common/atomic/ScrollTopButton';
 import { useScrollTop } from '@/hooks/useScrollTop';
+import useModalSafePadding from '@/hooks/useModalSafePadding';
+import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 
 // 규칙 한 줄 행 (아이콘 + 한 줄 텍스트)
 const RuleRow = ({ iconType, iconName, iconColor, chipColor, text }: { iconType: string; iconName: string; iconColor: string; chipColor: string; text: string }) => (
@@ -33,6 +35,7 @@ const RuleRow = ({ iconType, iconName, iconColor, chipColor, text }: { iconType:
 const InitTimeChallengeScreen = () => {
 	const STORAGE_KEY = MainStorageKeyType.TIME_CHALLENGE_HISTORY;
 	const navigation = useAppNavigation();
+	const safePadding = useModalSafePadding();
 	const scaleAnim = useRef(new Animated.Value(1)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
 	const slideAnim = useRef(new Animated.Value(scaleHeight(12))).current;
@@ -242,7 +245,7 @@ const InitTimeChallengeScreen = () => {
 								</View>
 
 								<View style={styles.warningBox}>
-									<IconComponent name="alert-circle" type="Feather" size={scaledSize(16)} color={COLORS.dangerLight} />
+									<IconComponent name="alert-circle" type="Feather" size={scaledSize(16)} color={COLORS.dangerDark} />
 									<Text style={styles.warningText}>시작 버튼을 누르면 3초 뒤에 퀴즈가 시작됩니다!</Text>
 								</View>
 
@@ -257,7 +260,7 @@ const InitTimeChallengeScreen = () => {
 								<RuleRow iconType="FontAwesome6" iconName="heart" iconColor={COLORS.dangerLight} chipColor={COLORS.dangerBg} text="오답 시 하트 1개 감소 (총 5개)" />
 
 								<View style={styles.warningBox}>
-									<IconComponent name="alert-circle" type="Feather" size={scaledSize(16)} color={COLORS.dangerLight} />
+									<IconComponent name="alert-circle" type="Feather" size={scaledSize(16)} color={COLORS.dangerDark} />
 									<Text style={styles.warningText}>시작 버튼을 누르면 3초 뒤에 퀴즈가 시작됩니다!</Text>
 								</View>
 
@@ -333,7 +336,7 @@ const InitTimeChallengeScreen = () => {
 			<BottomHomeButton backgroundColor={COLORS.background} />
 
 			<Modal visible={isCountingDown} transparent animationType="fade" onRequestClose={cancelCountdown}>
-				<View style={styles.countdownOverlay}>
+				<View style={[styles.countdownOverlay, safePadding]}>
 					<Animated.View style={[styles.countdownCircle, { transform: [{ scale: scaleAnim }] }]}>
 						<Text style={styles.countdownText}>{count === 0 ? '시작!' : String(count)}</Text>
 					</Animated.View>
@@ -372,11 +375,11 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingBottom: SCROLL_TOP_CLEARANCE,
 	},
 
-	// 카운트다운
-	// 카운트다운
+	// 카운트다운 — TimeChanllengeScreen 의 다시 도전 카운트다운과 같은 모양
 	countdownOverlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.92)',
+		// 타워/챌린지 다크 화면과 같은 밤의 쪽빛 (모드 무관 고정색)
+		backgroundColor: withAlpha(COLORS.darkBg, 0.92),
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
@@ -384,7 +387,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		width: scaleWidth(160),
 		height: scaleWidth(160),
 		borderRadius: scaleWidth(80),
-		backgroundColor: 'rgba(20, 184, 166, 0.2)',
+		// 예전 그린 primary 시절의 틸 틴트가 남아 있던 자리 — 테두리와 같은 쪽빛 틴트로
+		backgroundColor: withAlpha(COLORS.primary, ALPHA.soft),
 		borderWidth: 4,
 		borderColor: COLORS.primary,
 		justifyContent: 'center',
@@ -398,13 +402,14 @@ const styles = themedStyles(() => StyleSheet.create({
 		textAlign: 'center',
 		includeFontPadding: false,
 		textAlignVertical: 'center',
-		lineHeight: scaledSize(80),
+		// fontSize 와 같은 경로 — scaledSize 면 '글자 크게'(72×1.15=83)에서 행 높이를 넘어 숫자가 잘린다
+		lineHeight: displayFontSize(80),
 	},
 	countdownMessageWrapper: {
 		marginTop: SPACING_H.xxxl,
 		paddingHorizontal: SPACING_W.xxl,
 		paddingVertical: SPACING_H.smPlus,
-		backgroundColor: 'rgba(255,255,255,0.12)',
+		backgroundColor: withAlpha(COLORS.textWhite, ALPHA.soft),
 		borderRadius: RADIUS.xl,
 		minWidth: scaleWidth(180),
 		alignItems: 'center',
@@ -516,7 +521,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.primaryBg,
 		borderRadius: RADIUS.sm,
 		paddingVertical: SPACING_H.md,
-		paddingHorizontal: SPACING_W.mdPlus,
+		paddingHorizontal: SPACING_W.md,
 		borderWidth: 1,
 		borderColor: COLORS.primarySoft,
 		marginBottom: SPACING_H.sm,
@@ -552,12 +557,12 @@ const styles = themedStyles(() => StyleSheet.create({
 	comboCount: {
 		fontSize: FONT_SIZES.md,
 		fontWeight: '600',
-		color: COLORS.dangerLight,
+		color: COLORS.accentOrangeText,
 	},
 	comboReward: {
 		fontSize: FONT_SIZES.md,
 		fontWeight: '700',
-		color: COLORS.accentOrangeLight,
+		color: COLORS.accentOrangeDeep,
 	},
 
 	// 경고 박스
@@ -574,7 +579,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	warningText: {
 		flex: 1,
 		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.dangerLight,
+		color: COLORS.dangerDark,
 		fontWeight: '600',
 		marginLeft: SPACING_W.sm,
 	},
@@ -679,7 +684,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	rankScoreFirst: {
 		fontSize: FONT_SIZES.xxl,
-		color: COLORS.accentOrangeLight,
+		color: COLORS.accentOrangeDark,
 	},
 	rankDate: {
 		fontSize: FONT_SIZES.sm,
@@ -719,10 +724,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	startButtonText: {
 		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
+		fontWeight: '600',
 	},
-
-	// 카운트다운
 }));
 
 export default InitTimeChallengeScreen;

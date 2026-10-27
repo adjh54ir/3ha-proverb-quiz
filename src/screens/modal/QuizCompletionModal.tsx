@@ -230,7 +230,7 @@ const QuizCompletionModal: React.FC<QuizCompletionModalProps> = ({
                             fill={accuracy}
                             tintColor={getAccuracyColor()}
                             backgroundColor={COLORS.surfaceAlt}
-                            duration={1500}
+                            duration={reducedMotion ? 0 : 1500}
                             rotation={0}
                         >
                             {() => (
@@ -430,7 +430,7 @@ const styles = themedStyles(() => StyleSheet.create({
     celebrateText: {
         fontSize: FONT_SIZES.md,
         fontWeight: '600',
-        color: COLORS.primary,
+        color: COLORS.successDark, // 완료·축하는 청포(브랜드 쪽빛은 액션 전용)
     },
     // ===== 연습 모드 =====
     practiceHeader: {
@@ -487,12 +487,13 @@ const styles = themedStyles(() => StyleSheet.create({
         borderWidth: 1,
         borderColor: COLORS.border,
     },
+    // 결과 모달의 정답/오답 블록과 같은 틴트·보더 짝
     scoreCardCorrect: {
-        borderColor: COLORS.successSoft,
+        borderColor: COLORS.successBorder,
         backgroundColor: COLORS.successBg,
     },
     scoreCardWrong: {
-        borderColor: COLORS.dangerBg,
+        borderColor: COLORS.dangerBorderSoft,
         backgroundColor: COLORS.dangerBg,
     },
     scoreCardIcon: {
@@ -550,7 +551,7 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     reviewWrongButtonText: {
         fontSize: FONT_SIZES.lg,
-        fontWeight: '700',
+        fontWeight: '600',
         color: COLORS.textOnAccent, // 앰버(warningDark) 채움 위 — 흰 글자는 두 모드 모두 대비 부족
     },
     primaryButton: {
@@ -568,7 +569,7 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     primaryButtonText: {
         fontSize: FONT_SIZES.lg,
-        fontWeight: '700',
+        fontWeight: '600',
         color: COLORS.textWhite,
     },
     secondaryButton: {
@@ -581,7 +582,7 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     secondaryButtonText: {
         fontSize: FONT_SIZES.lg,
-        fontWeight: '700',
+        fontWeight: '600',
         color: COLORS.textSecondary,
     },
 }));

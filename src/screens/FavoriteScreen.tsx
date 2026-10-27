@@ -28,6 +28,7 @@ import CharacterGuide, { useCharacterGuideOnce } from '@/screens/common/Characte
 import { LEVEL_DROPDOWN_ITEMS } from '@/const/common/CommonMainData';
 import { AnimatedListItem } from '@/components/animation/FadeInView';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { useModalEnter } from '@/hooks/useModalEnter';
 import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
@@ -71,6 +72,8 @@ const FavoriteScreen = () => {
 	const [isSelectionMode, setIsSelectionMode] = useState(false);
 	const [selectedIds, setSelectedIds] = useState<number[]>([]);
 	const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+	// 다른 확인 대화상자(CmmDelConfirmModal)와 같은 fade + scale 등장
+	const confirmEnterStyle = useModalEnter(showDeleteConfirmModal);
 
 	// ─── 드롭다운 상태 ─────────────────────────────────────────
 	const [fieldOpen, setFieldOpen] = useState(false);
@@ -430,9 +433,10 @@ const FavoriteScreen = () => {
 											modalProps={DROPDOWN_MODAL_PROPS}
 											modalContentContainerStyle={[DROPDOWN_MODAL_CONTENT_STYLE, { borderWidth: 1, borderColor: COLORS.borderDark }]}
 											modalTitleStyle={{
+												fontFamily: FONTS.display,
 												fontSize: FONT_SIZES.lg,
 												fontWeight: '700',
-												color: COLORS.text,
+												color: COLORS.textStrong,
 												textAlign: 'center',
 												paddingVertical: SPACING_H.md,
 												paddingHorizontal: SPACING_W.lg,
@@ -501,6 +505,10 @@ const FavoriteScreen = () => {
 											<FastImage source={emptySearchImage} style={styles.emptyImage} resizeMode="contain" />
 											<Text style={styles.emptyTitle}>검색 결과가 없습니다</Text>
 											<Text style={styles.emptyDesc}>다른 검색어나 필터를 사용해보세요</Text>
+											<TouchableOpacity style={styles.emptyAddBtn} onPress={handleReset} activeOpacity={0.85}>
+												<Icon name="rotate-right" size={scaledSize(14)} color={COLORS.textOnAccent} />
+												<Text style={styles.emptyAddBtnText}>필터 초기화</Text>
+											</TouchableOpacity>
 										</>
 									)}
 								</View>
@@ -521,8 +529,8 @@ const FavoriteScreen = () => {
 									disabled={selectedIds.length === 0}
 									onPress={() => setShowDeleteConfirmModal(true)}
 									activeOpacity={0.85}>
-									<Icon name="trash-can" size={scaledSize(16)} color={COLORS.textWhite} />
-									<Text style={styles.deleteActionBtnText}>
+									<Icon name="trash-can" size={scaledSize(16)} color={selectedIds.length === 0 ? COLORS.textLight : COLORS.textWhite} />
+									<Text style={[styles.deleteActionBtnText, selectedIds.length === 0 && styles.deleteActionBtnTextDisabled]}>
 										{selectedIds.length > 0 ? `${selectedIds.length}개 삭제` : '항목을 선택해주세요'}
 									</Text>
 								</TouchableOpacity>
@@ -537,7 +545,7 @@ const FavoriteScreen = () => {
 
 			<Modal visible={showDeleteConfirmModal} transparent animationType="fade" onRequestClose={() => setShowDeleteConfirmModal(false)}>
 				<View style={[styles.confirmOverlay, modalSafePadding]}>
-					<View style={styles.confirmBox}>
+					<Animated.View style={[styles.confirmBox, confirmEnterStyle]}>
 						<View style={styles.confirmIconWrapper}>
 							<Icon name="triangle-exclamation" size={scaledSize(28)} color={COLORS.danger} />
 						</View>
@@ -554,7 +562,7 @@ const FavoriteScreen = () => {
 								<Text style={styles.confirmBtnDeleteText}>삭제</Text>
 							</TouchableOpacity>
 						</View>
-					</View>
+					</Animated.View>
 				</View>
 			</Modal>
 
@@ -731,7 +739,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	checkboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
 	// 빈 영역 전체를 채우고 그 정중앙에 놓인다. 위쪽 여백을 따로 주면 그만큼 아래로 밀린다.
 	emptyWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl },
-	emptyImage: { width: scaleWidth(160), height: scaleWidth(160), marginBottom: SPACING_H.lg },
+	emptyImage: { width: scaleWidth(160), height: scaleWidth(160), marginBottom: SPACING_H.md },
 	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
 	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', lineHeight: scaledSize(20) },
 	emptyAddBtn: {
@@ -744,7 +752,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.warning,
 	},
-	emptyAddBtnText: { color: COLORS.textOnAccent, fontSize: FONT_SIZES.md, fontWeight: '700' },
+	emptyAddBtnText: { color: COLORS.textOnAccent, fontSize: FONT_SIZES.md, fontWeight: '600' },
 	bottomActionBar: {
 		position: 'absolute',
 		bottom: 0,
@@ -768,8 +776,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.dangerFill,
 	},
-	deleteActionBtnDisabled: { backgroundColor: COLORS.borderDark },
-	deleteActionBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '700' },
+	// 비활성 — 옅은 표면 + 흐린 글자 (borderDark 위 흰 글자는 라이트에서 1.6:1 로 읽히지 않는다)
+	deleteActionBtnDisabled: { backgroundColor: COLORS.surfaceAlt },
+	deleteActionBtnTextDisabled: { color: COLORS.textLight },
+	deleteActionBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '600' },
 	confirmOverlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -779,6 +789,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	confirmBox: {
 		width: '100%',
+		maxHeight: '100%',
 		// 전체화면 모달이라 본문 기둥 밖이다 — 태블릿에서 대화상자가 화면 폭을 다 먹지 않게 묶는다.
 		maxWidth: MODAL_MAX_WIDTH,
 		backgroundColor: COLORS.surface,
@@ -788,6 +799,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xl,
 		borderWidth: 1,
 		borderColor: COLORS.border,
+		// scale 로 등장하는 테두리 카드 (모달 레이아웃 규칙 7)
 		overflow: 'hidden',
 		alignItems: 'center',
 	},
@@ -812,7 +824,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	confirmBtnRow: { flexDirection: 'row', width: '100%', columnGap: SPACING_W.md },
 	confirmBtn: { flex: 1, height: scaleHeight(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
 	confirmBtnCancel: { backgroundColor: COLORS.surfaceAlt },
-	confirmBtnCancelText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textSecondary },
+	confirmBtnCancelText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '600', color: COLORS.textSecondary },
 	confirmBtnDelete: { backgroundColor: COLORS.dangerFill },
-	confirmBtnDeleteText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700', color: COLORS.textWhite },
+	confirmBtnDeleteText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '600', color: COLORS.textWhite },
 }));

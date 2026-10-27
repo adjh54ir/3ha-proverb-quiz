@@ -197,7 +197,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.md,
 		color: COLORS.text,
 		textAlign: 'center',
-		lineHeight: scaledSize(20),
+		lineHeight: scaledSize(21),
 	},
 	bonusChip: {
 		flexDirection: 'row',

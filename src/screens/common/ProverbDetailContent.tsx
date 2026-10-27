@@ -5,7 +5,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { scaledSize, scaleWidth } from '@/utils';
 import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
 import { getCategoryColor, getLevelColorByNumber } from './CommonProverbModule';
-import { readableTextOn } from '@/utils/ColorAlphaUtils';
+import { inkOnFill } from '@/utils/ColorAlphaUtils';
 import { MainDataType } from '@/types/MainDataType';
 import IconComponent from './atomic/IconComponent';
 
@@ -31,13 +31,13 @@ const CATEGORY_ICON: Record<string, { type: string; name: string }> = {
 const getLevelIcon = (level: number) => {
 	switch (level) {
 		case 1:
-			return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(13)} color={readableTextOn(getLevelColorByNumber(level))} />;
+			return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(13)} color={inkOnFill(getLevelColorByNumber(level))} />;
 		case 2:
-			return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(13)} color={readableTextOn(getLevelColorByNumber(level))} />;
+			return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(13)} color={inkOnFill(getLevelColorByNumber(level))} />;
 		case 3:
-			return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(13)} color={readableTextOn(getLevelColorByNumber(level))} />;
+			return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(13)} color={inkOnFill(getLevelColorByNumber(level))} />;
 		case 4:
-			return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(13)} color={readableTextOn(getLevelColorByNumber(level))} />;
+			return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(13)} color={inkOnFill(getLevelColorByNumber(level))} />;
 		default:
 			return null;
 	}
@@ -64,13 +64,13 @@ const ProverbDetailContent: React.FC<ProverbDetailContentProps> = ({ proverb, sh
 
 			{/* 배지: 난이도 + 카테고리 */}
 			<View style={styles.badgeRow}>
-				<View style={[styles.levelBadge, { backgroundColor: getLevelColorByNumber(proverb.level) }]}>
+				<View style={[styles.badge, { backgroundColor: getLevelColorByNumber(proverb.level) }]}>
 					{getLevelIcon(proverb.level)}
-					<Text style={[styles.levelBadgeText, { color: readableTextOn(getLevelColorByNumber(proverb.level)) }]}>{proverb.levelName}</Text>
+					<Text style={[styles.badgeText, { color: inkOnFill(getLevelColorByNumber(proverb.level)) }]}>{proverb.levelName}</Text>
 				</View>
-				<View style={[styles.badge2, { backgroundColor: getCategoryColor(proverb.category) }]}>
-					{categoryIcon && <IconComponent type={categoryIcon.type} name={categoryIcon.name} size={scaledSize(13)} color={readableTextOn(getCategoryColor(proverb.category))} />}
-					<Text style={[styles.badgeText, { marginLeft: SPACING_W.xs, color: readableTextOn(getCategoryColor(proverb.category)) }]}>{proverb.category}</Text>
+				<View style={[styles.badge, { backgroundColor: getCategoryColor(proverb.category) }]}>
+					{categoryIcon && <IconComponent type={categoryIcon.type} name={categoryIcon.name} size={scaledSize(13)} color={inkOnFill(getCategoryColor(proverb.category))} />}
+					<Text style={[styles.badgeText, { color: inkOnFill(getCategoryColor(proverb.category)) }]}>{proverb.category}</Text>
 				</View>
 			</View>
 
@@ -173,30 +173,18 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginBottom: SPACING_H.lg,
 		flexWrap: 'wrap',
 	},
-	levelBadge: {
+	// 난이도·카테고리 배지는 한 줄에 나란히 놓이므로 크기·굵기를 하나로 (글자색은 inkOnFill 로 인라인 지정)
+	badge: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		borderRadius: RADIUS.round,
-		paddingVertical: SPACING_H.xs,
-		paddingHorizontal: SPACING_W.md,
-	},
-	levelBadgeText: {
-		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.textWhite,
-		fontWeight: '700',
-		marginLeft: SPACING_W.xs,
-	},
-	badge2: {
-		flexDirection: 'row',
-		alignItems: 'center',
+		columnGap: SPACING_W.xs,
 		paddingHorizontal: SPACING_W.md,
 		paddingVertical: SPACING_H.xs,
 		borderRadius: RADIUS.round,
 	},
 	badgeText: {
-		color: COLORS.textWhite,
 		fontSize: FONT_SIZES.sm,
-		fontWeight: '700',
+		fontWeight: '600',
 	},
 	modalSection: {
 		marginBottom: SPACING_H.md,
@@ -258,5 +246,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.warningDeep,
 		fontSize: FONT_SIZES.sm,
 		fontWeight: '400',
+		lineHeight: scaledSize(18), // 긴 동의 속담이 두 줄로 접힐 때 명조 획이 붙지 않게
 	},
 }));

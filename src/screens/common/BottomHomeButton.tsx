@@ -146,7 +146,7 @@ const modalStyles = themedStyles(() => StyleSheet.create({
 	},
 	title: {
 		fontFamily: FONTS.display,
-		fontSize: FONT_SIZES.xl,
+		fontSize: FONT_SIZES.heading, // 다른 다이얼로그 타이틀과 같은 단계
 		fontWeight: '700',
 		color: COLORS.textStrong,
 		marginBottom: SPACING_H.xs,

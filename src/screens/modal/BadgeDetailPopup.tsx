@@ -7,11 +7,12 @@ import IconComponent from '../common/atomic/IconComponent';
 import { MainDataType } from '@/types/MainDataType';
 import { BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, displayFontSize, themedStyles } from '@/const/common/Theme';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { getBadgeProgress, BadgeProgress } from '@/utils/BadgeProgressUtils';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { withAlpha, ALPHA } from '@/utils/ColorAlphaUtils';
 
 
 interface Props {
@@ -208,7 +209,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 							<View style={[styles.progressBlock, styles.sectionCard]}>
 								<View style={styles.progressHead}>
 									<Text style={styles.infoLabel}>획득 진행도</Text>
-									<Text style={[styles.progressValue, { color: meta.color }]}>
+									<Text style={styles.progressValue}>
 										{Math.min(progress.current, progress.goal).toLocaleString()} / {progress.goal.toLocaleString()}
 									</Text>
 								</View>
@@ -231,14 +232,15 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 							</View>
 						)}
 
-						<View style={[styles.statusBanner, isEarned ? { backgroundColor: meta.soft } : styles.statusBannerLocked]}>
+						{/* 획득 = 완료 표시라 희귀도 색이 아니라 청포 (CLAUDE.md 색 규칙 1). 영웅(치자) 글자는 옅은 치자 위에서 2:1 이었다 */}
+						<View style={[styles.statusBanner, isEarned ? styles.statusBannerEarned : styles.statusBannerLocked]}>
 							<IconComponent
 								type="materialIcons"
 								name={isEarned ? 'verified' : 'lock'}
 								size={scaledSize(16)}
-								color={isEarned ? meta.color : COLORS.textLight}
+								color={isEarned ? COLORS.successDark : COLORS.textLight}
 							/>
-							<Text style={[styles.statusText, { color: isEarned ? meta.color : COLORS.textLight }]}>
+							<Text style={[styles.statusText, { color: isEarned ? COLORS.successDeep : COLORS.textSecondary }]}>
 								{isEarned ? '획득 완료한 뱃지입니다!' : '아직 획득하지 못했습니다'}
 							</Text>
 						</View>
@@ -268,7 +270,7 @@ const BadgeDetailPopup = ({ visible, badge, isEarned, onClose }: Props) => {
 
 const InfoRow = ({ icon, label, value, tint }: { icon: string; label: string; value: string; tint: string }) => (
 	<View style={[styles.infoRow, styles.sectionCard]}>
-		<View style={[styles.infoIcon, { backgroundColor: `${tint}1A` }]}>
+		<View style={[styles.infoIcon, { backgroundColor: withAlpha(tint, ALPHA.soft) }]}>
 			<IconComponent type="materialIcons" name={icon} size={scaledSize(15)} color={tint} />
 		</View>
 		<View style={{ flex: 1 }}>
@@ -306,7 +308,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingBottom: SPACING_H.lg,
 		paddingHorizontal: SPACING_W.lg,
 	},
-	// 우하단 방향 어두운 오버레이 → 그라데이션 대체
+	// 우하단 방향 어두운 오버레이 → 그라데이션 대체.
+	// 헤더 rgba 들은 모드와 무관한 희귀도 채움 위의 막이라 고정값 (withAlpha 는 다크에서 진해진다)
 	headerOverlay: {
 		backgroundColor: 'rgba(0,0,0,0.18)',
 	},
@@ -413,7 +416,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.textSecondary,
 		marginBottom: SPACING_H.xs,
 	},
-	infoValue: { fontSize: FONT_SIZES.md, color: COLORS.text, lineHeight: scaledSize(20) },
+	infoValue: { fontSize: FONT_SIZES.md, color: COLORS.text, lineHeight: displayFontSize(20) },
 	rarityValueRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.sm },
 	rarityTag: { borderRadius: RADIUS.round, paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs },
 	rarityTagText: { fontSize: FONT_SIZES.sm, fontWeight: '700' },
@@ -427,7 +430,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	progressBlock: { rowGap: SPACING_H.sm },
 	progressHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-	progressValue: { fontSize: FONT_SIZES.smPlus, fontWeight: '700' },
+	progressValue: { fontSize: FONT_SIZES.smPlus, fontWeight: '700', color: COLORS.textStrong },
 	progressTrack: {
 		height: scaleHeight(8),
 		borderRadius: RADIUS.round,
@@ -437,6 +440,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	progressFill: { height: '100%', borderRadius: RADIUS.round },
 	progressLeft: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
 	statusBannerLocked: { backgroundColor: COLORS.surfaceAlt },
+	statusBannerEarned: { backgroundColor: COLORS.successBg },
 	statusText: { fontSize: FONT_SIZES.md, fontWeight: '600' },
 	closeBtn: {
 		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
@@ -446,5 +450,5 @@ const styles = themedStyles(() => StyleSheet.create({
 		justifyContent: 'center',
 		marginTop: SPACING_H.sm, // + body rowGap md = 20 (다른 대화상자의 내용 → 버튼 간격)
 	},
-	closeBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '700' },
+	closeBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '600' },
 }));

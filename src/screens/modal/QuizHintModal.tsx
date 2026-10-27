@@ -200,11 +200,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		columnGap: SPACING_W.xs,
 	},
 	sectionLabel: {
-		fontSize: FONT_SIZES.xs,
+		fontSize: FONT_SIZES.sm,
 		fontWeight: '600',
 		color: COLORS.textSecondary,
-		letterSpacing: 0.8,
-		textTransform: 'uppercase',
 	},
 	tagRow: {
 		flexDirection: 'row',
@@ -257,8 +255,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	exampleText: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.text,
+		// 한글 서체에는 이탤릭이 없어 기울임이 합성된다 — 바로 세운다(해설 모달 예문과 같게)
 		lineHeight: scaledSize(22),
-		fontStyle: 'italic',
 	},
 	emptyHint: {
 		alignItems: 'center',
@@ -282,7 +280,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	primaryButtonText: {
 		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
+		fontWeight: '600',
 		color: COLORS.textWhite,
 	},
 }));

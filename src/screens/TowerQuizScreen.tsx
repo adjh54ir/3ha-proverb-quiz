@@ -12,7 +12,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import IconComponent from './common/atomic/IconComponent';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles, displayFontSize } from '@/const/common/Theme';
 import { optionGrid } from '@/const/common/ListGrid';
 import { TOWER_LEVELS, TowerProgress } from '@/const/ConstTowerData';
 import { Paths } from '@/navigation/conf/Paths';
@@ -387,9 +387,9 @@ const TowerQuizScreen = () => {
 		return (
 			<View style={styles.container}>
 				<LinearGradient colors={COLORS.darkGradient} style={StyleSheet.absoluteFillObject} />
-				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
+				<SafeAreaView style={[styles.safeArea, styles.centerState]}>
 					<FastImage source={require('@/assets/images/screen-heroes/tower-quiz-coach.png')} style={styles.loadingCoachImage} resizeMode="contain" />
-					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>퀴즈 생성 중...</Text>
+					<Text style={styles.stateText}>퀴즈 생성 중...</Text>
 				</SafeAreaView>
 			</View>
 		);
@@ -399,11 +399,11 @@ const TowerQuizScreen = () => {
 		return (
 			<View style={styles.container}>
 				<LinearGradient colors={COLORS.darkGradient} style={StyleSheet.absoluteFillObject} />
-				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
+				<SafeAreaView style={[styles.safeArea, styles.centerState]}>
 					<FastImage source={require('@/assets/images/screen-heroes/data-retry.png')} style={styles.errorStateImage} resizeMode="contain" />
-					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>타워 정보를 찾을 수 없습니다.</Text>
-					<TouchableOpacity onPress={() => navigation.goBack()} hitSlop={HIT_SLOP} style={{ marginTop: SPACING_H.xl, padding: SPACING_W.sm }}>
-						<Text style={{ color: COLORS.darkAccent, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
+					<Text style={styles.stateText}>타워 정보를 찾을 수 없습니다.</Text>
+					<TouchableOpacity onPress={() => navigation.goBack()} hitSlop={HIT_SLOP} style={styles.backButton}>
+						<Text style={styles.backText}>뒤로 가기</Text>
 					</TouchableOpacity>
 				</SafeAreaView>
 			</View>
@@ -414,11 +414,11 @@ const TowerQuizScreen = () => {
 		return (
 			<View style={styles.container}>
 				<LinearGradient colors={COLORS.darkGradient} style={StyleSheet.absoluteFillObject} />
-				<SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
+				<SafeAreaView style={[styles.safeArea, styles.centerState]}>
 					<FastImage source={require('@/assets/images/screen-heroes/data-retry.png')} style={styles.errorStateImage} resizeMode="contain" />
-					<Text style={{ color: COLORS.textWhite, fontSize: FONT_SIZES.lg }}>레벨 {level}에 해당하는 단어가 없습니다.</Text>
-					<TouchableOpacity onPress={() => navigation.goBack()} hitSlop={HIT_SLOP} style={{ marginTop: SPACING_H.xl, padding: SPACING_W.sm }}>
-						<Text style={{ color: COLORS.darkAccent, fontSize: FONT_SIZES.md }}>뒤로 가기</Text>
+					<Text style={styles.stateText}>레벨 {level}에 해당하는 단어가 없습니다.</Text>
+					<TouchableOpacity onPress={() => navigation.goBack()} hitSlop={HIT_SLOP} style={styles.backButton}>
+						<Text style={styles.backText}>뒤로 가기</Text>
 					</TouchableOpacity>
 				</SafeAreaView>
 			</View>
@@ -523,7 +523,7 @@ const TowerQuizScreen = () => {
 						<View style={styles.questionCard}>
 							<View style={styles.questionCardGradient}>
 							<Text style={styles.questionText}>
-								<Text style={styles.questionProverb}>'{currentQuestion.proverb}'</Text>
+								<Text style={styles.questionProverb}>"{currentQuestion.proverb}"</Text>
 								<Text style={styles.questionAsk}>의 뜻은 무엇입니까?</Text>
 							</Text>
 						</View>
@@ -653,6 +653,10 @@ const styles = themedStyles(() => StyleSheet.create({
 	headerCenter: { flexShrink: 1, alignItems: 'center' },
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', columnGap: SPACING_W.xs },
 	headerCrest: { width: scaleWidth(28), height: scaleWidth(28) },
+	centerState: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: SPACING_W.lg },
+	stateText: { fontSize: FONT_SIZES.lg, color: COLORS.textWhite, textAlign: 'center' },
+	backButton: { marginTop: SPACING_H.xl, paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.sm },
+	backText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.darkAccent },
 	loadingCoachImage: { width: scaleWidth(150), height: scaleWidth(150), marginBottom: SPACING_H.lg },
 	errorStateImage: { width: scaleWidth(150), height: scaleHeight(100), marginBottom: SPACING_H.lg },
 	// 헤더 자리라 화면 타이틀로 본다(타워 이름이지만 명조)
@@ -690,7 +694,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.xl,
 		fontWeight: '600',
 		color: COLORS.textWhite,
-		lineHeight: scaledSize(26),
+		// 명조 속담이 섞이는 두 줄 질문 — 본문보다 여유 있게(≈1.55), 글자 크게 모드 배율도 따른다
+		lineHeight: displayFontSize(28),
 		textAlign: 'center',
 	},
 	questionProverb: {
@@ -716,7 +721,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 	answerNumberText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textWhite },
-	answerText: { flex: 1, fontSize: FONT_SIZES.lg, color: COLORS.textWhite, lineHeight: scaledSize(22) },
+	answerText: { flex: 1, fontSize: FONT_SIZES.lg, color: COLORS.textWhite, lineHeight: displayFontSize(24) },
 	explanationCard: {
 		marginTop: SPACING_H.xl,
 		marginBottom: SPACING_H.xl,
@@ -726,7 +731,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	explanationGradient: { paddingHorizontal: SPACING_W.lg, paddingVertical: SPACING_H.lg },
 	explanationHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm, marginBottom: SPACING_H.sm },
 	explanationTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700' },
-	explanationText: { fontSize: FONT_SIZES.md, color: COLORS.darkText, lineHeight: scaledSize(20) },
+	explanationText: { fontSize: FONT_SIZES.md, color: COLORS.darkText, lineHeight: displayFontSize(21) },
 	nextButtonContainer: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, paddingBottom: SPACING_H.lg },
 	nextButton: { borderRadius: RADIUS.md, overflow: 'hidden' },
 	nextButtonGradient: {
@@ -737,7 +742,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		minHeight: scaleHeight(48),
 		paddingVertical: SPACING_H.lg,
 	},
-	nextButtonText: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textWhite },
+	nextButtonText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.textWhite },
 	headerRight: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: SPACING_W.sm },
 	devButton: {
 		width: scaleWidth(36),

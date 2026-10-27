@@ -640,8 +640,8 @@ const InfinityQuizScreen = () => {
 
 	if (questionList.length === 0) {
 		return (
-			<SafeAreaView>
-				<Text>문제를 불러오는 중...</Text>
+			<SafeAreaView style={[styles.container, styles.loadingContainer]}>
+				<Text style={styles.statusLabel}>문제를 불러오는 중...</Text>
 			</SafeAreaView>
 		);
 	}
@@ -703,7 +703,7 @@ const InfinityQuizScreen = () => {
 											},
 										],
 									},
-									combo >= 2 && { color: COLORS.danger },
+									combo >= 2 && { color: COLORS.accentFlame },
 								]}>
 								{combo} Combo
 							</Animated.Text>
@@ -712,9 +712,10 @@ const InfinityQuizScreen = () => {
 				)}
 				{!isGameOver && (
 					<View style={styles.timeBoxWrapper}>
-						<View style={styles.timeBox}>
-							<IconComponent name="clock-o" type="FontAwesome" color={COLORS.primary} size={scaledSize(18)} />
-							<Text style={styles.timeText}>남은 시간: {formattedTime}</Text>
+						{/* 막판 10초(배경음 템포가 오르는 구간)는 색으로도 알린다 — 모션이 아니라 '애니메이션 줄이기'와 무관 */}
+						<View style={[styles.timeBox, timeLeftMs <= FINAL_SPURT_MS && styles.timeBoxUrgent]}>
+							<IconComponent name="clock-o" type="FontAwesome" color={timeLeftMs <= FINAL_SPURT_MS ? COLORS.dangerDark : COLORS.primary} size={scaledSize(18)} />
+							<Text style={[styles.timeText, timeLeftMs <= FINAL_SPURT_MS && styles.timeTextUrgent]}>남은 시간: {formattedTime}</Text>
 						</View>
 					</View>
 				)}
@@ -1223,7 +1224,7 @@ const InfinityQuizScreen = () => {
 			    하단 네비게이션바 영역이 비어 보인다 → Modal 로 띄워 화면 끝까지 채운다 */}
 			<Modal visible={isCountingDown} transparent animationType="fade" onRequestClose={cancelCountdown}>
 				<View style={StyleSheet.absoluteFillObject}>
-					<View style={styles.countdownOverlay}>
+					<View style={[styles.countdownOverlay, modalSafePadding]}>
 						<Animated.View style={[styles.countdownCircle, { transform: [{ scale: scaleAnim }] }]}>
 							<Text style={styles.countdownText}>{count === 0 ? '시작!' : String(count)}</Text>
 						</Animated.View>
@@ -1265,8 +1266,8 @@ const InfinityQuizScreen = () => {
 						style={{
 							fontSize: displayFontSize(36),
 							fontWeight: '700',
-							color: COLORS.danger,
-							textShadowColor: 'rgba(0,0,0,0.4)',
+							color: COLORS.accentFlame,
+							textShadowColor: withAlpha(COLORS.darkBg, 0.4),
 							textShadowOffset: { width: 1, height: 1 },
 							textShadowRadius: 2,
 						}}>
@@ -1351,46 +1352,13 @@ const styles = themedStyles(() => StyleSheet.create({
 	// 좌우·위 여백은 스크롤 내용에 둔다 — 여기 두면 하단 종료 바의 구분선이 화면 끝까지 닿지 않고
 	// 바 아래에 여백이 한 겹 더 생긴다 (QuizScreen 과 같은 구조).
 	container: { flex: 1, backgroundColor: COLORS.surface },
-	header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-	score: { fontSize: FONT_SIZES.xxl, fontWeight: '700' },
-	statusText: {
-		fontSize: FONT_SIZES.md,
-		color: COLORS.textSecondary,
-	},
-	scoreValue: {
-		fontSize: FONT_SIZES.xxl,
-		fontWeight: '700',
-		color: COLORS.text,
-		marginTop: SPACING_H.xs,
-	},
+	loadingContainer: { alignItems: 'center', justifyContent: 'center' },
 
-	correct: { backgroundColor: COLORS.secondarySoft },
-	wrong: { backgroundColor: COLORS.dangerBorderSoft },
 	gameOverBox: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
 		paddingTop: SPACING_H.sm,
-	},
-	gameOverText: {
-		fontSize: FONT_SIZES.title,
-		fontWeight: '700',
-	},
-	finalScore: {
-		fontSize: FONT_SIZES.heading,
-		marginBottom: SPACING_H.xxxl,
-	},
-	restartBtn: {
-		paddingVertical: SPACING_H.mdPlus,
-		paddingHorizontal: SPACING_W.xxxl,
-		backgroundColor: COLORS.secondaryFill,
-		borderRadius: RADIUS.sm,
-		marginBottom: SPACING_H.xxl,
-	},
-	restartText: {
-		color: COLORS.textWhite,
-		fontWeight: '700',
-		fontSize: FONT_SIZES.xl,
 	},
 	// 하단 종료 바 — QuizScreen 과 같은 규격. 예전엔 바 높이(30)가 버튼(40)보다 작아 버튼이 바 밖으로 삐져나왔다.
 	bottomExitWrapper: {
@@ -1420,10 +1388,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	modalOverlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
-		// backgroundColor: 'red',
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingTop: SPACING_H.xxxxl,
 	},
 	exitModal: {
 		width: '85%',
@@ -1439,10 +1405,11 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xl,
 	},
 	exitModalTitle: {
+		// 다이얼로그 타이틀 — 문장이 길어 heading 이면 두 줄로 접혀 xl (Theme FONT_SIZES 예외 규칙)
 		fontFamily: FONTS.display,
-		fontSize: FONT_SIZES.xxl,
+		fontSize: FONT_SIZES.xl,
 		fontWeight: '700',
-		color: COLORS.text,
+		color: COLORS.textStrong,
 		marginBottom: SPACING_H.md,
 		textAlign: 'center',
 	},
@@ -1458,7 +1425,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.dangerFill,
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.md,
-		borderRadius: RADIUS.sm,
+		borderRadius: RADIUS.md,
 		marginLeft: SPACING_W.xsPlus,
 		alignItems: 'center',
 	},
@@ -1473,17 +1440,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surfaceAlt,
 		paddingVertical: SPACING_H.md,
 		paddingHorizontal: SPACING_W.md,
-		borderRadius: RADIUS.sm,
+		borderRadius: RADIUS.md,
 		marginRight: SPACING_W.xsPlus,
-		alignItems: 'center',
-	},
-	modalStartButton: {
-		flex: 1,
-		backgroundColor: COLORS.secondaryFill,
-		paddingVertical: SPACING_H.md,
-		paddingHorizontal: SPACING_W.md,
-		borderRadius: RADIUS.sm,
-		marginLeft: SPACING_W.xsPlus,
 		alignItems: 'center',
 	},
 	modalBackButtonText: {
@@ -1496,18 +1454,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '600',
 		fontSize: FONT_SIZES.mdPlus,
 	},
-	fixedHeader: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'flex-start',
-		backgroundColor: COLORS.surface,
-		paddingHorizontal: SPACING_W.sm,
-		paddingTop: SPACING_H.md,
-		paddingBottom: SPACING_H.sm,
-		borderBottomWidth: 1,
-		borderBottomColor: COLORS.surfaceAlt,
-		zIndex: 10,
-	},
 
 	statusBox: {
 		flex: 1,
@@ -1517,12 +1463,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.smPlus,
 		paddingHorizontal: SPACING_W.sm,
 		alignItems: 'center',
-	},
-
-	statusRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: SPACING_W.xs,
 	},
 
 	statusLabel: {
@@ -1535,27 +1475,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '700',
 		color: COLORS.text,
 	},
-	heartRow: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		gap: SPACING_W.xxs,
-	},
 	iconWithLabel: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
 		gap: SPACING_W.xs,
 		marginBottom: SPACING_H.xsPlus,
-	},
-	statusWrapper: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		paddingHorizontal: SPACING_W.sm,
-		paddingVertical: SPACING_H.smPlus,
-		backgroundColor: COLORS.surface,
-		borderBottomWidth: 1,
-		borderBottomColor: COLORS.surfaceAlt,
-		gap: SPACING_W.xsPlus,
 	},
 	statusBoxRow: {
 		marginTop: SPACING_H.sm,
@@ -1614,9 +1539,6 @@ const styles = themedStyles(() => StyleSheet.create({
 	feedbackTagCorrect: { backgroundColor: COLORS.successSoft },
 	feedbackTagWrong: { backgroundColor: COLORS.dangerBg },
 	feedbackTagText: { fontSize: FONT_SIZES.smPlus, fontWeight: '700' },
-	choicesWrapper: {
-		gap: SPACING_H.smPlus,
-	},
 	choiceBtn: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -1669,18 +1591,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.dangerDeep,
 		fontWeight: '700',
 	},
-	skipTopRightButton: {
-		position: 'absolute',
-		top: SPACING_H.md,
-		right: SPACING_W.md,
-		zIndex: 1,
-	},
-	skipTopRightText: {
-		fontSize: FONT_SIZES.sm,
-		color: COLORS.textSecondary,
-		opacity: 0.6,
-		fontWeight: '500',
-	},
 	timeBoxWrapper: {
 		alignItems: 'center',
 		marginBottom: SPACING_H.md,
@@ -1689,7 +1599,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	timeBox: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: COLORS.secondaryBg, // 💚 연한 초록 계열 배경
+		backgroundColor: COLORS.secondaryBg,
 		paddingVertical: SPACING_H.sm,
 		paddingHorizontal: SPACING_W.lg,
 		borderRadius: RADIUS.round,
@@ -1703,51 +1613,21 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '600',
 		color: COLORS.text,
 	},
-	skipInlineButton: {
-		backgroundColor: COLORS.surfaceAlt,
-		paddingVertical: SPACING_H.xs,
-		paddingHorizontal: SPACING_W.smPlus,
-		borderRadius: RADIUS.sm,
-		marginLeft: SPACING_W.xsPlus,
+	timeBoxUrgent: {
+		backgroundColor: COLORS.dangerSoftBg,
+		borderColor: COLORS.dangerBorderSoft,
 	},
-	skipInlineText: {
-		fontSize: FONT_SIZES.sm,
-		color: COLORS.textSecondary,
-		fontWeight: '500',
+	timeTextUrgent: {
+		color: COLORS.dangerDark,
+		fontWeight: '700',
 	},
 	questionBoxCorrect: {
-		backgroundColor: COLORS.secondarySoft, // 연한 초록색 배경
+		backgroundColor: COLORS.successBg,
+		borderColor: COLORS.successBorder,
 	},
 	questionBoxWrong: {
-		backgroundColor: COLORS.dangerBg, // 연한 빨간색 배경
-	},
-	resultSummaryBox: {
-		width: '100%', // ✅ 전체 너비 사용
-		marginTop: SPACING_H.xl,
-		marginBottom: SPACING_H.xxl,
-		paddingVertical: SPACING_H.lg,
-		paddingHorizontal: SPACING_W.xl,
-		borderRadius: RADIUS.lg,
-		backgroundColor: COLORS.background,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-	resultRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		paddingVertical: SPACING_H.xsPlus,
-		paddingHorizontal: SPACING_W.xs,
-		borderBottomWidth: 1,
-		borderBottomColor: COLORS.surfaceAlt,
-	},
-	resultText: {
-		fontSize: FONT_SIZES.mdPlus,
-		marginLeft: SPACING_W.smPlus,
-		color: COLORS.text,
-		fontWeight: '500',
-	},
-	bold: {
-		fontWeight: '700',
+		backgroundColor: COLORS.dangerSoftBg,
+		borderColor: COLORS.dangerBorderSoft,
 	},
 
 	/* ===== 결과 화면: 정답과 해설 ===== */
@@ -1834,7 +1714,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	countdownOverlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.92)',
+		// 타워/챌린지 다크 화면과 같은 밤의 쪽빛 (모드 무관 고정색)
+		backgroundColor: withAlpha(COLORS.darkBg, 0.92),
 		justifyContent: 'center',
 		alignItems: 'center',
 		zIndex: 999,
@@ -1846,7 +1727,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		textAlign: 'center',
 		includeFontPadding: false,
 		textAlignVertical: 'center',
-		lineHeight: scaledSize(80),
+		// fontSize 와 같은 경로 — scaledSize 면 '글자 크게'(72×1.15=83)에서 행 높이를 넘어 숫자가 잘린다
+		lineHeight: displayFontSize(80),
 	},
 	countdownCircle: {
 		width: scaleWidth(160),
@@ -1871,23 +1753,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginTop: SPACING_H.xxxl,
 		paddingHorizontal: SPACING_W.xxl,
 		paddingVertical: SPACING_H.smPlus,
-		backgroundColor: 'rgba(255,255,255,0.12)',
+		backgroundColor: withAlpha(COLORS.textWhite, ALPHA.soft),
 		borderRadius: RADIUS.xl,
 		minWidth: scaleWidth(180),
 		alignItems: 'center',
-	},
-	feedbackStatus: {
-		fontSize: FONT_SIZES.lg,
-		fontWeight: '700',
-		marginLeft: SPACING_W.sm,
-	},
-	skipButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: COLORS.secondaryBg,
-		borderRadius: RADIUS.round,
-		paddingVertical: SPACING_H.xsPlus,
-		paddingHorizontal: SPACING_W.md,
 	},
 
 	skipContent: {
@@ -1898,7 +1767,7 @@ const styles = themedStyles(() => StyleSheet.create({
 
 	skipText: {
 		fontSize: FONT_SIZES.xs,
-		color: COLORS.accentTealDeep,
+		color: COLORS.primaryDark,
 		fontWeight: '700',
 		lineHeight: scaledSize(13),
 	},
@@ -1926,16 +1795,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		alignItems: 'center',
 	},
 
-	skipFixedRight: {
-		marginLeft: 'auto',
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: COLORS.secondaryBg,
-		borderRadius: RADIUS.round,
-		paddingVertical: SPACING_H.xsPlus,
-		paddingHorizontal: SPACING_W.md,
-		zIndex: 2,
-	},
 	leftFixed: {
 		position: 'absolute',
 		left: SPACING_W.sm,
@@ -1965,7 +1824,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	chanceContent: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: COLORS.primaryBg, // 💚 연한 초록색 배경
+		backgroundColor: COLORS.primaryBg,
 		borderRadius: RADIUS.md,
 		paddingVertical: SPACING_H.xs,
 		paddingHorizontal: SPACING_W.sm,
@@ -1978,10 +1837,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 		borderColor: COLORS.border,
+		// 앱 대화상자 표준(exitModal 과 동일) — 좌우 lg / 위아래 xl
 		borderRadius: RADIUS.xl,
-		paddingTop: SPACING_H.xxl,
-		paddingBottom: SPACING_H.lgPlus,
-		paddingHorizontal: SPACING_W.xl,
+		paddingVertical: SPACING_H.xl,
+		paddingHorizontal: SPACING_W.lg,
 		alignItems: 'center',
 	},
 	chanceModalHeaderIcon: {
@@ -1995,56 +1854,16 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	chanceModalTitle: {
 		fontFamily: FONTS.display,
-		fontSize: FONT_SIZES.xl,
+		fontSize: FONT_SIZES.heading,
 		fontWeight: '700',
 		color: COLORS.textStrong,
 		marginBottom: SPACING_H.xxs,
 	},
 	chanceModalSubtitle: {
 		fontSize: FONT_SIZES.sm,
-		color: COLORS.textLight,
-		marginBottom: SPACING_H.lg,
-		fontWeight: '600',
-	},
-	chanceCharBox: {
-		width: '100%',
-		flexDirection: 'row',
-		gap: SPACING_W.sm,
-		marginBottom: SPACING_H.mdPlus,
-	},
-	chanceCharRow: {
-		flex: 1,
-		alignItems: 'center',
-		backgroundColor: COLORS.surfaceAlt,
-		borderRadius: RADIUS.sm,
-		paddingVertical: SPACING_H.sm,
-		paddingHorizontal: SPACING_W.xsPlus,
-	},
-	chanceCharChar: {
-		fontSize: FONT_SIZES.xl,
-		fontWeight: '700',
-		color: COLORS.textDeep,
-		marginBottom: SPACING_H.xs,
-	},
-	chanceCharReading: {
-		fontSize: FONT_SIZES.xs,
-		color: COLORS.secondary,
-		fontWeight: '700',
-		textAlign: 'center',
-		marginTop: SPACING_H.xxs,
-	},
-	chanceCharMeaning: {
-		fontSize: FONT_SIZES.xs,
 		color: COLORS.textSecondary,
-		fontWeight: '600',
-		textAlign: 'center',
-	},
-	chanceCharSub: {
-		fontSize: FONT_SIZES.xxs,
-		color: COLORS.textLight,
-		fontWeight: '600',
-		textAlign: 'center',
-		marginTop: SPACING_H.xxs,
+		marginBottom: SPACING_H.lg,
+		fontWeight: '500',
 	},
 	chanceMetaRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: SPACING_W.xsPlus, marginBottom: SPACING_H.smPlus },
 	chanceMetaChip: { backgroundColor: COLORS.secondaryBg, borderRadius: RADIUS.round, paddingHorizontal: SPACING_W.smPlus, paddingVertical: SPACING_H.xs },
@@ -2072,7 +1891,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	chanceExampleText: {
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.text,
-		fontWeight: '600',
+		fontWeight: '500',
 		lineHeight: scaledSize(20),
 	},
 	chanceModalButton: {
@@ -2085,21 +1904,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	chanceModalButtonText: {
 		color: COLORS.textOnVivid, // primaryDark 채움 위
 		fontSize: FONT_SIZES.mdPlus,
-		fontWeight: '700',
-	},
-	resultTitleCard: {
-		alignItems: 'center',
-		paddingHorizontal: SPACING_W.md,
-		paddingVertical: SPACING_H.smPlus,
-		backgroundColor: COLORS.warningSoft,
-		borderRadius: RADIUS.md,
-		borderWidth: 1,
-		borderColor: COLORS.warningBorder,
-	},
-	animatedScore: {
-		fontSize: FONT_SIZES.xl,
-		fontWeight: '700',
-		color: COLORS.accentFlame,
+		fontWeight: '600',
 	},
 	quizScrollContent: {
 		// 도움말 버튼 행을 걷어내며 상태 박스가 화면 위쪽에 바짝 붙었다 — 그만큼 위를 띄운다
@@ -2147,8 +1952,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	resultHeaderSub: {
 		fontSize: FONT_SIZES.sm,
-		color: COLORS.textLight,
-		fontWeight: '600',
+		color: COLORS.textSecondary,
+		fontWeight: '500',
 		marginTop: SPACING_H.xs,
 	},
 	scoreHero: {
@@ -2159,8 +1964,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	scoreHeroLabel: {
 		fontSize: FONT_SIZES.smPlus,
-		fontWeight: '700',
-		color: COLORS.textLight,
+		fontWeight: '600',
+		color: COLORS.textSecondary,
 		marginBottom: SPACING_H.xxs,
 	},
 	resultScoreCardRow: {
@@ -2174,7 +1979,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		paddingVertical: SPACING_H.mdPlus,
-		borderRadius: RADIUS.lg,
+		borderRadius: RADIUS.md,
 		borderWidth: 1,
 	},
 	resultScoreIcon: {
@@ -2198,7 +2003,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	statList: {
 		width: '100%',
 		backgroundColor: COLORS.background,
-		borderRadius: RADIUS.lg,
+		borderRadius: RADIUS.md,
 		borderWidth: 1,
 		borderColor: COLORS.border,
 		paddingHorizontal: SPACING_W.lg,
@@ -2230,12 +2035,12 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontFamily: FONTS.body,
 		fontSize: displayFontSize(56),
 		fontWeight: '700',
-		color: COLORS.danger,
+		color: COLORS.accentOrange,
 	},
 	scoreHeroUnit: {
 		fontSize: FONT_SIZES.title,
 		fontWeight: '700',
-		color: COLORS.danger,
+		color: COLORS.accentOrange,
 		marginLeft: SPACING_W.xs,
 		marginBottom: SPACING_H.md,
 	},
@@ -2246,36 +2051,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontWeight: '600',
 		lineHeight: scaledSize(20),
 		marginTop: SPACING_H.xsPlus,
-	},
-	statGrid: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-		width: '100%',
-		gap: SPACING_W.sm,
-		marginTop: SPACING_H.mdPlus,
-		marginBottom: SPACING_H.md,
-	},
-	statChip: {
-		flexGrow: 1,
-		flexBasis: '30%',
-		alignItems: 'center',
-		backgroundColor: COLORS.background,
-		borderRadius: RADIUS.md,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-		paddingVertical: SPACING_H.md,
-	},
-	statChipValue: {
-		fontSize: FONT_SIZES.xl,
-		fontWeight: '700',
-		color: COLORS.text,
-		marginBottom: SPACING_H.xxs,
-	},
-	statChipLabel: {
-		fontSize: FONT_SIZES.xs,
-		color: COLORS.textLight,
-		fontWeight: '600',
 	},
 	usedTagRow: {
 		flexDirection: 'row',
@@ -2307,7 +2082,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	resultBtnPrimaryText: {
 		fontSize: FONT_SIZES.md,
-		fontWeight: '700',
+		fontWeight: '600',
 		color: COLORS.textWhite,
 	},
 	resultBtnSecondary: {
@@ -2317,7 +2092,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	resultBtnSecondaryText: {
 		fontSize: FONT_SIZES.md,
-		fontWeight: '700',
+		fontWeight: '600',
 		color: COLORS.secondary,
 	},
 	globalConfettiWrapper: {

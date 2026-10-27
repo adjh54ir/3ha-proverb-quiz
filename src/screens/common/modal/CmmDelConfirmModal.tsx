@@ -111,7 +111,7 @@ const styles = themedStyles(() => StyleSheet.create({
     modalButtonText: {
         color: COLORS.textWhite,
         fontSize: FONT_SIZES.mdPlus,
-        fontWeight: '700',
+        fontWeight: '600',
     },
     modalCancelText: {
         color: COLORS.textSecondary,

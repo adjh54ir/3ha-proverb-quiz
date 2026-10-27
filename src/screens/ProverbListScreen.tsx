@@ -18,12 +18,12 @@ import ProverbServices from '@/services/ProverbServices';
 import { MainDataType } from '@/types/MainDataType';
 import { useBlockBackHandler } from '@/hooks/useBlockBackHandler';
 import { getCategoryColor, getLevelColor, getLevelInkColor, getFieldIcon, getFieldIconName, getLevelIconName, LEVEL_NAME_BY_NUMBER } from './common/CommonProverbModule';
-import { readableTextOn } from '@/utils/ColorAlphaUtils';
+import { inkOnFill } from '@/utils/ColorAlphaUtils';
 import ProverbDetailModal from './modal/ProverbDetailModal';
 import { getFavorites, toggleFavorite } from '@/utils/favoriteUtils';
 import { useToast } from '@/hooks/useToast';
 import CharacterGuide, { useCharacterGuideOnce, CharacterGuideButton } from '@/screens/common/CharacterGuide';
-import { AnimatedListItem } from '@/components/animation/FadeInView';
+import FadeInView, { AnimatedListItem } from '@/components/animation/FadeInView';
 import { DROPDOWN_MODAL_CONTENT_STYLE, DROPDOWN_MODAL_PROPS } from '@/const/common/DropdownModal';
 
 
@@ -247,13 +247,13 @@ const ProverbListScreen = () => {
 	const getLevelIcon = (level: number) => {
 		switch (level) {
 			case 1:
-				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={readableTextOn(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
+				return <IconComponent type="FontAwesome6" name="seedling" size={scaledSize(14)} color={inkOnFill(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
 			case 2:
-				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={readableTextOn(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
+				return <IconComponent type="FontAwesome6" name="leaf" size={scaledSize(14)} color={inkOnFill(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
 			case 3:
-				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={readableTextOn(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
+				return <IconComponent type="FontAwesome6" name="tree" size={scaledSize(14)} color={inkOnFill(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
 			case 4:
-				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={readableTextOn(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
+				return <IconComponent type="FontAwesome6" name="trophy" size={scaledSize(14)} color={inkOnFill(getLevelColor(LEVEL_NAME_BY_NUMBER[level] ?? ''))} />;
 			default:
 				return null;
 		}
@@ -407,11 +407,7 @@ const ProverbListScreen = () => {
 										/>
 									</View>
 
-									{/* 초기화 버튼 */}
-									{/* <TouchableOpacity style={styles.resetButton} onPress={handleReset} hitSlop={HIT_SLOP}>
-                  <Icon name='rotate-right' size={scaledSize(20)} color={COLORS.textSecondary} />
-                </TouchableOpacity> */}
-								</View>
+											</View>
 								{/* ✅ 즐겨찾기 버튼 + 리스트 개수 */}
 								<View style={styles.listCountWrapper}>
 									<TouchableOpacity
@@ -455,14 +451,15 @@ const ProverbListScreen = () => {
 								onEndReachedThreshold={0.5}
 								onScroll={onListScroll}
 								scrollEventThrottle={16}
-								ListEmptyComponent={() => (
-									<View style={styles.emptyWrapper}>
+								// 함수가 아니라 엘리먼트로 넘긴다 — 함수면 렌더마다 새 컴포넌트로 리마운트돼 검색어를 칠 때마다 페이드가 다시 돈다
+								ListEmptyComponent={
+									<FadeInView style={styles.emptyWrapper}>
 										<FastImage source={emptyImage} style={styles.emptyImage} resizeMode="contain" />
 										<Text style={styles.emptyText}>
 											앗! 조건에 맞는 속담이 없습니다.{'\n'}다른 검색어나 필터를 사용해보세요!
 										</Text>
-									</View>
-								)}
+									</FadeInView>
+								}
 								contentContainerStyle={[styles.flatListCotent, visibleList.length === 0 && styles.flatListContentEmpty]}
 								renderItem={({ item, index }) => {
 									return (
@@ -479,11 +476,11 @@ const ProverbListScreen = () => {
 													<View style={styles.badgeGroup}>
 														<View style={[styles.badge, { backgroundColor: getLevelColor(item.levelName) }]}>
 															{getLevelIcon(item.level)}
-															<Text style={[styles.badgeText, { color: readableTextOn(getLevelColor(item.levelName)) }]}>{item.levelName}</Text>
+															<Text style={[styles.badgeText, { color: inkOnFill(getLevelColor(item.levelName)) }]}>{item.levelName}</Text>
 														</View>
 														<View style={[styles.badge, { backgroundColor: getCategoryColor(item.category) }]}>
 															{item?.category && getFieldIcon(item.category)}
-															<Text style={[styles.badgeText, { color: readableTextOn(getCategoryColor(item.category)) }]}>{item.category || '미지정'}</Text>
+															<Text style={[styles.badgeText, { color: inkOnFill(getCategoryColor(item.category)) }]}>{item.category || '미지정'}</Text>
 														</View>
 													</View>
 
@@ -620,7 +617,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surfaceAlt,
 	},
 	badgeText: {
-		color: COLORS.textWhite,
+		// 글자색은 배지 채움에 맞춰 inkOnFill 로 인라인 지정한다
 		fontSize: FONT_SIZES.sm,
 		fontWeight: '600',
 	},
@@ -650,14 +647,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.smPlus,
 		color: COLORS.textSecondary,
 		fontWeight: '500',
-	},
-	resetButton: {
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: COLORS.surfaceAlt,
-		height: scaleHeight(44),
-		width: scaleWidth(44),
-		borderRadius: RADIUS.md,
 	},
 	// 빈 목록 자리표시자 — contentContainer 의 flexGrow 로 받은 빈 영역 전체를 채우고 그 정중앙에 놓인다.
 	emptyWrapper: {
@@ -742,7 +731,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
 		color: COLORS.textStrong,
-		lineHeight: scaledSize(24),
+		lineHeight: scaledSize(25), // 명조 속담 여러 줄 — 본문보다 조금 더 여유
 		marginBottom: SPACING_H.xs,
 	},
 	container: {

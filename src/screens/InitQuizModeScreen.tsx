@@ -106,7 +106,7 @@ const InitQuizModeScreen = () => {
 
 						<View style={styles.titleWrap}>
 							<Text style={styles.titleLine}>🧩 퀴즈 준비되셨습니까?</Text>
-							<Text style={styles.titleLine}>도전하려는 퀴즈 모드를 선택하세요!</Text>
+							<Text style={styles.titleSub}>도전하려는 퀴즈 모드를 선택하세요!</Text>
 						</View>
 
 						<View style={styles.gridWrap}>
@@ -163,7 +163,7 @@ const InitQuizModeScreen = () => {
 									</View>
 									<View style={styles.accordionRow}>
 										<IconComponent type="MaterialCommunityIcons" name="reload" size={scaledSize(18)} color={COLORS.primary} style={styles.accordionIcon} />
-										<Text style={[styles.accordionText, styles.warningText]}>다시 풀기는 설정 탭에서 '퀴즈 다시 풀기'에서 할 수 있지만, 이전 기록이 초기화되니 꼭 참고하세요!</Text>
+										<Text style={[styles.accordionText, styles.warningText]}>다시 풀기는 설정 탭에서 "퀴즈 다시 풀기"에서 할 수 있지만, 이전 기록이 초기화되니 꼭 참고하세요!</Text>
 									</View>
 								</View>
 								<View style={styles.accordionButtonsRow}>
@@ -244,6 +244,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	titleWrap: { marginBottom: SPACING_H.xl, alignItems: 'center' },
 	// 내비게이션 헤더가 이미 명조 타이틀이라 본문 서체 (명조 헤드라인은 화면당 하나)
 	titleLine: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text, textAlign: 'center', marginBottom: SPACING_H.xs },
+	// 두 줄이 같은 굵기·크기면 한 덩어리로 읽힌다 — 안내 줄은 보조 텍스트로 한 단계 낮춘다
+	titleSub: { fontSize: FONT_SIZES.md, fontWeight: '500', color: COLORS.textSecondary, textAlign: 'center' },
 
 	// ===== 모드 카드 =====
 	gridWrap: {

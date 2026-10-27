@@ -9,7 +9,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconComponent from '../common/atomic/IconComponent';
 import FadeInView, { staggerDelay } from '@/components/animation/FadeInView';
-import { LIST_COLUMNS, listGrid } from '@/const/common/ListGrid';
+import { CARD_LIST_COLUMNS, cardListGrid } from '@/const/common/ListGrid';
 import { readableTextOn } from '@/utils/ColorAlphaUtils';
 import { CONTENT_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles, themedValue, getPickerTheme } from '@/const/common/Theme';
@@ -175,14 +175,14 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 	const isAllSelected = filteredList.length > 0 && filteredList.every((item) => selectedIds.includes(item.id));
 
 	const renderItem = ({ item, index }: { item: MainDataType.Proverb; index: number }) => {
-		// 마지막 '행' — 태블릿 2열에서는 마지막 두 장(홀수 개면 한 장)이 같은 행이다
-		const isLast = index >= filteredList.length - (filteredList.length % LIST_COLUMNS || LIST_COLUMNS);
+		// 마지막 '행' — 태블릿 2열(13인치 3열)에서는 마지막 두 장(홀수 개면 한 장)이 같은 행이다
+		const isLast = index >= filteredList.length - (filteredList.length % CARD_LIST_COLUMNS || CARD_LIST_COLUMNS);
 		const isSelected = selectedIds.includes(item.id);
 
 		return (
-			<FadeInView delay={staggerDelay(index)} duration={240} offsetY={10} style={listGrid?.cell}>
+			<FadeInView delay={staggerDelay(index)} duration={240} offsetY={10} style={cardListGrid?.cell}>
 			<TouchableOpacity
-				style={[styles.itemCard, listGrid?.fill, { marginBottom: isLast ? SPACING_H.xl : SPACING_H.md }, isSelected && styles.itemCardSelected]}
+				style={[styles.itemCard, cardListGrid?.fill, { marginBottom: isLast ? SPACING_H.xl : SPACING_H.md }, isSelected && styles.itemCardSelected]}
 				activeOpacity={0.75}
 				onPress={() => toggleSelection(item.id)}>
 				<View style={styles.itemHeader}>
@@ -346,8 +346,8 @@ const FavoriteAddModal = ({ visible, existingIds, onClose, onAdd }: Props) => {
 								scrollEnabled={!levelOpen && !categoryOpen}
 								onScroll={onListScroll}
 								scrollEventThrottle={16}
-								numColumns={LIST_COLUMNS}
-								columnWrapperStyle={listGrid?.row}
+								numColumns={CARD_LIST_COLUMNS}
+								columnWrapperStyle={cardListGrid?.row}
 								contentContainerStyle={[styles.listContent, filteredList.length === 0 && styles.listContentEmpty]}
 								showsVerticalScrollIndicator={false}
 								ListEmptyComponent={() => (
@@ -398,18 +398,19 @@ const styles = themedStyles(() => StyleSheet.create({
 	headerTitleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING_W.sm },
 	headerTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, letterSpacing: -0.3 },
 	headerSubText: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary },
-	headerCount: { fontWeight: '700', color: COLORS.warning },
+	// 치자(warning)를 글자로 쓰면 라이트에서 2:1 — 같은 계열의 진한 글자 토큰으로
+	headerCount: { fontWeight: '700', color: COLORS.warningDeep },
 	body: { flex: 1 },
 	filterWrap: { backgroundColor: COLORS.surface, paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.md, paddingBottom: SPACING_H.md, marginBottom: SPACING_H.xs, borderBottomWidth: 1, borderBottomColor: COLORS.surfaceAlt, zIndex: 10 },
 	searchRow: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING_H.sm },
-	searchBox: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, paddingHorizontal: SPACING_W.md, height: scaleHeight(48) },
+	searchBox: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, paddingHorizontal: SPACING_W.md, height: scaleHeight(44) },
 	searchBoxFocused: { borderColor: COLORS.primary, backgroundColor: COLORS.surface },
 	searchIcon: { marginRight: SPACING_W.sm },
 	searchInput: { flex: 1, fontSize: FONT_SIZES.md, color: COLORS.text, paddingVertical: 0 },
-	resetButton: { marginLeft: SPACING_W.sm, backgroundColor: COLORS.surfaceAlt, borderWidth: 1, borderColor: COLORS.border, paddingHorizontal: SPACING_W.md, height: scaleHeight(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
+	resetButton: { marginLeft: SPACING_W.sm, backgroundColor: COLORS.surfaceAlt, borderWidth: 1, borderColor: COLORS.border, width: scaleWidth(44), height: scaleHeight(44), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
 	dropdownRow: { flexDirection: 'row', gap: SPACING_W.sm, marginBottom: SPACING_H.sm },
 	dropdownWrapper: { flex: 1 },
-	dropdown: { backgroundColor: COLORS.surface, borderColor: COLORS.border, borderRadius: RADIUS.md, minHeight: scaleHeight(48), paddingHorizontal: SPACING_W.md },
+	dropdown: { backgroundColor: COLORS.surface, borderColor: COLORS.border, borderRadius: RADIUS.md, height: scaleHeight(44), minHeight: scaleHeight(44), paddingHorizontal: SPACING_W.md },
 	dropdownList: { backgroundColor: COLORS.surface, borderColor: COLORS.border, borderWidth: 1, borderRadius: RADIUS.md },
 	dropdownLabel: { fontSize: FONT_SIZES.smPlus, color: COLORS.text },
 	listCountRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: SPACING_H.xs },
@@ -430,7 +431,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	badgeText: { color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '600' },
 	checkbox: { width: scaleWidth(22), height: scaleWidth(22), borderRadius: RADIUS.sm, borderWidth: 2, borderColor: COLORS.borderDark, backgroundColor: COLORS.surface, justifyContent: 'center', alignItems: 'center' },
 	checkboxChecked: { backgroundColor: COLORS.warning, borderColor: COLORS.warning },
-	hanjaText: { fontFamily: FONTS.display, fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.xs },
+	hanjaText: { fontFamily: FONTS.display, fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, lineHeight: scaledSize(24), marginBottom: SPACING_H.xs },
 	meaningText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, lineHeight: scaledSize(19) },
 	// 빈 영역 전체를 채우고 그 정중앙에 놓인다. 위쪽 여백을 따로 주면 그만큼 아래로 밀린다.
 	emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
@@ -442,5 +443,5 @@ const styles = themedStyles(() => StyleSheet.create({
 	confirmBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING_W.sm, minHeight: scaleHeight(48), borderRadius: RADIUS.md, backgroundColor: COLORS.warning },
 	confirmBtnDisabled: { backgroundColor: COLORS.surfaceAlt },
 	confirmBtnTextDisabled: { color: COLORS.textLight },
-	confirmBtnText: { color: COLORS.textOnAccent, fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
+	confirmBtnText: { color: COLORS.textOnAccent, fontSize: FONT_SIZES.lg, fontWeight: '600' },
 }));

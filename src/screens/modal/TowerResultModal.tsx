@@ -238,11 +238,7 @@ const TowerResultModal: React.FC<TowerResultModalProps> = ({
 						{/* 보상 */}
 						{isVictory && (
 							<View style={styles.rewardSection}>
-								<View
-									style={[
-										styles.rewardHeader,
-										{ backgroundColor: 'rgba(250,204,21,0.15)', borderBottomColor: 'rgba(250,204,21,0.3)' },
-									]}>
+								<View style={styles.rewardHeader}>
 									<Text style={styles.rewardHeaderText}>🎁 REWARD UNLOCKED</Text>
 								</View>
 								<View style={styles.rewardBody}>
@@ -339,6 +335,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		height: scaleWidth(110),
 		borderRadius: scaleWidth(110) / 2,
 		borderWidth: 2,
+		// 부모(bossContainer)가 scale 로 등장한다 — 테두리 뷰는 overflow hidden (CLAUDE.md 모달 규칙 7)
+		overflow: 'hidden',
 	},
 	bossImageWrapper: {
 		width: scaleWidth(90),
@@ -377,9 +375,9 @@ const styles = themedStyles(() => StyleSheet.create({
 		marginTop: SPACING_H.sm,
 		textAlign: 'center',
 		fontSize: FONT_SIZES.sm,
-		color: 'rgba(255,255,255,0.5)',
+		// 흰색 50% 는 승리/패배 배경 위에서 대비 3.3 남짓이라 고정 다크 보조 글자색으로 올린다
+		color: COLORS.darkTextSecondary,
 		letterSpacing: 2,
-		textTransform: 'uppercase',
 	},
 	// 스크롤 영역이 남은 공간 전부 차지
 	scrollArea: {
@@ -406,7 +404,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	scoreLabel: {
 		fontSize: FONT_SIZES.xs,
-		color: 'rgba(255,255,255,0.4)',
+		color: COLORS.darkTextSecondary, // 흰색 40% 는 xs 라벨로 읽기 어려웠다
 		letterSpacing: 3,
 		marginBottom: SPACING_H.xs,
 	},
@@ -477,6 +475,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.sm,
 		alignItems: 'center',
 		borderBottomWidth: 1,
+		backgroundColor: 'rgba(250,204,21,0.15)',
+		borderBottomColor: 'rgba(250,204,21,0.3)',
 	},
 	rewardHeaderText: {
 		fontSize: FONT_SIZES.xs,
@@ -573,7 +573,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 	},
 	btnPrimaryText: {
-		fontSize: FONT_SIZES.mdPlus,
+		fontSize: FONT_SIZES.lg, // 주요 버튼 lg · 보조(홈) md
 		fontWeight: '700',
 		letterSpacing: 1,
 	},

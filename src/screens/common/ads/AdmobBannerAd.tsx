@@ -4,6 +4,7 @@ import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-goo
 import { GOOGLE_ADMOV_ANDROID_BANNER, GOOGLE_ADMOV_IOS_BANNER } from '@env';
 import { recordAdClick } from '@/utils/AdGuardUtils';
 import { logAdClick } from './logAdClick';
+import { SPACING_H } from '@/const/common/Theme';
 
 type AdUnitIdType = string;
 
@@ -19,8 +20,8 @@ interface AdmobBannerAdProps {
 }
 
 const AdmobBannerAd: React.FC<AdmobBannerAdProps> = ({
-	paramMarginTop = 6,
-	paramMarginBottom = 6,
+	paramMarginTop = SPACING_H.xsPlus,
+	paramMarginBottom = SPACING_H.xsPlus,
 	visible = true, // 표시 여부
 }) => {
 	const bannerRef = useRef<BannerAd | null>(null);

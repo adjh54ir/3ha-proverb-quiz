@@ -120,6 +120,8 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
         inputRange: [0, 1],
         outputRange: ['0deg', '-360deg'],  // outputRange에서 방향 반전
     });
+    // 레벨색 채움 위 글자 — LV1 라임(#82c91e)처럼 밝은 색에서는 흰 글자가 묻히므로 밝기로 고른다
+    const ink = readableTextOn(color);
 
     return (
         <Animated.View
@@ -131,10 +133,10 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
             <View style={styles.clearBadgeCircleLeft} />
             <View style={styles.clearBadgeCircleRight} />
 
-            <Animated.Text style={[styles.clearStar, styles.clearStarLeft, { transform: [{ rotate: star1Deg }] }]}>
+            <Animated.Text style={[styles.clearStar, styles.clearStarLeft, { color: ink, transform: [{ rotate: star1Deg }] }]}>
                 ✦
             </Animated.Text>
-            <Animated.Text style={[styles.clearStar, styles.clearStarRight, { transform: [{ rotate: star2Deg }] }]}>
+            <Animated.Text style={[styles.clearStar, styles.clearStarRight, { color: ink, transform: [{ rotate: star2Deg }] }]}>
                 ✦
             </Animated.Text>
 
@@ -143,11 +145,11 @@ const ClearBadge = ({ color, name }: { color: string; name: string }) => {
                 <Animated.Text
                     style={[
                         styles.clearBadgeText,
-                        { opacity: textOpacity, transform: [{ scale: textScale }] },
+                        { color: ink, opacity: textOpacity, transform: [{ scale: textScale }] },
                     ]}>
                     {name} 클리어!
                 </Animated.Text>
-                <Text style={styles.clearBadgeSubText}>★ ★ ★</Text>
+                <Text style={[styles.clearBadgeSubText, { color: ink }]}>★ ★ ★</Text>
             </View>
         </Animated.View>
     );
@@ -378,9 +380,10 @@ const styles = themedStyles(() => StyleSheet.create({
         marginBottom: SPACING_H.xs,
     },
     // 팝업의 타이틀 자리라 명조 (TowerChallengeScreen 카드 안의 보스 이름은 본문 서체)
+    // 이미지 옆 좁은 열이라 heading 대신 긴 타이틀 예외(xl)
     bossName: {
         fontFamily: FONTS.display,
-        fontSize: FONT_SIZES.lg,
+        fontSize: FONT_SIZES.xl,
         fontWeight: '700',
         color: COLORS.textStrong,
         marginBottom: SPACING_H.xs,
@@ -419,10 +422,11 @@ const styles = themedStyles(() => StyleSheet.create({
         right: -scaleWidth(10),
         bottom: -scaleWidth(10),
     },
+    // 장식 별·부제 색은 ink(흰/먹)로 받고 투명도만 여기서 준다
     clearStar: {
         position: 'absolute',
         fontSize: FONT_SIZES.lg,
-        color: 'rgba(255,255,255,0.6)',
+        opacity: 0.6,
     },
     clearStarLeft: {
         left: SPACING_W.xl,
@@ -449,7 +453,7 @@ const styles = themedStyles(() => StyleSheet.create({
         textShadowRadius: 4,
     },
     clearBadgeSubText: {
-        color: 'rgba(255,255,255,0.75)',
+        opacity: 0.75,
         fontSize: FONT_SIZES.xs,
         letterSpacing: 4,
     },
@@ -517,7 +521,7 @@ const styles = themedStyles(() => StyleSheet.create({
     },
     closeBtnText: {
         color: COLORS.textWhite,
-        fontWeight: '700',
+        fontWeight: '600',
         fontSize: FONT_SIZES.lg,
     },
 }));

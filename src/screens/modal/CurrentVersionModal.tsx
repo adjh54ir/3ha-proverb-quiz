@@ -67,7 +67,7 @@ const CurrentVersionModal = ({ visible, currentVersion, latestVersion, onClose, 
                                     type="MaterialCommunityIcons"
                                     name={isUnknown ? 'cloud-off-outline' : isLatest ? 'check-decagram' : 'arrow-up-circle'}
                                     size={scaledSize(18)}
-                                    color={isUnknown ? COLORS.textLight : isLatest ? COLORS.primaryDark : COLORS.warningDark}
+                                    color={isUnknown ? COLORS.textLight : isLatest ? COLORS.successDark : COLORS.warningDark}
                                 />
                                 <Text style={[styles.versionLabel, isLatest && styles.labelLatest, needsUpdate && styles.labelUpdate]}>
                                     최신 버전
@@ -117,7 +117,7 @@ const styles = themedStyles(() => StyleSheet.create({
         backgroundColor: COLORS.surface,
         borderRadius: RADIUS.xl,
         borderWidth: 1,
-        borderColor: COLORS.borderLight,
+        borderColor: COLORS.border,
         // 위·아래·좌·우 여백을 20 으로 맞춘다 (자동 업데이트 팝업과 동일한 리듬)
         paddingHorizontal: SPACING_W.xl,
         paddingVertical: SPACING_H.xl,
@@ -146,8 +146,9 @@ const styles = themedStyles(() => StyleSheet.create({
         paddingVertical: SPACING_H.xs,
         marginBottom: SPACING_H.sm,
     },
+    // '최신 버전 사용 중' 은 완료 상태라 브랜드(쪽빛)가 아니라 청포(success) 계열 — 권한 '허용' 배지와 같은 언어
     badgeLatest: {
-        backgroundColor: COLORS.primarySoft,
+        backgroundColor: COLORS.successSoft,
     },
     badgeUpdate: {
         backgroundColor: COLORS.warningBg,
@@ -158,7 +159,7 @@ const styles = themedStyles(() => StyleSheet.create({
         color: COLORS.textSecondary,
     },
     badgeTextLatest: {
-        color: COLORS.primaryDeep,
+        color: COLORS.successDeep,
     },
     badgeTextUpdate: {
         color: COLORS.warningDeep,
@@ -189,8 +190,8 @@ const styles = themedStyles(() => StyleSheet.create({
         columnGap: SPACING_W.sm,
     },
     versionCardLatest: {
-        backgroundColor: COLORS.primaryBg,
-        borderColor: COLORS.primaryBorder,
+        backgroundColor: COLORS.successBg,
+        borderColor: COLORS.successBorder,
     },
     // 최신이 아님 = 오류가 아니라 권유 → 레드 대신 앰버 톤
     versionCardUpdate: {
@@ -208,7 +209,7 @@ const styles = themedStyles(() => StyleSheet.create({
         color: COLORS.textSecondary,
     },
     labelLatest: {
-        color: COLORS.primaryDark,
+        color: COLORS.successDark,
     },
     labelUpdate: {
         color: COLORS.warningDark,
@@ -220,7 +221,7 @@ const styles = themedStyles(() => StyleSheet.create({
         color: COLORS.text,
     },
     valueLatest: {
-        color: COLORS.primaryDeep,
+        color: COLORS.successDeep,
     },
     valueUpdate: {
         color: COLORS.warningDeep,

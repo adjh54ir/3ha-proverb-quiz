@@ -6,7 +6,7 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import { MainDataType } from '@/types/MainDataType';
 import { BADGE_RARITY_META } from '@/const/ConstBadges';
 import { scaledSize, scaleHeight, scaleWidth } from '@/utils/DementionUtils';
-import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, themedStyles } from '@/const/common/Theme';
+import { COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, displayFontSize, themedStyles } from '@/const/common/Theme';
 import IconComponent from '../common/atomic/IconComponent';
 import ModalCloseButton from '../common/atomic/ModalCloseButton';
 import { inkOnFill } from '@/utils/ColorAlphaUtils';
@@ -153,7 +153,7 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 									</View>
 
 									{/* 이름 + 설명 */}
-									<Text style={[styles.badgeName, { color: rarity.color }]} numberOfLines={1}>
+									<Text style={styles.badgeName} numberOfLines={1}>
 										{badge.name}
 									</Text>
 									<Text style={styles.badgeDescription} numberOfLines={3}>
@@ -164,7 +164,7 @@ const NewBadgeModal = ({ visible, badges, onConfirm }: Props) => {
 									{!!badge.condition && (
 										<View style={[styles.conditionRow, { borderColor: rarity.color }]}>
 											<IconComponent type="materialIcons" name="flag" size={scaledSize(13)} color={rarity.color} />
-											<Text style={[styles.conditionText, { color: rarity.color }]} numberOfLines={2}>
+											<Text style={styles.conditionText} numberOfLines={2}>
 												{badge.condition}
 											</Text>
 										</View>
@@ -307,18 +307,19 @@ const styles = themedStyles(() => StyleSheet.create({
 		backgroundColor: COLORS.surface,
 		borderWidth: 1,
 	},
-	conditionText: { fontSize: FONT_SIZES.sm, fontWeight: '600', textAlign: 'center', flexShrink: 1 },
+	// 희귀도 색 글자는 영웅(치자)에서 흰 표면 위 2:1 — 희귀도는 리본·테두리·아이콘이 보여 주고 글자는 먹색
+	conditionText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text, textAlign: 'center', flexShrink: 1 },
 	badgeName: {
 		fontSize: FONT_SIZES.lg,
 		fontWeight: '700',
-		color: COLORS.primary,
+		color: COLORS.textStrong,
 		textAlign: 'center',
 		marginBottom: SPACING_H.xs,
 	},
 	badgeDescription: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.text,
-		lineHeight: scaledSize(20),
+		lineHeight: displayFontSize(20),
 		textAlign: 'center',
 		paddingHorizontal: SPACING_W.xs,
 	},

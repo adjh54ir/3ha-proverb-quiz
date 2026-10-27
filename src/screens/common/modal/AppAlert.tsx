@@ -206,6 +206,7 @@ const styles = themedStyles(() =>
 		},
 		message: {
 			fontSize: FONT_SIZES.md,
+			lineHeight: FONT_SIZES.md * 1.5, // 두세 줄 안내문이 많다 — 다른 대화상자 본문과 같은 줄높이
 			color: COLORS.textSecondary,
 			textAlign: 'center',
 		},
@@ -237,8 +238,9 @@ const styles = themedStyles(() =>
 		buttonDestructive: {
 			backgroundColor: COLORS.dangerFill,
 		},
+		// 다른 대화상자 버튼(48 높이 · lg 700)과 같은 크기
 		buttonText: {
-			fontSize: FONT_SIZES.mdPlus,
+			fontSize: FONT_SIZES.lg,
 			fontWeight: '700',
 			color: COLORS.textWhite,
 			textAlign: 'center',

@@ -37,6 +37,7 @@ const SHEET_SLIDE_FROM = Dimensions.get('screen').height;
 const SHEET_SLIDE_DURATION = 260;
 import { read, write } from '@/services/StorageService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
 // 속담집 색은 저장되는 값이라 모드에 따라 바뀌는 COLORS.primary 를 쓰면 다크에서 만든 속담집이
 // 다크 톤(#7C89FF)으로 굳어 라이트에서 물빠져 보인다. 모드와 무관한 기본 쪽빛으로 고정한다.
@@ -94,6 +95,8 @@ const MyProverbBook = () => {
 	const [formTarget, setFormTarget] = useState<MainDataType.ProverbBook | null | undefined>(undefined);
 	const formVisible = formTarget !== undefined;
 	const [deleteConfirm, setDeleteConfirm] = useState<MainDataType.ProverbBook | null>(null);
+	// 다른 확인 대화상자(CmmDelConfirmModal)와 같은 fade + scale 등장
+	const confirmEnterStyle = useModalEnter(!!deleteConfirm);
 	const [quizModeModal, setQuizModeModal] = useState<MainDataType.ProverbBook | null>(null);
 	const [addProverbModal, setAddProverbModal] = useState<MainDataType.ProverbBook | null>(null);
 	// 주요 CRUD 피드백은 공통 토스트 훅으로 통일한다(하단 고정 버튼을 피해 조금 띄운다).
@@ -292,8 +295,8 @@ const MyProverbBook = () => {
 										</View>
 									)}
 									<TouchableOpacity style={[styles.quizBtn, book.proverbIds.length === 0 && styles.quizBtnDisabled]} disabled={book.proverbIds.length === 0} onPress={(e) => { e.stopPropagation(); setQuizModeModal(book); }}>
-										<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(16)} color={COLORS.textWhite} />
-										<Text style={styles.quizBtnText}>퀴즈 시작</Text>
+										<IconComponent type="materialIcons" name="play-arrow" size={scaledSize(16)} color={book.proverbIds.length === 0 ? COLORS.textLight : COLORS.textWhite} />
+										<Text style={[styles.quizBtnText, book.proverbIds.length === 0 && styles.quizBtnTextDisabled]}>퀴즈 시작</Text>
 									</TouchableOpacity>
 								</TouchableOpacity>
 								</AnimatedListItem>
@@ -329,8 +332,11 @@ const MyProverbBook = () => {
 			{/* 삭제 확인 */}
 			<Modal visible={!!deleteConfirm} transparent animationType="fade" onRequestClose={() => setDeleteConfirm(null)}>
 				<View style={[styles.modalOverlay, modalSafePadding]}>
-					<View style={styles.confirmModal}>
-						<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(40)} color={COLORS.danger} />
+					<Animated.View style={[styles.confirmModal, confirmEnterStyle]}>
+						{/* 즐겨찾기 삭제 확인과 같은 원형 아이콘 배지 */}
+						<View style={styles.confirmIconWrapper}>
+							<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(30)} color={COLORS.danger} />
+						</View>
 						<Text style={styles.confirmTitle}>속담집을 삭제하시겠습니까?</Text>
 						<Text style={styles.confirmDesc}>
 							<Text style={{ fontWeight: '700' }}>{deleteConfirm?.title}</Text>을 삭제하면{'\n'}복구할 수 없습니다.
@@ -343,7 +349,7 @@ const MyProverbBook = () => {
 								<Text style={[styles.confirmBtnText, { color: COLORS.textWhite }]}>삭제</Text>
 							</TouchableOpacity>
 						</View>
-					</View>
+					</Animated.View>
 				</View>
 			</Modal>
 
@@ -455,7 +461,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	emptyImage: { width: scaleWidth(176), height: scaleWidth(176) },
 	emptyShelfImage: { width: scaleWidth(220), height: scaleHeight(140) },
 	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
-	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textLight, textAlign: 'center', lineHeight: scaledSize(20) },
+	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', lineHeight: scaledSize(20) },
 	emptyBtn: {
 		marginTop: SPACING_H.xl,
 		paddingHorizontal: SPACING_W.xxl,
@@ -463,7 +469,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.secondaryFill,
 	},
-	emptyBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '700' },
+	emptyBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '600' },
 	bookCard: {
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.lg,
@@ -516,8 +522,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.primaryFill,
 	},
-	quizBtnDisabled: { backgroundColor: COLORS.borderDark },
-	quizBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '700' },
+	// 비활성 — 옅은 표면 + 흐린 글자 (borderDark 위 흰 글자는 라이트에서 1.6:1 로 읽히지 않는다)
+	quizBtnDisabled: { backgroundColor: COLORS.surfaceAlt },
+	quizBtnTextDisabled: { color: COLORS.textLight },
+	quizBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.md, fontWeight: '600' },
 	fab: {
 		position: 'absolute',
 		right: SPACING_W.xl,
@@ -538,6 +546,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	confirmModal: {
 		width: '100%',
+		maxHeight: '100%',
 		// 전체화면 모달이라 본문 기둥 밖이다 — 태블릿에서 대화상자가 화면 폭을 다 먹지 않게 묶는다.
 		maxWidth: MODAL_MAX_WIDTH,
 		backgroundColor: COLORS.surface,
@@ -547,10 +556,20 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xl,
 		borderWidth: 1,
 		borderColor: COLORS.border,
+		// scale 로 등장하는 테두리 카드 (모달 레이아웃 규칙 7)
 		overflow: 'hidden',
 		alignItems: 'center',
 	},
-	confirmTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
+	confirmIconWrapper: {
+		width: scaleWidth(60),
+		height: scaleWidth(60),
+		borderRadius: scaleWidth(60) / 2,
+		backgroundColor: COLORS.dangerBg,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginBottom: SPACING_H.md,
+	},
+	confirmTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
 	confirmDesc: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.textSecondary,
@@ -562,7 +581,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	confirmBtn: { flex: 1, height: scaleHeight(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
 	confirmBtnCancel: { backgroundColor: COLORS.surfaceAlt },
 	confirmBtnDelete: { backgroundColor: COLORS.dangerFill },
-	confirmBtnText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
+	confirmBtnText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '600' },
 	actionSheetOverlay: { flex: 1, backgroundColor: COLORS.dim, justifyContent: 'flex-end' },
 	actionSheet: {
 		// 바텀시트는 본문 기둥 폭까지만 (다른 시트와 같은 규칙)

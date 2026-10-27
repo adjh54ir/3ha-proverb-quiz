@@ -12,14 +12,24 @@ import Animated, {
 import { scaledSize, scaleWidth } from '@/utils';
 import { withAlpha } from '@/utils/ColorAlphaUtils';
 import { COLORS, FONT_SIZES, RADIUS, SPACING_H, themedStyles, displayFontSize } from '@/const/common/Theme';
+import useReducedMotion from '@/hooks/useReducedMotion';
 
 const CompleteOverlay = () => {
+    const reducedMotion = useReducedMotion();
     const opacity = useSharedValue(0);
     const scale = useSharedValue(0.5);
     const checkScale = useSharedValue(0);
     const textOpacity = useSharedValue(0);
 
     useEffect(() => {
+        // '애니메이션 줄이기' — 완료 표시는 최종 상태로 바로 세운다
+        if (reducedMotion) {
+            opacity.value = 1;
+            scale.value = 1;
+            checkScale.value = 1;
+            textOpacity.value = 1;
+            return;
+        }
         // 배경 fade in
         opacity.value = withTiming(1, { duration: 300 });
         // 원형 배경 scale up
@@ -36,7 +46,7 @@ const CompleteOverlay = () => {
             cancelAnimation(checkScale);
             cancelAnimation(textOpacity);
         };
-    }, []);
+    }, [reducedMotion]);
 
     const overlayStyle = useAnimatedStyle(() => ({
         opacity: opacity.value,
@@ -52,7 +62,8 @@ const CompleteOverlay = () => {
 
     const textStyle = useAnimatedStyle(() => ({
         opacity: textOpacity.value,
-        transform: [{ translateY: withTiming(textOpacity.value === 0 ? SPACING_H.md : 0, { duration: 300 }) }],
+        // 페이드와 같은 진행값으로 아래에서 올라온다 (애니메이션 줄이기면 textOpacity 가 곧바로 1)
+        transform: [{ translateY: (1 - textOpacity.value) * SPACING_H.md }],
     }));
 
     return (
@@ -60,7 +71,7 @@ const CompleteOverlay = () => {
             <Animated.View style={[styles.circle, circleStyle]}>
                 <Animated.Text style={[styles.checkIcon, checkStyle]}>✓</Animated.Text>
             </Animated.View>
-            <Animated.Text style={[styles.completeText, textStyle]}>COMPLETE</Animated.Text>
+            <Animated.Text style={[styles.completeText, textStyle]}>정복 완료</Animated.Text>
         </Animated.View>
     );
 };
@@ -97,7 +108,6 @@ const styles = themedStyles(() => StyleSheet.create({
         fontSize: FONT_SIZES.heading,
         fontWeight: '700',
         color: COLORS.textWhite,
-        letterSpacing: 4,
         textShadowColor: 'rgba(0,0,0,0.2)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,

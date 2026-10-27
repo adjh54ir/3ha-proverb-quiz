@@ -42,6 +42,7 @@ import { useAppNavigation, QuizScreenParams } from '@/navigation/conf/Types';
 import QuizHistoryService from '@/services/QuizHistoryService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
 import { useModalHandoff } from '@/hooks/useModalHandoff';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
 // themedValue 로 감싸야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
 const labelColors = themedValue(() => [COLORS.primary, COLORS.accentFlame, COLORS.accentTeal, COLORS.accentPink]); // A, B, C, D 보기 라벨
@@ -88,6 +89,8 @@ const QuizScreen = () => {
 	const scaleAnim = useRef(new Animated.Value(0)).current;
 	const comboEffectAnim = useRef(new Animated.Value(0)).current;
 	const comboShake = useRef(new Animated.Value(0)).current;
+	// 고른 보기가 오답이면 그 카드만 좌우로 흔든다 (-1 ~ 1)
+	const wrongShakeAnim = useRef(new Animated.Value(0)).current;
 	// 문제 전환 시 페이드 인 (문제 텍스트 + 보기 목록 공용)
 	const questionFadeAnim = useRef(new Animated.Value(1)).current;
 	// 화면에서 띄운 setTimeout 을 모아 두었다가 언마운트 시 일괄 정리
@@ -137,6 +140,7 @@ const QuizScreen = () => {
 	const [comboEffectText, setComboEffectText] = useState('');
 
 	const [reviewIndex, setReviewIndex] = useState(0);
+	const exitEnterStyle = useModalEnter(showExitModal);
 
 	const normalizeRouteLevel = (level?: QuizScreenParams['selectedLevel']): string => {
 		switch (level) {
@@ -926,6 +930,30 @@ const QuizScreen = () => {
 		return () => anim.stop();
 	}, [question?.id, questionFadeAnim]);
 
+	// ✅ 답을 고른 순간의 응답 모션 — 정답 보기는 한 번 튀어 오르고, 고른 오답은 좌우로 흔들린다.
+	// 색(청포/레드)과 아이콘이 본 신호라 '애니메이션 줄이기'에서는 모션만 뺀다.
+	useEffect(() => {
+		if (selected === null || reducedMotion) return;
+		const correctAnswer = routeMode === 'meaning' ? question?.longMeaning : routeMode === 'blank' ? blankWord : question?.proverb;
+		const pulse = scaleAnims.current[options.indexOf(correctAnswer ?? '')];
+		const motions: Animated.CompositeAnimation[] = [];
+		if (pulse) {
+			motions.push(
+				Animated.sequence([
+					Animated.timing(pulse, { toValue: 1.04, duration: 140, useNativeDriver: true }),
+					Animated.spring(pulse, { toValue: 1, friction: 4, useNativeDriver: true }),
+				]),
+			);
+		}
+		if (selected && selected !== correctAnswer) {
+			wrongShakeAnim.setValue(0);
+			motions.push(Animated.sequence([1, -1, 1, -1, 0].map((toValue) => Animated.timing(wrongShakeAnim, { toValue, duration: 55, useNativeDriver: true }))));
+		}
+		const feedback = Animated.parallel(motions);
+		feedback.start();
+		return () => feedback.stop();
+	}, [selected]);
+
 	// 🧹 언마운트 시 타이머/타임아웃/애니메이션 일괄 정리 (메모리 누수 방지)
 	useEffect(() => {
 		return () => {
@@ -939,10 +967,10 @@ const QuizScreen = () => {
 				hintGlowLoopRef.current.stop();
 				hintGlowLoopRef.current = null;
 			}
-			[comboAnim, comboEffectAnim, comboShake, scaleAnim, scoreBonusAnim, hintGlowAnim, questionFadeAnim].forEach((value) => value.stopAnimation());
+			[comboAnim, comboEffectAnim, comboShake, wrongShakeAnim, scaleAnim, scoreBonusAnim, hintGlowAnim, questionFadeAnim].forEach((value) => value.stopAnimation());
 			stopBgm(); // 🎵 화면을 벗어나면 BGM 정리
 		};
-	}, [comboAnim, comboEffectAnim, comboShake, scaleAnim, scoreBonusAnim, hintGlowAnim, questionFadeAnim]);
+	}, [comboAnim, comboEffectAnim, comboShake, wrongShakeAnim, scaleAnim, scoreBonusAnim, hintGlowAnim, questionFadeAnim]);
 
 	const questionEnterStyle = {
 		opacity: questionFadeAnim,
@@ -958,7 +986,7 @@ const QuizScreen = () => {
 									<View style={styles.quizHeaderCopy}>
 									<Text style={styles.progressText}>{getModeLabel(routeMode)}</Text>
 									{question?.level && (
-										<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+										<View style={styles.badgeRow}>
 											{/* 레벨 표시 */}
 											<View style={[styles.badgePill, { backgroundColor: getLevelColor(question.level) }]}>
 												{getLevelIcon(question.level)}
@@ -969,7 +997,7 @@ const QuizScreen = () => {
 											{question?.category && (
 												<View style={[styles.badgePill, { backgroundColor: getFieldColor(question.category) }]}>
 													{getFieldIcon(question.category)}
-													<Text style={[styles.badgeText, { color: readableTextOn(getFieldColor(question.category)) }]}> {question.category}</Text>
+													<Text style={[styles.badgeText, { color: readableTextOn(getFieldColor(question.category)) }]}>{question.category}</Text>
 												</View>
 											)}
 										</View>
@@ -1017,11 +1045,9 @@ const QuizScreen = () => {
 															outputRange: [1, 1.5],
 														}),
 													},
+													// 2콤보 이상에서 triggerComboShake() 가 돌리는 흔들림
+													{ translateX: comboShake.interpolate({ inputRange: [-1, 1], outputRange: [-scaleWidth(4), scaleWidth(4)] }) },
 												],
-												opacity: comboAnim.interpolate({
-													inputRange: [0, 1],
-													outputRange: [1, 1],
-												}),
 											}}>
 											<Text style={[styles.statusCardValue, { color: combo > 0 ? COLORS.warning : COLORS.text }]}>
 												{combo}
@@ -1138,14 +1164,23 @@ const QuizScreen = () => {
 											};
 
 											return (
-												<Animated.View style={[grid?.cell, { transform: [{ scale: scaleAnim }] }]}>
+												<Animated.View
+													style={[
+														grid?.cell,
+														{
+															transform: [
+																{ scale: scaleAnim },
+																{ translateX: isSelectedWrong ? wrongShakeAnim.interpolate({ inputRange: [-1, 1], outputRange: [-scaleWidth(6), scaleWidth(6)] }) : 0 },
+															],
+														},
+													]}>
 													<TouchableOpacity
 														onPressIn={handlePressIn}
 														onPressOut={handlePressOut}
 														style={[
 															styles.optionCard,
 															grid?.fill,
-															isSelected && styles.optionSelectedCard, // ✅ 내가 선택한 보기 (파란색 배경)
+															isSelected && styles.optionSelectedCard, // ✅ 내가 선택한 보기 (쪽빛 — 곧바로 아래 정답/오답 색이 덮는다)
 															selected && isCorrectAnswer && styles.optionCorrectCard, // ⭕ 정답은 항상 초록 강조
 															selected && isSelectedWrong && styles.optionWrongCard, // ❌ 오답이면 빨강 배경
 														]}
@@ -1264,7 +1299,7 @@ const QuizScreen = () => {
 			{/* ======================= 퀴즈 종료 ============================ */}
 			<Modal visible={showExitModal} transparent animationType='fade' onRequestClose={() => setShowExitModal(false)}>
 				<View style={[styles.modalOverlay, modalSafePadding]}>
-					<View style={styles.exitModal}>
+					<Animated.View style={[styles.exitModal, exitEnterStyle]}>
 						<Text style={styles.exitModalTitle}>퀴즈를 종료하시겠습니까?</Text>
 						<Text style={styles.exitModalMessage}>진행 중인 퀴즈가 저장되지 않습니다.</Text>
 						<View style={styles.modalButtonRow}>
@@ -1286,7 +1321,7 @@ const QuizScreen = () => {
 								<Text style={styles.modalButtonText}>종료하기</Text>
 							</TouchableOpacity>
 						</View>
-					</View>
+					</Animated.View>
 				</View>
 			</Modal>
 			<QuizResultModal
@@ -1376,7 +1411,14 @@ const styles = themedStyles(() => StyleSheet.create({
 		color: COLORS.text,
 		fontWeight: '600',
 		marginBottom: SPACING_H.sm,
-		textAlign: 'center',
+	},
+	// 모드 라벨과 같은 왼쪽 선에서 시작 — 칩 사이 간격은 columnGap 하나로
+	badgeRow: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		alignItems: 'center',
+		columnGap: SPACING_W.xsPlus,
+		rowGap: SPACING_H.xs,
 	},
 	badgePill: {
 		flexDirection: 'row',
@@ -1384,8 +1426,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.round,
 		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: SPACING_H.xs,
-		marginLeft: SPACING_W.sm,
-		marginBottom: SPACING_H.sm,
 	},
 	badgeText: {
 		color: COLORS.textWhite,
@@ -1537,6 +1577,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderWidth: 2,
 		borderColor: COLORS.border,
 		marginBottom: SPACING_H.md,
+		// scale(누름·정답 펄스)이 걸리는 래퍼 안의 테두리 카드 — 모달 레이아웃 규칙 7
+		overflow: 'hidden',
 	},
 	optionRow: {
 		flexDirection: 'row',
@@ -1544,8 +1586,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		columnGap: SPACING_W.sm,
 	},
 	optionSelectedCard: {
-		backgroundColor: COLORS.secondaryBg,
-		borderColor: COLORS.secondary,
+		backgroundColor: COLORS.primaryBg,
+		borderColor: COLORS.primary,
 	},
 	optionCorrectCard: {
 		backgroundColor: COLORS.successBg,
@@ -1571,7 +1613,8 @@ const styles = themedStyles(() => StyleSheet.create({
 	comboEffectText: {
 		fontSize: FONT_SIZES.display,
 		fontWeight: '700',
-		color: COLORS.danger,
+		// 연속 정답은 칭찬 신호 — 오답색(danger) 대신 불꽃 포인트(감빛)
+		color: COLORS.accentFlame,
 		textShadowColor: 'rgba(0, 0, 0, 0.2)',
 		textShadowOffset: { width: 1, height: 1 },
 		textShadowRadius: 2,
@@ -1620,6 +1663,8 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xl,
 		borderRadius: RADIUS.xl,
 		alignItems: 'center',
+		// useModalEnter 의 scale 로 등장하는 테두리 카드 — 모달 레이아웃 규칙 7
+		overflow: 'hidden',
 	},
 	exitModalTitle: {
 		fontFamily: FONTS.display,

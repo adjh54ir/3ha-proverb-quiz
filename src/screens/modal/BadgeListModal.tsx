@@ -151,7 +151,7 @@ const BadgeListModal = ({
 												{badge.condition}
 											</Text>
 											<View style={[styles.badgeStatusPill, isEarned ? styles.badgeStatusPillEarned : styles.badgeStatusPillLocked]}>
-												<Text style={[styles.badgeStatusPillText, { color: isEarned ? COLORS.primaryDark : COLORS.textLight }]}>
+												<Text style={[styles.badgeStatusPillText, { color: isEarned ? COLORS.successDeep : COLORS.textLight }]}>
 													{isEarned ? '획득' : '미획득'}
 												</Text>
 											</View>
@@ -313,9 +313,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderColor: COLORS.border,
 		backgroundColor: COLORS.surface,
 	},
+	// 획득 = 달성(완료) 표시라 브랜드 쪽빛이 아니라 청포 (CLAUDE.md 색 규칙 1)
 	badgeCardActive: {
-		backgroundColor: COLORS.primaryBg,
-		borderColor: COLORS.primarySoft,
+		backgroundColor: COLORS.successBg,
+		borderColor: COLORS.successBorder,
 		borderWidth: 1.5,
 	},
 	iconBox: {
@@ -362,7 +363,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingHorizontal: SPACING_W.sm,
 		paddingVertical: SPACING_H.xxs,
 	},
-	badgeStatusPillEarned: { backgroundColor: COLORS.primarySoft },
+	badgeStatusPillEarned: { backgroundColor: COLORS.successSoft },
 	badgeStatusPillLocked: { backgroundColor: COLORS.surfaceAlt },
 	badgeStatusPillText: { fontSize: FONT_SIZES.xxs, fontWeight: '700' },
 	badgeModalDoneBtn: {

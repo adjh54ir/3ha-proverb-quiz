@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
+import { Animated, View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
 import Modal from '@/screens/common/atomic/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import IconComponent from './common/atomic/IconComponent';
 import { MODAL_MAX_WIDTH, scaledSize, scaleHeight, scaleWidth } from '@/utils';
-import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles } from '@/const/common/Theme';
+import { HIT_SLOP, COLORS, FONTS, FONT_SIZES, PALETTES, RADIUS, SPACING_W, SPACING_H, SOLO_BUTTON, themedStyles } from '@/const/common/Theme';
 import { CARD_LIST_COLUMNS, cardListGrid } from '@/const/common/ListGrid';
 import { Paths } from '@/navigation/conf/Paths';
 import BottomHomeButton from './common/BottomHomeButton';
@@ -26,9 +26,11 @@ import { AnimatedListItem } from '@/components/animation/FadeInView';
 import ScreenHeader from '@/screens/common/ScreenHeader';
 import { read, update } from '@/services/StorageService';
 import { useModalSafePadding } from '@/hooks/useModalSafePadding';
+import { useModalEnter } from '@/hooks/useModalEnter';
 
-// 함수로 둬야 모듈 로드 시점 팔레트로 굳지 않고 다크모드를 따라간다.
-const getDefaultColor = () => COLORS.primary;
+// 색 없는 예전 속담집의 기본색 — 목록(MyProverbBook)·폼(BookFormModal)과 같은 모드 무관 쪽빛.
+// (모드를 따르면 다크에서 목록과 상세의 아이콘 색이 서로 달라진다)
+const getDefaultColor = (): string => PALETTES.light.primary;
 const DEFAULT_ICON = 'menu-book';
 const STORAGE_KEY = MainStorageKeyType.USER_PROVERB_BOOKS;
 const PRACTICE_RECORD_KEY = MainStorageKeyType.USER_PROVERB_PRACTICE_RECORDS;
@@ -61,6 +63,8 @@ const MyProverbBookDetail = () => {
 	const [removeMode, setRemoveMode] = useState(false);
 	const [selectedForRemove, setSelectedForRemove] = useState<Set<number>>(new Set());
 	const [removeConfirmVisible, setRemoveConfirmVisible] = useState(false);
+	// 다른 확인 대화상자(CmmDelConfirmModal)와 같은 fade + scale 등장
+	const confirmEnterStyle = useModalEnter(removeConfirmVisible);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -260,8 +264,8 @@ const MyProverbBookDetail = () => {
 							style={[styles.removeBtn, SOLO_BUTTON, selectedForRemove.size === 0 && styles.removeBtnDisabled]}
 							disabled={selectedForRemove.size === 0}
 							onPress={() => setRemoveConfirmVisible(true)}>
-							<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(16)} color={COLORS.textWhite} />
-							<Text style={styles.removeBtnText}>{selectedForRemove.size > 0 ? `${selectedForRemove.size}개 빼기` : '속담을 선택해주세요'}</Text>
+							<IconComponent type="materialIcons" name="delete-outline" size={scaledSize(16)} color={selectedForRemove.size === 0 ? COLORS.textLight : COLORS.textWhite} />
+							<Text style={[styles.removeBtnText, selectedForRemove.size === 0 && styles.removeBtnTextDisabled]}>{selectedForRemove.size > 0 ? `${selectedForRemove.size}개 빼기` : '속담을 선택해주세요'}</Text>
 						</TouchableOpacity>
 					</View>
 				)}
@@ -274,8 +278,11 @@ const MyProverbBookDetail = () => {
 
 			<Modal visible={removeConfirmVisible} transparent animationType="fade" onRequestClose={() => setRemoveConfirmVisible(false)}>
 				<View style={[styles.modalOverlay, modalSafePadding]}>
-					<View style={styles.confirmModal}>
-						<IconComponent type="materialIcons" name="remove-circle-outline" size={scaledSize(40)} color={COLORS.danger} />
+					<Animated.View style={[styles.confirmModal, confirmEnterStyle]}>
+						{/* 즐겨찾기 삭제 확인과 같은 원형 아이콘 배지 */}
+						<View style={styles.confirmIconWrapper}>
+							<IconComponent type="materialIcons" name="remove-circle-outline" size={scaledSize(30)} color={COLORS.danger} />
+						</View>
 						<Text style={styles.confirmTitle}>선택한 속담을 빼시겠습니까?</Text>
 						<Text style={styles.confirmDesc}>선택한 {selectedForRemove.size}개의 속담을{'\n'}이 속담집에서 제거합니다.</Text>
 						<View style={styles.confirmBtnRow}>
@@ -286,7 +293,7 @@ const MyProverbBookDetail = () => {
 								<Text style={[styles.confirmBtnText, { color: COLORS.textWhite }]}>빼기</Text>
 							</TouchableOpacity>
 						</View>
-					</View>
+					</Animated.View>
 				</View>
 			</Modal>
 
@@ -349,7 +356,7 @@ const styles = themedStyles(() => StyleSheet.create({
 		minHeight: scaleHeight(48), // 고정 height 는 '글자 크게' 모드에서 두 줄 라벨을 자른다
 		borderRadius: RADIUS.md,
 	},
-	actionBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700' },
+	actionBtnText: { fontSize: FONT_SIZES.md, fontWeight: '600' },
 	listContent: { paddingHorizontal: SPACING_W.lg, paddingTop: SPACING_H.xs, paddingBottom: SPACING_H.xxxxl, flexGrow: 1 },
 	// 편집 모드에서만 하단 삭제 바(absolute)가 뜨므로 그때만 그만큼 더 비운다.
 	listContentWithBar: { paddingBottom: BOTTOM_BAR_HEIGHT + SPACING_H.lg },
@@ -385,12 +392,12 @@ const styles = themedStyles(() => StyleSheet.create({
 	itemMeaning: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, marginTop: SPACING_H.xs },
 	itemBadges: { rowGap: SPACING_H.xs, alignItems: 'flex-end' },
 	miniBadge: { paddingHorizontal: SPACING_W.sm, paddingVertical: SPACING_H.xs, borderRadius: RADIUS.round },
-	miniBadgeText: { color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '700' },
+	miniBadgeText: { color: COLORS.textWhite, fontSize: FONT_SIZES.xxs, fontWeight: '600' },
 	// 빈 영역 전체를 채우고 그 정중앙에 놓인다. 위쪽 여백을 따로 주면 그만큼 아래로 밀린다.
 	emptyView: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING_W.xl },
 	emptyImage: { width: scaleWidth(164), height: scaleWidth(164) },
 	emptyTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
-	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textLight, textAlign: 'center', lineHeight: scaledSize(20) },
+	emptyDesc: { fontSize: FONT_SIZES.smPlus, color: COLORS.textSecondary, textAlign: 'center', lineHeight: scaledSize(20) },
 	removeBar: {
 		position: 'absolute',
 		bottom: 0,
@@ -414,8 +421,10 @@ const styles = themedStyles(() => StyleSheet.create({
 		borderRadius: RADIUS.md,
 		backgroundColor: COLORS.dangerFill,
 	},
-	removeBtnDisabled: { backgroundColor: COLORS.borderDark },
-	removeBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '700' },
+	// 비활성 — 옅은 표면 + 흐린 글자 (위 '퀴즈 시작' 비활성과 같은 표현)
+	removeBtnDisabled: { backgroundColor: COLORS.surfaceAlt },
+	removeBtnTextDisabled: { color: COLORS.textLight },
+	removeBtnText: { color: COLORS.textWhite, fontSize: FONT_SIZES.lg, fontWeight: '600' },
 	modalOverlay: {
 		flex: 1,
 		backgroundColor: COLORS.dim,
@@ -425,6 +434,7 @@ const styles = themedStyles(() => StyleSheet.create({
 	},
 	confirmModal: {
 		width: '100%',
+		maxHeight: '100%',
 		// 전체화면 모달이라 본문 기둥 밖이다 — 태블릿에서 대화상자가 화면 폭을 다 먹지 않게 묶는다.
 		maxWidth: MODAL_MAX_WIDTH,
 		backgroundColor: COLORS.surface,
@@ -434,10 +444,20 @@ const styles = themedStyles(() => StyleSheet.create({
 		paddingVertical: SPACING_H.xl,
 		borderWidth: 1,
 		borderColor: COLORS.border,
+		// scale 로 등장하는 테두리 카드 (모달 레이아웃 규칙 7)
 		overflow: 'hidden',
 		alignItems: 'center',
 	},
-	confirmTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginTop: SPACING_H.md, marginBottom: SPACING_H.sm },
+	confirmIconWrapper: {
+		width: scaleWidth(60),
+		height: scaleWidth(60),
+		borderRadius: scaleWidth(60) / 2,
+		backgroundColor: COLORS.dangerBg,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginBottom: SPACING_H.md,
+	},
+	confirmTitle: { fontFamily: FONTS.display, fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.textStrong, marginBottom: SPACING_H.sm },
 	confirmDesc: {
 		fontSize: FONT_SIZES.md,
 		color: COLORS.textSecondary,
@@ -449,5 +469,5 @@ const styles = themedStyles(() => StyleSheet.create({
 	confirmBtn: { flex: 1, height: scaleHeight(48), borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
 	confirmBtnCancel: { backgroundColor: COLORS.surfaceAlt },
 	confirmBtnDelete: { backgroundColor: COLORS.dangerFill },
-	confirmBtnText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '700' },
+	confirmBtnText: { fontSize: FONT_SIZES.mdPlus, fontWeight: '600' },
 }));

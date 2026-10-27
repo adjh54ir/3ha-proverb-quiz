@@ -265,7 +265,7 @@ export const OpenSourceModal = ({ visible, onClose }) => {
         <Animated.View style={[modalStyles.container, enterStyle]}>
           <View style={modalStyles.header}>
             <View style={modalStyles.spacer} />
-            <Text style={modalStyles.modalTitle}>오픈소스 라이선스</Text>
+            <Text style={[modalStyles.modalTitle, modalStyles.modalTitleShort]}>오픈소스 라이선스</Text>
             <ModalCloseButton onPress={onClose} style={modalStyles.closeIcon} />
           </View>
 
@@ -369,8 +369,13 @@ const modalStyles = themedStyles(() => StyleSheet.create({
     textAlign: 'center',
     color: COLORS.textStrong,
   },
+  // xl 은 "개인정보처리방침 및 이용약관" 처럼 긴 타이틀만의 예외(Theme.ts). 짧은 타이틀은 다이얼로그 기본값 heading.
+  modalTitleShort: {
+    fontSize: FONT_SIZES.heading,
+  },
   spacer: {
-    width: scaledSize(22) + SPACING_W.sm, // 닫기 아이콘 크기 + 여백만큼 확보
+    // 닫기 버튼이 실제로 차지하는 폭(아이콘 22 + 좌우 패딩 xs×2 − 당긴 xs)과 같아야 타이틀이 정확히 가운데 온다
+    width: scaledSize(22) + SPACING_W.xs,
   },
   closeIcon: {
     // 공용 ModalCloseButton 은 카드 우상단 고정이 기본이라, 헤더 행 안에 넣을 때는 흐름 배치로 되돌린다.
@@ -442,23 +447,24 @@ const markdownStyles = themedValue(() => ({
     fontFamily: FONTS.body,
     color: COLORS.text,
     fontSize: FONT_SIZES.md,
-    lineHeight: scaledSize(24),
+    lineHeight: FONT_SIZES.md * 1.6,
   },
+  // 본문 헤딩은 모달 타이틀(xl)보다 크면 안 된다 — xl / lg / mdPlus 로 한 단계씩
   heading1: {
-    fontSize: FONT_SIZES.heading,
+    fontSize: FONT_SIZES.xl,
     fontWeight: '700',
     color: COLORS.textStrong,
     marginBottom: SPACING_H.lg,
   },
   heading2: {
-    fontSize: FONT_SIZES.xl,
+    fontSize: FONT_SIZES.lg,
     fontWeight: '700',
     color: COLORS.textStrong,
     marginTop: SPACING_H.xxl,
     marginBottom: SPACING_H.md,
   },
   heading3: {
-    fontSize: FONT_SIZES.lg,
+    fontSize: FONT_SIZES.mdPlus,
     fontWeight: '700',
     color: COLORS.textStrong,
     marginTop: SPACING_H.xl,

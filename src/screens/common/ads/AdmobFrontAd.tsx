@@ -1,4 +1,3 @@
-import { scaledSize, scaleHeight, scaleWidth } from '@/utils';
 import { GOOGLE_ADMOV_ANDROID_FRONT, GOOGLE_ADMOV_IOS_FRONT } from '@env';
 import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View, ActivityIndicator, Text, StyleSheet } from 'react-native';
@@ -149,7 +148,8 @@ const AdmobFrontAd: React.FC<{ onAdClosed?: () => void }> = ({ onAdClosed }) => 
 
 const styles = themedStyles(() => StyleSheet.create({
 	container: {
-		padding: SPACING_H.xxl,
+		paddingHorizontal: SPACING_W.xxl,
+		paddingVertical: SPACING_H.xxl,
 		backgroundColor: COLORS.surface,
 		borderRadius: RADIUS.xl,
 		alignItems: 'center',
@@ -177,19 +177,6 @@ const styles = themedStyles(() => StyleSheet.create({
 		fontSize: FONT_SIZES.lg,
 		color: COLORS.textStrong,
 		fontWeight: '600',
-	},
-
-	subTxt: {
-		marginTop: SPACING_H.xs,
-		fontSize: FONT_SIZES.smPlus,
-		color: COLORS.textSecondary,
-	},
-
-	mascotImage: {
-		width: scaleWidth(80),
-		height: scaleWidth(80),
-		marginBottom: SPACING_H.lg,
-		opacity: 0.9,
 	},
 }));
 
